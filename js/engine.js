@@ -17,7 +17,7 @@ const Engine = {
     },
 
     init: function () {
-        console.log("App Controller Initialized");
+        console.log("App Controller Initialized v4.1 - Level State Fix");
 
         // Initialize Sub-Engines
         if (typeof QuizEngine !== 'undefined') QuizEngine.init(this);
@@ -87,28 +87,57 @@ const Engine = {
     },
 
     restoreState: function () {
+        const saved = localStorage.getItem('parapente_state');
+        if (!saved) return false;
+
+        let stateToRestore;
         try {
-            const saved = localStorage.getItem('parapente_state');
-            if (!saved) return false;
-            const data = JSON.parse(saved);
+            stateToRestore = JSON.parse(saved);
+        } catch (e) {
+            console.warn("Corrupted state in localStorage, resetting.", e);
+            localStorage.removeItem('parapente_state');
+            return false;
+        }
 
-            if (data.level) this.state.level = data.level;
+        console.log("Attempting to restore session:", stateToRestore);
 
-            if (data.mode === 'COURSE' && data.currentCourseId) {
-                // If LibraryEngine exists, use it to open
-                // But generally simpler to just open the URL if it's a restore
-                // However, we rely on the engines to set themselves up
-                if (typeof LibraryEngine !== 'undefined') {
-                    LibraryEngine.openCourse(data.currentCourseId);
+        // 1. Level Restoration
+        // We defer to the explicitly stored 'userLevel' loaded in init() for the Level.
+        // But for consistency, we can log if they differ.
+        if (stateToRestore.level && stateToRestore.level !== this.state.level) {
+            console.log(`Session level (${stateToRestore.level}) differs from User Preference (${this.state.level}). Keeping User Preference.`);
+        }
+
+        // 2. Mode Restoration
+        const { mode, currentCourseId } = stateToRestore;
+
+        // Block start if mode is MENU
+        if (!mode || mode === 'MENU') {
+            return false;
+        }
+
+        // Handle Modes
+        switch (mode) {
+            case 'COURSE':
+                if (currentCourseId && typeof LibraryEngine !== 'undefined') {
+                    // Directly open the course without going through startMode checks that might wipe ID
+                    LibraryEngine.openCourse(currentCourseId);
                     return true;
                 }
-            } else if (data.mode && data.mode !== 'MENU') {
-                this.startMode(data.mode);
+                break;
+
+            case 'ADVENTURE':
+            case 'QCM':
+            case 'QCM_BANK':
+            case 'STATS':
+            case 'LIBRARY':
+                this.startMode(mode);
                 return true;
-            }
-        } catch (e) {
-            console.error("Failed to restore state", e);
+
+            default:
+                console.warn(`Unrecognized mode '${mode}', returning to Dashboard.`);
         }
+
         return false;
     },
 
@@ -169,7 +198,7 @@ const Engine = {
     changeLevel: function (newLevel) {
         this.state.level = newLevel;
         localStorage.setItem('userLevel', newLevel);
-
+        this.saveState(); // Ensure session state is updated
         console.log("DEBUG: Engine.changeLevel called with", newLevel, "State updated to", this.state.level);
 
         // Refresh current view

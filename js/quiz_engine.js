@@ -596,106 +596,100 @@ const QuizEngine = {
         let levelQuestionCodes = new Set();
         let totalLevelQuestions = 0;
 
-        if (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) {
-            let levelQs = [];
-            console.log("DEBUG RENDER STATS: User Level =", Engine.state.level, "Normalized =", currentLevel);
+        let levelQs = [];
+        console.log("DEBUG RENDER STATS: User Level =", Engine.state.level, "Normalized =", currentLevel);
 
 
-            // Mapping levels to QCM_OFFICIAL 'niveau' property
-            // 0: Vert (Intro)? 1: Bleu (BI)? 2: Marron (BP)? 3: Rouge/Confirme (BPC)?
 
-            if (currentLevel === 'BI') {
-                // BI usually includes level 0 and 1
-                levelQs = QCM_OFFICIAL.questions.filter(q => q.niveau === 0 || q.niveau === 1);
-            } else if (currentLevel === 'BP') {
-                // BP is level 2
-                levelQs = QCM_OFFICIAL.questions.filter(q => q.niveau === 2);
-            } else if (currentLevel === 'BPC') {
-                // BPC is level 3
-                levelQs = QCM_OFFICIAL.questions.filter(q => q.niveau === 3);
-            } else {
-                // Fallback: try to match by old class logic or defaulting
-                levelQs = QCM_OFFICIAL.questions.filter(q => q.class && q.class.includes(currentLevel));
-            }
 
-            if (levelQs.length > 0) {
-                totalLevelQuestions = levelQs.length;
-                levelQs.forEach(q => levelQuestionCodes.add(q.code));
-                console.log(`Found ${totalLevelQuestions} questions for level ${currentLevel} in QCM_OFFICIAL`);
-            }
+
+        // Mapping levels to QCM_OFFICIAL 'niveau' property
+        // 0: Vert (Intro)? 1: Bleu (BI)? 2: Marron (BP)? 3: Rouge/Confirme (BPC)?
+
+        if (currentLevel === 'BI') {
+            // BI usually includes level 0 and 1
+            levelQs = QCM_OFFICIAL.questions.filter(q => q.niveau === 0 || q.niveau === 1);
+        } else if (currentLevel === 'BP') {
+            // BP is level 2
+            levelQs = QCM_OFFICIAL.questions.filter(q => q.niveau === 2);
+        } else if (currentLevel === 'BPC') {
+            // BPC is level 3
+            levelQs = QCM_OFFICIAL.questions.filter(q => q.niveau === 3);
+        } else {
+            // Fallback: try to match by old class logic or defaulting
+            levelQs = QCM_OFFICIAL.questions.filter(q => q.class && q.class.includes(currentLevel));
         }
+
+        if (levelQs.length > 0) {
+            totalLevelQuestions = levelQs.length;
+            levelQs.forEach(q => levelQuestionCodes.add(q.code));
+            console.log(`Found ${totalLevelQuestions} questions for level ${currentLevel} in QCM_OFFICIAL`);
+        }
+    }
 
         // Check globals if no questions found yet
-        if (totalLevelQuestions === 0) {
-            // Fallback to QCM_BI / QCM_BP / QCM_BPC globals
-            let targetArray = null;
-            if (currentLevel === 'BI' && typeof QCM_BI !== 'undefined') targetArray = QCM_BI;
-            else if (currentLevel === 'BP' && typeof QCM_BP !== 'undefined') targetArray = QCM_BP;
-            else if (currentLevel === 'BPC' && typeof QCM_BPC !== 'undefined') targetArray = QCM_BPC;
+        if(totalLevelQuestions === 0) {
+        // Fallback to QCM_BI / QCM_BP / QCM_BPC globals
+        let targetArray = null;
+if (currentLevel === 'BI' && typeof QCM_BI !== 'undefined') targetArray = QCM_BI;
+else if (currentLevel === 'BP' && typeof QCM_BP !== 'undefined') targetArray = QCM_BP;
+else if (currentLevel === 'BPC' && typeof QCM_BPC !== 'undefined') targetArray = QCM_BPC;
 
-            if (targetArray) {
-                totalLevelQuestions = targetArray.length;
-                // Use ID instead of Code if available
-                targetArray.forEach(q => levelQuestionCodes.add(q.id || q.code));
-                console.log(`Found ${totalLevelQuestions} questions for level ${currentLevel} in global array`);
-            } else {
-                console.warn("No question data found during stats render");
-            }
+if (targetArray) {
+    totalLevelQuestions = targetArray.length;
+    // Use ID instead of Code if available
+    targetArray.forEach(q => levelQuestionCodes.add(q.id || q.code));
+    console.log(`Found ${totalLevelQuestions} questions for level ${currentLevel} in global array`);
+} else {
+    console.warn("No question data found during stats render");
+}
         }
 
-        // Calculate question distribution for CURRENT LEVEL
-        const allQuestionEntries = Object.entries(stats.questions);
+// Calculate question distribution for CURRENT LEVEL
+const allQuestionEntries = Object.entries(stats.questions);
 
-        // Debug filtering
-        let levelQuestionEntries = allQuestionEntries.filter(([code, data]) => levelQuestionCodes.has(code));
+// Debug filtering
+let levelQuestionEntries = allQuestionEntries.filter(([code, data]) => levelQuestionCodes.has(code));
 
-        // FALLBACK: If filtering returns 0 results but we have stats, it might be due to code mismatches.
-        // In that case, we display everything to ensure the user sees their data.
-        if (levelQuestionEntries.length === 0 && allQuestionEntries.length > 0) {
-            console.warn("No stats matched current level codes. Showing all stats as fallback.");
-            levelQuestionEntries = allQuestionEntries;
-
-            // Also adjust 'notAttempted' logic because we are now mixing levels or using unknown codes
-            // If we fallback, we can't reliably calculate 'notAttempted' for this level easily based on these stats.
-            // We'll keep the theoretical notAttempted based on official count, or set to 0?
-            // Let's keep it as is, it might show "Total Questions" as not attempted, which is technically true for "Official Codes".
-        }
-
-        let perfect = 0;      // 100%
-        let excellent = 0;    // 75-99%
-        let good = 0;         // 50-74%
-        let poor = 0;         // 1-49%
-        let failed = 0;       // 0%
-        // notAttempted is relative to the level total
-        let notAttempted = totalLevelQuestions - levelQuestionEntries.length;
-
-        // Ensure non-negative (incase of data sync issues)
-        if (notAttempted < 0) notAttempted = 0;
-
-        levelQuestionEntries.forEach(([code, data]) => {
-            if (data.total === 0) return;
-            const pct = Math.round((data.correct / data.total) * 100);
-
-            if (pct === 100) perfect++;
-            else if (pct >= 75) excellent++;
-            else if (pct >= 50) good++;
-            else if (pct > 0) poor++;
-            else failed++;
-        });
-
-        // Recalculate global percentage for this level only
-        let levelTotalQuestions = 0;
-        let levelTotalCorrect = 0;
-        levelQuestionEntries.forEach(([code, data]) => {
-            levelTotalQuestions += data.total;
-            levelTotalCorrect += data.correct;
-        });
-
-        const globalPct = levelTotalQuestions > 0 ? Math.round((levelTotalCorrect / levelTotalQuestions) * 100) : 0;
-        const color = globalPct >= 75 ? '#4ade80' : (globalPct >= 50 ? '#facc15' : '#f87171');
+// FALLBACK: If filtering returns 0 results but we have stats, it might be due to code mismatches.
+// In that case, we display everything to ensure the user sees their data.
 
 
-        const distributionHtml = `
+let perfect = 0;      // 100%
+let excellent = 0;    // 75-99%
+let good = 0;         // 50-74%
+let poor = 0;         // 1-49%
+let failed = 0;       // 0%
+// notAttempted is relative to the level total
+let notAttempted = totalLevelQuestions - levelQuestionEntries.length;
+
+// Ensure non-negative (incase of data sync issues)
+if (notAttempted < 0) notAttempted = 0;
+
+levelQuestionEntries.forEach(([code, data]) => {
+    if (data.total === 0) return;
+    const pct = Math.round((data.correct / data.total) * 100);
+
+    if (pct === 100) perfect++;
+    else if (pct >= 75) excellent++;
+    else if (pct >= 50) good++;
+    else if (pct > 0) poor++;
+    else failed++;
+});
+
+// Recalculate global percentage for this level only
+let levelTotalQuestions = 0;
+let levelTotalCorrect = 0;
+levelQuestionEntries.forEach(([code, data]) => {
+    levelTotalQuestions += data.total;
+    levelTotalCorrect += data.correct;
+});
+
+const globalPct = levelTotalQuestions > 0 ? Math.round((levelTotalCorrect / levelTotalQuestions) * 100) : 0;
+const color = globalPct >= 75 ? '#4ade80' : (globalPct >= 50 ? '#facc15' : '#f87171');
+
+
+const distributionHtml = `
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px;">
                 <div style="background:rgba(74, 222, 128, 0.1); border:1px solid #4ade80; padding:12px; border-radius:8px; text-align:center;">
                     <div style="font-size:1.8rem; font-weight:700; color:#4ade80;">${perfect}</div>
@@ -724,11 +718,11 @@ const QuizEngine = {
             </div>
         `;
 
-        let themesHtml = '';
-        Object.entries(stats.themes).sort((a, b) => b[1].total - a[1].total).forEach(([name, data]) => {
-            const pct = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
-            const tColor = pct >= 75 ? '#4ade80' : (pct >= 50 ? '#facc15' : '#f87171');
-            themesHtml += `
+let themesHtml = '';
+Object.entries(stats.themes).sort((a, b) => b[1].total - a[1].total).forEach(([name, data]) => {
+    const pct = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
+    const tColor = pct >= 75 ? '#4ade80' : (pct >= 50 ? '#facc15' : '#f87171');
+    themesHtml += `
                 <div class="stats-row">
                     <div>
                         <div style="font-weight:600;">${name}</div>
@@ -737,51 +731,51 @@ const QuizEngine = {
                     <div style="font-weight:bold; color:${tColor}; font-size:1.1rem;">${pct}%</div>
                 </div>
             `;
-        });
+});
 
-        const problemQuestions = Object.entries(stats.questions)
-            .filter(([code, data]) => data.total > 1 && (data.correct / data.total) < 0.5)
-            .sort((a, b) => (a[1].correct / a[1].total) - (b[1].correct / b[1].total))
-            .slice(0, 5);
+const problemQuestions = Object.entries(stats.questions)
+    .filter(([code, data]) => data.total > 1 && (data.correct / data.total) < 0.5)
+    .sort((a, b) => (a[1].correct / a[1].total) - (b[1].correct / b[1].total))
+    .slice(0, 5);
 
-        let problemsHtml = '';
-        if (problemQuestions.length > 0) {
-            problemsHtml = '<div style="display:flex; flex-direction:column; gap:8px;">';
-            problemQuestions.forEach(([code, data]) => {
-                let qText = "Question " + code;
-                if (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) {
-                    const qObj = QCM_OFFICIAL.questions.find(q => q.code === code);
-                    if (qObj) qText = qObj.question;
-                    if (qText.length > 60) qText = qText.substring(0, 60) + "...";
-                }
-                const pct = Math.round((data.correct / data.total) * 100);
-                problemsHtml += `
+let problemsHtml = '';
+if (problemQuestions.length > 0) {
+    problemsHtml = '<div style="display:flex; flex-direction:column; gap:8px;">';
+    problemQuestions.forEach(([code, data]) => {
+        let qText = "Question " + code;
+        if (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) {
+            const qObj = QCM_OFFICIAL.questions.find(q => q.code === code);
+            if (qObj) qText = qObj.question;
+            if (qText.length > 60) qText = qText.substring(0, 60) + "...";
+        }
+        const pct = Math.round((data.correct / data.total) * 100);
+        problemsHtml += `
                     <div class="problem-item">
                         <div style="font-size:0.8rem; font-weight:bold; color:#f87171;">${code} (${pct}% réussite)</div>
                         <div style="font-size:0.9rem; opacity:0.9;">${qText}</div>
                     </div>
                  `;
-            });
-            problemsHtml += '</div>';
-        } else {
-            problemsHtml = '<div style="opacity:0.6; font-style:italic;">Pas encore de questions problématiques identifiées.</div>';
-        }
+    });
+    problemsHtml += '</div>';
+} else {
+    problemsHtml = '<div style="opacity:0.6; font-style:italic;">Pas encore de questions problématiques identifiées.</div>';
+}
 
-        // Build individual questions list (FILTERED BY LEVEL)
-        let allQuestionsHtml = '';
-        // Use levelQuestionEntries computed earlier to show only relevant questions
+// Build individual questions list (FILTERED BY LEVEL)
+let allQuestionsHtml = '';
+// Use levelQuestionEntries computed earlier to show only relevant questions
 
-        if (levelQuestionEntries.length > 0) {
-            // Sort by success rate (worst first) by default
-            // Create a copy to avoid mutating the original array if used elsewhere? 
-            // Although here it's fine as we are at the end.
-            const sortedQuestions = [...levelQuestionEntries].sort((a, b) => {
-                const pctA = a[1].total > 0 ? (a[1].correct / a[1].total) : 0;
-                const pctB = b[1].total > 0 ? (b[1].correct / b[1].total) : 0;
-                return pctA - pctB;
-            });
+if (levelQuestionEntries.length > 0) {
+    // Sort by success rate (worst first) by default
+    // Create a copy to avoid mutating the original array if used elsewhere? 
+    // Although here it's fine as we are at the end.
+    const sortedQuestions = [...levelQuestionEntries].sort((a, b) => {
+        const pctA = a[1].total > 0 ? (a[1].correct / a[1].total) : 0;
+        const pctB = b[1].total > 0 ? (b[1].correct / b[1].total) : 0;
+        return pctA - pctB;
+    });
 
-            allQuestionsHtml = `
+    allQuestionsHtml = `
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">${levelQuestionEntries.length} questions tentées</div>
                     <div style="display:flex; gap:8px;">
@@ -796,56 +790,56 @@ const QuizEngine = {
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             `;
 
-            sortedQuestions.forEach(([code, data]) => {
-                let qText = "Question " + code;
-                let theme = "Autre";
-                let qObj = null;
+    sortedQuestions.forEach(([code, data]) => {
+        let qText = "Question " + code;
+        let theme = "Autre";
+        let qObj = null;
 
-                if (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) {
-                    qObj = QCM_OFFICIAL.questions.find(q => q.code === code || q.id === code);
-                }
+        if (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) {
+            qObj = QCM_OFFICIAL.questions.find(q => q.code === code || q.id === code);
+        }
 
-                // Fallback search in global arrays
-                if (!qObj) {
-                    if (typeof QCM_BI !== 'undefined') qObj = QCM_BI.find(q => q.id === code || q.code === code);
-                    if (!qObj && typeof QCM_BP !== 'undefined') qObj = QCM_BP.find(q => q.id === code || q.code === code);
-                    if (!qObj && typeof QCM_BPC !== 'undefined') qObj = QCM_BPC.find(q => q.id === code || q.code === code);
-                }
+        // Fallback search in global arrays
+        if (!qObj) {
+            if (typeof QCM_BI !== 'undefined') qObj = QCM_BI.find(q => q.id === code || q.code === code);
+            if (!qObj && typeof QCM_BP !== 'undefined') qObj = QCM_BP.find(q => q.id === code || q.code === code);
+            if (!qObj && typeof QCM_BPC !== 'undefined') qObj = QCM_BPC.find(q => q.id === code || q.code === code);
+        }
 
-                if (qObj) {
-                    qText = qObj.question;
-                    theme = qObj.theme || 'Autre';
-                }
+        if (qObj) {
+            qText = qObj.question;
+            theme = qObj.theme || 'Autre';
+        }
 
-                const pct = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
-                const qColor = pct >= 75 ? '#4ade80' : (pct >= 50 ? '#facc15' : '#f87171');
-                const streak = data.streak || 0;
+        const pct = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
+        const qColor = pct >= 75 ? '#4ade80' : (pct >= 50 ? '#facc15' : '#f87171');
+        const streak = data.streak || 0;
 
-                // Build answers HTML if available
-                let answersHtml = '';
-                if (qObj && qObj.ans) {
-                    answersHtml = '<div class="question-answers" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">';
-                    qObj.ans.forEach((ans, idx) => {
-                        const isCorrect = parseInt(ans.pts) > 0;
-                        const answerStyle = isCorrect
-                            ? 'background:rgba(74, 222, 128, 0.1); border-left:3px solid #4ade80;'
-                            : 'background:rgba(255,255,255,0.02);';
-                        const icon = isCorrect ? '<i class="ri-checkbox-circle-fill" style="color:#4ade80;"></i>' : '';
+        // Build answers HTML if available
+        let answersHtml = '';
+        if (qObj && qObj.ans) {
+            answersHtml = '<div class="question-answers" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">';
+            qObj.ans.forEach((ans, idx) => {
+                const isCorrect = parseInt(ans.pts) > 0;
+                const answerStyle = isCorrect
+                    ? 'background:rgba(74, 222, 128, 0.1); border-left:3px solid #4ade80;'
+                    : 'background:rgba(255,255,255,0.02);';
+                const icon = isCorrect ? '<i class="ri-checkbox-circle-fill" style="color:#4ade80;"></i>' : '';
 
-                        answersHtml += `
+                answersHtml += `
                             <div style="padding:8px 12px; margin-bottom:6px; border-radius:6px; ${answerStyle} display:flex; align-items:center; gap:8px; font-size:0.85rem;">
                                 ${icon}
                                 <span style="flex:1;">${ans.text}</span>
                             </div>
                         `;
-                    });
-                    answersHtml += '</div>';
-                }
+            });
+            answersHtml += '</div>';
+        }
 
-                const displayText = qText.length > 80 ? qText.substring(0, 80) + "..." : qText;
-                const hasAnswers = qObj && qObj.ans;
+        const displayText = qText.length > 80 ? qText.substring(0, 80) + "..." : qText;
+        const hasAnswers = qObj && qObj.ans;
 
-                allQuestionsHtml += `
+        allQuestionsHtml += `
                     <div class="question-stat-item" data-code="${code}" data-pct="${pct}" data-total="${data.total}" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:${hasAnswers ? 'pointer' : 'default'};" ${hasAnswers ? `onclick="QuizEngine.toggleQuestionDetails('${code}')"` : ''}>
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
@@ -865,15 +859,15 @@ const QuizEngine = {
                         </div>
                     </div>
                 `;
-            });
+    });
 
 
-            allQuestionsHtml += '</div>';
-        } else {
-            allQuestionsHtml = '<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">Aucune question tentée pour le moment.</div>';
-        }
+    allQuestionsHtml += '</div>';
+} else {
+    allQuestionsHtml = '<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">Aucune question tentée pour le moment.</div>';
+}
 
-        container.innerHTML = `
+container.innerHTML = `
             <div class="stats-circle-container">
                 <div class="stats-circle" style="border-color:${color}; color:${color}; box-shadow:0 0 20px -5px ${color};">
                     ${globalPct}%
@@ -924,59 +918,59 @@ const QuizEngine = {
         `;
     },
 
-    renderExamHistory: function () {
-        const exams = this.getExamHistory();
+renderExamHistory: function () {
+    const exams = this.getExamHistory();
 
-        if (exams.length === 0) {
-            return '<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">Aucun examen complété pour le moment.</div>';
-        }
+    if (exams.length === 0) {
+        return '<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">Aucun examen complété pour le moment.</div>';
+    }
 
-        let html = '<div style="display:flex; flex-direction:column; gap:12px;">';
+    let html = '<div style="display:flex; flex-direction:column; gap:12px;">';
 
-        exams.forEach(exam => {
-            const date = new Date(exam.date);
-            const dateStr = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-            const color = exam.percentage >= 75 ? '#4ade80' : exam.percentage >= 50 ? '#facc15' : '#f87171';
-            const levelLabel = exam.level === 'BI' ? 'Brevet Initial' : exam.level === 'BP' ? 'Brevet de Pilote' : 'Brevet de Pilote Confirmé';
+    exams.forEach(exam => {
+        const date = new Date(exam.date);
+        const dateStr = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        const color = exam.percentage >= 75 ? '#4ade80' : exam.percentage >= 50 ? '#facc15' : '#f87171';
+        const levelLabel = exam.level === 'BI' ? 'Brevet Initial' : exam.level === 'BP' ? 'Brevet de Pilote' : 'Brevet de Pilote Confirmé';
 
-            // Build questions HTML
-            let questionsHtml = '<div class="exam-details" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border-color);">';
-            questionsHtml += '<div style="display:flex; flex-direction:column; gap:16px;">';
+        // Build questions HTML
+        let questionsHtml = '<div class="exam-details" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border-color);">';
+        questionsHtml += '<div style="display:flex; flex-direction:column; gap:16px;">';
 
-            exam.results.forEach((r, idx) => {
-                const q = r.question;
-                let optionsHtml = '';
+        exam.results.forEach((r, idx) => {
+            const q = r.question;
+            let optionsHtml = '';
 
-                q.choices.forEach(opt => {
-                    // Fix object reference comparison for loaded JSON data
-                    const wasSelected = r.selected.some(s => s.text === opt.text);
-                    const pts = parseInt(opt.pts || 0);
-                    let statusClass = '';
-                    let icon = '';
+            q.choices.forEach(opt => {
+                // Fix object reference comparison for loaded JSON data
+                const wasSelected = r.selected.some(s => s.text === opt.text);
+                const pts = parseInt(opt.pts || 0);
+                let statusClass = '';
+                let icon = '';
 
-                    if (pts > 0) {
-                        statusClass = 'background:rgba(74, 222, 128, 0.1); border-left:3px solid #4ade80;';
-                        icon = wasSelected ? '<i class="ri-check-double-line" style="color:#4ade80;"></i>' : '<i class="ri-checkbox-circle-line" style="color:#4ade80;"></i>';
-                    } else if (pts < 0 && wasSelected) {
-                        statusClass = 'background:rgba(248, 113, 113, 0.1); border-left:3px solid #f87171;';
-                        icon = '<i class="ri-close-circle-line" style="color:#f87171;"></i>';
-                    } else if (pts === 0 && wasSelected) {
-                        // Neutral (0 pts)
-                        statusClass = 'background:rgba(255, 255, 255, 0.05); border:1px solid var(--text-secondary);';
-                        icon = '<i class="ri-checkbox-blank-circle-line" style="opacity:0.5;"></i>';
-                    } else {
-                        statusClass = 'background:rgba(255,255,255,0.02);';
-                    }
+                if (pts > 0) {
+                    statusClass = 'background:rgba(74, 222, 128, 0.1); border-left:3px solid #4ade80;';
+                    icon = wasSelected ? '<i class="ri-check-double-line" style="color:#4ade80;"></i>' : '<i class="ri-checkbox-circle-line" style="color:#4ade80;"></i>';
+                } else if (pts < 0 && wasSelected) {
+                    statusClass = 'background:rgba(248, 113, 113, 0.1); border-left:3px solid #f87171;';
+                    icon = '<i class="ri-close-circle-line" style="color:#f87171;"></i>';
+                } else if (pts === 0 && wasSelected) {
+                    // Neutral (0 pts)
+                    statusClass = 'background:rgba(255, 255, 255, 0.05); border:1px solid var(--text-secondary);';
+                    icon = '<i class="ri-checkbox-blank-circle-line" style="opacity:0.5;"></i>';
+                } else {
+                    statusClass = 'background:rgba(255,255,255,0.02);';
+                }
 
-                    optionsHtml += `
+                optionsHtml += `
                         <div style="padding:8px 12px; border-radius:6px; ${statusClass} display:flex; align-items:center; gap:8px; font-size:0.85rem;">
                             ${icon}
                             <span style="flex:1;">${opt.text}</span>
                         </div>
                     `;
-                });
+            });
 
-                questionsHtml += `
+            questionsHtml += `
                     <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; ${!r.isCorrect ? 'border:1px solid #f87171;' : ''}">
                         <div style="font-size:0.75rem; opacity:0.6; margin-bottom:6px;">Question ${idx + 1}</div>
                         <div style="font-weight:600; margin-bottom:12px;">${q.question}</div>
@@ -986,11 +980,11 @@ const QuizEngine = {
                         ${!r.isCorrect && q.explanation ? `<div style="margin-top:12px; padding:8px; background:rgba(251, 146, 60, 0.1); border-left:3px solid #fb923c; font-size:0.85rem; opacity:0.9;">${q.explanation}</div>` : ''}
                     </div>
                 `;
-            });
+        });
 
-            questionsHtml += '</div></div>';
+        questionsHtml += '</div></div>';
 
-            html += `
+        html += `
                 <div data-exam-id="${exam.id}" style="background:var(--bg-card); padding:16px; border-radius:12px; border:1px solid var(--border-color); cursor:pointer;" onclick="QuizEngine.toggleExamDetails(${exam.id})">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div style="flex:1;">
@@ -1011,376 +1005,376 @@ const QuizEngine = {
                     ${questionsHtml}
                 </div>
             `;
+    });
+
+    html += '</div>';
+    return html;
+},
+
+sortQuestions: function (sortBy) {
+    const list = document.getElementById('all-questions-list');
+    if (!list) return;
+
+    const items = Array.from(list.querySelectorAll('.question-stat-item'));
+
+    // Update button states
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+        btn.style.background = 'transparent';
+    });
+
+    if (sortBy === 'rate') {
+        document.getElementById('sort-rate-btn').style.background = 'rgba(255,255,255,0.05)';
+        items.sort((a, b) => {
+            const pctA = parseInt(a.dataset.pct);
+            const pctB = parseInt(b.dataset.pct);
+            return pctA - pctB;
         });
-
-        html += '</div>';
-        return html;
-    },
-
-    sortQuestions: function (sortBy) {
-        const list = document.getElementById('all-questions-list');
-        if (!list) return;
-
-        const items = Array.from(list.querySelectorAll('.question-stat-item'));
-
-        // Update button states
-        document.querySelectorAll('.sort-btn').forEach(btn => {
-            btn.style.background = 'transparent';
+    } else if (sortBy === 'attempts') {
+        document.getElementById('sort-attempts-btn').style.background = 'rgba(255,255,255,0.05)';
+        items.sort((a, b) => {
+            const totalA = parseInt(a.dataset.total);
+            const totalB = parseInt(b.dataset.total);
+            return totalB - totalA;
         });
+    }
 
-        if (sortBy === 'rate') {
-            document.getElementById('sort-rate-btn').style.background = 'rgba(255,255,255,0.05)';
-            items.sort((a, b) => {
-                const pctA = parseInt(a.dataset.pct);
-                const pctB = parseInt(b.dataset.pct);
-                return pctA - pctB;
-            });
-        } else if (sortBy === 'attempts') {
-            document.getElementById('sort-attempts-btn').style.background = 'rgba(255,255,255,0.05)';
-            items.sort((a, b) => {
-                const totalA = parseInt(a.dataset.total);
-                const totalB = parseInt(b.dataset.total);
-                return totalB - totalA;
-            });
+    list.innerHTML = '';
+    items.forEach(item => list.appendChild(item));
+},
+
+toggleQuestionDetails: function (code) {
+    const card = document.querySelector(`[data-code="${code}"]`);
+    if (!card) return;
+
+    const answersDiv = card.querySelector('.question-answers');
+    const arrow = document.getElementById('arrow-' + code);
+
+    if (!answersDiv) return;
+
+    const isExpanded = answersDiv.style.display !== 'none';
+
+    if (isExpanded) {
+        answersDiv.style.display = 'none';
+        if (arrow) arrow.style.transform = 'rotate(0deg)';
+    } else {
+        answersDiv.style.display = 'block';
+        if (arrow) arrow.style.transform = 'rotate(180deg)';
+    }
+},
+
+
+
+// --- STATISTICS MANAGEMENT ---
+getPersistentStats: function () {
+    const defaultStats = {
+        totalQuestions: 0,
+        totalCorrect: 0,
+        themes: {},
+        questions: {}
+    };
+
+    try {
+        const saved = localStorage.getItem('parapente_qcm_stats');
+        if (!saved) return defaultStats;
+        return JSON.parse(saved);
+    } catch (e) {
+        console.error("Failed to load stats", e);
+        return defaultStats;
+    }
+},
+
+updateStats: function (question, isCorrect) {
+    const stats = this.getPersistentStats();
+
+    // Update global counters
+    stats.totalQuestions++;
+    if (isCorrect) stats.totalCorrect++;
+
+    // Update theme stats
+    const theme = question.theme || 'Autre';
+    if (!stats.themes[theme]) {
+        stats.themes[theme] = { total: 0, correct: 0 };
+    }
+    stats.themes[theme].total++;
+    if (isCorrect) stats.themes[theme].correct++;
+
+    // Update question-specific stats
+    // Prefer ID over code for stability, falling back to generated ID
+    const code = question.id || question.code || `q_${Date.now()}`;
+    if (!stats.questions[code]) {
+        stats.questions[code] = { total: 0, correct: 0, streak: 0 };
+    }
+    stats.questions[code].total++;
+    if (isCorrect) {
+        stats.questions[code].correct++;
+        stats.questions[code].streak = (stats.questions[code].streak || 0) + 1;
+
+        // REDEMPTION: After 10 consecutive correct answers, reset to 100%
+        if (stats.questions[code].streak >= 10) {
+            stats.questions[code].total = stats.questions[code].streak;
+            stats.questions[code].correct = stats.questions[code].streak;
+            // Keep the streak to show mastery
         }
+    } else {
+        stats.questions[code].streak = 0;
+    }
 
-        list.innerHTML = '';
-        items.forEach(item => list.appendChild(item));
-    },
+    localStorage.setItem('parapente_qcm_stats', JSON.stringify(stats));
+},
 
-    toggleQuestionDetails: function (code) {
-        const card = document.querySelector(`[data-code="${code}"]`);
-        if (!card) return;
-
-        const answersDiv = card.querySelector('.question-answers');
-        const arrow = document.getElementById('arrow-' + code);
-
-        if (!answersDiv) return;
-
-        const isExpanded = answersDiv.style.display !== 'none';
-
-        if (isExpanded) {
-            answersDiv.style.display = 'none';
-            if (arrow) arrow.style.transform = 'rotate(0deg)';
-        } else {
-            answersDiv.style.display = 'block';
-            if (arrow) arrow.style.transform = 'rotate(180deg)';
-        }
-    },
-
-
-
-    // --- STATISTICS MANAGEMENT ---
-    getPersistentStats: function () {
-        const defaultStats = {
-            totalQuestions: 0,
-            totalCorrect: 0,
-            themes: {},
-            questions: {}
-        };
-
-        try {
-            const saved = localStorage.getItem('parapente_qcm_stats');
-            if (!saved) return defaultStats;
-            return JSON.parse(saved);
-        } catch (e) {
-            console.error("Failed to load stats", e);
-            return defaultStats;
-        }
-    },
-
-    updateStats: function (question, isCorrect) {
-        const stats = this.getPersistentStats();
-
-        // Update global counters
-        stats.totalQuestions++;
-        if (isCorrect) stats.totalCorrect++;
-
-        // Update theme stats
-        const theme = question.theme || 'Autre';
-        if (!stats.themes[theme]) {
-            stats.themes[theme] = { total: 0, correct: 0 };
-        }
-        stats.themes[theme].total++;
-        if (isCorrect) stats.themes[theme].correct++;
-
-        // Update question-specific stats
-        // Prefer ID over code for stability, falling back to generated ID
-        const code = question.id || question.code || `q_${Date.now()}`;
-        if (!stats.questions[code]) {
-            stats.questions[code] = { total: 0, correct: 0, streak: 0 };
-        }
-        stats.questions[code].total++;
-        if (isCorrect) {
-            stats.questions[code].correct++;
-            stats.questions[code].streak = (stats.questions[code].streak || 0) + 1;
-
-            // REDEMPTION: After 10 consecutive correct answers, reset to 100%
-            if (stats.questions[code].streak >= 10) {
-                stats.questions[code].total = stats.questions[code].streak;
-                stats.questions[code].correct = stats.questions[code].streak;
-                // Keep the streak to show mastery
-            }
-        } else {
-            stats.questions[code].streak = 0;
-        }
-
-        localStorage.setItem('parapente_qcm_stats', JSON.stringify(stats));
-    },
-
-    resetStats: function () {
-        if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes vos statistiques ?')) {
-            localStorage.removeItem('parapente_qcm_stats');
-            alert('Statistiques réinitialisées !');
-            this.renderStats();
-        }
-    },
-
-    saveExamHistory: function (level, score, total, results) {
-        try {
-            let history = JSON.parse(localStorage.getItem('parapente_exam_history') || '{"exams":[]}');
-
-            const exam = {
-                id: Date.now(),
-                date: new Date().toISOString(),
-                level: level,
-                score: score,
-                total: total,
-                percentage: Math.round((score / total) * 100),
-                results: results
-            };
-
-            history.exams.unshift(exam); // Add to beginning
-            history.exams = history.exams.slice(0, 10); // Keep only last 10
-
-            localStorage.setItem('parapente_exam_history', JSON.stringify(history));
-        } catch (e) {
-            console.error("Failed to save exam history", e);
-        }
-    },
-
-    getExamHistory: function () {
-        try {
-            const history = JSON.parse(localStorage.getItem('parapente_exam_history') || '{"exams":[]}');
-            return history.exams || [];
-        } catch (e) {
-            console.error("Failed to load exam history", e);
-            return [];
-        }
-    },
-
-    importData: function () {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    const data = JSON.parse(event.target.result);
-
-                    // Basic validation of the file structure
-                    if (!data.stats || !data.examHistory) {
-                        alert('❌ Fichier invalide: Format de données incorrect');
-                        return;
-                    }
-
-                    if (confirm('⚠️ Cela va remplacer toutes vos statistiques et historiques actuels. Continuer ?')) {
-                        // Save directly to localStorage
-                        localStorage.setItem('parapente_qcm_stats', JSON.stringify(data.stats));
-                        localStorage.setItem('parapente_exam_history', JSON.stringify({ exams: data.examHistory }));
-
-                        // Force update of current runtime stats if needed? 
-                        // Actually getPersistentStats reads from localStorage so it's fine.
-
-                        alert('✅ Données importées avec succès !');
-
-                        try {
-                            // Refresh stats display
-                            this.renderStats();
-                        } catch (renderError) {
-                            console.error("Render failed after import", renderError);
-                            alert("Données importées, mais une erreur est survenue lors de l'affichage. Veuillez recharger la page.");
-                        }
-                    }
-                } catch (e) {
-                    console.error('Import failed', e);
-                    alert('❌ Erreur lors de l\'import : ' + e.message);
-                }
-            };
-            reader.readAsText(file);
-        };
-
-        input.click();
-    },
-    toggleExamDetails: function (examId) {
-        const card = document.querySelector(`[data-exam-id="${examId}"]`);
-        if (!card) return;
-
-        const detailsDiv = card.querySelector('.exam-details');
-        const arrow = card.querySelector('.exam-arrow');
-
-        if (!detailsDiv) return;
-
-        const isExpanded = detailsDiv.style.display !== 'none';
-
-        if (isExpanded) {
-            detailsDiv.style.display = 'none';
-            if (arrow) arrow.style.transform = 'rotate(0deg)';
-        } else {
-            detailsDiv.style.display = 'block';
-            if (arrow) arrow.style.transform = 'rotate(180deg)';
-        }
-    },
-
-    exportData: function () {
-        try {
-            const stats = this.getPersistentStats();
-            const examHistory = this.getExamHistory();
-
-            const data = {
-                stats: stats,
-                examHistory: examHistory,
-                exportDate: new Date().toISOString(),
-                version: '1.0'
-            };
-
-            const json = JSON.stringify(data, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `parapente_stats_${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            alert('✅ Données exportées avec succès !');
-        } catch (e) {
-            console.error('Export failed', e);
-            alert('❌ Erreur lors de l\'export');
-        }
-    },
-
-    importData: function () {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    const data = JSON.parse(event.target.result);
-
-                    if (!data.stats || !data.examHistory) {
-                        alert('❌ Fichier invalide');
-                        return;
-                    }
-
-                    if (confirm('⚠️ Cela va remplacer vos données actuelles. Continuer ?')) {
-                        localStorage.setItem('parapente_qcm_stats', JSON.stringify(data.stats));
-                        localStorage.setItem('parapente_exam_history', JSON.stringify({ exams: data.examHistory }));
-
-                        alert('✅ Données importées avec succès !');
-                        this.renderStats();
-                    }
-                } catch (e) {
-                    console.error('Import failed', e);
-                    alert('❌ Erreur lors de l\'import : fichier corrompu');
-                }
-            };
-            reader.readAsText(file);
-        };
-
-        input.click();
-    },
-
-    showStats: function () {
-        document.querySelectorAll('.mode-screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('stats-screen').classList.add('active');
+resetStats: function () {
+    if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes vos statistiques ?')) {
+        localStorage.removeItem('parapente_qcm_stats');
+        alert('Statistiques réinitialisées !');
         this.renderStats();
-    },
+    }
+},
 
-    // --- QUESTION BANK ---
-    showBank: function () {
-        this.state.mainEngine.startMode('QCM_BANK');
-    },
+saveExamHistory: function (level, score, total, results) {
+    try {
+        let history = JSON.parse(localStorage.getItem('parapente_exam_history') || '{"exams":[]}');
 
-    renderBank: function () {
-        const searchInput = document.getElementById('bank-search');
-        const levelFilter = document.getElementById('bank-level-filter');
-        const resultsDiv = document.getElementById('bank-results');
+        const exam = {
+            id: Date.now(),
+            date: new Date().toISOString(),
+            level: level,
+            score: score,
+            total: total,
+            percentage: Math.round((score / total) * 100),
+            results: results
+        };
 
-        if (!resultsDiv) return;
+        history.exams.unshift(exam); // Add to beginning
+        history.exams = history.exams.slice(0, 10); // Keep only last 10
 
-        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-        const levelValue = levelFilter ? levelFilter.value : 'ALL';
+        localStorage.setItem('parapente_exam_history', JSON.stringify(history));
+    } catch (e) {
+        console.error("Failed to save exam history", e);
+    }
+},
 
-        let questions = [];
-        if (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) {
-            const getCategory = (code) => {
-                const letter = code.charAt(0);
-                const map = {
-                    'A': 'Météo',
-                    'E': 'Mécavol', 'G': 'Mécavol', 'H': 'Mécavol',
-                    'L': 'Matériel', 'N': 'Matériel', 'R': 'Matériel',
-                    'U': 'Pilotage', 'W': 'Pilotage', 'X': 'Pilotage',
-                    'S': 'Réglementation',
-                    'F': 'Facteurs humains',
-                    'P': 'Milieu naturel'
-                };
-                return map[letter] || 'Autre';
+getExamHistory: function () {
+    try {
+        const history = JSON.parse(localStorage.getItem('parapente_exam_history') || '{"exams":[]}');
+        return history.exams || [];
+    } catch (e) {
+        console.error("Failed to load exam history", e);
+        return [];
+    }
+},
+
+importData: function () {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const data = JSON.parse(event.target.result);
+
+                // Basic validation of the file structure
+                if (!data.stats || !data.examHistory) {
+                    alert('❌ Fichier invalide: Format de données incorrect');
+                    return;
+                }
+
+                if (confirm('⚠️ Cela va remplacer toutes vos statistiques et historiques actuels. Continuer ?')) {
+                    // Save directly to localStorage
+                    localStorage.setItem('parapente_qcm_stats', JSON.stringify(data.stats));
+                    localStorage.setItem('parapente_exam_history', JSON.stringify({ exams: data.examHistory }));
+
+                    // Force update of current runtime stats if needed? 
+                    // Actually getPersistentStats reads from localStorage so it's fine.
+
+                    alert('✅ Données importées avec succès !');
+
+                    try {
+                        // Refresh stats display
+                        this.renderStats();
+                    } catch (renderError) {
+                        console.error("Render failed after import", renderError);
+                        alert("Données importées, mais une erreur est survenue lors de l'affichage. Veuillez recharger la page.");
+                    }
+                }
+            } catch (e) {
+                console.error('Import failed', e);
+                alert('❌ Erreur lors de l\'import : ' + e.message);
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    input.click();
+},
+toggleExamDetails: function (examId) {
+    const card = document.querySelector(`[data-exam-id="${examId}"]`);
+    if (!card) return;
+
+    const detailsDiv = card.querySelector('.exam-details');
+    const arrow = card.querySelector('.exam-arrow');
+
+    if (!detailsDiv) return;
+
+    const isExpanded = detailsDiv.style.display !== 'none';
+
+    if (isExpanded) {
+        detailsDiv.style.display = 'none';
+        if (arrow) arrow.style.transform = 'rotate(0deg)';
+    } else {
+        detailsDiv.style.display = 'block';
+        if (arrow) arrow.style.transform = 'rotate(180deg)';
+    }
+},
+
+exportData: function () {
+    try {
+        const stats = this.getPersistentStats();
+        const examHistory = this.getExamHistory();
+
+        const data = {
+            stats: stats,
+            examHistory: examHistory,
+            exportDate: new Date().toISOString(),
+            version: '1.0'
+        };
+
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `parapente_stats_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        alert('✅ Données exportées avec succès !');
+    } catch (e) {
+        console.error('Export failed', e);
+        alert('❌ Erreur lors de l\'export');
+    }
+},
+
+importData: function () {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const data = JSON.parse(event.target.result);
+
+                if (!data.stats || !data.examHistory) {
+                    alert('❌ Fichier invalide');
+                    return;
+                }
+
+                if (confirm('⚠️ Cela va remplacer vos données actuelles. Continuer ?')) {
+                    localStorage.setItem('parapente_qcm_stats', JSON.stringify(data.stats));
+                    localStorage.setItem('parapente_exam_history', JSON.stringify({ exams: data.examHistory }));
+
+                    alert('✅ Données importées avec succès !');
+                    this.renderStats();
+                }
+            } catch (e) {
+                console.error('Import failed', e);
+                alert('❌ Erreur lors de l\'import : fichier corrompu');
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    input.click();
+},
+
+showStats: function () {
+    document.querySelectorAll('.mode-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('stats-screen').classList.add('active');
+    this.renderStats();
+},
+
+// --- QUESTION BANK ---
+showBank: function () {
+    this.state.mainEngine.startMode('QCM_BANK');
+},
+
+renderBank: function () {
+    const searchInput = document.getElementById('bank-search');
+    const levelFilter = document.getElementById('bank-level-filter');
+    const resultsDiv = document.getElementById('bank-results');
+
+    if (!resultsDiv) return;
+
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+    const levelValue = levelFilter ? levelFilter.value : 'ALL';
+
+    let questions = [];
+    if (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) {
+        const getCategory = (code) => {
+            const letter = code.charAt(0);
+            const map = {
+                'A': 'Météo',
+                'E': 'Mécavol', 'G': 'Mécavol', 'H': 'Mécavol',
+                'L': 'Matériel', 'N': 'Matériel', 'R': 'Matériel',
+                'U': 'Pilotage', 'W': 'Pilotage', 'X': 'Pilotage',
+                'S': 'Réglementation',
+                'F': 'Facteurs humains',
+                'P': 'Milieu naturel'
             };
+            return map[letter] || 'Autre';
+        };
 
-            questions = QCM_OFFICIAL.questions.map(q => ({
-                code: q.code,
-                question: q.question,
-                theme: getCategory(q.code),
-                level: (function (c) {
-                    const lastChar = c.charAt(c.length - 1).toUpperCase();
-                    if (lastChar === 'V') return 1;
-                    if (lastChar === 'B') return 2;
-                    if (lastChar === 'M') return 3;
-                    return 0;
-                })(q.code),
-                choices: q.ans
-            }));
-        }
+        questions = QCM_OFFICIAL.questions.map(q => ({
+            code: q.code,
+            question: q.question,
+            theme: getCategory(q.code),
+            level: (function (c) {
+                const lastChar = c.charAt(c.length - 1).toUpperCase();
+                if (lastChar === 'V') return 1;
+                if (lastChar === 'B') return 2;
+                if (lastChar === 'M') return 3;
+                return 0;
+            })(q.code),
+            choices: q.ans
+        }));
+    }
 
-        // Apply filters
-        if (levelValue !== 'ALL') {
-            questions = questions.filter(q => q.level === parseInt(levelValue));
-        }
+    // Apply filters
+    if (levelValue !== 'ALL') {
+        questions = questions.filter(q => q.level === parseInt(levelValue));
+    }
 
-        if (searchTerm) {
-            questions = questions.filter(q =>
-                q.question.toLowerCase().includes(searchTerm) ||
-                q.code.toLowerCase().includes(searchTerm)
-            );
-        }
+    if (searchTerm) {
+        questions = questions.filter(q =>
+            q.question.toLowerCase().includes(searchTerm) ||
+            q.code.toLowerCase().includes(searchTerm)
+        );
+    }
 
-        // Render
-        if (questions.length === 0) {
-            resultsDiv.innerHTML = '<div style="text-align:center; opacity:0.5; padding:40px;">Aucune question trouvée</div>';
-            return;
-        }
+    // Render
+    if (questions.length === 0) {
+        resultsDiv.innerHTML = '<div style="text-align:center; opacity:0.5; padding:40px;">Aucune question trouvée</div>';
+        return;
+    }
 
-        let html = '';
-        questions.forEach(q => {
-            const levelLabel = q.level === 1 ? 'BI' : q.level === 2 ? 'BP' : q.level === 3 ? 'BPC' : 'N/A';
-            const levelColor = q.level === 1 ? '#48BB78' : q.level === 2 ? '#4299E1' : '#92400e';
+    let html = '';
+    questions.forEach(q => {
+        const levelLabel = q.level === 1 ? 'BI' : q.level === 2 ? 'BP' : q.level === 3 ? 'BPC' : 'N/A';
+        const levelColor = q.level === 1 ? '#48BB78' : q.level === 2 ? '#4299E1' : '#92400e';
 
-            html += `
+        html += `
                 <div class="bank-question-card" style="background:var(--bg-card); padding:20px; border-radius:12px; border:1px solid var(--border-color);">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                         <div style="display:flex; gap:8px; align-items:center;">
@@ -1399,10 +1393,10 @@ const QuizEngine = {
                     </div>
                 </div>
             `;
-        });
+    });
 
-        resultsDiv.innerHTML = html;
-    }
+    resultsDiv.innerHTML = html;
+}
 
 };
 
