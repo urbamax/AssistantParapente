@@ -598,15 +598,23 @@ const QuizEngine = {
 
         if (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) {
             let levelQs = [];
+            console.log("DEBUG RENDER STATS: User Level =", Engine.state.level, "Normalized =", currentLevel);
 
-            // Special handling for BI level: includes questions ending in 'V' as per user request
+
+            // Mapping levels to QCM_OFFICIAL 'niveau' property
+            // 0: Vert (Intro)? 1: Bleu (BI)? 2: Marron (BP)? 3: Rouge/Confirme (BPC)?
+
             if (currentLevel === 'BI') {
-                levelQs = QCM_OFFICIAL.questions.filter(q =>
-                    (q.code && q.code.endsWith('V')) ||
-                    (q.class && q.class.includes(currentLevel))
-                );
+                // BI usually includes level 0 and 1
+                levelQs = QCM_OFFICIAL.questions.filter(q => q.niveau === 0 || q.niveau === 1);
+            } else if (currentLevel === 'BP') {
+                // BP is level 2
+                levelQs = QCM_OFFICIAL.questions.filter(q => q.niveau === 2);
+            } else if (currentLevel === 'BPC') {
+                // BPC is level 3
+                levelQs = QCM_OFFICIAL.questions.filter(q => q.niveau === 3);
             } else {
-                // Standard filter for other levels
+                // Fallback: try to match by old class logic or defaulting
                 levelQs = QCM_OFFICIAL.questions.filter(q => q.class && q.class.includes(currentLevel));
             }
 

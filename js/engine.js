@@ -126,6 +126,9 @@ const Engine = {
             const bankScreen = document.getElementById('qcm-bank-screen');
             if (bankScreen) bankScreen.classList.add('active');
             if (typeof QuizEngine !== 'undefined') QuizEngine.renderBank();
+        } else if (mode === 'STATS') {
+            document.getElementById('stats-screen').classList.add('active');
+            if (typeof QuizEngine !== 'undefined') QuizEngine.renderStats();
         } else if (mode === 'LIBRARY') {
             if (typeof LibraryEngine !== 'undefined') LibraryEngine.show();
         }
@@ -167,6 +170,8 @@ const Engine = {
         this.state.level = newLevel;
         localStorage.setItem('userLevel', newLevel);
 
+        console.log("DEBUG: Engine.changeLevel called with", newLevel, "State updated to", this.state.level);
+
         // Refresh current view
         if (this.state.mode === 'LIBRARY' && typeof LibraryEngine !== 'undefined') {
             LibraryEngine.render();
@@ -175,6 +180,9 @@ const Engine = {
             AdventureEngine.startFlight(newLevel);
         }
         // Qcm might use it too
+        else if (this.state.mode === 'STATS' && typeof QuizEngine !== 'undefined') {
+            QuizEngine.renderStats();
+        }
     },
 
     updateHeaderUI: function () {
@@ -300,7 +308,7 @@ const Engine = {
     startQcmSession: () => typeof QuizEngine !== 'undefined' && QuizEngine.startSession(),
     showQcmBank: () => typeof QuizEngine !== 'undefined' && QuizEngine.showBank(),
     renderQcmBank: () => typeof QuizEngine !== 'undefined' && QuizEngine.renderBank(),
-    showStats: () => typeof QuizEngine !== 'undefined' && QuizEngine.showStats(),
+    showStats: function () { this.startMode('STATS'); },
     checkGenAnswer: (e, q, o, c) => typeof QuizEngine !== 'undefined' && QuizEngine.checkGenAnswer && QuizEngine.checkGenAnswer(e, q, o, c),
     // note: checkGenAnswer was in engine.js for review mode. I extracted it in my head? 
     // Wait, the review/generated content logic (lines 894-972) was NOT extracted to QuizEngine yet!
