@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Les Brises</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/header.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #f1f5f9;
+            background-color: #0f172a;
+            margin: 0;
+            padding: 0;
+        }
+
+        .course-standalone-container {
+            max-width: 900px;
+            margin: 180px auto 0 auto;
+            padding: 40px 24px 120px 24px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #38bdf8;
+        }
+
+        h1 {
+            border-bottom: 2px solid #334155;
+            padding-bottom: 10px;
+        }
+
+        .note {
+            background: rgba(56, 189, 248, 0.1);
+            border-left: 4px solid #38bdf8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .tip {
+            background: rgba(74, 222, 128, 0.1);
+            border-left: 4px solid #4ade80;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #1e293b;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #334155;
+        }
+
+        th {
+            background-color: #334155;
+            color: #fff;
+        }
+
+        strong {
+            color: #e2e8f0;
+        }
+    </style>
+</head>
+
+<body class="standalone-course">
+    <div id="app-header" class="top-controls"></div>
+    <div class="course-standalone-container">
+
+        <h1>Le Cycle des Brises</h1>
+
+        <div class="note">
+            <i class="ri-information-line"></i> Ce cours explique les phénomènes de brises thermiques, essentiels pour
+            comprendre l'aérologie locale en tant que parapentiste.
+        </div>
+
+        <h2>Le Cycle des Brises</h2>
+        <p>Le relief crée ses propres vents locaux par différence de température. C'est ce qu'on appelle la
+            <strong>brise
+                thermique</strong>.</p>
+
+        <div
+            style="text-align: center; margin: 30px 0; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px;">
+            <svg width="400" height="200" viewBox="0 0 400 200">
+                <!-- Mountain -->
+                <path d="M 0 200 L 150 50 L 250 200 Z" fill="#475569" />
+                <!-- Sun -->
+                <circle cx="350" cy="50" r="20" fill="#fbbf24" opacity="0.8" />
+
+                <!-- Anabatic (rising) -->
+                <path d="M 120 180 Q 135 120 150 60" fill="none" stroke="#60a5fa" stroke-width="3"
+                    marker-end="url(#arrow-blue)" />
+                <text x="60" y="140" fill="#60a5fa" font-size="0.8rem">Brise de pente (Montante)</text>
+
+                <!-- Dynamic Labels -->
+                <text x="160" y="100" fill="white" font-size="0.9rem">CHAUFFAGE SOLAIRE</text>
+
+                <!-- Markers -->
+                <defs>
+                    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#60a5fa" />
+                    </marker>
+                </defs>
+            </svg>
+            <div style="font-size: 0.9rem; color: #94a3b8; margin-top: 10px;">Schéma 2 : Formation de la brise de pente
+                anabatique par ensoleillement du relief.</div>
+        </div>
+
+        <h3>1. La Brise de Pente</h3>
+        <ul>
+            <li><strong>Quand ?</strong> En journée, lorsque le soleil chauffe le sol.</li>
+            <li><strong>Mécanisme</strong> :
+                <ol>
+                    <li>Le soleil chauffe le sol.</li>
+                    <li>Le sol transmet sa chaleur à la couche d'air en contact (conduction).</li>
+                    <li>L'air chaud, moins dense que l'air environnant, s'élève le long de la pente.</li>
+                </ol>
+            </li>
+            <li><strong>Résultat</strong> : Une brise qui remonte la pente ("brise de pente montante"), alimentant les
+                thermiques.</li>
+        </ul>
+
+        <h3>Brise Descendante (Catabatique)</h3>
+        <ul>
+            <li><strong>Quand ?</strong> Le soir et la nuit.</li>
+            <li><strong>Mécanisme</strong> :
+                <ol>
+                    <li>Le sol se refroidit (rayonnement nocturne).</li>
+                    <li>L'air au contact du sol se refroidit, devient plus dense et lourd.</li>
+                    <li>Il s'écoule par gravité vers le bas.</li>
+                </ol>
+            </li>
+            <li><strong>Résultat</strong> : Une brise qui descend la pente ("brise de pente descendante").</li>
+        </ul>
+
+        <h2>La Brise de Vallée</h2>
+        <p>C'est un phénomène de plus grande échelle qui résulte de l'accumulation des brises de pente.</p>
+
+        <h3>En journée (Brise de vallée montante)</h3>
+        <p>Sur tous les versants exposés (Est le matin, Sud à midi, Ouest l'après-midi), l'air s'élève (brises de
+            pente).<br>
+            Cet appel d'air massif "aspire" l'air des plaines ou des parties basses de la vallée.<br>
+            Il se crée un courant d'air général qui remonte la vallée principale. C'est souvent un vent soutenu.</p>
+
+        <h3>La nuit (Brise de vallée descendante)</h3>
+        <p>Le phénomène s'inverse : l'air froid des sommets et des pentes coule vers le fond de vallée.<br>
+            Ce flux d'air froid redescend ensuite vers la sortie de la vallée.</p>
+
+        <h2>Brise de Mer et de Terre</h2>
+        <p>Le même principe s'applique entre la terre et la mer.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Moment</th>
+                    <th>Mécanisme</th>
+                    <th>Direction</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Brise de Mer</strong></td>
+                    <td>Jour</td>
+                    <td>La terre chauffe plus vite que la mer. L'air chaud monte sur terre, l'air frais marin vient
+                        combler
+                        le vide.</td>
+                    <td>De la Mer vers la Terre</td>
+                </tr>
+                <tr>
+                    <td><strong>Brise de Terre</strong></td>
+                    <td>Nuit</td>
+                    <td>La terre se refroidit plus vite que la mer. L'air froid continental coule vers la mer plus
+                        tiède.
+                    </td>
+                    <td>De la Terre vers la Mer</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="tip-box">
+            <h4><i class="ri-lightbulb-line"></i> Rappel Sécurité</h4>
+            <p>Plus le contraste thermique est fort, plus la brise est dynamique. Soyez vigilant lors des transitions
+                vers
+                les vents météo plus forts.</p>
+        </div>
+
+        <!-- Final CTA -->
+        <button class="start-quiz-end-btn" onclick="window.parent.Engine.toggleReviewMode('modernized/les-brises')">
+            <i class="ri-book-open-line"></i> Lancer le Quiz de Validation
+        </button>
+
+    </div>
+    <script src="js/data/courses_data.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/engine.js"></script>
+    <script>
+        if (typeof Engine !== 'undefined') {
+            Engine.loadComponents('.');
+        }
+    </script>
+</body>
+
+</html>

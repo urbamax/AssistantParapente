@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Théorie Parapente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/header.css">
+</head>
+
+<body>
+
+    <!-- Top Controls (Level Select & Theme) -->
+    <div id="app-header" class="top-controls"></div>
+
+    <!-- START SCREEN (Dashboard) -->
+    <div id="start-screen" class="mode-screen active">
+        <div class="dashboard-content">
+            <!-- SECTION 1: APPS (Hero) -->
+            <section class="apps-section">
+
+                <div class="apps-grid">
+                    <button class="app-card accent-ad" onclick="Engine.startMode('ADVENTURE')">
+                        <div class="app-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 12c4-8 14-8 18 0" />
+                                <path d="M3 12c4 4 14 4 18 0" />
+                                <path d="M12 11v11" />
+                                <path d="M12 22l-4-4" />
+                                <path d="M12 22l4-4" />
+                                <path d="M3 12l9 10 9-10" />
+                            </svg>
+                        </div>
+                        <div class="app-info">
+                            <h3>Simulateur</h3>
+                            <p>Scénarios réels (BI, BP, BPC)</p>
+                        </div>
+                    </button>
+                    <button class="app-card accent-qcm" onclick="Engine.startMode('QCM')">
+                        <div class="app-icon"><i class="ri-file-list-3-line"></i></div>
+                        <div class="app-info">
+                            <h3>QCM Officiel</h3>
+                            <p>Entraînement questions FFVL</p>
+                        </div>
+                    </button>
+                    <button class="app-card accent-library" onclick="Engine.startMode('LIBRARY')">
+                        <div class="app-icon"><i class="ri-book-open-line"></i></div>
+                        <div class="app-info">
+                            <h3>Bibliothèque</h3>
+                            <p>Cours, manuels & affiches</p>
+                        </div>
+                    </button>
+                    <button class="app-card accent-qcm" onclick="Engine.showStats()" style="filter:grayscale(1);">
+                        <div class="app-icon"><i class="ri-bar-chart-2-line"></i></div>
+                        <div class="app-info">
+                            <h3>Statistiques</h3>
+                            <p>Historique & Progression</p>
+                        </div>
+                    </button>
+                </div>
+            </section>
+
+            <div class="app-footer-placeholder"></div>
+        </div>
+    </div>
+
+    <!-- ADVENTURE SCREEN -->
+    <div id="adventure-screen" class="mode-screen">
+        <button class="return-btn" onclick="Engine.goBack()">← Retour</button>
+        <div class="main-stage">
+            <div id="scenario-title" class="level-tag">INITIALISATION...</div>
+
+            <div class="narrative-text" id="narrative-text">
+                Chargement de la simulation...
+            </div>
+
+            <div class="choices-area" id="choices-area">
+                <!-- Buttons injected by engine.js -->
+            </div>
+        </div>
+        <footer class="app-footer">
+            <p>Développé par <a href="https://www.facebook.com/maxime.urbaniak/" target="_blank"
+                    style="color:var(--accent-blue); text-decoration:none;"><strong>Maxime Urbaniak</strong></a>
+                adhérent et stagiaire du club-école <a href="https://parapente62lefildariane.wordpress.com"
+                    target="_blank" style="color:var(--accent-blue); text-decoration:none;"><strong>Le Fil
+                        d'Ariane</strong></a> •
+                Basé sur les ressources de la <a href="https://ffvl.fr" target="_blank"
+                    style="color:var(--accent-blue); text-decoration:none;">Fédération Française de Vol Libre</a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- QCM SETUP SCREEN -->
+    <div id="qcm-setup-screen" class="mode-screen">
+        <button class="return-btn" onclick="Engine.goBack()">← Retour</button>
+        <div class="course-container">
+            <div class="setup-grid" style="display:grid; gap:24px; max-width:800px; margin:0 auto;">
+
+                <!-- MODE SELECTION -->
+                <div class="setup-group">
+                    <label class="setup-label">MODE</label>
+                    <div class="mode-toggle-container">
+                        <button id="mode-training" class="mode-toggle-btn active"
+                            onclick="Engine.setQcmMode('TRAINING')">
+                            <i class="ri-edit-circle-line"></i> Entraînement
+                        </button>
+                        <button id="mode-exam" class="mode-toggle-btn" onclick="Engine.setQcmMode('EXAM')">
+                            <i class="ri-timer-flash-line"></i> Examen
+                        </button>
+                        <button id="mode-revision" class="mode-toggle-btn" onclick="Engine.setQcmMode('REVISION')">
+                            <i class="ri-refresh-line"></i> Révision
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TRAINING OPTIONS (Hidden in Exam Mode) -->
+                <div id="training-options">
+                    <div class="setup-group">
+                        <label class="setup-label">NOMBRE DE QUESTIONS</label>
+                        <div class="count-selector">
+                            <button class="count-btn active" onclick="Engine.setQcmCount(10)">10</button>
+                            <button class="count-btn" onclick="Engine.setQcmCount(20)">20</button>
+                            <button class="count-btn" onclick="Engine.setQcmCount(30)">30</button>
+                            <button class="count-btn" onclick="Engine.setQcmCount(40)">40</button>
+                        </div>
+                    </div>
+
+                    <div class="setup-group" style="margin-top:24px;">
+                        <label class="setup-label">THÈME SPÉCIFIQUE (OPTIONNEL)</label>
+                        <select id="qcm-theme-select">
+                            <option value="ALL">Tous les thèmes</option>
+                            <!-- Injected by JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- START BUTTON -->
+                <button class="next-btn" onclick="Engine.startQcmSession()"
+                    style="margin-top:32px; padding:20px; font-size:1.2rem;">
+                    COMMENCER <i class="ri-arrow-right-line"></i>
+                </button>
+
+                <button onclick="Engine.showQcmBank()"
+                    style="margin-top:16px; background:transparent; border:1px solid rgba(255,255,255,0.2); width:100%; padding:15px; border-radius:12px; cursor:pointer; color:var(--text-secondary); transition:all 0.2s;">
+                    <i class="ri-book-2-line"></i> Consulter la Banque de Questions
+                </button>
+
+            </div>
+            <footer class="app-footer">
+                <p>Développé par <a href="https://www.facebook.com/maxime.urbaniak/" target="_blank"
+                        style="color:var(--accent-blue); text-decoration:none;"><strong>Maxime Urbaniak</strong></a>
+                    adhérent et stagiaire du club-école <a href="https://parapente62lefildariane.wordpress.com"
+                        target="_blank" style="color:var(--accent-blue); text-decoration:none;"><strong>Le Fil
+                            d'Ariane</strong></a> •
+                    Basé sur les ressources de la <a href="https://ffvl.fr" target="_blank"
+                        style="color:var(--accent-blue); text-decoration:none;">Fédération Française de Vol Libre</a>
+                </p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- QCM SCREEN -->
+    <div id="qcm-screen" class="mode-screen">
+        <button class="return-btn" onclick="Engine.goBack()">← Retour</button>
+        <div class="main-stage">
+            <div class="level-tag" style="opacity:0.5;">MODE EXAMEN</div>
+
+            <div id="qcm-question-text" class="qcm-question">
+                Chargement...
+            </div>
+
+            <div id="qcm-choices" class="choices-area">
+                <!-- Options injected manually -->
+            </div>
+
+            <div id="qcm-feedback" class="narrative-text"
+                style="display:none; font-size:1rem; margin-top:30px; border-left: 2px solid white; padding-left:20px;">
+                <!-- Feedback text -->
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS SCREEN -->
+    <div id="stats-screen" class="mode-screen">
+        <button class="return-btn" onclick="Engine.showDashboard()">← Retour au menu</button>
+        <div class="course-container">
+            <h2 class="section-title" style="text-align:center; font-size:1.5rem; margin-bottom:32px;">STATISTIQUES</h2>
+            <div id="stats-content">
+                <!-- Injected by JS -->
+            </div>
+            <footer class="app-footer">
+                <p>Développé par <a href="https://www.facebook.com/maxime.urbaniak/" target="_blank"
+                        style="color:var(--accent-blue); text-decoration:none;"><strong>Maxime Urbaniak</strong></a>
+                    adhérent et stagiaire du club-école <a href="https://parapente62lefildariane.wordpress.com"
+                        target="_blank" style="color:var(--accent-blue); text-decoration:none;"><strong>Le Fil
+                            d'Ariane</strong></a> •
+                    Basé sur les ressources de la <a href="https://ffvl.fr" target="_blank"
+                        style="color:var(--accent-blue); text-decoration:none;">Fédération Française de Vol Libre</a>
+                </p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- QCM BANK SCREEN -->
+    <div id="qcm-bank-screen" class="mode-screen">
+        <button class="return-btn" onclick="Engine.goBack()">← Retour</button>
+        <div class="library-container"> <!-- Reuse library container for styling -->
+            <h2 class="section-title" style="text-align:center; font-size:1.5rem; margin-bottom:32px;">BANQUE DE
+                QUESTIONS</h2>
+
+            <!-- SEARCH & FILTER -->
+            <div class="library-toolbar">
+                <div class="search-box">
+                    <i class="ri-search-line"></i>
+                    <input type="text" id="bank-search" placeholder="Rechercher par mot-clé (ex: cumulus)..."
+                        oninput="Engine.renderQcmBank()">
+                </div>
+                <div class="sort-controls">
+                    <select id="bank-level-filter" onchange="Engine.renderQcmBank()" class="sort-btn"
+                        style="appearance:none; padding-right:30px;">
+                        <option value="ALL">TOUS NIVEAUX</option>
+                        <option value="1">BREVET INITIAL (BI)</option>
+                        <option value="2">BREVET PILOTE (BP)</option>
+                        <option value="3">BREVET CONFIRME (BPC)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="bank-results" class="library-grid-container"
+                style="display:flex; flex-direction:column; gap:16px;">
+                <!-- Results injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- LIBRARY SCREEN -->
+    <div id="library-screen" class="mode-screen">
+        <button class="return-btn" onclick="Engine.goBack()">← Retour</button>
+        <div class="library-container">
+            <h2 class="section-title" style="text-align:center; font-size:1.5rem; margin-bottom:32px;">BIBLIOTHEQUE</h2>
+
+            <!-- SEARCH & SORT TOOLBAR -->
+            <div class="library-toolbar">
+                <div class="search-box">
+                    <i class="ri-search-line"></i>
+                    <input type="text" id="library-search" placeholder="Rechercher un dossier, une affiche..."
+                        oninput="Engine.updateLibrarySearch(this.value)">
+                </div>
+                <div class="sort-controls">
+                    <button id="sort-TITLE" class="sort-btn" onclick="Engine.setLibrarySort('TITLE')">A-Z</button>
+                    <button id="sort-LEVEL" class="sort-btn" onclick="Engine.setLibrarySort('LEVEL')">PAR
+                        NIVEAU</button>
+                    <button id="sort-CATEGORY" class="sort-btn active" onclick="Engine.setLibrarySort('CATEGORY')">PAR
+                        CATÉGORIE</button>
+                </div>
+            </div>
+
+            <div id="library-results" class="library-grid-container">
+                <!-- Results injected by JS -->
+            </div>
+
+            <footer class="app-footer">
+                <p>Développé par <a href="https://www.facebook.com/maxime.urbaniak/" target="_blank"
+                        style="color:var(--accent-blue); text-decoration:none;"><strong>Maxime Urbaniak</strong></a>
+                    adhérent et stagiaire du club-école <a href="https://parapente62lefildariane.wordpress.com"
+                        target="_blank" style="color:var(--accent-blue); text-decoration:none;"><strong>Le Fil
+                            d'Ariane</strong></a> •
+                    Basé sur les ressources de la <a href="https://ffvl.fr" target="_blank"
+                        style="color:var(--accent-blue); text-decoration:none;">Fédération Française de Vol Libre</a>
+                </p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- COURSE SCREEN -->
+    <div id="course-screen" class="mode-screen">
+        <div class="course-container">
+            <div class="course-controls-top">
+                <button class="action-btn" onclick="Engine.goBack()">
+                    <i class="ri-arrow-left-line"></i> Retour à la bibliothèque
+                </button>
+                <div class="course-actions-group" id="course-actions-bar">
+                    <!-- Buttons injected by JS (Quiz, PDF Original, etc) -->
+                </div>
+            </div>
+
+            <div class="course-viewer" id="course-viewer-container">
+                <iframe id="course-pdf-frame" src="" width="100%" height="100%" style="border:none;"></iframe>
+            </div>
+
+            <footer class="app-footer">
+                <p>Développé par <a href="https://www.facebook.com/maxime.urbaniak/" target="_blank"
+                        style="color:var(--accent-blue); text-decoration:none;"><strong>Maxime Urbaniak</strong></a>
+                    adhérent et stagiaire du club-école <a href="https://parapente62lefildariane.wordpress.com"
+                        target="_blank" style="color:var(--accent-blue); text-decoration:none;"><strong>Le Fil
+                            d'Ariane</strong></a> •
+                    Basé sur les ressources de la <a href="https://ffvl.fr" target="_blank"
+                        style="color:var(--accent-blue); text-decoration:none;">Fédération Française de Vol Libre</a>
+                </p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- GLOBAL FOOTER REMOVED -->
+
+    <!-- Scripts -->
+    <script src="js/data/qcm_bi.js"></script>
+    <script src="js/data/qcm_bp.js"></script>
+    <script src="js/data/qcm_bpc.js"></script>
+    <script src="js/data/generated_content.js"></script>
+    <script src="js/data/courses_data.js"></script>
+    <script src="js/data/qcm_official_data.js"></script>
+    <script src="js/qcm_data.js"></script>
+    <script src="js/scenarios.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/quiz_engine.js"></script>
+    <script src="js/library_engine.js"></script>
+    <script src="js/adventure_engine.js"></script>
+    <script src="js/engine.js"></script>
+    <script>
+        // Load Components (Header/Footer)
+        Engine.loadComponents('.');
+    </script>
+</body>
+
+</html>

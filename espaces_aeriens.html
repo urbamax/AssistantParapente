@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espaces Aériens</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/header.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #f1f5f9;
+            background-color: #0f172a;
+            margin: 0;
+            padding: 0;
+        }
+
+        .course-standalone-container {
+            max-width: 900px;
+            margin: 180px auto 0 auto;
+            padding: 40px 24px 120px 24px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #38bdf8;
+        }
+
+        h1 {
+            border-bottom: 2px solid #334155;
+            padding-bottom: 10px;
+        }
+
+        .note {
+            background: rgba(56, 189, 248, 0.1);
+            border-left: 4px solid #38bdf8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .tip {
+            background: rgba(74, 222, 128, 0.1);
+            border-left: 4px solid #4ade80;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #1e293b;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #334155;
+        }
+
+        th {
+            background-color: #334155;
+            color: #fff;
+        }
+
+        strong {
+            color: #e2e8f0;
+        }
+    </style>
+</head>
+
+<body class="standalone-course">
+    <div id="app-header" class="top-controls"></div>
+    <div class="course-standalone-container">
+
+        <h1>Espaces Aériens : Les Fondamentaux</h1>
+
+        <div class="note">
+            <i class="ri-information-line"></i> Comprendre l'espace aérien est vital pour votre sécurité et pour
+            respecter
+            la réglementation. En parapente, nous volons principalement en VFR (Vol à Vue).
+        </div>
+
+        <li>Exemple : FL 100 = environ 10 000 pieds (soit ~3000m en atmosphère standard).</li>
+        </ul>
+        </li>
+        </ul>
+
+        <h2>Structure de l'Espace Aérien</h2>
+        <p>L'espace est divisé en deux grandes parties :</p>
+        <ol>
+            <li><strong>Espace Inférieur (LTA - Lower Traffic Area)</strong> : Du sol jusqu'au FL 115 (~3450m) ou FL 195
+                (~5950m) selon les zones. C'est là que nous évoluons le plus souvent.</li>
+            <li><strong>Espace Supérieur (UTA - Upper Traffic Area)</strong> : Au-dessus du FL 195. C'est le domaine des
+                avions de ligne (Classe A), <strong>interdit au Vol Libre</strong>.</li>
+        </ol>
+
+        <h3>Les Types d'Espaces Controllés</h3>
+        <p>Pour protéger les aérodromes et les flux de trafic, on trouve :</p>
+        <ul>
+            <li><strong>CTR (Control Zone)</strong> : Espace autour d'un aéroport qui part du sol. <strong>Interdit sans
+                    contact radio/transpondeur.</strong></li>
+            <li><strong>TMA (Terminal Manoeuvring Area)</strong> : Espace situé au-dessus des CTR ou d'autres zones,
+                pour
+                gérer les arrivées et départs.</li>
+        </ul>
+
+        <h2>Les Classes d'Espace</h2>
+        <p>En France, les espaces sont classés par lettres.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Classe</th>
+                    <th>Statut pour le Vol Libre (VFR)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>A</strong></td>
+                    <td><strong>Interdit</strong>. (Espace supérieur, Région Parisienne...)</td>
+                </tr>
+                <tr>
+                    <td><strong>B</strong></td>
+                    <td>N'existe pas en France.</td>
+                </tr>
+                <tr>
+                    <td><strong>C</strong></td>
+                    <td><strong>Interdit</strong> sans clairance (contact radio + transpondeur).</td>
+                </tr>
+                <tr>
+                    <td><strong>D</strong></td>
+                    <td><strong>Interdit</strong> en général. Contact radio obligatoire.</td>
+                </tr>
+                <tr>
+                    <td><strong>E</strong></td>
+                    <td><strong>Autorisé</strong>. Contrôlé pour les IFR, mais libre pour les VFR.</td>
+                </tr>
+                <tr>
+                    <td><strong>F</strong></td>
+                    <td>N'existe pas en France.</td>
+                </tr>
+                <tr>
+                    <td><strong>G</strong></td>
+                    <td><strong>Autorisé</strong>. Espace non contrôlé.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Zones à Statut Particulier</h2>
+        <ul>
+            <li><strong>P (Prohibited)</strong> : Zone Interdite (ex: Centrales nucléaires, bases militaires sensibles).
+            </li>
+            <li><strong>R (Restricted)</strong> : Zone Réglementée. L'accès peut être autorisé sous conditions.</li>
+            <li><strong>RTBA</strong> : Réseau Très Basse Altitude. Vols rasants d'avions de chasse. <strong>Danger de
+                    mort</strong>.</li>
+            <li><strong>D (Dangerous)</strong> : Zone Dangereuse. Signalé, mais pas interdit. Prudence.</li>
+            <li><strong>ZSM (Zone de Sensibilité Majeure)</strong> : Protection de la faune. À respecter impérativement.
+            </li>
+        </ul>
+
+        <div class="tip-box">
+            <h4><i class="ri-lightbulb-line"></i> Rappel Réglementaire</h4>
+            <p>Les cartes OACI et SIA sont les références officielles. Pensez à vérifier les NOTAM et les zones actives
+                avant chaque vol.</p>
+        </div>
+
+        <!-- Final CTA -->
+        <button class="start-quiz-end-btn"
+            onclick="window.parent.Engine.toggleReviewMode('modernized/espaces-aeriens')">
+            <i class="ri-book-open-line"></i> Lancer le Quiz de Validation
+        </button>
+
+    </div>
+    <script src="js/data/courses_data.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/engine.js"></script>
+    <script>
+        if (typeof Engine !== 'undefined') {
+            Engine.loadComponents('.');
+        }
+    </script>
+</body>
+
+</html>

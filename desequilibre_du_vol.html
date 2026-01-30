@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Déséquilibre du Vol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/header.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #f1f5f9;
+            background-color: #0f172a;
+            margin: 0;
+            padding: 0;
+        }
+
+        .course-standalone-container {
+            max-width: 900px;
+            margin: 180px auto 0 auto;
+            padding: 40px 24px 120px 24px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #38bdf8;
+        }
+
+        h1 {
+            border-bottom: 2px solid #334155;
+            padding-bottom: 10px;
+        }
+
+        .note {
+            background: rgba(56, 189, 248, 0.1);
+            border-left: 4px solid #38bdf8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .tip {
+            background: rgba(74, 222, 128, 0.1);
+            border-left: 4px solid #4ade80;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        strong {
+            color: #e2e8f0;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body class="standalone-course">
+    <div id="app-header" class="top-controls"></div>
+    <div class="course-standalone-container">
+
+        <h1>Déséquilibre du Vol</h1>
+
+        <div class="note">
+            <i class="ri-information-line"></i> Ce cours traite des conséquences aérodynamiques des variations de
+            vitesse
+            sur les profils de parapente.
+        </div>
+
+        <h2>Concepts Fondamentaux</h2>
+        <p>Il est important de comprendre deux notions clés dans la mécanique de vol :</p>
+        <ul>
+            <li><strong>PTV (Poids Total Volant)</strong> : C'est la somme des poids du pilote, de l'aile, de la
+                sellette et
+                de tout l'équipement embarqué. C'est une force dirigée vers le bas.</li>
+            <li><strong>RFA (Résultante des Forces Aérodynamiques)</strong> : Elle est la somme de la Portance et de la
+                Traînée. C'est la force qui permet à l'aile de voler.</li>
+        </ul>
+
+        <div
+            style="text-align: center; margin: 30px 0; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px;">
+            <svg width="300" height="200" viewBox="0 0 300 200">
+                <!-- Paraglider wing profile -->
+                <path d="M 50 100 Q 150 50 250 110 Q 150 120 50 100" fill="none" stroke="#38bdf8" stroke-width="3" />
+                <!-- PTV Vector -->
+                <line x1="150" y1="105" x2="150" y2="180" stroke="#ef4444" stroke-width="4"
+                    marker-end="url(#arrow-red)" />
+                <text x="160" y="175" fill="#ef4444" font-weight="bold">PTV</text>
+                <!-- RFA Vector -->
+                <line x1="150" y1="95" x2="150" y2="20" stroke="#4ade80" stroke-width="4"
+                    marker-end="url(#arrow-green)" />
+                <text x="160" y="35" fill="#4ade80" font-weight="bold">RFA</text>
+
+                <!-- Markers -->
+                <defs>
+                    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444" />
+                    </marker>
+                    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#4ade80" />
+                    </marker>
+                </defs>
+            </svg>
+            <div style="font-size: 0.9rem; color: #94a3b8; margin-top: 10px;">Schéma 1 : Équilibre des forces en vol
+                stabilisé (RFA = PTV)</div>
+        </div>
+
+        <h3>Le Vol Équilibré</h3>
+        <p>En vol équilibré, la vitesse et la trajectoire sont constantes. Dans cette phase, la <strong>RFA est
+                parfaitement
+                opposée et égale au PTV</strong>.</p>
+
+        <h2>Les Phases de Déséquilibre</h2>
+        <p>Des perturbations aérologiques (comme entrer ou sortir d'une ascendance) ou des actions de pilotage peuvent
+            rompre cet équilibre.</p>
+
+        <h3>1. Entrée en turbulence (Perte de vitesse)</h3>
+        <p>Pour une raison aérologique (ex: entrée dans une turbulence ou sortie d'ascendance), le rendement de l'aile
+            peut
+            chuter.</p>
+        <ul>
+            <li><strong>Conséquence</strong> : La Force Aérodynamique (FA) diminue et devient
+                <strong>inférieure</strong> au
+                PTV.</li>
+            <li><strong>Effet</strong> : L'aile s'enfonce par manque de portance.</li>
+        </ul>
+
+        <h3>2. L'Abatée (Reprise de vitesse)</h3>
+        <p>Pour revoler, l'aile doit reprendre de la vitesse. Elle va donc "plonger" vers l'avant : c'est
+            l'<strong>abatée</strong>.</p>
+        <ul>
+            <li>Par inertie, l'aile va acquérir une vitesse supérieure à celle nécessaire au vol équilibré.</li>
+        </ul>
+
+        <h3>3. La Ressource (Retour à l'équilibre)</h3>
+        <p>Lorsque le pilote repasse sous son aile (rappel pendulaire), la vitesse est élevée.</p>
+        <ul>
+            <li><strong>Conséquence</strong> : La FA générée est alors <strong>supérieure</strong> au PTV.</li>
+            <li><strong>Effet</strong> : L'aile remonte, elle fait une <strong>ressource</strong>.</li>
+            <li><strong>Sensation</strong> : Le pilote ressent une compression (force G) et une bascule vers l'arrière
+                ("tassement" dans la sellette).</li>
+        </ul>
+
+        <h3>4. Retour au vol équilibré</h3>
+        <p>Après ces oscillations (qui peuvent être amorties par le pilote), le vol se stabilise à nouveau : la FA
+            redevient
+            égale au PTV.</p>
+
+        <h2>Définition d'un Vecteur</h2>
+        <p>Un vecteur est la représentation graphique d'une force. Il se caractérise par :</p>
+        <ul>
+            <li>Son <strong>point d’application</strong> (placé sur l’objet concerné).</li>
+            <li>Son <strong>orientation</strong> (portée par un axe).</li>
+            <li>Son <strong>intensité</strong> (illustrée par la longueur du vecteur).</li>
+            <li>Sa <strong>direction</strong> (donnée par l'extrémité de la flèche).</li>
+        </ul>
+
+        <div class="tip">
+            <div class="tip-box">
+                <h4><i class="ri-lightbulb-line"></i> Rappel</h4>
+                <p>Un vecteur est une représentation graphique d'une force. Il se caractérise par son point
+                    d'application,
+                    son orientation, son intensité et sa direction.</p>
+            </div>
+
+            <!-- Final CTA -->
+            <button class="start-quiz-end-btn"
+                onclick="window.parent.Engine.toggleReviewMode('modernized/desequilibre-du-vol')">
+                <i class="ri-book-open-line"></i> Lancer le Quiz de Validation
+            </button>
+        </div>
+
+    </div>
+    <script src="js/data/courses_data.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/engine.js"></script>
+    <script>
+        if (typeof Engine !== 'undefined') {
+            Engine.loadComponents('.');
+        }
+    </script>
+</body>
+
+</html>

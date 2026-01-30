@@ -1,0 +1,46 @@
+const COMPONENTS = {
+    header: `
+<div class="header-top-row">
+    <div class="header-nav-slot"></div>
+    <div class="header-branding">
+        <h1 class="dashboard-title" onclick="if(window.Engine) Engine.showDashboard()" style="cursor:pointer;">THÉORIE PARAPENTE</h1>
+    </div>
+    <div class="header-actions-slot">
+        <a href="https://parapente62lefildariane.wordpress.com" target="_blank" title="Visiter le site du Club Le Fil d'Ariane">
+            <img src="https://parapente62lefildariane.wordpress.com/wp-content/uploads/2025/02/logo-club-2025-2.png?w=781" alt="Logo Club" class="club-logo">
+        </a>
+        <a href="https://parapente.ffvl.fr" target="_blank" title="Visiter le site de la FFVL">
+            <img src="https://federation.ffvl.fr/sites/ffvl.fr/files/FFVL_3.png" alt="Logo FFVL" class="ffvl-logo">
+        </a>
+        <button id="theme-toggle" class="icon-btn" onclick="if(window.Engine) Engine.toggleTheme()" title="Mode: Auto (Système)">
+            <div class="auto-icon-composite">
+                <i class="ri-sun-line"></i>
+                <i class="ri-moon-line"></i>
+            </div>
+        </button>
+    </div>
+</div>
+<div class="header-level-row">
+    <div class="level-select-container">
+        <label for="global-level-select">
+            <i class="ri-graduation-cap-line"></i> NIVEAU</label>
+        <select id="global-level-select" onchange="if(window.Engine) Engine.changeLevel(this.value)">
+            <option value="ALL">TOUS LES NIVEAUX</option>
+            <option value="BI">BREVET INITIAL</option>
+            <option value="BP">BREVET PILOTE</option>
+            <option value="BPC">BREVET PILOTE CONFIRMÉ</option>
+        </select>
+    </div>
+</div>
+`,
+    footer: `
+<p>Développé par <a href="https://www.facebook.com/maxime.urbaniak/" target="_blank"
+        style="color:var(--accent-blue); text-decoration:none;"><strong>Maxime Urbaniak</strong></a>
+    adhérent et stagiaire du club-école <a href="https://parapente62lefildariane.wordpress.com"
+        target="_blank" style="color:var(--accent-blue); text-decoration:none;"><strong>Le Fil
+            d'Ariane</strong></a> •
+    Basé sur les ressources de la <a href="https://ffvl.fr" target="_blank"
+        style="color:var(--accent-blue); text-decoration:none;">Fédération Française de Vol Libre</a>
+</p>
+`
+};
