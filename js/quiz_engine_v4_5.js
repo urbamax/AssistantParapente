@@ -11,6 +11,7 @@ const QuizEngine = {
             count: 10,
             theme: 'ALL'
         },
+        masteryFilter: 'ALL', // ALL, PERFECT, EXCELLENT, GOOD, POOR, FAILED, NOT_ATTEMPTED
         qcmSessionData: [],
         currentQcmSelection: new Set(),
         examResults: [],
@@ -128,7 +129,7 @@ const QuizEngine = {
                     correct: parseInt(a.pts) > 0,
                     pts: parseInt(a.pts)
                 })),
-                explanation: " (Source: QCM FFVL Officiel)",
+                explanation: q.explication || "",
                 theme: getCategory(q.code),
                 level: (function (c) {
                     const lastChar = c.charAt(c.length - 1).toUpperCase();
@@ -149,6 +150,7 @@ const QuizEngine = {
         if (typeof QCM_OFFICIAL !== 'undefined') {
             const excludedPrefixes = ['H', 'R', 'X']; // Delta specifics
             sourceData = sourceData.filter(q => !excludedPrefixes.includes(q.code.charAt(0)));
+
 
             if (level === 'BI') {
                 sourceData = sourceData.filter(q => q.code && q.code.includes('V'));
@@ -632,6 +634,11 @@ const QuizEngine = {
             levelQs = QCM_OFFICIAL.questions.filter(q => q.parapente === true && q.class && q.class.includes(currentLevel));
         }
 
+        // Deduplicate and Filter levelQs (Fix for erroneous 198 count vs 174)
+        const excludedPrefixes = ['H', 'R', 'X']; // Delta specifics
+        levelQs = levelQs.filter(q => !excludedPrefixes.includes(q.code.charAt(0)));
+
+
         if (levelQs.length > 0) {
             totalLevelQuestions = levelQs.length;
             levelQs.forEach(q => levelQuestionCodes.add(q.code));
@@ -681,43 +688,75 @@ const QuizEngine = {
             else failed++;
         });
 
-        // Recalculate global percentage for this level only
-        let levelTotalQuestions = 0;
-        let levelTotalCorrect = 0;
-        levelQuestionEntries.forEach(([code, data]) => {
-            levelTotalQuestions += data.total;
-            levelTotalCorrect += data.correct;
+        // Recalculate global percentage (MASTERY SCORE)
+        // Formula: Sum of (Correct/Total) for each unique question / Total number of unique questions
+        // This ensures unattempted questions count as 0% mastery.
+
+        let accumulatedMastery = 0;
+
+        // Iterate over ALL unique questions for this level (attempted or not)
+        levelQs.forEach(q => {
+            const stat = stats.questions[q.code];
+            if (stat && stat.total > 0) {
+                accumulatedMastery += (stat.correct / stat.total);
+            } else {
+                // Unattempted or 0 total attempts = 0% mastery
+                accumulatedMastery += 0;
+            }
         });
 
-        const globalPct = levelTotalQuestions > 0 ? Math.round((levelTotalCorrect / levelTotalQuestions) * 100) : 0;
+        // If totalLevelQuestions is 0 (should not happen if data loaded), avoid division by zero
+        const globalPct = totalLevelQuestions > 0 ? Math.round((accumulatedMastery / totalLevelQuestions) * 100) : 0;
         const color = globalPct >= 75 ? '#4ade80' : (globalPct >= 50 ? '#facc15' : '#f87171');
 
 
+        const currentFilter = this.state.masteryFilter || 'ALL';
+        const getCardStyle = (baseColor, filterType) => {
+            const isActive = currentFilter === filterType;
+            const bgOpacity = isActive ? 0.15 : 0.03;
+            const borderOpacity = isActive ? 0.6 : 0.1;
+            const scale = isActive ? 'transform:scale(1.05);' : '';
+            return `background:rgba(${baseColor}, ${bgOpacity}); border:1px solid rgba(${baseColor}, ${borderOpacity}); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; ${scale}`;
+        };
+
+        // Colors in RGB for helper
+        const cGreen = '74, 222, 128';
+        const cYellow = '250, 204, 21';
+        const cOrange = '251, 146, 60';
+        const cRed = '248, 113, 113';
+        const cGray = '255, 255, 255';
+
         const distributionHtml = `
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px;">
-                <div style="background:rgba(74, 222, 128, 0.1); border:1px solid #4ade80; padding:12px; border-radius:8px; text-align:center;">
-                    <div style="font-size:1.8rem; font-weight:700; color:#4ade80;">${perfect}</div>
-                    <div style="font-size:0.75rem; opacity:0.8; margin-top:4px;">100% maîtrisées</div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:16px;">
+                <div onclick="QuizEngine.setMasteryFilter('PERFECT')" style="${getCardStyle(cGreen, 'PERFECT')}">
+                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">${perfect}</div>
+                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Maîtrisées</div>
+                    <div style="font-size:0.65rem; opacity:0.4;">(100%)</div>
                 </div>
-                <div style="background:rgba(74, 222, 128, 0.05); border:1px solid #86efac; padding:12px; border-radius:8px; text-align:center;">
-                    <div style="font-size:1.8rem; font-weight:700; color:#86efac;">${excellent}</div>
-                    <div style="font-size:0.75rem; opacity:0.8; margin-top:4px;">75-99%</div>
+                <div onclick="QuizEngine.setMasteryFilter('EXCELLENT')" style="${getCardStyle('134, 239, 172', 'EXCELLENT')}">
+                    <div style="font-size:2rem; font-weight:900; color:#86efac;">${excellent}</div>
+                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Excellentes</div>
+                    <div style="font-size:0.65rem; opacity:0.4;">(75-99%)</div>
                 </div>
-                <div style="background:rgba(250, 204, 21, 0.1); border:1px solid #facc15; padding:12px; border-radius:8px; text-align:center;">
-                    <div style="font-size:1.8rem; font-weight:700; color:#facc15;">${good}</div>
-                    <div style="font-size:0.75rem; opacity:0.8; margin-top:4px;">50-74%</div>
+                <div onclick="QuizEngine.setMasteryFilter('GOOD')" style="${getCardStyle(cYellow, 'GOOD')}">
+                    <div style="font-size:2rem; font-weight:900; color:#facc15;">${good}</div>
+                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Satisfaisantes</div>
+                    <div style="font-size:0.65rem; opacity:0.4;">(50-74%)</div>
                 </div>
-                <div style="background:rgba(251, 146, 60, 0.1); border:1px solid #fb923c; padding:12px; border-radius:8px; text-align:center;">
-                    <div style="font-size:1.8rem; font-weight:700; color:#fb923c;">${poor}</div>
-                    <div style="font-size:0.75rem; opacity:0.8; margin-top:4px;">1-49%</div>
+                <div onclick="QuizEngine.setMasteryFilter('POOR')" style="${getCardStyle(cOrange, 'POOR')}">
+                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">${poor}</div>
+                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
+                    <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
-                <div style="background:rgba(248, 113, 113, 0.1); border:1px solid #f87171; padding:12px; border-radius:8px; text-align:center;">
-                    <div style="font-size:1.8rem; font-weight:700; color:#f87171;">${failed}</div>
-                    <div style="font-size:0.75rem; opacity:0.8; margin-top:4px;">0% (échec)</div>
+                <div onclick="QuizEngine.setMasteryFilter('FAILED')" style="${getCardStyle(cRed, 'FAILED')}">
+                    <div style="font-size:2rem; font-weight:900; color:#f87171;">${failed}</div>
+                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Échecs</div>
+                    <div style="font-size:0.65rem; opacity:0.4;">(0%)</div>
                 </div>
-                <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); padding:12px; border-radius:8px; text-align:center;">
-                    <div style="font-size:1.8rem; font-weight:700; color:var(--text-muted);">${notAttempted}</div>
-                    <div style="font-size:0.75rem; opacity:0.8; margin-top:4px;">Non tentées <span style="opacity:0.6; font-size:0.7rem;">(sur ${totalLevelQuestions})</span></div>
+                <div onclick="QuizEngine.setMasteryFilter('NOT_ATTEMPTED')" style="${getCardStyle(cGray, 'NOT_ATTEMPTED')}">
+                    <div style="font-size:2rem; font-weight:900; color:var(--text-muted);">${notAttempted}</div>
+                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Non tentées</div>
+                    <div style="font-size:0.65rem; opacity:0.4;">(sur ${totalLevelQuestions})</div>
                 </div>
             </div>
         `;
@@ -727,12 +766,11 @@ const QuizEngine = {
             const pct = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
             const tColor = pct >= 75 ? '#4ade80' : (pct >= 50 ? '#facc15' : '#f87171');
             themesHtml += `
-                <div class="stats-row">
-                    <div>
-                        <div style="font-weight:600;">${name}</div>
-                        <div style="font-size:0.8rem; opacity:0.6;">${data.correct}/${data.total} corrects</div>
+                <div class="stats-row" style="margin-bottom:12px; padding:12px 16px; background:rgba(255,255,255,0.02); border-radius:12px; border:1px solid rgba(255,255,255,0.03);">
+                    <div style="flex:1;">
+                        <div style="font-weight:600; font-size:1rem; letter-spacing:0.01em;">${name}</div>
                     </div>
-                    <div style="font-weight:bold; color:${tColor}; font-size:1.1rem;">${pct}%</div>
+                    <div style="font-weight:800; color:${tColor}; font-size:1.2rem; min-width:60px; text-align:right;">${pct}%</div>
                 </div>
             `;
         });
@@ -779,9 +817,50 @@ const QuizEngine = {
                 return pctA - pctB;
             });
 
+            // --- FILTERING LOGIC ---
+            let visibleQuestions = [];
+
+            if (this.state.masteryFilter === 'ALL') {
+                visibleQuestions = sortedQuestions;
+            } else if (this.state.masteryFilter === 'NOT_ATTEMPTED') {
+                // Determine unattempted questions
+                // levelQs contains ALL valid questions for this level (excluding Delta)
+                // stats.questions contains history
+                levelQs.forEach(q => {
+                    if (!stats.questions[q.code] || stats.questions[q.code].total === 0) {
+                        // Create a mock "data" object for rendering
+                        visibleQuestions.push([q.code, { total: 0, correct: 0 }]);
+                    }
+                });
+            } else {
+                visibleQuestions = sortedQuestions.filter(([code, data]) => {
+                    const pct = Math.round((data.correct / data.total) * 100);
+                    if (this.state.masteryFilter === 'PERFECT') return pct === 100;
+                    if (this.state.masteryFilter === 'EXCELLENT') return pct >= 75 && pct < 100;
+                    if (this.state.masteryFilter === 'GOOD') return pct >= 50 && pct < 75;
+                    if (this.state.masteryFilter === 'POOR') return pct > 0 && pct < 50;
+                    if (this.state.masteryFilter === 'FAILED') return pct === 0;
+                    return true;
+                });
+            }
+
+            const filterLabel = {
+                'ALL': 'Toutes les questions tentées',
+                'PERFECT': 'Questions Maîtrisées (100%)',
+                'EXCELLENT': 'Questions Excellentes (75-99%)',
+                'GOOD': 'Questions Satisfaisantes (50-74%)',
+                'POOR': 'Questions À travailler (1-49%)',
+                'FAILED': 'Questions Échouées (0%)',
+                'NOT_ATTEMPTED': 'Questions Non Tentées'
+            }[this.state.masteryFilter];
+
             allQuestionsHtml = `
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
-                    <div style="font-size:0.9rem; opacity:0.7;">${levelQuestionEntries.length} questions tentées</div>
+                    <div style="font-size:0.9rem; opacity:0.7;">
+                        <span style="font-weight:700; color:var(--text-main);">${visibleQuestions.length}</span> questions 
+                        <span style="opacity:0.6;">(${filterLabel})</span>
+                        ${this.state.masteryFilter !== 'ALL' ? '<a onclick="QuizEngine.setMasteryFilter(\'ALL\')" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--color-primary);">Tout voir</a>' : ''}
+                    </div>
                     <div style="display:flex; gap:8px;">
                         <button onclick="QuizEngine.sortQuestions('rate')" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
                             Par taux
@@ -794,7 +873,7 @@ const QuizEngine = {
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             `;
 
-            sortedQuestions.forEach(([code, data]) => {
+            visibleQuestions.forEach(([code, data]) => {
                 let qText = "Question " + code;
                 let theme = "Autre";
                 let qObj = null;
@@ -871,52 +950,95 @@ const QuizEngine = {
             allQuestionsHtml = '<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">Aucune question tentée pour le moment.</div>';
         }
 
-        container.innerHTML = `
-            <div class="stats-circle-container">
-                <div class="stats-circle" style="border-color:${color}; color:${color}; box-shadow:0 0 20px -5px ${color};">
-                    ${globalPct}%
-                </div>
-                <div style="font-size:0.9rem; opacity:0.7;">Taux de réussite (${currentLevel})</div>
-                <div style="font-size:0.8rem; opacity:0.5;">(Activité totale: ${stats.totalQuestions} réponses)</div>
-            </div>
+        // Premium Circular Gauge Calculation
+        const strokeDash = 2 * Math.PI * 45; // r=45
+        const offset = strokeDash - (globalPct / 100) * strokeDash;
+        const colorGlow = color + '44'; // Add transparency for glow
 
-            <div style="margin-top:32px;">
-                <h3 class="library-section-header">Répartition des questions</h3>
+        const successGaugeHtml = `
+            <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:rgba(255,255,255,0.02); border-radius:32px; border: 1px solid rgba(255,255,255,0.05); backdrop-filter:blur(10px);">
+                <div class="gauge-wrapper" style="position:relative; width:180px; height:180px; display:flex; align-items:center; justify-content:center;">
+                    <!-- SVG Progress Circle -->
+                    <svg width="180" height="180" viewBox="0 0 100 100" style="transform: rotate(-90deg);">
+                        <!-- Background track -->
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="8" />
+                        <!-- Progress bar -->
+                        <circle cx="50" cy="50" r="45" fill="none" 
+                            stroke="${color}" 
+                            stroke-width="8" 
+                            stroke-dasharray="${strokeDash}" 
+                            stroke-dashoffset="${offset}" 
+                            stroke-linecap="round"
+                            style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px ${color});"
+                        />
+                    </svg>
+                    
+                    <!-- Internal Content -->
+                    <div style="position:absolute; text-align:center; transform: rotate(0deg); display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%;">
+                        <div style="font-size:3.5rem; font-weight:900; color:${color}; line-height:1; letter-spacing:-2px; font-family:'Inter', sans-serif;">
+                            ${globalPct}<span style="font-size:1.4rem; opacity:0.8; margin-left:2px;">%</span>
+                        </div>
+                        <div style="font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; margin-top:8px; line-height:1.2;">
+                            RÉUSSITE<br>GLOBALE
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align:center; margin-top:24px;">
+                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : ${currentLevel === 'ALL' ? 'TOUS LES NIVEAUX' : currentLevel}</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : ${stats.totalQuestions} réponses enregistrées</div>
+                </div>
+            </div>
+        `;
+
+        const statsGridStyle = `display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:32px;`;
+
+        container.innerHTML = `
+            ${successGaugeHtml}
+
+            <div style="margin-top:48px;">
+                <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
                 ${distributionHtml}
             </div>
 
-            <div class="stats-grid-2">
+            <div style="${statsGridStyle} margin-top:48px;">
                 <div>
-                    <h3 class="library-section-header">Statistiques par Thème</h3>
-                    <div style="display:flex; flex-direction:column; gap:8px;">
+                    <h3 class="library-section-header" style="border:none; margin-bottom:24px;">STATISTIQUES PAR THÈME</h3>
+                    <div style="display:flex; flex-direction:column; gap:2px;">
                         ${themesHtml || '<div style="opacity:0.5;">Aucune donnée.</div>'}
                     </div>
                 </div>
                 <div>
-                    <h3 class="library-section-header">Questions à revoir</h3>
-                    ${problemsHtml}
+                    <h3 class="library-section-header" style="border:none; margin-bottom:24px;">QUESTIONS À REVOIR</h3>
+                    <div style="display:flex; flex-direction:column; gap:2px;">
+                        ${problemsHtml}
+                    </div>
                 </div>
             </div>
 
-            <div style="margin-top:40px;">
-                <h3 class="library-section-header">Historique des examens</h3>
-                ${this.renderExamHistory()}
+            <div style="margin-top:64px;">
+                <h3 class="library-section-header" style="border:none; margin-bottom:24px;">HISTORIQUE DES EXAMENS</h3>
+                <div style="background:rgba(255,255,255,0.02); padding:24px; border-radius:24px; border:1px solid rgba(255,255,255,0.05);">
+                    ${this.renderExamHistory()}
+                </div>
             </div>
 
-            <div style="margin-top:40px;">
-                <h3 class="library-section-header">Toutes les questions</h3>
-                ${allQuestionsHtml}
+            <div style="margin-top:64px;">
+                <h3 class="library-section-header" style="border:none; margin-bottom:24px;">LISTE DÉTAILLÉE DES QUESTIONS</h3>
+                <div style="background:rgba(255,255,255,0.02); padding:24px; border-radius:24px; border:1px solid rgba(255,255,255,0.05);">
+                    ${allQuestionsHtml}
+                </div>
             </div>
 
-            <div style="text-align:center; margin-top:32px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-                <button onclick="QuizEngine.exportData()" style="background:rgba(74, 222, 128, 0.1); color:#4ade80; border:1px solid #4ade80; padding:10px 20px; border-radius:8px; cursor:pointer;">
-                    <i class="ri-download-line"></i> Exporter les données
+            <div style="text-align:center; margin-top:64px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; padding-bottom:40px;">
+                <button onclick="QuizEngine.exportData()" style="background:rgba(74, 222, 128, 0.1); color:#4ade80; border:1px solid rgba(74, 222, 128, 0.3); padding:12px 28px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; display:flex; align-items:center; gap:8px;">
+                    <i class="ri-download-cloud-line" style="font-size:1.2rem;"></i> Exporter
                 </button>
-                <button onclick="QuizEngine.importData()" style="background:rgba(59, 130, 246, 0.1); color:#3b82f6; border:1px solid #3b82f6; padding:10px 20px; border-radius:8px; cursor:pointer;">
-                    <i class="ri-upload-line"></i> Importer les données
+                <button onclick="QuizEngine.importData()" style="background:rgba(59, 130, 246, 0.1); color:#3b82f6; border:1px solid rgba(59, 130, 246, 0.3); padding:12px 28px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; display:flex; align-items:center; gap:8px;">
+                    <i class="ri-upload-cloud-line" style="font-size:1.2rem;"></i> Importer
                 </button>
-                <button onclick="QuizEngine.resetStats()" style="background:rgba(248, 113, 113, 0.1); color:#f87171; border:1px solid #f87171; padding:10px 20px; border-radius:8px; cursor:pointer;">
-                    <i class="ri-delete-bin-line"></i> Réinitialiser
+                <button onclick="QuizEngine.resetStats()" style="background:rgba(248, 113, 113, 0.05); color:#f87171; border:1px solid rgba(248, 113, 113, 0.2); padding:12px 28px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; display:flex; align-items:center; gap:8px;">
+                    <i class="ri-delete-bin-7-line" style="font-size:1.2rem;"></i> Réinitialiser
                 </button>
             </div>
         `;
@@ -967,48 +1089,48 @@ const QuizEngine = {
                     }
 
                     optionsHtml += `
-                        <div style="padding:8px 12px; border-radius:6px; ${statusClass} display:flex; align-items:center; gap:8px; font-size:0.85rem;">
-                            ${icon}
-                            <span style="flex:1;">${opt.text}</span>
-                        </div>
-                    `;
+            <div style="padding:8px 12px; border-radius:6px; ${statusClass} display:flex; align-items:center; gap:8px; font-size:0.85rem;" >
+                ${icon}
+        <span style="flex:1;">${opt.text}</span>
+                        </div >
+    `;
                 });
 
                 questionsHtml += `
-                    <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; ${!r.isCorrect ? 'border:1px solid #f87171;' : ''}">
+    <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; ${!r.isCorrect ? 'border:1px solid #f87171;' : ''}" >
                         <div style="font-size:0.75rem; opacity:0.6; margin-bottom:6px;">Question ${idx + 1}</div>
                         <div style="font-weight:600; margin-bottom:12px;">${q.question}</div>
                         <div style="display:flex; flex-direction:column; gap:6px;">
                             ${optionsHtml}
                         </div>
                         ${!r.isCorrect && q.explanation ? `<div style="margin-top:12px; padding:8px; background:rgba(251, 146, 60, 0.1); border-left:3px solid #fb923c; font-size:0.85rem; opacity:0.9;">${q.explanation}</div>` : ''}
-                    </div>
-                `;
+                    </div >
+    `;
             });
 
             questionsHtml += '</div></div>';
 
             html += `
-                <div data-exam-id="${exam.id}" style="background:var(--bg-card); padding:16px; border-radius:12px; border:1px solid var(--border-color); cursor:pointer;" onclick="QuizEngine.toggleExamDetails(${exam.id})">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div style="flex:1;">
-                            <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-                                <span style="font-size:0.75rem; opacity:0.6;">${dateStr}</span>
-                                <span style="background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:4px; font-size:0.7rem;">${levelLabel}</span>
-                                <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
-                            </div>
-                            <div style="font-size:0.9rem;">
-                                <span style="color:${color}; font-weight:700; font-size:1.1rem;">${exam.score}/${exam.total}</span>
-                                <span style="opacity:0.7; margin-left:8px;">(${exam.percentage}%)</span>
-                            </div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div style="font-size:1.5rem; font-weight:700; color:${color};">${exam.percentage}%</div>
-                        </div>
-                    </div>
-                    ${questionsHtml}
+    <div data-exam-id="${exam.id}" style="background:var(--bg-card); padding:16px; border-radius:12px; border:1px solid var(--border-color); cursor:pointer;" onclick= "QuizEngine.toggleExamDetails(${exam.id})" >
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="flex:1;">
+                <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+                    <span style="font-size:0.75rem; opacity:0.6;">${dateStr}</span>
+                    <span style="background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:4px; font-size:0.7rem;">${levelLabel}</span>
+                    <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
-            `;
+                <div style="font-size:0.9rem;">
+                    <span style="color:${color}; font-weight:700; font-size:1.1rem;">${exam.score}/${exam.total}</span>
+                    <span style="opacity:0.7; margin-left:8px;">(${exam.percentage}%)</span>
+                </div>
+            </div>
+            <div style="text-align:right;">
+                <div style="font-size:1.5rem; font-weight:700; color:${color};">${exam.percentage}%</div>
+            </div>
+        </div>
+                    ${questionsHtml}
+                </div >
+    `;
         });
 
         html += '</div>';
@@ -1066,6 +1188,15 @@ const QuizEngine = {
         }
     },
 
+    setMasteryFilter: function (filter) {
+        if (this.state.masteryFilter === filter) {
+            this.state.masteryFilter = 'ALL'; // Toggle off
+        } else {
+            this.state.masteryFilter = filter;
+        }
+        this.renderStats();
+    },
+
 
 
     // --- STATISTICS MANAGEMENT ---
@@ -1104,7 +1235,7 @@ const QuizEngine = {
 
         // Update question-specific stats
         // Prefer ID over code for stability, falling back to generated ID
-        const code = question.id || question.code || `q_${Date.now()}`;
+        const code = question.id || question.code || `q_${Date.now()} `;
         if (!stats.questions[code]) {
             stats.questions[code] = { total: 0, correct: 0, streak: 0 };
         }
@@ -1379,7 +1510,7 @@ const QuizEngine = {
             const levelColor = q.level === 1 ? '#48BB78' : q.level === 2 ? '#4299E1' : '#92400e';
 
             html += `
-                <div class="bank-question-card" style="background:var(--bg-card); padding:20px; border-radius:12px; border:1px solid var(--border-color);">
+    <div class="bank-question-card" style="background:var(--bg-card); padding:20px; border-radius:12px; border:1px solid var(--border-color);" >
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                         <div style="display:flex; gap:8px; align-items:center;">
                             <span style="background:${levelColor}; color:white; padding:4px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${levelLabel}</span>
@@ -1395,8 +1526,8 @@ const QuizEngine = {
                             </div>
                         `).join('')}
                     </div>
-                </div>
-            `;
+                </div >
+    `;
         });
 
         resultsDiv.innerHTML = html;

@@ -27,7 +27,7 @@ const Engine = {
         // Setup Theme Toggle Listener safely
         const themeBtn = document.getElementById('theme-toggle');
         if (themeBtn) {
-            themeBtn.onclick = () => this.toggleTheme();
+            themeBtn.onclick= () => this.toggleTheme();
         }
 
         // Load saved theme
@@ -261,7 +261,7 @@ const Engine = {
         const navSlot = document.querySelector('.header-nav-slot');
         if (navSlot && !document.getElementById('standalone-back-btn')) {
             const backBtn = document.createElement('a');
-            backBtn.id = 'standalone-back-btn';
+            backBtn.id='standalone-back-btn';
             backBtn.href = basePath + '/index.html';
             backBtn.className = 'nav-btn-glass';
             backBtn.innerHTML = '<i class="ri-arrow-left-line"></i> <span>RETOUR</span>';
@@ -279,7 +279,7 @@ const Engine = {
             }
             if (pdfPath) {
                 const pdfBtn = document.createElement('a');
-                pdfBtn.id = 'standalone-pdf-btn';
+                pdfBtn.id='standalone-pdf-btn';
                 pdfBtn.href = basePath + '/' + pdfPath;
                 pdfBtn.target = '_blank';
                 pdfBtn.className = 'nav-btn-glass secondary';
@@ -377,7 +377,7 @@ const Engine = {
         const data = GENERATED_CONTENT[courseId];
 
         const overlay = document.createElement('div');
-        overlay.id = 'review-overlay';
+        overlay.id='review-overlay';
         overlay.className = 'review-overlay';
 
         if (viewer === document.body) {
