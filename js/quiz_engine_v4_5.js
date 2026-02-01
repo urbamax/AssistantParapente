@@ -170,74 +170,85 @@ const QuizEngine = {
             const stats = this.getPersistentStats();
             if (selectedTheme !== 'ALL') sourceData = sourceData.filter(q => q.theme === selectedTheme);
 
-            // Filter questions that have been attempted at least once
-            sourceData = sourceData.filter(q => {
-                const s = stats.questions[q.code];
-                return s && s.total > 0;
-            });
-
-            if (sourceData.length === 0) {
-                alert("Aucune question à réviser ! Vous devez d'abord faire des quiz pour générer des statistiques.");
-                return;
-            }
-
-            // Sort by success rate (worst first) and streak (prioritize non-mastered)
+            // Smart Sort:
+            // 1. Success Rate (Low -> High)
+            // 2. Attempts (Low -> High) - prioritize less practiced
             sourceData.sort((a, b) => {
-                const statsA = stats.questions[a.code];
-                const statsB = stats.questions[b.code];
+                const statsA = stats.questions[a.code] || { total: 0, correct: 0 };
+                const statsB = stats.questions[b.code] || { total: 0, correct: 0 };
 
-                const rateA = statsA.total > 0 ? (statsA.correct / statsA.total) : 0;
-                const rateB = statsB.total > 0 ? (statsB.correct / statsB.total) : 0;
+                const rateA = statsA.total > 0 ? (statsA.correct / statsA.total) : -1; // -1 for unattempted to put them differently? 
+                // Wait, user wants to favor WORST results.
+                // 0% (0/1) is worse than Unattempted? Or Unattempted is "neutral"?
+                // Let's treat Unattempted as "100% potential" (push to end) or similar?
+                // Actually, standard "Smart" is: Failed (<50%) > Unattempted > Passed.
+                // Or Failed > Passed (Low rate to High rate). Unattempted? 
+                // User said "Revision = on favorise les moins bon resultats".
+                // So Questions with 0% success come first.
+                // Questions with 100% success come last.
+                // Unattempted?
 
-                // First priority: success rate (lower is worse, should come first)
-                if (rateA !== rateB) {
-                    return rateA - rateB;
-                }
+                // Let's define a "Score":
+                // Rate: 0..1
+                // Unattempted: let's give them a score of 0.5 (middle) or 1.1 (last)?
+                // Often Revision means "Review what I got wrong".
+                // I will prioritize: 
+                // 1. Attempted & < 100% (ascending rate)
+                // 2. Unattempted
+                // 3. Mastered (100%)
 
-                // Second priority: streak (lower streak = needs more practice)
-                const streakA = statsA.streak || 0;
-                const streakB = statsB.streak || 0;
-                return streakA - streakB;
+                const getScore = (s) => {
+                    if (!s || s.total === 0) return 2; // Priority group 2 (Unattempted)
+                    const r = s.correct / s.total;
+                    if (r === 1) return 3; // Priority group 3 (Mastered)
+                    return r; // Priority group 0..1 (Failed to Good)
+                };
+
+                const scoreA = getScore(statsA);
+                const scoreB = getScore(statsB);
+
+                return scoreA - scoreB;
             });
+
+            // Take top N
+            questions = sourceData.slice(0, count);
+            // Shuffle the selection so we don't always get the same order of failed questions? 
+            // Or keep them strictly ordered? STRICTLY ordered ensures we see the worst ones.
+            // But if I request 10 questions and have 50 failed, I might want variety.
+            // Let's keep strict order for "Revision" to ensure focus.
 
         } else if (mode === 'TRAINING') {
             const stats = this.getPersistentStats();
             if (selectedTheme !== 'ALL') sourceData = sourceData.filter(q => q.theme === selectedTheme);
 
-            // Sort by attempt count (fewest attempts first) to prioritize unexplored questions
-            sourceData.sort((a, b) => {
-                const statsA = stats.questions[a.code];
-                const statsB = stats.questions[b.code];
-
-                const attemptsA = statsA ? statsA.total : 0;
-                const attemptsB = statsB ? statsB.total : 0;
-
-                return attemptsA - attemptsB;
-            });
+            // TRAINING IS NOW RANDOM (like Exam) but with Instant Answer
+            // Just Shuffle
+            questions = this.shuffle(sourceData).slice(0, count);
 
         } else if (selectedTheme !== 'ALL') {
             sourceData = sourceData.filter(q => q.theme === selectedTheme);
+            questions = this.shuffle(sourceData).slice(0, count);
         }
 
         if (mode === 'EXAM') {
             if (level === 'BI') count = 30;
             else if (level === 'BP') count = 60;
             else if (level === 'BPC') count = 30;
-        }
 
-        if (sourceData.length === 0) {
-            alert("Aucune question disponible pour ce filtre !");
-            return;
-        }
-
-        // For TRAINING and REVISION: keep sorted order to prioritize
-        // For EXAM: shuffle for randomness
-        let questions;
-        if (mode === 'TRAINING' || mode === 'REVISION') {
-            questions = sourceData.slice(0, count);
-        } else {
+            // Exam is already shuffled below if I didn't set 'questions' yet
+            // logic below needs adjustment
             questions = this.shuffle(sourceData).slice(0, count);
         }
+
+        // Final fallback if questions not set (should be covered above)
+        if (!questions) questions = this.shuffle(sourceData).slice(0, count);
+
+        /*
+        // Code Replaced:
+        // Original logic had sorting/filtering separately and then slicing at the end.
+        // I moved slicing into the blocks to handle specific logic.
+        // Clean up downstream.
+        */
 
         if (questions.length === 0) {
             alert("Aucune question trouvée !");
@@ -715,8 +726,9 @@ const QuizEngine = {
             const isActive = currentFilter === filterType;
             const bgOpacity = isActive ? 0.15 : 0.03;
             const borderOpacity = isActive ? 0.6 : 0.1;
-            const scale = isActive ? 'transform:scale(1.05);' : '';
-            return `background:rgba(${baseColor}, ${bgOpacity}); border:1px solid rgba(${baseColor}, ${borderOpacity}); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; ${scale}`;
+            // Remove scale, use shadow/border for "pop"
+            const shadow = isActive ? `box-shadow: 0 0 20px rgba(${baseColor}, 0.2);` : '';
+            return `background:rgba(${baseColor}, ${bgOpacity}); border:1px solid rgba(${baseColor}, ${borderOpacity}); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ${shadow}`;
         };
 
         // Colors in RGB for helper
@@ -727,7 +739,7 @@ const QuizEngine = {
         const cGray = '255, 255, 255';
 
         const distributionHtml = `
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:16px;">
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 <div onclick="QuizEngine.setMasteryFilter('PERFECT')" style="${getCardStyle(cGreen, 'PERFECT')}">
                     <div style="font-size:2rem; font-weight:900; color:#4ade80;">${perfect}</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Maîtrisées</div>
