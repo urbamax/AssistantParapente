@@ -7,8 +7,8 @@
     <title>Théorie Parapente</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/style.css?v=4.43">
+    <link rel="stylesheet" href="css/header.css?v=4.39">
 </head>
 
 <body>
@@ -56,7 +56,6 @@
 
     <!-- QCM SETUP SCREEN -->
     <div id="qcm-setup-screen" class="mode-screen">
-        <button class="return-btn" onclick="Engine.goBack()">← Retour</button>
         <div class="course-container">
             <div class="setup-grid" style="display:grid; gap:24px; max-width:800px; margin:0 auto;">
 
@@ -76,6 +75,12 @@
                         </button>
                     </div>
                 </div>
+                <!-- Mode Description (New) -->
+                <!-- Mode Description (New) -->
+                <div id="mode-description"
+                    style="background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; margin-top:-16px; margin-bottom:24px; font-size:0.9rem; opacity:0.8; font-style:italic;">
+                    Mode Entraînement : choisissez votre thème et volume. Correction immédiate après chaque question.
+                </div>
 
                 <!-- TRAINING OPTIONS (Hidden in Exam Mode) -->
                 <div id="training-options">
@@ -86,6 +91,7 @@
                             <button class="count-btn" onclick="Engine.setQcmCount(20)">20</button>
                             <button class="count-btn" onclick="Engine.setQcmCount(30)">30</button>
                             <button class="count-btn" onclick="Engine.setQcmCount(40)">40</button>
+                            <button class="count-btn" onclick="Engine.setQcmCount('ALL')">TOUT</button>
                         </div>
                     </div>
 
@@ -125,9 +131,8 @@
 
     <!-- QCM SCREEN -->
     <div id="qcm-screen" class="mode-screen">
-        <button class="return-btn" onclick="Engine.goBack()">← Retour</button>
         <div class="main-stage">
-            <div class="level-tag" style="opacity:0.5;">MODE EXAMEN</div>
+            <div id="qcm-mode-label" class="level-tag" style="opacity:0.5;">MODE EXAMEN</div>
 
             <div id="qcm-question-text" class="qcm-question">
                 Chargement...
@@ -146,7 +151,6 @@
 
     <!-- STATS SCREEN -->
     <div id="stats-screen" class="mode-screen">
-        <button class="return-btn" onclick="Engine.showDashboard()">← Retour au menu</button>
         <div class="course-container">
             <h2 class="section-title" style="text-align:center; font-size:1.5rem; margin-bottom:32px;">STATISTIQUES</h2>
             <div id="stats-content">
@@ -167,7 +171,6 @@
 
     <!-- QCM BANK SCREEN -->
     <div id="qcm-bank-screen" class="mode-screen">
-        <button class="return-btn" onclick="Engine.goBack()">← Retour</button>
         <div class="library-container"> <!-- Reuse library container for styling -->
             <h2 class="section-title" style="text-align:center; font-size:1.5rem; margin-bottom:32px;">BANQUE DE
                 QUESTIONS</h2>
@@ -180,21 +183,25 @@
                         oninput="Engine.renderQcmBank()">
                 </div>
                 <div class="sort-controls">
-                    <select id="bank-level-filter" onchange="Engine.renderQcmBank()" class="sort-btn"
+                    <select id="bank-theme-filter" onchange="Engine.renderQcmBank()" class="sort-btn"
                         style="appearance:none; padding-right:30px;">
-                        <option value="ALL">TOUS NIVEAUX</option>
-                        <option value="1">BREVET INITIAL (BI)</option>
-                        <option value="2">BREVET PILOTE (BP)</option>
-                        <option value="3">BREVET CONFIRME (BPC)</option>
+                        <option value="ALL">Tous les thèmes</option>
+                        <option value="Météo">Météo</option>
+                        <option value="Mécavol">Mécavol</option>
+                        <option value="Matériel">Matériel</option>
+                        <option value="Pilotage">Pilotage</option>
+                        <option value="Réglementation">Réglementation</option>
+                        <option value="Facteurs humains">Facteurs humains</option>
+                        <option value="Milieu naturel">Milieu naturel</option>
                     </select>
                 </div>
             </div>
-
-            <div id="bank-results" class="library-grid-container"
-                style="display:flex; flex-direction:column; gap:16px;">
-                <!-- Results injected by JS -->
-            </div>
         </div>
+
+        <div id="bank-results" class="library-grid-container" style="display:flex; flex-direction:column; gap:16px;">
+            <!-- Results injected by JS -->
+        </div>
+    </div>
     </div>
 
     <!-- LIBRARY SCREEN -->
@@ -212,8 +219,6 @@
                 </div>
                 <div class="sort-controls">
                     <button id="sort-TITLE" class="sort-btn" onclick="Engine.setLibrarySort('TITLE')">A-Z</button>
-                    <button id="sort-LEVEL" class="sort-btn" onclick="Engine.setLibrarySort('LEVEL')">PAR
-                        NIVEAU</button>
                     <button id="sort-CATEGORY" class="sort-btn active" onclick="Engine.setLibrarySort('CATEGORY')">PAR
                         CATÉGORIE</button>
                 </div>
@@ -277,10 +282,10 @@
     <script src="js/qcm_data.js?v=4.11"></script>
     <script src="js/scenarios.js?v=4.11"></script>
     <script src="js/components.js?v=4.11"></script>
-    <script src="js/quiz_engine_v4_5.js?v=4.12"></script>
-    <script src="js/library_engine.js?v=4.11"></script>
+    <script src="js/quiz_engine_v4_5.js?v=4.45"></script>
+    <script src="js/library_engine.js?v=4.30"></script>
     <script src="js/adventure_engine.js?v=4.11"></script>
-    <script src="js/engine_v4_5.js?v=4.11"></script>
+    <script src="js/engine_v4_5.js?v=4.40"></script>
     <script>
         // Load Components (Header/Footer)
         Engine.loadComponents('.');

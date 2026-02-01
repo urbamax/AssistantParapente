@@ -27,7 +27,7 @@ const Engine = {
         // Setup Theme Toggle Listener safely
         const themeBtn = document.getElementById('theme-toggle');
         if (themeBtn) {
-            themeBtn.onclick= () => this.toggleTheme();
+            themeBtn.onclick = () => this.toggleTheme();
         }
 
         // Load saved theme
@@ -74,6 +74,24 @@ const Engine = {
                 }
             }, { passive: true });
         });
+
+        // Initialize Theme based on loaded level
+        this.updateAppTheme(this.state.level);
+
+        // --- EVENT LISTENERS ---
+        // Global Navigation
+        window.onpopstate = (event) => {
+            if (event.state) {
+                this.restoreState();
+            }
+        };
+
+        // Keyboard Navigation (Esc to close modals)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') this.goBack();
+        });
+
+        console.log("Engine v4.5 Initialized");
     },
 
     /* --- STATE MANAGEMENT --- */
@@ -161,6 +179,7 @@ const Engine = {
         } else if (mode === 'LIBRARY') {
             if (typeof LibraryEngine !== 'undefined') LibraryEngine.show();
         }
+        this.updateHeaderNavigation();
         this.saveState();
     },
 
@@ -180,6 +199,7 @@ const Engine = {
         if (dashContent) dashContent.style.display = 'block';
 
         this.updateHeaderUI();
+        this.updateHeaderNavigation();
         this.saveState();
     },
 
@@ -193,12 +213,17 @@ const Engine = {
             return;
         }
         this.showDashboard();
+        this.updateHeaderNavigation();
     },
 
     changeLevel: function (newLevel) {
         this.state.level = newLevel;
         localStorage.setItem('userLevel', newLevel);
         this.saveState(); // Ensure session state is updated
+
+        // Update Theme
+        this.updateAppTheme(newLevel);
+
         console.log("DEBUG: Engine.changeLevel called with", newLevel, "State updated to", this.state.level);
 
         // Refresh current view
@@ -208,14 +233,46 @@ const Engine = {
         else if (this.state.mode === 'ADVENTURE' && typeof AdventureEngine !== 'undefined') {
             AdventureEngine.startFlight(newLevel);
         }
+        else if (this.state.mode === 'QCM_BANK' && typeof QuizEngine !== 'undefined') {
+            QuizEngine.renderBank();
+        }
         // Qcm might use it too
         else if (this.state.mode === 'STATS' && typeof QuizEngine !== 'undefined') {
             QuizEngine.renderStats();
         }
     },
 
+    // --- THEME MANAGEMENT ---
+    updateAppTheme: function (level) {
+        const root = document.documentElement;
+        let color = '#0ea5e9'; // Default Blue (BP)
+
+        if (level === 'BI') color = '#22c55e'; // Green
+        else if (level === 'BPC') color = '#8B4513'; // Brown (Marron)
+        else if (level === 'ALL') color = '#64748b'; // Slate (Sober)
+
+        root.style.setProperty('--accent-blue', color);
+    },
+
     updateHeaderUI: function () {
         // Reserved for future header updates
+    },
+
+    updateHeaderNavigation: function () {
+        const navSlot = document.querySelector('.header-nav-slot');
+        if (!navSlot) return;
+
+        // Clear slot
+        navSlot.innerHTML = '';
+
+        // Only show back button if not on MENU
+        if (this.state.mode !== 'MENU') {
+            const backBtn = document.createElement('button');
+            backBtn.className = 'nav-btn-glass';
+            backBtn.innerHTML = '<i class="ri-arrow-left-line"></i> <span>RETOUR</span>';
+            backBtn.onclick = () => this.goBack();
+            navSlot.appendChild(backBtn);
+        }
     },
 
     /* --- COMPONENT LOADING --- */
@@ -247,6 +304,8 @@ const Engine = {
             } catch (e) { }
         });
 
+        this.updateHeaderNavigation();
+
         // Re-bind theme
         this.applyThemeMode();
 
@@ -261,7 +320,7 @@ const Engine = {
         const navSlot = document.querySelector('.header-nav-slot');
         if (navSlot && !document.getElementById('standalone-back-btn')) {
             const backBtn = document.createElement('a');
-            backBtn.id='standalone-back-btn';
+            backBtn.id = 'standalone-back-btn';
             backBtn.href = basePath + '/index.html';
             backBtn.className = 'nav-btn-glass';
             backBtn.innerHTML = '<i class="ri-arrow-left-line"></i> <span>RETOUR</span>';
@@ -279,7 +338,7 @@ const Engine = {
             }
             if (pdfPath) {
                 const pdfBtn = document.createElement('a');
-                pdfBtn.id='standalone-pdf-btn';
+                pdfBtn.id = 'standalone-pdf-btn';
                 pdfBtn.href = basePath + '/' + pdfPath;
                 pdfBtn.target = '_blank';
                 pdfBtn.className = 'nav-btn-glass secondary';
@@ -377,7 +436,7 @@ const Engine = {
         const data = GENERATED_CONTENT[courseId];
 
         const overlay = document.createElement('div');
-        overlay.id='review-overlay';
+        overlay.id = 'review-overlay';
         overlay.className = 'review-overlay';
 
         if (viewer === document.body) {

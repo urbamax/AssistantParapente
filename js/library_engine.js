@@ -6,7 +6,7 @@
 const LibraryEngine = {
     state: {
         search: '',
-        sort: 'LEVEL', // TITLE, LEVEL, CATEGORY
+        sort: 'CATEGORY', // TITLE, LEVEL, CATEGORY
         mainEngine: null,
         courses: {}
     },
@@ -152,8 +152,11 @@ const LibraryEngine = {
 
     createCourseCard: function (c) {
         const btn = document.createElement('button');
-        const isModernized = c.id.startsWith('modernized/');
-        btn.className = `mode-btn ${isModernized ? 'modernized' : ''}`;
+        // Disable modernization check - treating all as standard
+        // const isModernized = c.id.startsWith('modernized/');
+        const isModernized = false;
+
+        btn.className = `mode-btn`;
         btn.onclick = () => this.openCourse(c.id);
 
         let levelBadges = '';
@@ -162,15 +165,11 @@ const LibraryEngine = {
             levelBadges += `<span class="badge badge-${l}">${l}</span> `;
         });
 
-        if (isModernized) {
-            levelBadges += `<span class="badge badge-modernized"><i class="ri-sparkling-fill"></i> NOUVEAU</span>`;
-        }
-
         btn.innerHTML = `
             <div class="course-card-content">
                 <div class="course-card-title">${this.formatTitle(c.title)}</div>
                 <div class="course-card-meta">
-                    <span class="category-tag">${c.category}</span>
+                    <span class="category-tag">${c.category === 'Cours Modernisés' ? 'Général' : c.category}</span>
                     <div class="level-badges">${levelBadges}</div>
                 </div>
             </div>
@@ -182,20 +181,13 @@ const LibraryEngine = {
         const course = this.state.courses[courseId];
         if (!course) return console.error("Course not found:", courseId);
 
-        console.log("Navigating to course:", course.title);
+        console.log("Opening course PDF:", course.title);
 
-        // Tell Main Engine to switch key if needed, or just navigate
-        // Engine.js used to set currentCourseId and saveState.
-        // We should replicate that or ask Engine to do it.
-        // For now, simpler to just navigate as it's a PDF link mostly.
+        // PREFER ORIGINAL PDF IF AVAILABLE (skips modernized HTML)
+        const targetUrl = course.original_pdf || course.pdf;
 
-        if (this.state.mainEngine) {
-            this.state.mainEngine.state.currentCourseId = courseId;
-            this.state.mainEngine.saveState();
-        }
-
-        // DIRECT NAVIGATION
-        window.location.href = course.pdf;
+        // OPEN IN NEW TAB
+        window.open(targetUrl, '_blank');
     },
 
     formatTitle: function (title) {

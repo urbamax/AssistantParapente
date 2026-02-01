@@ -166,6 +166,13 @@ body.light-mode .icon-btn {
     color: white;
 }
 
+.action-btn.primary:hover {
+    background: var(--accent-green);
+    /* Keep base color */
+    filter: brightness(1.1);
+    box-shadow: 0 0 30px rgba(74, 222, 128, 0.4);
+}
+
 .action-btn.primary {
     background: var(--accent-green);
     border-color: var(--accent-green);
@@ -262,7 +269,7 @@ select {
 
 /* --- MODULE: DASHBOARD --- */
 .dashboard-content {
-    max-width: 1200px;
+    max-width: 1800px;
     margin: 0 auto;
     width: 100%;
 }
@@ -272,7 +279,7 @@ select {
     grid-template-columns: 1fr;
     gap: 24px;
     margin-bottom: 64px;
-    max-width: 700px;
+    max-width: 1800px;
     margin: 0 auto;
 }
 
@@ -281,7 +288,7 @@ select {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 24px;
-    max-width: 900px;
+    max-width: 1800px;
     margin: 40px auto;
     padding: 0 20px;
 }
@@ -367,8 +374,8 @@ body.light-mode .accent-qcm .app-icon {
 .main-stage,
 .library-container,
 .course-container {
-    max-width: 900px;
-    width: 100%;
+    max-width: 1800px;
+    width: 98%;
     margin: 40px auto;
     background: var(--bg-card);
     border: var(--border-glass);
@@ -431,7 +438,7 @@ body.light-mode .accent-qcm .app-icon {
     font-weight: 700;
     font-size: 1.2rem;
     border: none !important;
-    box-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
     border-radius: 16px;
     display: block;
     margin-bottom: 16px;
@@ -440,9 +447,10 @@ body.light-mode .accent-qcm .app-icon {
 }
 
 .next-btn:hover {
-    background: #38bdf8 !important;
-    box-shadow: 0 0 40px rgba(14, 165, 233, 0.6);
+    filter: brightness(1.1);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
     transform: translateY(-2px);
+    cursor: pointer;
 }
 
 body.light-mode .choice-btn,
@@ -462,9 +470,9 @@ body.light-mode .qcm-option {
 }
 
 .qcm-option.selected {
-    background: rgba(14, 165, 233, 0.4);
-    border-color: #38bdf8;
-    box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
     color: #fff;
     transform: scale(1.02);
     font-weight: 600;
@@ -488,6 +496,17 @@ body.light-mode .qcm-option.selected {
     background: rgba(248, 113, 113, 0.15) !important;
     border-color: var(--accent-red) !important;
     color: var(--accent-red) !important;
+}
+
+.missed,
+.qcm-option.missed {
+    background: rgba(249, 115, 22, 0.15) !important;
+    /* Orange background */
+    border-color: #f97316 !important;
+    /* Orange border */
+    color: #fdba74 !important;
+    /* Light orange text */
+    font-weight: 500;
 }
 
 .qcm-text {
@@ -730,7 +749,17 @@ body.light-mode .library-section-header {
 .count-btn.active {
     background: var(--accent-blue);
     color: #fff;
-    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+    box-shadow: 0 4px 12px var(--shadow-glow);
+}
+
+.mode-toggle-btn.active:hover,
+.count-btn.active:hover {
+    filter: brightness(1.1);
+}
+
+.mode-toggle-btn:hover:not(.active),
+.count-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.05);
 }
 
 #qcm-theme-select {
@@ -796,7 +825,7 @@ body.light-mode .library-section-header {
 .sort-btn.active {
     background: var(--accent-blue);
     color: #fff;
-    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+    box-shadow: 0 4px 12px var(--shadow-glow);
 }
 
 body.light-mode .sort-btn.active {
