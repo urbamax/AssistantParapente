@@ -1691,7 +1691,10 @@ const QuizEngine = {
 
             const a = document.createElement('a');
             a.href = url;
-            a.download = `parapente_stats_${new Date().toISOString().split('T')[0]}.json`;
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            const timeStr = now.getHours().toString().padStart(2, '0') + '-' + now.getMinutes().toString().padStart(2, '0');
+            a.download = `parapente_stats_${dateStr}_${timeStr}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
