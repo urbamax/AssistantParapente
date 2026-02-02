@@ -576,7 +576,7 @@ const QuizEngine = {
                     } else {
                         // Correct but missed (Orange)
                         btn.classList.add('missed');
-                        btn.innerHTML += ' <i class="ri-checkbox-circle-line"></i> (Oublié)';
+                        btn.innerHTML += ' <i class="ri-checkbox-circle-line"></i>';
                     }
                 } else if (pts < 0) {
                     // Incorrect answer (negative points)
@@ -682,7 +682,7 @@ const QuizEngine = {
                         icon = '<i class="ri-check-double-line"></i>';
                     } else {
                         statusClass = 'missed'; // Was correct but not selected -> Orange
-                        icon = '<i class="ri-checkbox-circle-line"></i> (Oublié)'; // Distinct icon/text
+                        icon = '<i class="ri-checkbox-circle-line"></i>'; // Distinct icon/text
                     }
                 } else if (pts < 0) {
                     if (wasSelected) {
