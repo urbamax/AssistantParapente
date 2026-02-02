@@ -731,7 +731,6 @@ const QuizEngine = {
     // ... stats methods ...
 
     renderStats: function () {
-        alert("DEBUG: renderStats Called. QCM_OFFICIAL type: " + (typeof QCM_OFFICIAL));
         console.log("QuizEngine.renderStats v4.4 - Starting");
         const container = document.getElementById('stats-content');
         if (!container) return;
