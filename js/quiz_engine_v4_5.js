@@ -48,10 +48,40 @@ const QuizEngine = {
 
     terminateExam: function (reason) {
         if (reason === "FOCUS_LOST") {
-            alert("⚠️ ALERTE ANTI-TRICHE ⚠️\n\nVous avez quitté la page de l'examen.\nL'examen est annulé.");
-            this.showSetup(); // Return to setup
-            this.state.qcmSessionData = []; // Clear current session
-            this.state.qcmIndex = 0;
+            // Custom Anti-Cheat Modal
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100vw';
+            modal.style.height = '100vh';
+            modal.style.background = 'black';
+            modal.style.zIndex = '99999';
+            modal.style.display = 'flex';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
+
+            modal.innerHTML = `
+                <div style="background:white; padding:30px; border-radius:12px; max-width:400px; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
+                    <div style="font-size:3rem; margin-bottom:10px;">⚠️</div>
+                    <h2 style="color:#b91c1c; margin-bottom:10px;">ALERTE ANTI-TRICHE</h2>
+                    <p style="color:#333; margin-bottom:20px; line-height:1.5;">Vous avez quitté la page de l'examen.<br>L'examen est annulé.</p>
+                    <button id="anti-cheat-close" style="background:#b91c1c; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%;">FERMER ET QUITTER</button>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            document.getElementById('anti-cheat-close').onclick = () => {
+                modal.remove();
+                if (window.Engine) window.Engine.showDashboard();
+                this.state.qcmSessionData = []; // Clear session
+                this.state.qcmIndex = 0;
+            };
+
+            // this.showSetup(); // Removed in favor of strict clear via modal
+            // this.state.qcmSessionData = []; // Moved to callback
+            // this.state.qcmIndex = 0; // Moved to callback
         }
     },
 
@@ -167,24 +197,34 @@ const QuizEngine = {
         let sourceData = [];
         if (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) {
             console.log("Using Official FFVL Data");
-            sourceData = QCM_OFFICIAL.questions.map(q => ({
-                code: q.code,
-                question: q.question,
-                choices: q.ans.map(a => ({
-                    text: a.text,
-                    correct: parseInt(a.pts) > 0,
-                    pts: parseInt(a.pts)
-                })),
-                explanation: q.explication || "",
-                theme: getCategory(q.code),
-                level: (function (c) {
-                    const lastChar = c.charAt(c.length - 1).toUpperCase();
-                    if (lastChar === 'V') return 1; // Vert -> BI
-                    if (lastChar === 'B') return 2; // Bleu -> BP
-                    if (lastChar === 'M') return 3; // Marron -> BPC
-                    return q.niveau || 0;
-                })(q.code)
-            }));
+            sourceData = QCM_OFFICIAL.questions.map(q => {
+                if (!q.code || !q.ans) return null; // Skip invalid
+                try {
+                    return {
+                        code: q.code,
+                        question: q.question || "Question vide",
+                        choices: (q.ans || []).map(a => ({
+                            text: a.text || "",
+                            correct: parseInt(a.pts) > 0,
+                            pts: parseInt(a.pts || 0)
+                        })),
+                        explanation: q.explication || "",
+                        theme: getCategory(q.code),
+                        level: (function (c) {
+                            if (!c) return 0;
+                            const str = String(c);
+                            const lastChar = str.charAt(str.length - 1).toUpperCase();
+                            if (lastChar === 'V') return 1; // Vert -> BI
+                            if (lastChar === 'B') return 2; // Bleu -> BP
+                            if (lastChar === 'M') return 3; // Marron -> BPC
+                            return q.niveau || 0;
+                        })(q.code)
+                    };
+                } catch (e) {
+                    console.warn("Skipped invalid question:", q, e);
+                    return null;
+                }
+            }).filter(q => q !== null);
         } else {
             console.warn("Official Data Not Found. Please ensure qcm_official_data.js is loaded.");
             sourceData = [];
@@ -324,8 +364,12 @@ const QuizEngine = {
     },
 
     renderQuestion: function () {
+
         const sessionData = this.state.qcmSessionData;
-        if (!sessionData || sessionData.length === 0) return;
+        if (!sessionData || sessionData.length === 0) {
+            console.warn("No session data for renderQuestion");
+            return;
+        }
 
         this.state.currentQcmSelection = new Set();
 
@@ -354,9 +398,10 @@ const QuizEngine = {
         // Generate Badges based on Code Suffix
         let badgesHtml = '';
         if (q.code) {
-            const hasV = q.code.includes('V');
-            const hasB = q.code.includes('B');
-            const hasM = q.code.includes('M');
+            const codeStr = String(q.code).toUpperCase();
+            const hasV = codeStr.includes('V');
+            const hasB = codeStr.includes('B');
+            const hasM = codeStr.includes('M');
 
             // If explicit level overrides are needed, we can check q.level too, 
             // but the suffix is usually the source of truth for "all applicable levels".
@@ -407,6 +452,7 @@ const QuizEngine = {
 
         this.renderActions(choicesDiv, q);
     },
+
 
     renderActions: function (container, question) {
         const actionContainer = document.createElement('div');
@@ -685,9 +731,21 @@ const QuizEngine = {
     // ... stats methods ...
 
     renderStats: function () {
+        alert("DEBUG: renderStats Called. QCM_OFFICIAL type: " + (typeof QCM_OFFICIAL));
         console.log("QuizEngine.renderStats v4.4 - Starting");
         const container = document.getElementById('stats-content');
         if (!container) return;
+
+        if (typeof QCM_OFFICIAL === 'undefined' || !QCM_OFFICIAL.questions) {
+            container.innerHTML = `
+                <div style="padding:40px; text-align:center; color:white;">
+                    <i class="ri-error-warning-line" style="font-size:3rem; color:#b91c1c; display:block; margin-bottom:20px;"></i>
+                    <h2 style="margin-bottom:10px;">Données QCM Introuvables</h2>
+                    <p style="opacity:0.7;">Le fichier de questions (qcm_official_data.js) semble manquant ou corrompu.</p>
+                </div>
+            `;
+            return;
+        }
 
         try {
             const stats = this.getPersistentStats();
@@ -1018,32 +1076,31 @@ const QuizEngine = {
                         if (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) {
                             qObj = QCM_OFFICIAL.questions.find(q => q.code === code || q.id === code);
                         }
-                        // Fallback removed
-                    }
 
                         let qTheme = (qObj && qObj.theme) ? qObj.theme : null;
 
-                    // If theme is missing but we have a code, try to derive it (Logic from startSession)
-                    if (!qTheme && qObj && qObj.code) {
-                        const letter = qObj.code.charAt(0);
-                        const map = {
-                            'A': 'Météo',
-                            'E': 'Mécavol', 'G': 'Mécavol', 'H': 'Mécavol',
-                            'L': 'Matériel', 'N': 'Matériel', 'R': 'Matériel',
-                            'U': 'Pilotage', 'W': 'Pilotage', 'X': 'Pilotage',
-                            'S': 'Réglementation',
-                            'F': 'Facteurs humains',
-                            'P': 'Milieu naturel'
-                        };
-                        qTheme = map[letter] || 'Autre';
-                    }
+                        // If theme is missing but we have a code, try to derive it
+                        if (!qTheme && qObj && qObj.code) {
+                            const letter = qObj.code.charAt(0);
+                            const map = {
+                                'A': 'Météo',
+                                'E': 'Mécavol', 'G': 'Mécavol', 'H': 'Mécavol',
+                                'L': 'Matériel', 'N': 'Matériel', 'R': 'Matériel',
+                                'U': 'Pilotage', 'W': 'Pilotage', 'X': 'Pilotage',
+                                'S': 'Réglementation',
+                                'F': 'Facteurs humains',
+                                'P': 'Milieu naturel'
+                            };
+                            qTheme = map[letter] || 'Autre';
+                        }
 
-                    if (!qTheme) qTheme = 'Autre';
-                    return qTheme === this.state.themeFilter;
-                });
-            }
+                        if (!qTheme) qTheme = 'Autre';
+                        return qTheme === this.state.themeFilter;
+                    });
+                }
 
-            allQuestionsHtml = `
+
+                allQuestionsHtml = `
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
                         <span style="font-weight:700; color:var(--text-main);">${visibleQuestions.length}</span> questions 
@@ -1062,67 +1119,67 @@ const QuizEngine = {
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             `;
 
-            visibleQuestions.forEach(([code, data]) => {
-                let qText = "Question " + code;
-                let theme = "Autre";
-                let qObj = null;
+                visibleQuestions.forEach(([code, data]) => {
+                    let qText = "Question " + code;
+                    let theme = "Autre";
+                    let qObj = null;
 
-                if (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) {
-                    qObj = QCM_OFFICIAL.questions.find(q => q.code === code || q.id === code);
-                }
-
-                // Fallback removed
-
-                if (qObj) {
-                    qText = qObj.question;
-                    theme = qObj.theme || null;
-
-                    // Derive theme if missing
-                    if (!theme && code) {
-                        const letter = code.charAt(0);
-                        const map = {
-                            'A': 'Météo',
-                            'E': 'Mécavol', 'G': 'Mécavol', 'H': 'Mécavol',
-                            'L': 'Matériel', 'N': 'Matériel', 'R': 'Matériel',
-                            'U': 'Pilotage', 'W': 'Pilotage', 'X': 'Pilotage',
-                            'S': 'Réglementation',
-                            'F': 'Facteurs humains',
-                            'P': 'Milieu naturel'
-                        };
-                        theme = map[letter] || 'Autre';
+                    if (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) {
+                        qObj = QCM_OFFICIAL.questions.find(q => q.code === code || q.id === code);
                     }
-                    if (!theme) theme = 'Autre';
-                }
 
-                const pct = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
-                const qColor = pct >= 75 ? '#4ade80' : (pct >= 50 ? '#facc15' : '#f87171');
-                const streak = data.streak || 0;
+                    // Fallback removed
 
-                // Build answers HTML if available
-                let answersHtml = '';
-                if (qObj && qObj.ans) {
-                    answersHtml = '<div class="question-answers" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">';
-                    qObj.ans.forEach((ans, idx) => {
-                        const isCorrect = parseInt(ans.pts) > 0;
-                        const answerStyle = isCorrect
-                            ? 'background:rgba(74, 222, 128, 0.1); border-left:3px solid #4ade80;'
-                            : 'background:rgba(255,255,255,0.02);';
-                        const icon = isCorrect ? '<i class="ri-checkbox-circle-fill" style="color:#4ade80;"></i>' : '';
+                    if (qObj) {
+                        qText = qObj.question;
+                        theme = qObj.theme || null;
 
-                        answersHtml += `
+                        // Derive theme if missing
+                        if (!theme && code) {
+                            const letter = code.charAt(0);
+                            const map = {
+                                'A': 'Météo',
+                                'E': 'Mécavol', 'G': 'Mécavol', 'H': 'Mécavol',
+                                'L': 'Matériel', 'N': 'Matériel', 'R': 'Matériel',
+                                'U': 'Pilotage', 'W': 'Pilotage', 'X': 'Pilotage',
+                                'S': 'Réglementation',
+                                'F': 'Facteurs humains',
+                                'P': 'Milieu naturel'
+                            };
+                            theme = map[letter] || 'Autre';
+                        }
+                        if (!theme) theme = 'Autre';
+                    }
+
+                    const pct = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
+                    const qColor = pct >= 75 ? '#4ade80' : (pct >= 50 ? '#facc15' : '#f87171');
+                    const streak = data.streak || 0;
+
+                    // Build answers HTML if available
+                    let answersHtml = '';
+                    if (qObj && qObj.ans) {
+                        answersHtml = '<div class="question-answers" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">';
+                        qObj.ans.forEach((ans, idx) => {
+                            const isCorrect = parseInt(ans.pts) > 0;
+                            const answerStyle = isCorrect
+                                ? 'background:rgba(74, 222, 128, 0.1); border-left:3px solid #4ade80;'
+                                : 'background:rgba(255,255,255,0.02);';
+                            const icon = isCorrect ? '<i class="ri-checkbox-circle-fill" style="color:#4ade80;"></i>' : '';
+
+                            answersHtml += `
                             <div style="padding:8px 12px; margin-bottom:6px; border-radius:6px; ${answerStyle} display:flex; align-items:center; gap:8px; font-size:0.85rem;">
                                 ${icon}
                                 <span style="flex:1;">${ans.text}</span>
                             </div>
                         `;
-                    });
-                    answersHtml += '</div>';
-                }
+                        });
+                        answersHtml += '</div>';
+                    }
 
-                const displayText = qText.length > 80 ? qText.substring(0, 80) + "..." : qText;
-                const hasAnswers = qObj && qObj.ans;
+                    const displayText = qText.length > 80 ? qText.substring(0, 80) + "..." : qText;
+                    const hasAnswers = qObj && qObj.ans;
 
-                allQuestionsHtml += `
+                    allQuestionsHtml += `
                     <div class="question-stat-item" data-code="${code}" data-pct="${pct}" data-total="${data.total}" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:${hasAnswers ? 'pointer' : 'default'};" ${hasAnswers ? `onclick="QuizEngine.toggleQuestionDetails('${code}')"` : ''}>
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
@@ -1143,20 +1200,20 @@ const QuizEngine = {
                         </div>
                     </div>
                 `;
-            });
+                });
 
 
-            allQuestionsHtml += '</div>';
-        } else {
-            allQuestionsHtml = '<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">Aucune question tentée pour le moment.</div>';
-        }
+                allQuestionsHtml += '</div>';
+            } else {
+                allQuestionsHtml = '<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">Aucune question tentée pour le moment.</div>';
+            }
 
             // Premium Circular Gauge Calculation
             const strokeDash = 2 * Math.PI * 55; // r=55
-    const offset = strokeDash - (globalPct / 100) * strokeDash;
-    const colorGlow = color + '44'; // Add transparency for glow
+            const offset = strokeDash - (globalPct / 100) * strokeDash;
+            const colorGlow = color + '44'; // Add transparency for glow
 
-    const successGaugeHtml = `
+            const successGaugeHtml = `
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:rgba(255,255,255,0.02); border-radius:32px; border: 1px solid rgba(255,255,255,0.05); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -1192,9 +1249,9 @@ const QuizEngine = {
             </div>
         `;
 
-    const statsGridStyle = `display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:32px;`;
+            const statsGridStyle = `display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:32px;`;
 
-    container.innerHTML = `
+            container.innerHTML = `
             ${successGaugeHtml}
 
             <div style="margin-top:48px;">
@@ -1243,67 +1300,67 @@ const QuizEngine = {
                 </button>
             </div>
         `;
-} catch (e) {
-    console.error("Critical Error in renderStats:", e);
-    if (container) {
-        container.innerHTML = `<div style="padding:20px; color:#f87171; background:rgba(255,0,0,0.1); border-radius:12px;">Erreur d'affichage des statistiques: ${e.message}</div>`;
-    }
-}
+        } catch (e) {
+            console.error("Critical Error in renderStats:", e);
+            if (container) {
+                container.innerHTML = `<div style="padding:20px; color:#f87171; background:rgba(255,0,0,0.1); border-radius:12px;">Erreur d'affichage des statistiques: ${e.message}</div>`;
+            }
+        }
     },
 
-renderExamHistory: function () {
-    const exams = this.getExamHistory();
+    renderExamHistory: function () {
+        const exams = this.getExamHistory();
 
-    if (exams.length === 0) {
-        return '<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">Aucun examen complété pour le moment.</div>';
-    }
+        if (exams.length === 0) {
+            return '<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">Aucun examen complété pour le moment.</div>';
+        }
 
-    let html = '<div style="display:flex; flex-direction:column; gap:12px;">';
+        let html = '<div style="display:flex; flex-direction:column; gap:12px;">';
 
-    exams.forEach(exam => {
-        const date = new Date(exam.date);
-        const dateStr = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-        const color = exam.percentage >= 75 ? '#4ade80' : exam.percentage >= 50 ? '#facc15' : '#f87171';
-        const levelLabel = exam.level === 'BI' ? 'Brevet Initial' : exam.level === 'BP' ? 'Brevet de Pilote' : 'Brevet de Pilote Confirmé';
+        exams.forEach(exam => {
+            const date = new Date(exam.date);
+            const dateStr = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const color = exam.percentage >= 75 ? '#4ade80' : exam.percentage >= 50 ? '#facc15' : '#f87171';
+            const levelLabel = exam.level === 'BI' ? 'Brevet Initial' : exam.level === 'BP' ? 'Brevet de Pilote' : 'Brevet de Pilote Confirmé';
 
-        // Build questions HTML
-        let questionsHtml = '<div class="exam-details" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border-color);">';
-        questionsHtml += '<div style="display:flex; flex-direction:column; gap:16px;">';
+            // Build questions HTML
+            let questionsHtml = '<div class="exam-details" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border-color);">';
+            questionsHtml += '<div style="display:flex; flex-direction:column; gap:16px;">';
 
-        exam.results.forEach((r, idx) => {
-            const q = r.question;
-            let optionsHtml = '';
+            exam.results.forEach((r, idx) => {
+                const q = r.question;
+                let optionsHtml = '';
 
-            q.choices.forEach(opt => {
-                // Fix object reference comparison for loaded JSON data
-                const wasSelected = r.selected.some(s => s.text === opt.text);
-                const pts = parseInt(opt.pts || 0);
-                let statusClass = '';
-                let icon = '';
+                q.choices.forEach(opt => {
+                    // Fix object reference comparison for loaded JSON data
+                    const wasSelected = r.selected.some(s => s.text === opt.text);
+                    const pts = parseInt(opt.pts || 0);
+                    let statusClass = '';
+                    let icon = '';
 
-                if (pts > 0) {
-                    statusClass = 'background:rgba(74, 222, 128, 0.1); border-left:3px solid #4ade80;';
-                    icon = wasSelected ? '<i class="ri-check-double-line" style="color:#4ade80;"></i>' : '<i class="ri-checkbox-circle-line" style="color:#4ade80;"></i>';
-                } else if (pts < 0 && wasSelected) {
-                    statusClass = 'background:rgba(248, 113, 113, 0.1); border-left:3px solid #f87171;';
-                    icon = '<i class="ri-close-circle-line" style="color:#f87171;"></i>';
-                } else if (pts === 0 && wasSelected) {
-                    // Neutral (0 pts)
-                    statusClass = 'background:rgba(255, 255, 255, 0.05); border:1px solid var(--text-secondary);';
-                    icon = '<i class="ri-checkbox-blank-circle-line" style="opacity:0.5;"></i>';
-                } else {
-                    statusClass = 'background:rgba(255,255,255,0.02);';
-                }
+                    if (pts > 0) {
+                        statusClass = 'background:rgba(74, 222, 128, 0.1); border-left:3px solid #4ade80;';
+                        icon = wasSelected ? '<i class="ri-check-double-line" style="color:#4ade80;"></i>' : '<i class="ri-checkbox-circle-line" style="color:#4ade80;"></i>';
+                    } else if (pts < 0 && wasSelected) {
+                        statusClass = 'background:rgba(248, 113, 113, 0.1); border-left:3px solid #f87171;';
+                        icon = '<i class="ri-close-circle-line" style="color:#f87171;"></i>';
+                    } else if (pts === 0 && wasSelected) {
+                        // Neutral (0 pts)
+                        statusClass = 'background:rgba(255, 255, 255, 0.05); border:1px solid var(--text-secondary);';
+                        icon = '<i class="ri-checkbox-blank-circle-line" style="opacity:0.5;"></i>';
+                    } else {
+                        statusClass = 'background:rgba(255,255,255,0.02);';
+                    }
 
-                optionsHtml += `
+                    optionsHtml += `
             <div style="padding:8px 12px; border-radius:6px; ${statusClass} display:flex; align-items:center; gap:8px; font-size:0.85rem;" >
                 ${icon}
         <span style="flex:1;">${opt.text}</span>
                         </div >
     `;
-            });
+                });
 
-            questionsHtml += `
+                questionsHtml += `
     <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; ${!r.isCorrect ? 'border:1px solid #f87171;' : ''}" >
                         <div style="font-size:0.75rem; opacity:0.6; margin-bottom:6px;">Question ${idx + 1}</div>
                         <div style="font-weight:600; margin-bottom:12px;">${q.question}</div>
@@ -1313,11 +1370,11 @@ renderExamHistory: function () {
                         ${!r.isCorrect && q.explanation ? `<div style="margin-top:12px; padding:8px; background:rgba(251, 146, 60, 0.1); border-left:3px solid #fb923c; font-size:0.85rem; opacity:0.9;">${q.explanation}</div>` : ''}
                     </div >
     `;
-        });
+            });
 
-        questionsHtml += '</div></div>';
+            questionsHtml += '</div></div>';
 
-        html += `
+            html += `
     <div data-exam-id="${exam.id}" style="background:var(--bg-card); padding:16px; border-radius:12px; border:1px solid var(--border-color); cursor:pointer;" onclick= "QuizEngine.toggleExamDetails(${exam.id})" >
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div style="flex:1;">
@@ -1337,452 +1394,452 @@ renderExamHistory: function () {
                     ${questionsHtml}
                 </div >
     `;
-    });
+        });
 
-    html += '</div>';
-    return html;
-},
+        html += '</div>';
+        return html;
+    },
 
-sortQuestions: function (sortBy) {
-    const list = document.getElementById('all-questions-list');
-    if (!list) return;
+    sortQuestions: function (sortBy) {
+        const list = document.getElementById('all-questions-list');
+        if (!list) return;
 
-    // Toggle direction if clicking same sort
-    if (this.state.sortState.field === sortBy) {
-        this.state.sortState.dir = this.state.sortState.dir === 'asc' ? 'desc' : 'asc';
-    } else {
-        this.state.sortState.field = sortBy;
-        // Default directions: Rate -> ASC (worst first), Attempts -> DESC (most first)
-        this.state.sortState.dir = (sortBy === 'rate') ? 'asc' : 'desc';
-    }
-
-    const dir = this.state.sortState.dir;
-    const items = Array.from(list.querySelectorAll('.question-stat-item'));
-
-    // Update button states & Icons
-    document.querySelectorAll('.sort-btn').forEach(btn => {
-        btn.style.background = 'transparent';
-        // Reset text (remove arrows) - fragile depends on innerHTML structure
-        const baseText = btn.id === 'sort-rate-btn' ? 'Par taux' : 'Par tentatives';
-        btn.innerHTML = baseText;
-    });
-
-    const activeBtn = document.getElementById(sortBy === 'rate' ? 'sort-rate-btn' : 'sort-attempts-btn');
-    if (activeBtn) {
-        activeBtn.style.background = 'rgba(255,255,255,0.05)';
-        const arrow = dir === 'asc' ? ' <i class="ri-arrow-up-line"></i>' : ' <i class="ri-arrow-down-line"></i>';
-        activeBtn.innerHTML += arrow;
-    }
-
-    items.sort((a, b) => {
-        let valA, valB;
-        if (sortBy === 'rate') {
-            valA = parseInt(a.dataset.pct);
-            valB = parseInt(b.dataset.pct);
+        // Toggle direction if clicking same sort
+        if (this.state.sortState.field === sortBy) {
+            this.state.sortState.dir = this.state.sortState.dir === 'asc' ? 'desc' : 'asc';
         } else {
-            valA = parseInt(a.dataset.total);
-            valB = parseInt(b.dataset.total);
+            this.state.sortState.field = sortBy;
+            // Default directions: Rate -> ASC (worst first), Attempts -> DESC (most first)
+            this.state.sortState.dir = (sortBy === 'rate') ? 'asc' : 'desc';
         }
 
-        if (dir === 'asc') return valA - valB;
-        else return valB - valA;
-    });
+        const dir = this.state.sortState.dir;
+        const items = Array.from(list.querySelectorAll('.question-stat-item'));
 
-    list.innerHTML = '';
-    items.forEach(item => list.appendChild(item));
-},
+        // Update button states & Icons
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+            btn.style.background = 'transparent';
+            // Reset text (remove arrows) - fragile depends on innerHTML structure
+            const baseText = btn.id === 'sort-rate-btn' ? 'Par taux' : 'Par tentatives';
+            btn.innerHTML = baseText;
+        });
 
-toggleQuestionDetails: function (code) {
-    const card = document.querySelector(`[data-code="${code}"]`);
-    if (!card) return;
-
-    const answersDiv = card.querySelector('.question-answers');
-    const arrow = document.getElementById('arrow-' + code);
-
-    if (!answersDiv) return;
-
-    const isExpanded = answersDiv.style.display !== 'none';
-
-    if (isExpanded) {
-        answersDiv.style.display = 'none';
-        if (arrow) arrow.style.transform = 'rotate(0deg)';
-    } else {
-        answersDiv.style.display = 'block';
-        if (arrow) arrow.style.transform = 'rotate(180deg)';
-    }
-},
-
-setMasteryFilter: function (filter) {
-    if (this.state.masteryFilter === filter) {
-        this.state.masteryFilter = 'ALL'; // Toggle off
-    } else {
-        this.state.masteryFilter = filter;
-    }
-    this.renderStats();
-},
-
-setThemeFilter: function (theme) {
-    if (this.state.themeFilter === theme) {
-        this.state.themeFilter = null; // Toggle off
-    } else {
-        this.state.themeFilter = theme;
-    }
-    this.renderStats();
-},
-
-setThemeSort: function (sortType) {
-    if (this.state.themeSort === sortType) {
-        // Toggle direction
-        this.state.themeSortDir = this.state.themeSortDir === 'asc' ? 'desc' : 'asc';
-    } else {
-        this.state.themeSort = sortType;
-        this.state.themeSortDir = 'desc'; // Default to desc for new sort
-        if (sortType === 'alpha') this.state.themeSortDir = 'asc'; // Default asc for alpha
-    }
-    this.renderStats();
-},
-
-clearAllFilters: function () {
-    this.state.masteryFilter = 'ALL';
-    this.state.themeFilter = null;
-    this.renderStats();
-},
-
-
-
-// --- STATISTICS MANAGEMENT ---
-getPersistentStats: function () {
-    const defaultStats = {
-        totalQuestions: 0,
-        totalCorrect: 0,
-        themes: {},
-        questions: {}
-    };
-
-    try {
-        const saved = localStorage.getItem('parapente_qcm_stats');
-        if (!saved) return defaultStats;
-        return JSON.parse(saved);
-    } catch (e) {
-        console.error("Failed to load stats", e);
-        return defaultStats;
-    }
-},
-
-updateStats: function (question, isCorrect) {
-    const stats = this.getPersistentStats();
-
-    // Update global counters
-    stats.totalQuestions++;
-    if (isCorrect) stats.totalCorrect++;
-
-    // Update theme stats
-    const theme = question.theme || 'Autre';
-    if (!stats.themes[theme]) {
-        stats.themes[theme] = { total: 0, correct: 0 };
-    }
-    stats.themes[theme].total++;
-    if (isCorrect) stats.themes[theme].correct++;
-
-    // Update question-specific stats
-    // Prefer ID over code for stability, falling back to generated ID
-    const code = question.id || question.code || `q_${Date.now()} `;
-    if (!stats.questions[code]) {
-        stats.questions[code] = { total: 0, correct: 0, streak: 0 };
-    }
-    stats.questions[code].total++;
-    if (isCorrect) {
-        stats.questions[code].correct++;
-        stats.questions[code].streak = (stats.questions[code].streak || 0) + 1;
-
-        // REDEMPTION: After 10 consecutive correct answers, reset to 100%
-        if (stats.questions[code].streak >= 10) {
-            stats.questions[code].total = stats.questions[code].streak;
-            stats.questions[code].correct = stats.questions[code].streak;
-            // Keep the streak to show mastery
+        const activeBtn = document.getElementById(sortBy === 'rate' ? 'sort-rate-btn' : 'sort-attempts-btn');
+        if (activeBtn) {
+            activeBtn.style.background = 'rgba(255,255,255,0.05)';
+            const arrow = dir === 'asc' ? ' <i class="ri-arrow-up-line"></i>' : ' <i class="ri-arrow-down-line"></i>';
+            activeBtn.innerHTML += arrow;
         }
-    } else {
-        stats.questions[code].streak = 0;
-    }
 
-    localStorage.setItem('parapente_qcm_stats', JSON.stringify(stats));
-},
+        items.sort((a, b) => {
+            let valA, valB;
+            if (sortBy === 'rate') {
+                valA = parseInt(a.dataset.pct);
+                valB = parseInt(b.dataset.pct);
+            } else {
+                valA = parseInt(a.dataset.total);
+                valB = parseInt(b.dataset.total);
+            }
 
-resetStats: function () {
-    if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes vos statistiques ?')) {
-        localStorage.removeItem('parapente_qcm_stats');
-        alert('Statistiques réinitialisées !');
+            if (dir === 'asc') return valA - valB;
+            else return valB - valA;
+        });
+
+        list.innerHTML = '';
+        items.forEach(item => list.appendChild(item));
+    },
+
+    toggleQuestionDetails: function (code) {
+        const card = document.querySelector(`[data-code="${code}"]`);
+        if (!card) return;
+
+        const answersDiv = card.querySelector('.question-answers');
+        const arrow = document.getElementById('arrow-' + code);
+
+        if (!answersDiv) return;
+
+        const isExpanded = answersDiv.style.display !== 'none';
+
+        if (isExpanded) {
+            answersDiv.style.display = 'none';
+            if (arrow) arrow.style.transform = 'rotate(0deg)';
+        } else {
+            answersDiv.style.display = 'block';
+            if (arrow) arrow.style.transform = 'rotate(180deg)';
+        }
+    },
+
+    setMasteryFilter: function (filter) {
+        if (this.state.masteryFilter === filter) {
+            this.state.masteryFilter = 'ALL'; // Toggle off
+        } else {
+            this.state.masteryFilter = filter;
+        }
         this.renderStats();
-    }
-},
+    },
 
-saveExamHistory: function (level, score, total, results) {
-    try {
-        let history = JSON.parse(localStorage.getItem('parapente_exam_history') || '{"exams":[]}');
+    setThemeFilter: function (theme) {
+        if (this.state.themeFilter === theme) {
+            this.state.themeFilter = null; // Toggle off
+        } else {
+            this.state.themeFilter = theme;
+        }
+        this.renderStats();
+    },
 
-        const exam = {
-            id: Date.now(),
-            date: new Date().toISOString(),
-            level: level,
-            score: score,
-            total: total,
-            percentage: Math.round((score / total) * 100),
-            results: results
+    setThemeSort: function (sortType) {
+        if (this.state.themeSort === sortType) {
+            // Toggle direction
+            this.state.themeSortDir = this.state.themeSortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            this.state.themeSort = sortType;
+            this.state.themeSortDir = 'desc'; // Default to desc for new sort
+            if (sortType === 'alpha') this.state.themeSortDir = 'asc'; // Default asc for alpha
+        }
+        this.renderStats();
+    },
+
+    clearAllFilters: function () {
+        this.state.masteryFilter = 'ALL';
+        this.state.themeFilter = null;
+        this.renderStats();
+    },
+
+
+
+    // --- STATISTICS MANAGEMENT ---
+    getPersistentStats: function () {
+        const defaultStats = {
+            totalQuestions: 0,
+            totalCorrect: 0,
+            themes: {},
+            questions: {}
         };
 
-        history.exams.unshift(exam); // Add to beginning
-        history.exams = history.exams.slice(0, 10); // Keep only last 10
+        try {
+            const saved = localStorage.getItem('parapente_qcm_stats');
+            if (!saved) return defaultStats;
+            return JSON.parse(saved);
+        } catch (e) {
+            console.error("Failed to load stats", e);
+            return defaultStats;
+        }
+    },
 
-        localStorage.setItem('parapente_exam_history', JSON.stringify(history));
-    } catch (e) {
-        console.error("Failed to save exam history", e);
-    }
-},
-
-getExamHistory: function () {
-    try {
-        const history = JSON.parse(localStorage.getItem('parapente_exam_history') || '{"exams":[]}');
-        return history.exams || [];
-    } catch (e) {
-        console.error("Failed to load exam history", e);
-        return [];
-    }
-},
-
-importData: function () {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-
-    input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            try {
-                const data = JSON.parse(event.target.result);
-
-                // Basic validation of the file structure
-                if (!data.stats || !data.examHistory) {
-                    alert('❌ Fichier invalide: Format de données incorrect');
-                    return;
-                }
-
-                if (confirm('⚠️ Cela va remplacer toutes vos statistiques et historiques actuels. Continuer ?')) {
-                    // Save directly to localStorage
-                    localStorage.setItem('parapente_qcm_stats', JSON.stringify(data.stats));
-                    localStorage.setItem('parapente_exam_history', JSON.stringify({ exams: data.examHistory }));
-
-                    // Force update of current runtime stats if needed? 
-                    // Actually getPersistentStats reads from localStorage so it's fine.
-
-                    alert('✅ Données importées avec succès !');
-
-                    try {
-                        // Refresh stats display
-                        this.renderStats();
-                    } catch (renderError) {
-                        console.error("Render failed after import", renderError);
-                        alert("Données importées, mais une erreur est survenue lors de l'affichage. Veuillez recharger la page.");
-                    }
-                }
-            } catch (e) {
-                console.error('Import failed', e);
-                alert('❌ Erreur lors de l\'import : ' + e.message);
-            }
-        };
-        reader.readAsText(file);
-    };
-
-    input.click();
-},
-toggleExamDetails: function (examId) {
-    const card = document.querySelector(`[data-exam-id="${examId}"]`);
-    if (!card) return;
-
-    const detailsDiv = card.querySelector('.exam-details');
-    const arrow = card.querySelector('.exam-arrow');
-
-    if (!detailsDiv) return;
-
-    const isExpanded = detailsDiv.style.display !== 'none';
-
-    if (isExpanded) {
-        detailsDiv.style.display = 'none';
-        if (arrow) arrow.style.transform = 'rotate(0deg)';
-    } else {
-        detailsDiv.style.display = 'block';
-        if (arrow) arrow.style.transform = 'rotate(180deg)';
-    }
-},
-
-exportData: function () {
-    try {
+    updateStats: function (question, isCorrect) {
         const stats = this.getPersistentStats();
-        const examHistory = this.getExamHistory();
 
-        const data = {
-            stats: stats,
-            examHistory: examHistory,
-            exportDate: new Date().toISOString(),
-            version: '1.0'
-        };
+        // Update global counters
+        stats.totalQuestions++;
+        if (isCorrect) stats.totalCorrect++;
 
-        const json = JSON.stringify(data, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
+        // Update theme stats
+        const theme = question.theme || 'Autre';
+        if (!stats.themes[theme]) {
+            stats.themes[theme] = { total: 0, correct: 0 };
+        }
+        stats.themes[theme].total++;
+        if (isCorrect) stats.themes[theme].correct++;
 
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `parapente_stats_${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        // Update question-specific stats
+        // Prefer ID over code for stability, falling back to generated ID
+        const code = question.id || question.code || `q_${Date.now()} `;
+        if (!stats.questions[code]) {
+            stats.questions[code] = { total: 0, correct: 0, streak: 0 };
+        }
+        stats.questions[code].total++;
+        if (isCorrect) {
+            stats.questions[code].correct++;
+            stats.questions[code].streak = (stats.questions[code].streak || 0) + 1;
 
-        alert('✅ Données exportées avec succès !');
-    } catch (e) {
-        console.error('Export failed', e);
-        alert('❌ Erreur lors de l\'export');
-    }
-},
-
-importData: function () {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-
-    input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            try {
-                const data = JSON.parse(event.target.result);
-
-                if (!data.stats || !data.examHistory) {
-                    alert('❌ Fichier invalide');
-                    return;
-                }
-
-                if (confirm('⚠️ Cela va remplacer vos données actuelles. Continuer ?')) {
-                    localStorage.setItem('parapente_qcm_stats', JSON.stringify(data.stats));
-                    localStorage.setItem('parapente_exam_history', JSON.stringify({ exams: data.examHistory }));
-
-                    alert('✅ Données importées avec succès !');
-                    this.renderStats();
-                }
-            } catch (e) {
-                console.error('Import failed', e);
-                alert('❌ Erreur lors de l\'import : fichier corrompu');
+            // REDEMPTION: After 10 consecutive correct answers, reset to 100%
+            if (stats.questions[code].streak >= 10) {
+                stats.questions[code].total = stats.questions[code].streak;
+                stats.questions[code].correct = stats.questions[code].streak;
+                // Keep the streak to show mastery
             }
-        };
-        reader.readAsText(file);
-    };
+        } else {
+            stats.questions[code].streak = 0;
+        }
 
-    input.click();
-},
+        localStorage.setItem('parapente_qcm_stats', JSON.stringify(stats));
+    },
 
-showStats: function () {
-    document.querySelectorAll('.mode-screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('stats-screen').classList.add('active');
-    this.renderStats();
-},
+    resetStats: function () {
+        if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes vos statistiques ?')) {
+            localStorage.removeItem('parapente_qcm_stats');
+            alert('Statistiques réinitialisées !');
+            this.renderStats();
+        }
+    },
 
-// --- QUESTION BANK ---
-showBank: function () {
-    this.state.mainEngine.startMode('QCM_BANK');
-},
+    saveExamHistory: function (level, score, total, results) {
+        try {
+            let history = JSON.parse(localStorage.getItem('parapente_exam_history') || '{"exams":[]}');
 
-renderBank: function () {
-    const searchInput = document.getElementById('bank-search');
-    const themeFilter = document.getElementById('bank-theme-filter');
-    const resultsDiv = document.getElementById('bank-results');
-
-    if (!resultsDiv) return;
-
-    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-    const themeValue = themeFilter ? themeFilter.value : 'ALL';
-
-    // Use Global Level from Main Engine
-    // Use Global Level from Main Engine
-    let levelValue = 'ALL';
-    if (this.state.mainEngine && this.state.mainEngine.state) {
-        const globalLevel = this.state.mainEngine.state.level; // BI, BP, BPC, ALL
-        if (globalLevel === 'BI') levelValue = '1';
-        else if (globalLevel === 'BP') levelValue = '2';
-        else if (globalLevel === 'BPC') levelValue = '3';
-        else levelValue = 'ALL';
-    }
-
-    let questions = [];
-    if (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) {
-        const getCategory = (code) => {
-            const letter = code.charAt(0);
-            const map = {
-                'A': 'Météo',
-                'E': 'Mécavol', 'G': 'Mécavol', 'H': 'Mécavol',
-                'L': 'Matériel', 'N': 'Matériel', 'R': 'Matériel',
-                'U': 'Pilotage', 'W': 'Pilotage', 'X': 'Pilotage',
-                'S': 'Réglementation',
-                'F': 'Facteurs humains',
-                'P': 'Milieu naturel'
+            const exam = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                level: level,
+                score: score,
+                total: total,
+                percentage: Math.round((score / total) * 100),
+                results: results
             };
-            return map[letter] || 'Autre';
+
+            history.exams.unshift(exam); // Add to beginning
+            history.exams = history.exams.slice(0, 10); // Keep only last 10
+
+            localStorage.setItem('parapente_exam_history', JSON.stringify(history));
+        } catch (e) {
+            console.error("Failed to save exam history", e);
+        }
+    },
+
+    getExamHistory: function () {
+        try {
+            const history = JSON.parse(localStorage.getItem('parapente_exam_history') || '{"exams":[]}');
+            return history.exams || [];
+        } catch (e) {
+            console.error("Failed to load exam history", e);
+            return [];
+        }
+    },
+
+    importData: function () {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+
+                    // Basic validation of the file structure
+                    if (!data.stats || !data.examHistory) {
+                        alert('❌ Fichier invalide: Format de données incorrect');
+                        return;
+                    }
+
+                    if (confirm('⚠️ Cela va remplacer toutes vos statistiques et historiques actuels. Continuer ?')) {
+                        // Save directly to localStorage
+                        localStorage.setItem('parapente_qcm_stats', JSON.stringify(data.stats));
+                        localStorage.setItem('parapente_exam_history', JSON.stringify({ exams: data.examHistory }));
+
+                        // Force update of current runtime stats if needed? 
+                        // Actually getPersistentStats reads from localStorage so it's fine.
+
+                        alert('✅ Données importées avec succès !');
+
+                        try {
+                            // Refresh stats display
+                            this.renderStats();
+                        } catch (renderError) {
+                            console.error("Render failed after import", renderError);
+                            alert("Données importées, mais une erreur est survenue lors de l'affichage. Veuillez recharger la page.");
+                        }
+                    }
+                } catch (e) {
+                    console.error('Import failed', e);
+                    alert('❌ Erreur lors de l\'import : ' + e.message);
+                }
+            };
+            reader.readAsText(file);
         };
 
-        questions = QCM_OFFICIAL.questions.map(q => ({
-            code: q.code,
-            question: q.question,
-            theme: getCategory(q.code),
-            level: (function (c) {
-                const lastChar = c.charAt(c.length - 1).toUpperCase();
-                if (lastChar === 'V') return 1;
-                if (lastChar === 'B') return 2;
-                if (lastChar === 'M') return 3;
-                return 0;
-            })(q.code),
-            choices: q.ans
-        }));
-    }
+        input.click();
+    },
+    toggleExamDetails: function (examId) {
+        const card = document.querySelector(`[data-exam-id="${examId}"]`);
+        if (!card) return;
 
-    // Apply filters
-    if (levelValue !== 'ALL') {
-        questions = questions.filter(q => q.level === parseInt(levelValue));
-    }
+        const detailsDiv = card.querySelector('.exam-details');
+        const arrow = card.querySelector('.exam-arrow');
 
-    if (themeValue !== 'ALL') {
-        questions = questions.filter(q => q.theme === themeValue);
-    }
+        if (!detailsDiv) return;
 
-    if (searchTerm) {
-        questions = questions.filter(q =>
-            q.question.toLowerCase().includes(searchTerm) ||
-            q.code.toLowerCase().includes(searchTerm)
-        );
-    }
+        const isExpanded = detailsDiv.style.display !== 'none';
 
-    // Render
-    const mappingKeys = Object.keys(this.state.qcmCourseMapping || {});
-    const mappingLoaded = mappingKeys.length > 0;
-    const coursesLoaded = Object.keys(this.state.qcmCourses || {}).length > 0;
+        if (isExpanded) {
+            detailsDiv.style.display = 'none';
+            if (arrow) arrow.style.transform = 'rotate(0deg)';
+        } else {
+            detailsDiv.style.display = 'block';
+            if (arrow) arrow.style.transform = 'rotate(180deg)';
+        }
+    },
 
-    // Diagnostic UI REMOVED (v4.56)
-    let debugInfo = '';
+    exportData: function () {
+        try {
+            const stats = this.getPersistentStats();
+            const examHistory = this.getExamHistory();
 
-    if (questions.length === 0) {
-        resultsDiv.innerHTML = debugInfo + '<div style="text-align:center; opacity:0.5; padding:40px;">Aucune question trouvée</div>';
-        return;
-    }
+            const data = {
+                stats: stats,
+                examHistory: examHistory,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
 
-    let html = debugInfo;
-    questions.forEach(q => {
-        const levelLabel = q.level === 1 ? 'BI' : q.level === 2 ? 'BP' : q.level === 3 ? 'BPC' : 'N/A';
-        const levelColor = q.level === 1 ? '#48BB78' : q.level === 2 ? '#4299E1' : '#92400e';
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
 
-        html += `
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `parapente_stats_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            alert('✅ Données exportées avec succès !');
+        } catch (e) {
+            console.error('Export failed', e);
+            alert('❌ Erreur lors de l\'export');
+        }
+    },
+
+    importData: function () {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+
+                    if (!data.stats || !data.examHistory) {
+                        alert('❌ Fichier invalide');
+                        return;
+                    }
+
+                    if (confirm('⚠️ Cela va remplacer vos données actuelles. Continuer ?')) {
+                        localStorage.setItem('parapente_qcm_stats', JSON.stringify(data.stats));
+                        localStorage.setItem('parapente_exam_history', JSON.stringify({ exams: data.examHistory }));
+
+                        alert('✅ Données importées avec succès !');
+                        this.renderStats();
+                    }
+                } catch (e) {
+                    console.error('Import failed', e);
+                    alert('❌ Erreur lors de l\'import : fichier corrompu');
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        input.click();
+    },
+
+    showStats: function () {
+        document.querySelectorAll('.mode-screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('stats-screen').classList.add('active');
+        this.renderStats();
+    },
+
+    // --- QUESTION BANK ---
+    showBank: function () {
+        this.state.mainEngine.startMode('QCM_BANK');
+    },
+
+    renderBank: function () {
+        const searchInput = document.getElementById('bank-search');
+        const themeFilter = document.getElementById('bank-theme-filter');
+        const resultsDiv = document.getElementById('bank-results');
+
+        if (!resultsDiv) return;
+
+        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+        const themeValue = themeFilter ? themeFilter.value : 'ALL';
+
+        // Use Global Level from Main Engine
+        // Use Global Level from Main Engine
+        let levelValue = 'ALL';
+        if (this.state.mainEngine && this.state.mainEngine.state) {
+            const globalLevel = this.state.mainEngine.state.level; // BI, BP, BPC, ALL
+            if (globalLevel === 'BI') levelValue = '1';
+            else if (globalLevel === 'BP') levelValue = '2';
+            else if (globalLevel === 'BPC') levelValue = '3';
+            else levelValue = 'ALL';
+        }
+
+        let questions = [];
+        if (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) {
+            const getCategory = (code) => {
+                const letter = code.charAt(0);
+                const map = {
+                    'A': 'Météo',
+                    'E': 'Mécavol', 'G': 'Mécavol', 'H': 'Mécavol',
+                    'L': 'Matériel', 'N': 'Matériel', 'R': 'Matériel',
+                    'U': 'Pilotage', 'W': 'Pilotage', 'X': 'Pilotage',
+                    'S': 'Réglementation',
+                    'F': 'Facteurs humains',
+                    'P': 'Milieu naturel'
+                };
+                return map[letter] || 'Autre';
+            };
+
+            questions = QCM_OFFICIAL.questions.map(q => ({
+                code: q.code,
+                question: q.question,
+                theme: getCategory(q.code),
+                level: (function (c) {
+                    const lastChar = c.charAt(c.length - 1).toUpperCase();
+                    if (lastChar === 'V') return 1;
+                    if (lastChar === 'B') return 2;
+                    if (lastChar === 'M') return 3;
+                    return 0;
+                })(q.code),
+                choices: q.ans
+            }));
+        }
+
+        // Apply filters
+        if (levelValue !== 'ALL') {
+            questions = questions.filter(q => q.level === parseInt(levelValue));
+        }
+
+        if (themeValue !== 'ALL') {
+            questions = questions.filter(q => q.theme === themeValue);
+        }
+
+        if (searchTerm) {
+            questions = questions.filter(q =>
+                q.question.toLowerCase().includes(searchTerm) ||
+                q.code.toLowerCase().includes(searchTerm)
+            );
+        }
+
+        // Render
+        const mappingKeys = Object.keys(this.state.qcmCourseMapping || {});
+        const mappingLoaded = mappingKeys.length > 0;
+        const coursesLoaded = Object.keys(this.state.qcmCourses || {}).length > 0;
+
+        // Diagnostic UI REMOVED (v4.56)
+        let debugInfo = '';
+
+        if (questions.length === 0) {
+            resultsDiv.innerHTML = debugInfo + '<div style="text-align:center; opacity:0.5; padding:40px;">Aucune question trouvée</div>';
+            return;
+        }
+
+        let html = debugInfo;
+        questions.forEach(q => {
+            const levelLabel = q.level === 1 ? 'BI' : q.level === 2 ? 'BP' : q.level === 3 ? 'BPC' : 'N/A';
+            const levelColor = q.level === 1 ? '#48BB78' : q.level === 2 ? '#4299E1' : '#92400e';
+
+            html += `
     <div class="bank-question-card" style="background:var(--bg-card); padding:20px; border-radius:12px; border:1px solid var(--border-color);" >
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                         <div style="display:flex; gap:8px; align-items:center;">
@@ -1802,192 +1859,176 @@ renderBank: function () {
                     </div>
                 </div >
     `;
-    });
+        });
 
-    resultsDiv.innerHTML = html;
-},
+        resultsDiv.innerHTML = html;
+    },
 
-// --- COURSE MAPPING INTEGRATION ---
-initCourseMapping: function () {
-    const basePath = (this.state.mainEngine && this.state.mainEngine.state.basePath) ? this.state.mainEngine.state.basePath : '.';
-    const cacheBuster = `v=${Date.now()}`;
+    // --- COURSE MAPPING INTEGRATION ---
+    initCourseMapping: function () {
+        const basePath = (this.state.mainEngine && this.state.mainEngine.state.basePath) ? this.state.mainEngine.state.basePath : '.';
+        const cacheBuster = `v=${Date.now()}`;
 
-    console.log("Initializing Course Mapping with cacheBuster:", cacheBuster);
+        console.log("Initializing Course Mapping with cacheBuster:", cacheBuster);
 
-    // Load Mapping
-    fetch(`${basePath}/js/data/question_course_mapping.json?${cacheBuster}`)
-        .then(res => {
-            if (!res.ok) throw new Error("Mapping file not found");
-            return res.json();
-        })
-        .then(data => {
-            this.state.qcmCourseMapping = data;
-            console.log("✅ Course mapping loaded:", Object.keys(data).length, "questions");
+        // Load Mapping
+        fetch(`${basePath}/js/data/question_course_mapping.json?${cacheBuster}`)
+            .then(res => {
+                if (!res.ok) throw new Error("Mapping file not found");
+                return res.json();
+            })
+            .then(data => {
+                this.state.qcmCourseMapping = data;
+                console.log("✅ Course mapping loaded:", Object.keys(data).length, "questions");
 
-            // Diagnostic log
-            setTimeout(() => {
-                const mapped = (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) ?
-                    QCM_OFFICIAL.questions.filter(q => !!this.state.qcmCourseMapping[q.code]).length : 0;
-                console.log(`📊 Diagnostic Mapping : ${mapped} questions de la base officielle ont un cours associé.`);
-            }, 1000);
+                // Diagnostic log
+                setTimeout(() => {
+                    const mapped = (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) ?
+                        QCM_OFFICIAL.questions.filter(q => !!this.state.qcmCourseMapping[q.code]).length : 0;
+                    console.log(`📊 Diagnostic Mapping : ${mapped} questions de la base officielle ont un cours associé.`);
+                }, 1000);
 
-            // If we are in Bank mode, refresh to show buttons
+                // If we are in Bank mode, refresh to show buttons
+                if (this.state.mainEngine && this.state.mainEngine.state.mode === 'QCM_BANK') {
+                    this.renderBank();
+                }
+            })
+            .catch(err => {
+                console.error("❌ Error loading mapping:", err);
+            });
+
+        // Load Course Metadata (for PDF paths)
+        // Check if COURSES_DATA is already available in window (pre-loaded via script tag)
+        if (window.COURSES_DATA) {
+            this.state.qcmCourses = window.COURSES_DATA;
+            console.log("✅ Course metadata initialized from window.COURSES_DATA:", Object.keys(this.state.qcmCourses).length, "courses");
             if (this.state.mainEngine && this.state.mainEngine.state.mode === 'QCM_BANK') {
                 this.renderBank();
             }
-        })
-        .catch(err => {
-            console.error("❌ Error loading mapping:", err);
-        });
-
-    // Load Course Metadata (for PDF paths)
-    // Check if COURSES_DATA is already available in window (pre-loaded via script tag)
-    if (window.COURSES_DATA) {
-        this.state.qcmCourses = window.COURSES_DATA;
-        console.log("✅ Course metadata initialized from window.COURSES_DATA:", Object.keys(this.state.qcmCourses).length, "courses");
-        if (this.state.mainEngine && this.state.mainEngine.state.mode === 'QCM_BANK') {
-            this.renderBank();
         }
-    }
 
-    fetch(`${basePath}/js/data/courses.json?${cacheBuster}`)
-        .then(res => {
-            if (!res.ok) throw new Error("Courses metadata file not found");
-            return res.json();
-        })
-        .then(data => {
-            // Merge if COURSES_DATA was used, or just set
-            this.state.qcmCourses = data;
-            console.log("✅ Course metadata loaded:", Object.keys(data).length, "courses");
-            // Refresh view if in bank mode to update diagnostic line
-            if (this.state.mainEngine && this.state.mainEngine.state.mode === 'QCM_BANK') {
-                this.renderBank();
-            }
-        })
-        .catch(err => {
-            console.error("❌ Error loading courses metadata:", err);
-        });
-},
+        // fetch(`${basePath}/js/data/courses.json`) removed (file deleted v4.64)
+    },
 
-getCourseUrl: function (questionCode, questionText) {
-    // Feature PAUSED by user request (v4.55).
-    // The automatic heuristics were not precise enough.
-    // Future plan: Implement strict manual tagging for both courses and questions.
-    return null;
+    getCourseUrl: function (questionCode, questionText) {
+        // Feature PAUSED by user request (v4.55).
+        // The automatic heuristics were not precise enough.
+        // Future plan: Implement strict manual tagging for both courses and questions.
+        return null;
 
-    if (!this.state.qcmCourseMapping || !this.state.qcmCourses) return null;
+        if (!this.state.qcmCourseMapping || !this.state.qcmCourses) return null;
 
-    // Clean query: trim spaces and uppercase
-    const cleanCode = (questionCode || "").toString().trim().toUpperCase();
-    const cleanText = (questionText || "").toLowerCase();
+        // Clean query: trim spaces and uppercase
+        const cleanCode = (questionCode || "").toString().trim().toUpperCase();
+        const cleanText = (questionText || "").toLowerCase();
 
-    // 1. Exact Match Lookup (Source de vérité absolue)
-    const mapping = this.state.qcmCourseMapping[cleanCode];
-    if (mapping && mapping.course_id) {
-        // New safety: only trust direct mapping if score is sufficient (>= 0.15)
-        // This prevents low-quality automated links (like Cloud -> Traps) from hijacking the logic
-        const relevanceScore = mapping.score || 0;
-        if (relevanceScore >= 0.15) {
-            let courseData = this.state.qcmCourses[mapping.course_id];
-            if (!courseData) {
-                courseData = Object.values(this.state.qcmCourses).find(c => c.id === mapping.course_id);
-            }
-            if (courseData && (courseData.pdf || courseData.path)) {
-                return courseData.pdf || courseData.path;
+        // 1. Exact Match Lookup (Source de vérité absolue)
+        const mapping = this.state.qcmCourseMapping[cleanCode];
+        if (mapping && mapping.course_id) {
+            // New safety: only trust direct mapping if score is sufficient (>= 0.15)
+            // This prevents low-quality automated links (like Cloud -> Traps) from hijacking the logic
+            const relevanceScore = mapping.score || 0;
+            if (relevanceScore >= 0.15) {
+                let courseData = this.state.qcmCourses[mapping.course_id];
+                if (!courseData) {
+                    courseData = Object.values(this.state.qcmCourses).find(c => c.id === mapping.course_id);
+                }
+                if (courseData && (courseData.pdf || courseData.path)) {
+                    return courseData.pdf || courseData.path;
+                }
             }
         }
+
+        // 2. Intelligent Fallback (Theme + Level + Topic match)
+        const categoryLetter = cleanCode.charAt(0);
+        const levelCode = cleanCode.slice(-1).toUpperCase(); // V, B, M
+
+        let targetLevel = null;
+        if (levelCode === 'V') targetLevel = 'BI';
+        else if (levelCode === 'B') targetLevel = 'BP';
+        else if (levelCode === 'M') targetLevel = 'BPC';
+
+        if (targetLevel) {
+            const topicGroups = this.getTopicGroups(categoryLetter);
+
+            // Priority 1: Modernized course for this category/level + topic match
+            const modernizedId = Object.keys(this.state.qcmCourses).find(id => {
+                const c = this.state.qcmCourses[id];
+                const courseTitle = (c.title || "").toLowerCase();
+
+                return id.startsWith('modernized/') &&
+                    c.level && c.level.includes(targetLevel) &&
+                    // Topic match: Check if question shares a topic group with the course title
+                    topicGroups.some(group =>
+                        group.match.some(m => cleanText.includes(m)) &&
+                        group.title.some(t => courseTitle.includes(t))
+                    );
+            });
+            if (modernizedId) return this.state.qcmCourses[modernizedId].pdf;
+
+            // Priority 2: Any course matching category + level + topic match
+            const anyMatchId = Object.keys(this.state.qcmCourses).find(id => {
+                const c = this.state.qcmCourses[id];
+                const courseTitle = (c.title || c.category || "").toLowerCase();
+
+                return c.level && c.level.includes(targetLevel) &&
+                    topicGroups.some(group =>
+                        group.match.some(m => cleanText.includes(m)) &&
+                        group.title.some(t => courseTitle.includes(t))
+                    );
+            });
+            if (anyMatchId) return this.state.qcmCourses[anyMatchId].pdf;
+        }
+
+        return null;
+    },
+
+    getTopicGroups: function (letter) {
+        const groups = {
+            'A': [ // Météo
+                { title: ['brise'], match: ['brise', 'pente', 'vallée', 'montante', 'descendante', 'restitution'] },
+                { title: ['front', 'nuage'], match: ['front', 'nuage', 'cumulus', 'saturation', 'rosée', 'condens', 'base', 'plafond', 'stratus', 'nimbus', 'cirrus', 'alto', 'étage', 'etage'] },
+                { title: ['piège', 'piege', 'aéro'], match: ['piège', 'piege', 'aéro', 'gradient', 'cisaillement', 'venturi', 'rouleau', 'turbulence', 'foehn', 'brise de mer'] },
+                { title: ['météo', 'meteo'], match: ['météo', 'meteo', 'vent', 'vitesse', 'pression', 'isobare', 'air', 'température', 'stabilité', 'gradient', ' dépression', 'anticyclone'] }
+            ],
+            'E': [ // Mécavol
+                { title: ['mécanique', 'mécavol', 'dynamique', 'vol'], match: ['vol', 'vitesse', 'portance', 'traînée', 'polaire', 'finesse', 'incidence', 'décrochage', 'calage', 'équilibre', 'centrage', 'stabilité', 'roulis', 'tangage'] }
+            ],
+            'G': [ // Mécavol Parapente
+                { title: ['mécanique', 'mécavol', 'dynamique', 'vol'], match: ['parapente', 'vol', 'vitesse', 'portance', 'traînée', 'polaire', 'finesse', 'incidence', 'décrochage', 'calage', 'suspente', 'intrados', 'extrados'] }
+            ],
+            'L': [ // Matériel / Secours
+                { title: ['secours', 'parachute'], match: ['secours', 'parachute', 'pod', 'apex', 'suspente', 'pliage', 'ouverture', 'extraction'] },
+                { title: ['sellette'], match: ['sellette', 'protection', 'mousse', 'airbag', 'cuissard', 'maillon', 'abs', 'ventrale', 'cuissarde'] },
+                { title: ['matériel', 'parapente', 'chaine'], match: ['voile', 'intrados', 'extrados', 'nervure', 'caisson', 'élévateur', 'maillon', 'tissu', 'vieillissement'] }
+            ],
+            'S': [ // Réglementation
+                { title: ['réglementation', 'espaces', 'aérien', 'vfr', 'sigr'], match: ['réglementation', 'droit', 'priorité', 'vfr', 'espace', 'ctr', 'tma', 'zone', 'altitude', 'notam', 'supaip', 'règles', 'collision', 'licence', 'assurance'] }
+            ],
+            'U': [ // Pilotage
+                { title: ['pilotage', 'virage', 'tangage', 'roulis'], match: ['pilotage', 'virage', 'tangage', 'roulis', 'frein', 'sellette', 'appuis', 'direction', 'correction', 'fermeture', 'gonflage', 'décollage', 'atterrissage', 'approche', 'pénétrer'] }
+            ]
+        };
+        // Add defaults for others or fallbacks
+        if (!groups[letter]) {
+            groups[letter] = [{ title: [''], match: [''] }]; // Generic
+        }
+
+        // Add specific mappings for letters not explicitly grouped above
+        if (letter === 'N' || letter === 'R') groups[letter] = groups['L'];
+        if (letter === 'W' || letter === 'X') groups[letter] = groups['U'];
+        if (letter === 'F') groups[letter] = [{ title: ['facteurs', 'humains'], match: ['stress', 'peur', 'fatigue', 'analyse', 'décision', 'regard', 'vigilance', 'hypoxie', 'vision'] }];
+        if (letter === 'P') groups[letter] = [{ title: ['milieu', 'naturel', 'faune', 'rapace'], match: ['nature', 'oiseau', 'vautour', 'aigle', 'nid', 'parc', 'réserve', 'milieu'] }];
+
+        return groups[letter];
+    },
+
+    isCategoryMatch: function (letter, text) {
+        if (!text) return false;
+        const t = text.toLowerCase();
+        const groups = this.getTopicGroups(letter);
+        return groups.some(group => group.title.some(titleWord => t.includes(titleWord)));
     }
-
-    // 2. Intelligent Fallback (Theme + Level + Topic match)
-    const categoryLetter = cleanCode.charAt(0);
-    const levelCode = cleanCode.slice(-1).toUpperCase(); // V, B, M
-
-    let targetLevel = null;
-    if (levelCode === 'V') targetLevel = 'BI';
-    else if (levelCode === 'B') targetLevel = 'BP';
-    else if (levelCode === 'M') targetLevel = 'BPC';
-
-    if (targetLevel) {
-        const topicGroups = this.getTopicGroups(categoryLetter);
-
-        // Priority 1: Modernized course for this category/level + topic match
-        const modernizedId = Object.keys(this.state.qcmCourses).find(id => {
-            const c = this.state.qcmCourses[id];
-            const courseTitle = (c.title || "").toLowerCase();
-
-            return id.startsWith('modernized/') &&
-                c.level && c.level.includes(targetLevel) &&
-                // Topic match: Check if question shares a topic group with the course title
-                topicGroups.some(group =>
-                    group.match.some(m => cleanText.includes(m)) &&
-                    group.title.some(t => courseTitle.includes(t))
-                );
-        });
-        if (modernizedId) return this.state.qcmCourses[modernizedId].pdf;
-
-        // Priority 2: Any course matching category + level + topic match
-        const anyMatchId = Object.keys(this.state.qcmCourses).find(id => {
-            const c = this.state.qcmCourses[id];
-            const courseTitle = (c.title || c.category || "").toLowerCase();
-
-            return c.level && c.level.includes(targetLevel) &&
-                topicGroups.some(group =>
-                    group.match.some(m => cleanText.includes(m)) &&
-                    group.title.some(t => courseTitle.includes(t))
-                );
-        });
-        if (anyMatchId) return this.state.qcmCourses[anyMatchId].pdf;
-    }
-
-    return null;
-},
-
-getTopicGroups: function (letter) {
-    const groups = {
-        'A': [ // Météo
-            { title: ['brise'], match: ['brise', 'pente', 'vallée', 'montante', 'descendante', 'restitution'] },
-            { title: ['front', 'nuage'], match: ['front', 'nuage', 'cumulus', 'saturation', 'rosée', 'condens', 'base', 'plafond', 'stratus', 'nimbus', 'cirrus', 'alto', 'étage', 'etage'] },
-            { title: ['piège', 'piege', 'aéro'], match: ['piège', 'piege', 'aéro', 'gradient', 'cisaillement', 'venturi', 'rouleau', 'turbulence', 'foehn', 'brise de mer'] },
-            { title: ['météo', 'meteo'], match: ['météo', 'meteo', 'vent', 'vitesse', 'pression', 'isobare', 'air', 'température', 'stabilité', 'gradient', ' dépression', 'anticyclone'] }
-        ],
-        'E': [ // Mécavol
-            { title: ['mécanique', 'mécavol', 'dynamique', 'vol'], match: ['vol', 'vitesse', 'portance', 'traînée', 'polaire', 'finesse', 'incidence', 'décrochage', 'calage', 'équilibre', 'centrage', 'stabilité', 'roulis', 'tangage'] }
-        ],
-        'G': [ // Mécavol Parapente
-            { title: ['mécanique', 'mécavol', 'dynamique', 'vol'], match: ['parapente', 'vol', 'vitesse', 'portance', 'traînée', 'polaire', 'finesse', 'incidence', 'décrochage', 'calage', 'suspente', 'intrados', 'extrados'] }
-        ],
-        'L': [ // Matériel / Secours
-            { title: ['secours', 'parachute'], match: ['secours', 'parachute', 'pod', 'apex', 'suspente', 'pliage', 'ouverture', 'extraction'] },
-            { title: ['sellette'], match: ['sellette', 'protection', 'mousse', 'airbag', 'cuissard', 'maillon', 'abs', 'ventrale', 'cuissarde'] },
-            { title: ['matériel', 'parapente', 'chaine'], match: ['voile', 'intrados', 'extrados', 'nervure', 'caisson', 'élévateur', 'maillon', 'tissu', 'vieillissement'] }
-        ],
-        'S': [ // Réglementation
-            { title: ['réglementation', 'espaces', 'aérien', 'vfr', 'sigr'], match: ['réglementation', 'droit', 'priorité', 'vfr', 'espace', 'ctr', 'tma', 'zone', 'altitude', 'notam', 'supaip', 'règles', 'collision', 'licence', 'assurance'] }
-        ],
-        'U': [ // Pilotage
-            { title: ['pilotage', 'virage', 'tangage', 'roulis'], match: ['pilotage', 'virage', 'tangage', 'roulis', 'frein', 'sellette', 'appuis', 'direction', 'correction', 'fermeture', 'gonflage', 'décollage', 'atterrissage', 'approche', 'pénétrer'] }
-        ]
-    };
-    // Add defaults for others or fallbacks
-    if (!groups[letter]) {
-        groups[letter] = [{ title: [''], match: [''] }]; // Generic
-    }
-
-    // Add specific mappings for letters not explicitly grouped above
-    if (letter === 'N' || letter === 'R') groups[letter] = groups['L'];
-    if (letter === 'W' || letter === 'X') groups[letter] = groups['U'];
-    if (letter === 'F') groups[letter] = [{ title: ['facteurs', 'humains'], match: ['stress', 'peur', 'fatigue', 'analyse', 'décision', 'regard', 'vigilance', 'hypoxie', 'vision'] }];
-    if (letter === 'P') groups[letter] = [{ title: ['milieu', 'naturel', 'faune', 'rapace'], match: ['nature', 'oiseau', 'vautour', 'aigle', 'nid', 'parc', 'réserve', 'milieu'] }];
-
-    return groups[letter];
-},
-
-isCategoryMatch: function (letter, text) {
-    if (!text) return false;
-    const t = text.toLowerCase();
-    const groups = this.getTopicGroups(letter);
-    return groups.some(group => group.title.some(titleWord => t.includes(titleWord)));
-}
 
 };
 
