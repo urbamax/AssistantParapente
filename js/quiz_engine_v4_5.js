@@ -366,7 +366,7 @@ const QuizEngine = {
                     <div style="font-size:0.8rem; opacity:0.4; font-family:monospace;">(#${q.code})</div>
                 </div>
                 <div style="display:flex; gap:8px; align-items:center;">
-                    ${(this.state.qcmConfig.mode !== 'EXAM' && this.getCourseUrl(q.code)) ? `<button onclick="window.open('${this.getCourseUrl(q.code)}', '_blank')" style="background:rgba(255, 255, 255, 0.1); color:var(--text-secondary); border:1px solid rgba(255, 255, 255, 0.2); padding:4px 10px; border-radius:6px; cursor:pointer; font-size:0.75rem; font-weight:700; display:flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR LE COURS</button>` : ''}
+                    ${(this.state.qcmConfig.mode !== 'EXAM' && this.getCourseUrl(q.code, q.question)) ? `<button onclick="window.open('${this.getCourseUrl(q.code, q.question)}', '_blank')" style="background:rgba(255, 255, 255, 0.1); color:var(--text-secondary); border:1px solid rgba(255, 255, 255, 0.2); padding:4px 10px; border-radius:6px; cursor:pointer; font-size:0.75rem; font-weight:700; display:flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR LE COURS</button>` : ''}
                     <div class="level-tag" style="margin:0; font-size:0.75rem;">${levelLabel}</div>
                 </div>
             </div>
@@ -654,7 +654,7 @@ const QuizEngine = {
                     </div>
                     ${!r.isCorrect ? `<div style="padding:12px; background:rgba(255,255,255,0.03); border-left:3px solid #f472b6; font-size:0.9rem; color:#e2e8f0;">
                         <div style="margin-bottom:8px;">${q.explanation || 'Pas d\'explication disponible.'}</div>
-                        ${this.getCourseUrl(q.code) ? `<button onclick="window.open('${this.getCourseUrl(q.code)}', '_blank')" style="background:rgba(255, 255, 255, 0.1); color:var(--text-secondary); border:1px solid rgba(255, 255, 255, 0.2); padding:4px 10px; border-radius:6px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR LE COURS</button>` : ''}
+                        ${this.getCourseUrl(q.code, q.question) ? `<button onclick="window.open('${this.getCourseUrl(q.code, q.question)}', '_blank')" style="background:rgba(255, 255, 255, 0.1); color:var(--text-secondary); border:1px solid rgba(255, 255, 255, 0.2); padding:4px 10px; border-radius:6px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR LE COURS</button>` : ''}
                     </div>` : ''}
                 </div>
             `;
@@ -1121,7 +1121,8 @@ const QuizEngine = {
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#${code}</span>
-                                    <span style="background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:4px; font-size:0.7rem;">${theme}</span>
+                                    ${QuizEngine.getCourseUrl(code, qText) ? `<button onclick="event.stopPropagation(); window.open('${QuizEngine.getCourseUrl(code, qText)}', '_blank')" style="background:var(--color-primary); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>` : ''}
+                                    <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">${theme}</span>
                                     ${streak >= 3 ? `<span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 ${streak}</span>` : ''}
                                     ${hasAnswers ? '<i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-' + code + '"></i>' : ''}
                                 </div>
@@ -1757,12 +1758,19 @@ const QuizEngine = {
         }
 
         // Render
+        const mappingKeys = Object.keys(this.state.qcmCourseMapping || {});
+        const mappingLoaded = mappingKeys.length > 0;
+        const coursesLoaded = Object.keys(this.state.qcmCourses || {}).length > 0;
+
+        // Diagnostic UI REMOVED (v4.56)
+        let debugInfo = '';
+
         if (questions.length === 0) {
-            resultsDiv.innerHTML = '<div style="text-align:center; opacity:0.5; padding:40px;">Aucune question trouvée</div>';
+            resultsDiv.innerHTML = debugInfo + '<div style="text-align:center; opacity:0.5; padding:40px;">Aucune question trouvée</div>';
             return;
         }
 
-        let html = '';
+        let html = debugInfo;
         questions.forEach(q => {
             const levelLabel = q.level === 1 ? 'BI' : q.level === 2 ? 'BP' : q.level === 3 ? 'BPC' : 'N/A';
             const levelColor = q.level === 1 ? '#48BB78' : q.level === 2 ? '#4299E1' : '#92400e';
@@ -1773,6 +1781,7 @@ const QuizEngine = {
                         <div style="display:flex; gap:8px; align-items:center;">
                             <span style="background:${levelColor}; color:white; padding:4px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${levelLabel}</span>
                             <span style="background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:6px; font-size:0.7rem;">${q.theme}</span>
+                            ${QuizEngine.getCourseUrl(q.code, q.question) ? `<button onclick="window.open('${QuizEngine.getCourseUrl(q.code, q.question)}', '_blank')" style="background:var(--color-primary); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>` : ''}
                         </div>
                         <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#${q.code}</span>
                     </div>
@@ -1791,44 +1800,189 @@ const QuizEngine = {
         resultsDiv.innerHTML = html;
     },
 
-    // --- COURSE MAPPING INTIGRATION ---
+    // --- COURSE MAPPING INTEGRATION ---
     initCourseMapping: function () {
+        const basePath = (this.state.mainEngine && this.state.mainEngine.state.basePath) ? this.state.mainEngine.state.basePath : '.';
+        const cacheBuster = `v=${Date.now()}`;
+
+        console.log("Initializing Course Mapping with cacheBuster:", cacheBuster);
+
         // Load Mapping
-        fetch('js/data/question_course_mapping.json')
-            .then(res => res.json())
+        fetch(`${basePath}/js/data/question_course_mapping.json?${cacheBuster}`)
+            .then(res => {
+                if (!res.ok) throw new Error("Mapping file not found");
+                return res.json();
+            })
             .then(data => {
                 this.state.qcmCourseMapping = data;
-                console.log("Course mapping loaded:", Object.keys(data).length);
+                console.log("✅ Course mapping loaded:", Object.keys(data).length, "questions");
+
+                // Diagnostic log
+                setTimeout(() => {
+                    const mapped = (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) ?
+                        QCM_OFFICIAL.questions.filter(q => !!this.state.qcmCourseMapping[q.code]).length : 0;
+                    console.log(`📊 Diagnostic Mapping : ${mapped} questions de la base officielle ont un cours associé.`);
+                }, 1000);
+
+                // If we are in Bank mode, refresh to show buttons
+                if (this.state.mainEngine && this.state.mainEngine.state.mode === 'QCM_BANK') {
+                    this.renderBank();
+                }
             })
-            .catch(err => console.warn("Error loading mapping:", err));
+            .catch(err => {
+                console.error("❌ Error loading mapping:", err);
+            });
 
         // Load Course Metadata (for PDF paths)
-        fetch('js/data/courses.json')
-            .then(res => res.json())
-            .then(data => {
-                this.state.qcmCourses = data;
-                console.log("Course metadata loaded:", Object.keys(data).length);
+        // Check if COURSES_DATA is already available in window (pre-loaded via script tag)
+        if (window.COURSES_DATA) {
+            this.state.qcmCourses = window.COURSES_DATA;
+            console.log("✅ Course metadata initialized from window.COURSES_DATA:", Object.keys(this.state.qcmCourses).length, "courses");
+            if (this.state.mainEngine && this.state.mainEngine.state.mode === 'QCM_BANK') {
+                this.renderBank();
+            }
+        }
+
+        fetch(`${basePath}/js/data/courses.json?${cacheBuster}`)
+            .then(res => {
+                if (!res.ok) throw new Error("Courses metadata file not found");
+                return res.json();
             })
-            .catch(err => console.warn("Error loading courses:", err));
+            .then(data => {
+                // Merge if COURSES_DATA was used, or just set
+                this.state.qcmCourses = data;
+                console.log("✅ Course metadata loaded:", Object.keys(data).length, "courses");
+                // Refresh view if in bank mode to update diagnostic line
+                if (this.state.mainEngine && this.state.mainEngine.state.mode === 'QCM_BANK') {
+                    this.renderBank();
+                }
+            })
+            .catch(err => {
+                console.error("❌ Error loading courses metadata:", err);
+            });
     },
 
-    getCourseUrl: function (questionCode) {
+    getCourseUrl: function (questionCode, questionText) {
+        // Feature PAUSED by user request (v4.55).
+        // The automatic heuristics were not precise enough.
+        // Future plan: Implement strict manual tagging for both courses and questions.
+        return null;
+
         if (!this.state.qcmCourseMapping || !this.state.qcmCourses) return null;
 
-        const mapping = this.state.qcmCourseMapping[questionCode];
+        // Clean query: trim spaces and uppercase
+        const cleanCode = (questionCode || "").toString().trim().toUpperCase();
+        const cleanText = (questionText || "").toLowerCase();
+
+        // 1. Exact Match Lookup (Source de vérité absolue)
+        const mapping = this.state.qcmCourseMapping[cleanCode];
         if (mapping && mapping.course_id) {
-            // Look up the full course object to get the real PDF path
-            const courseData = this.state.qcmCourses[mapping.course_id];
-            if (courseData && courseData.pdf) {
-                return courseData.pdf;
+            // New safety: only trust direct mapping if score is sufficient (>= 0.15)
+            // This prevents low-quality automated links (like Cloud -> Traps) from hijacking the logic
+            const relevanceScore = mapping.score || 0;
+            if (relevanceScore >= 0.15) {
+                let courseData = this.state.qcmCourses[mapping.course_id];
+                if (!courseData) {
+                    courseData = Object.values(this.state.qcmCourses).find(c => c.id === mapping.course_id);
+                }
+                if (courseData && (courseData.pdf || courseData.path)) {
+                    return courseData.pdf || courseData.path;
+                }
             }
-            // Fallback if course not found in metadata (shouldn't happen if synced)
-            // console.warn("Course metadata not found for ID:", mapping.course_id);
         }
+
+        // 2. Intelligent Fallback (Theme + Level + Topic match)
+        const categoryLetter = cleanCode.charAt(0);
+        const levelCode = cleanCode.slice(-1).toUpperCase(); // V, B, M
+
+        let targetLevel = null;
+        if (levelCode === 'V') targetLevel = 'BI';
+        else if (levelCode === 'B') targetLevel = 'BP';
+        else if (levelCode === 'M') targetLevel = 'BPC';
+
+        if (targetLevel) {
+            const topicGroups = this.getTopicGroups(categoryLetter);
+
+            // Priority 1: Modernized course for this category/level + topic match
+            const modernizedId = Object.keys(this.state.qcmCourses).find(id => {
+                const c = this.state.qcmCourses[id];
+                const courseTitle = (c.title || "").toLowerCase();
+
+                return id.startsWith('modernized/') &&
+                    c.level && c.level.includes(targetLevel) &&
+                    // Topic match: Check if question shares a topic group with the course title
+                    topicGroups.some(group =>
+                        group.match.some(m => cleanText.includes(m)) &&
+                        group.title.some(t => courseTitle.includes(t))
+                    );
+            });
+            if (modernizedId) return this.state.qcmCourses[modernizedId].pdf;
+
+            // Priority 2: Any course matching category + level + topic match
+            const anyMatchId = Object.keys(this.state.qcmCourses).find(id => {
+                const c = this.state.qcmCourses[id];
+                const courseTitle = (c.title || c.category || "").toLowerCase();
+
+                return c.level && c.level.includes(targetLevel) &&
+                    topicGroups.some(group =>
+                        group.match.some(m => cleanText.includes(m)) &&
+                        group.title.some(t => courseTitle.includes(t))
+                    );
+            });
+            if (anyMatchId) return this.state.qcmCourses[anyMatchId].pdf;
+        }
+
         return null;
+    },
+
+    getTopicGroups: function (letter) {
+        const groups = {
+            'A': [ // Météo
+                { title: ['brise'], match: ['brise', 'pente', 'vallée', 'montante', 'descendante', 'restitution'] },
+                { title: ['front', 'nuage'], match: ['front', 'nuage', 'cumulus', 'saturation', 'rosée', 'condens', 'base', 'plafond', 'stratus', 'nimbus', 'cirrus', 'alto', 'étage', 'etage'] },
+                { title: ['piège', 'piege', 'aéro'], match: ['piège', 'piege', 'aéro', 'gradient', 'cisaillement', 'venturi', 'rouleau', 'turbulence', 'foehn', 'brise de mer'] },
+                { title: ['météo', 'meteo'], match: ['météo', 'meteo', 'vent', 'vitesse', 'pression', 'isobare', 'air', 'température', 'stabilité', 'gradient', ' dépression', 'anticyclone'] }
+            ],
+            'E': [ // Mécavol
+                { title: ['mécanique', 'mécavol', 'dynamique', 'vol'], match: ['vol', 'vitesse', 'portance', 'traînée', 'polaire', 'finesse', 'incidence', 'décrochage', 'calage', 'équilibre', 'centrage', 'stabilité', 'roulis', 'tangage'] }
+            ],
+            'G': [ // Mécavol Parapente
+                { title: ['mécanique', 'mécavol', 'dynamique', 'vol'], match: ['parapente', 'vol', 'vitesse', 'portance', 'traînée', 'polaire', 'finesse', 'incidence', 'décrochage', 'calage', 'suspente', 'intrados', 'extrados'] }
+            ],
+            'L': [ // Matériel / Secours
+                { title: ['secours', 'parachute'], match: ['secours', 'parachute', 'pod', 'apex', 'suspente', 'pliage', 'ouverture', 'extraction'] },
+                { title: ['sellette'], match: ['sellette', 'protection', 'mousse', 'airbag', 'cuissard', 'maillon', 'abs', 'ventrale', 'cuissarde'] },
+                { title: ['matériel', 'parapente', 'chaine'], match: ['voile', 'intrados', 'extrados', 'nervure', 'caisson', 'élévateur', 'maillon', 'tissu', 'vieillissement'] }
+            ],
+            'S': [ // Réglementation
+                { title: ['réglementation', 'espaces', 'aérien', 'vfr', 'sigr'], match: ['réglementation', 'droit', 'priorité', 'vfr', 'espace', 'ctr', 'tma', 'zone', 'altitude', 'notam', 'supaip', 'règles', 'collision', 'licence', 'assurance'] }
+            ],
+            'U': [ // Pilotage
+                { title: ['pilotage', 'virage', 'tangage', 'roulis'], match: ['pilotage', 'virage', 'tangage', 'roulis', 'frein', 'sellette', 'appuis', 'direction', 'correction', 'fermeture', 'gonflage', 'décollage', 'atterrissage', 'approche', 'pénétrer'] }
+            ]
+        };
+        // Add defaults for others or fallbacks
+        if (!groups[letter]) {
+            groups[letter] = [{ title: [''], match: [''] }]; // Generic
+        }
+
+        // Add specific mappings for letters not explicitly grouped above
+        if (letter === 'N' || letter === 'R') groups[letter] = groups['L'];
+        if (letter === 'W' || letter === 'X') groups[letter] = groups['U'];
+        if (letter === 'F') groups[letter] = [{ title: ['facteurs', 'humains'], match: ['stress', 'peur', 'fatigue', 'analyse', 'décision', 'regard', 'vigilance', 'hypoxie', 'vision'] }];
+        if (letter === 'P') groups[letter] = [{ title: ['milieu', 'naturel', 'faune', 'rapace'], match: ['nature', 'oiseau', 'vautour', 'aigle', 'nid', 'parc', 'réserve', 'milieu'] }];
+
+        return groups[letter];
+    },
+
+    isCategoryMatch: function (letter, text) {
+        if (!text) return false;
+        const t = text.toLowerCase();
+        const groups = this.getTopicGroups(letter);
+        return groups.some(group => group.title.some(titleWord => t.includes(titleWord)));
     }
 
 };
 
 window.QuizEngine = QuizEngine;
-console.log("QuizEngine v4.2 LOADED");
+console.log("QuizEngine v4.56 (Diagnostics & Mapping REMOVED) LOADED");

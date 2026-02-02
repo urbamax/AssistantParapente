@@ -839,8 +839,18 @@ body.light-mode .sort-btn.active {
     background: var(--bg-input);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-pill);
-    padding: 12px 24px 12px 50px;
+    padding: 2px 24px;
     color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 48px;
+}
+
+.search-box i {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
 }
 
 .search-box input {
@@ -849,6 +859,8 @@ body.light-mode .sort-btn.active {
     outline: none;
     color: var(--text-main);
     width: 100%;
+    font-size: 0.95rem;
+    font-family: inherit;
 }
 
 .library-grid {
@@ -1242,12 +1254,17 @@ body.light-mode .choice-btn {
         min-width: auto;
         width: 100%;
         max-width: 100%;
-        padding: 10px 16px 10px 40px;
+        padding: 0 16px;
         margin: 0;
+        height: 44px;
     }
 
     .search-box i {
-        left: 15px;
+        font-size: 1.1rem;
+    }
+
+    .search-box input {
+        font-size: 0.85rem;
     }
 
     /* HUD */
