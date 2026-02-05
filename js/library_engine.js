@@ -89,10 +89,10 @@ const LibraryEngine = {
     },
 
     renderSimpleGrid: function (container, courses) {
-        const grid = document.createElement('div');
-        grid.className = 'library-grid';
-        courses.forEach(c => grid.appendChild(this.createCourseCard(c)));
-        container.appendChild(grid);
+        const listContainer = document.createElement('div');
+        listContainer.className = 'library-list';
+        courses.forEach(c => listContainer.appendChild(this.createCourseListItem(c)));
+        container.appendChild(listContainer);
     },
 
     renderGroupedByLevel: function (container, courses) {
@@ -110,53 +110,74 @@ const LibraryEngine = {
             const section = document.createElement('div');
             section.className = 'library-section';
             section.innerHTML = `<h3 class="library-section-header level-header level-${lKey}"><i class="ri-bookmark-3-fill"></i> ${this.getLevelName(lKey)}</h3>`;
-            const grid = document.createElement('div');
-            grid.className = 'library-grid';
-            levels[lKey].forEach(c => grid.appendChild(this.createCourseCard(c)));
-            section.appendChild(grid);
+
+            // USE LIST CONTAINER
+            const listContainer = document.createElement('div');
+            listContainer.className = 'library-list';
+
+            levels[lKey].forEach(c => listContainer.appendChild(this.createCourseCard(c)));
+            section.appendChild(listContainer);
             container.appendChild(section);
         });
     },
 
     renderGroupedByCategory: function (container, courses) {
-        const categories = {};
+        // Group by INFERRED THEME instead of Folder Category
+        const themes = {};
+
         courses.forEach(c => {
-            const cat = c.category || "Autre";
-            if (!categories[cat]) categories[cat] = [];
-            categories[cat].push(c);
+            const theme = this.assignTheme(c);
+            if (!themes[theme]) themes[theme] = [];
+            themes[theme].push(c);
         });
 
-        const catWeights = {
-            "Livrets PP 2025": 10,
-            "Manuels & Guides": 15,
-            "Developpement Durable": 20,
-            "Facteurs Humains": 30,
-            "Preparation Examens": 40,
-            "Passeport Telechargement Web": 50,
-            "Affiches Pedagogiques A3": 60,
-            "Autre": 100
-        };
+        // Define fixed order for themes
+        const themeOrder = [
+            "Météo",
+            "Mécavol",
+            "Matériel",
+            "Pilotage",
+            "Réglementation",
+            "Facteurs humains",
+            "Milieu naturel",
+            "Autre"
+        ];
 
-        const sortedCats = Object.keys(categories).sort((a, b) => (catWeights[a] || 999) - (catWeights[b] || 999));
-        sortedCats.forEach(cat => {
+        themeOrder.forEach(theme => {
+            if (!themes[theme] || themes[theme].length === 0) return;
+
             const section = document.createElement('div');
             section.className = 'library-section';
-            section.innerHTML = `<h3 class="library-section-header"><i class="ri-folder-open-line"></i> ${cat}</h3>`;
-            const grid = document.createElement('div');
-            grid.className = 'library-grid';
-            categories[cat].forEach(c => grid.appendChild(this.createCourseCard(c)));
-            section.appendChild(grid);
+            section.innerHTML = `<h3 class="library-section-header"><i class="ri-folder-open-line"></i> ${theme.toUpperCase()}</h3>`;
+
+            // USE LIST CONTAINER
+            const listContainer = document.createElement('div');
+            listContainer.className = 'library-list';
+
+            themes[theme].forEach(c => listContainer.appendChild(this.createCourseListItem(c)));
+
+            section.appendChild(listContainer);
             container.appendChild(section);
         });
     },
 
-    createCourseCard: function (c) {
-        const btn = document.createElement('button');
-        // Disable modernization check - treating all as standard
-        // const isModernized = c.id.startsWith('modernized/');
-        const isModernized = false;
+    assignTheme: function (c) {
+        const text = (c.title + " " + (c.keywords || []).join(" ")).toLowerCase();
 
-        btn.className = `mode-btn`;
+        if (text.includes("météo") || text.includes("nuage") || text.includes("front") || text.includes("atmosphère") || text.includes("brise") || text.includes("thermique")) return "Météo";
+        if (text.includes("mécanique") || text.includes("mécavol") || text.includes("portance") || text.includes("polaire") || text.includes("finesse") || text.includes("dynamique")) return "Mécavol";
+        if (text.includes("matériel") || text.includes("parachute") || text.includes("sellette") || text.includes("voile") || text.includes("homologation") || text.includes("suspente")) return "Matériel";
+        if (text.includes("pilotage") || text.includes("tangage") || text.includes("roulis") || text.includes("virage") || text.includes("gonflage") || text.includes("décollage") || text.includes("atterrissage") || text.includes("vitesse") || text.includes("plan de vol")) return "Pilotage";
+        if (text.includes("règlementation") || text.includes("reglementation") || text.includes("aérien") || text.includes("espace") || text.includes("vfr") || text.includes("site")) return "Réglementation";
+        if (text.includes("humain") || text.includes("stress") || text.includes("mental") || text.includes("risque") || text.includes("decision") || text.includes("fatigue")) return "Facteurs humains";
+        if (text.includes("milieu") || text.includes("nature") || text.includes("rapace") || text.includes("faune") || text.includes("flore")) return "Milieu naturel";
+
+        return "Autre";
+    },
+
+    createCourseListItem: function (c) {
+        const btn = document.createElement('div');
+        btn.className = 'library-list-item';
         btn.onclick = () => this.openCourse(c.id);
 
         let levelBadges = '';
@@ -165,16 +186,25 @@ const LibraryEngine = {
             levelBadges += `<span class="badge badge-${l}">${l}</span> `;
         });
 
+        // SIMPLIFIED STRUCTURE MATCHING STATS ROW
+        // Title on left | Badges + Arrow on right
         btn.innerHTML = `
-            <div class="course-card-content">
-                <div class="course-card-title">${this.formatTitle(c.title)}</div>
-                <div class="course-card-meta">
-                    <span class="category-tag">${c.category === 'Cours Modernisés' ? 'Général' : c.category}</span>
-                    <div class="level-badges">${levelBadges}</div>
+            <div class="list-item-content">
+                <div class="list-item-title">${this.formatTitle(c.title)}</div>
+            </div>
+            <div class="list-item-meta">
+                ${levelBadges}
+                <div class="list-item-action">
+                    <i class="ri-arrow-right-s-line"></i>
                 </div>
             </div>
         `;
         return btn;
+    },
+
+    // Legacy support for grid (unused in CATEGORY view but kept for others if needed)
+    createCourseCard: function (c) {
+        return this.createCourseListItem(c); // Redirect to list view globally for consistency
     },
 
     openCourse: function (courseId) {

@@ -9,7 +9,8 @@ const QuizEngine = {
         qcmConfig: {
             mode: 'TRAINING', // TRAINING, EXAM, REVISION
             count: 10,
-            theme: 'ALL'
+            theme: 'ALL',
+            MASTERY_STREAK_THRESHOLD: 10 // Number of consecutive correct answers to trigger "Mastery" reset
         },
         masteryFilter: 'ALL', // ALL, PERFECT, EXCELLENT, GOOD, POOR, FAILED, NOT_ATTEMPTED
         qcmSessionData: [],
@@ -605,7 +606,7 @@ const QuizEngine = {
                 feedbackDiv.innerHTML = `
                     <div class="instructor-feedback ${feedbackClass}" style="margin-top:0;">
                         <div class="feedback-header"><i class="${icon}"></i> ${isSuccess ? 'BRAVO !' : 'OUPS...'}</div>
-                        ${(this.state.qcmConfig.mode === 'REVISION' && isSuccess) ? '<div style="font-size:0.8em; opacity:0.7; margin-bottom:8px;">Série en cours: ' + ((this.getPersistentStats().questions[question.code]?.streak) || 1) + '/5</div>' : ''}
+                        ${(this.state.qcmConfig.mode === 'REVISION' && isSuccess) ? '<div style="font-size:0.8em; opacity:0.7; margin-bottom:8px;">Série en cours: ' + ((this.getPersistentStats().questions[question.code]?.streak) || 1) + '</div>' : ''}
                         <div style="opacity:0.9;">${question.explanation}</div>
                     </div>
                 `;
@@ -829,7 +830,8 @@ const QuizEngine = {
 
 
             let perfect = 0;      // 100%
-            let excellent = 0;    // 75-99%
+            let excellent = 0;    // 90-99%
+            let veryGood = 0;     // 75-89%
             let good = 0;         // 50-74%
             let poor = 0;         // 1-49%
             let failed = 0;       // 0%
@@ -845,7 +847,8 @@ const QuizEngine = {
                 const pct = Math.round((data.correct / data.total) * 100);
 
                 if (pct === 100) perfect++;
-                else if (pct >= 75) excellent++;
+                else if (pct >= 90) excellent++; // 90-99%
+                else if (pct >= 75) veryGood++;  // 75-89% (NEW)
                 else if (pct >= 50) good++;
                 else if (pct > 0) poor++;
                 else failed++;
@@ -900,7 +903,12 @@ const QuizEngine = {
                 <div onclick="QuizEngine.setMasteryFilter('EXCELLENT')" style="${getCardStyle('134, 239, 172', 'EXCELLENT')}">
                     <div style="font-size:2rem; font-weight:900; color:#86efac;">${excellent}</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Excellentes</div>
-                    <div style="font-size:0.65rem; opacity:0.4;">(75-99%)</div>
+                    <div style="font-size:0.65rem; opacity:0.4;">(90-99%)</div>
+                </div>
+                <div onclick="QuizEngine.setMasteryFilter('VERY_GOOD')" style="${getCardStyle('56, 189, 248', 'VERY_GOOD')}">
+                    <div style="font-size:2rem; font-weight:900; color:#38bdf8;">${veryGood}</div>
+                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Très Bonnes</div>
+                    <div style="font-size:0.65rem; opacity:0.4;">(75-89%)</div>
                 </div>
                 <div onclick="QuizEngine.setMasteryFilter('GOOD')" style="${getCardStyle(cYellow, 'GOOD')}">
                     <div style="font-size:2rem; font-weight:900; color:#facc15;">${good}</div>
@@ -968,7 +976,7 @@ const QuizEngine = {
 
             sortedThemes.forEach(([name, data]) => {
                 const pct = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
-                const tColor = pct >= 75 ? '#4ade80' : (pct >= 50 ? '#facc15' : '#f87171');
+                const tColor = pct >= 90 ? '#4ade80' : (pct >= 75 ? '#38bdf8' : (pct >= 50 ? '#facc15' : '#f87171'));
 
                 // Active state
                 const isActive = this.state.themeFilter === name;
@@ -987,32 +995,7 @@ const QuizEngine = {
             `;
             });
 
-            const problemQuestions = Object.entries(stats.questions)
-                .filter(([code, data]) => data.total > 1 && (data.correct / data.total) < 0.5)
-                .sort((a, b) => (a[1].correct / a[1].total) - (b[1].correct / b[1].total));
 
-            let problemsHtml = '';
-            if (problemQuestions.length > 0) {
-                problemsHtml = '<div style="display:flex; flex-direction:column; gap:8px; max-height:400px; overflow-y:auto; padding-right:8px;">';
-                problemQuestions.forEach(([code, data]) => {
-                    let qText = "Question " + code;
-                    if (typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) {
-                        const qObj = QCM_OFFICIAL.questions.find(q => q.code === code);
-                        if (qObj) qText = qObj.question;
-                        if (qText.length > 60) qText = qText.substring(0, 60) + "...";
-                    }
-                    const pct = Math.round((data.correct / data.total) * 100);
-                    problemsHtml += `
-                    <div class="problem-item">
-                        <div style="font-size:0.8rem; font-weight:bold; color:#f87171;">${code} (${pct}% réussite)</div>
-                        <div style="font-size:0.9rem; opacity:0.9;">${qText}</div>
-                    </div>
-                 `;
-                });
-                problemsHtml += '</div>';
-            } else {
-                problemsHtml = '<div style="opacity:0.6; font-style:italic;">Pas encore de questions problématiques identifiées.</div>';
-            }
 
             // Build individual questions list (FILTERED BY LEVEL)
             let allQuestionsHtml = '';
@@ -1047,7 +1030,8 @@ const QuizEngine = {
                     visibleQuestions = sortedQuestions.filter(([code, data]) => {
                         const pct = Math.round((data.correct / data.total) * 100);
                         if (this.state.masteryFilter === 'PERFECT') return pct === 100;
-                        if (this.state.masteryFilter === 'EXCELLENT') return pct >= 75 && pct < 100;
+                        if (this.state.masteryFilter === 'EXCELLENT') return pct >= 90 && pct < 100;
+                        if (this.state.masteryFilter === 'VERY_GOOD') return pct >= 75 && pct < 90;
                         if (this.state.masteryFilter === 'GOOD') return pct >= 50 && pct < 75;
                         if (this.state.masteryFilter === 'POOR') return pct > 0 && pct < 50;
                         if (this.state.masteryFilter === 'FAILED') return pct === 0;
@@ -1058,7 +1042,8 @@ const QuizEngine = {
                 const filterLabel = {
                     'ALL': 'Toutes les questions tentées',
                     'PERFECT': 'Questions Maîtrisées (100%)',
-                    'EXCELLENT': 'Questions Excellentes (75-99%)',
+                    'EXCELLENT': 'Questions Excellentes (90-99%)',
+                    'VERY_GOOD': 'Questions Très Bonnes (75-89%)',
                     'GOOD': 'Questions Satisfaisantes (50-74%)',
                     'POOR': 'Questions À travailler (1-49%)',
                     'FAILED': 'Questions Échouées (0%)',
@@ -1113,6 +1098,9 @@ const QuizEngine = {
                         <button onclick="QuizEngine.sortQuestions('attempts')" id="sort-attempts-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
                             Par tentatives
                         </button>
+                        <button onclick="QuizEngine.sortQuestions('streak')" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
+                            Par série
+                        </button>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
@@ -1151,7 +1139,7 @@ const QuizEngine = {
                     }
 
                     const pct = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
-                    const qColor = pct >= 75 ? '#4ade80' : (pct >= 50 ? '#facc15' : '#f87171');
+                    const qColor = pct >= 90 ? '#4ade80' : (pct >= 75 ? '#38bdf8' : (pct >= 50 ? '#facc15' : '#f87171'));
                     const streak = data.streak || 0;
 
                     // Build answers HTML if available
@@ -1179,7 +1167,7 @@ const QuizEngine = {
                     const hasAnswers = qObj && qObj.ans;
 
                     allQuestionsHtml += `
-                    <div class="question-stat-item" data-code="${code}" data-pct="${pct}" data-total="${data.total}" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:${hasAnswers ? 'pointer' : 'default'};" ${hasAnswers ? `onclick="QuizEngine.toggleQuestionDetails('${code}')"` : ''}>
+                    <div class="question-stat-item" data-code="${code}" data-pct="${pct}" data-total="${data.total}" data-streak="${streak}" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:${hasAnswers ? 'pointer' : 'default'};" ${hasAnswers ? `onclick="QuizEngine.toggleQuestionDetails('${code}')"` : ''}>
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -1190,7 +1178,9 @@ const QuizEngine = {
                                     ${hasAnswers ? '<i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-' + code + '"></i>' : ''}
                                 </div>
                                 <div style="font-size:0.9rem; line-height:1.4;">${displayText}</div>
-                                <div style="font-size:0.75rem; opacity:0.6; margin-top:4px;">${data.correct}/${data.total} corrects • ${data.total} tentative${data.total > 1 ? 's' : ''}</div>
+                                <div style="font-size:0.75rem; opacity:0.6; margin-top:4px;">
+                                    ${data.correct}/${data.total} corrects • ${data.total} tentative${data.total > 1 ? 's' : ''} • Série en cours : ${streak}
+                                </div>
                                 ${answersHtml}
                             </div>
                             <div style="text-align:right; min-width:60px;">
@@ -1244,6 +1234,7 @@ const QuizEngine = {
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : ${currentLevel === 'ALL' ? 'TOUS LES NIVEAUX' : currentLevel}</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : ${stats.totalQuestions} réponses enregistrées</div>
+                    <div style="font-size:0.7rem; opacity:0.3; margin-top:4px; font-style:italic;">(Moyenne cumulée de tous vos scores)</div>
                 </div>
             </div>
         `;
@@ -1258,17 +1249,10 @@ const QuizEngine = {
                 ${distributionHtml}
             </div>
 
-            <div style="${statsGridStyle} margin-top:48px;">
                 <div>
                     <h3 class="library-section-header" style="border:none; margin-bottom:24px;">STATISTIQUES PAR THÈME</h3>
                     <div style="display:flex; flex-direction:column; gap:2px;">
                         ${themesHtml || '<div style="opacity:0.5;">Aucune donnée.</div>'}
-                    </div>
-                </div>
-                <div>
-                    <h3 class="library-section-header" style="border:none; margin-bottom:24px;">QUESTIONS À REVOIR</h3>
-                    <div style="display:flex; flex-direction:column; gap:2px;">
-                        ${problemsHtml}
                     </div>
                 </div>
             </div>
@@ -1416,14 +1400,21 @@ const QuizEngine = {
         const items = Array.from(list.querySelectorAll('.question-stat-item'));
 
         // Update button states & Icons
-        document.querySelectorAll('.sort-btn').forEach(btn => {
+        // Update button states & Icons - Scope only to Stats buttons
+        const statsButtons = ['sort-rate-btn', 'sort-attempts-btn', 'sort-streak-btn'];
+        statsButtons.forEach(id => {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+
             btn.style.background = 'transparent';
-            // Reset text (remove arrows) - fragile depends on innerHTML structure
-            const baseText = btn.id === 'sort-rate-btn' ? 'Par taux' : 'Par tentatives';
+            // Reset text (remove arrows)
+            let baseText = 'Par taux';
+            if (id === 'sort-attempts-btn') baseText = 'Par tentatives';
+            if (id === 'sort-streak-btn') baseText = 'Par série';
             btn.innerHTML = baseText;
         });
 
-        const activeBtn = document.getElementById(sortBy === 'rate' ? 'sort-rate-btn' : 'sort-attempts-btn');
+        const activeBtn = document.getElementById(sortBy === 'rate' ? 'sort-rate-btn' : (sortBy === 'attempts' ? 'sort-attempts-btn' : 'sort-streak-btn'));
         if (activeBtn) {
             activeBtn.style.background = 'rgba(255,255,255,0.05)';
             const arrow = dir === 'asc' ? ' <i class="ri-arrow-up-line"></i>' : ' <i class="ri-arrow-down-line"></i>';
@@ -1435,6 +1426,9 @@ const QuizEngine = {
             if (sortBy === 'rate') {
                 valA = parseInt(a.dataset.pct);
                 valB = parseInt(b.dataset.pct);
+            } else if (sortBy === 'streak') {
+                valA = parseInt(a.dataset.streak || 0);
+                valB = parseInt(b.dataset.streak || 0);
             } else {
                 valA = parseInt(a.dataset.total);
                 valB = parseInt(b.dataset.total);
@@ -1551,8 +1545,8 @@ const QuizEngine = {
             stats.questions[code].correct++;
             stats.questions[code].streak = (stats.questions[code].streak || 0) + 1;
 
-            // REDEMPTION: After 10 consecutive correct answers, reset to 100%
-            if (stats.questions[code].streak >= 10) {
+            // REDEMPTION: After consecutive correct answers defined in config, reset to 100%
+            if (stats.questions[code].streak >= (this.state.qcmConfig.MASTERY_STREAK_THRESHOLD || 5)) {
                 stats.questions[code].total = stats.questions[code].streak;
                 stats.questions[code].correct = stats.questions[code].streak;
                 // Keep the streak to show mastery
