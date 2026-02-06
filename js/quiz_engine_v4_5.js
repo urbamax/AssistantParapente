@@ -532,7 +532,9 @@ const QuizEngine = {
                 question: question,
                 selected: selectedOptions,
                 correct: question.choices.filter(c => parseInt(c.pts || 0) > 0),
-                isCorrect: isCorrect
+                isCorrect: isCorrect,
+                userPoints: userScore,
+                maxPoints: maxScore
             };
 
             if (this.state.examResults[this.state.qcmIndex]) {
@@ -641,6 +643,15 @@ const QuizEngine = {
         const results = this.state.examResults;
         const total = results.length;
         const score = results.filter(r => r.isCorrect).length;
+
+        // Calculate Points
+        let totalUserPoints = 0;
+        let totalMaxPoints = 0;
+        results.forEach(r => {
+            totalUserPoints += (r.userPoints || 0);
+            totalMaxPoints += (r.maxPoints || 0);
+        });
+
         const container = document.getElementById('qcm-question-text');
         const choicesArea = document.getElementById('qcm-choices');
         const feedbackDiv = document.getElementById('qcm-feedback');
@@ -656,10 +667,13 @@ const QuizEngine = {
         container.innerHTML = `
             <div class="stats-circle-container">
                 <h2 class="section-title" style="margin-bottom:16px;">RÉSULTATS</h2>
-                <div class="stats-circle" style="border-color:${color}; color:${color}; box-shadow:0 0 20px -5px ${color};">
+                <div class="stats-circle" style="border-color:${color}; color:${color};">
                     ${score}/${total}
                 </div>
-                <p style="color:var(--text-secondary);">
+                <div style="margin-top:12px; font-size:1.1rem; opacity:0.9; color:${color}; font-weight:600;">
+                    ${totalUserPoints} / ${totalMaxPoints} pts
+                </div>
+                <p style="color:var(--text-secondary); margin-top:16px;">
                     ${score >= total * 0.75 ? 'Excellent travail !' : 'Continuez à vous entraîner !'}
                 </p>
             </div>
@@ -860,6 +874,27 @@ const QuizEngine = {
 
             let accumulatedMastery = 0;
 
+            // Calculate Theme Stats dynamically for THIS LEVEL
+            const levelThemes = {};
+
+            if (levelQs) {
+                levelQs.forEach(q => {
+                    // Ensure we're using the stats from the persistent storage
+                    const qStat = stats.questions[q.code];
+                    const theme = q.theme || 'Autre';
+
+                    if (!levelThemes[theme]) {
+                        levelThemes[theme] = { total: 0, correct: 0 };
+                    }
+
+                    // Aggregate stats if they exist
+                    if (qStat && qStat.total > 0) {
+                        levelThemes[theme].total += qStat.total;
+                        levelThemes[theme].correct += qStat.correct;
+                    }
+                });
+            }
+
             // Iterate over ALL unique questions for this level (attempted or not)
             levelQs.forEach(q => {
                 const stat = stats.questions[q.code];
@@ -936,7 +971,7 @@ const QuizEngine = {
             let themesHtml = '';
 
             // Sort Themes
-            const sortedThemes = Object.entries(stats.themes).sort((a, b) => {
+            const sortedThemes = Object.entries(levelThemes).sort((a, b) => {
                 let valA, valB;
 
                 if (this.state.themeSort === 'rate') {
@@ -1292,10 +1327,24 @@ const QuizEngine = {
     },
 
     renderExamHistory: function () {
-        const exams = this.getExamHistory();
+        let exams = this.getExamHistory();
+
+        // FILTER EXAMS BY CURRENT LEVEL
+        let currentLevel = 'ALL';
+        if (typeof Engine !== 'undefined' && Engine.state && Engine.state.level) {
+            currentLevel = Engine.state.level;
+            // Normalize
+            if (currentLevel.includes("INITIAL")) currentLevel = "BI";
+            else if (currentLevel.includes("PILOTE") && !currentLevel.includes("CONFIRM")) currentLevel = "BP";
+            else if (currentLevel.includes("CONFIRM") || currentLevel.includes("BPC")) currentLevel = "BPC";
+        }
+
+        if (currentLevel !== 'ALL') {
+            exams = exams.filter(e => e.level === currentLevel);
+        }
 
         if (exams.length === 0) {
-            return '<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">Aucun examen complété pour le moment.</div>';
+            return '<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">Aucun examen complété pour le moment pour ce niveau.</div>';
         }
 
         let html = '<div style="display:flex; flex-direction:column; gap:12px;">';
