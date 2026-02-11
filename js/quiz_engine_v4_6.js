@@ -1195,6 +1195,15 @@ const QuizEngine = {
                             </div>
                         `;
                         });
+                        // Add Explanation in Stats View
+                        if (qObj.explication) {
+                            answersHtml += `
+                                <div style="margin-top:12px; padding:12px; background:rgba(251, 146, 60, 0.1); border-left:3px solid #fb923c; font-size:0.9rem; color:#e2e8f0;">
+                                    <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">Explication</div>
+                                    ${qObj.explication}
+                                </div>
+                            `;
+                        }
                         answersHtml += '</div>';
                     }
 
@@ -1399,7 +1408,9 @@ const QuizEngine = {
                         <div style="display:flex; flex-direction:column; gap:6px;">
                             ${optionsHtml}
                         </div>
-                        ${!r.isCorrect && q.explanation ? `<div style="margin-top:12px; padding:8px; background:rgba(251, 146, 60, 0.1); border-left:3px solid #fb923c; font-size:0.85rem; opacity:0.9;">${q.explanation}</div>` : ''}
+                        ${q.explanation ? `<div style="margin-top:12px; padding:8px; background:rgba(251, 146, 60, 0.1); border-left:3px solid #fb923c; font-size:0.85rem; opacity:0.9;">
+                            <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">Explication</div>
+                            ${q.explanation}</div>` : ''}
                     </div >
     `;
             });
@@ -1838,6 +1849,7 @@ const QuizEngine = {
             questions = QCM_OFFICIAL.questions.map(q => ({
                 code: q.code,
                 question: q.question,
+                explication: q.explication || "", // Ensure explication is carried over
                 theme: getCategory(q.code),
                 level: (function (c) {
                     const lastChar = c.charAt(c.length - 1).toUpperCase();
@@ -1880,30 +1892,36 @@ const QuizEngine = {
         }
 
         let html = debugInfo;
-        questions.forEach(q => {
-            const levelLabel = q.level === 1 ? 'BI' : q.level === 2 ? 'BP' : q.level === 3 ? 'BPC' : 'N/A';
-            const levelColor = q.level === 1 ? '#48BB78' : q.level === 2 ? '#4299E1' : '#92400e';
+        questions.forEach(qObj => { // Renamed q to qObj to avoid conflict with outer q in diff
+            const levelLabel = qObj.level === 1 ? 'BI' : qObj.level === 2 ? 'BP' : qObj.level === 3 ? 'BPC' : 'N/A';
+            const levelColor = qObj.level === 1 ? '#48BB78' : qObj.level === 2 ? '#4299E1' : '#92400e';
 
             html += `
     <div class="bank-question-card" style="background:var(--bg-card); padding:20px; border-radius:12px; border:1px solid var(--border-color);" >
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                         <div style="display:flex; gap:8px; align-items:center;">
                             <span style="background:${levelColor}; color:white; padding:4px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${levelLabel}</span>
-                            <span style="background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:6px; font-size:0.7rem;">${q.theme}</span>
-                            ${QuizEngine.getCourseUrl(q.code, q.question) ? `<button onclick="window.open('${QuizEngine.getCourseUrl(q.code, q.question)}', '_blank')" style="background:var(--color-primary); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>` : ''}
+                            <span style="background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:6px; font-size:0.7rem;">${qObj.theme}</span>
+                            ${QuizEngine.getCourseUrl(qObj.code, qObj.question) ? `<button onclick="window.open('${QuizEngine.getCourseUrl(qObj.code, qObj.question)}', '_blank')" style="background:var(--color-primary); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>` : ''}
                         </div>
-                        <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#${q.code}</span>
+                        <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#${qObj.code}</span>
                     </div>
-                    <div style="font-weight:600; margin-bottom:12px;">${q.question}</div>
+                    <div style="font-weight:600; margin-bottom:12px;">${qObj.question}</div>
                     <div style="display:flex; flex-direction:column; gap:6px; font-size:0.9rem; opacity:0.8;">
-                        ${q.choices.map((a, i) => `
+                        ${qObj.choices.map((a, i) => `
                             <div style="padding:8px; background:rgba(255,255,255,0.02); border-radius:6px; ${parseInt(a.pts) > 0 ? 'border-left:3px solid #48BB78;' : ''}">
                                 ${a.text}
                             </div>
                         `).join('')}
-                    </div>
-                </div >
-    `;
+                    ${qObj.explication ? `
+                        <div style="margin-top:12px; padding:12px; background:rgba(251, 146, 60, 0.1); border-left:3px solid #fb923c; font-size:0.9rem; color:#e2e8f0;">
+                            <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">Explication</div>
+                            ${qObj.explication}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+`;
         });
 
         resultsDiv.innerHTML = html;
