@@ -96,8 +96,9 @@ const LibraryEngine = {
     },
 
     renderGroupedByLevel: function (container, courses) {
-        const levels = { 'BI': [], 'BP': [], 'BPC': [], 'GENERAL': [] };
+        const levels = { 'BI': [], 'BP': [], 'BPC': [], 'TREUIL': [], 'GENERAL': [] };
         courses.forEach(c => {
+
             const l = Array.isArray(c.level) ? c.level : [c.level || 'GENERAL'];
             l.forEach(levelKey => {
                 if (levels[levelKey]) levels[levelKey].push(c);
@@ -105,8 +106,9 @@ const LibraryEngine = {
             });
         });
 
-        ['BI', 'BP', 'BPC', 'GENERAL'].forEach(lKey => {
+        ['BI', 'BP', 'BPC', 'TREUIL', 'GENERAL'].forEach(lKey => {
             if (levels[lKey].length === 0) return;
+
             const section = document.createElement('div');
             section.className = 'library-section';
             section.innerHTML = `<h3 class="library-section-header level-header level-${lKey}"><i class="ri-bookmark-3-fill"></i> ${this.getLevelName(lKey)}</h3>`;
@@ -122,58 +124,51 @@ const LibraryEngine = {
     },
 
     renderGroupedByCategory: function (container, courses) {
-        // Group by INFERRED THEME instead of Folder Category
-        const themes = {};
+        // Group by the 'category' property defined in courses_data.js
+        const categories = {};
 
         courses.forEach(c => {
-            const theme = this.assignTheme(c);
-            if (!themes[theme]) themes[theme] = [];
-            themes[theme].push(c);
+            const cat = c.category || "Autre";
+            if (!categories[cat]) categories[cat] = [];
+            categories[cat].push(c);
         });
 
-        // Define fixed order for themes
-        const themeOrder = [
-            "Météo",
-            "Mécavol",
-            "Matériel",
-            "Pilotage",
-            "Réglementation",
-            "Facteurs humains",
-            "Milieu naturel",
-            "Autre"
-        ];
+        // Get all unique categories and sort them
+        const sortedCategories = Object.keys(categories).sort((a, b) => {
+            // Put 'Général' or 'GENERAL' first, 'Autre' last
+            if (a.toLowerCase().includes('général') || a === 'GENERAL') return -1;
+            if (b.toLowerCase().includes('général') || b === 'GENERAL') return 1;
+            if (a === 'Autre') return 1;
+            if (b === 'Autre') return -1;
+            return a.localeCompare(b);
+        });
 
-        themeOrder.forEach(theme => {
-            if (!themes[theme] || themes[theme].length === 0) return;
+        sortedCategories.forEach(cat => {
+            if (categories[cat].length === 0) return;
 
             const section = document.createElement('div');
             section.className = 'library-section';
-            section.innerHTML = `<h3 class="library-section-header"><i class="ri-folder-open-line"></i> ${theme.toUpperCase()}</h3>`;
+            section.innerHTML = `<h3 class="library-section-header"><i class="ri-folder-open-line"></i> ${cat}</h3>`;
 
-            // USE LIST CONTAINER
             const listContainer = document.createElement('div');
             listContainer.className = 'library-list';
 
-            themes[theme].forEach(c => listContainer.appendChild(this.createCourseListItem(c)));
+            // Sort courses within each category by title
+            categories[cat].sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+
+            categories[cat].forEach(c => listContainer.appendChild(this.createCourseListItem(c)));
 
             section.appendChild(listContainer);
             container.appendChild(section);
         });
-    },
+    }
+    ,
 
     assignTheme: function (c) {
-        const text = (c.title + " " + (c.keywords || []).join(" ")).toLowerCase();
-
-        if (text.includes("météo") || text.includes("nuage") || text.includes("front") || text.includes("atmosphère") || text.includes("brise") || text.includes("thermique")) return "Météo";
-        if (text.includes("mécanique") || text.includes("mécavol") || text.includes("portance") || text.includes("polaire") || text.includes("finesse") || text.includes("dynamique")) return "Mécavol";
-        if (text.includes("matériel") || text.includes("parachute") || text.includes("sellette") || text.includes("voile") || text.includes("homologation") || text.includes("suspente")) return "Matériel";
-        if (text.includes("pilotage") || text.includes("tangage") || text.includes("roulis") || text.includes("virage") || text.includes("gonflage") || text.includes("décollage") || text.includes("atterrissage") || text.includes("vitesse") || text.includes("plan de vol")) return "Pilotage";
-        if (text.includes("règlementation") || text.includes("reglementation") || text.includes("aérien") || text.includes("espace") || text.includes("vfr") || text.includes("site")) return "Réglementation";
-        if (text.includes("humain") || text.includes("stress") || text.includes("mental") || text.includes("risque") || text.includes("decision") || text.includes("fatigue")) return "Facteurs humains";
-        if (text.includes("milieu") || text.includes("nature") || text.includes("rapace") || text.includes("faune") || text.includes("flore")) return "Milieu naturel";
-
-        return "Autre";
-    },
+        // Logic removed: We now use the 'category' property directly from courses_data.js
+        return c.category || "Autre";
+    }
+    ,
 
     createCourseListItem: function (c) {
         const btn = document.createElement('div');
@@ -221,29 +216,14 @@ const LibraryEngine = {
     },
 
     formatTitle: function (title) {
-        if (!title) return "";
-        let clean = title.replace(/\(Cours Modernisé\)/g, '');
-        clean = clean.replace(/^[0-9]+[ \-_]*/, '');
-        clean = clean.replace(/[_\-]/g, ' ');
-        clean = clean.replace(/(2019|2021|2022|2024|2025|WEB|WEB2025|PP2025)/gi, '');
-        clean = clean.replace(/\s+/g, ' ').trim();
-
-        if (clean.includes("RCFC")) clean = clean.replace("RCFC", "Référentiel");
-        if (clean.includes("RENTIEL")) clean = clean.replace("RENTIEL", "Référentiel");
-        if (clean === "DESEQUILIBRE DU VOL") clean = "Déséquilibre du Vol";
-
-        if (clean === clean.toUpperCase()) {
-            clean = clean.toLowerCase().split(' ').map(s => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
-        }
-
-        clean = clean.replace(/Brevet Pilote/gi, 'Brevet de Pilote');
-        return clean;
+        return title || "";
     },
 
     getLevelName: function (l) {
-        const names = { 'BI': 'BREVET INITIAL', 'BP': 'BREVET DE PILOTE', 'BPC': 'BREVET DE PILOTE CONFIRMÉ', 'GENERAL': 'GÉNÉRAL' };
+        const names = { 'BI': 'BREVET INITIAL', 'BP': 'BREVET DE PILOTE', 'BPC': 'BREVET DE PILOTE CONFIRMÉ', 'TREUIL': 'TREUIL', 'GENERAL': 'GÉNÉRAL' };
         return names[l] || l;
     }
+
 };
 
 window.LibraryEngine = LibraryEngine;

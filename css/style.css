@@ -591,7 +591,6 @@ body.light-mode .mode-btn:hover {
     color: var(--text-main);
     margin-bottom: auto;
     line-height: 1.4;
-    text-transform: uppercase;
 }
 
 .course-card-meta {
@@ -649,6 +648,11 @@ body.light-mode .course-card-meta {
     color: #fff;
 }
 
+.badge-TREUIL {
+    background: #6366f1;
+    color: #fff;
+}
+
 .badge-GENERAL {
     background: #475569;
     color: #fff;
@@ -693,7 +697,6 @@ body.light-mode .badge-GENERAL {
 .library-section-header {
     font-size: 1.25rem;
     font-weight: 800;
-    text-transform: uppercase;
     margin-bottom: 16px;
     margin-top: 32px;
     display: flex;
@@ -716,6 +719,11 @@ body.light-mode .badge-GENERAL {
 .library-section-header.level-BPC {
     color: #92400e;
     border-bottom-color: rgba(146, 64, 14, 0.3);
+}
+
+.library-section-header.level-TREUIL {
+    color: #6366f1;
+    border-bottom-color: rgba(99, 102, 241, 0.3);
 }
 
 body.light-mode .library-section-header {
@@ -973,6 +981,11 @@ body.course-open #course-pdf-frame {
     border-color: rgba(146, 64, 14, 0.3);
 }
 
+.level-TREUIL {
+    color: #6366f1;
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
 body.light-mode .level-tag {
     background: rgba(0, 0, 0, 0.05);
     border-color: rgba(0, 0, 0, 0.1);
@@ -1023,16 +1036,6 @@ body.light-mode .level-tag {
     text-align: left;
 }
 
-/* --- FOOTER --- */
-.app-footer {
-    margin-top: 64px;
-    padding: 32px;
-    border-top: 1px solid var(--border-color);
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    font-weight: 500;
-}
 
 /* --- MODULE: ADVENTURE ENGINE (HUD & CARDS) --- */
 .hud-container {
@@ -1380,7 +1383,6 @@ body.light-mode .choice-btn {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    text-transform: uppercase;
 }
 
 .list-item-meta {

@@ -22,7 +22,9 @@ const QuizEngine = {
         themeFilter: null, // New state for theme filtering
         themeSort: 'rate', // rate, alpha
         themeSortDir: 'desc', // asc, desc
-        mainEngine: null // Reference to main Engine
+        mainEngine: null, // Reference to main Engine
+        isLoaded: false, // Data loading state
+        loadingError: null // Error message if loading fails
     },
 
     init: function (mainEngine) {
@@ -30,10 +32,171 @@ const QuizEngine = {
         this.initCourseMapping();
         this.setMode('TRAINING'); // Ensure UI is synced
 
+        // Async Data Loading
+        this.loadOfficialData();
+
         // Anti-Cheat Listener
         document.addEventListener('visibilitychange', () => this.handleVisibilityChange());
 
         console.log("QuizEngine Initialized");
+    },
+
+    // --- DATA LOADING ---
+    loadOfficialData: async function () {
+        const basePath = (this.state.mainEngine && this.state.mainEngine.state.basePath) ? this.state.mainEngine.state.basePath : '.';
+        const cacheBuster = `v=${Date.now()}`;
+
+        // CHECK IF DATA ALREADY LOADED VIA SCRIPT (Bypassing CORS)
+        if (typeof window.QCM_OFFICIAL !== 'undefined' && window.QCM_OFFICIAL.questions) {
+            console.log("✅ QCM Data loaded from local JS file (CORS bypass).");
+            this.state.isLoaded = true;
+            this.renderThemes();
+            this.renderStats();
+            // Refresh Bank if needed
+            if (this.state.mainEngine && this.state.mainEngine.state.mode === 'QCM_BANK') {
+                this.renderBank();
+            }
+            return;
+        }
+
+        try {
+            console.log("Fetching QCM data from CSVs...");
+            const [questionsRes, explicationsRes] = await Promise.all([
+                fetch(`${basePath}/js/data/qcm_ffvl.csv?${cacheBuster}`),
+                fetch(`${basePath}/js/data/qcm_ffvl_explanations.csv?${cacheBuster}`)
+            ]);
+
+            if (!questionsRes.ok || !explicationsRes.ok) throw new Error("Failed to load QCM CSV data");
+
+            const questionsCSV = await questionsRes.text();
+            const explicationsCSV = await explicationsRes.text();
+
+            // Parse Explanations first for easy lookup
+            const explications = this.parseExplicationsCSV(explicationsCSV);
+
+            // Parse Questions and merge
+            const questions = this.parseQuestionsCSV(questionsCSV, explications);
+
+            window.QCM_OFFICIAL = { questions: questions };
+            this.state.isLoaded = true;
+            console.log(`✅ QCM FFVL Data loaded: ${questions.length} questions merged with explanations.`);
+
+            // Refresh UI if needed
+            if (this.state.mainEngine && this.state.mainEngine.state.mode === 'QCM_BANK') {
+                this.renderBank();
+            }
+            this.renderThemes(); // Re-populate themes now that data is ready
+            this.renderStats(); // Refresh stats if user is on that screen
+
+        } catch (err) {
+            console.error("❌ Error loading QCM data:", err);
+            this.state.loadingError = err.message || "Erreur inconnue lors du chargement des données.";
+            this.state.isLoaded = true; // Stop loading spinner
+            this.renderStats(); // Show error in UI
+            if (this.state.mainEngine && this.state.mainEngine.state.mode === 'QCM_BANK') {
+                this.renderBank();
+            }
+        }
+    },
+
+    parseExplicationsCSV: function (csvText) {
+        const rows = csvText.split('\n');
+        const data = {};
+        // Skip header: id;question;explication
+        for (let i = 1; i < rows.length; i++) {
+            const row = rows[i].trim();
+            if (!row) continue;
+
+            // Format is id;question;explication
+            // Question text might contain semicolons if quoted, but usually it's simple
+            // Let's use a simpler split if no quotes, or a regex if needed
+            const parts = row.split(';');
+            if (parts.length >= 3) {
+                const id = parts[0].replace(/"/g, '');
+                const expl = parts.slice(2).join(';').replace(/^"|"$/g, '').trim();
+                data[id] = expl;
+            }
+        }
+        return data;
+    },
+
+    parseQuestionsCSV: function (csvText, explications) {
+        // CSV Helper to handle quotes and commas
+        const parseLine = (line) => {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+            return result;
+        };
+
+        const rows = csvText.split('\n');
+        const questions = [];
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i].trim();
+            if (!row) continue;
+
+            const cols = parseLine(row);
+            if (cols.length < 4) continue;
+
+            const code = cols[0];
+            const questionText = cols[1];
+
+            // Answer pattern: Text, Pts (repeated)
+            const ans = [];
+            for (let j = 2; j < cols.length - 1; j += 2) {
+                if (cols[j] && cols[j + 1]) {
+                    ans.push({
+                        text: cols[j],
+                        pts: cols[j + 1]
+                    });
+                }
+            }
+
+            // Derive Metadata from ID
+            const lastChar = code.slice(-1);
+            let niveau = 0;
+            if (lastChar === 'V') niveau = 0;
+            else if (lastChar === 'B') niveau = 1;
+            else if (lastChar === 'M') niveau = 2;
+            else if (lastChar === 'T') niveau = 3;
+
+            // Multi-level detection for outliers like F7VBM
+            if (code.includes('V') && code.includes('B') && code.includes('M')) niveau = 0; // Prefer lower
+            else if (code.includes('V') && code.includes('B')) niveau = 0;
+            else if (code.includes('B') && code.includes('M')) niveau = 1;
+
+            const categoryPrefix = code.charAt(0);
+            const isDelta = ['H', 'R', 'X'].includes(categoryPrefix);
+            const isParapente = !isDelta || ['A', 'E', 'F', 'L', 'P', 'S', 'U'].includes(categoryPrefix);
+            // Note: A, E, F etc are BOTH. G, N, W are Parapente only. H, R, X are Delta only.
+
+            const pFlag = ['A', 'E', 'F', 'G', 'L', 'N', 'P', 'S', 'U', 'W'].includes(categoryPrefix);
+            const dFlag = ['A', 'E', 'F', 'H', 'L', 'P', 'R', 'S', 'U', 'X'].includes(categoryPrefix);
+
+            questions.push({
+                code: code,
+                question: questionText,
+                ans: ans,
+                niveau: niveau,
+                parapente: pFlag,
+                delta: dFlag,
+                explication: explications[code] || ""
+            });
+        }
+        return questions;
     },
 
     // --- ANTI-CHEAT ---
@@ -121,9 +284,6 @@ const QuizEngine = {
                     themes.add(map[code] || 'Autre');
                 });
             } else {
-                if (typeof QCM_DATA !== 'undefined') {
-                    QCM_DATA.forEach(q => themes.add(q.theme));
-                }
             }
 
             [...themes].sort().forEach(theme => {
@@ -177,6 +337,11 @@ const QuizEngine = {
 
     // --- SESSION MGMT ---
     startSession: function () {
+        if (!this.state.isLoaded) {
+            alert("Les données QCM sont en cours de chargement... Veuillez réessayer dans quelques secondes.");
+            return;
+        }
+
         // Resolve Level from Main Engine
         const level = this.state.mainEngine ? this.state.mainEngine.state.level : 'BI';
 
@@ -218,8 +383,10 @@ const QuizEngine = {
                             if (lastChar === 'V') return 1; // Vert -> BI
                             if (lastChar === 'B') return 2; // Bleu -> BP
                             if (lastChar === 'M') return 3; // Marron -> BPC
+                            if (lastChar === 'T') return 4; // Treuil
                             return q.niveau || 0;
                         })(q.code)
+
                     };
                 } catch (e) {
                     console.warn("Skipped invalid question:", q, e);
@@ -227,7 +394,7 @@ const QuizEngine = {
                 }
             }).filter(q => q !== null);
         } else {
-            console.warn("Official Data Not Found. Please ensure qcm_official_data.js is loaded.");
+            console.warn("Official Data Not Found. Please ensure qcm_ffvl.csv is loaded.");
             sourceData = [];
         }
 
@@ -243,7 +410,10 @@ const QuizEngine = {
                 sourceData = sourceData.filter(q => q.code && q.code.includes('B'));
             } else if (level === 'BPC') {
                 sourceData = sourceData.filter(q => q.code && q.code.includes('M'));
+            } else if (level === 'TREUIL') {
+                sourceData = sourceData.filter(q => q.code && q.code.includes('T'));
             }
+
             // 'ALL' level includes all parapente questions (already handled by excludedPrefixes check and default mappings)
         }
 
@@ -403,13 +573,16 @@ const QuizEngine = {
             const hasV = codeStr.includes('V');
             const hasB = codeStr.includes('B');
             const hasM = codeStr.includes('M');
+            const hasT = codeStr.includes('T');
 
             // If explicit level overrides are needed, we can check q.level too, 
             // but the suffix is usually the source of truth for "all applicable levels".
             if (hasV) badgesHtml += '<div class="level-tag" style="margin:0; font-size:0.75rem; background:rgba(74, 222, 128, 0.2); color:#4ade80; border:1px solid #4ade80;">BI</div>';
             if (hasB) badgesHtml += '<div class="level-tag" style="margin:0; font-size:0.75rem; background:rgba(96, 165, 250, 0.2); color:#60a5fa; border:1px solid #60a5fa;">BP</div>';
             if (hasM) badgesHtml += '<div class="level-tag" style="margin:0; font-size:0.75rem; background:rgba(121, 85, 72, 0.3); color:#e6ceca; border:1px solid #bcaaa4;">BPC</div>';
+            if (hasT) badgesHtml += '<div class="level-tag" style="margin:0; font-size:0.75rem; background:rgba(99, 102, 241, 0.2); color:#6366f1; border:1px solid #6366f1;">TREUIL</div>';
         }
+
 
         // Fallback or Generic
         if (badgesHtml === '') {
@@ -417,8 +590,10 @@ const QuizEngine = {
             if (q.level === 1) levelLabel = "BI";
             else if (q.level === 2) levelLabel = "BP";
             else if (q.level === 3) levelLabel = "BPC";
+            else if (q.level === 4) levelLabel = "TREUIL";
             badgesHtml = `<div class="level-tag" style="margin:0; font-size:0.75rem;">${levelLabel}</div>`;
         }
+
 
         document.getElementById('qcm-question-text').innerHTML = `
             <div class="quiz-header-row">
@@ -607,7 +782,7 @@ const QuizEngine = {
                 const icon = isSuccess ? 'ri-thumb-up-line' : 'ri-thumb-down-line';
                 feedbackDiv.innerHTML = `
                     <div class="instructor-feedback ${feedbackClass}" style="margin-top:0;">
-                        <div class="feedback-header"><i class="${icon}"></i> ${isSuccess ? 'BRAVO !' : 'OUPS...'}</div>
+                        <div class="feedback-header"><i class="${icon}"></i></div>
                         ${(this.state.qcmConfig.mode === 'REVISION' && isSuccess) ? '<div style="font-size:0.8em; opacity:0.7; margin-bottom:8px;">Série en cours: ' + ((this.getPersistentStats().questions[question.code]?.streak) || 1) + '</div>' : ''}
                         <div style="opacity:0.9;">${question.explanation}</div>
                     </div>
@@ -750,12 +925,34 @@ const QuizEngine = {
         const container = document.getElementById('stats-content');
         if (!container) return;
 
+        if (!this.state.isLoaded) {
+            container.innerHTML = `
+                <div style="padding:40px; text-align:center; color:white; opacity:0.7;">
+                    <i class="ri-loader-4-line ri-spin" style="font-size:3rem; margin-bottom:20px; display:block;"></i>
+                    <p>Chargement des données QCM...</p>
+                </div>
+            `;
+            return;
+        }
+
+        if (this.state.loadingError) {
+            container.innerHTML = `
+                <div style="padding:40px; text-align:center; color:white;">
+                    <i class="ri-error-warning-line" style="font-size:3rem; color:#b91c1c; display:block; margin-bottom:20px;"></i>
+                    <h2 style="margin-bottom:10px;">Erreur de chargement</h2>
+                    <p style="opacity:0.7;">Impossible de charger les fichiers de données (CORS/Fichier manquant).<br>Détail: ${this.state.loadingError}</p>
+                    <p style="opacity:0.5; font-size:0.8rem; margin-top:20px;">Si vous ouvrez ce fichier en local (file://), les navigateurs modernes bloquent le chargement de fichiers externes (CSV/JSON) par sécurité.</p>
+                </div>
+            `;
+            return;
+        }
+
         if (typeof QCM_OFFICIAL === 'undefined' || !QCM_OFFICIAL.questions) {
             container.innerHTML = `
                 <div style="padding:40px; text-align:center; color:white;">
                     <i class="ri-error-warning-line" style="font-size:3rem; color:#b91c1c; display:block; margin-bottom:20px;"></i>
                     <h2 style="margin-bottom:10px;">Données QCM Introuvables</h2>
-                    <p style="opacity:0.7;">Le fichier de questions (qcm_official_data.js) semble manquant ou corrompu.</p>
+                    <p style="opacity:0.7;">Le fichier de questions (qcm_ffvl.csv) semble manquant ou corrompu.</p>
                 </div>
             `;
             return;
@@ -775,7 +972,9 @@ const QuizEngine = {
                 if (currentLevel.includes("INITIAL")) currentLevel = "BI";
                 else if (currentLevel.includes("PILOTE") && !currentLevel.includes("CONFIRM")) currentLevel = "BP";
                 else if (currentLevel.includes("CONFIRM") || currentLevel.includes("BPC")) currentLevel = "BPC";
+                else if (currentLevel.includes("TREUIL")) currentLevel = "TREUIL";
             }
+
             console.log("Rendering stats for normalized level:", currentLevel);
 
             let levelQuestionCodes = new Set();
@@ -807,7 +1006,12 @@ const QuizEngine = {
                 // BPC = Contains suffix M AND parapente
                 levelQs = QCM_OFFICIAL.questions.filter(q => q.parapente === true && q.code && q.code.includes('M'));
                 console.log(`DEBUG BPC FILTER: Found ${levelQs.length} questions (Suffix contains M).`);
+            } else if (currentLevel === 'TREUIL') {
+                // TREUIL = Contains suffix T AND parapente
+                levelQs = QCM_OFFICIAL.questions.filter(q => q.parapente === true && q.code && q.code.includes('T'));
+                console.log(`DEBUG TREUIL FILTER: Found ${levelQs.length} questions (Suffix contains T).`);
             } else {
+
                 // Fallback
                 levelQs = QCM_OFFICIAL.questions.filter(q => q.parapente === true && q.class && q.class.includes(currentLevel));
             }
@@ -1346,7 +1550,9 @@ const QuizEngine = {
             if (currentLevel.includes("INITIAL")) currentLevel = "BI";
             else if (currentLevel.includes("PILOTE") && !currentLevel.includes("CONFIRM")) currentLevel = "BP";
             else if (currentLevel.includes("CONFIRM") || currentLevel.includes("BPC")) currentLevel = "BPC";
+            else if (currentLevel.includes("TREUIL")) currentLevel = "TREUIL";
         }
+
 
         if (currentLevel !== 'ALL') {
             exams = exams.filter(e => e.level === currentLevel);
@@ -1362,9 +1568,10 @@ const QuizEngine = {
             const date = new Date(exam.date);
             const dateStr = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             const color = exam.percentage >= 75 ? '#4ade80' : exam.percentage >= 50 ? '#facc15' : '#f87171';
-            const levelLabel = exam.level === 'BI' ? 'Brevet Initial' : exam.level === 'BP' ? 'Brevet de Pilote' : 'Brevet de Pilote Confirmé';
+            const levelLabel = exam.level === 'BI' ? 'Brevet Initial' : exam.level === 'BP' ? 'Brevet de Pilote' : exam.level === 'BPC' ? 'Brevet de Pilote Confirmé' : 'Treuil';
 
             // Build questions HTML
+
             let questionsHtml = '<div class="exam-details" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border-color);">';
             questionsHtml += '<div style="display:flex; flex-direction:column; gap:16px;">';
 
@@ -1408,9 +1615,21 @@ const QuizEngine = {
                         <div style="display:flex; flex-direction:column; gap:6px;">
                             ${optionsHtml}
                         </div>
-                        ${q.explanation ? `<div style="margin-top:12px; padding:8px; background:rgba(251, 146, 60, 0.1); border-left:3px solid #fb923c; font-size:0.85rem; opacity:0.9;">
-                            <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">Explication</div>
-                            ${q.explanation}</div>` : ''}
+                        ${(function () {
+                        // Try to get explanation from saved question, or lookup in current QCM_OFFICIAL
+                        let expl = q.explanation;
+                        if (!expl && typeof QCM_OFFICIAL !== 'undefined' && QCM_OFFICIAL.questions) {
+                            const currentQ = QCM_OFFICIAL.questions.find(curr => curr.code === q.code);
+                            if (currentQ) expl = currentQ.explication;
+                        }
+
+                        if (expl) {
+                            return `<div style="margin-top:12px; padding:8px; background:rgba(251, 146, 60, 0.1); border-left:3px solid #fb923c; font-size:0.85rem; opacity:0.9;">
+                                    <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">Explication</div>
+                                    ${expl}</div>`;
+                        }
+                        return '';
+                    })()}
                     </div >
     `;
             });
@@ -1849,7 +2068,7 @@ const QuizEngine = {
             questions = QCM_OFFICIAL.questions.map(q => ({
                 code: q.code,
                 question: q.question,
-                explication: q.explication || "", // Ensure explication is carried over
+                explication: q.explication, // Explicitly map explication
                 theme: getCategory(q.code),
                 level: (function (c) {
                     const lastChar = c.charAt(c.length - 1).toUpperCase();

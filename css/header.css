@@ -105,11 +105,7 @@
     color: var(--accent-blue);
 }
 
-.ffvl-logo,
-.club-logo {
-    height: 32px;
-    transition: all 0.3s ease;
-}
+/* Nav Buttons (Glass Style) */
 
 /* Level Selector */
 .level-select-container {
@@ -188,11 +184,6 @@
         font-size: 0.8rem;
     }
 
-    .ffvl-logo,
-    .club-logo {
-        height: 28px;
-        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
-    }
 
     .header-level-row {
         order: 4;

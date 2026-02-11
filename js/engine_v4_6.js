@@ -2,7 +2,6 @@
  * ENGINE.JS - v4.0 (Modular Architecture)
  * Acts as the Application Controller, coordinating Mode switching and Logic delegation.
  * - Library Logic -> js/library_engine.js
- * - Adventure Logic -> js/adventure_engine.js
  * - QCM Logic -> js/quiz_engine.js
  */
 
@@ -22,7 +21,6 @@ const Engine = {
         // Initialize Sub-Engines
         if (typeof QuizEngine !== 'undefined') QuizEngine.init(this);
         if (typeof LibraryEngine !== 'undefined') LibraryEngine.init(this);
-        if (typeof AdventureEngine !== 'undefined') AdventureEngine.init(this);
 
         // Setup Theme Toggle Listener safely
         const themeBtn = document.getElementById('theme-toggle');
@@ -144,7 +142,6 @@ const Engine = {
                 }
                 break;
 
-            case 'ADVENTURE':
             case 'QCM':
             case 'QCM_BANK':
             case 'STATS':
@@ -249,6 +246,7 @@ const Engine = {
 
         if (level === 'BI') color = '#22c55e'; // Green
         else if (level === 'BPC') color = '#8B4513'; // Brown (Marron)
+        else if (level === 'TREUIL') color = '#6366f1'; // Indigo
         else if (level === 'ALL') color = '#64748b'; // Slate (Sober)
 
         root.style.setProperty('--accent-blue', color);
