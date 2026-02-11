@@ -24,9 +24,21 @@
 
 .ffvl-logo,
 .club-logo {
-    height: 60px;
+    height: 80px;
     transition: all 0.3s ease;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+    /* Added for Dark Mode Visibility */
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px;
+    border-radius: 12px;
+}
+
+/* Remove background in Light Mode */
+body.light-mode .ffvl-logo,
+body.light-mode .club-logo {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
 }
 
 .ffvl-logo:hover,
