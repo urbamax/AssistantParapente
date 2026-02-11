@@ -273,44 +273,62 @@ const Engine = {
         }
     },
 
-    /* --- COMPONENT LOADING --- */
+    /* --- COMPONENT LOADING (Dynamic Fetch) --- */
     loadComponents: function (basePath) {
         basePath = basePath || '.';
         this.state.basePath = basePath;
-        if (typeof COMPONENTS === 'undefined') return;
 
         const componentMap = [
-            { id: 'app-header', content: COMPONENTS.header },
-            { id: 'app-footer', content: COMPONENTS.footer, selector: '.app-footer-placeholder' }
+            { id: 'app-header', url: basePath + '/components/header.html' },
+            { id: 'app-footer', url: basePath + '/components/footer.html', selector: '.app-footer-placeholder' }
         ];
 
+        const self = this;
+
         componentMap.forEach(function (comp) {
-            try {
-                const targets = comp.selector ? document.querySelectorAll(comp.selector) : (document.getElementById(comp.id) ? [document.getElementById(comp.id)] : []);
-                targets.forEach(function (el) {
-                    el.innerHTML = comp.content;
-                    if (basePath !== '.') {
-                        el.querySelectorAll('[src], [href]').forEach(function (node) {
-                            const attr = node.hasAttribute('src') ? 'src' : 'href';
-                            const val = node.getAttribute(attr);
-                            if (!val.match(/^(http|\/\/|#|mailto:)/)) {
-                                node.setAttribute(attr, basePath + '/' + val);
-                            }
-                        });
+            fetch(comp.url)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.text();
+                })
+                .then(html => {
+                    const targets = comp.selector ? document.querySelectorAll(comp.selector) : (document.getElementById(comp.id) ? [document.getElementById(comp.id)] : []);
+                    targets.forEach(function (el) {
+                        el.innerHTML = html;
+
+                        // Path correction
+                        if (basePath !== '.') {
+                            el.querySelectorAll('[src], [href]').forEach(function (node) {
+                                const attr = node.hasAttribute('src') ? 'src' : 'href';
+                                const val = node.getAttribute(attr);
+                                if (!val.match(/^(http|\/\/|#|mailto:)/)) {
+                                    node.setAttribute(attr, basePath + '/' + val);
+                                }
+                            });
+                        }
+                    });
+
+                    // Re-bind theme and navigation after loading
+                    self.updateHeaderNavigation();
+                    self.applyThemeMode();
+
+                    // Standalone Hooks
+                    if (window.self === window.top && basePath !== '.') {
+                        self.setupStandalone(basePath);
+                    }
+                })
+                .catch(error => {
+                    console.warn('Error loading component:', comp.url, error);
+                    // Fallback to legacy global object if available (backward compatibility)
+                    if (typeof COMPONENTS !== 'undefined') {
+                        const legacyKey = comp.url.includes('header') ? 'header' : 'footer';
+                        if (COMPONENTS[legacyKey]) {
+                            const targets = comp.selector ? document.querySelectorAll(comp.selector) : (document.getElementById(comp.id) ? [document.getElementById(comp.id)] : []);
+                            targets.forEach(function (el) { el.innerHTML = COMPONENTS[legacyKey]; });
+                        }
                     }
                 });
-            } catch (e) { }
         });
-
-        this.updateHeaderNavigation();
-
-        // Re-bind theme
-        this.applyThemeMode();
-
-        // Standalone Hooks
-        if (window.self === window.top && basePath !== '.') {
-            this.setupStandalone(basePath);
-        }
     },
 
     setupStandalone: function (basePath) {
