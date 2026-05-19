@@ -3,6 +3,7 @@
     display: flex;
     flex-direction: column;
     gap: 32px;
+    margin-top: calc(var(--header-height, 140px) + 20px);
     /* Redundant Card Style Enforcement */
     background: var(--bg-card);
     border: var(--border-glass);
@@ -505,8 +506,9 @@ body.light-mode .list-item-icon {
         grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     }
 }
-}
+
 @media (max-width: 768px) {
+
     /* Library */
     .library-grid {
         grid-template-columns: 1fr;

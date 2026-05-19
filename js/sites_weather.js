@@ -181,25 +181,43 @@ SitesEngine.changeWeatherModel = function (model) {
 };
 
 SitesEngine.isForecastFlyable = function (site, weather) {
-    if (!weather) return { flyable: false, reason: 'Chargement...', class: 'weather-unknown', icon: 'ri-loader-4-line' };
-    if (!weather.isDaytime) return { flyable: false, reason: 'Nuit', class: 'weather-unflyable', icon: 'ri-moon-clear-line' };
+    // 1. Construire l'objet des préférences de l'utilisateur
+    const userPrefs = {
+        vMin: this.state.limitWindMin,
+        vMax: this.state.limitWindMax,
+        deltaRafaleMax: this.state.limitGustDelta
+    };
 
-    const precip = weather.precipitation ?? 0;
-    if (precip > 0) return { flyable: false, reason: `Pluie (${precip.toFixed(1)} mm)`, class: 'weather-unflyable', icon: 'ri-showers-fill' };
+    // 2. Déterminer la meilleure orientation du site par rapport au vent actuel
+    let bestOrientation = undefined;
+    
+    if (site.orientations_vent && site.orientations_vent.length > 0 && weather) {
+        const CARD_TO_DEG = { "N": 0, "NE": 45, "E": 90, "SE": 135, "S": 180, "SO": 225, "O": 270, "NO": 315 };
+        let minDiff = 180;
+        
+        site.orientations_vent.forEach(card => {
+            const deg = CARD_TO_DEG[card];
+            if (deg !== undefined) {
+                // Trouver la différence angulaire
+                let diff = Math.abs(weather.windDirDeg - deg) % 360;
+                diff = diff > 180 ? 360 - diff : diff;
+                
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    bestOrientation = deg;
+                }
+            }
+        });
+    }
 
-    const hasOrientations = site.orientations_vent && site.orientations_vent.length > 0;
-    const isOriented = hasOrientations ? site.orientations_vent.includes(weather.windCard) : true;
-    if (hasOrientations && !isOriented) return { flyable: false, reason: 'Mauvaise orientation', class: 'weather-unflyable', icon: 'ri-close-circle-fill' };
+    // 3. Préparer l'objet site pour l'évaluateur (on ne modifie pas l'objet original)
+    const siteGeometry = {
+        ...site,
+        orientation: bestOrientation
+    };
 
-    const windSpeedOk = weather.windSpeed >= this.state.limitWindMin && weather.windSpeed <= this.state.limitWindMax;
-    if (!windSpeedOk) return { flyable: false, reason: 'Vent hors limites', class: 'weather-unflyable', icon: 'ri-close-circle-fill' };
-
-    const gustDeltaOk = (weather.windGust - weather.windSpeed) <= this.state.limitGustDelta;
-    if (!gustDeltaOk) return { flyable: false, reason: 'Rafales hors limites', class: 'weather-unflyable', icon: 'ri-close-circle-fill' };
-
-    if (!hasOrientations) return { flyable: true, reason: 'Favorable', class: 'weather-flyable', icon: 'ri-checkbox-circle-fill' };
-
-    return { flyable: true, reason: 'Favorable', class: 'weather-flyable', icon: 'ri-checkbox-circle-fill' };
+    // 4. Appel du nouveau module de scoring
+    return evaluateSpotForecast(siteGeometry, weather, userPrefs);
 };
 
 SitesEngine.degreesToCardinal = function (deg) {

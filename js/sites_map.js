@@ -37,6 +37,40 @@ SitesEngine.updateMapMarkers = function () {
         if (!this.state.map || !this.state.markersGroup) return;
         this.state.markersGroup.clearLayers();
         let activeSites = SITES_DATA.filter(s => s.affiche !== false);
+
+        // Filter map markers by search query
+        if (this.state.searchQuery) {
+            const queryCleaned = this.removeAccents(this.state.searchQuery.trim().toLowerCase());
+            activeSites = activeSites.filter(site => {
+                const name = this.removeAccents(site.nom || '').toLowerCase();
+                const city = this.removeAccents(site.ville || '').toLowerCase();
+                const zip = (site.code_postal || '').toLowerCase();
+                
+                let dept = '';
+                if (Array.isArray(site.departement)) {
+                    dept = this.removeAccents(site.departement.join(' ')).toLowerCase();
+                } else if (site.departement) {
+                    dept = this.removeAccents(site.departement).toLowerCase();
+                }
+                
+                const region = this.removeAccents(site.region || '').toLowerCase();
+                const obs = this.removeAccents(site.observations || '').toLowerCase();
+                const topo = this.removeAccents(site.acces_topo || '').toLowerCase();
+                const dangers = this.removeAccents(site.dangers || '').toLowerCase();
+                const practice = this.removeAccents(site.praticabilite || '').toLowerCase();
+
+                return name.includes(queryCleaned) ||
+                       city.includes(queryCleaned) ||
+                       zip.includes(queryCleaned) ||
+                       dept.includes(queryCleaned) ||
+                       region.includes(queryCleaned) ||
+                       obs.includes(queryCleaned) ||
+                       topo.includes(queryCleaned) ||
+                       dangers.includes(queryCleaned) ||
+                       practice.includes(queryCleaned);
+            });
+        }
+
         // 3-State Wind Map Filtering
         if (this.state.filterWindExclude && this.state.filterWindExclude.length > 0) {
             activeSites = activeSites.filter(s => s.orientations_vent && !s.orientations_vent.some(w => this.state.filterWindExclude.includes(w)));

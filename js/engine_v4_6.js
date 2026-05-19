@@ -81,6 +81,25 @@ const Engine = {
             }, { passive: true });
         });
 
+        // Dynamic Header Height Variable
+        const header = document.getElementById('app-header');
+        if (header) {
+            const updateHeaderHeight = () => {
+                const height = header.offsetHeight;
+                document.documentElement.style.setProperty('--header-height', height + 'px');
+            };
+            updateHeaderHeight();
+            if (window.ResizeObserver) {
+                const ro = new ResizeObserver(() => updateHeaderHeight());
+                ro.observe(header);
+            } else {
+                window.addEventListener('resize', updateHeaderHeight);
+            }
+            window.addEventListener('load', updateHeaderHeight);
+            setTimeout(updateHeaderHeight, 200);
+            setTimeout(updateHeaderHeight, 1000);
+        }
+
         // Initialize Theme based on loaded level
         this.updateAppTheme(this.state.level);
 

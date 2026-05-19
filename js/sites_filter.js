@@ -187,43 +187,80 @@ SitesEngine.changeSortMode = function (mode) {
         }
 
         if (mode === 'DISTANCE') {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        this.state.userLocation = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        };
-                        this.renderList();
-                        if (this.state.mapExpanded) {
-                            this.updateMapMarkers();
-                        }
-                    },
-                    (error) => {
-                        console.error("Geolocation error:", error);
-                        alert("Impossible de récupérer votre position GPS. Assurez-vous d'avoir autorisé l'accès.");
-                        this.state.sortMode = 'CONDITIONS';
-                        const selectEl = document.getElementById('select-sort-mode');
-                        if (selectEl) selectEl.value = 'CONDITIONS';
-                        if (strategyPanel) strategyPanel.style.display = 'flex';
-                        this.renderList();
-                    }
-                );
-            } else {
-                alert("La géolocalisation n'est pas supportée par votre navigateur.");
-                this.state.sortMode = 'CONDITIONS';
-                const selectEl = document.getElementById('select-sort-mode');
-                if (selectEl) selectEl.value = 'CONDITIONS';
-                if (strategyPanel) strategyPanel.style.display = 'flex';
+            if (this.state.userLocation) {
                 this.renderList();
+                if (this.state.map) {
+                    this.updateMapMarkers();
+                }
+            } else {
+                this.requestGpsLocation();
             }
         } else {
             this.renderList();
-            if (this.state.mapExpanded) {
+            if (this.state.map) {
                 this.updateMapMarkers();
             }
         }
     };
+
+SitesEngine.geocodeAddress = function (query) {
+    if (!query || query.trim() === '') {
+        alert("Veuillez saisir une adresse ou une ville.");
+        return;
+    }
+
+    const statusEl = document.getElementById('address-status-message');
+    const gpsBtn = document.getElementById('btn-use-gps');
+    
+    if (statusEl) {
+        statusEl.innerHTML = `<i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i> Recherche de l'adresse...`;
+        statusEl.style.color = 'var(--text-muted)';
+    }
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                const result = data[0];
+                const lat = parseFloat(result.lat);
+                const lng = parseFloat(result.lon);
+                
+                // Clear cached distances on sites data to force recalculation with new reference coordinates
+                if (typeof SITES_DATA !== 'undefined' && Array.isArray(SITES_DATA)) {
+                    SITES_DATA.forEach(s => { delete s.distance; });
+                }
+
+                this.state.userLocation = { lat, lng };
+
+                if (statusEl) {
+                    statusEl.innerHTML = `<i class="ri-checkbox-circle-line" style="color: var(--accent-green);"></i> Localisé : ${result.display_name}`;
+                    statusEl.style.color = 'var(--accent-green)';
+                }
+                if (gpsBtn) {
+                    gpsBtn.style.borderColor = '';
+                    gpsBtn.style.color = '';
+                }
+
+                this.renderList();
+                if (this.state.map) {
+                    this.updateMapMarkers();
+                    this.state.map.setView([lat, lng], 10);
+                }
+            } else {
+                if (statusEl) {
+                    statusEl.innerHTML = `<i class="ri-error-warning-line" style="color: var(--accent-red);"></i> Adresse non trouvée.`;
+                    statusEl.style.color = 'var(--accent-red)';
+                }
+            }
+        })
+        .catch(err => {
+            console.error("Geocoding error:", err);
+            if (statusEl) {
+                statusEl.innerHTML = `<i class="ri-error-warning-line" style="color: var(--accent-red);"></i> Erreur de connexion au service.`;
+                statusEl.style.color = 'var(--accent-red)';
+            }
+        });
+};
 
 SitesEngine.changeStrategy = function (strategy) {
         this.state.conditionsStrategy = strategy;

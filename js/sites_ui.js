@@ -1,3 +1,11 @@
+SitesEngine.updateSearchQuery = function (val) {
+    this.state.searchQuery = val || '';
+    this.renderList();
+    if (this.state.map) {
+        this.updateMapMarkers();
+    }
+};
+
 SitesEngine.renderList = function () {
         const container = document.getElementById('sites-list-container');
         if (!container) return;
@@ -9,6 +17,40 @@ SitesEngine.renderList = function () {
             }
 
             let activeSites = SITES_DATA.filter(s => s.affiche !== false);
+
+            // Filter by search query
+            const searchQuery = (this.state.searchQuery || '').trim().toLowerCase();
+            if (searchQuery) {
+                const queryCleaned = this.removeAccents(searchQuery);
+                activeSites = activeSites.filter(site => {
+                    const name = this.removeAccents(site.nom || '').toLowerCase();
+                    const city = this.removeAccents(site.ville || '').toLowerCase();
+                    const zip = (site.code_postal || '').toLowerCase();
+                    
+                    let dept = '';
+                    if (Array.isArray(site.departement)) {
+                        dept = this.removeAccents(site.departement.join(' ')).toLowerCase();
+                    } else if (site.departement) {
+                        dept = this.removeAccents(site.departement).toLowerCase();
+                    }
+                    
+                    const region = this.removeAccents(site.region || '').toLowerCase();
+                    const obs = this.removeAccents(site.observations || '').toLowerCase();
+                    const topo = this.removeAccents(site.acces_topo || '').toLowerCase();
+                    const dangers = this.removeAccents(site.dangers || '').toLowerCase();
+                    const practice = this.removeAccents(site.praticabilite || '').toLowerCase();
+
+                    return name.includes(queryCleaned) ||
+                           city.includes(queryCleaned) ||
+                           zip.includes(queryCleaned) ||
+                           dept.includes(queryCleaned) ||
+                           region.includes(queryCleaned) ||
+                           obs.includes(queryCleaned) ||
+                           topo.includes(queryCleaned) ||
+                           dangers.includes(queryCleaned) ||
+                           practice.includes(queryCleaned);
+                });
+            }
 
             activeSites.forEach(site => {
                 const forecasts = this.state.weatherForecasts[site.id] || [];
@@ -407,7 +449,6 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
             </div>
             ${slotsTextHtml}
             ${(() => {
-                let richDetailsHtml = '';
                 const showConv = this.isFieldFilled(site.conventionnement);
                 const showPrat = this.isFieldFilled(site.praticabilite);
                 const showGest = this.isFieldFilled(site.structure_gestionnaire);
@@ -420,93 +461,117 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                 const cleanObs = rawObs.replace(/^Altitude\s*:\s*\d+\s*m\.?\s*/i, '').trim();
                 const showObs = this.isFieldFilled(cleanObs);
 
-                if (showConv || showPrat || showGest || showAero || showSec || showDang || showTopo || showObs) {
-                    const isOpen = this.state.expandedSites[site.id] ? 'open' : '';
-                    const toggleText = this.state.expandedSites[site.id] ? 'Masquer les détails' : "Voir plus d'infos";
-                    richDetailsHtml = `
-                        <details class="site-details-toggle" ${isOpen} ontoggle="SitesEngine.handleDetailsToggle(${site.id}, this)">
-                            <summary>
-                                <span class="toggle-text">${toggleText}</span>
-                                <i class="ri-arrow-down-s-line"></i>
-                            </summary>
-                            <div class="site-rich-details">
-                                ${showConv ? `
-                                <div class="rich-detail-item default">
-                                    <i class="ri-shield-check-line rich-detail-icon blue"></i>
-                                    <div>
-                                        <strong class="rich-detail-label muted">Conventionnement</strong>
-                                        <span class="rich-detail-value">${site.conventionnement}</span>
-                                    </div>
+                const isOpen = this.state.expandedSites[site.id] ? 'open' : '';
+                const toggleText = this.state.expandedSites[site.id] ? 'Masquer les détails' : "Voir plus d'infos";
+                
+                return `
+                    <details class="site-details-toggle" ${isOpen} ontoggle="SitesEngine.handleDetailsToggle(${site.id}, this)">
+                        <summary>
+                            <span class="toggle-text">${toggleText}</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </summary>
+                        <div class="site-rich-details">
+                            <div class="external-links-section">
+                                <h4 class="external-links-title"><i class="ri-links-line"></i> Météo & Cartes Externes</h4>
+                                <div class="external-links-grid">
+                                    <a href="https://meteo-parapente.com/#/${site.latitude},${site.longitude},11" target="_blank" class="external-link-btn mp-btn" onclick="event.stopPropagation();">
+                                        <i class="ri-cloud-windy-line"></i> Météo-Parapente
+                                    </a>
+                                    <a href="https://www.meteoblue.com/fr/meteo/semaine/?lat=${site.latitude}&lon=${site.longitude}" target="_blank" class="external-link-btn mb-btn" onclick="event.stopPropagation();">
+                                        <i class="ri-temp-hot-line"></i> Meteoblue
+                                    </a>
+                                    <a href="https://fr.windfinder.com/#11/${site.latitude}/${site.longitude}" target="_blank" class="external-link-btn wf-btn" onclick="event.stopPropagation();">
+                                        <i class="ri-compass-line"></i> Windfinder
+                                    </a>
+                                    <a href="https://www.paraglidingmap.com/app/?lat=${site.latitude}&lng=${site.longitude}&zoom=11" target="_blank" class="external-link-btn pm-btn" onclick="event.stopPropagation();">
+                                        <i class="ri-map-pin-line"></i> Paragliding Map
+                                    </a>
+                                    ${site.referecence_terrain ? `
+                                    <a href="https://www.spotair.mobi/spot/ffvl/${site.referecence_terrain}" target="_blank" class="external-link-btn sa-btn" onclick="event.stopPropagation();">
+                                        <i class="ri-radar-line"></i> Spotair
+                                    </a>
+                                    ` : ''}
+                                    <a href="http://www.paraglidingearth.com/api/getAroundLatLngSites.php?lat=${site.latitude}&lng=${site.longitude}&distance=10&style=detailled" target="_blank" class="external-link-btn pe-btn" onclick="event.stopPropagation();">
+                                        <i class="ri-earth-line"></i> Paragliding Earth
+                                    </a>
                                 </div>
-                                ` : ''}
-                                ${showPrat ? `
-                                <div class="rich-detail-item default">
-                                    <i class="ri-checkbox-circle-line rich-detail-icon ${site.affiche ? 'green' : 'red'}"></i>
-                                    <div>
-                                        <strong class="rich-detail-label muted">Praticabilité</strong>
-                                        <span class="rich-detail-value">${site.praticabilite}</span>
-                                    </div>
-                                </div>
-                                ` : ''}
-                                ${showGest ? `
-                                <div class="rich-detail-item default">
-                                    <i class="ri-group-line rich-detail-icon secondary"></i>
-                                    <div>
-                                        <strong class="rich-detail-label muted">Structure Gestionnaire</strong>
-                                        <span class="rich-detail-value">${site.structure_gestionnaire}</span>
-                                    </div>
-                                </div>
-                                ` : ''}
-                                ${showAero ? `
-                                <div class="rich-detail-item default">
-                                    <i class="ri-compass-3-line rich-detail-icon blue"></i>
-                                    <div>
-                                        <strong class="rich-detail-label muted">Aérologie Idéale</strong>
-                                        <span class="rich-detail-value">${site.aerologie_ideale}</span>
-                                    </div>
-                                </div>
-                                ` : ''}
-                                ${showSec ? `
-                                <div class="rich-detail-item default">
-                                    <i class="ri-heart-pulse-line rich-detail-icon red"></i>
-                                    <div>
-                                        <strong class="rich-detail-label muted">Secours & Accès</strong>
-                                        <span class="rich-detail-value">${site.secours_acces}</span>
-                                    </div>
-                                </div>
-                                ` : ''}
-                                ${showDang ? `
-                                <div class="rich-detail-item danger">
-                                    <i class="ri-error-warning-line rich-detail-icon red"></i>
-                                    <div>
-                                        <strong class="rich-detail-label red">Dangers Signalés</strong>
-                                        <span class="rich-detail-value">${site.dangers}</span>
-                                    </div>
-                                </div>
-                                ` : ''}
-                                ${showTopo ? `
-                                <div class="rich-detail-item default full-width">
-                                    <i class="ri-walk-line rich-detail-icon secondary"></i>
-                                    <div>
-                                        <strong class="rich-detail-label muted">Accès & Topo</strong>
-                                        <span class="rich-detail-value">${site.acces_topo}</span>
-                                    </div>
-                                </div>
-                                ` : ''}
-                                ${showObs ? `
-                                <div class="rich-detail-item obs">
-                                    <i class="ri-information-line rich-detail-icon blue"></i>
-                                    <div>
-                                        <strong class="rich-detail-label muted">Observations & Réglementation</strong>
-                                        <span class="rich-detail-value">${cleanObs}</span>
-                                    </div>
-                                </div>
-                                ` : ''}
                             </div>
-                        </details>
-                    `;
-                }
-                return richDetailsHtml;
+
+                            ${showConv ? `
+                            <div class="rich-detail-item default">
+                                <i class="ri-shield-check-line rich-detail-icon blue"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Conventionnement</strong>
+                                    <span class="rich-detail-value">${site.conventionnement}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                            ${showPrat ? `
+                            <div class="rich-detail-item default">
+                                <i class="ri-checkbox-circle-line rich-detail-icon ${site.affiche ? 'green' : 'red'}"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Praticabilité</strong>
+                                    <span class="rich-detail-value">${site.praticabilite}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                            ${showGest ? `
+                            <div class="rich-detail-item default">
+                                <i class="ri-group-line rich-detail-icon secondary"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Structure Gestionnaire</strong>
+                                    <span class="rich-detail-value">${site.structure_gestionnaire}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                            ${showAero ? `
+                            <div class="rich-detail-item default">
+                                <i class="ri-compass-3-line rich-detail-icon blue"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Aérologie Idéale</strong>
+                                    <span class="rich-detail-value">${site.aerologie_ideale}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                            ${showSec ? `
+                            <div class="rich-detail-item default">
+                                <i class="ri-heart-pulse-line rich-detail-icon red"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Secours & Accès</strong>
+                                    <span class="rich-detail-value">${site.secours_acces}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                            ${showDang ? `
+                            <div class="rich-detail-item danger">
+                                <i class="ri-error-warning-line rich-detail-icon red"></i>
+                                <div>
+                                    <strong class="rich-detail-label red">Dangers Signalés</strong>
+                                    <span class="rich-detail-value">${site.dangers}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                            ${showTopo ? `
+                            <div class="rich-detail-item default full-width">
+                                <i class="ri-walk-line rich-detail-icon secondary"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Accès & Topo</strong>
+                                    <span class="rich-detail-value">${site.acces_topo}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                            ${showObs ? `
+                            <div class="rich-detail-item obs">
+                                <i class="ri-information-line rich-detail-icon blue"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Observations & Réglementation</strong>
+                                    <span class="rich-detail-value">${cleanObs}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </details>
+                `;
             })()}
         `;
     };

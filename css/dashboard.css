@@ -6,7 +6,7 @@
     transition: opacity 0.4s ease;
     display: none;
     flex-direction: column;
-    padding: 160px 40px 80px 40px;
+    padding: 0 40px 80px 40px;
     overflow-y: auto;
     background: transparent;
     animation: fadeIn 0.4s ease-out;
@@ -35,6 +35,7 @@
     max-width: 1800px;
     margin: 0 auto;
     width: 100%;
+    margin-top: calc(var(--header-height, 140px) + 20px);
 }
 
 .apps-grid {

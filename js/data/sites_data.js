@@ -6,7 +6,8 @@ const SITES_DATA = [
         latitude: 49.3306,
         longitude: 2.0912,
         orientations_vent: ["N"],
-        type: ["NATUREL"],
+        type: "NATUREL",
+        altitude: 210,
         affiche: true,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain ouvert à la pratique",
@@ -18,8 +19,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "",
         reglementation: "",
-        url: "https://federation.ffvl.fr/terrain/1347",
-        altitude: 210
+        url: "https://federation.ffvl.fr/terrain/1347"
     },
     {
         id: "auteuil-1348",
@@ -29,6 +29,7 @@ const SITES_DATA = [
         longitude: 2,
         orientations_vent: [],
         type: "ATTERRO",
+        altitude: 127,
         affiche: true,
         conventionnement: "terrain conventionné FFVL",
         praticabilite: "terrain ouvert à la pratique",
@@ -40,8 +41,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "",
         reglementation: "",
-        url: "https://federation.ffvl.fr/terrain/1348",
-        altitude: 127
+        url: "https://federation.ffvl.fr/terrain/1348"
     },
     {
         id: "ons-en-bray-le-grand-larris-1378",
@@ -51,6 +51,7 @@ const SITES_DATA = [
         longitude: 1.8981,
         orientations_vent: ["N", "NE"],
         type: "NATUREL",
+        altitude: 213,
         affiche: true,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain ouvert à la pratique",
@@ -62,8 +63,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "Site fermé tous les dimanches pendant la période de chasse et certains samedis pour cause de battues. Merci de respecter scrupuleusement cette réglementation. Fermetures 2025/2026 : Interdiction de vol, tous les dimanches, du 21 septembre au 28 mars Interdiction de vol, le samedi 11 octobre, samedi 1 novembre, samedi 29 novembre, samedi 13 décembre, samedi 10 janvier, samedi 7 février et samedi 28 mars. Jours de battues",
         reglementation: "Attention aux Zones D et A /! nouvelle convention avec la DSAC Nord : plafond de 3500 ft uniquement si autorisation de l'aéroport de Beauvais (LFOB) : https://tma-beauvais.martelet.com",
-        url: "https://federation.ffvl.fr/terrain/1378",
-        altitude: 213
+        url: "https://federation.ffvl.fr/terrain/1378"
     },
     {
         id: "ons-en-bray-saint-aubin-en-bray-1420",
@@ -73,6 +73,7 @@ const SITES_DATA = [
         longitude: 1.8908,
         orientations_vent: ["N", "NE"],
         type: "NATUREL",
+        altitude: 201,
         affiche: true,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain ouvert à la pratique",
@@ -84,8 +85,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "Site fermé tous les dimanches pendant la période de chasse et certains samedis pour cause de battues. Merci de respecter scrupuleusement cette réglementation. Fermetures 2025/2026 : Interdiction de vol, tous les dimanches, du 21 septembre au 28 mars Interdiction de vol, le samedi 11 octobre, samedi 1 novembre, samedi 29 novembre, samedi 13 décembre, samedi 10 janvier, samedi 7 février et samedi 28 mars. Jours de battues Piétinnement des cultures et gonflage interdit dans le champ derrière le décollage",
         reglementation: "Attention aux Zones D et A /! nouvelle convention avec la DSAC Nord : plafond de 3500 ft uniquement si autorisation de l'aéroport de Beauvais (LFOB) : https://tma-beauvais.martelet.com",
-        url: "https://federation.ffvl.fr/terrain/1420",
-        altitude: 201
+        url: "https://federation.ffvl.fr/terrain/1420"
     },
     {
         id: "ons-en-bray-1379",
@@ -95,6 +95,7 @@ const SITES_DATA = [
         longitude: 1.8938,
         orientations_vent: ["N"],
         type: "ATTERRO",
+        altitude: 136,
         affiche: true,
         conventionnement: "terrain conventionné FFVL",
         praticabilite: "terrain ouvert à la pratique",
@@ -106,8 +107,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "Site fermé tous les dimanches pendant la période de chasse et certains samedis pour cause de battues. Merci de respecter scrupuleusement cette réglementation. Fermetures 2025/2026 : Interdiction de vol, tous les dimanches, du 21 septembre au 28 mars Interdiction de vol, le samedi 11 octobre, samedi 1 novembre, samedi 29 novembre, samedi 13 décembre, samedi 10 janvier, samedi 7 février et samedi 28 mars. Jours de battues",
         reglementation: "",
-        url: "https://federation.ffvl.fr/terrain/1379",
-        altitude: 136
+        url: "https://federation.ffvl.fr/terrain/1379"
     },
     {
         id: "paillart-treuil-13113",
@@ -252,6 +252,7 @@ const SITES_DATA = [
         longitude: 1.6831,
         orientations_vent: ["SO"],
         type: "NATUREL",
+        altitude: 152,
         affiche: false,
         conventionnement: "pas de convention FFVL identifiée",
         praticabilite: "ATTENTION : PRATIQUE STRICTEMENT INTERDITE SUR CE TERRAIN",
@@ -263,8 +264,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "INTERDICTION COMPLETE du site",
         reglementation: "",
-        url: "https://federation.ffvl.fr/terrain/78",
-        altitude: 152
+        url: "https://federation.ffvl.fr/terrain/78"
     },
     {
         id: "chaussee-de-brunehaut-1558",
@@ -274,6 +274,7 @@ const SITES_DATA = [
         longitude: 2.13889,
         orientations_vent: [],
         type: "NATUREL",
+        altitude: 65,
         affiche: false,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain non praticable pour le vol libre",
@@ -285,8 +286,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "",
         reglementation: "",
-        url: "https://federation.ffvl.fr/terrain/1558",
-        altitude: 65
+        url: "https://federation.ffvl.fr/terrain/1558"
     },
     {
         id: "arry-vercourt-2320",
@@ -404,6 +404,7 @@ const SITES_DATA = [
         longitude: 2.4488,
         orientations_vent: ["NO", "SE"],
         type: "NATUREL",
+        altitude: 156,
         affiche: false,
         conventionnement: "pas de convention FFVL identifiée",
         praticabilite: "terrain non praticable pour le vol libre",
@@ -415,8 +416,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "",
         reglementation: "",
-        url: "https://federation.ffvl.fr/terrain/13197",
-        altitude: 156
+        url: "https://federation.ffvl.fr/terrain/13197"
     },
     {
         id: "bailleul-treuil-13394",
@@ -480,6 +480,7 @@ const SITES_DATA = [
         longitude: 2.9342,
         orientations_vent: ["S", "SE"],
         type: "NATUREL",
+        altitude: 40,
         affiche: false,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain non praticable pour le vol libre",
@@ -491,8 +492,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "Accès au terril interdit par arrêté préfectoral jusqu'à nouvel ordre pour cause de combustion lente du Terril.",
         reglementation: "TMA Lille 3 classe D commencent 2500Pieds /FL115",
-        url: "https://federation.ffvl.fr/terrain/13108",
-        altitude: 40
+        url: "https://federation.ffvl.fr/terrain/13108"
     },
     {
         id: "parc-des-iles-treuil-13098",
@@ -556,6 +556,7 @@ const SITES_DATA = [
         longitude: 2.4415,
         orientations_vent: ["E", "SE"],
         type: "NATUREL",
+        altitude: 151,
         affiche: false,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain temporairement non praticable pour le vol libre",
@@ -567,8 +568,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "interdiction d'utilisation pendant la période de dégel (si barrière de dégel signalée)",
         reglementation: "plafond: environ 600 m",
-        url: "https://federation.ffvl.fr/terrain/13084",
-        altitude: 151
+        url: "https://federation.ffvl.fr/terrain/13084"
     },
     {
         id: "sous-le-mont-de-la-comte-1304",
@@ -838,6 +838,7 @@ const SITES_DATA = [
         longitude: 1.629,
         orientations_vent: ["O", "SO"],
         type: "NATUREL",
+        altitude: 135,
         affiche: false,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain non praticable pour le vol libre",
@@ -849,8 +850,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "Interdiction de vol la semaine avant 12 h. Interdiction de vol le dimanche en période de chasse. Interdiction de se poser dans la carrière et dans les terrains environnants autres que le décollage. Toute activité commerciale est interdite sans accord préalable du club \" Raz'motte \"",
         reglementation: "Le site est dans la CTR du Touquet. Un protocole permet de voler en parapente à la condition suivante: Accord téléphonique du contrôle aérien de la tour du Touquet à l'un des numéros suivants. 03-21-06-62-86 ou 03-21-06-62-71 ou 03-21-06-62-73 Départ en cross vers le Nord et l'Est uniquement.",
-        url: "https://federation.ffvl.fr/terrain/1004",
-        altitude: 135
+        url: "https://federation.ffvl.fr/terrain/1004"
     },
     {
         id: "mieures-campagne-les-boulonnais-946",
@@ -887,6 +887,7 @@ const SITES_DATA = [
         longitude: 3.1619,
         orientations_vent: ["SE"],
         type: "GONFLAGE",
+        altitude: 40,
         affiche: false,
         conventionnement: "terrain conventionné FFVL",
         praticabilite: "terrain non praticable pour le vol libre",
@@ -898,8 +899,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "Présence obligatoire d'un encadrant moniteur ou animateur de club",
         reglementation: "Obligation d'installer une signalisation amovible pendant l'utilisation",
-        url: "https://federation.ffvl.fr/terrain/13404",
-        altitude: 40
+        url: "https://federation.ffvl.fr/terrain/13404"
     },
     {
         id: "plaine-du-fort-de-mons-13177",
@@ -952,6 +952,7 @@ const SITES_DATA = [
         longitude: 1.85,
         orientations_vent: ["E", "N", "NE", "NO", "O", "S", "SE", "SO"],
         type: "TREUIL",
+        altitude: 133,
         affiche: false,
         conventionnement: "terrain conventionné FFVL",
         praticabilite: "terrain non praticable pour le vol libre",
@@ -963,8 +964,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "",
         reglementation: "",
-        url: "https://federation.ffvl.fr/terrain/958",
-        altitude: 133
+        url: "https://federation.ffvl.fr/terrain/958"
     },
     {
         id: "equihen-deco-herbe-1355",
@@ -1001,6 +1001,7 @@ const SITES_DATA = [
         longitude: 1.5621,
         orientations_vent: ["O"],
         type: "NATUREL",
+        altitude: 36,
         affiche: false,
         conventionnement: "pas de convention FFVL identifiée",
         praticabilite: "terrain non praticable pour le vol libre",
@@ -1012,8 +1013,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "",
         reglementation: "",
-        url: "https://federation.ffvl.fr/terrain/1674",
-        altitude: 36
+        url: "https://federation.ffvl.fr/terrain/1674"
     },
     {
         id: "la-montagne-d-acquin-1388",
@@ -1023,6 +1023,7 @@ const SITES_DATA = [
         longitude: 2.10833,
         orientations_vent: ["NO"],
         type: "NATUREL",
+        altitude: 121,
         affiche: false,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain non praticable pour le vol libre",
@@ -1034,8 +1035,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "",
         reglementation: "",
-        url: "https://federation.ffvl.fr/terrain/1388",
-        altitude: 121
+        url: "https://federation.ffvl.fr/terrain/1388"
     },
     {
         id: "la-montagne-d-acquin-acquin-westbecourt-1387",
@@ -1045,6 +1045,7 @@ const SITES_DATA = [
         longitude: 2.10861,
         orientations_vent: ["SO"],
         type: "NATUREL",
+        altitude: 108,
         affiche: false,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain non praticable pour le vol libre",
@@ -1056,8 +1057,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "",
         reglementation: "",
-        url: "https://federation.ffvl.fr/terrain/1387",
-        altitude: 108
+        url: "https://federation.ffvl.fr/terrain/1387"
     },
     {
         id: "pointe-de-la-creche-ouest-sud-ouest-738",
@@ -1067,6 +1067,7 @@ const SITES_DATA = [
         longitude: 1.5948,
         orientations_vent: ["O", "SO"],
         type: "NATUREL",
+        altitude: 14,
         affiche: false,
         conventionnement: "terrain conventionné FFVL",
         praticabilite: "terrain non praticable pour le vol libre",
@@ -1078,8 +1079,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: "L'accès à ces sites est désormais réglementé, réservé uniquement aux détenteurs d'un badge-règlement. Ce badge doit pouvoir être présenté aux membres du club gestionnaire des sites et/ou aux gardes assermentés en charge des espaces naturels concernés.",
         reglementation: "oui",
-        url: "https://federation.ffvl.fr/terrain/738",
-        altitude: 14
+        url: "https://federation.ffvl.fr/terrain/738"
     },
     {
         id: "pointe-de-la-creche-740",
@@ -1348,6 +1348,7 @@ const SITES_DATA = [
         longitude: 3.2667,
         orientations_vent: [],
         type: "TREUIL",
+        altitude: 172,
         affiche: true,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain ouvert à la pratique",
@@ -1359,8 +1360,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: null,
         reglementation: "terrain ouvert à la pratique",
-        url: "https://federation.ffvl.fr/terrain/1191",
-        altitude: 172
+        url: "https://federation.ffvl.fr/terrain/1191"
     },
     {
         id: "guignicourt-treuil-1752",
@@ -1370,6 +1370,7 @@ const SITES_DATA = [
         longitude: 3.9757,
         orientations_vent: ["NE", "E", "SE"],
         type: "TREUIL",
+        altitude: 80,
         affiche: true,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain ouvert à la pratique",
@@ -1381,8 +1382,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: null,
         reglementation: "terrain ouvert à la pratique",
-        url: "https://federation.ffvl.fr/terrain/1752",
-        altitude: 80
+        url: "https://federation.ffvl.fr/terrain/1752"
     },
     {
         id: "la-grande-queue-treuil-1735",
@@ -1392,6 +1392,7 @@ const SITES_DATA = [
         longitude: 3.3823,
         orientations_vent: [],
         type: "TREUIL",
+        altitude: 206,
         affiche: true,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain ouvert à la pratique",
@@ -1403,8 +1404,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: null,
         reglementation: "terrain ouvert à la pratique",
-        url: "https://federation.ffvl.fr/terrain/1735",
-        altitude: 206
+        url: "https://federation.ffvl.fr/terrain/1735"
     },
     {
         id: "la-grande-foret-treuil-1734",
@@ -1414,6 +1414,7 @@ const SITES_DATA = [
         longitude: 3.3845,
         orientations_vent: ["SO", "O"],
         type: "TREUIL",
+        altitude: 203,
         affiche: true,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain ouvert à la pratique",
@@ -1425,8 +1426,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: null,
         reglementation: "terrain ouvert à la pratique",
-        url: "https://federation.ffvl.fr/terrain/1734",
-        altitude: 203
+        url: "https://federation.ffvl.fr/terrain/1734"
     },
     {
         id: "monnes-treuil-1736",
@@ -1436,6 +1436,7 @@ const SITES_DATA = [
         longitude: 3.2333,
         orientations_vent: [],
         type: "TREUIL",
+        altitude: 160,
         affiche: true,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain ouvert à la pratique",
@@ -1448,7 +1449,6 @@ const SITES_DATA = [
         restrictions: null,
         reglementation: "terrain ouvert à la pratique",
         url: "https://federation.ffvl.fr/terrain/1736",
-        altitude: 160
     },
     {
         id: "mont-saint-pere-dessus-les-toits-du-ru-dollond-1717",
@@ -1458,6 +1458,7 @@ const SITES_DATA = [
         longitude: 3.475,
         orientations_vent: ["SE"],
         type: "NATUREL",
+        altitude: 165,
         affiche: true,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain ouvert à la pratique",
@@ -1470,7 +1471,6 @@ const SITES_DATA = [
         restrictions: null,
         reglementation: "terrain ouvert à la pratique",
         url: "https://federation.ffvl.fr/terrain/1717",
-        altitude: 165
     },
     {
         id: "mont-saint-pere-1718",
@@ -1480,6 +1480,7 @@ const SITES_DATA = [
         longitude: 3.4756,
         orientations_vent: ["SE"],
         type: "ATTERRO",
+        altitude: 110,
         affiche: true,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain ouvert à la pratique",
@@ -1491,8 +1492,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: null,
         reglementation: "terrain ouvert à la pratique",
-        url: "https://federation.ffvl.fr/terrain/1718",
-        altitude: 110
+        url: "https://federation.ffvl.fr/terrain/1718"
     },
     {
         id: "rozoy-bellevalle-treuil-1763",
@@ -1502,6 +1502,7 @@ const SITES_DATA = [
         longitude: 3.4516,
         orientations_vent: ["N", "E", "S", "O"],
         type: "TREUIL",
+        altitude: 200,
         affiche: true,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain ouvert à la pratique",
@@ -1514,7 +1515,6 @@ const SITES_DATA = [
         restrictions: null,
         reglementation: "terrain ouvert à la pratique",
         url: "https://federation.ffvl.fr/terrain/1763",
-        altitude: 200
     },
     {
         id: "rozoy-bellevalle-1751",
@@ -1524,6 +1524,7 @@ const SITES_DATA = [
         longitude: 3.4417,
         orientations_vent: ["NE", "E"],
         type: "GONFLAGE",
+        altitude: 212,
         affiche: true,
         conventionnement: "terrain conventionné FFVL",
         praticabilite: "terrain ouvert à la pratique",
@@ -1535,8 +1536,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: null,
         reglementation: "terrain ouvert à la pratique",
-        url: "https://federation.ffvl.fr/terrain/1751",
-        altitude: 212
+        url: "https://federation.ffvl.fr/terrain/1751"
     },
     {
         id: "vendieres-1759",
@@ -1546,6 +1546,7 @@ const SITES_DATA = [
         longitude: 3.4435,
         orientations_vent: ["N", "O", "NO"],
         type: "GONFLAGE",
+        altitude: 154,
         affiche: false,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain non praticable pour le vol libre",
@@ -1558,7 +1559,6 @@ const SITES_DATA = [
         restrictions: null,
         reglementation: "terrain non praticable pour le vol libre",
         url: "https://federation.ffvl.fr/terrain/1759",
-        altitude: 154
     },
     {
         id: "bonneil-3039",
@@ -1568,6 +1568,7 @@ const SITES_DATA = [
         longitude: 3.33875,
         orientations_vent: [],
         type: "NATUREL",
+        altitude: 171,
         affiche: true,
         conventionnement: "⚠️ pas de convention FFVL identifiée => votre propre responsabilité est engagée ⚠️.",
         praticabilite: "le terrain semble pratiqué mais son état de conventionnement est inconnu",
@@ -1580,7 +1581,6 @@ const SITES_DATA = [
         restrictions: null,
         reglementation: "⚠️ ATTENTION ⚠️ : à notre connaissance, ce terrain n°3039 accueille une activité vol libre identifiée publiquement mais ne dispose pas d’autorisation connue ou de convention FFVL. Si vous êtes propriétaire, gestionnaire, souhaitez revendiquer la gestion de ce terrain ou si vous disposez d’informations : contactez-nous à [email&#160;protected] ! ⚠️⚠️⚠️ La FFVL ne certifie la fiabilité des informations relatives d'un terrain de pratique que lorsqu'il est conventionné par elle.",
         url: "https://federation.ffvl.fr/terrain/3039",
-        altitude: 171
     },
     {
         id: "chezy-sur-marne-nord-ouest-817",
@@ -1590,6 +1590,7 @@ const SITES_DATA = [
         longitude: 3.3906,
         orientations_vent: ["NO"],
         type: "NATUREL",
+        altitude: 131,
         affiche: true,
         conventionnement: "terrain non conventionné mais la pratique semble y être notoirement admise",
         praticabilite: "terrain ouvert à la pratique",
@@ -1601,8 +1602,7 @@ const SITES_DATA = [
         observations: null,
         restrictions: null,
         reglementation: "terrain ouvert à la pratique",
-        url: "https://federation.ffvl.fr/terrain/817",
-        altitude: 131
+        url: "https://federation.ffvl.fr/terrain/817"
     },
     {
         id: "craonelle-5032",
@@ -1612,6 +1612,7 @@ const SITES_DATA = [
         longitude: 3.75916,
         orientations_vent: [],
         type: "ATTERRO",
+        altitude: 141,
         affiche: true,
         conventionnement: "⚠️ pas de convention FFVL identifiée => votre propre responsabilité est engagée ⚠️.",
         praticabilite: "le terrain semble pratiqué mais son état de conventionnement est inconnu",
@@ -1623,7 +1624,6 @@ const SITES_DATA = [
         observations: null,
         restrictions: null,
         reglementation: "⚠️ ATTENTION ⚠️ : à notre connaissance, ce terrain n°5032 accueille une activité vol libre identifiée publiquement mais ne dispose pas d’autorisation connue ou de convention FFVL. Si vous êtes propriétaire, gestionnaire, souhaitez revendiquer la gestion de ce terrain ou si vous disposez d’informations : contactez-nous à [email&#160;protected] ! ⚠️⚠️⚠️ La FFVL ne certifie la fiabilité des informations relatives d'un terrain de pratique que lorsqu'il est conventionné par elle.",
-        url: "https://federation.ffvl.fr/terrain/5032",
-        altitude: 141
+        url: "https://federation.ffvl.fr/terrain/5032"
     }
 ];

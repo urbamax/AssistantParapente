@@ -5,7 +5,7 @@
 .course-container {
     max-width: 1800px;
     width: 98%;
-    margin: 40px auto;
+    margin: calc(var(--header-height, 140px) + 20px) auto 40px auto;
     background: var(--bg-card);
     border: var(--border-glass);
     backdrop-filter: blur(24px);
@@ -422,20 +422,20 @@ body.light-mode .choice-btn {
 /* TABLET (max-width: 1024px) */
 @media (max-width: 1024px) {
     .mode-screen {
-        padding: 140px 24px 40px 24px;
+        padding: 0 24px 40px 24px;
     }
 
     .main-stage,
     .qcm-container {
         padding: 32px;
-        margin-top: 20px;
+        margin-top: calc(var(--header-height, 140px) + 20px);
     }
 
 }
 @media (max-width: 768px) {
     /* Screens & Containers */
     .mode-screen {
-        padding: 110px 16px 80px 16px;
+        padding: 0 16px 80px 16px;
         overflow-y: auto;
     }
 

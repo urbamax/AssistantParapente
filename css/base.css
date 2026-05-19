@@ -19,8 +19,10 @@
     --p-light-border: rgba(0, 0, 0, 0.1);
 
     /* Accents (Shared) */
-    --accent-blue: #ff7a00; /* Vibrant Wing Orange */
-    --accent-purple: #e2001a; /* Vibrant School Red */
+    --accent-blue: #ff7a00;
+    /* Vibrant Wing Orange */
+    --accent-purple: #e2001a;
+    /* Vibrant School Red */
     --accent-green: #22c55e;
     --accent-red: #e2001a;
     --accent-gold: #eab308;
@@ -115,11 +117,12 @@ button {
 }
 
 @media (max-width: 768px) {
-@media (max-width: 768px) {
+    @media (max-width: 768px) {
 
-    /* Base */
-    body {
-        font-size: 14px;
+        /* Base */
+        body {
+            font-size: 14px;
+        }
+
     }
-
 }
