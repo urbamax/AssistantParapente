@@ -1,7 +1,0 @@
-  "scripts": {
-    "start": "node watch.js"
-  },
-  "dependencies": {
-    "csv-parse": "^6.1.0"
-  }
-}

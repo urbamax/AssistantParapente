@@ -1,48 +1,87 @@
 /* --- FOOTER STYLES --- */
 
 .app-footer {
-    margin-top: 64px;
-    padding: 32px;
-    border-top: 1px solid var(--border-color);
+    margin-top: 40px;
+    padding: 24px 16px;
+    border-top: 1px solid var(--border-glass);
     text-align: center;
     color: var(--text-muted);
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: 0.8rem;
+    font-weight: 400;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 8px;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.app-footer:hover {
+    opacity: 1;
+}
+
+.app-footer p {
+    margin: 4px 0;
+}
+
+.app-footer a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.app-footer a:hover {
+    color: var(--accent-blue);
 }
 
 .footer-logos {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 32px;
-    margin-bottom: 8px;
+    gap: 24px;
+    margin-bottom: 12px;
 }
 
 .ffvl-logo,
 .club-logo {
-    height: 80px;
+    height: 40px;
     transition: all 0.3s ease;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
-    /* Added for Dark Mode Visibility */
-    background: rgba(255, 255, 255, 0.9);
-    padding: 8px;
-    border-radius: 12px;
+    filter: opacity(0.85);
+    background: rgba(255, 255, 255, 0.85); /* Requis pour la lisibilité sur fond sombre */
+    padding: 4px 8px;
+    border-radius: 8px;
 }
 
-/* Remove background in Light Mode */
-body.light-mode .ffvl-logo,
-body.light-mode .club-logo {
-    background: transparent;
-    padding: 0;
-    border-radius: 0;
-}
-
+/* On hover, full opacity and brighter background */
 .ffvl-logo:hover,
 .club-logo:hover {
     transform: translateY(-2px) scale(1.05);
-    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
+    filter: opacity(1);
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* In light mode, no white background needed on hover */
+body.light-mode .ffvl-logo:hover,
+body.light-mode .club-logo:hover {
+    background: transparent;
+}
+
+@media (max-width: 768px) {
+    .app-footer {
+        padding: 20px 16px;
+        margin-top: 40px;
+    }
+    .footer-logos {
+        gap: 16px;
+    }
+    .ffvl-logo,
+    .club-logo {
+        height: 50px;
+    }
+}
+
+.app-footer-placeholder {
+    margin-top: auto;
+    width: 100%;
 }

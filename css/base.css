@@ -1,0 +1,125 @@
+/* LIQUID GLASS PRO THEME - REFACTORED V2 */
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    color-scheme: light dark;
+    /* --- PALETTE DEFINITIONS (Base Colors) --- */
+    /* Dark Palette */
+    --p-dark-deep: #000205;
+    --p-dark-surface: #0a0e17;
+    --p-dark-glass: rgba(15, 23, 42, 0.4);
+    --p-dark-border: rgba(255, 255, 255, 0.1);
+
+    /* Light Palette */
+    --p-light-deep: #f8fafc;
+    --p-light-surface: #ffffff;
+    --p-light-glass: rgba(0, 0, 0, 0.05);
+    --p-light-border: rgba(0, 0, 0, 0.1);
+
+    /* Accents (Shared) */
+    --accent-blue: #ff7a00; /* Vibrant Wing Orange */
+    --accent-purple: #e2001a; /* Vibrant School Red */
+    --accent-green: #22c55e;
+    --accent-red: #e2001a;
+    --accent-gold: #eab308;
+
+    /* --- THEME VARIABLES (Default: Dark) --- */
+    --bg-app: var(--p-dark-deep);
+    --bg-surface: var(--p-dark-surface);
+    --bg-overlay: rgba(2, 6, 23, 0.6);
+    --bg-card: rgba(15, 23, 42, 0.6);
+    --bg-input: rgba(0, 0, 0, 0.2);
+
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
+    --text-secondary: #cbd5e1;
+
+    /* FFVL Branded Colors */
+    --accent-blue: #ff7a00;
+    --accent-red: #e2001a;
+    --accent-green: #22c55e;
+
+    --border-color: var(--p-dark-border);
+    --border-glass: 1px solid var(--p-dark-border);
+
+    --glass-bg: var(--p-dark-glass);
+    --glass-shine: linear-gradient(125deg, rgba(255, 255, 255, 0.03) 0%, transparent 40%, rgba(255, 255, 255, 0.02) 100%);
+
+    --grad-primary: linear-gradient(135deg, #ff7a00 0%, #e2001a 100%);
+    --bg-pattern: radial-gradient(circle at 15% 50%, rgba(255, 122, 0, 0.08), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(226, 0, 26, 0.08), transparent 25%);
+
+    --shadow-glow: 0 0 20px rgba(255, 122, 0, 0.15);
+    --shadow-card: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
+
+    /* Typography */
+    --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+
+    /* Shapes */
+    --radius-pill: 9999px;
+    --radius-card: 24px;
+    --radius-lg: 16px;
+    --radius-md: 8px;
+    --radius-sm: 4px;
+}
+
+/* --- LIGHT MODE THEME REDEFINITION --- */
+body.light-mode {
+    --bg-app: var(--p-light-deep);
+    --bg-surface: var(--p-light-surface);
+    --bg-overlay: rgba(255, 255, 255, 0.8);
+    --bg-card: rgba(255, 255, 255, 0.85);
+    --bg-input: rgba(0, 0, 0, 0.05);
+
+    --text-main: #0f172a;
+    --text-muted: #475569;
+    --text-secondary: #64748b;
+
+    --border-color: var(--p-light-border);
+    --border-glass: 1px solid var(--p-light-border);
+
+    --glass-bg: var(--p-light-glass);
+    --glass-shine: linear-gradient(145deg, rgba(0, 0, 0, 0.05) 0%, transparent 100%);
+
+    --shadow-card: 0 20px 40px rgba(0, 0, 0, 0.1);
+
+    --grad-primary: linear-gradient(to bottom right, #ff7a00, #e2001a);
+    --bg-pattern: radial-gradient(circle at 0% 0%, rgba(255, 122, 0, 0.08), transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(226, 0, 26, 0.08), transparent 40%);
+}
+
+/* --- BASE --- */
+body {
+    background-color: var(--bg-app);
+    background-image: var(--bg-pattern);
+    background-attachment: fixed;
+    background-size: cover;
+    color: var(--text-main);
+    font-family: var(--font-main);
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    background: none;
+    color: inherit;
+}
+
+@media (max-width: 768px) {
+@media (max-width: 768px) {
+
+    /* Base */
+    body {
+        font-size: 14px;
+    }
+
+}

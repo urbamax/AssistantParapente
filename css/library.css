@@ -1,0 +1,557 @@
+/* --- MODULE: LIBRARY --- */
+.library-container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    /* Redundant Card Style Enforcement */
+    background: var(--bg-card);
+    border: var(--border-glass);
+    backdrop-filter: blur(24px);
+    border-radius: 32px;
+    padding: 48px;
+    box-shadow: var(--shadow-card);
+}
+
+/* --- RESTORED LIBRARY CARD STYLES --- */
+.mode-btn {
+    background: var(--bg-card);
+    border: var(--border-glass);
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.3s ease;
+    text-align: left;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    min-height: 180px;
+    /* Ensure height */
+    position: relative;
+    overflow: hidden;
+}
+
+.mode-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent-blue);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 0 20px rgba(14, 165, 233, 0.15);
+}
+
+body.light-mode .mode-btn:hover {
+    background: #ffffff;
+    border-color: var(--accent-blue);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.course-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    height: 100%;
+}
+
+/* Section Titles (Restored) */
+.section-title {
+    font-size: 1.8rem;
+    font-weight: 900;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 40px;
+    background: var(--grad-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 10px rgba(14, 165, 233, 0.2));
+}
+
+.course-card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: auto;
+    line-height: 1.4;
+}
+
+.course-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.1);
+    padding: 10px 12px;
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+    gap: 8px;
+    margin-top: 12px;
+}
+
+body.light-mode .course-card-meta {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.category-tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* Badge Styles */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 900;
+    margin-left: 6px;
+    white-space: nowrap;
+    line-height: 1;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+.badge-BI {
+    background: #22c55e;
+    color: #fff;
+}
+
+.badge-BP {
+    background: #0ea5e9;
+    color: #fff;
+}
+
+.badge-BPC {
+    background: #92400e;
+    color: #fff;
+}
+
+.badge-TREUIL {
+    background: #6366f1;
+    color: #fff;
+}
+
+.badge-GENERAL {
+    background: #475569;
+    color: #fff;
+}
+
+body.light-mode .badge-GENERAL {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.badge-modernized {
+    background: #1e293b;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Modernized Card: Blue Gradient Background */
+.mode-btn.modernized {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(71, 85, 105, 0.4)) !important;
+    border: 1px solid rgba(14, 165, 233, 0.3) !important;
+    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.1) !important;
+}
+
+.mode-btn.modernized::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    bottom: 0;
+    background: var(--accent-blue);
+    box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+}
+
+.mode-btn.modernized:hover {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.25), rgba(71, 85, 105, 0.5)) !important;
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 10px 25px rgba(14, 165, 233, 0.2) !important;
+}
+
+/* Library Section Headers (Colored) */
+.library-section-header {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+    margin-top: 32px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.library-section-header.level-BI {
+    color: var(--accent-green);
+    border-bottom-color: rgba(34, 197, 94, 0.3);
+}
+
+.library-section-header.level-BP {
+    color: var(--accent-blue);
+    border-bottom-color: rgba(14, 165, 233, 0.3);
+}
+
+.library-section-header.level-BPC {
+    color: #92400e;
+    border-bottom-color: rgba(146, 64, 14, 0.3);
+}
+
+.library-section-header.level-TREUIL {
+    color: #6366f1;
+    border-bottom-color: rgba(99, 102, 241, 0.3);
+}
+
+body.light-mode .library-section-header {
+    border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+
+/* --- RESTORED CONFIG & MODERN STYLES --- */
+.mode-toggle-container,
+.count-selector {
+    display: flex;
+    gap: 12px;
+    background: var(--bg-input);
+    padding: 6px;
+    border-radius: var(--radius-md);
+    margin-bottom: 24px;
+}
+
+.mode-toggle-btn,
+.count-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.mode-toggle-btn.active,
+.count-btn.active {
+    background: var(--accent-blue);
+    color: #fff;
+    box-shadow: 0 4px 12px var(--shadow-glow);
+}
+
+.mode-toggle-btn.active:hover,
+.count-btn.active:hover {
+    filter: brightness(1.1);
+}
+
+.mode-toggle-btn:hover:not(.active),
+.count-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+#qcm-theme-select {
+    width: 100%;
+    padding: 16px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-main);
+    font-size: 1rem;
+    cursor: pointer;
+    margin-bottom: 24px;
+}
+
+#qcm-theme-select option {
+    background: var(--bg-surface);
+    color: var(--text-main);
+}
+
+/* Enhanced Modernized Badge */
+.badge-modernized {
+    background: var(--grad-primary) !important;
+    color: white !important;
+    font-size: 0.65rem !important;
+    box-shadow: 0 0 10px rgba(14, 165, 233, 0.3);
+    border: none !important;
+}
+
+.library-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+/* Sort Controls */
+.sort-controls {
+    display: flex;
+    gap: 8px;
+    background: var(--bg-input);
+    padding: 4px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-color);
+}
+
+.sort-btn {
+    padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.sort-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sort-btn.active {
+    background: var(--accent-blue);
+    color: #fff;
+    box-shadow: 0 4px 12px var(--shadow-glow);
+}
+
+body.light-mode .sort-btn.active {
+    color: #fff;
+}
+
+.search-box {
+    flex: 1;
+    min-width: 300px;
+    position: relative;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-pill);
+    padding: 2px 24px;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 48px;
+}
+
+.search-box i {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.search-box input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-main);
+    width: 100%;
+    font-size: 0.95rem;
+    font-family: inherit;
+}
+
+.library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+/* --- LIBRARY LIST VIEW STYLES --- */
+.library-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 32px;
+}
+
+
+/* --- PREMIUM LIBRARY LIST STYLES (v4.34) --- */
+.library-list-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 12px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.library-list-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-2px) scale(1.005);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.library-list-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent-blue);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.library-list-item:hover::after {
+    opacity: 1;
+}
+
+.list-item-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.library-list-item:hover .list-item-icon {
+    background: var(--grad-primary);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
+}
+
+.list-item-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* Force separation */
+    gap: 20px;
+    min-width: 0;
+    /* Prevent flex overflow */
+}
+
+.list-item-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.list-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    /* Don't shrink meta */
+}
+
+.list-item-action {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    opacity: 0.4;
+    transition: all 0.3s;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 50%;
+}
+
+.library-list-item:hover .list-item-action {
+    opacity: 1;
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(2px);
+}
+
+/* Light Mode Overrides */
+body.light-mode .library-list-item {
+    background: #ffffff;
+    border-color: var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+body.light-mode .library-list-item:hover {
+    background: #ffffff;
+    border-color: var(--accent-blue);
+    box-shadow: 0 10px 20px rgba(14, 165, 233, 0.1);
+}
+
+body.light-mode .list-item-icon {
+    background: #f1f5f9;
+    color: #64748b;
+    border-color: var(--border-color);
+}
+
+@media (max-width: 1024px) {
+    .library-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+}
+}
+@media (max-width: 768px) {
+    /* Library */
+    .library-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .library-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .sort-controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        padding: 4px;
+        width: 100%;
+    }
+
+    .sort-btn {
+        flex: 1 1 calc(33.33% - 8px);
+        /* Try 3 columns, or wrap */
+        min-width: 80px;
+        text-align: center;
+        padding: 8px 12px;
+        font-size: 0.7rem;
+        white-space: nowrap;
+    }
+
+    .search-box {
+        min-width: auto;
+        width: 100%;
+        max-width: 100%;
+        padding: 0 16px;
+        margin: 0;
+        height: 44px;
+    }
+
+    .search-box i {
+        font-size: 1.1rem;
+    }
+
+    .search-box input {
+        font-size: 0.85rem;
+    }
+
+}

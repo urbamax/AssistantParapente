@@ -1,0 +1,1 @@
+document.getElementById('isofronts-embed-iframe').src = 'https://meteofrance.com/isofronts'; document.getElementById('isofronts-embed-iframe').style.display='block'; document.getElementById('isofronts-img-container').style.display='none';

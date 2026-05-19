@@ -209,7 +209,10 @@ const LibraryEngine = {
         console.log("Opening course PDF:", course.title);
 
         // PREFER ORIGINAL PDF IF AVAILABLE (skips modernized HTML)
-        const targetUrl = course.original_pdf || course.pdf;
+        let targetUrl = course.original_pdf || course.pdf;
+        if (targetUrl) {
+            targetUrl = targetUrl.normalize('NFC');
+        }
 
         // OPEN IN NEW TAB
         window.open(targetUrl, '_blank');

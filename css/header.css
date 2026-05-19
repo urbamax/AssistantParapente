@@ -141,35 +141,39 @@
     }
 
     .header-top-row {
-        flex-direction: column;
-        gap: 15px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
     }
 
     .header-nav-slot {
-        order: 2;
-        width: 100%;
-        justify-content: center;
-        gap: 10px;
+        order: 1;
+        width: auto;
+        flex: 1;
+        justify-content: flex-start;
     }
 
     .header-branding {
-        order: 1;
-        width: 100%;
+        order: 2;
+        width: auto;
+        flex: 2;
         text-align: center;
-        margin-bottom: 4px;
+        margin-bottom: 0;
     }
 
     .header-actions-slot {
         order: 3;
-        width: 100%;
-        justify-content: center;
-        gap: 20px;
+        width: auto;
+        flex: 1;
+        justify-content: flex-end;
     }
 
     .header-branding .dashboard-title {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
         font-weight: 800;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.02em;
         text-transform: uppercase;
         margin: 0;
         color: var(--accent-blue);
@@ -180,8 +184,18 @@
     }
 
     .nav-btn-glass {
-        padding: 8px 16px;
+        padding: 8px 12px;
         font-size: 0.8rem;
+    }
+
+    .nav-btn-glass span {
+        display: none; /* Cache le texte 'RETOUR' pour gagner de la place */
+    }
+
+    .icon-btn {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 1rem !important;
     }
 
 

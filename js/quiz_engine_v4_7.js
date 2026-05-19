@@ -193,6 +193,7 @@ const QuizEngine = {
                 niveau: niveau,
                 parapente: pFlag,
                 delta: dFlag,
+                theme: this.getThemeForCode(code), // Fix: Assign theme here
                 explication: explications[code] || ""
             });
         }
@@ -660,7 +661,25 @@ const QuizEngine = {
         validateBtn.onclick = () => this.validate(question);
         actionContainer.appendChild(validateBtn);
 
+        // Assign ID to container for easy access
+        actionContainer.id = 'qcm-actions-container';
+
         container.appendChild(actionContainer);
+    },
+
+    getThemeForCode: function (code) {
+        if (!code) return 'Autre';
+        const letter = code.charAt(0);
+        const map = {
+            'A': 'Météo',
+            'E': 'Mécavol', 'G': 'Mécavol', 'H': 'Mécavol',
+            'L': 'Matériel', 'N': 'Matériel', 'R': 'Matériel',
+            'U': 'Pilotage', 'W': 'Pilotage', 'X': 'Pilotage',
+            'S': 'Réglementation',
+            'F': 'Facteurs humains',
+            'P': 'Milieu naturel'
+        };
+        return map[letter] || 'Autre';
     },
 
     toggleSelection: function (opt, btnElement) {
@@ -789,17 +808,24 @@ const QuizEngine = {
                 `;
             }
 
-            const choicesDiv = document.getElementById('qcm-choices');
             const nextBtn = document.createElement('button');
             nextBtn.className = 'next-btn';
             nextBtn.innerHTML = "QUESTION SUIVANTE <i class='ri-arrow-right-line'></i>";
-            nextBtn.style.marginTop = "20px";
-            nextBtn.style.width = "100%";
+            // nextBtn.style.marginTop = "20px"; // Removed for inline alignment
+            // nextBtn.style.width = "100%"; // Removed for flex
+            nextBtn.style.flex = "1"; // Fill remaining space
             nextBtn.onclick = () => {
                 this.state.qcmIndex++;
                 this.renderQuestion();
             };
-            choicesDiv.appendChild(nextBtn);
+
+            // Move to action container for alignment
+            const actionContainer = document.getElementById('qcm-actions-container');
+            if (actionContainer) {
+                actionContainer.appendChild(nextBtn);
+            } else {
+                choicesDiv.appendChild(nextBtn); // Fallback
+            }
         }
     },
 

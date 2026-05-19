@@ -21,6 +21,7 @@ const Engine = {
         // Initialize Sub-Engines
         if (typeof QuizEngine !== 'undefined') QuizEngine.init(this);
         if (typeof LibraryEngine !== 'undefined') LibraryEngine.init(this);
+        if (typeof SitesEngine !== 'undefined') SitesEngine.init(this);
 
         // Setup Theme Toggle Listener safely
         const themeBtn = document.getElementById('theme-toggle');
@@ -34,6 +35,13 @@ const Engine = {
             this.state.themeMode = savedTheme;
         }
         this.applyThemeMode();
+
+        // Listen for system theme changes and update if mode is 'auto'
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (this.state.themeMode === 'auto') {
+                this.applyThemeMode();
+            }
+        });
 
         // Load saved level
         const savedLevel = localStorage.getItem('userLevel');
@@ -146,6 +154,7 @@ const Engine = {
             case 'QCM_BANK':
             case 'STATS':
             case 'LIBRARY':
+            case 'SITES':
                 this.startMode(mode);
                 return true;
 
@@ -173,6 +182,9 @@ const Engine = {
         } else if (mode === 'STATS') {
             document.getElementById('stats-screen').classList.add('active');
             if (typeof QuizEngine !== 'undefined') QuizEngine.renderStats();
+        } else if (mode === 'SITES') {
+            document.getElementById('sites-screen').classList.add('active');
+            if (typeof SitesEngine !== 'undefined') SitesEngine.show();
         } else if (mode === 'LIBRARY') {
             if (typeof LibraryEngine !== 'undefined') LibraryEngine.show();
         }
@@ -312,6 +324,11 @@ const Engine = {
                     self.updateHeaderNavigation();
                     self.applyThemeMode();
 
+                    // Fix: Restore level selector state with slight delay to ensure DOM readiness
+                    setTimeout(() => {
+                        self.restoreLevelUI();
+                    }, 50);
+
                     // Standalone Hooks
                     if (window.self === window.top && basePath !== '.') {
                         self.setupStandalone(basePath);
@@ -325,10 +342,47 @@ const Engine = {
                         if (COMPONENTS[legacyKey]) {
                             const targets = comp.selector ? document.querySelectorAll(comp.selector) : (document.getElementById(comp.id) ? [document.getElementById(comp.id)] : []);
                             targets.forEach(function (el) { el.innerHTML = COMPONENTS[legacyKey]; });
+                            self.restoreLevelUI(); // Ensure level is restored even on fallback
                         }
                     }
                 });
         });
+    },
+
+    restoreLevelUI: function (attempts = 0) {
+        const levelSelect = document.getElementById('global-level-select');
+        if (levelSelect && this.state.level) {
+            // ALWAYS Enforce Value (Blindly overwrite to fight browser restoration)
+            levelSelect.value = this.state.level;
+
+            // Force Option Attribute as fallback
+            const targetOption = levelSelect.querySelector(`option[value="${this.state.level}"]`);
+            if (targetOption) targetOption.selected = true;
+
+            // Log mainly on first attempt or failures
+            if (attempts === 0 || attempts % 10 === 0) {
+                console.log(`Enforcing UI Level: ${this.state.level} (Attempt ${attempts})`);
+            }
+
+            // Sync Theme if needed (only once)
+            if (this.state.level !== 'ALL' && attempts === 0) {
+                this.updateAppTheme(this.state.level);
+            }
+
+            // CONTINUOUS ENFORCEMENT
+            // Browsers often restore form state asynchronously after load.
+            // We must watch this element for a few seconds to ensure our value sticks.
+            if (attempts < 25) { // Check for ~2.5 seconds
+                setTimeout(() => this.restoreLevelUI(attempts + 1), 100);
+            }
+        } else {
+            // Element not found yet, retry
+            if (attempts < 50) { // Wait up to 5 seconds for slow loading
+                setTimeout(() => this.restoreLevelUI(attempts + 1), 100);
+            } else {
+                console.warn("Failed to restore UI Level: Element not found.");
+            }
+        }
     },
 
     setupStandalone: function (basePath) {
@@ -402,6 +456,11 @@ const Engine = {
             }
         }
         if (effectiveMode === 'light') body.classList.add('light-mode');
+
+        // Dynamically update paragliding map tiles theme if initialized
+        if (window.SitesEngine && typeof SitesEngine.updateMapTiles === 'function') {
+            SitesEngine.updateMapTiles();
+        }
     },
 
     /* --- DELEGATIONS (API for HTML) --- */

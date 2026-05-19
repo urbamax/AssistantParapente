@@ -406,9 +406,9 @@ const COURSES_DATA = {
     "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-": {
         "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
         "category": "Général",
-        "path": "courses/BREVET DE PILOTE CONFIRMÉ - MARRON",
+        "path": "courses/BREVET DE PILOTE CONFIRMÉ - MARRON",
         "pages": 0,
-        "pdf": "courses/BREVET DE PILOTE CONFIRMÉ - MARRON/bpc_pp_delta_v2025_may.pdf",
+        "pdf": "courses/BREVET DE PILOTE CONFIRMÉ - MARRON/bpc_pp_delta_v2025_may.pdf",
         "keywords": ["bpc", "confirmé", "delta", "règlementation", "compétition", "distance"],
         "level": [
             "BPC"
@@ -417,9 +417,9 @@ const COURSES_DATA = {
     "brevet-de-pilote-confirme---marron/fiche-eval-2025/2025-fiche-cval-bpc-4-modules/2025-fiche-cval-bpc-4-modules": {
         "title": "Fiche d'évaluation - Brevet de Pilote Confirmé",
         "category": "Général",
-        "path": "courses/BREVET DE PILOTE CONFIRMÉ - MARRON/fiche-eval-2025/2025-fiche-cval-bpc_4-modules",
+        "path": "courses/BREVET DE PILOTE CONFIRMÉ - MARRON/fiche-eval-2025/2025-fiche-cval-bpc_4-modules",
         "pages": 0,
-        "pdf": "courses/BREVET DE PILOTE CONFIRMÉ - MARRON/fiche-eval-2025/2025-fiche-cval-bpc_4-modules/2025-fiche-cval-bpc_4-modules.pdf",
+        "pdf": "courses/BREVET DE PILOTE CONFIRMÉ - MARRON/fiche-eval-2025/2025-fiche-cval-bpc_4-modules/2025-fiche-cval-bpc_4-modules.pdf",
         "keywords": ["fiche", "évaluation", "bpc", "confirmé", "modules", "examen"],
         "level": [
             "BPC"

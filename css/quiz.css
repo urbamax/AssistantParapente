@@ -1,0 +1,494 @@
+/* --- MODULE: GAME CONTAINERS (QUIZ/ADVENTURE) + LIBRARY/CONFIG --- */
+.qcm-container,
+.main-stage,
+.library-container,
+.course-container {
+    max-width: 1800px;
+    width: 98%;
+    margin: 40px auto;
+    background: var(--bg-card);
+    border: var(--border-glass);
+    backdrop-filter: blur(24px);
+    border-radius: 32px;
+    padding: 48px;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: all 0.3s ease;
+    color: var(--text-main);
+    flex-shrink: 0; /* Évite l'écrasement sur mobile */
+}
+
+/* Explicit Redundancy for QCM Stage */
+.main-stage {
+    background: var(--bg-card) !important;
+    border: var(--border-glass) !important;
+    box-shadow: var(--shadow-card) !important;
+    border-radius: 32px;
+    backdrop-filter: blur(24px);
+}
+
+/* Explicit Redundancy for Config/Stats */
+#qcm-setup-screen .course-container,
+#stats-screen .course-container {
+    background: var(--bg-card) !important;
+    border: var(--border-glass) !important;
+    box-shadow: var(--shadow-card) !important;
+    border-radius: 32px;
+}
+
+.choice-btn,
+.qcm-option {
+    width: 100%;
+    padding: 20px 32px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-align: left;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    display: block;
+    margin-bottom: 16px;
+}
+
+/* Primary Action Button (Blue) */
+/* Primary Action Button (Blue - Restored from Old CSS) */
+.next-btn {
+    width: 100%;
+    padding: 20px 32px;
+    text-align: center;
+    background: var(--accent-blue) !important;
+    color: #ffffff !important;
+    /* Fixed from #000 for readability */
+    font-weight: 700;
+    font-size: 1.2rem;
+    border: none !important;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+    border-radius: 16px;
+    display: block;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.next-btn:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+    transform: translateY(-2px);
+    cursor: pointer;
+}
+
+body.light-mode .choice-btn,
+body.light-mode .qcm-option {
+    background: #ffffff;
+    border-color: var(--border-color);
+    color: var(--text-main);
+}
+
+.choice-btn:hover,
+.qcm-option:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent-blue);
+    color: var(--text-main);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px -10px rgba(14, 165, 233, 0.3);
+}
+
+.qcm-option.selected {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transform: scale(1.02);
+    font-weight: 600;
+}
+
+body.light-mode .qcm-option.selected {
+    background: #e0f2fe;
+    color: #0f172a;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+}
+
+.correct,
+.qcm-option.correct {
+    background: rgba(74, 222, 128, 0.15) !important;
+    border-color: var(--accent-green) !important;
+    color: var(--accent-green) !important;
+}
+
+.incorrect,
+.qcm-option.incorrect {
+    background: rgba(248, 113, 113, 0.15) !important;
+    border-color: var(--accent-red) !important;
+    color: var(--accent-red) !important;
+}
+
+.missed,
+.qcm-option.missed {
+    background: rgba(249, 115, 22, 0.15) !important;
+    /* Orange background */
+    border-color: #f97316 !important;
+    /* Orange border */
+    color: #fdba74 !important;
+    /* Light orange text */
+    font-weight: 500;
+}
+
+.qcm-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--text-main);
+    margin-bottom: 32px;
+}
+
+/* --- MODULE: COURSE VIEWER --- */
+#course-screen .course-container {
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 20px 5% 300px 5% !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    overflow-x: hidden;
+}
+
+.course-viewer {
+    background: transparent;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    min-height: 800px;
+    display: flex;
+    flex-direction: column;
+}
+
+body.course-open #course-pdf-frame {
+    background: transparent;
+    border: none;
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* --- MODULE: REVIEW OVERLAY --- */
+.review-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.98);
+    backdrop-filter: blur(10px);
+    z-index: 10000;
+    overflow-y: auto;
+    padding: 40px 20px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.review-content {
+    max-width: 800px;
+    margin: 40px auto;
+    background: transparent;
+}
+
+.close-review {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    color: var(--text-main);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+/* --- HUD / UI ELEMENTS --- */
+.level-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 16px;
+    border-radius: 9999px;
+    /* radius-pill */
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    color: var(--text-main);
+    align-self: center;
+    /* Center "MODE EXAMEN" pill */
+}
+
+.level-BI {
+    color: var(--accent-green);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.level-BP {
+    color: var(--accent-blue);
+    border-color: rgba(56, 189, 248, 0.3);
+}
+
+.level-BPC {
+    color: #92400e;
+    border-color: rgba(146, 64, 14, 0.3);
+}
+
+.level-TREUIL {
+    color: #6366f1;
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+body.light-mode .level-tag {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: var(--text-main);
+    box-shadow: none;
+}
+
+/* Quiz Layout Details */
+.quiz-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    width: 100%;
+}
+
+.quiz-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+}
+
+.quiz-theme-tag {
+    font-size: 0.75rem;
+    color: var(--accent-blue);
+    background: rgba(14, 165, 233, 0.1);
+    padding: 4px 10px;
+    border-radius: 6px;
+    align-self: flex-start;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.quiz-progress {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.quiz-question-text {
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1.4;
+    color: var(--text-main);
+    margin-bottom: 32px;
+    text-align: left;
+}
+
+
+/* --- MODULE: ADVENTURE ENGINE (HUD & CARDS) --- */
+.hud-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 32px;
+    padding: 24px 40px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+body.light-mode .hud-container {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.hud-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 120px;
+}
+
+.hud-stat-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.hud-stat-value {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--text-main);
+    font-family: 'Outfit', sans-serif;
+}
+
+.hud-progress-track {
+    flex: 1;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    margin: 0 20px;
+}
+
+body.light-mode .hud-progress-track {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.hud-progress-fill {
+    height: 100%;
+    background: var(--grad-primary);
+    border-radius: 12px;
+    transition: width 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+}
+
+.narrative-content {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: var(--text-main);
+    margin: 40px 0;
+    font-weight: 500;
+}
+
+.choice-btn {
+    width: 100%;
+    padding: 24px 32px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    color: var(--text-main);
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: left;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    margin-bottom: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+body.light-mode .choice-btn {
+    background: white;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.02);
+    border-color: #f1f5f9;
+}
+
+.choice-btn:hover {
+    transform: translateY(-6px) scale(1.02);
+    border-color: var(--accent-blue);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 25px 45px rgba(14, 165, 233, 0.2);
+}
+
+.choice-btn i {
+    font-size: 1.5rem;
+    color: var(--accent-blue);
+}
+
+
+
+/* ========================================= */
+@media (max-width: 1024px) {
+/* TABLET (max-width: 1024px) */
+@media (max-width: 1024px) {
+    .mode-screen {
+        padding: 140px 24px 40px 24px;
+    }
+
+    .main-stage,
+    .qcm-container {
+        padding: 32px;
+        margin-top: 20px;
+    }
+
+}
+@media (max-width: 768px) {
+    /* Screens & Containers */
+    .mode-screen {
+        padding: 110px 16px 80px 16px;
+        overflow-y: auto;
+    }
+
+    /* Fixed Course Overlap */
+    .course-standalone-container {
+        margin-top: 200px !important;
+        /* Increased margin for standalone courses */
+    }
+
+    /* QCM Setup Grid Fix */
+    .setup-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+
+}
+@media (max-width: 768px) {
+    /* Critical Container Width Fixes */
+    /* Critical Container Width Fixes */
+    .qcm-container,
+    .main-stage,
+    .library-container,
+    .course-container {
+        padding: 20px 16px;
+        width: 100%;
+        max-width: 100vw;
+        box-sizing: border-box;
+        margin: 0;
+        border-radius: 20px;
+        overflow-x: hidden;
+    }
+
+}
+@media (max-width: 768px) {
+    /* HUD */
+    .hud-container {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+        padding: 12px;
+    }
+
+    /* Review Overlay Mobile */
+    .review-overlay {
+        padding: 16px 8px;
+    }
+
+    .close-review {
+        top: 12px !important;
+        right: 12px !important;
+        width: 36px !important;
+        height: 36px !important;
+        background: rgba(255, 255, 255, 0.2) !important;
+    }
+}
+}
