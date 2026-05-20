@@ -274,7 +274,8 @@ const FirebaseAuthEngine = {
             console.log("Sync complete!");
         } catch (error) {
             console.error("Synchronization failed:", error);
-            this.showAlert("La synchronisation a échoué. Les données restent stockées localement.", "error");
+            const errorDetail = error.message ? ` : ${error.message}` : '';
+            this.showAlert(`La synchronisation a échoué${errorDetail}. Les données restent stockées localement.`, "error");
         }
     },
 
