@@ -204,6 +204,9 @@ SitesEngine.buildMapPopupHtml = function (site, weatherPopupHtml) {
                 <button class="action-btn-secondary windy-btn" onclick="SitesEngine.focusSiteWindy(${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}'); event.stopPropagation();" style="padding: 6px 8px;" title="Afficher le vent sur le radar">
                     <i class="ri-windy-line"></i>
                 </button>
+                <button class="action-btn-secondary paraglidable-btn" onclick="SitesEngine.focusSiteMap('paraglidable', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}'); event.stopPropagation();" style="padding: 6px 8px;" title="Afficher sur Paraglidable">
+                    <i class="ri-flight-takeoff-line"></i>
+                </button>
             </div>
         </div>`;
     };
@@ -238,7 +241,7 @@ SitesEngine.launchGps = function (app) {
 
 SitesEngine.switchMapMode = function (mode) {
     const modes = [
-        'leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'isofronts'
+        'leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'isofronts', 'paraglidable'
     ];
     
     // Toggle buttons
@@ -263,7 +266,8 @@ SitesEngine.switchMapMode = function (mode) {
         'windy': document.getElementById('sites-windy-canvas'),
         'meteoparapente': document.getElementById('sites-meteoparapente-canvas'),
         'paraglidingearth': document.getElementById('sites-paraglidingearth-canvas'),
-        'isofronts': document.getElementById('sites-isofronts-canvas')
+        'isofronts': document.getElementById('sites-isofronts-canvas'),
+        'paraglidable': document.getElementById('sites-paraglidable-canvas')
     };
 
     Object.keys(canvases).forEach(k => {
@@ -315,7 +319,8 @@ SitesEngine.loadIframeContent = function (mode, lat, lon, siteName, extraId) {
     const nameLabels = {
         'windy': document.getElementById('windy-active-spot-name'),
         'meteoparapente': document.getElementById('meteoparapente-active-spot-name'),
-        'paraglidingearth': document.getElementById('paraglidingearth-active-spot-name')
+        'paraglidingearth': document.getElementById('paraglidingearth-active-spot-name'),
+        'paraglidable': document.getElementById('paraglidable-active-spot-name')
     };
 
     if (nameLabels[mode]) {
@@ -325,19 +330,23 @@ SitesEngine.loadIframeContent = function (mode, lat, lon, siteName, extraId) {
     const iframes = {
         'windy': document.getElementById('windy-embed-iframe'),
         'meteoparapente': document.getElementById('meteoparapente-embed-iframe'),
-        'paraglidingearth': document.getElementById('paraglidingearth-embed-iframe')
+        'paraglidingearth': document.getElementById('paraglidingearth-embed-iframe'),
+        'paraglidable': document.getElementById('paraglidable-embed-iframe')
     };
 
     const openLinks = {
+        'windy': document.getElementById('windy-open-link'),
         'meteoparapente': document.getElementById('meteoparapente-open-link'),
-        'paraglidingearth': document.getElementById('paraglidingearth-open-link')
+        'paraglidingearth': document.getElementById('paraglidingearth-open-link'),
+        'paraglidable': document.getElementById('paraglidable-open-link')
     };
 
     // Calculate URLs
     const urls = {
         'windy': `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&detailLat=${lat}&detailLon=${lon}&width=100%&height=400&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&metricWind=default&metricTemp=default&radarRange=`,
         'meteoparapente': `https://meteo-parapente.com/#/${lat},${lon},11`,
-        'paraglidingearth': `https://www.paraglidingearth.com/?latlng=${lat},${lon}`
+        'paraglidingearth': `https://www.paraglidingearth.com/?latlng=${lat},${lon}`,
+        'paraglidable': `https://paraglidable.com/?lat=${lat}&lon=${lon}&zoom=8`
     };
 
     const iframe = iframes[mode];
@@ -350,10 +359,14 @@ SitesEngine.loadIframeContent = function (mode, lat, lon, siteName, extraId) {
     const openLink = openLinks[mode];
     if (openLink) {
         let linkUrl = urls[mode];
-        if (mode === 'meteoparapente') {
+        if (mode === 'windy') {
+            linkUrl = `https://www.windy.com/?${lat},${lon},11`;
+        } else if (mode === 'meteoparapente') {
             linkUrl = `https://meteo-parapente.com/#/${lat},${lon},11`;
         } else if (mode === 'paraglidingearth') {
             linkUrl = `https://www.paraglidingearth.com/?latlng=${lat},${lon}`;
+        } else if (mode === 'paraglidable') {
+            linkUrl = `https://paraglidable.com/?lat=${lat}&lon=${lon}&zoom=8`;
         }
         openLink.href = linkUrl;
     }

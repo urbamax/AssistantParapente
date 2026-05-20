@@ -12,16 +12,16 @@
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <link rel="stylesheet" href="css/base.css?v=2026.05.20_v11">
-    <link rel="stylesheet" href="css/components.css?v=2026.05.20_v11">
-    <link rel="stylesheet" href="css/header.css?v=2026.05.20_v11">
-    <link rel="stylesheet" href="css/footer.css?v=2026.05.20_v11">
-    <link rel="stylesheet" href="css/dashboard.css?v=2026.05.20_v11">
-    <link rel="stylesheet" href="css/quiz.css?v=2026.05.20_v11">
-    <link rel="stylesheet" href="css/library.css?v=2026.05.20_v11">
-    <link rel="stylesheet" href="css/sites.css?v=2026.05.20_v11">
-    <link rel="stylesheet" href="css/auth.css?v=2026.05.20_v11">
-    <link rel="stylesheet" href="css/gdpr.css?v=2026.05.20_v11">
+    <link rel="stylesheet" href="css/base.css?v=2026.05.20_v19">
+    <link rel="stylesheet" href="css/components.css?v=2026.05.20_v19">
+    <link rel="stylesheet" href="css/header.css?v=2026.05.20_v19">
+    <link rel="stylesheet" href="css/footer.css?v=2026.05.20_v19">
+    <link rel="stylesheet" href="css/dashboard.css?v=2026.05.20_v19">
+    <link rel="stylesheet" href="css/quiz.css?v=2026.05.20_v19">
+    <link rel="stylesheet" href="css/library.css?v=2026.05.20_v19">
+    <link rel="stylesheet" href="css/sites.css?v=2026.05.20_v19">
+    <link rel="stylesheet" href="css/auth.css?v=2026.05.20_v19">
+    <link rel="stylesheet" href="css/gdpr.css?v=2026.05.20_v19">
 </head>
 
 <body>
@@ -268,33 +268,38 @@
                     <div class="map-toggles-left">
                         <button id="map-toggle-leaflet" class="action-btn-primary map-toggle-btn"
                             onclick="SitesEngine.switchMapMode('leaflet')">
-                            <i class="ri-map-2-line"></i> Cartographie
+                            <i class="ri-map-2-line"></i> <span>Cartographie</span>
                         </button>
                         <button id="map-toggle-windy" class="action-btn-secondary map-toggle-btn"
                             onclick="SitesEngine.switchMapMode('windy')"
                             style="color: var(--text-secondary); border-color: var(--border-color);">
-                            <i class="ri-windy-line"></i> Windy
+                            <i class="ri-windy-line"></i> <span>Windy</span>
                         </button>
                         <button id="map-toggle-meteoparapente" class="action-btn-secondary map-toggle-btn"
                             onclick="SitesEngine.switchMapMode('meteoparapente')"
                             style="color: var(--text-secondary); border-color: var(--border-color);">
-                            <i class="ri-temp-hot-line"></i> Météo-P.
+                            <i class="ri-temp-hot-line"></i> <span>Météo-P.</span>
                         </button>
                         <button id="map-toggle-paraglidingearth" class="action-btn-secondary map-toggle-btn"
                             onclick="SitesEngine.switchMapMode('paraglidingearth')"
                             style="color: var(--text-secondary); border-color: var(--border-color);">
-                            <i class="ri-earth-line"></i> PG Earth
+                            <i class="ri-earth-line"></i> <span>PG Earth</span>
+                        </button>
+                        <button id="map-toggle-paraglidable" class="action-btn-secondary map-toggle-btn"
+                            onclick="SitesEngine.switchMapMode('paraglidable')"
+                            style="color: var(--text-secondary); border-color: var(--border-color);">
+                            <i class="ri-flight-takeoff-line"></i> <span>Paraglidable</span>
                         </button>
                         <button id="map-toggle-isofronts" class="action-btn-secondary map-toggle-btn"
                             onclick="SitesEngine.switchMapMode('isofronts')"
                             style="color: var(--text-secondary); border-color: var(--border-color);">
-                            <i class="ri-cloud-line"></i> Fronts &amp; Isobares
+                            <i class="ri-cloud-line"></i> <span>Fronts &amp; Isobares</span>
                         </button>
                     </div>
                     <button id="map-toggle-fullscreen" class="action-btn-secondary map-toggle-btn"
                         onclick="SitesEngine.toggleFullscreen()"
                         style="color: var(--text-secondary); border-color: var(--border-color);">
-                        <i class="ri-fullscreen-line"></i> Plein écran
+                        <i class="ri-fullscreen-line"></i> <span>Plein écran</span>
                     </button>
                 </div>
                 <!-- Container Leaflet -->
@@ -302,9 +307,17 @@
                 <!-- Container Windy Iframe -->
                 <div id="sites-windy-canvas" class="sites-windy-canvas">
                     <div id="windy-active-spot-header" class="windy-active-spot-header">
-                        <i class="ri-map-pin-2-fill windy-spot-icon"></i>
-                        <span>Radar Vent :</span>
-                        <span id="windy-active-spot-name" class="windy-spot-name">Général</span>
+                        <div class="isofronts-header-left">
+                            <i class="ri-windy-line windy-spot-icon"></i>
+                            <span>Radar Vent :</span>
+                            <span id="windy-active-spot-name" class="windy-spot-name">Général</span>
+                        </div>
+                        <div class="isofronts-header-right">
+                            <a id="windy-open-link" href="https://www.windy.com/" target="_blank"
+                                class="isofronts-link">
+                                <i class="ri-external-link-line"></i> Ouvrir
+                            </a>
+                        </div>
                     </div>
                     <iframe id="windy-embed-iframe" src="" width="100%" height="100%" class="sites-iframe"></iframe>
                 </div>
@@ -342,6 +355,24 @@
                         </div>
                     </div>
                     <iframe id="paraglidingearth-embed-iframe" src="" width="100%" height="100%"
+                        class="sites-iframe"></iframe>
+                </div>
+                <!-- Container Paraglidable Iframe -->
+                <div id="sites-paraglidable-canvas" class="sites-map-canvas-custom" style="display: none;">
+                    <div id="paraglidable-active-spot-header" class="windy-active-spot-header">
+                        <div class="isofronts-header-left">
+                            <i class="ri-flight-takeoff-line windy-spot-icon"></i>
+                            <span>Paraglidable :</span>
+                            <span id="paraglidable-active-spot-name" class="windy-spot-name">Général</span>
+                        </div>
+                        <div class="isofronts-header-right">
+                            <a id="paraglidable-open-link" href="https://paraglidable.com/" target="_blank"
+                                class="isofronts-link">
+                                <i class="ri-external-link-line"></i> Ouvrir
+                            </a>
+                        </div>
+                    </div>
+                    <iframe id="paraglidable-embed-iframe" src="" width="100%" height="100%"
                         class="sites-iframe"></iframe>
                 </div>
                 <!-- Container Isofronts -->
@@ -567,7 +598,7 @@
                 style="margin-bottom: 24px; width: 100%; min-width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 2px 24px; height: 48px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-pill); color: var(--text-main);">
                 <i class="ri-search-line" style="font-size: 1.25rem; color: var(--text-muted); flex-shrink: 0;"></i>
                 <input type="text" id="site-search"
-                    placeholder="Rechercher un site par nom, ville, code postal, observations..."
+                    placeholder="Rechercher un site, ville, code postal..."
                     style="background: transparent; border: none; outline: none; color: var(--text-main); width: 100%; font-size: 0.95rem;"
                     oninput="SitesEngine.updateSearchQuery(this.value)">
             </div>
@@ -588,25 +619,25 @@
 
 
     <!-- SCRIPTS -->
-    <script src="js/data/courses_data.js?v=2026.05.20_v10"></script>
-    <script src="js/data/sites_data.js?v=2026.05.20_v10"></script>
-    <script src="js/sites_engine.js?v=2026.05.20_v10"></script>
-    <script src="js/sites_filter.js?v=2026.05.20_v10"></script>
-    <script src="js/weatherScoring.js?v=2026.05.20_v10"></script>
-    <script src="js/sites_weather.js?v=2026.05.20_v10"></script>
-    <script src="js/sites_ui.js?v=2026.05.20_v10"></script>
-    <script src="js/sites_map.js?v=2026.05.20_v10"></script>
+    <script src="js/data/courses_data.js?v=2026.05.20_v19"></script>
+    <script src="js/data/sites_data.js?v=2026.05.20_v19"></script>
+    <script src="js/sites_engine.js?v=2026.05.20_v19"></script>
+    <script src="js/sites_filter.js?v=2026.05.20_v19"></script>
+    <script src="js/weatherScoring.js?v=2026.05.20_v19"></script>
+    <script src="js/sites_weather.js?v=2026.05.20_v19"></script>
+    <script src="js/sites_ui.js?v=2026.05.20_v19"></script>
+    <script src="js/sites_map.js?v=2026.05.20_v19"></script>
 
     <!-- Firebase Sync Config & Engine -->
-    <script src="js/firebase_config.js?v=2026.05.20_v10"></script>
-    <script src="js/gdpr_engine.js?v=2026.05.20_v10"></script>
-    <script type="module" src="js/firebase_engine.js?v=2026.05.20_v10"></script>
+    <script src="js/firebase_config.js?v=2026.05.20_v19"></script>
+    <script src="js/gdpr_engine.js?v=2026.05.20_v19"></script>
+    <script type="module" src="js/firebase_engine.js?v=2026.05.20_v19"></script>
 
     <!-- Quiz Engine Version 4.8 (Theme Fix & Button Alignment) -->
-    <script src="js/quiz_engine_v4_7.js?v=2026.05.20_v10"></script>
-    <script src="js/library_engine.js?v=2026.05.20_v10"></script>
+    <script src="js/quiz_engine_v4_7.js?v=2026.05.20_v19"></script>
+    <script src="js/library_engine.js?v=2026.05.20_v19"></script>
     <!-- Engine v4.70 (Level Persistence Fix) -->
-    <script src="js/engine_v4_6.js?v=2026.05.20_v10"></script>
+    <script src="js/engine_v4_6.js?v=2026.05.20_v19"></script>
 
     <script>
         // Load Components and Initialize
