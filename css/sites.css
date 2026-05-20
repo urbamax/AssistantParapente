@@ -888,7 +888,10 @@ body.light-mode .leaflet-custom-popup .leaflet-popup-tip {
 }
 .map-view-fullscreen #sites-map-canvas,
 .map-view-fullscreen #sites-windy-canvas,
-.map-view-fullscreen #sites-isofronts-canvas {
+.map-view-fullscreen #sites-meteoparapente-canvas,
+.map-view-fullscreen #sites-paraglidingearth-canvas,
+.map-view-fullscreen #sites-isofronts-canvas,
+.map-view-fullscreen #sites-paraglidable-canvas {
     flex: 1 !important;
     height: 100% !important;
     border-radius: 0 !important;
@@ -934,6 +937,8 @@ body.light-mode .leaflet-custom-popup .leaflet-popup-tip {
 #sites-meteoparapente-canvas[style*='display:block'] { display: flex !important; }
 #sites-paraglidingearth-canvas[style*='display: block'],
 #sites-paraglidingearth-canvas[style*='display:block'] { display: flex !important; }
+#sites-paraglidable-canvas[style*='display: block'],
+#sites-paraglidable-canvas[style*='display:block'] { display: flex !important; }
 /* Isofronts uses flex column: header + image + footer */
 .sites-isofronts-canvas {
     width: 100%;
