@@ -4,6 +4,18 @@ SitesEngine.initMap = function () {
         this.updateMapTiles();
         this.state.markersGroup = L.featureGroup().addTo(this.state.map);
         this.updateMapMarkers();
+        
+        // Fix Leaflet tile loading issue on mobile/resize using ResizeObserver
+        const mapCanvas = document.getElementById('sites-map-canvas');
+        if (mapCanvas && window.ResizeObserver) {
+            this.state.mapResizeObserver = new ResizeObserver(() => {
+                if (this.state.map) {
+                    this.state.map.invalidateSize();
+                }
+            });
+            this.state.mapResizeObserver.observe(mapCanvas);
+        }
+
         try {
             const bounds = this.state.markersGroup.getBounds();
             if (bounds.isValid()) this.state.map.fitBounds(bounds, { padding: [30, 30] });
@@ -389,7 +401,7 @@ SitesEngine.toggleFullscreen = function () {
         if (isFullscreen) {
             document.body.style.overflow = 'hidden';
             document.documentElement.style.overflow = 'hidden';
-            fsBtn.innerHTML = '<i class="ri-fullscreen-exit-line"></i> Réduire';
+            fsBtn.innerHTML = '<i class="ri-fullscreen-exit-line"></i> <span>Réduire</span>';
             fsBtn.classList.add('active-fs');
             if (this.state.map && document.getElementById('sites-map-canvas').style.display !== 'none') {
                 setTimeout(() => {
@@ -405,7 +417,7 @@ SitesEngine.toggleFullscreen = function () {
         } else {
             document.body.style.overflow = '';
             document.documentElement.style.overflow = '';
-            fsBtn.innerHTML = '<i class="ri-fullscreen-line"></i> Plein écran';
+            fsBtn.innerHTML = '<i class="ri-fullscreen-line"></i> <span>Plein écran</span>';
             fsBtn.classList.remove('active-fs');
             if (this.state.map && document.getElementById('sites-map-canvas').style.display !== 'none') {
                 setTimeout(() => {
