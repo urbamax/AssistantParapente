@@ -1952,7 +1952,7 @@ const QuizEngine = {
 
         localStorage.setItem('parapente_qcm_stats', JSON.stringify(stats));
         if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
-            window.FirebaseAuthEngine.saveStatsToCloud();
+            window.FirebaseAuthEngine.syncDataWithCloud(true);
         }
     },
 
