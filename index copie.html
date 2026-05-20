@@ -327,7 +327,7 @@
                     <iframe id="isofronts-embed-iframe" src="https://meteofrance.com/isofronts" width="100%"
                         height="100%" class="sites-iframe" style="display: block;"></iframe>
                 </div>
-                
+
                 <!-- Container Météo-Parapente -->
                 <div id="sites-mp-canvas" class="sites-isofronts-canvas" style="display: none;">
                     <div class="isofronts-header">
@@ -337,7 +337,8 @@
                             <span class="windy-spot-name">Météo-Parapente</span>
                         </div>
                         <div class="isofronts-header-right">
-                            <a id="mp-external-link" href="https://meteo-parapente.com/" target="_blank" class="isofronts-link">
+                            <a id="mp-external-link" href="https://meteo-parapente.com/" target="_blank"
+                                class="isofronts-link">
                                 <i class="ri-external-link-line"></i> Ouvrir
                             </a>
                         </div>
@@ -354,7 +355,8 @@
                             <span class="windy-spot-name">Paragliding Map</span>
                         </div>
                         <div class="isofronts-header-right">
-                            <a id="pm-external-link" href="https://www.paraglidingmap.com/app/" target="_blank" class="isofronts-link">
+                            <a id="pm-external-link" href="https://www.paraglidingmap.com/app/" target="_blank"
+                                class="isofronts-link">
                                 <i class="ri-external-link-line"></i> Ouvrir
                             </a>
                         </div>
@@ -371,7 +373,8 @@
                             <span class="windy-spot-name">Paragliding Earth</span>
                         </div>
                         <div class="isofronts-header-right">
-                            <a id="pe-external-link" href="https://paraglidingearth.com/" target="_blank" class="isofronts-link">
+                            <a id="pe-external-link" href="https://paraglidingearth.com/" target="_blank"
+                                class="isofronts-link">
                                 <i class="ri-external-link-line"></i> Ouvrir
                             </a>
                         </div>
@@ -389,39 +392,53 @@
                         <span class="slider-label-left">
                             <i class="ri-radar-line" style="color: var(--accent-blue);"></i> Rayon maximal :
                         </span>
-                        <span id="radius-val-label" class="slider-label-right" style="background: rgba(14,165,233,0.15); border: 1px solid rgba(14,165,233,0.3); color: var(--text-main);">Illimité</span>
+                        <span id="radius-val-label" class="slider-label-right"
+                            style="background: rgba(14,165,233,0.15); border: 1px solid rgba(14,165,233,0.3); color: var(--text-main);">Illimité</span>
                     </div>
                     <input type="range" id="radius-slider" min="10" max="210" value="210" step="10"
                         oninput="SitesEngine.setRadiusLimit(parseInt(this.value))" class="slider-input">
                 </div>
 
                 <!-- Reference Location Fields (under the radius slider) -->
-                <div id="reference-location-container" class="reference-location-container" style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; width: 100%;">
-                    <div class="reference-location-header" style="display: flex; align-items: center; justify-content: space-between;">
+                <div id="reference-location-container" class="reference-location-container"
+                    style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; width: 100%;">
+                    <div class="reference-location-header"
+                        style="display: flex; align-items: center; justify-content: space-between;">
                         <span class="settings-label" style="display: flex; align-items: center; gap: 8px;">
-                            <i class="ri-map-pin-user-line" style="color: var(--accent-blue);"></i> Centre du rayon / Distance :
+                            <i class="ri-map-pin-user-line" style="color: var(--accent-blue);"></i> Centre du rayon /
+                            Distance :
                         </span>
                     </div>
-                    <div class="reference-location-controls" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; width: 100%;">
-                        <div class="search-box address-search-box" style="flex: 1; min-width: 200px; height: 42px; padding: 2px 12px 2px 16px; border-radius: var(--radius-md); background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; box-sizing: border-box;">
+                    <div class="reference-location-controls"
+                        style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; width: 100%;">
+                        <div class="search-box address-search-box"
+                            style="flex: 1; min-width: 200px; height: 42px; padding: 2px 12px 2px 16px; border-radius: var(--radius-md); background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; box-sizing: border-box;">
                             <i class="ri-map-pin-2-line" style="font-size: 1rem; color: var(--text-muted);"></i>
-                            <input type="text" id="address-input" placeholder="Adresse ou ville (ex: Annecy, Gourdon)..." style="background: transparent; border: none; outline: none; color: var(--text-main); font-size: 0.9rem; flex: 1; min-width: 0;" onkeydown="if(event.key === 'Enter') SitesEngine.geocodeAddress(this.value)">
-                            <button class="action-btn-primary" onclick="SitesEngine.geocodeAddress(document.getElementById('address-input').value)" style="padding: 4px 12px; font-size: 0.8rem; height: 28px; border-radius: var(--radius-sm); border: none; cursor: pointer; flex-shrink: 0;">
+                            <input type="text" id="address-input"
+                                placeholder="Adresse ou ville (ex: Annecy, Gourdon)..."
+                                style="background: transparent; border: none; outline: none; color: var(--text-main); font-size: 0.9rem; flex: 1; min-width: 0;"
+                                onkeydown="if(event.key === 'Enter') SitesEngine.geocodeAddress(this.value)">
+                            <button class="action-btn-primary"
+                                onclick="SitesEngine.geocodeAddress(document.getElementById('address-input').value)"
+                                style="padding: 4px 12px; font-size: 0.8rem; height: 28px; border-radius: var(--radius-sm); border: none; cursor: pointer; flex-shrink: 0;">
                                 Valider
                             </button>
                         </div>
-                        <button id="btn-use-gps" class="action-btn-secondary" onclick="SitesEngine.requestGpsLocation()" style="height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: rgba(0,0,0,0.15); color: var(--text-secondary); cursor: pointer; font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">
+                        <button id="btn-use-gps" class="action-btn-secondary" onclick="SitesEngine.requestGpsLocation()"
+                            style="height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: rgba(0,0,0,0.15); color: var(--text-secondary); cursor: pointer; font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">
                             <i class="ri-gps-line"></i> GPS
                         </button>
                     </div>
-                    <div id="address-status-message" style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; font-weight: 500;">
+                    <div id="address-status-message"
+                        style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; font-weight: 500;">
                         <i class="ri-information-line"></i> Aucun point de référence (GPS désactivé).
                     </div>
                 </div>
             </div>
 
             <!-- Weather Settings Card (Modèle & Limites) -->
-            <div class="weather-settings-card" style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 24px; background: var(--bg-card); border: var(--border-glass); padding: 24px; border-radius: var(--radius-card); box-shadow: var(--shadow-card); backdrop-filter: blur(20px);">
+            <div class="weather-settings-card"
+                style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 24px; background: var(--bg-card); border: var(--border-glass); padding: 24px; border-radius: var(--radius-card); box-shadow: var(--shadow-card); backdrop-filter: blur(20px);">
                 <div class="weather-settings-col" style="width: 100%;">
                     <!-- Weather Model Selector -->
                     <div class="weather-model-row">
@@ -438,7 +455,8 @@
                     </div>
 
                     <!-- Wind Limits Inputs -->
-                    <div class="wind-limits-row" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+                    <div class="wind-limits-row"
+                        style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
                         <span class="wind-limits-label-full">Limites de vent (km/h) :</span>
                         <div class="wind-limit-group">
                             <label class="wind-limit-label">Vent Min</label>
@@ -447,7 +465,7 @@
                         </div>
                         <div class="wind-limit-group">
                             <label class="wind-limit-label">Vent Max</label>
-                            <input type="number" id="limit-wind-max" value="25" min="0"
+                            <input type="number" id="limit-wind-max" value="20" min="0"
                                 oninput="SitesEngine.updateWindLimits()" class="wind-limit-input">
                         </div>
                         <div class="wind-limit-group">
@@ -535,9 +553,13 @@
             </div>
 
             <!-- SITES SEARCH BAR -->
-            <div class="search-box site-search-box" style="margin-bottom: 24px; width: 100%; min-width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 2px 24px; height: 48px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-pill); color: var(--text-main);">
+            <div class="search-box site-search-box"
+                style="margin-bottom: 24px; width: 100%; min-width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 2px 24px; height: 48px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-pill); color: var(--text-main);">
                 <i class="ri-search-line" style="font-size: 1.25rem; color: var(--text-muted); flex-shrink: 0;"></i>
-                <input type="text" id="site-search" placeholder="Rechercher un site par nom, ville, code postal, observations..." style="background: transparent; border: none; outline: none; color: var(--text-main); width: 100%; font-size: 0.95rem;" oninput="SitesEngine.updateSearchQuery(this.value)">
+                <input type="text" id="site-search"
+                    placeholder="Rechercher un site par nom, ville, code postal, observations..."
+                    style="background: transparent; border: none; outline: none; color: var(--text-main); width: 100%; font-size: 0.95rem;"
+                    oninput="SitesEngine.updateSearchQuery(this.value)">
             </div>
 
             <!-- UNIFIED SITE CARD LIST -->

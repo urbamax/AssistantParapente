@@ -41,33 +41,23 @@
     text-align: center;
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
 }
 
 .dashboard-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 800;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     margin: 0;
+    line-height: 1.2;
     color: var(--accent-blue);
-    text-shadow: 0 0 30px rgba(0, 92, 169, 0.3);
     transition: font-size 0.3s ease;
 }
 
-.dashboard-subtitle {
-    font-size: 0.75rem;
-    margin-bottom: 0;
-    opacity: 0.8;
-    color: var(--text-secondary);
-    letter-spacing: 0.25em;
-    font-weight: 600;
-    text-transform: uppercase;
-    padding-left: 12px;
-    border-left: 2px solid var(--accent-purple);
-    line-height: 1;
-    display: inline-block;
-    margin: 5px auto 0;
+.dashboard-title em {
+    font-style: italic;
 }
 
 .header-level-row {
@@ -171,16 +161,9 @@
     }
 
     .header-branding .dashboard-title {
-        font-size: 1.1rem;
+        font-size: 1rem;
         font-weight: 800;
-        letter-spacing: 0.02em;
-        text-transform: uppercase;
-        margin: 0;
-        color: var(--accent-blue);
-    }
-
-    .dashboard-subtitle {
-        display: none !important;
+        letter-spacing: 0.04em;
     }
 
     .nav-btn-glass {

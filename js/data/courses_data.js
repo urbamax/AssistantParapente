@@ -35,7 +35,7 @@ const COURSES_DATA = {
         ]
     },
     "general/facteurs-humains/1-fh-check-list/1-fh-check-list": {
-        "title": "Facteurs Humains 01 - Votre check-list",
+        "title": "Facteurs Humains 04 - Votre check-list",
         "category": "Facteurs Humains",
         "path": "courses/GENERAL/facteurs_humains/1-fh-check-list",
         "pages": 0,
@@ -46,7 +46,7 @@ const COURSES_DATA = {
         ]
     },
     "general/facteurs-humains/5-fh-fiche-synthase-ressources-vl/5-fh-fiche-synthase-ressources-vl": {
-        "title": "Facteurs Humains 05 - Cartographie des Ressources",
+        "title": "Facteurs Humains 02 - Cartographie des Ressources",
         "category": "Facteurs Humains",
         "path": "courses/GENERAL/facteurs_humains/5-fh-fiche-synthase-ressources-vl",
         "pages": 0,
@@ -57,7 +57,7 @@ const COURSES_DATA = {
         ]
     },
     "general/facteurs-humains/2-fh-le-vol-de-didier/2-fh-le-vol-de-didier": {
-        "title": "Facteurs Humains 02 - Le vol de Didier",
+        "title": "Facteurs Humains 05 - Le vol de Didier",
         "category": "Facteurs Humains",
         "path": "courses/GENERAL/facteurs_humains/2-fh-le-vol-de-didier",
         "pages": 0,
@@ -77,7 +77,7 @@ const COURSES_DATA = {
         ]
     },
     "general/facteurs-humains/4-fh-fiche-synthase-intro-vl/4-fh-fiche-synthase-intro-vl": {
-        "title": "Facteurs Humains 04 - Introduction",
+        "title": "Facteurs Humains 01 - Introduction",
         "category": "Facteurs Humains",
         "path": "courses/GENERAL/facteurs_humains/4-fh-fiche-synthase-intro-vl",
         "pages": 0,
