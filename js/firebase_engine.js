@@ -35,22 +35,18 @@ const FirebaseAuthEngine = {
                 if (user) {
                     console.log("User logged in:", user.email);
                     this.currentUser = user;
-                    
-                    // Show loading state in UI
-                    this.showStatus("Synchronisation en cours...", "info");
+                    this.updateHeaderUI();
+                    this.updateModalUI();
                     
                     // Sync stats
                     await this.syncDataWithCloud();
-                    
-                    this.lastSyncTime = new Date().toLocaleTimeString();
-                    this.showStatus("Synchronisé avec le cloud !", "success");
                 } else {
                     console.log("User logged out");
                     this.currentUser = null;
                     this.lastSyncTime = null;
+                    this.updateHeaderUI();
+                    this.updateModalUI();
                 }
-                this.updateHeaderUI();
-                this.updateModalUI();
             });
 
         } catch (error) {
@@ -233,6 +229,8 @@ const FirebaseAuthEngine = {
     syncDataWithCloud: async function() {
         if (!this.currentUser) return;
         
+        this.showStatus("Synchronisation en cours...", "info");
+        
         try {
             const { doc, getDoc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
             const uid = this.currentUser.uid;
@@ -272,6 +270,10 @@ const FirebaseAuthEngine = {
             }
 
             console.log("Sync complete!");
+            
+            this.lastSyncTime = new Date().toLocaleTimeString();
+            this.showStatus("Synchronisé avec le cloud !", "success");
+            this.updateModalUI();
         } catch (error) {
             console.error("Synchronization failed:", error);
             const errorDetail = error.message ? ` : ${error.message}` : '';
