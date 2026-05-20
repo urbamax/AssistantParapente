@@ -428,22 +428,11 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                     <button class="action-btn-secondary meteoparapente-btn" onclick="SitesEngine.focusSiteMap('meteoparapente', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Météo-Parapente">
                         <i class="ri-temp-hot-line"></i> Météo-P.
                     </button>
-                    <button class="action-btn-secondary meteoblue-btn" onclick="SitesEngine.focusSiteMap('meteoblue', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Meteoblue">
-                        <i class="ri-cloud-line"></i> Meteoblue
-                    </button>
-                    <button class="action-btn-secondary windfinder-btn" onclick="SitesEngine.focusSiteMap('windfinder', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Windfinder">
-                        <i class="ri-windy-fill"></i> Windfinder
-                    </button>
-                    <button class="action-btn-secondary paraglidingmap-btn" onclick="SitesEngine.focusSiteMap('paraglidingmap', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Paragliding Map">
-                        <i class="ri-map-2-line"></i> PG Map
-                    </button>
-                    ${site.referecence_terrain ? `
-                    <button class="action-btn-secondary spotair-btn" onclick="SitesEngine.focusSiteMap('spotair', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain}'); event.stopPropagation();" title="Spotair">
-                        <i class="ri-radar-line"></i> Spotair
-                    </button>
-                    ` : ''}
                     <button class="action-btn-secondary paraglidingearth-btn" onclick="SitesEngine.focusSiteMap('paraglidingearth', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Paragliding Earth">
                         <i class="ri-earth-line"></i> PGEarth
+                    </button>
+                    <button class="action-btn-secondary paraglidable-btn" onclick="SitesEngine.focusSiteMap('paraglidable', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Paraglidable">
+                        <i class="ri-flight-takeoff-line"></i> Paraglidable
                     </button>
                     <button class="action-btn-primary gps-btn" onclick="SitesEngine.openGpsMenu(${site.latitude}, ${site.longitude}); event.stopPropagation();">
                         <i class="ri-navigation-line"></i> S'y rendre
@@ -453,7 +442,7 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
             ${weatherHtml}
             <div style="margin-top: 14px;">
                 <div class="timeline-labels">
-                    <span>Maintenant (+0h)</span><span>Prévisions météo sur 48 heures</span><span>Dans 2 jours (+48h)</span>
+                    <span>Maintenant</span><span>Prévisions (48h)</span><span>Dans 2 jours</span>
                 </div>
                 <div class="ranking-timeline">
                     ${timelineBarsHtml}
@@ -511,8 +500,11 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                                         <i class="ri-radar-line"></i> Spotair
                                     </a>
                                     ` : ''}
-                                    <a href="http://www.paraglidingearth.com/api/getAroundLatLngSites.php?lat=${site.latitude}&lng=${site.longitude}&distance=10&style=detailled" target="_blank" class="external-link-btn pe-btn" onclick="event.stopPropagation();">
+                                    <a href="https://www.paraglidingearth.com/?latlng=${site.latitude},${site.longitude}" target="_blank" class="external-link-btn pe-btn" onclick="event.stopPropagation();">
                                         <i class="ri-earth-line"></i> Paragliding Earth
+                                    </a>
+                                    <a href="https://paraglidable.com/?lat=${site.latitude}&lon=${site.longitude}&zoom=8" target="_blank" class="external-link-btn pg-btn" onclick="event.stopPropagation();">
+                                        <i class="ri-flight-takeoff-line"></i> Paraglidable
                                     </a>
                                 </div>
                             </div>
