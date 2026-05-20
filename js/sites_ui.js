@@ -422,8 +422,28 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                         <img src="https://federation.ffvl.fr/sites/all/themes/ffvl/favicon.ico" alt="FFVL"> FFVL
                     </a>
                     ` : ''}
-                    <button class="action-btn-secondary windy-btn" onclick="SitesEngine.focusSiteWindy(${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}'); event.stopPropagation();">
+                    <button class="action-btn-secondary windy-btn" onclick="SitesEngine.focusSiteMap('windy', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Windy">
                         <i class="ri-windy-line"></i> Windy
+                    </button>
+                    <button class="action-btn-secondary meteoparapente-btn" onclick="SitesEngine.focusSiteMap('meteoparapente', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Météo-Parapente">
+                        <i class="ri-temp-hot-line"></i> Météo-P.
+                    </button>
+                    <button class="action-btn-secondary meteoblue-btn" onclick="SitesEngine.focusSiteMap('meteoblue', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Meteoblue">
+                        <i class="ri-cloud-line"></i> Meteoblue
+                    </button>
+                    <button class="action-btn-secondary windfinder-btn" onclick="SitesEngine.focusSiteMap('windfinder', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Windfinder">
+                        <i class="ri-windy-fill"></i> Windfinder
+                    </button>
+                    <button class="action-btn-secondary paraglidingmap-btn" onclick="SitesEngine.focusSiteMap('paraglidingmap', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Paragliding Map">
+                        <i class="ri-map-2-line"></i> PG Map
+                    </button>
+                    ${site.referecence_terrain ? `
+                    <button class="action-btn-secondary spotair-btn" onclick="SitesEngine.focusSiteMap('spotair', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain}'); event.stopPropagation();" title="Spotair">
+                        <i class="ri-radar-line"></i> Spotair
+                    </button>
+                    ` : ''}
+                    <button class="action-btn-secondary paraglidingearth-btn" onclick="SitesEngine.focusSiteMap('paraglidingearth', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Paragliding Earth">
+                        <i class="ri-earth-line"></i> PGEarth
                     </button>
                     <button class="action-btn-primary gps-btn" onclick="SitesEngine.openGpsMenu(${site.latitude}, ${site.longitude}); event.stopPropagation();">
                         <i class="ri-navigation-line"></i> S'y rendre

@@ -1861,11 +1861,17 @@ const QuizEngine = {
         }
 
         localStorage.setItem('parapente_qcm_stats', JSON.stringify(stats));
+        if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
+            window.FirebaseAuthEngine.saveStatsToCloud();
+        }
     },
 
     resetStats: function () {
         if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes vos statistiques ?')) {
             localStorage.removeItem('parapente_qcm_stats');
+            if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
+                window.FirebaseAuthEngine.saveStatsToCloud();
+            }
             alert('Statistiques réinitialisées !');
             this.renderStats();
         }
@@ -1889,6 +1895,9 @@ const QuizEngine = {
             history.exams = history.exams.slice(0, 10); // Keep only last 10
 
             localStorage.setItem('parapente_exam_history', JSON.stringify(history));
+            if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
+                window.FirebaseAuthEngine.saveHistoryToCloud();
+            }
         } catch (e) {
             console.error("Failed to save exam history", e);
         }

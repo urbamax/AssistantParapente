@@ -342,6 +342,9 @@ const Engine = {
                     // Re-bind theme and navigation after loading
                     self.updateHeaderNavigation();
                     self.applyThemeMode();
+                    if (window.FirebaseAuthEngine && typeof window.FirebaseAuthEngine.updateHeaderUI === 'function') {
+                        window.FirebaseAuthEngine.updateHeaderUI();
+                    }
 
                     // Fix: Restore level selector state with slight delay to ensure DOM readiness
                     setTimeout(() => {

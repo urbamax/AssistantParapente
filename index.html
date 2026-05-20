@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="css/quiz.css?v=2026.05.19_final">
     <link rel="stylesheet" href="css/library.css?v=2026.05.19_final">
     <link rel="stylesheet" href="css/sites.css?v=2026.05.19_final">
+    <link rel="stylesheet" href="css/auth.css?v=2026.05.19_final">
 </head>
 
 <body>
@@ -265,12 +266,22 @@
                     <div class="map-toggles-left">
                         <button id="map-toggle-leaflet" class="action-btn-primary map-toggle-btn"
                             onclick="SitesEngine.switchMapMode('leaflet')">
-                            <i class="ri-map-2-line"></i> Carte des sites
+                            <i class="ri-map-2-line"></i> Cartographie
                         </button>
                         <button id="map-toggle-windy" class="action-btn-secondary map-toggle-btn"
                             onclick="SitesEngine.switchMapMode('windy')"
                             style="color: var(--text-secondary); border-color: var(--border-color);">
-                            <i class="ri-windy-line"></i> Radar Vent (Windy)
+                            <i class="ri-windy-line"></i> Windy
+                        </button>
+                        <button id="map-toggle-meteoparapente" class="action-btn-secondary map-toggle-btn"
+                            onclick="SitesEngine.switchMapMode('meteoparapente')"
+                            style="color: var(--text-secondary); border-color: var(--border-color);">
+                            <i class="ri-temp-hot-line"></i> Météo-P.
+                        </button>
+                        <button id="map-toggle-paraglidingearth" class="action-btn-secondary map-toggle-btn"
+                            onclick="SitesEngine.switchMapMode('paraglidingearth')"
+                            style="color: var(--text-secondary); border-color: var(--border-color);">
+                            <i class="ri-earth-line"></i> PG Earth
                         </button>
                         <button id="map-toggle-isofronts" class="action-btn-secondary map-toggle-btn"
                             onclick="SitesEngine.switchMapMode('isofronts')"
@@ -294,6 +305,38 @@
                         <span id="windy-active-spot-name" class="windy-spot-name">Général</span>
                     </div>
                     <iframe id="windy-embed-iframe" src="" width="100%" height="100%" class="sites-iframe"></iframe>
+                </div>
+                <!-- Container Météo-Parapente Iframe -->
+                <div id="sites-meteoparapente-canvas" class="sites-map-canvas-custom" style="display: none;">
+                    <div id="meteoparapente-active-spot-header" class="windy-active-spot-header">
+                        <div class="isofronts-header-left">
+                            <i class="ri-temp-hot-line windy-spot-icon"></i>
+                            <span>Météo-Parapente :</span>
+                            <span id="meteoparapente-active-spot-name" class="windy-spot-name">Général</span>
+                        </div>
+                        <div class="isofronts-header-right">
+                            <a id="meteoparapente-open-link" href="https://meteo-parapente.com/" target="_blank" class="isofronts-link">
+                                <i class="ri-external-link-line"></i> Ouvrir
+                            </a>
+                        </div>
+                    </div>
+                    <iframe id="meteoparapente-embed-iframe" src="" width="100%" height="100%" class="sites-iframe"></iframe>
+                </div>
+                <!-- Container Paragliding Earth Iframe -->
+                <div id="sites-paraglidingearth-canvas" class="sites-map-canvas-custom" style="display: none;">
+                    <div id="paraglidingearth-active-spot-header" class="windy-active-spot-header">
+                        <div class="isofronts-header-left">
+                            <i class="ri-earth-line windy-spot-icon"></i>
+                            <span>Paragliding Earth :</span>
+                            <span id="paraglidingearth-active-spot-name" class="windy-spot-name">Général</span>
+                        </div>
+                        <div class="isofronts-header-right">
+                            <a id="paraglidingearth-open-link" href="https://www.paraglidingearth.com/" target="_blank" class="isofronts-link">
+                                <i class="ri-external-link-line"></i> Ouvrir
+                            </a>
+                        </div>
+                    </div>
+                    <iframe id="paraglidingearth-embed-iframe" src="" width="100%" height="100%" class="sites-iframe"></iframe>
                 </div>
                 <!-- Container Isofronts -->
                 <div id="sites-isofronts-canvas" class="sites-isofronts-canvas">
@@ -499,6 +542,10 @@
     <script src="js/sites_ui.js?v=2026.05.19_final"></script>
     <script src="js/sites_map.js?v=2026.05.19_final"></script>
 
+    <!-- Firebase Sync Config & Engine -->
+    <script src="js/firebase_config.js?v=2026.05.19_final"></script>
+    <script type="module" src="js/firebase_engine.js?v=2026.05.19_final"></script>
+
     <!-- Quiz Engine Version 4.8 (Theme Fix & Button Alignment) -->
     <script src="js/quiz_engine_v4_7.js?v=2026.05.19_final"></script>
     <script src="js/library_engine.js?v=2026.05.19_final"></script>
@@ -521,6 +568,124 @@
             };
         }
     </script>
+
+    <!-- AUTHENTICATION MODAL -->
+    <div id="auth-modal-overlay" class="auth-modal-overlay" onclick="if(event.target === this) FirebaseAuthEngine.closeAuthModal()">
+        <div class="auth-modal">
+            <button class="auth-close-btn" onclick="FirebaseAuthEngine.closeAuthModal()"><i class="ri-close-line"></i></button>
+            <div class="auth-title">ESPACE SYNCHRO</div>
+            
+            <div id="auth-alert" class="auth-alert"></div>
+
+            <!-- View 1: Firebase not set up -->
+            <div id="auth-setup-required-view" style="display: none;">
+                <div style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">
+                    <i class="ri-alert-line" style="font-size: 2.5rem; color: var(--accent-blue); display: block; margin-bottom: 12px;"></i>
+                    La synchronisation en ligne n'est pas activée sur ce déploiement.
+                </div>
+                <div style="font-size: 0.8rem; line-height: 1.5; color: var(--text-secondary); background: rgba(255,122,0,0.05); padding: 12px; border-radius: var(--radius-lg); border: 1px dashed var(--border-color);">
+                    Pour activer la synchronisation de vos statistiques sur tous vos appareils :
+                    <ol style="margin: 8px 0 0 16px; padding: 0;">
+                        <li>Créez un projet sur la console Firebase.</li>
+                        <li>Activez l'authentification par email/mot de passe et la base de données Firestore.</li>
+                        <li>Renseignez vos clés dans le fichier <code>js/firebase_config.js</code>.</li>
+                        <li>Basculez <code>IS_FIREBASE_ENABLED</code> à <code>true</code>.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- View 2: User not logged in -->
+            <div id="auth-anonymous-view" style="display: none;">
+                <div class="auth-tabs">
+                    <div id="tab-login" class="auth-tab active" onclick="FirebaseAuthEngine.switchTab('login')">Connexion</div>
+                    <div id="tab-register" class="auth-tab" onclick="FirebaseAuthEngine.switchTab('register')">Inscription</div>
+                </div>
+
+                <!-- Form Login -->
+                <div id="form-login-container" class="auth-form-container active">
+                    <div class="auth-field">
+                        <label for="login-email">Adresse Email</label>
+                        <div class="auth-input-wrapper">
+                            <i class="ri-mail-line"></i>
+                            <input type="email" id="login-email" class="auth-input" placeholder="pilote@email.com" autocomplete="email">
+                        </div>
+                    </div>
+                    <div class="auth-field">
+                        <label for="login-password">Mot de passe</label>
+                        <div class="auth-input-wrapper">
+                            <i class="ri-lock-line"></i>
+                            <input type="password" id="login-password" class="auth-input" placeholder="••••••••" autocomplete="current-password">
+                        </div>
+                    </div>
+                    <div class="auth-forgot-link" onclick="FirebaseAuthEngine.forgotPassword(document.getElementById('login-email').value)">
+                        Mot de passe oublié ?
+                    </div>
+                    <button class="auth-submit-btn" onclick="FirebaseAuthEngine.signIn(document.getElementById('login-email').value, document.getElementById('login-password').value)">
+                        Se connecter
+                    </button>
+                </div>
+
+                <!-- Form Register -->
+                <div id="form-register-container" class="auth-form-container">
+                    <div class="auth-field">
+                        <label for="register-email">Adresse Email</label>
+                        <div class="auth-input-wrapper">
+                            <i class="ri-mail-line"></i>
+                            <input type="email" id="register-email" class="auth-input" placeholder="pilote@email.com" autocomplete="email">
+                        </div>
+                    </div>
+                    <div class="auth-field">
+                        <label for="register-password">Mot de passe (min 6 car.)</label>
+                        <div class="auth-input-wrapper">
+                            <i class="ri-lock-line"></i>
+                            <input type="password" id="register-password" class="auth-input" placeholder="••••••••" autocomplete="new-password">
+                        </div>
+                    </div>
+                    <div class="auth-field">
+                        <label for="register-confirm-password">Confirmer le mot de passe</label>
+                        <div class="auth-input-wrapper">
+                            <i class="ri-lock-line"></i>
+                            <input type="password" id="register-confirm-password" class="auth-input" placeholder="••••••••" autocomplete="new-password">
+                        </div>
+                    </div>
+                    <button class="auth-submit-btn" onclick="FirebaseAuthEngine.signUp(document.getElementById('register-email').value, document.getElementById('register-password').value, document.getElementById('register-confirm-password').value)">
+                        Créer mon compte
+                    </button>
+                </div>
+            </div>
+
+            <!-- View 3: User logged in -->
+            <div id="auth-logged-in-view" class="auth-user-view" style="display: none;">
+                <div class="auth-user-card">
+                    <div id="auth-user-avatar" class="auth-user-avatar">P</div>
+                    <div class="auth-user-info">
+                        <div id="auth-user-email" class="auth-user-email">pilote@email.com</div>
+                        <div class="auth-user-status">Compte connecté & synchronisé</div>
+                    </div>
+                </div>
+                
+                <div class="auth-sync-status">
+                    <div class="auth-sync-row">
+                        <span>Statut :</span>
+                        <span style="color: var(--accent-green); font-weight: 700;">Actif</span>
+                    </div>
+                    <div class="auth-sync-row">
+                        <span>Dernière synchro :</span>
+                        <span id="auth-sync-time" class="auth-sync-time">Jamais</span>
+                    </div>
+                </div>
+
+                <div class="auth-action-row">
+                    <button class="action-btn primary" onclick="FirebaseAuthEngine.syncDataWithCloud()">
+                        <i class="ri-refresh-line"></i> Synchro
+                    </button>
+                    <button class="action-btn secondary" onclick="FirebaseAuthEngine.signOut()">
+                        <i class="ri-logout-box-r-line"></i> Déconnexion
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- BOTTOM SHEET GPS -->
     <div id="gps-bottom-sheet" class="bottom-sheet-overlay"

@@ -225,123 +225,155 @@ SitesEngine.launchGps = function (app) {
     };
 
 SitesEngine.switchMapMode = function (mode) {
-        const leafletBtn = document.getElementById('map-toggle-leaflet');
-        const windyBtn = document.getElementById('map-toggle-windy');
-        const isofrontsBtn = document.getElementById('map-toggle-isofronts');
-        const leafletCanvas = document.getElementById('sites-map-canvas');
-        const windyCanvas = document.getElementById('sites-windy-canvas');
-        const isofrontsCanvas = document.getElementById('sites-isofronts-canvas');
-        const windyIframe = document.getElementById('windy-embed-iframe');
-
-        if (mode === 'leaflet') {
-            if (leafletBtn) {
-                leafletBtn.className = 'action-btn-primary';
-                leafletBtn.style.color = '';
-                leafletBtn.style.borderColor = '';
+    const modes = [
+        'leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'isofronts'
+    ];
+    
+    // Toggle buttons
+    modes.forEach(m => {
+        const btn = document.getElementById(`map-toggle-${m}`);
+        if (btn) {
+            if (m === mode) {
+                btn.className = 'action-btn-primary map-toggle-btn';
+                btn.style.color = '';
+                btn.style.borderColor = '';
+            } else {
+                btn.className = 'action-btn-secondary map-toggle-btn';
+                btn.style.color = 'var(--text-secondary)';
+                btn.style.borderColor = 'var(--border-color)';
             }
-            if (windyBtn) {
-                windyBtn.className = 'action-btn-secondary';
-                windyBtn.style.color = 'var(--text-secondary)';
-                windyBtn.style.borderColor = 'var(--border-color)';
-            }
-            if (isofrontsBtn) {
-                isofrontsBtn.className = 'action-btn-secondary';
-                isofrontsBtn.style.color = 'var(--text-secondary)';
-                isofrontsBtn.style.borderColor = 'var(--border-color)';
-            }
-            if (leafletCanvas) leafletCanvas.style.display = 'block';
-            if (windyCanvas) windyCanvas.style.display = 'none';
-            if (isofrontsCanvas) isofrontsCanvas.style.display = 'none';
-            if (this.state.map) {
-                setTimeout(() => {
-                    this.state.map.invalidateSize();
-                    if (this.state.markersGroup) {
-                        const bounds = this.state.markersGroup.getBounds();
-                        if (bounds.isValid()) {
-                            this.state.map.fitBounds(bounds, { padding: [30, 30] });
-                        }
-                    }
-                }, 150);
-            }
-        } else if (mode === 'windy') {
-            if (leafletBtn) {
-                leafletBtn.className = 'action-btn-secondary';
-                leafletBtn.style.color = 'var(--text-secondary)';
-                leafletBtn.style.borderColor = 'var(--border-color)';
-            }
-            if (windyBtn) {
-                windyBtn.className = 'action-btn-primary';
-                windyBtn.style.color = '';
-                windyBtn.style.borderColor = '';
-            }
-            if (isofrontsBtn) {
-                isofrontsBtn.className = 'action-btn-secondary';
-                isofrontsBtn.style.color = 'var(--text-secondary)';
-                isofrontsBtn.style.borderColor = 'var(--border-color)';
-            }
-            if (leafletCanvas) leafletCanvas.style.display = 'none';
-            if (windyCanvas) windyCanvas.style.display = 'block';
-            if (isofrontsCanvas) isofrontsCanvas.style.display = 'none';
-
-            // Load Windy Widget Centered
-            let lat = 50.45;
-            let lon = 2.20;
-            if (this.state.userLocation) {
-                lat = this.state.userLocation.lat;
-                lon = this.state.userLocation.lng;
-            } else if (typeof SITES_DATA !== 'undefined' && SITES_DATA.length > 0) {
-                lat = SITES_DATA[0].latitude;
-                lon = SITES_DATA[0].longitude;
-            }
-
-            if (windyIframe && !windyIframe.src.includes('windy.com')) {
-                windyIframe.src = `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&width=100%&height=400&zoom=8&level=surface&overlay=wind&product=ecmwf&menu=&message=&marker=true&calendar=now&pressure=&type=map&location=coordinates&metricWind=default&metricTemp=default&radarRange=`;
-                const nameLabel = document.getElementById('windy-active-spot-name');
-                if (nameLabel) {
-                    nameLabel.textContent = "Général (Centre de la carte)";
-                }
-            }
-        } else if (mode === 'isofronts') {
-            if (leafletBtn) {
-                leafletBtn.className = 'action-btn-secondary';
-                leafletBtn.style.color = 'var(--text-secondary)';
-                leafletBtn.style.borderColor = 'var(--border-color)';
-            }
-            if (windyBtn) {
-                windyBtn.className = 'action-btn-secondary';
-                windyBtn.style.color = 'var(--text-secondary)';
-                windyBtn.style.borderColor = 'var(--border-color)';
-            }
-            if (isofrontsBtn) {
-                isofrontsBtn.className = 'action-btn-primary';
-                isofrontsBtn.style.color = '';
-                isofrontsBtn.style.borderColor = '';
-            }
-            if (leafletCanvas) leafletCanvas.style.display = 'none';
-            if (windyCanvas) windyCanvas.style.display = 'none';
-            if (isofrontsCanvas) isofrontsCanvas.style.display = 'block';
         }
+    });
+
+    // Toggle canvases
+    const canvases = {
+        'leaflet': document.getElementById('sites-map-canvas'),
+        'windy': document.getElementById('sites-windy-canvas'),
+        'meteoparapente': document.getElementById('sites-meteoparapente-canvas'),
+        'paraglidingearth': document.getElementById('sites-paraglidingearth-canvas'),
+        'isofronts': document.getElementById('sites-isofronts-canvas')
     };
 
-    // Removed getLatestIsofrontsUrl and toggleIsofrontsSource as Météo-France map is now directly embedded
+    Object.keys(canvases).forEach(k => {
+        const canvas = canvases[k];
+        if (canvas) {
+            canvas.style.display = (k === mode) ? 'block' : 'none';
+        }
+    });
+
+    // Special behavior per mode
+    if (mode === 'leaflet') {
+        if (this.state.map) {
+            setTimeout(() => {
+                this.state.map.invalidateSize();
+                if (this.state.markersGroup) {
+                    const bounds = this.state.markersGroup.getBounds();
+                    if (bounds.isValid()) {
+                        this.state.map.fitBounds(bounds, { padding: [30, 30] });
+                    }
+                }
+            }, 150);
+        }
+    } else {
+        // Load default/current coordinates if not switching to Leaflet
+        let lat = 50.45;
+        let lon = 2.20;
+        let name = "Général";
+        let extraId = "";
+        
+        if (this.state.userLocation) {
+            lat = this.state.userLocation.lat;
+            lon = this.state.userLocation.lng;
+        } else if (typeof SITES_DATA !== 'undefined' && SITES_DATA.length > 0) {
+            lat = SITES_DATA[0].latitude;
+            lon = SITES_DATA[0].longitude;
+            name = SITES_DATA[0].nom;
+            extraId = SITES_DATA[0].referecence_terrain || "";
+        }
+        
+        this.loadIframeContent(mode, lat, lon, name, extraId);
+    }
+};
+
+SitesEngine.loadIframeContent = function (mode, lat, lon, siteName, extraId) {
+    const nameLabels = {
+        'windy': document.getElementById('windy-active-spot-name'),
+        'meteoparapente': document.getElementById('meteoparapente-active-spot-name'),
+        'paraglidingearth': document.getElementById('paraglidingearth-active-spot-name')
+    };
+
+    if (nameLabels[mode]) {
+        nameLabels[mode].textContent = siteName ? siteName.toUpperCase() : "Général";
+    }
+
+    const iframes = {
+        'windy': document.getElementById('windy-embed-iframe'),
+        'meteoparapente': document.getElementById('meteoparapente-embed-iframe'),
+        'paraglidingearth': document.getElementById('paraglidingearth-embed-iframe')
+    };
+
+    const openLinks = {
+        'meteoparapente': document.getElementById('meteoparapente-open-link'),
+        'paraglidingearth': document.getElementById('paraglidingearth-open-link')
+    };
+
+    // Calculate URLs
+    const urls = {
+        'windy': `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&detailLat=${lat}&detailLon=${lon}&width=100%&height=400&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&metricWind=default&metricTemp=default&radarRange=`,
+        'meteoparapente': `https://meteo-parapente.com/#/${lat},${lon},11`,
+        'paraglidingearth': `https://www.paraglidingearth.com/?latlng=${lat},${lon}`
+    };
+
+    const iframe = iframes[mode];
+    if (iframe) {
+        if (iframe.src !== urls[mode]) {
+            iframe.src = urls[mode];
+        }
+    }
+
+    const openLink = openLinks[mode];
+    if (openLink) {
+        let linkUrl = urls[mode];
+        if (mode === 'meteoparapente') {
+            linkUrl = `https://meteo-parapente.com/#/${lat},${lon},11`;
+        } else if (mode === 'paraglidingearth') {
+            linkUrl = `https://www.paraglidingearth.com/?latlng=${lat},${lon}`;
+        }
+        openLink.href = linkUrl;
+    }
+};
+
+SitesEngine.focusSiteMap = function (mode, lat, lon, siteName, extraId) {
+    const externalModes = ['meteoblue', 'windfinder', 'spotair', 'paraglidingmap'];
+    if (externalModes.includes(mode)) {
+        let url = "";
+        if (mode === 'meteoblue') {
+            url = `https://www.meteoblue.com/fr/meteo/semaine/${lat}N${lon}E`;
+        } else if (mode === 'windfinder') {
+            url = `https://fr.windfinder.com/#11/${lat}/${lon}`;
+        } else if (mode === 'spotair') {
+            url = extraId ? `https://www.spotair.mobi/spot/ffvl/${extraId}` : `https://www.spotair.mobi/`;
+        } else if (mode === 'paraglidingmap') {
+            url = `https://www.paraglidingmap.com/app/?lat=${lat}&lng=${lon}&zoom=11`;
+        }
+        if (url) {
+            window.open(url, '_blank');
+        }
+        return;
+    }
+
+    this.switchMapMode(mode);
+    this.loadIframeContent(mode, lat, lon, siteName, extraId);
+
+    const mapView = document.getElementById('sites-map-view');
+    if (mapView) {
+        mapView.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+};
 
 SitesEngine.focusSiteWindy = function (lat, lon, siteName) {
-        this.switchMapMode('windy');
-
-        const nameLabel = document.getElementById('windy-active-spot-name');
-        if (nameLabel) {
-            nameLabel.textContent = siteName ? siteName.toUpperCase() : "Général";
-        }
-
-        const windyIframe = document.getElementById('windy-embed-iframe');
-        if (windyIframe) {
-            windyIframe.src = `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&detailLat=${lat}&detailLon=${lon}&width=100%&height=400&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&metricWind=default&metricTemp=default&radarRange=`;
-        }
-        const mapView = document.getElementById('sites-map-view');
-        if (mapView) {
-            mapView.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    };
+    this.focusSiteMap('windy', lat, lon, siteName);
+};
 
 SitesEngine.toggleFullscreen = function () {
         const mapView = document.getElementById('sites-map-view');

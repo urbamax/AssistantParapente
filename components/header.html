@@ -12,6 +12,12 @@
                 <i class="ri-moon-line"></i>
             </div>
         </button>
+        <div class="auth-btn-wrapper">
+            <button id="auth-btn" class="icon-btn" onclick="if(window.FirebaseAuthEngine) window.FirebaseAuthEngine.openAuthModal()" title="Espace Personnel / Connexion">
+                <i class="ri-user-line"></i>
+            </button>
+            <div id="auth-active-dot" class="auth-active-dot"></div>
+        </div>
     </div>
 </div>
 <div class="header-level-row">
