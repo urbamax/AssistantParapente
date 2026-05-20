@@ -291,7 +291,11 @@ SitesEngine.switchMapMode = function (mode) {
             extraId = SITES_DATA[0].referecence_terrain || "";
         }
         
-        this.loadIframeContent(mode, lat, lon, name, extraId);
+        if (mode === 'isofronts') {
+            this.initIsofronts();
+        } else {
+            this.loadIframeContent(mode, lat, lon, name, extraId);
+        }
     }
 };
 
@@ -416,3 +420,100 @@ SitesEngine.toggleFullscreen = function () {
             }
         }
     };
+
+/* ============================================================
+   ISOFRONTS IMAGE VIEWER
+   Sources: wetterzentrale.de (UKMO), dwd.de
+   These are direct static image URLs that don't block hotlinking.
+   ============================================================ */
+
+SitesEngine._isofrontsSources = {
+    wz: {
+        url: 'https://www.wetterzentrale.de/pics/bracka.gif',
+        label: 'Source : Wetterzentrale / UKMO — Atlantique Nord',
+        link: 'https://www.wetterzentrale.de/de/reanalysis.php'
+    },
+    dwd: {
+        url: 'https://www.dwd.de/DWD/wetter/wv_spez/hobbymeteorologen/bild_bodenanalyse.png',
+        label: 'Source : DWD (Allemagne) — Europe',
+        link: 'https://www.dwd.de/DE/leistungen/hobbymet_wv_bodendruck/hobbymet_wv_bodendruck.html'
+    },
+    wz2: {
+        url: 'https://www.wetterzentrale.de/pics/brack24a.gif',
+        label: 'Source : Wetterzentrale / UKMO — Europe du Nord',
+        link: 'https://www.wetterzentrale.de/de/reanalysis.php'
+    }
+};
+
+SitesEngine._isofrontsCurrentSource = 'wz';
+
+SitesEngine.initIsofronts = function () {
+    this.switchIsofrontsSource('wz');
+};
+
+SitesEngine.switchIsofrontsSource = function (sourceKey) {
+    const sources = this._isofrontsSources;
+    if (!sources[sourceKey]) return;
+
+    this._isofrontsCurrentSource = sourceKey;
+
+    // Update source buttons
+    Object.keys(sources).forEach(k => {
+        const btn = document.getElementById('isofronts-src-' + k);
+        if (btn) btn.classList.toggle('active', k === sourceKey);
+    });
+
+    // Update open link
+    const openLink = document.getElementById('isofronts-open-link');
+    if (openLink) openLink.href = sources[sourceKey].link;
+
+    // Update source label
+    const label = document.getElementById('isofronts-source-label');
+    if (label) label.textContent = sources[sourceKey].label;
+
+    // Show loading state
+    const loadingEl = document.getElementById('isofronts-loading');
+    const imgEl = document.getElementById('isofronts-img');
+    const errorEl = document.getElementById('isofronts-error');
+
+    if (loadingEl) loadingEl.style.display = 'flex';
+    if (imgEl) { imgEl.style.display = 'none'; imgEl.classList.remove('zoomed'); }
+    if (errorEl) errorEl.style.display = 'none';
+
+    // Load image with cache-busting timestamp
+    if (imgEl) {
+        const ts = Math.floor(Date.now() / (1000 * 60 * 10)); // refresh every 10 min
+        imgEl.src = sources[sourceKey].url + '?_t=' + ts;
+    }
+};
+
+SitesEngine.onIsofrontsImgLoad = function () {
+    const loadingEl = document.getElementById('isofronts-loading');
+    const imgEl = document.getElementById('isofronts-img');
+    const errorEl = document.getElementById('isofronts-error');
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (errorEl) errorEl.style.display = 'none';
+    if (imgEl) imgEl.style.display = 'block';
+};
+
+SitesEngine.onIsofrontsImgError = function () {
+    const loadingEl = document.getElementById('isofronts-loading');
+    const imgEl = document.getElementById('isofronts-img');
+    const errorEl = document.getElementById('isofronts-error');
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (imgEl) imgEl.style.display = 'none';
+    if (errorEl) errorEl.style.display = 'flex';
+};
+
+SitesEngine.toggleIsofrontsZoom = function (imgEl) {
+    if (!imgEl) return;
+    imgEl.classList.toggle('zoomed');
+    const hint = imgEl.closest('.sites-isofronts-canvas')
+        ? imgEl.closest('.sites-isofronts-canvas').querySelector('.isofronts-hint')
+        : null;
+    if (hint) {
+        hint.innerHTML = imgEl.classList.contains('zoomed')
+            ? '<i class="ri-zoom-out-line"></i> Cliquer pour réduire'
+            : '<i class="ri-zoom-in-line"></i> Cliquer pour agrandir';
+    }
+};

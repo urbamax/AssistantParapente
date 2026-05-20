@@ -85,3 +85,43 @@ body.light-mode .club-logo:hover {
     margin-top: auto;
     width: 100%;
 }
+
+/* --- GDPR Footer Links --- */
+.footer-gdpr-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+.footer-gdpr-links a {
+    color: var(--text-muted) !important;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.footer-gdpr-links a:hover {
+    color: var(--accent-blue) !important;
+    text-decoration: underline;
+}
+
+.footer-gdpr-links .separator {
+    color: var(--text-muted);
+    opacity: 0.4;
+    user-select: none;
+}
+
+@media (max-width: 600px) {
+    .footer-gdpr-links {
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 12px;
+    }
+    .footer-gdpr-links .separator {
+        display: none;
+    }
+}

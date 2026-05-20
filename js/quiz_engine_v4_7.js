@@ -964,6 +964,22 @@ const QuizEngine = {
         const container = document.getElementById('stats-content');
         if (!container) return;
 
+        if (window.GdprEngine && !window.GdprEngine.isConsentGranted('stats')) {
+            container.innerHTML = `
+                <div style="padding:40px; text-align:center; color:var(--text-main); max-width: 500px; margin: 0 auto; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <i class="ri-shield-user-line" style="font-size:3.5rem; color:var(--accent-blue); display:block; margin-bottom:20px;"></i>
+                    <h2 style="margin-bottom:12px; font-weight: 800; font-size: 1.4rem;">Statistiques désactivées</h2>
+                    <p style="opacity:0.7; font-size:0.9rem; line-height: 1.6; margin-bottom: 24px;">
+                        Vous avez désactivé le stockage de vos statistiques d'entraînement dans vos préférences de confidentialité. Pour suivre votre progression et voir votre historique, veuillez activer cette option.
+                    </p>
+                    <button onclick="if(window.GdprEngine) window.GdprEngine.showModal('gdpr-settings-modal');" style="background:var(--accent-blue); color:white; border:none; padding:12px 24px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; font-size:0.9rem;">
+                        Activer le suivi de progression
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
         if (!this.state.isLoaded) {
             container.innerHTML = `
                 <div style="padding:40px; text-align:center; color:white; opacity:0.7;">
@@ -1838,6 +1854,10 @@ const QuizEngine = {
     },
 
     updateStats: function (question, isCorrect) {
+        if (window.GdprEngine && !window.GdprEngine.isConsentGranted('stats')) {
+            console.log("Stats consent missing, skipping stats save.");
+            return;
+        }
         const stats = this.getPersistentStats();
 
         // Update global counters
@@ -1891,6 +1911,10 @@ const QuizEngine = {
     },
 
     saveExamHistory: function (level, score, total, results) {
+        if (window.GdprEngine && !window.GdprEngine.isConsentGranted('stats')) {
+            console.log("Stats consent missing, skipping exam history save.");
+            return;
+        }
         try {
             let history = JSON.parse(localStorage.getItem('parapente_exam_history') || '{"exams":[]}');
 

@@ -17,6 +17,14 @@ const FirebaseAuthEngine = {
             return;
         }
 
+        // GDPR (RGPD) consent guard
+        if (window.GdprEngine && !window.GdprEngine.isConsentGranted('firebase')) {
+            console.log("Firebase initialization bypassed: waiting for user GDPR consent.");
+            this.enabled = false;
+            this.updateHeaderUI();
+            return;
+        }
+
         try {
             // Import Firebase SDKs dynamically from CDN
             const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
@@ -123,6 +131,16 @@ const FirebaseAuthEngine = {
 
         if (!this.enabled) {
             setupRequiredView.style.display = 'block';
+            const devDesc = document.getElementById('auth-setup-required-desc');
+            const gdprDesc = document.getElementById('auth-gdpr-required-desc');
+            
+            if (typeof IS_FIREBASE_ENABLED === 'undefined' || !IS_FIREBASE_ENABLED) {
+                if (devDesc) devDesc.style.display = 'block';
+                if (gdprDesc) gdprDesc.style.display = 'none';
+            } else {
+                if (devDesc) devDesc.style.display = 'none';
+                if (gdprDesc) gdprDesc.style.display = 'block';
+            }
         } else if (this.currentUser) {
             loggedInView.style.display = 'flex';
             

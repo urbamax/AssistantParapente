@@ -42,6 +42,24 @@ SitesEngine.requestGpsLocation = function (isInitialLoad = false) {
     const inputEl = document.getElementById('address-input');
     const gpsBtn = document.getElementById('btn-use-gps');
 
+    if (window.GdprEngine && !window.GdprEngine.isConsentGranted('gps')) {
+        if (!isInitialLoad) {
+            const openSettings = confirm("Vous devez autoriser la géolocalisation dans vos options de confidentialité pour utiliser cette fonctionnalité. Souhaitez-vous modifier vos préférences ?");
+            if (openSettings) {
+                window.GdprEngine.showModal('gdpr-settings-modal');
+            }
+        }
+        if (statusEl) {
+            statusEl.innerHTML = `<i class="ri-shield-user-line" style="color: var(--text-muted);"></i> Géolocalisation désactivée par vos choix de confidentialité. <a href="#" onclick="if(window.GdprEngine) window.GdprEngine.showModal('gdpr-settings-modal'); return false;" style="color: var(--accent-blue); text-decoration: underline; font-weight: 600;">Gérer</a>`;
+            statusEl.style.color = 'var(--text-muted)';
+        }
+        if (gpsBtn) {
+            gpsBtn.style.borderColor = 'var(--border-color)';
+            gpsBtn.style.color = 'var(--text-muted)';
+        }
+        return;
+    }
+
     if (!navigator.geolocation) {
         if (!isInitialLoad && statusEl) {
             statusEl.innerHTML = `<i class="ri-error-warning-line" style="color: var(--accent-red);"></i> La géolocalisation n'est pas supportée par votre navigateur.`;

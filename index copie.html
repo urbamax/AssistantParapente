@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Assistant Parapente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="css/base.css?v=2026.05.19_final">
+    <link rel="stylesheet" href="css/components.css?v=2026.05.19_final">
+    <link rel="stylesheet" href="css/header.css?v=2026.05.19_final">
+    <link rel="stylesheet" href="css/footer.css?v=2026.05.19_final">
+    <link rel="stylesheet" href="css/dashboard.css?v=2026.05.19_final">
+    <link rel="stylesheet" href="css/quiz.css?v=2026.05.19_final">
+    <link rel="stylesheet" href="css/library.css?v=2026.05.19_final">
+    <link rel="stylesheet" href="css/sites.css?v=2026.05.19_final">
+</head>
+
+<body>
+
+    <!-- Top Controls (Level Select & Theme) -->
+    <div id="app-header" class="top-controls"></div>
+
+    <!-- START SCREEN (Dashboard) -->
+    <div id="start-screen" class="mode-screen active">
+        <div class="dashboard-content">
+            <!-- SECTION 1: APPS (Hero) -->
+            <section class="apps-section">
+
+                <div class="apps-grid">
+
+                    <button class="app-card sites-mode" onclick="Engine.startMode('SITES')">
+                        <div class="app-icon" style="color: var(--accent-blue);"><i class="ri-map-pin-line"></i></div>
+                        <div class="app-info">
+                            <h3>Sites de vol</h3>
+                            <p>Décollages & Itinéraires</p>
+                        </div>
+                    </button>
+
+
+                    <button class="app-card accent-qcm" onclick="Engine.startMode('QCM')">
+                        <div class="app-icon"><i class="ri-file-list-3-line"></i></div>
+                        <div class="app-info">
+                            <h3>QCM Officiel</h3>
+                            <p>Entraînement questions FFVL</p>
+                        </div>
+                    </button>
+                    <button class="app-card accent-library" onclick="Engine.startMode('LIBRARY')">
+                        <div class="app-icon"><i class="ri-book-open-line"></i></div>
+                        <div class="app-info">
+                            <h3>Bibliothèque</h3>
+                            <p>Cours, manuels & affiches</p>
+                        </div>
+                    </button>
+                    <button class="app-card accent-qcm stats-mode" onclick="Engine.showStats()">
+                        <div class="app-icon"><i class="ri-bar-chart-2-line"></i></div>
+                        <div class="app-info">
+                            <h3>Statistiques</h3>
+                            <p>Historique & Progression</p>
+                        </div>
+                    </button>
+                </div>
+
+            </section>
+
+        </div>
+        <div class="app-footer-placeholder"></div>
+    </div>
+
+
+
+    <!-- QCM SETUP SCREEN -->
+    <div id="qcm-setup-screen" class="mode-screen">
+        <div class="course-container">
+            <div class="setup-grid">
+
+                <!-- MODE SELECTION -->
+                <div class="setup-group">
+
+                    <div class="mode-toggle-container">
+                        <button id="mode-training" class="mode-toggle-btn active"
+                            onclick="Engine.setQcmMode('TRAINING')">
+                            <i class="ri-edit-circle-line"></i> Entraînement
+                        </button>
+                        <button id="mode-exam" class="mode-toggle-btn" onclick="Engine.setQcmMode('EXAM')">
+                            <i class="ri-timer-flash-line"></i> Examen
+                        </button>
+                        <button id="mode-revision" class="mode-toggle-btn" onclick="Engine.setQcmMode('REVISION')">
+                            <i class="ri-refresh-line"></i> Révision
+                        </button>
+                    </div>
+                </div>
+                <!-- Mode Description (New) -->
+                <!-- Mode Description (New) -->
+                <div id="mode-description" class="mode-description">
+                    Mode Entraînement : choisissez votre thème et volume. Correction immédiate après chaque question.
+                </div>
+
+                <!-- TRAINING OPTIONS (Hidden in Exam Mode) -->
+                <div id="training-options">
+                    <div class="setup-group">
+                        <label class="setup-label">NOMBRE DE QUESTIONS</label>
+                        <div class="count-selector">
+                            <button class="count-btn active" onclick="Engine.setQcmCount(10)">10</button>
+                            <button class="count-btn" onclick="Engine.setQcmCount(20)">20</button>
+                            <button class="count-btn" onclick="Engine.setQcmCount(30)">30</button>
+                            <button class="count-btn" onclick="Engine.setQcmCount(40)">40</button>
+                            <button class="count-btn" onclick="Engine.setQcmCount('ALL')">TOUT</button>
+                        </div>
+                    </div>
+
+                    <div class="setup-group setup-group-margin">
+                        <label class="setup-label">THÈME SPÉCIFIQUE (OPTIONNEL)</label>
+                        <select id="qcm-theme-select">
+                            <option value="ALL">Tous les thèmes</option>
+                            <!-- Injected by JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- START BUTTON -->
+                <button class="next-btn next-btn-large" onclick="Engine.startQcmSession()">
+                    COMMENCER <i class="ri-arrow-right-line"></i>
+                </button>
+
+                <button class="bank-btn" onclick="Engine.showQcmBank()">
+                    <i class="ri-book-2-line"></i> Consulter la Banque de Questions
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- QCM SCREEN -->
+    <div id="qcm-screen" class="mode-screen">
+        <div class="main-stage">
+            <div id="qcm-mode-label" class="level-tag level-tag-faded">MODE EXAMEN</div>
+
+            <div id="qcm-question-text" class="qcm-question">
+                Chargement...
+            </div>
+
+            <div id="qcm-choices" class="choices-area">
+                <!-- Options injected manually -->
+            </div>
+
+            <div id="qcm-feedback" class="narrative-text qcm-feedback" style="display:none;">
+                <!-- Feedback text -->
+            </div>
+        </div>
+        <div class="app-footer-placeholder"></div>
+    </div>
+
+    <!-- STATS SCREEN -->
+    <div id="stats-screen" class="mode-screen">
+        <div class="course-container">
+            <h2 class="section-title section-title-center">STATISTIQUES</h2>
+            <div id="stats-content">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+        <div class="app-footer-placeholder"></div>
+    </div>
+
+    <!-- QCM BANK SCREEN -->
+    <div id="qcm-bank-screen" class="mode-screen">
+        <div class="library-container"> <!-- Reuse library container for styling -->
+            <h2 class="section-title section-title-center">BANQUE DE
+                QUESTIONS</h2>
+
+            <!-- SEARCH & FILTER -->
+            <div class="library-toolbar">
+                <div class="search-box">
+                    <i class="ri-search-line"></i>
+                    <input type="text" id="bank-search" placeholder="Rechercher par mot-clé (ex: cumulus)..."
+                        oninput="Engine.renderQcmBank()">
+                </div>
+                <div class="sort-controls">
+                    <select id="bank-theme-filter" onchange="Engine.renderQcmBank()" class="sort-btn">
+                        <option value="ALL">Tous les thèmes</option>
+                        <option value="Météo">Météo</option>
+                        <option value="Mécavol">Mécavol</option>
+                        <option value="Matériel">Matériel</option>
+                        <option value="Pilotage">Pilotage</option>
+                        <option value="Réglementation">Réglementation</option>
+                        <option value="Facteurs humains">Facteurs humains</option>
+                        <option value="Milieu naturel">Milieu naturel</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="bank-results" class="library-grid-container flex-column-gap16">
+            <!-- Results injected by JS -->
+        </div>
+        <div class="app-footer-placeholder"></div>
+    </div>
+
+    <!-- LIBRARY SCREEN -->
+    <div id="library-screen" class="mode-screen">
+
+        <div class="library-container">
+            <h2 class="section-title section-title-center">BIBLIOTHEQUE</h2>
+
+            <!-- SEARCH & SORT TOOLBAR -->
+            <div class="library-toolbar">
+                <div class="search-box">
+                    <i class="ri-search-line"></i>
+                    <input type="text" id="library-search" placeholder="Rechercher un dossier, une affiche..."
+                        oninput="Engine.updateLibrarySearch(this.value)">
+                </div>
+                <div class="sort-controls">
+                    <button id="sort-TITLE" class="sort-btn" onclick="Engine.setLibrarySort('TITLE')">A-Z</button>
+                    <button id="sort-CATEGORY" class="sort-btn active" onclick="Engine.setLibrarySort('CATEGORY')">PAR
+                        CATÉGORIE</button>
+                </div>
+            </div>
+
+            <div id="library-results" class="library-grid-container">
+                <!-- Results injected by JS -->
+            </div>
+
+        </div>
+        <div class="app-footer-placeholder"></div>
+    </div>
+
+    <!-- COURSE SCREEN -->
+    <div id="course-screen" class="mode-screen">
+        <div class="course-container">
+            <div class="course-controls-top">
+                <button class="action-btn" onclick="Engine.goBack()">
+                    <i class="ri-arrow-left-line"></i> Retour à la bibliothèque
+                </button>
+                <div class="course-actions-group" id="course-actions-bar">
+                    <!-- Buttons injected by JS (Quiz, PDF Original, etc) -->
+                </div>
+            </div>
+
+            <div class="course-viewer" id="course-viewer-container">
+                <iframe id="course-pdf-frame" src="" width="100%" height="100%" class="course-pdf-frame"></iframe>
+            </div>
+
+
+
+        </div>
+        <div class="app-footer-placeholder"></div>
+    </div>
+
+
+    <!-- SITES SCREEN -->
+    <div id="sites-screen" class="mode-screen">
+        <div class="library-container">
+            <h2 class="section-title section-title-sites">SITES DE VOL</h2>
+
+            <!-- Modern Map Panel (Always Visible) -->
+            <div id="sites-map-view" class="sites-map-view">
+                <!-- Map Toggle Tabs & Fullscreen -->
+                <div class="map-toggles-container">
+                    <div class="map-toggles-left">
+                        <button id="map-toggle-leaflet" class="action-btn-primary map-toggle-btn"
+                            onclick="SitesEngine.switchMapMode('leaflet')">
+                            <i class="ri-map-2-line"></i> Carte des sites
+                        </button>
+                        <button id="map-toggle-windy" class="action-btn-secondary map-toggle-btn"
+                            onclick="SitesEngine.switchMapMode('windy')"
+                            style="color: var(--text-secondary); border-color: var(--border-color);">
+                            <i class="ri-windy-line"></i> Radar Vent (Windy)
+                        </button>
+                        <button id="map-toggle-isofronts" class="action-btn-secondary map-toggle-btn"
+                            onclick="SitesEngine.switchMapMode('isofronts')"
+                            style="color: var(--text-secondary); border-color: var(--border-color);">
+                            <i class="ri-cloud-line"></i> Fronts &amp; Isobares
+                        </button>
+                        <button id="map-toggle-mp" class="action-btn-secondary map-toggle-btn"
+                            onclick="SitesEngine.switchMapMode('mp')"
+                            style="color: var(--text-secondary); border-color: var(--border-color);">
+                            <i class="ri-cloud-windy-line"></i> Météo-Parapente
+                        </button>
+                        <button id="map-toggle-pm" class="action-btn-secondary map-toggle-btn"
+                            onclick="SitesEngine.switchMapMode('pm')"
+                            style="color: var(--text-secondary); border-color: var(--border-color);">
+                            <i class="ri-map-pin-2-line"></i> Paragliding Map
+                        </button>
+                        <button id="map-toggle-pe" class="action-btn-secondary map-toggle-btn"
+                            onclick="SitesEngine.switchMapMode('pe')"
+                            style="color: var(--text-secondary); border-color: var(--border-color);">
+                            <i class="ri-earth-line"></i> Paragliding Earth
+                        </button>
+                    </div>
+                    <button id="map-toggle-fullscreen" class="action-btn-secondary map-toggle-btn"
+                        onclick="SitesEngine.toggleFullscreen()"
+                        style="color: var(--text-secondary); border-color: var(--border-color);">
+                        <i class="ri-fullscreen-line"></i> Plein écran
+                    </button>
+                </div>
+                <!-- Container Leaflet -->
+                <div id="sites-map-canvas" class="sites-map-canvas"></div>
+                <!-- Container Windy Iframe -->
+                <div id="sites-windy-canvas" class="sites-windy-canvas">
+                    <div id="windy-active-spot-header" class="windy-active-spot-header">
+                        <i class="ri-map-pin-2-fill windy-spot-icon"></i>
+                        <span>Radar Vent :</span>
+                        <span id="windy-active-spot-name" class="windy-spot-name">Général</span>
+                    </div>
+                    <iframe id="windy-embed-iframe" src="" width="100%" height="100%" class="sites-iframe"></iframe>
+                </div>
+                <!-- Container Isofronts -->
+                <div id="sites-isofronts-canvas" class="sites-isofronts-canvas">
+                    <div id="isofronts-active-spot-header" class="isofronts-header">
+                        <div class="isofronts-header-left">
+                            <i class="ri-cloud-line windy-spot-icon"></i>
+                            <span>Fronts &amp; Isobares :</span>
+                            <span id="isofronts-active-spot-name" class="windy-spot-name">Météo-France</span>
+                        </div>
+                        <div class="isofronts-header-right">
+                            <a href="https://meteofrance.com/isofronts" target="_blank" class="isofronts-link">
+                                <i class="ri-external-link-line"></i> Ouvrir
+                            </a>
+                        </div>
+                    </div>
+                    <iframe id="isofronts-embed-iframe" src="https://meteofrance.com/isofronts" width="100%"
+                        height="100%" class="sites-iframe" style="display: block;"></iframe>
+                </div>
+                
+                <!-- Container Météo-Parapente -->
+                <div id="sites-mp-canvas" class="sites-isofronts-canvas" style="display: none;">
+                    <div class="isofronts-header">
+                        <div class="isofronts-header-left">
+                            <i class="ri-cloud-windy-line windy-spot-icon" style="color: #38bdf8;"></i>
+                            <span>Carte :</span>
+                            <span class="windy-spot-name">Météo-Parapente</span>
+                        </div>
+                        <div class="isofronts-header-right">
+                            <a id="mp-external-link" href="https://meteo-parapente.com/" target="_blank" class="isofronts-link">
+                                <i class="ri-external-link-line"></i> Ouvrir
+                            </a>
+                        </div>
+                    </div>
+                    <iframe id="mp-embed-iframe" src="" width="100%" height="100%" class="sites-iframe"></iframe>
+                </div>
+
+                <!-- Container Paragliding Map -->
+                <div id="sites-pm-canvas" class="sites-isofronts-canvas" style="display: none;">
+                    <div class="isofronts-header">
+                        <div class="isofronts-header-left">
+                            <i class="ri-map-pin-2-line windy-spot-icon" style="color: #4ade80;"></i>
+                            <span>Carte :</span>
+                            <span class="windy-spot-name">Paragliding Map</span>
+                        </div>
+                        <div class="isofronts-header-right">
+                            <a id="pm-external-link" href="https://www.paraglidingmap.com/app/" target="_blank" class="isofronts-link">
+                                <i class="ri-external-link-line"></i> Ouvrir
+                            </a>
+                        </div>
+                    </div>
+                    <iframe id="pm-embed-iframe" src="" width="100%" height="100%" class="sites-iframe"></iframe>
+                </div>
+
+                <!-- Container Paragliding Earth -->
+                <div id="sites-pe-canvas" class="sites-isofronts-canvas" style="display: none;">
+                    <div class="isofronts-header">
+                        <div class="isofronts-header-left">
+                            <i class="ri-earth-line windy-spot-icon" style="color: #f472b6;"></i>
+                            <span>Carte :</span>
+                            <span class="windy-spot-name">Paragliding Earth</span>
+                        </div>
+                        <div class="isofronts-header-right">
+                            <a id="pe-external-link" href="https://paraglidingearth.com/" target="_blank" class="isofronts-link">
+                                <i class="ri-external-link-line"></i> Ouvrir
+                            </a>
+                        </div>
+                    </div>
+                    <iframe id="pe-embed-iframe" src="" width="100%" height="100%" class="sites-iframe"></iframe>
+                </div>
+            </div>
+
+
+            <!-- Radius Settings (Always visible) -->
+            <div class="radius-panel-container">
+                <!-- Radius Slider Row -->
+                <div class="slider-row" style="border-bottom: none; padding-bottom: 0;">
+                    <div class="slider-labels">
+                        <span class="slider-label-left">
+                            <i class="ri-radar-line" style="color: var(--accent-blue);"></i> Rayon maximal :
+                        </span>
+                        <span id="radius-val-label" class="slider-label-right" style="background: rgba(14,165,233,0.15); border: 1px solid rgba(14,165,233,0.3); color: var(--text-main);">Illimité</span>
+                    </div>
+                    <input type="range" id="radius-slider" min="10" max="210" value="210" step="10"
+                        oninput="SitesEngine.setRadiusLimit(parseInt(this.value))" class="slider-input">
+                </div>
+
+                <!-- Reference Location Fields (under the radius slider) -->
+                <div id="reference-location-container" class="reference-location-container" style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; width: 100%;">
+                    <div class="reference-location-header" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span class="settings-label" style="display: flex; align-items: center; gap: 8px;">
+                            <i class="ri-map-pin-user-line" style="color: var(--accent-blue);"></i> Centre du rayon / Distance :
+                        </span>
+                    </div>
+                    <div class="reference-location-controls" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; width: 100%;">
+                        <div class="search-box address-search-box" style="flex: 1; min-width: 200px; height: 42px; padding: 2px 12px 2px 16px; border-radius: var(--radius-md); background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; box-sizing: border-box;">
+                            <i class="ri-map-pin-2-line" style="font-size: 1rem; color: var(--text-muted);"></i>
+                            <input type="text" id="address-input" placeholder="Adresse ou ville (ex: Annecy, Gourdon)..." style="background: transparent; border: none; outline: none; color: var(--text-main); font-size: 0.9rem; flex: 1; min-width: 0;" onkeydown="if(event.key === 'Enter') SitesEngine.geocodeAddress(this.value)">
+                            <button class="action-btn-primary" onclick="SitesEngine.geocodeAddress(document.getElementById('address-input').value)" style="padding: 4px 12px; font-size: 0.8rem; height: 28px; border-radius: var(--radius-sm); border: none; cursor: pointer; flex-shrink: 0;">
+                                Valider
+                            </button>
+                        </div>
+                        <button id="btn-use-gps" class="action-btn-secondary" onclick="SitesEngine.requestGpsLocation()" style="height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: rgba(0,0,0,0.15); color: var(--text-secondary); cursor: pointer; font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">
+                            <i class="ri-gps-line"></i> GPS
+                        </button>
+                    </div>
+                    <div id="address-status-message" style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; font-weight: 500;">
+                        <i class="ri-information-line"></i> Aucun point de référence (GPS désactivé).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weather Settings Card (Modèle & Limites) -->
+            <div class="weather-settings-card" style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 24px; background: var(--bg-card); border: var(--border-glass); padding: 24px; border-radius: var(--radius-card); box-shadow: var(--shadow-card); backdrop-filter: blur(20px);">
+                <div class="weather-settings-col" style="width: 100%;">
+                    <!-- Weather Model Selector -->
+                    <div class="weather-model-row">
+                        <span class="settings-label">Modèle Météo :</span>
+                        <select id="weather-model-select" onchange="SitesEngine.changeWeatherModel(this.value)"
+                            class="settings-select">
+                            <option value="meteofrance">AROME Météo-France (HD)</option>
+                            <option value="iconeu">ICON DWD (Europe Regional)</option>
+                            <option value="icon">ICON DWD (Global)</option>
+                            <option value="ecmwf">ECMWF (Europe Global)</option>
+                            <option value="gfs">GFS NOAA (USA Global)</option>
+                            <option value="meteoblue">Meteoblue (Multi-modèle)</option>
+                        </select>
+                    </div>
+
+                    <!-- Wind Limits Inputs -->
+                    <div class="wind-limits-row" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+                        <span class="wind-limits-label-full">Limites de vent (km/h) :</span>
+                        <div class="wind-limit-group">
+                            <label class="wind-limit-label">Vent Min</label>
+                            <input type="number" id="limit-wind-min" value="0" min="0"
+                                oninput="SitesEngine.updateWindLimits()" class="wind-limit-input">
+                        </div>
+                        <div class="wind-limit-group">
+                            <label class="wind-limit-label">Vent Max</label>
+                            <input type="number" id="limit-wind-max" value="25" min="0"
+                                oninput="SitesEngine.updateWindLimits()" class="wind-limit-input">
+                        </div>
+                        <div class="wind-limit-group">
+                            <label class="wind-limit-label">Rafales Max</label>
+                            <input type="number" id="limit-gust-delta" value="10" min="0"
+                                oninput="SitesEngine.updateWindLimits()" class="wind-limit-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sticky Forecast Time Slider Card -->
+            <div class="forecast-sticky-container">
+                <div class="slider-row" style="border-bottom: none; padding-bottom: 0;">
+                    <div class="slider-labels">
+                        <span class="slider-label-left">
+                            <i class="ri-time-line"></i> Échéance Prévision :
+                        </span>
+                        <span id="forecast-time-label" class="slider-label-right">Chargement des prévisions...</span>
+                    </div>
+                    <input type="range" id="forecast-slider" min="0" max="48" value="0" step="1"
+                        oninput="SitesEngine.setForecastOffset(parseInt(this.value))" class="slider-input" disabled>
+                </div>
+            </div>
+
+
+            <!-- SORT & FILTER TOOLBAR (GLOBAL) -->
+            <div class="library-toolbar toolbar-global">
+
+                <!-- Wind Filter Dropdown -->
+                <div class="filter-dropdown-container" id="dropdown-wind">
+                    <button class="filter-dropdown-btn" onclick="SitesEngine.toggleDropdown('wind')">
+                        <span>Orientation</span>
+                        <span class="filter-badge" id="badge-wind">0</span>
+                        <i class="ri-arrow-down-s-line" style="margin-left: auto;"></i>
+                    </button>
+                    <div class="filter-dropdown-menu" id="menu-wind">
+                        <!-- Options generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Type Filter Dropdown -->
+                <div class="filter-dropdown-container" id="dropdown-type">
+                    <button class="filter-dropdown-btn" onclick="SitesEngine.toggleDropdown('type')">
+                        <span>Type</span>
+                        <span class="filter-badge" id="badge-type">0</span>
+                        <i class="ri-arrow-down-s-line" style="margin-left: auto;"></i>
+                    </button>
+                    <div class="filter-dropdown-menu" id="menu-type">
+                        <!-- Options generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Sort Dropdown (Meilleures conditions, Distance, Nom A-Z) -->
+                <div class="filter-dropdown-container" id="dropdown-sort">
+                    <select id="select-sort-mode" onchange="SitesEngine.changeSortMode(this.value)" class="sort-select">
+                        <option value="CONDITIONS">Meilleures conditions</option>
+                        <option value="DISTANCE">Plus proche (GPS)</option>
+                        <option value="AZ">Nom (A - Z)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- CONDITIONS STRATEGY SUB-TOOLBAR -->
+            <div id="conditions-strategy-panel" class="conditions-strategy-panel">
+                <div class="strategy-panel-label">
+                    <i class="ri-equalizer-line" style="color: var(--accent-blue);"></i>
+                    <span>Définition des meilleures conditions :</span>
+                </div>
+                <div class="strategy-buttons">
+                    <button class="strategy-btn active" id="strat-CONSECUTIVE"
+                        onclick="SitesEngine.changeStrategy('CONSECUTIVE')">
+                        <i class="ri-time-line"></i> Créneau continu (Consécutif)
+                    </button>
+                    <button class="strategy-btn" id="strat-HALF_DAY" onclick="SitesEngine.changeStrategy('HALF_DAY')">
+                        <i class="ri-sun-cloudy-line"></i> Demi-journée active (Heures proches)
+                    </button>
+                    <button class="strategy-btn" id="strat-DAILY" onclick="SitesEngine.changeStrategy('DAILY')">
+                        <i class="ri-sun-line"></i> Journée complète (Max/jour)
+                    </button>
+                    <button class="strategy-btn" id="strat-TOTAL" onclick="SitesEngine.changeStrategy('TOTAL')">
+                        <i class="ri-calendar-todo-line"></i> Volume total (Max/48h)
+                    </button>
+                </div>
+            </div>
+
+            <!-- SITES SEARCH BAR -->
+            <div class="search-box site-search-box" style="margin-bottom: 24px; width: 100%; min-width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 2px 24px; height: 48px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-pill); color: var(--text-main);">
+                <i class="ri-search-line" style="font-size: 1.25rem; color: var(--text-muted); flex-shrink: 0;"></i>
+                <input type="text" id="site-search" placeholder="Rechercher un site par nom, ville, code postal, observations..." style="background: transparent; border: none; outline: none; color: var(--text-main); width: 100%; font-size: 0.95rem;" oninput="SitesEngine.updateSearchQuery(this.value)">
+            </div>
+
+            <!-- UNIFIED SITE CARD LIST -->
+            <div id="sites-list-view" class="sites-list-view">
+                <div id="sites-list-container" class="library-grid-container sites-list-container">
+                    <!-- Injected by SitesEngine -->
+                </div>
+            </div>
+
+        </div>
+        <div class="app-footer-placeholder"></div>
+    </div>
+
+    <!-- GLOBAL FOOTER -->
+    <div id="app-footer"></div>
+
+
+    <!-- SCRIPTS -->
+    <script src="js/data/courses_data.js?v=2026.05.19_final"></script>
+    <script src="js/data/sites_data.js?v=2026.05.19_final"></script>
+    <script src="js/sites_engine.js?v=2026.05.19_final"></script>
+    <script src="js/sites_filter.js?v=2026.05.19_final"></script>
+    <script src="js/weatherScoring.js?v=2026.05.19_final"></script>
+    <script src="js/sites_weather.js?v=2026.05.19_final"></script>
+    <script src="js/sites_ui.js?v=2026.05.19_final"></script>
+    <script src="js/sites_map.js?v=2026.05.19_final"></script>
+
+    <!-- Quiz Engine Version 4.8 (Theme Fix & Button Alignment) -->
+    <script src="js/quiz_engine_v4_7.js?v=2026.05.19_final"></script>
+    <script src="js/library_engine.js?v=2026.05.19_final"></script>
+    <!-- Engine v4.70 (Level Persistence Fix) -->
+    <script src="js/engine_v4_6.js?v=2026.05.19_final"></script>
+
+    <script>
+        // Load Components and Initialize
+        if (window.Engine) {
+            Engine.loadComponents('.');
+            Engine.init();
+        } else {
+            console.error("Engine module not found! Check script loading order.");
+            // Fallback init attempt
+            window.onload = function () {
+                if (window.Engine) {
+                    Engine.loadComponents('.');
+                    Engine.init();
+                }
+            };
+        }
+    </script>
+
+    <!-- BOTTOM SHEET GPS -->
+    <div id="gps-bottom-sheet" class="bottom-sheet-overlay"
+        onclick="if(event.target === this) SitesEngine.closeGpsMenu()">
+        <div class="bottom-sheet">
+            <div class="bs-header">
+                <h3>S'y rendre avec...</h3>
+                <button class="close-bs-btn" onclick="SitesEngine.closeGpsMenu()"><i class="ri-close-line"></i></button>
+            </div>
+            <div class="bs-options">
+                <button class="bs-option-btn" onclick="SitesEngine.launchGps('waze')">
+                    <i class="ri-navigation-fill" style="color: #33ccff;"></i> Waze
+                </button>
+                <button class="bs-option-btn" onclick="SitesEngine.launchGps('gmaps')">
+                    <i class="ri-google-fill" style="color: #ea4335;"></i> Google Maps
+                </button>
+                <button class="bs-option-btn" onclick="SitesEngine.launchGps('apple')">
+                    <i class="ri-apple-fill" style="color: #a2aaad;"></i> Apple Plans
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+</body>
+
+</html>
