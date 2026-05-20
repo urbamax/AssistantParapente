@@ -851,6 +851,11 @@ const QuizEngine = {
             <button class="choice-btn" onclick="Engine.showDashboard()">Retour au Menu</button>
         `;
         document.getElementById('qcm-feedback').style.display = 'none';
+
+        // Auto-synchronize progress with cloud silently
+        if (window.FirebaseAuthEngine) {
+            window.FirebaseAuthEngine.syncDataWithCloud(true);
+        }
     },
 
     showExamResults: function () {
@@ -875,6 +880,11 @@ const QuizEngine = {
         // Save exam to history (only for EXAM mode)
         if (this.state.qcmConfig.mode === 'EXAM') {
             this.saveExamHistory(Engine.state.level, score, total, results);
+        }
+
+        // Auto-synchronize progress with cloud silently
+        if (window.FirebaseAuthEngine) {
+            window.FirebaseAuthEngine.syncDataWithCloud(true);
         }
 
         let color = score >= total * 0.75 ? '#4ade80' : '#f87171'; // keeping inline for dynamic color logic simplicity or could map to class
@@ -1138,18 +1148,20 @@ const QuizEngine = {
 
             if (levelQs) {
                 levelQs.forEach(q => {
-                    // Ensure we're using the stats from the persistent storage
                     const qStat = stats.questions[q.code];
                     const theme = q.theme || 'Autre';
 
                     if (!levelThemes[theme]) {
-                        levelThemes[theme] = { total: 0, correct: 0 };
+                        levelThemes[theme] = { mastery: 0, totalQuestions: 0, attemptedCount: 0 };
                     }
 
-                    // Aggregate stats if they exist
+                    // Always count this question toward the theme total
+                    levelThemes[theme].totalQuestions++;
+
+                    // Per-question mastery score: correct/total ratio (0–1), or 0 if not attempted
                     if (qStat && qStat.total > 0) {
-                        levelThemes[theme].total += qStat.total;
-                        levelThemes[theme].correct += qStat.correct;
+                        levelThemes[theme].mastery += (qStat.correct / qStat.total);
+                        levelThemes[theme].attemptedCount++;
                     }
                 });
             }
@@ -1234,8 +1246,8 @@ const QuizEngine = {
                 let valA, valB;
 
                 if (this.state.themeSort === 'rate') {
-                    valA = a[1].total > 0 ? (a[1].correct / a[1].total) : 0;
-                    valB = b[1].total > 0 ? (b[1].correct / b[1].total) : 0;
+                    valA = a[1].totalQuestions > 0 ? (a[1].mastery / a[1].totalQuestions) : 0;
+                    valB = b[1].totalQuestions > 0 ? (b[1].mastery / b[1].totalQuestions) : 0;
                 } else {
                     valA = a[0];
                     valB = b[0];
@@ -1246,7 +1258,7 @@ const QuizEngine = {
                 return 0;
             });
 
-            // Sort Controls HTML
+            // Sort Controls HTML — rendered separately above the grid
             const getSortIcon = (type) => {
                 if (this.state.themeSort !== type) return '';
                 return this.state.themeSortDir === 'asc' ? '<i class="ri-arrow-up-s-line"></i>' : '<i class="ri-arrow-down-s-line"></i>';
@@ -1254,37 +1266,81 @@ const QuizEngine = {
 
             const sortBtnStyle = (type) => {
                 const isActive = this.state.themeSort === type;
-                return `background:${isActive ? 'var(--bg-input)' : 'transparent'}; border:1px solid ${isActive ? 'var(--accent-blue)' : 'var(--border-color)'}; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:0.75rem; display:flex; align-items:center; gap:4px; opacity:${isActive ? 1 : 0.6};`;
+                return `flex:1; background:${isActive ? 'var(--bg-main)' : 'transparent'}; color:${isActive ? 'var(--text-main)' : 'var(--text-muted)'}; border:none; padding:6px 14px; border-radius:8px; cursor:pointer; font-size:0.8rem; font-weight:${isActive ? '700' : '500'}; display:flex; align-items:center; justify-content:center; gap:5px; transition:all 0.2s; box-shadow:${isActive ? '0 1px 4px rgba(0,0,0,0.18)' : 'none'};`;
             };
 
-            themesHtml += `
-                <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:8px;">
-                     <button onclick="QuizEngine.setThemeSort('alpha')" style="${sortBtnStyle('alpha')}">
-                        ${getSortIcon('alpha')} Alphabétique
-                    </button>
-                    <button onclick="QuizEngine.setThemeSort('rate')" style="${sortBtnStyle('rate')}">
-                        ${getSortIcon('rate')} Taux
-                    </button>
+            const sortControlsHtml = `
+                <div style="display:flex; align-items:center; justify-content:flex-end; margin-bottom:16px;">
+                    <div style="display:flex; background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:3px; gap:2px;">
+                        <button onclick="QuizEngine.setThemeSort('alpha')" style="${sortBtnStyle('alpha')}">
+                            ${getSortIcon('alpha')} Alphabétique
+                        </button>
+                        <button onclick="QuizEngine.setThemeSort('rate')" style="${sortBtnStyle('rate')}">
+                            ${getSortIcon('rate')} Taux
+                        </button>
+                    </div>
                 </div>
             `;
 
             sortedThemes.forEach(([name, data]) => {
-                const pct = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
-                const tColor = pct >= 90 ? '#4ade80' : (pct >= 75 ? '#38bdf8' : (pct >= 50 ? '#facc15' : '#f87171'));
+                // totalQ = all questions in this theme for the current level (attempted or not)
+                const totalQ = data.totalQuestions || 0;
+                const attemptedUnique = data.attemptedCount || 0;
+                const notAttemptedQ = totalQ - attemptedUnique;
+
+                // pct = sum of per-question mastery ratios / totalQ
+                // This is identical to the global gauge formula and always stays 0–100%
+                const pct = totalQ > 0 ? Math.round((data.mastery / totalQ) * 100) : 0;
+
+                const tColor = pct >= 90 ? '#4ade80' : (pct >= 75 ? '#38bdf8' : (pct >= 50 ? '#facc15' : (totalQ === 0 ? 'var(--text-muted)' : '#f87171')));
+                const tColorRgb = pct >= 90 ? '74,222,128' : (pct >= 75 ? '56,189,248' : (pct >= 50 ? '250,204,21' : (totalQ === 0 ? '150,150,150' : '248,113,113')));
+
+                // Theme emoji icon
+                const themeIcons = {
+                    'Météo': '🌦️', 'Mécavol': '⚙️', 'Matériel': '🪂',
+                    'Pilotage': '🧭', 'Réglementation': '📋', 'Facteurs humains': '🧠',
+                    'Milieu naturel': '🏔️'
+                };
+                const icon = themeIcons[name] || '📚';
 
                 // Active state
                 const isActive = this.state.themeFilter === name;
-                const activeStyle = isActive
-                    ? `background:var(--bg-input); border-color:${tColor}; box-shadow:0 0 15px -5px ${tColor}; color:var(--text-main);`
-                    : `background:var(--bg-card); border:1px solid var(--border-color); color:var(--text-main);`;
+                const cardBorder = isActive
+                    ? `border:2px solid ${tColor}; box-shadow:0 0 20px -4px rgba(${tColorRgb},0.4);`
+                    : `border:1px solid var(--border-color);`;
+                const cardBg = isActive
+                    ? `background:rgba(${tColorRgb},0.08);`
+                    : `background:var(--bg-card);`;
+
+                // Progress bar width
+                const barWidth = totalQ > 0 ? pct : 0;
 
                 themesHtml += `
-                <div class="stats-row" onclick="QuizEngine.setThemeFilter('${name}')" style="cursor:pointer; margin-bottom:12px; padding:12px 16px; border-radius:12px; ${activeStyle} transition:all 0.2s;">
-                    <div style="flex:1;">
-                        <div style="font-weight:600; font-size:1rem; letter-spacing:0.01em;">${name}</div>
+                <div class="theme-card" onclick="QuizEngine.setThemeFilter('${name}')" style="cursor:pointer; padding:16px 18px; border-radius:16px; ${cardBorder} ${cardBg} color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden;">
+                    <!-- Subtle background glow for active -->
+                    ${isActive ? `<div style="position:absolute;inset:0;background:radial-gradient(ellipse at top left, rgba(${tColorRgb},0.08) 0%, transparent 70%);pointer-events:none;"></div>` : ''}
+
+                    <!-- Top row: emoji (left) + badge % (right) — never overlaps -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-size:1.4rem; line-height:1;">${icon}</span>
+                        <div style="background:rgba(${tColorRgb},0.15); color:${tColor}; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
+                            ${totalQ === 0 ? '—' : pct + '%'}
+                        </div>
                     </div>
 
-                    <div style="font-weight:800; color:${tColor}; font-size:1.2rem; min-width:60px; text-align:right;">${pct}%</div>
+                    <!-- Theme name — full width, wraps freely -->
+                    <div style="font-weight:700; font-size:0.88rem; line-height:1.3; letter-spacing:0.01em; margin-bottom:12px;">${name}</div>
+
+                    <!-- Progress bar -->
+                    <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
+                        <div style="height:100%; width:${barWidth}%; background:${tColor}; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px ${tColor};"></div>
+                    </div>
+
+                    <!-- Footer: question count -->
+                    <div style="font-size:0.72rem; opacity:0.5; display:flex; justify-content:space-between; align-items:center;">
+                        <span>${attemptedUnique} tentées / ${totalQ} questions${notAttemptedQ > 0 ? ` <span style="opacity:0.7;">(${notAttemptedQ} non tentée${notAttemptedQ > 1 ? 's' : ''})</span>` : ''}</span>
+                        ${isActive ? '<span style="font-size:0.68rem; font-weight:700; opacity:0.8;">✕ Retirer filtre</span>' : ''}
+                    </div>
                 </div>
             `;
             });
@@ -1552,9 +1608,10 @@ const QuizEngine = {
                 ${distributionHtml}
             </div>
 
-                <div>
-                    <h3 class="library-section-header" style="border:none; margin-bottom:24px;">STATISTIQUES PAR THÈME</h3>
-                    <div style="display:flex; flex-direction:column; gap:2px;">
+                <div style="margin-top:48px;">
+                    <h3 class="library-section-header" style="border:none; margin-bottom:20px;">STATISTIQUES PAR THÈME</h3>
+                    ${sortControlsHtml}
+                    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px;">
                         ${themesHtml || '<div style="opacity:0.5;">Aucune donnée.</div>'}
                     </div>
                 </div>

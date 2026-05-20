@@ -256,10 +256,12 @@ const FirebaseAuthEngine = {
     },
 
     // Stats Cloud Synchronization Logic
-    syncDataWithCloud: async function() {
+    syncDataWithCloud: async function(silent = false) {
         if (!this.currentUser) return;
         
-        this.showStatus("Synchronisation en cours...", "info");
+        if (!silent) {
+            this.showStatus("Synchronisation en cours...", "info");
+        }
         
         try {
             const { doc, getDoc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
@@ -302,12 +304,16 @@ const FirebaseAuthEngine = {
             console.log("Sync complete!");
             
             this.lastSyncTime = new Date().toLocaleTimeString();
-            this.showStatus("Synchronisé avec le cloud !", "success");
-            this.updateModalUI();
+            if (!silent) {
+                this.showStatus("Synchronisé avec le cloud !", "success");
+                this.updateModalUI();
+            }
         } catch (error) {
             console.error("Synchronization failed:", error);
-            const errorDetail = error.message ? ` : ${error.message}` : '';
-            this.showAlert(`La synchronisation a échoué${errorDetail}. Les données restent stockées localement.`, "error");
+            if (!silent) {
+                const errorDetail = error.message ? ` : ${error.message}` : '';
+                this.showAlert(`La synchronisation a échoué${errorDetail}. Les données restent stockées localement.`, "error");
+            }
         }
     },
 
