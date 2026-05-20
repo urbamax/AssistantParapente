@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="css/quiz.css?v=2026.05.19_final">
     <link rel="stylesheet" href="css/library.css?v=2026.05.19_final">
     <link rel="stylesheet" href="css/sites.css?v=2026.05.19_final">
-    <link rel="stylesheet" href="css/auth.css?v=2026.05.20_v2">
+    <link rel="stylesheet" href="css/auth.css?v=2026.05.20_v3">
 </head>
 
 <body>
@@ -544,7 +544,7 @@
 
     <!-- Firebase Sync Config & Engine -->
     <script src="js/firebase_config.js?v=2026.05.20_v2"></script>
-    <script type="module" src="js/firebase_engine.js?v=2026.05.20_v3"></script>
+    <script type="module" src="js/firebase_engine.js?v=2026.05.20_v4"></script>
 
     <!-- Quiz Engine Version 4.8 (Theme Fix & Button Alignment) -->
     <script src="js/quiz_engine_v4_7.js?v=2026.05.20_v2"></script>
@@ -617,8 +617,14 @@
                             <input type="password" id="login-password" class="auth-input" placeholder="••••••••" autocomplete="current-password">
                         </div>
                     </div>
-                    <div class="auth-forgot-link" onclick="FirebaseAuthEngine.forgotPassword(document.getElementById('login-email').value)">
-                        Mot de passe oublié ?
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 4px;">
+                        <label class="auth-remember-row">
+                            <input type="checkbox" id="login-remember-me" class="auth-remember-checkbox" checked>
+                            <span>Rester connecté</span>
+                        </label>
+                        <div class="auth-forgot-link" style="margin: 0; align-self: center;" onclick="FirebaseAuthEngine.forgotPassword(document.getElementById('login-email').value)">
+                            Mot de passe oublié ?
+                        </div>
                     </div>
                     <button class="auth-submit-btn" onclick="FirebaseAuthEngine.signIn(document.getElementById('login-email').value, document.getElementById('login-password').value)">
                         Se connecter
@@ -648,6 +654,10 @@
                             <input type="password" id="register-confirm-password" class="auth-input" placeholder="••••••••" autocomplete="new-password">
                         </div>
                     </div>
+                    <label class="auth-remember-row" style="margin-top: 4px;">
+                        <input type="checkbox" id="register-remember-me" class="auth-remember-checkbox" checked>
+                        <span>Rester connecté</span>
+                    </label>
                     <button class="auth-submit-btn" onclick="FirebaseAuthEngine.signUp(document.getElementById('register-email').value, document.getElementById('register-password').value, document.getElementById('register-confirm-password').value)">
                         Créer mon compte
                     </button>

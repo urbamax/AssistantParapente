@@ -365,3 +365,45 @@ body.light-mode .auth-sync-status {
 .auth-active-dot.active {
     display: block;
 }
+
+/* Checkbox / Remember Me */
+.auth-remember-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    user-select: none;
+    align-self: flex-start;
+}
+
+.auth-remember-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-input);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+.auth-remember-checkbox:checked {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+}
+
+.auth-remember-checkbox:checked::after {
+    content: '\2713';
+    font-weight: 900;
+    color: white;
+    font-size: 11px;
+}

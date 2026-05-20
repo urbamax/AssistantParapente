@@ -575,13 +575,26 @@ const QuizEngine = {
             const hasB = codeStr.includes('B');
             const hasM = codeStr.includes('M');
             const hasT = codeStr.includes('T');
+            const isLight = document.body.classList.contains('light-mode');
 
-            // If explicit level overrides are needed, we can check q.level too, 
-            // but the suffix is usually the source of truth for "all applicable levels".
-            if (hasV) badgesHtml += '<div class="level-tag" style="margin:0; font-size:0.75rem; background:rgba(74, 222, 128, 0.2); color:#4ade80; border:1px solid #4ade80;">BI</div>';
-            if (hasB) badgesHtml += '<div class="level-tag" style="margin:0; font-size:0.75rem; background:rgba(96, 165, 250, 0.2); color:#60a5fa; border:1px solid #60a5fa;">BP</div>';
-            if (hasM) badgesHtml += '<div class="level-tag" style="margin:0; font-size:0.75rem; background:rgba(121, 85, 72, 0.3); color:#e6ceca; border:1px solid #bcaaa4;">BPC</div>';
-            if (hasT) badgesHtml += '<div class="level-tag" style="margin:0; font-size:0.75rem; background:rgba(99, 102, 241, 0.2); color:#6366f1; border:1px solid #6366f1;">TREUIL</div>';
+            // Theme-aware styles for badges to ensure premium design and high contrast/readability
+            const styleBI = isLight 
+                ? 'background:rgba(34, 197, 94, 0.1); color:#16a34a; border:1px solid rgba(34, 197, 94, 0.4);' 
+                : 'background:rgba(74, 222, 128, 0.2); color:#4ade80; border:1px solid #4ade80;';
+            const styleBP = isLight 
+                ? 'background:rgba(37, 99, 235, 0.1); color:#2563eb; border:1px solid rgba(37, 99, 235, 0.4);' 
+                : 'background:rgba(96, 165, 250, 0.2); color:#60a5fa; border:1px solid #60a5fa;';
+            const styleBPC = isLight 
+                ? 'background:rgba(121, 85, 72, 0.15); color:#5d4037; border:1px solid rgba(121, 85, 72, 0.4);' 
+                : 'background:rgba(121, 85, 72, 0.3); color:#e6ceca; border:1px solid #bcaaa4;';
+            const styleTreuil = isLight 
+                ? 'background:rgba(79, 70, 229, 0.1); color:#4f46e5; border:1px solid rgba(79, 70, 229, 0.4);' 
+                : 'background:rgba(99, 102, 241, 0.2); color:#6366f1; border:1px solid #6366f1;';
+
+            if (hasV) badgesHtml += `<div class="level-tag" style="margin:0; font-size:0.75rem; ${styleBI}">BI</div>`;
+            if (hasB) badgesHtml += `<div class="level-tag" style="margin:0; font-size:0.75rem; ${styleBP}">BP</div>`;
+            if (hasM) badgesHtml += `<div class="level-tag" style="margin:0; font-size:0.75rem; ${styleBPC}">BPC</div>`;
+            if (hasT) badgesHtml += `<div class="level-tag" style="margin:0; font-size:0.75rem; ${styleTreuil}">TREUIL</div>`;
         }
 
 
@@ -930,9 +943,9 @@ const QuizEngine = {
                     <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
                         ${optionsHtml}
                     </div>
-                    ${!r.isCorrect ? `<div style="padding:12px; background:rgba(255,255,255,0.03); border-left:3px solid #f472b6; font-size:0.9rem; color:#e2e8f0;">
+                    ${!r.isCorrect ? `<div style="padding:12px; background:rgba(244, 114, 182, 0.08); border-left:3px solid #f472b6; font-size:0.9rem; color:var(--text-main); border-radius:8px;">
                         <div style="margin-bottom:8px;">${q.explanation || 'Pas d\'explication disponible.'}</div>
-                        ${this.getCourseUrl(q.code, q.question) ? `<button onclick="window.open('${this.getCourseUrl(q.code, q.question)}', '_blank')" style="background:rgba(255, 255, 255, 0.1); color:var(--text-secondary); border:1px solid rgba(255, 255, 255, 0.2); padding:4px 10px; border-radius:6px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR LE COURS</button>` : ''}
+                        ${this.getCourseUrl(q.code, q.question) ? `<button onclick="window.open('${this.getCourseUrl(q.code, q.question)}', '_blank')" style="background:var(--bg-input); color:var(--text-main); border:1px solid var(--border-color); padding:4px 10px; border-radius:6px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR LE COURS</button>` : ''}
                     </div>` : ''}
                 </div>
             `;
@@ -1156,7 +1169,7 @@ const QuizEngine = {
             const cYellow = '250, 204, 21';
             const cOrange = '251, 146, 60';
             const cRed = '248, 113, 113';
-            const cGray = '255, 255, 255';
+            const cGray = document.body.classList.contains('light-mode') ? '100, 116, 139' : '255, 255, 255';
 
             const distributionHtml = `
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
@@ -1225,7 +1238,7 @@ const QuizEngine = {
 
             const sortBtnStyle = (type) => {
                 const isActive = this.state.themeSort === type;
-                return `background:${isActive ? 'rgba(255,255,255,0.1)' : 'transparent'}; border:1px solid ${isActive ? 'var(--primary-color)' : 'var(--border-color)'}; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:0.75rem; display:flex; align-items:center; gap:4px; opacity:${isActive ? 1 : 0.6};`;
+                return `background:${isActive ? 'var(--bg-input)' : 'transparent'}; border:1px solid ${isActive ? 'var(--accent-blue)' : 'var(--border-color)'}; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:0.75rem; display:flex; align-items:center; gap:4px; opacity:${isActive ? 1 : 0.6};`;
             };
 
             themesHtml += `
@@ -1246,8 +1259,8 @@ const QuizEngine = {
                 // Active state
                 const isActive = this.state.themeFilter === name;
                 const activeStyle = isActive
-                    ? `background:rgba(255,255,255,0.1); border-color:${tColor}; box-shadow:0 0 15px -5px ${tColor};`
-                    : `background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03);`;
+                    ? `background:var(--bg-input); border-color:${tColor}; box-shadow:0 0 15px -5px ${tColor}; color:var(--text-main);`
+                    : `background:var(--bg-card); border:1px solid var(--border-color); color:var(--text-main);`;
 
                 themesHtml += `
                 <div class="stats-row" onclick="QuizEngine.setThemeFilter('${name}')" style="cursor:pointer; margin-bottom:12px; padding:12px 16px; border-radius:12px; ${activeStyle} transition:all 0.2s;">
@@ -1354,7 +1367,7 @@ const QuizEngine = {
                     <div style="font-size:0.9rem; opacity:0.7;">
                         <span style="font-weight:700; color:var(--text-main);">${visibleQuestions.length}</span> questions 
                         <span style="opacity:0.6;">(${displayLabel})</span>
-                        ${(this.state.masteryFilter !== 'ALL' || this.state.themeFilter) ? '<a onclick="QuizEngine.clearAllFilters()" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--color-primary);">Tout effacer</a>' : ''}
+                        ${(this.state.masteryFilter !== 'ALL' || this.state.themeFilter) ? '<a onclick="QuizEngine.clearAllFilters()" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">Tout effacer</a>' : ''}
                     </div>
                     <div style="display:flex; gap:8px;">
                         <button onclick="QuizEngine.sortQuestions('rate')" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
@@ -1428,7 +1441,7 @@ const QuizEngine = {
                         // Add Explanation in Stats View
                         if (qObj.explication) {
                             answersHtml += `
-                                <div style="margin-top:12px; padding:12px; background:rgba(251, 146, 60, 0.1); border-left:3px solid #fb923c; font-size:0.9rem; color:#e2e8f0;">
+                                <div style="margin-top:12px; padding:12px; background:rgba(251, 146, 60, 0.15); border-left:3px solid #fb923c; font-size:0.9rem; color:var(--text-main); border-radius:8px;">
                                     <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">Explication</div>
                                     ${qObj.explication}
                                 </div>
@@ -1446,7 +1459,7 @@ const QuizEngine = {
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#${code}</span>
-                                    ${QuizEngine.getCourseUrl(code, qText) ? `<button onclick="event.stopPropagation(); window.open('${QuizEngine.getCourseUrl(code, qText)}', '_blank')" style="background:var(--color-primary); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>` : ''}
+                                    ${QuizEngine.getCourseUrl(code, qText) ? `<button onclick="event.stopPropagation(); window.open('${QuizEngine.getCourseUrl(code, qText)}', '_blank')" style="background:var(--accent-blue); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>` : ''}
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">${theme}</span>
                                     ${streak >= 3 ? `<span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 ${streak}</span>` : ''}
                                     ${hasAnswers ? '<i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-' + code + '"></i>' : ''}
@@ -1477,12 +1490,12 @@ const QuizEngine = {
             const colorGlow = color + '44'; // Add transparency for glow
 
             const successGaugeHtml = `
-            <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:rgba(255,255,255,0.02); border-radius:32px; border: 1px solid rgba(255,255,255,0.05); backdrop-filter:blur(10px);">
+            <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
                     <svg width="250" height="250" viewBox="0 0 140 140" style="transform: rotate(-90deg); overflow: visible;">
                         <!-- Background track -->
-                        <circle cx="70" cy="70" r="55" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="8" />
+                        <circle cx="70" cy="70" r="55" fill="none" stroke="var(--border-color)" stroke-width="8" />
                         <!-- Progress bar -->
                         <circle cx="70" cy="70" r="55" fill="none" 
                             stroke="${color}" 
@@ -1533,14 +1546,14 @@ const QuizEngine = {
 
             <div style="margin-top:64px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">HISTORIQUE DES EXAMENS</h3>
-                <div style="background:rgba(255,255,255,0.02); padding:24px; border-radius:24px; border:1px solid rgba(255,255,255,0.05);">
+                <div style="background:var(--bg-card); padding:24px; border-radius:24px; border:1px solid var(--border-color);">
                     ${this.renderExamHistory()}
                 </div>
             </div>
 
             <div style="margin-top:64px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">LISTE DÉTAILLÉE DES QUESTIONS</h3>
-                <div style="background:rgba(255,255,255,0.02); padding:24px; border-radius:24px; border:1px solid rgba(255,255,255,0.05);">
+                <div style="background:var(--bg-card); padding:24px; border-radius:24px; border:1px solid var(--border-color);">
                     ${allQuestionsHtml}
                 </div>
             </div>
@@ -1650,7 +1663,7 @@ const QuizEngine = {
                         }
 
                         if (expl) {
-                            return `<div style="margin-top:12px; padding:8px; background:rgba(251, 146, 60, 0.1); border-left:3px solid #fb923c; font-size:0.85rem; opacity:0.9;">
+                            return `<div style="margin-top:12px; padding:8px; background:rgba(251, 146, 60, 0.15); border-left:3px solid #fb923c; font-size:0.85rem; color:var(--text-main); border-radius:8px;">
                                     <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">Explication</div>
                                     ${expl}</div>`;
                         }
@@ -2156,7 +2169,7 @@ const QuizEngine = {
                         <div style="display:flex; gap:8px; align-items:center;">
                             <span style="background:${levelColor}; color:white; padding:4px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${levelLabel}</span>
                             <span style="background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:6px; font-size:0.7rem;">${qObj.theme}</span>
-                            ${QuizEngine.getCourseUrl(qObj.code, qObj.question) ? `<button onclick="window.open('${QuizEngine.getCourseUrl(qObj.code, qObj.question)}', '_blank')" style="background:var(--color-primary); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>` : ''}
+                            ${QuizEngine.getCourseUrl(qObj.code, qObj.question) ? `<button onclick="window.open('${QuizEngine.getCourseUrl(qObj.code, qObj.question)}', '_blank')" style="background:var(--accent-blue); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>` : ''}
                         </div>
                         <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#${qObj.code}</span>
                     </div>
@@ -2168,7 +2181,7 @@ const QuizEngine = {
                             </div>
                         `).join('')}
                     ${qObj.explication ? `
-                        <div style="margin-top:12px; padding:12px; background:rgba(251, 146, 60, 0.1); border-left:3px solid #fb923c; font-size:0.9rem; color:#e2e8f0;">
+                        <div style="margin-top:12px; padding:12px; background:rgba(251, 146, 60, 0.15); border-left:3px solid #fb923c; font-size:0.9rem; color:var(--text-main); border-radius:8px;">
                             <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">Explication</div>
                             ${qObj.explication}
                         </div>

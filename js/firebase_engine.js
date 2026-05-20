@@ -157,8 +157,14 @@ const FirebaseAuthEngine = {
         }
 
         try {
-            const { createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+            const { createUserWithEmailAndPassword, setPersistence, indexedDBLocalPersistence, browserSessionPersistence } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
             this.showStatus("Création du compte...", "info");
+            
+            // Set persistence dynamically
+            const rememberMeEl = document.getElementById('register-remember-me');
+            const rememberMe = rememberMeEl ? rememberMeEl.checked : true;
+            await setPersistence(auth, rememberMe ? indexedDBLocalPersistence : browserSessionPersistence);
+
             await createUserWithEmailAndPassword(auth, email, password);
             this.showAlert("Compte créé avec succès !", "success");
         } catch (error) {
@@ -180,8 +186,14 @@ const FirebaseAuthEngine = {
         this.clearAlerts();
 
         try {
-            const { signInWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+            const { signInWithEmailAndPassword, setPersistence, indexedDBLocalPersistence, browserSessionPersistence } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
             this.showStatus("Connexion...", "info");
+            
+            // Set persistence dynamically
+            const rememberMeEl = document.getElementById('login-remember-me');
+            const rememberMe = rememberMeEl ? rememberMeEl.checked : true;
+            await setPersistence(auth, rememberMe ? indexedDBLocalPersistence : browserSessionPersistence);
+
             await signInWithEmailAndPassword(auth, email, password);
         } catch (error) {
             console.error("Signin error:", error);
