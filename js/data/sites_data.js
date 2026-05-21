@@ -929,8 +929,8 @@ const SITES_DATA = [
         acces_topo: "Stationnement sur le parking du Fort de Mons. Accès en contournant le fort par un côté ou l'autre. Le terrain est une grande prairie herbeuse, avec une butte. Marche depuis le parking : 3 minutes."
     },
     {
-        id: "equihen-deco-dunes-8",
-        referecence_terrain: "8",
+        id: "equihen-deco-dunes",
+        referecence_terrain: "",
         nom: "Equihen, déco dunes",
         code_postal: "62224",
         ville: "Equihen-Plage",

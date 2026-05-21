@@ -422,17 +422,8 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                         <img src="https://federation.ffvl.fr/sites/all/themes/ffvl/favicon.ico" alt="FFVL"> FFVL
                     </a>
                     ` : ''}
-                    <button class="action-btn-secondary windy-btn" onclick="SitesEngine.focusSiteMap('windy', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Windy">
-                        <i class="ri-windy-line"></i> Windy
-                    </button>
-                    <button class="action-btn-secondary meteoparapente-btn" onclick="SitesEngine.focusSiteMap('meteoparapente', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Météo-Parapente">
-                        <i class="ri-temp-hot-line"></i> Météo-P.
-                    </button>
-                    <button class="action-btn-secondary paraglidingearth-btn" onclick="SitesEngine.focusSiteMap('paraglidingearth', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Paragliding Earth">
-                        <i class="ri-earth-line"></i> PGEarth
-                    </button>
-                    <button class="action-btn-secondary paraglidable-btn" onclick="SitesEngine.focusSiteMap('paraglidable', ${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Paraglidable">
-                        <i class="ri-flight-takeoff-line"></i> Paraglidable
+                    <button class="action-btn-spot spot-it-btn" onclick="SitesEngine.spotSite(${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                        <i class="ri-focus-3-line"></i> Spot It
                     </button>
                     <button class="action-btn-primary gps-btn" onclick="SitesEngine.openGpsMenu(${site.latitude}, ${site.longitude}); event.stopPropagation();">
                         <i class="ri-navigation-line"></i> S'y rendre
@@ -480,34 +471,6 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                             <i class="ri-arrow-down-s-line"></i>
                         </summary>
                         <div class="site-rich-details">
-                            <div class="external-links-section">
-                                <h4 class="external-links-title"><i class="ri-links-line"></i> Météo & Cartes Externes</h4>
-                                <div class="external-links-grid">
-                                    <a href="https://meteo-parapente.com/#/${site.latitude},${site.longitude},11" target="_blank" class="external-link-btn mp-btn" onclick="event.stopPropagation();">
-                                        <i class="ri-cloud-windy-line"></i> Météo-Parapente
-                                    </a>
-                                    <a href="https://www.meteoblue.com/fr/meteo/semaine/?lat=${site.latitude}&lon=${site.longitude}" target="_blank" class="external-link-btn mb-btn" onclick="event.stopPropagation();">
-                                        <i class="ri-temp-hot-line"></i> Meteoblue
-                                    </a>
-                                    <a href="https://fr.windfinder.com/#11/${site.latitude}/${site.longitude}" target="_blank" class="external-link-btn wf-btn" onclick="event.stopPropagation();">
-                                        <i class="ri-compass-line"></i> Windfinder
-                                    </a>
-                                    <a href="https://www.paraglidingmap.com/app/?lat=${site.latitude}&lng=${site.longitude}&zoom=11" target="_blank" class="external-link-btn pm-btn" onclick="event.stopPropagation();">
-                                        <i class="ri-map-pin-line"></i> Paragliding Map
-                                    </a>
-                                    ${site.referecence_terrain ? `
-                                    <a href="https://www.spotair.mobi/spot/ffvl/${site.referecence_terrain}" target="_blank" class="external-link-btn sa-btn" onclick="event.stopPropagation();">
-                                        <i class="ri-radar-line"></i> Spotair
-                                    </a>
-                                    ` : ''}
-                                    <a href="https://www.paraglidingearth.com/?latlng=${site.latitude},${site.longitude}" target="_blank" class="external-link-btn pe-btn" onclick="event.stopPropagation();">
-                                        <i class="ri-earth-line"></i> Paragliding Earth
-                                    </a>
-                                    <a href="https://paraglidable.com/?lat=${site.latitude}&lon=${site.longitude}&zoom=8" target="_blank" class="external-link-btn pg-btn" onclick="event.stopPropagation();">
-                                        <i class="ri-flight-takeoff-line"></i> Paraglidable
-                                    </a>
-                                </div>
-                            </div>
 
                             ${showConv ? `
                             <div class="rich-detail-item default">

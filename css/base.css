@@ -117,12 +117,14 @@ button {
 }
 
 @media (max-width: 768px) {
-    @media (max-width: 768px) {
-
-        /* Base */
-        body {
-            font-size: 14px;
-        }
-
+    /* Base */
+    body {
+        font-size: 14px;
+    }
+    .mode-screen {
+        padding: 0 8px 80px 8px !important;
+    }
+    body:has(.gdpr-banner.active) .mode-screen {
+        padding-bottom: 220px !important;
     }
 }

@@ -135,14 +135,39 @@ body.light-mode .accent-qcm .app-icon {
 
 @media (max-width: 768px) {
     /* Dashboard */
+    .dashboard-content {
+        margin-top: calc(var(--header-height, 140px) + 12px) !important;
+    }
+
     .apps-grid {
         grid-template-columns: 1fr;
-        padding-bottom: 80px;
+        padding: 0 4px !important;
+        padding-bottom: 80px !important;
+        gap: 12px !important;
+        margin: 16px auto !important;
     }
 
     .app-card {
-        padding: 20px;
-        gap: 16px;
-        min-height: 100px;
+        padding: 16px !important;
+        gap: 16px !important;
+        min-height: auto;
+        border-radius: var(--radius-card);
+    }
+
+    .app-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.8rem;
+        border-radius: 14px;
+    }
+
+    .app-info h3 {
+        font-size: 1.2rem;
+        margin: 0 0 4px 0;
+    }
+
+    .app-info p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
     }
 }

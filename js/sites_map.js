@@ -39,10 +39,18 @@ SitesEngine.updateMapTiles = function () {
 
         if (this.state.tileLayer) return; // No need to recreate the tile layer!
 
-        this.state.tileLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-            attribution: 'Données de carte: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributeurs, SRTM | Style de carte: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
-            maxZoom: 17
+        // 1. Couche de base (Esri World Topo Map) - Rendu beaucoup plus "dessin/vectoriel" et épuré que OpenTopoMap
+        this.state.tileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri',
+            maxZoom: 17,
+            maxNativeZoom: 15 // Astuce Ligne Claire : Étire les tuiles (lignes épaisses, pas de lissage)
         }).addTo(this.state.map);
+
+        // 2. On supprime la surcouche de relief car Esri intègre déjà un relief très doux et plat
+        if (this.state.hillshadeLayer) {
+            this.state.map.removeLayer(this.state.hillshadeLayer);
+            this.state.hillshadeLayer = null;
+        }
     };
 
 SitesEngine.updateMapMarkers = function () {
@@ -165,7 +173,7 @@ SitesEngine.updateMapMarkers = function () {
             const iconHtml = `<div class="custom-map-marker ${flyableClass}" style="position: relative; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">${pulseHtml}<div class="marker-core" style="width: 14px; height: 14px; border-radius: 50%; background: ${color}; border: 2px solid var(--bg-surface); box-shadow: 0 2px 6px rgba(0,0,0,0.4); z-index: 2; transition: background-color 0.3s;"></div></div>`;
             const marker = L.marker([site.latitude, site.longitude], { icon: L.divIcon({ html: iconHtml, className: 'leaflet-custom-icon', iconSize: [30, 30], iconAnchor: [15, 15] }) });
             marker.on('click', (e) => {
-                this.focusSiteWindy(site.latitude, site.longitude, site.nom);
+                this.spotSite(site.latitude, site.longitude, site.nom, site.referecence_terrain || "");
             });
             this.state.markersGroup.addLayer(marker);
         });
@@ -292,30 +300,33 @@ SitesEngine.switchMapMode = function (mode) {
         }
     } else {
         // Load default/current coordinates if not switching to Leaflet
-        let lat = 50.45;
-        let lon = 2.20;
-        let name = "Général";
+        let lat = 46.5;
+        let lon = 2.2;
+        let name = "France";
         let extraId = "";
+        let isGeneric = true;
         
-        if (this.state.userLocation) {
+        if (this.state._spottedSite) {
+            lat = this.state._spottedSite.lat;
+            lon = this.state._spottedSite.lon;
+            name = this.state._spottedSite.siteName;
+            extraId = this.state._spottedSite.extraId || "";
+            isGeneric = false;
+        } else if (this.state.userLocation) {
             lat = this.state.userLocation.lat;
             lon = this.state.userLocation.lng;
-        } else if (typeof SITES_DATA !== 'undefined' && SITES_DATA.length > 0) {
-            lat = SITES_DATA[0].latitude;
-            lon = SITES_DATA[0].longitude;
-            name = SITES_DATA[0].nom;
-            extraId = SITES_DATA[0].referecence_terrain || "";
+            isGeneric = false;
         }
         
         if (mode === 'isofronts') {
             this.initIsofronts();
         } else {
-            this.loadIframeContent(mode, lat, lon, name, extraId);
+            this.loadIframeContent(mode, lat, lon, name, extraId, isGeneric);
         }
     }
 };
 
-SitesEngine.loadIframeContent = function (mode, lat, lon, siteName, extraId) {
+SitesEngine.loadIframeContent = function (mode, lat, lon, siteName, extraId, isGeneric) {
     const nameLabels = {
         'windy': document.getElementById('windy-active-spot-name'),
         'meteoparapente': document.getElementById('meteoparapente-active-spot-name'),
@@ -341,12 +352,15 @@ SitesEngine.loadIframeContent = function (mode, lat, lon, siteName, extraId) {
         'paraglidable': document.getElementById('paraglidable-open-link')
     };
 
+    const zoom = isGeneric ? 6 : 11;
+    const paraglidableZoom = isGeneric ? 6 : 8;
+
     // Calculate URLs
     const urls = {
-        'windy': `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&detailLat=${lat}&detailLon=${lon}&width=100%&height=400&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&metricWind=default&metricTemp=default&radarRange=`,
-        'meteoparapente': `https://meteo-parapente.com/#/${lat},${lon},11`,
+        'windy': `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&detailLat=${lat}&detailLon=${lon}&width=100%&height=400&zoom=${zoom}&level=surface&overlay=wind&product=ecmwf&menu=&message=true&marker=${isGeneric ? 'false' : 'true'}&calendar=now&pressure=&type=map&location=coordinates&metricWind=default&metricTemp=default&radarRange=`,
+        'meteoparapente': `https://meteo-parapente.com/#/${lat},${lon},${zoom}`,
         'paraglidingearth': `https://www.paraglidingearth.com/?latlng=${lat},${lon}`,
-        'paraglidable': `https://paraglidable.com/?lat=${lat}&lon=${lon}&zoom=8`
+        'paraglidable': `https://paraglidable.com/?lat=${lat}&lon=${lon}&zoom=${paraglidableZoom}`
     };
 
     const iframe = iframes[mode];
@@ -360,13 +374,13 @@ SitesEngine.loadIframeContent = function (mode, lat, lon, siteName, extraId) {
     if (openLink) {
         let linkUrl = urls[mode];
         if (mode === 'windy') {
-            linkUrl = `https://www.windy.com/?${lat},${lon},11`;
+            linkUrl = `https://www.windy.com/?${lat},${lon},${zoom}`;
         } else if (mode === 'meteoparapente') {
-            linkUrl = `https://meteo-parapente.com/#/${lat},${lon},11`;
+            linkUrl = `https://meteo-parapente.com/#/${lat},${lon},${zoom}`;
         } else if (mode === 'paraglidingearth') {
             linkUrl = `https://www.paraglidingearth.com/?latlng=${lat},${lon}`;
         } else if (mode === 'paraglidable') {
-            linkUrl = `https://paraglidable.com/?lat=${lat}&lon=${lon}&zoom=8`;
+            linkUrl = `https://paraglidable.com/?lat=${lat}&lon=${lon}&zoom=${paraglidableZoom}`;
         }
         openLink.href = linkUrl;
     }
@@ -377,7 +391,11 @@ SitesEngine.focusSiteMap = function (mode, lat, lon, siteName, extraId) {
     if (externalModes.includes(mode)) {
         let url = "";
         if (mode === 'meteoblue') {
-            url = `https://www.meteoblue.com/fr/meteo/semaine/${lat}N${lon}E`;
+            const latVal = Math.abs(lat);
+            const lonVal = Math.abs(lon);
+            const latDir = lat >= 0 ? 'N' : 'S';
+            const lonDir = lon >= 0 ? 'E' : 'W';
+            url = `https://www.meteoblue.com/fr/meteo/semaine/${latVal}${latDir}${lonVal}${lonDir}`;
         } else if (mode === 'windfinder') {
             url = `https://fr.windfinder.com/#11/${lat}/${lon}`;
         } else if (mode === 'spotair') {
@@ -447,98 +465,142 @@ SitesEngine.toggleFullscreen = function () {
     };
 
 /* ============================================================
-   ISOFRONTS IMAGE VIEWER
-   Sources: wetterzentrale.de (UKMO), dwd.de
-   These are direct static image URLs that don't block hotlinking.
+   ISOFRONTS
+   Redirige vers meteofrance.com/isofronts car les APIs tierces
+   (wetterzentrale, dwd) bloquent le hotlinking ou ont changé d'URL.
    ============================================================ */
 
-SitesEngine._isofrontsSources = {
-    wz: {
-        url: 'https://www.wetterzentrale.de/pics/bracka.gif',
-        label: 'Source : Wetterzentrale / UKMO — Atlantique Nord',
-        link: 'https://www.wetterzentrale.de/de/reanalysis.php'
-    },
-    dwd: {
-        url: 'https://www.dwd.de/DWD/wetter/wv_spez/hobbymeteorologen/bild_bodenanalyse.png',
-        label: 'Source : DWD (Allemagne) — Europe',
-        link: 'https://www.dwd.de/DE/leistungen/hobbymet_wv_bodendruck/hobbymet_wv_bodendruck.html'
-    },
-    wz2: {
-        url: 'https://www.wetterzentrale.de/pics/brack24a.gif',
-        label: 'Source : Wetterzentrale / UKMO — Europe du Nord',
-        link: 'https://www.wetterzentrale.de/de/reanalysis.php'
-    }
-};
-
-SitesEngine._isofrontsCurrentSource = 'wz';
-
 SitesEngine.initIsofronts = function () {
-    this.switchIsofrontsSource('wz');
+    // Panneau statique Météo-France — rien à charger dynamiquement
 };
+/* ============================================================
+   SPOT IT
+   Scrolle vers les cartes en haut et parametre toutes les
+   cartes disponibles en iframe sur les coordonnees du site.
+   ============================================================ */
 
-SitesEngine.switchIsofrontsSource = function (sourceKey) {
-    const sources = this._isofrontsSources;
-    if (!sources[sourceKey]) return;
+SitesEngine.spotSite = function (lat, lon, siteName, extraId) {
+    // 1. Scroll to the top map view
+    var mapView = document.getElementById('sites-map-view');
+    if (mapView) {
+        mapView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
-    this._isofrontsCurrentSource = sourceKey;
+    // 2. Switch to Windy as main visible map
+    this.switchMapMode('windy');
 
-    // Update source buttons
-    Object.keys(sources).forEach(k => {
-        const btn = document.getElementById('isofronts-src-' + k);
-        if (btn) btn.classList.toggle('active', k === sourceKey);
+    // 3. Load all iframe maps with the site coordinates
+    ['windy', 'meteoparapente', 'paraglidingearth', 'paraglidable'].forEach(function(mode) {
+        SitesEngine.loadIframeContent(mode, lat, lon, siteName, extraId);
     });
 
-    // Update open link
-    const openLink = document.getElementById('isofronts-open-link');
-    if (openLink) openLink.href = sources[sourceKey].link;
-
-    // Update source label
-    const label = document.getElementById('isofronts-source-label');
-    if (label) label.textContent = sources[sourceKey].label;
-
-    // Show loading state
-    const loadingEl = document.getElementById('isofronts-loading');
-    const imgEl = document.getElementById('isofronts-img');
-    const errorEl = document.getElementById('isofronts-error');
-
-    if (loadingEl) loadingEl.style.display = 'flex';
-    if (imgEl) { imgEl.style.display = 'none'; imgEl.classList.remove('zoomed'); }
-    if (errorEl) errorEl.style.display = 'none';
-
-    // Load image with cache-busting timestamp
-    if (imgEl) {
-        const ts = Math.floor(Date.now() / (1000 * 60 * 10)); // refresh every 10 min
-        imgEl.src = sources[sourceKey].url + '?_t=' + ts;
+    // 4. Update the leaflet marker focus
+    if (this.state.map) {
+        this.state.map.setView([lat, lon], 13, { animate: true });
     }
+
+    // 5. Store last spotted site for the "Plus" dropdown
+    this.state._spottedSite = { lat: lat, lon: lon, siteName: siteName, extraId: extraId };
+
+    // 6. Show a brief toast feedback
+    this.showSpotItToast(siteName);
 };
 
-SitesEngine.onIsofrontsImgLoad = function () {
-    const loadingEl = document.getElementById('isofronts-loading');
-    const imgEl = document.getElementById('isofronts-img');
-    const errorEl = document.getElementById('isofronts-error');
-    if (loadingEl) loadingEl.style.display = 'none';
-    if (errorEl) errorEl.style.display = 'none';
-    if (imgEl) imgEl.style.display = 'block';
-};
-
-SitesEngine.onIsofrontsImgError = function () {
-    const loadingEl = document.getElementById('isofronts-loading');
-    const imgEl = document.getElementById('isofronts-img');
-    const errorEl = document.getElementById('isofronts-error');
-    if (loadingEl) loadingEl.style.display = 'none';
-    if (imgEl) imgEl.style.display = 'none';
-    if (errorEl) errorEl.style.display = 'flex';
-};
-
-SitesEngine.toggleIsofrontsZoom = function (imgEl) {
-    if (!imgEl) return;
-    imgEl.classList.toggle('zoomed');
-    const hint = imgEl.closest('.sites-isofronts-canvas')
-        ? imgEl.closest('.sites-isofronts-canvas').querySelector('.isofronts-hint')
-        : null;
-    if (hint) {
-        hint.innerHTML = imgEl.classList.contains('zoomed')
-            ? '<i class="ri-zoom-out-line"></i> Cliquer pour réduire'
-            : '<i class="ri-zoom-in-line"></i> Cliquer pour agrandir';
+SitesEngine.showSpotItToast = function (siteName) {
+    var toast = document.getElementById('spot-it-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'spot-it-toast';
+        toast.className = 'spot-it-toast';
+        document.body.appendChild(toast);
     }
+    toast.innerHTML = '<i class="ri-focus-3-line"></i> Cartes centrees sur <strong>' + siteName + '</strong>';
+    toast.classList.add('visible');
+    clearTimeout(toast._hideTimer);
+    toast._hideTimer = setTimeout(function() {
+        toast.classList.remove('visible');
+    }, 2500);
+};
+
+/* ============================================================
+   "PLUS" DROPDOWN — cartes externes sans iframe
+   (Meteoblue, Windfinder, Spotair, ParaglidingMap)
+   Ouvre dans un nouvel onglet sur le spot actif.
+   ============================================================ */
+
+SitesEngine.openMoreMapsDropdown = function () {
+    var sheet = document.getElementById('more-maps-bottom-sheet');
+    if (!sheet) return;
+
+    var spotted = this.state._spottedSite || null;
+    var lat = spotted ? spotted.lat : null;
+    var lon = spotted ? spotted.lon : null;
+    var siteName = spotted ? spotted.siteName : null;
+    var extraId = spotted ? spotted.extraId : null;
+
+    var mbUrl = 'https://www.meteoblue.com/';
+    if (lat && lon) {
+        var latVal = Math.abs(lat);
+        var lonVal = Math.abs(lon);
+        var latDir = lat >= 0 ? 'N' : 'S';
+        var lonDir = lon >= 0 ? 'E' : 'W';
+        mbUrl = 'https://www.meteoblue.com/fr/meteo/semaine/' + latVal + latDir + lonVal + lonDir;
+    }
+
+    var links = [
+        {
+            label: 'Meteoblue',
+            icon: 'ri-temp-hot-line',
+            cls: 'mb-btn',
+            url: mbUrl
+        },
+        {
+            label: 'Windfinder',
+            icon: 'ri-compass-line',
+            cls: 'wf-btn',
+            url: lat ? ('https://fr.windfinder.com/#11/' + lat + '/' + lon) : 'https://www.windfinder.com/'
+        },
+        {
+            label: 'Paragliding Map',
+            icon: 'ri-map-pin-line',
+            cls: 'pm-btn',
+            url: lat ? ('https://www.paraglidingmap.com/app/?lat=' + lat + '&lng=' + lon + '&zoom=11') : 'https://www.paraglidingmap.com/'
+        }
+    ];
+
+    if (extraId) {
+        links.splice(2, 0, {
+            label: 'Spotair',
+            icon: 'ri-radar-line',
+            cls: 'sa-btn',
+            url: 'https://www.spotair.mobi/spot/ffvl/' + extraId
+        });
+    }
+
+    var grid = document.getElementById('more-maps-grid');
+    if (grid) {
+        grid.innerHTML = links.map(function(link) {
+            return '<a href="' + link.url + '" target="_blank" class="external-link-btn ' + link.cls + ' more-map-link" onclick="SitesEngine.closeMoreMapsDropdown()">' +
+                '<i class="' + link.icon + '"></i> ' + link.label + '</a>';
+        }).join('');
+    }
+
+    var title = document.getElementById('more-maps-title');
+    if (title) {
+        title.textContent = siteName ? siteName.toUpperCase() : 'CARTES EXTERNES';
+    }
+
+    var subtitle = document.getElementById('more-maps-subtitle');
+    if (subtitle) {
+        subtitle.textContent = siteName
+            ? 'Ouvrir dans un nouvel onglet sur ce spot'
+            : 'Aucun site spotte — cliquez Spot It sur une fiche d\'abord';
+    }
+
+    sheet.classList.add('active');
+};
+
+SitesEngine.closeMoreMapsDropdown = function () {
+    var sheet = document.getElementById('more-maps-bottom-sheet');
+    if (sheet) sheet.classList.remove('active');
 };

@@ -5,7 +5,7 @@ const SitesEngine = {
         filterWindInclude: [],
         filterWindExclude: [],
         filterTypeInclude: [],
-        filterTypeExclude: [],
+        filterTypeExclude: ['ATTERRO'],
         currentSiteCoords: null,
         userLocation: null, // {lat, lng}
         radiusLimit: 210, // Max distance radius limit (210 = Illimité)

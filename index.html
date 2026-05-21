@@ -6,22 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
     <title>Assistant Parapente</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap"
+        rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <link rel="stylesheet" href="css/base.css?v=2026.05.20_v19">
-    <link rel="stylesheet" href="css/components.css?v=2026.05.20_v19">
-    <link rel="stylesheet" href="css/header.css?v=2026.05.20_v19">
-    <link rel="stylesheet" href="css/footer.css?v=2026.05.20_v19">
-    <link rel="stylesheet" href="css/dashboard.css?v=2026.05.20_v19">
-    <link rel="stylesheet" href="css/quiz.css?v=2026.05.20_v19">
-    <link rel="stylesheet" href="css/library.css?v=2026.05.20_v19">
-    <link rel="stylesheet" href="css/sites.css?v=2026.05.20_v19">
-    <link rel="stylesheet" href="css/auth.css?v=2026.05.20_v19">
-    <link rel="stylesheet" href="css/gdpr.css?v=2026.05.20_v19">
+    <link rel="stylesheet" href="css/base.css?v=2026.05.21_v1">
+    <link rel="stylesheet" href="css/components.css?v=2026.05.21_v1">
+    <link rel="stylesheet" href="css/header.css?v=2026.05.21_v1">
+    <link rel="stylesheet" href="css/footer.css?v=2026.05.21_v1">
+    <link rel="stylesheet" href="css/dashboard.css?v=2026.05.21_v1">
+    <link rel="stylesheet" href="css/quiz.css?v=2026.05.21_v1">
+    <link rel="stylesheet" href="css/library.css?v=2026.05.21_v1">
+    <link rel="stylesheet" href="css/sites.css?v=2026.05.21_v1">
+    <link rel="stylesheet" href="css/auth.css?v=2026.05.21_v1">
+    <link rel="stylesheet" href="css/gdpr.css?v=2026.05.21_v1">
 </head>
 
 <body>
@@ -295,6 +296,12 @@
                             style="color: var(--text-secondary); border-color: var(--border-color);">
                             <i class="ri-cloud-line"></i> <span>Fronts &amp; Isobares</span>
                         </button>
+                        <button id="map-toggle-more" class="action-btn-secondary map-toggle-btn map-toggle-more-btn"
+                            onclick="SitesEngine.openMoreMapsDropdown()"
+                            style="color: var(--text-secondary); border-color: var(--border-color);">
+                            <i class="ri-map-2-line"></i> <span>Plus</span> <i class="ri-arrow-down-s-line"
+                                style="margin-left:2px;"></i>
+                        </button>
                     </div>
                     <button id="map-toggle-fullscreen" class="action-btn-secondary map-toggle-btn"
                         onclick="SitesEngine.toggleFullscreen()"
@@ -309,7 +316,7 @@
                     <div id="windy-active-spot-header" class="windy-active-spot-header">
                         <div class="isofronts-header-left">
                             <i class="ri-windy-line windy-spot-icon"></i>
-                            <span>Radar Vent :</span>
+                            <span>Windy :</span>
                             <span id="windy-active-spot-name" class="windy-spot-name">Général</span>
                         </div>
                         <div class="isofronts-header-right">
@@ -375,51 +382,39 @@
                     <iframe id="paraglidable-embed-iframe" src="" width="100%" height="100%"
                         class="sites-iframe"></iframe>
                 </div>
-                <!-- Container Isofronts -->
-                <div id="sites-isofronts-canvas" class="sites-isofronts-canvas">
-                    <div id="isofronts-active-spot-header" class="isofronts-header">
+                <!-- Container Isofronts (Météo France) -->
+                <div id="sites-isofronts-canvas" class="sites-map-canvas-custom"
+                    style="display: none; background: var(--bg-card); position: relative; border-radius: 0 0 12px 12px; overflow: hidden;">
+                    <div id="isofronts-active-spot-header" class="windy-active-spot-header"
+                        style="border-bottom: 1px solid var(--border-color);">
                         <div class="isofronts-header-left">
                             <i class="ri-cloud-line windy-spot-icon"></i>
-                            <span>Fronts &amp; Isobares</span>
-                        </div>
-                        <div class="isofronts-sources-btns">
-                            <button class="isofronts-src-btn active" id="isofronts-src-wz" onclick="SitesEngine.switchIsofrontsSource('wz')" title="Wetterzentrale (UKMO)">
-                                Atlantique
-                            </button>
-                            <button class="isofronts-src-btn" id="isofronts-src-dwd" onclick="SitesEngine.switchIsofrontsSource('dwd')" title="DWD Allemagne">
-                                Europe
-                            </button>
-                            <button class="isofronts-src-btn" id="isofronts-src-wz2" onclick="SitesEngine.switchIsofrontsSource('wz2')" title="Wetterzentrale Europe">
-                                Europe N.
-                            </button>
+                            <span>Fronts &amp; Isobares :</span>
+                            <span class="windy-spot-name">Météo-France</span>
                         </div>
                         <div class="isofronts-header-right">
-                            <a id="isofronts-open-link" href="https://www.wetterzentrale.de/de/reanalysis.php" target="_blank" class="isofronts-link">
+                            <a id="isofronts-open-link" href="https://meteofrance.com/isofronts" target="_blank"
+                                class="isofronts-link">
                                 <i class="ri-external-link-line"></i> Ouvrir
                             </a>
                         </div>
                     </div>
-                    <div class="isofronts-img-container" id="isofronts-img-container">
-                        <div class="isofronts-loading" id="isofronts-loading">
-                            <i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i>
-                            Chargement de la carte...
-                        </div>
-                        <img id="isofronts-img"
-                            src=""
-                            alt="Carte synoptique - Fronts et Isobares"
-                            class="isofronts-img"
-                            onclick="SitesEngine.toggleIsofrontsZoom(this)"
-                            onload="SitesEngine.onIsofrontsImgLoad()"
-                            onerror="SitesEngine.onIsofrontsImgError()"
-                        />
-                        <div class="isofronts-error" id="isofronts-error" style="display:none;">
-                            <i class="ri-error-warning-line" style="font-size:2rem; color: var(--accent-red);"></i>
-                            <p>Impossible de charger la carte.<br>Essayez une autre source ou ouvrez le lien directement.</p>
-                        </div>
-                    </div>
-                    <div class="isofronts-footer">
-                        <span id="isofronts-source-label" class="isofronts-source-credit">Source : Wetterzentrale / UKMO</span>
-                        <span class="isofronts-hint"><i class="ri-zoom-in-line"></i> Cliquer pour agrandir</span>
+                    <div
+                        style="width: 100%; height: calc(100% - 45px); display: flex; align-items: center; justify-content: center; flex-direction: column; background: var(--bg-surface); padding: 2rem; box-sizing: border-box; text-align: center;">
+                        <i class="ri-cloud-windy-line"
+                            style="font-size: 4rem; color: var(--accent-blue); margin-bottom: 16px;"></i>
+                        <h3 style="color: var(--text-main); margin-bottom: 8px; font-size: 1.25rem;">Carte Interactive
+                            des Fronts</h3>
+                        <p
+                            style="color: var(--text-secondary); margin-bottom: 24px; max-width: 400px; font-size: 0.95rem; line-height: 1.5;">
+                            Météo-France propose une excellente carte interactive pour visualiser les fronts et isobares
+                            de manière détaillée.<br><br>Le chargement direct n'étant pas autorisé par Météo-France,
+                            vous pouvez la consulter sur leur site.
+                        </p>
+                        <a href="https://meteofrance.com/isofronts" target="_blank" class="action-btn-primary"
+                            style="text-decoration: none; padding: 12px 24px; font-weight: 600; font-size: 1rem; border-radius: var(--radius-pill);">
+                            Ouvrir sur Météo-France <i class="ri-arrow-right-up-line" style="margin-left: 8px;"></i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -506,7 +501,7 @@
                         </div>
                         <div class="wind-limit-group">
                             <label class="wind-limit-label">Vent Max</label>
-                            <input type="number" id="limit-wind-max" value="25" min="0"
+                            <input type="number" id="limit-wind-max" value="20" min="0"
                                 oninput="SitesEngine.updateWindLimits()" class="wind-limit-input">
                         </div>
                         <div class="wind-limit-group">
@@ -597,19 +592,21 @@
             <div class="search-box site-search-box"
                 style="margin-bottom: 24px; width: 100%; min-width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 2px 24px; height: 48px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-pill); color: var(--text-main);">
                 <i class="ri-search-line" style="font-size: 1.25rem; color: var(--text-muted); flex-shrink: 0;"></i>
-                <input type="text" id="site-search"
-                    placeholder="Rechercher un site, ville, code postal..."
+                <input type="text" id="site-search" placeholder="Rechercher un site, ville, code postal..."
                     style="background: transparent; border: none; outline: none; color: var(--text-main); width: 100%; font-size: 0.95rem;"
                     oninput="SitesEngine.updateSearchQuery(this.value)">
             </div>
 
             <!-- UNIFIED SITE CARD LIST -->
-            <div id="sites-list-view" class="sites-list-view">
-                <div id="sites-list-container" class="library-grid-container sites-list-container">
-                    <!-- Injected by SitesEngine -->
-                </div>
+            <div id="sites-list-container" class="sites-grid"
+                style="display: flex; flex-direction: column; gap: 24px; min-height: 200px;">
+                <!-- Les cartes des sites seront injectées ici par sites_ui.js -->
             </div>
 
+            <button id="btn-back-to-top" class="back-to-top-btn" onclick="SitesEngine.scrollToTop()"
+                title="Remonter en haut">
+                <i class="ri-arrow-up-line"></i>
+            </button>
         </div>
         <div class="app-footer-placeholder"></div>
     </div>
@@ -619,25 +616,25 @@
 
 
     <!-- SCRIPTS -->
-    <script src="js/data/courses_data.js?v=2026.05.20_v19"></script>
-    <script src="js/data/sites_data.js?v=2026.05.20_v19"></script>
-    <script src="js/sites_engine.js?v=2026.05.20_v19"></script>
-    <script src="js/sites_filter.js?v=2026.05.20_v19"></script>
-    <script src="js/weatherScoring.js?v=2026.05.20_v19"></script>
-    <script src="js/sites_weather.js?v=2026.05.20_v19"></script>
-    <script src="js/sites_ui.js?v=2026.05.20_v19"></script>
-    <script src="js/sites_map.js?v=2026.05.20_v19"></script>
+    <script src="js/data/courses_data.js?v=2026.05.21_v1"></script>
+    <script src="js/data/sites_data.js?v=2026.05.21_v1"></script>
+    <script src="js/sites_engine.js?v=2026.05.21_v1"></script>
+    <script src="js/sites_filter.js?v=2026.05.21_v1"></script>
+    <script src="js/weatherScoring.js?v=2026.05.21_v1"></script>
+    <script src="js/sites_weather.js?v=2026.05.21_v1"></script>
+    <script src="js/sites_ui.js?v=2026.05.21_v1"></script>
+    <script src="js/sites_map.js?v=2026.05.21_v1"></script>
 
     <!-- Firebase Sync Config & Engine -->
-    <script src="js/firebase_config.js?v=2026.05.20_v19"></script>
-    <script src="js/gdpr_engine.js?v=2026.05.20_v19"></script>
-    <script type="module" src="js/firebase_engine.js?v=2026.05.20_v19"></script>
+    <script src="js/firebase_config.js?v=2026.05.21_v1"></script>
+    <script src="js/gdpr_engine.js?v=2026.05.21_v1"></script>
+    <script type="module" src="js/firebase_engine.js?v=2026.05.21_v1"></script>
 
     <!-- Quiz Engine Version 4.8 (Theme Fix & Button Alignment) -->
-    <script src="js/quiz_engine_v4_7.js?v=2026.05.20_v19"></script>
-    <script src="js/library_engine.js?v=2026.05.20_v19"></script>
+    <script src="js/quiz_engine_v4_7.js?v=2026.05.21_v1"></script>
+    <script src="js/library_engine.js?v=2026.05.21_v1"></script>
     <!-- Engine v4.70 (Level Persistence Fix) -->
-    <script src="js/engine_v4_6.js?v=2026.05.20_v19"></script>
+    <script src="js/engine_v4_6.js?v=2026.05.21_v1"></script>
 
     <script>
         // Load Components and Initialize
@@ -820,6 +817,27 @@
     </div>
 
     <!-- BOTTOM SHEET GPS -->
+    <!-- MORE MAPS BOTTOM SHEET -->
+    <div id="more-maps-bottom-sheet" class="bottom-sheet-overlay"
+        onclick="if(event.target===this) SitesEngine.closeMoreMapsDropdown()">
+        <div class="bottom-sheet gps-sheet">
+            <div class="gps-sheet-header">
+                <div class="gps-sheet-title">
+                    <i class="ri-map-2-line" style="color: var(--accent-blue);"></i>
+                    <div>
+                        <div id="more-maps-title" class="gps-sheet-site">CARTES EXTERNES</div>
+                        <div id="more-maps-subtitle" class="gps-sheet-coords">Aucun site spotte — cliquez Spot It sur
+                            une fiche</div>
+                    </div>
+                </div>
+                <button class="gps-sheet-close" onclick="SitesEngine.closeMoreMapsDropdown()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div id="more-maps-grid" class="external-links-grid" style="padding: 0 4px 8px;"></div>
+        </div>
+    </div>
+
     <div id="gps-bottom-sheet" class="bottom-sheet-overlay"
         onclick="if(event.target === this) SitesEngine.closeGpsMenu()">
         <div class="bottom-sheet">
@@ -1048,7 +1066,8 @@
                 <h4>1. Éditeur de l'Application</h4>
                 <p>L'application <em>Assistant Parapente</em> est éditée et développée de manière bénévole par
                     <strong>Maxime Urbaniak</strong> à titre strictement personnel et indépendant. Ce site est un outil
-                    à but éducatif et non commercial.</p>
+                    à but éducatif et non commercial.
+                </p>
 
                 <h4>2. Clause de Non-Responsabilité</h4>
                 <p>Bien que l'éditeur soit adhérent du club-école de parapente <strong>Le Fil d'Ariane</strong>

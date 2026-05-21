@@ -419,8 +419,7 @@ body.light-mode .choice-btn {
 
 /* ========================================= */
 @media (max-width: 1024px) {
-/* TABLET (max-width: 1024px) */
-@media (max-width: 1024px) {
+    /* TABLET (max-width: 1024px) */
     .mode-screen {
         padding: 0 24px 40px 24px;
     }
@@ -430,8 +429,8 @@ body.light-mode .choice-btn {
         padding: 32px;
         margin-top: calc(var(--header-height, 140px) + 20px);
     }
-
 }
+
 @media (max-width: 768px) {
     /* Screens & Containers */
     .mode-screen {
@@ -451,25 +450,20 @@ body.light-mode .choice-btn {
         gap: 16px !important;
     }
 
-}
-@media (max-width: 768px) {
-    /* Critical Container Width Fixes */
     /* Critical Container Width Fixes */
     .qcm-container,
     .main-stage,
     .library-container,
     .course-container {
-        padding: 20px 16px;
-        width: 100%;
-        max-width: 100vw;
-        box-sizing: border-box;
-        margin: 0;
-        border-radius: 20px;
-        overflow-x: hidden;
+        padding: 12px 10px !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
+        margin: calc(var(--header-height, 110px) + 12px) 0 40px 0 !important;
+        border-radius: 16px !important;
+        overflow-x: hidden !important;
     }
 
-}
-@media (max-width: 768px) {
     /* HUD */
     .hud-container {
         flex-direction: column;
@@ -490,5 +484,29 @@ body.light-mode .choice-btn {
         height: 36px !important;
         background: rgba(255, 255, 255, 0.2) !important;
     }
-}
+
+    /* Choice Button & QCM Option Mobile Optimization */
+    .choice-btn,
+    .qcm-option {
+        padding: 10px 14px !important;
+        font-size: 0.88rem !important;
+        margin-bottom: 8px !important;
+        border-radius: 10px !important;
+        gap: 8px !important;
+    }
+
+    /* Quiz Question Text Compact Sizing */
+    .quiz-question-text,
+    .qcm-text {
+        font-size: 1.05rem !important;
+        margin-bottom: 12px !important;
+        line-height: 1.3 !important;
+    }
+
+    .quiz-header-row {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
 }

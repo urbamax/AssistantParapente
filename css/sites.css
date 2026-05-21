@@ -502,6 +502,7 @@ body.light-mode .filter-option.state-include .custom-filter-icon {
 
 /* State 2: Exclude (Hide) */
 .filter-option.state-exclude .custom-filter-icon {
+    display: none;
     color: #ef4444;
     transform: scale(1.1);
 }
@@ -747,12 +748,32 @@ body.light-mode .leaflet-custom-popup .leaflet-popup-tip {
     z-index: 10;
 }
 
-/* Leaflet OpenTopoMap Tile Inversion for Dark Mode - Disabled to keep standard SpotAir style */
-.dark-map .leaflet-tile-pane {
-    /* Map tiles should not be inverted to maintain standard topographic legibility and match SpotAir */
+/* --- LIGNE CLAIRE & RENDU CARTE --- */
+.leaflet-tile {
+    /* Netteté des bords: on supprime le lissage bilinéaire pour un rendu "crisp edges" */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated; /* Particulièrement important avec maxNativeZoom */
 }
+
+/* Filtres adoucis pour le style BD "Ligne Claire" sur la carte Esri */
+.dark-map .leaflet-tile-pane {
+    /* Esri World Topo est déjà très propre, on l'assombrit légèrement pour le mode nuit sans brûler les contrastes */
+    filter: brightness(0.85) saturate(1.1) contrast(1.1);
+}
+
+body.light-mode .leaflet-tile-pane {
+    /* Très léger ajustement pour faire ressortir les contours en mode clair */
+    filter: brightness(0.95) saturate(1.1) contrast(1.1);
+}
+
 .dark-map.leaflet-container {
     background: #f4f3f0 !important;
+}
+
+/* Couche de relief additionnelle (désactivée par défaut maintenant) */
+.hillshade-layer {
+    mix-blend-mode: multiply;
 }
 
 /* Collapsible Settings Details Custom Styling */
@@ -919,7 +940,7 @@ body.light-mode .leaflet-custom-popup .leaflet-popup-tip {
 .course-pdf-frame { border: none; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
 
 /* --- MAP & TOGGLES --- */
-.sites-map-view { width: 100%; margin-bottom: 32px; display: flex; flex-direction: column; gap: 16px; }
+.sites-map-view { width: 100%; margin-bottom: 32px; display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 140px; }
 
 .map-toggles-container { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; flex-wrap: wrap; background: rgba(0,0,0,0.15); padding: 6px; border-radius: var(--radius-pill); border: var(--border-glass); backdrop-filter: blur(10px); }
 .map-toggles-left { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -1109,7 +1130,9 @@ body.light-mode .isofronts-footer {
 .forecast-sticky-container {
     position: -webkit-sticky;
     position: sticky;
-    top: var(--header-height, 140px);
+    top: calc(var(--header-height, 140px) - 10px);
+    align-self: flex-start;
+    width: 100%;
     z-index: 990;
     background: var(--bg-card);
     border: var(--border-glass);
@@ -1701,4 +1724,145 @@ body.light-mode .ffvl-btn:hover {
     #sites-map-canvas-custom {
         height: 300px !important;
     }
+}
+
+/* ============================================================
+   SPOT IT BUTTON
+   ============================================================ */
+
+.action-btn-spot {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.18) 0%, rgba(14, 165, 233, 0.18) 100%);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    color: #a78bfa;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.02em;
+}
+
+.action-btn-spot:hover {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.35) 0%, rgba(14, 165, 233, 0.25) 100%);
+    border-color: rgba(139, 92, 246, 0.7);
+    color: #c4b5fd;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
+}
+
+.action-btn-spot:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);
+}
+
+body.light-mode .action-btn-spot {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(14, 165, 233, 0.1) 100%);
+    border-color: rgba(139, 92, 246, 0.3);
+    color: #7c3aed;
+}
+
+body.light-mode .action-btn-spot:hover {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(14, 165, 233, 0.15) 100%);
+    color: #6d28d9;
+    border-color: rgba(139, 92, 246, 0.5);
+}
+
+/* "Plus" button in map toggles bar */
+.map-toggle-more-btn {
+    position: relative;
+}
+
+/* ============================================================
+   SPOT IT TOAST
+   ============================================================ */
+
+.spot-it-toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.9) 0%, rgba(14, 165, 233, 0.9) 100%);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: var(--radius-pill);
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 99999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+    backdrop-filter: blur(12px);
+    white-space: nowrap;
+}
+
+.spot-it-toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ============================================================
+   MORE MAPS BOTTOM SHEET — link grid
+   ============================================================ */
+
+.more-map-link {
+    flex: 1 1 calc(50% - 8px);
+    justify-content: center;
+    font-size: 0.95rem;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+#more-maps-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 4px;
+}
+/* --- FLOATING ACTION BUTTONS --- */
+.back-to-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--accent-blue);
+    color: white;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4), 0 0 15px rgba(14, 165, 233, 0.3);
+    cursor: pointer;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(255,255,255,0.1);
+}
+
+.back-to-top-btn.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.back-to-top-btn:hover {
+    transform: translateY(-5px);
+    background: var(--accent-green);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 20px rgba(34, 197, 94, 0.4);
+}
+
+body.light-mode .back-to-top-btn {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }

@@ -217,11 +217,54 @@ SitesEngine.geocodeAddress = function (query) {
         statusEl.style.color = 'var(--text-muted)';
     }
 
-    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
+    // Fetch up to 15 candidates with address details to check country codes
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(query)}&limit=15`)
         .then(res => res.json())
         .then(data => {
             if (data && data.length > 0) {
-                const result = data[0];
+                // Rank logic: 
+                // 1 = France (fr)
+                // 2 = Bordering countries (be, lu, de, ch, it, es, ad, mc)
+                // 3 = Other countries
+                const getCountryRank = (item) => {
+                    let cc = (item.address && item.address.country_code) ? item.address.country_code.toLowerCase() : '';
+                    if (!cc && item.display_name) {
+                        const nameLower = item.display_name.toLowerCase();
+                        if (nameLower.includes('france')) {
+                            cc = 'fr';
+                        } else if (nameLower.includes('belgique') || nameLower.includes('belgium') || nameLower.includes('belgië')) {
+                            cc = 'be';
+                        } else if (nameLower.includes('luxembourg')) {
+                            cc = 'lu';
+                        } else if (nameLower.includes('deutschland') || nameLower.includes('germany') || nameLower.includes('allemagne')) {
+                            cc = 'de';
+                        } else if (nameLower.includes('schweiz') || nameLower.includes('switzerland') || nameLower.includes('suisse')) {
+                            cc = 'ch';
+                        } else if (nameLower.includes('italia') || nameLower.includes('italy') || nameLower.includes('italie')) {
+                            cc = 'it';
+                        } else if (nameLower.includes('españa') || nameLower.includes('spain') || nameLower.includes('espagne')) {
+                            cc = 'es';
+                        } else if (nameLower.includes('andorra') || nameLower.includes('andorre')) {
+                            cc = 'ad';
+                        } else if (nameLower.includes('monaco')) {
+                            cc = 'mc';
+                        }
+                    }
+                    if (cc === 'fr') return 1;
+                    if (['be', 'lu', 'de', 'ch', 'it', 'es', 'ad', 'mc'].includes(cc)) return 2;
+                    return 3;
+                };
+
+                // Stable sort prioritizing French and bordering countries' locations
+                const mapped = data.map((item, idx) => ({ item, idx, rank: getCountryRank(item) }));
+                mapped.sort((a, b) => {
+                    if (a.rank !== b.rank) {
+                        return a.rank - b.rank;
+                    }
+                    return a.idx - b.idx;
+                });
+
+                const result = mapped[0].item;
                 const lat = parseFloat(result.lat);
                 const lng = parseFloat(result.lon);
                 
@@ -353,6 +396,9 @@ SitesEngine.setForecastOffset = function (value) {
         const slider = document.getElementById('forecast-slider');
         if (slider) {
             slider.value = offset;
+            const maxVal = parseInt(slider.max) || 48;
+            const percentage = maxVal > 0 ? (offset / maxVal) * 100 : 0;
+            slider.style.background = `linear-gradient(to right, var(--accent-blue) 0%, var(--accent-blue) ${percentage}%, rgba(255,255,255,0.1) ${percentage}%, rgba(255,255,255,0.1) 100%)`;
         }
 
         this.updateForecastLabel();
@@ -397,3 +443,32 @@ SitesEngine.isFieldFilled = function (val) {
         ];
         return !placeholders.includes(cleaned);
     };
+
+// Scroll to top button logic
+SitesEngine.initScrollLogic = function() {
+    const screen = document.getElementById('sites-screen');
+    if (screen) {
+        screen.addEventListener('scroll', function() {
+            const btn = document.getElementById('btn-back-to-top');
+            if (btn) {
+                if (this.scrollTop > 300) {
+                    btn.classList.add('show');
+                } else {
+                    btn.classList.remove('show');
+                }
+            }
+        });
+    }
+};
+
+SitesEngine.scrollToTop = function() {
+    const screen = document.getElementById('sites-screen');
+    if (screen) {
+        screen.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+// Initialize scroll logic when script loads
+document.addEventListener('DOMContentLoaded', () => {
+    SitesEngine.initScrollLogic();
+});

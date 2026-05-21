@@ -427,24 +427,49 @@ input:checked + .gdpr-slider:before {
 @media (max-width: 600px) {
     .gdpr-banner {
         width: 95%;
-        padding: 18px;
-        bottom: -250px;
+        padding: 12px 14px !important;
+        bottom: -280px;
+        gap: 10px !important;
     }
     
     .gdpr-banner.active {
         bottom: 12px;
     }
 
+    .gdpr-banner-title {
+        font-size: 0.85rem !important;
+    }
+    .gdpr-banner-title i {
+        font-size: 1.1rem !important;
+    }
+    .gdpr-banner-text {
+        font-size: 0.74rem !important;
+        line-height: 1.4 !important;
+    }
+
     .gdpr-banner-actions {
-        flex-direction: column;
-        gap: 8px;
-        width: 100%;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 6px !important;
+        width: 100% !important;
     }
 
     .gdpr-banner-actions button {
-        width: 100%;
-        min-width: 100%;
-        padding: 10px 14px;
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 8px 10px !important;
+        font-size: 0.78rem !important;
+    }
+
+    .gdpr-btn-settings {
+        order: 3 !important;
+        grid-column: span 2 !important;
+    }
+    .gdpr-btn-refuse {
+        order: 1 !important;
+    }
+    .gdpr-btn-accept {
+        order: 2 !important;
     }
 
     .gdpr-modal {
