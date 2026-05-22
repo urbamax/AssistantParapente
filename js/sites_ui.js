@@ -406,9 +406,9 @@ SitesEngine.renderList = function () {
 
 
                 const card = document.createElement('div');
-                card.id = `site-card-${site.id}`;
-                card.className = 'site-card';
-                card.innerHTML = this.buildSiteCardHtml(site, windTags, typeLabel, distanceHtml, flyableHoursHtml, weatherHtml, timelineBarsHtml, slotsTextHtml);
+                const isMinimized = this.state.userPreferences && this.state.userPreferences.minimizedSites && this.state.userPreferences.minimizedSites.includes(site.id);
+                card.className = isMinimized ? 'site-card minimized' : 'site-card';
+                card.innerHTML = this.buildSiteCardHtml(site, windTags, typeLabel, distanceHtml, flyableHoursHtml, weatherHtml, timelineBarsHtml, slotsTextHtml, isMinimized);
                 container.appendChild(card);
             });
         } catch (err) {
@@ -416,16 +416,20 @@ SitesEngine.renderList = function () {
         }
     };
 
-SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtml, flyableHoursHtml, weatherHtml, timelineBarsHtml, slotsTextHtml) {
+SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtml, flyableHoursHtml, weatherHtml, timelineBarsHtml, slotsTextHtml, isMinimized) {
         const isFav = this.state.userPreferences && this.state.userPreferences.favoriteSites.includes(site.id);
         const starIcon = isFav ? 'ri-star-fill' : 'ri-star-line';
         const starColor = isFav ? '#fbbf24' : 'var(--text-muted)';
+        const minIcon = isMinimized ? 'ri-add-line' : 'ri-subtract-line';
 
         return `
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
-                    <button class="favorite-toggle-btn" onclick="SitesEngine.toggleFavorite('${site.id}'); event.stopPropagation();" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: ${starColor}; cursor: pointer; padding: 0; margin-right: 8px;">
+                    <button class="favorite-toggle-btn" onclick="SitesEngine.toggleFavorite('${site.id}'); event.stopPropagation();" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: ${starColor}; cursor: pointer; padding: 0; margin-right: 4px;">
                         <i class="${starIcon}"></i>
+                    </button>
+                    <button class="minimize-toggle-btn" onclick="SitesEngine.toggleMinimize('${site.id}'); event.stopPropagation();" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0; margin-right: 8px;">
+                        <i class="${minIcon}"></i>
                     </button>
                     <h3 class="site-card-title">${site.nom}</h3>
                     ${site.altitude ? `

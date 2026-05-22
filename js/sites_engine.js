@@ -29,6 +29,7 @@ const SitesEngine = {
         userPreferences: {
             pilotLevel: 'ALL',
             favoriteSites: [],
+            minimizedSites: [],
             savedLocations: [], // array of {name, lat, lng}
             forecastMaxRange: 120,
             activeMapLayers: ['leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'paraglidable', 'isofronts']
@@ -49,9 +50,9 @@ SitesEngine.loadUserPreferences = function() {
     } else {
         try {
             const saved = localStorage.getItem('parapente_user_prefs');
-            this.state.userPreferences = saved ? JSON.parse(saved) : { pilotLevel: 'ALL', favoriteSites: [], savedLocations: [], forecastMaxRange: 120 };
+            this.state.userPreferences = saved ? JSON.parse(saved) : { pilotLevel: 'ALL', favoriteSites: [], minimizedSites: [], savedLocations: [], forecastMaxRange: 120 };
         } catch(e) {
-            this.state.userPreferences = { pilotLevel: 'ALL', favoriteSites: [], savedLocations: [], forecastMaxRange: 120 };
+            this.state.userPreferences = { pilotLevel: 'ALL', favoriteSites: [], minimizedSites: [], savedLocations: [], forecastMaxRange: 120 };
         }
         const globalLevel = localStorage.getItem('userLevel');
         if (globalLevel) {
@@ -87,7 +88,7 @@ SitesEngine.loadUserPreferences = function() {
 };
 
 SitesEngine.savePreferences = function() {
-    if (!this.state.userPreferences) this.state.userPreferences = { pilotLevel: 'ALL', favoriteSites: [] };
+    if (!this.state.userPreferences) this.state.userPreferences = { pilotLevel: 'ALL', favoriteSites: [], minimizedSites: [] };
     
     // Save all dynamic preferences
     for (const key of this.PREFERENCE_KEYS) {

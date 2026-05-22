@@ -528,6 +528,10 @@ const FirebaseAuthEngine = {
         const cloudFavs = cloud.favoriteSites || [];
         merged.favoriteSites = Array.from(new Set([...localFavs, ...cloudFavs]));
         
+        const localMin = local.minimizedSites || [];
+        const cloudMin = cloud.minimizedSites || [];
+        merged.minimizedSites = Array.from(new Set([...localMin, ...cloudMin]));
+        
         const mergedLocsMap = new Map();
         (cloud.savedLocations || []).forEach(loc => mergedLocsMap.set(loc.name, loc));
         (local.savedLocations || []).forEach(loc => mergedLocsMap.set(loc.name, loc));
@@ -556,7 +560,7 @@ const FirebaseAuthEngine = {
     },
 
     getLocalPreferences: function() {
-        let prefs = { pilotLevel: 'ALL', themeMode: 'auto', favoriteSites: [], savedLocations: [], activeMapLayers: ['leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'paraglidable', 'isofronts'] };
+        let prefs = { pilotLevel: 'ALL', themeMode: 'auto', favoriteSites: [], minimizedSites: [], savedLocations: [], activeMapLayers: ['leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'paraglidable', 'isofronts'] };
         try {
             const saved = localStorage.getItem('parapente_user_prefs');
             if (saved) {

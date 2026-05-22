@@ -705,7 +705,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // User Preferences Management
 
 SitesEngine.toggleFavorite = function(siteId) {
-    if (!this.state.userPreferences) this.state.userPreferences = { pilotLevel: 'ALL', favoriteSites: [] };
+    if (!this.state.userPreferences) this.state.userPreferences = { pilotLevel: 'ALL', favoriteSites: [], minimizedSites: [] };
     const idx = this.state.userPreferences.favoriteSites.indexOf(siteId);
     if (idx > -1) {
         this.state.userPreferences.favoriteSites.splice(idx, 1);
@@ -716,6 +716,20 @@ SitesEngine.toggleFavorite = function(siteId) {
     this.savePreferences();
     this.renderList();
     if (this.state.mapExpanded) this.updateMapMarkers();
+};
+
+SitesEngine.toggleMinimize = function(siteId) {
+    if (!this.state.userPreferences) this.state.userPreferences = { pilotLevel: 'ALL', favoriteSites: [], minimizedSites: [] };
+    if (!this.state.userPreferences.minimizedSites) this.state.userPreferences.minimizedSites = [];
+    const idx = this.state.userPreferences.minimizedSites.indexOf(siteId);
+    if (idx > -1) {
+        this.state.userPreferences.minimizedSites.splice(idx, 1);
+    } else {
+        this.state.userPreferences.minimizedSites.push(siteId);
+    }
+    
+    this.savePreferences();
+    this.renderList();
 };
 
 SitesEngine.toggleFilterFavoritesOnly = function() {
