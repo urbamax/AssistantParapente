@@ -251,6 +251,10 @@ const Engine = {
 
         // Update Theme
         this.updateAppTheme(newLevel);
+        
+        if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled && window.FirebaseAuthEngine.currentUser) {
+            window.FirebaseAuthEngine.savePreferencesToCloud();
+        }
 
         console.log("DEBUG: Engine.changeLevel called with", newLevel, "State updated to", this.state.level);
 
@@ -264,7 +268,6 @@ const Engine = {
         else if (this.state.mode === 'QCM_BANK' && typeof QuizEngine !== 'undefined') {
             QuizEngine.renderBank();
         }
-        // Qcm might use it too
         else if (this.state.mode === 'STATS' && typeof QuizEngine !== 'undefined') {
             QuizEngine.renderStats();
         }
@@ -289,18 +292,38 @@ const Engine = {
 
     updateHeaderNavigation: function () {
         const navSlot = document.querySelector('.header-nav-slot');
-        if (!navSlot) return;
+        if (navSlot) {
+            // Clear slot
+            navSlot.innerHTML = '';
 
-        // Clear slot
-        navSlot.innerHTML = '';
+            // Only show back button if not on MENU
+            if (this.state.mode !== 'MENU') {
+                const backBtn = document.createElement('button');
+                backBtn.className = 'nav-btn-glass';
+                backBtn.innerHTML = '<i class="ri-arrow-left-line"></i> <span>RETOUR</span>';
+                backBtn.onclick = () => this.goBack();
+                navSlot.appendChild(backBtn);
+            }
+        }
 
-        // Only show back button if not on MENU
-        if (this.state.mode !== 'MENU') {
-            const backBtn = document.createElement('button');
-            backBtn.className = 'nav-btn-glass';
-            backBtn.innerHTML = '<i class="ri-arrow-left-line"></i> <span>RETOUR</span>';
-            backBtn.onclick = () => this.goBack();
-            navSlot.appendChild(backBtn);
+        // Update Desktop Nav Active State
+        const desktopNavBtns = document.querySelectorAll('.desktop-main-nav .nav-menu-btn');
+        if (desktopNavBtns.length > 0) {
+            desktopNavBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-target') === this.state.mode) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Handle sub-modes that map to parent modes
+            if (this.state.mode === 'COURSE' || this.state.mode === 'ADVENTURE') {
+                const libBtn = document.querySelector('.desktop-main-nav .nav-menu-btn[data-target="LIBRARY"]');
+                if (libBtn) libBtn.classList.add('active');
+            } else if (this.state.mode === 'QCM_BANK') {
+                const qcmBtn = document.querySelector('.desktop-main-nav .nav-menu-btn[data-target="QCM"]');
+                if (qcmBtn) qcmBtn.classList.add('active');
+            }
         }
     },
 
@@ -310,8 +333,8 @@ const Engine = {
         this.state.basePath = basePath;
 
         const componentMap = [
-            { id: 'app-header', url: basePath + '/components/header.html' },
-            { id: 'app-footer', url: basePath + '/components/footer.html', selector: '.app-footer-placeholder' }
+            { id: 'app-header', url: basePath + '/components/header.html?v=2026.05.21_v22' },
+            { id: 'app-footer', url: basePath + '/components/footer.html?v=2026.05.21_v22', selector: '.app-footer-placeholder' }
         ];
 
         const self = this;
@@ -447,6 +470,10 @@ const Engine = {
         this.state.themeMode = next;
         localStorage.setItem('themeMode', next);
         this.applyThemeMode();
+        
+        if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled && window.FirebaseAuthEngine.currentUser) {
+            window.FirebaseAuthEngine.savePreferencesToCloud();
+        }
     },
 
     applyThemeMode: function () {
@@ -585,6 +612,40 @@ const Engine = {
 
         const expl = document.getElementById(`g-expl-${qIndex}`);
         if (expl) expl.style.display = 'block';
+    },
+
+    /* --- MANUAL / MODE D'EMPLOI --- */
+    showManual: function (section = 'about') {
+        const modal = document.getElementById('manual-modal');
+        if (modal) {
+            modal.style.display = 'flex'; // ensure display
+            // Force reflow to ensure transition works if it was display: none
+            void modal.offsetWidth;
+            modal.classList.add('active');
+            this.showManualSection(section);
+        }
+    },
+
+    hideManual: function () {
+        const modal = document.getElementById('manual-modal');
+        if (modal) {
+            modal.classList.remove('active');
+            setTimeout(() => {
+                if (!modal.classList.contains('active')) modal.style.display = 'none';
+            }, 400);
+        }
+    },
+
+    showManualSection: function (section) {
+        // Update tabs
+        document.querySelectorAll('.manual-tab-btn').forEach(btn => btn.classList.remove('active'));
+        const tab = document.getElementById(`manual-tab-${section}`);
+        if (tab) tab.classList.add('active');
+
+        // Update sections
+        document.querySelectorAll('.manual-section').forEach(sec => sec.style.display = 'none');
+        const sec = document.getElementById(`manual-section-${section}`);
+        if (sec) sec.style.display = 'block';
     }
 };
 

@@ -577,9 +577,34 @@ SitesEngine.openMoreMapsDropdown = function () {
         });
     }
 
+    const internalMaps = [
+        { id: 'leaflet', label: 'Cartographie', icon: 'ri-map-2-line' },
+        { id: 'windy', label: 'Windy', icon: 'ri-windy-line' },
+        { id: 'meteoparapente', label: 'Météo-P.', icon: 'ri-cloud-windy-line' },
+        { id: 'paraglidingearth', label: 'PG Earth', icon: 'ri-earth-line' },
+        { id: 'paraglidable', label: 'Paraglidable', icon: 'ri-flight-takeoff-line' },
+        { id: 'isofronts', label: 'Fronts & Isobares', icon: 'ri-mist-line' }
+    ];
+
+    internalMaps.forEach(function(m) {
+        if (!SitesEngine.state.activeMapLayers.includes(m.id)) {
+            links.push({
+                label: m.label,
+                icon: m.icon,
+                cls: 'internal-map-btn',
+                onclick: "SitesEngine.switchMapMode('" + m.id + "'); SitesEngine.closeMoreMapsDropdown();",
+                url: '#'
+            });
+        }
+    });
+
     var grid = document.getElementById('more-maps-grid');
     if (grid) {
         grid.innerHTML = links.map(function(link) {
+            if (link.onclick) {
+                return '<a href="#" class="external-link-btn ' + link.cls + ' more-map-link" onclick="' + link.onclick + ' event.preventDefault();">' +
+                    '<i class="' + link.icon + '"></i> ' + link.label + '</a>';
+            }
             return '<a href="' + link.url + '" target="_blank" class="external-link-btn ' + link.cls + ' more-map-link" onclick="SitesEngine.closeMoreMapsDropdown()">' +
                 '<i class="' + link.icon + '"></i> ' + link.label + '</a>';
         }).join('');

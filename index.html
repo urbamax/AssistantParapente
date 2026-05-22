@@ -13,16 +13,16 @@
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <link rel="stylesheet" href="css/base.css?v=2026.05.21_v1">
-    <link rel="stylesheet" href="css/components.css?v=2026.05.21_v1">
-    <link rel="stylesheet" href="css/header.css?v=2026.05.21_v1">
-    <link rel="stylesheet" href="css/footer.css?v=2026.05.21_v1">
-    <link rel="stylesheet" href="css/dashboard.css?v=2026.05.21_v1">
-    <link rel="stylesheet" href="css/quiz.css?v=2026.05.21_v1">
-    <link rel="stylesheet" href="css/library.css?v=2026.05.21_v1">
-    <link rel="stylesheet" href="css/sites.css?v=2026.05.21_v1">
-    <link rel="stylesheet" href="css/auth.css?v=2026.05.21_v1">
-    <link rel="stylesheet" href="css/gdpr.css?v=2026.05.21_v1">
+    <link rel="stylesheet" href="css/base.css?v=2026.05.22_v1">
+    <link rel="stylesheet" href="css/components.css?v=2026.05.22_v1">
+    <link rel="stylesheet" href="css/header.css?v=2026.05.22_v1">
+    <link rel="stylesheet" href="css/footer.css?v=2026.05.22_v1">
+    <link rel="stylesheet" href="css/dashboard.css?v=2026.05.22_v1">
+    <link rel="stylesheet" href="css/quiz.css?v=2026.05.22_v1">
+    <link rel="stylesheet" href="css/library.css?v=2026.05.22_v1">
+    <link rel="stylesheet" href="css/sites.css?v=2026.05.22_v2">
+    <link rel="stylesheet" href="css/auth.css?v=2026.05.22_v1">
+    <link rel="stylesheet" href="css/gdpr.css?v=2026.05.22_v1">
 </head>
 
 <body>
@@ -68,6 +68,16 @@
                             <p>Historique & Progression</p>
                         </div>
                     </button>
+
+                    <button class="app-card"
+                        style="border: 1px dashed var(--border-color); background: rgba(0,0,0,0.05);"
+                        onclick="Engine.showManual('about')">
+                        <div class="app-icon" style="color: var(--text-main);"><i class="ri-book-read-line"></i></div>
+                        <div class="app-info">
+                            <h3 style="color: var(--text-main);">Mode d'emploi</h3>
+                            <p style="color: var(--text-secondary);"></p>
+                        </div>
+                    </button>
                 </div>
 
             </section>
@@ -78,9 +88,15 @@
 
 
 
-    <!-- QCM SETUP SCREEN -->
     <div id="qcm-setup-screen" class="mode-screen">
         <div class="course-container">
+            <div id="qcm-guest-warning" style="display: none; background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: var(--radius-md); padding: 12px 16px; margin-bottom: 20px; align-items: flex-start; gap: 12px;">
+                <i class="ri-error-warning-line" style="color: #fbbf24; font-size: 1.5rem; margin-top: 2px; flex-shrink: 0;"></i>
+                <div>
+                    <h4 style="margin: 0 0 4px 0; color: var(--text-main); font-size: 0.95rem;">Vous n'êtes pas connecté</h4>
+                    <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4;">Vos résultats d'examens sont stockés localement. <a href="#" onclick="if(window.FirebaseAuthEngine) window.FirebaseAuthEngine.openAuthModal(); return false;" style="color: var(--accent-blue); text-decoration: underline;">Connectez-vous</a> pour synchroniser votre progression et ne jamais la perdre.</p>
+                </div>
+            </div>
             <div class="setup-grid">
 
                 <!-- MODE SELECTION -->
@@ -136,6 +152,11 @@
                     <i class="ri-book-2-line"></i> Consulter la Banque de Questions
                 </button>
 
+                <button class="bank-btn" onclick="Engine.showManual('qcm')"
+                    style="margin-top: 8px; border: 1px dashed var(--border-color); background: transparent; color: var(--text-secondary);">
+                    <i class="ri-question-line"></i> Mode d'emploi QCM
+                </button>
+
             </div>
         </div>
         <div class="app-footer-placeholder"></div>
@@ -164,8 +185,22 @@
     <!-- STATS SCREEN -->
     <div id="stats-screen" class="mode-screen">
         <div class="course-container">
-            <h2 class="section-title section-title-center">STATISTIQUES</h2>
-            <div id="stats-content">
+            <div style="display: flex; justify-content: center; align-items: center; position: relative;">
+                <h2 class="section-title section-title-center" style="margin-bottom: 0;">STATISTIQUES</h2>
+                <button class="action-btn-secondary" onclick="Engine.showManual('stats')"
+                    style="position: absolute; right: 0; padding: 4px 8px; font-size: 0.9rem; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary);"
+                    title="Mode d'emploi"><i class="ri-question-line" style="font-size: 1.2rem;"></i></button>
+            </div>
+            
+            <div id="stats-guest-warning" style="display: none; background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: var(--radius-md); padding: 12px 16px; margin-top: 20px; align-items: flex-start; gap: 12px;">
+                <i class="ri-error-warning-line" style="color: #fbbf24; font-size: 1.5rem; margin-top: 2px; flex-shrink: 0;"></i>
+                <div>
+                    <h4 style="margin: 0 0 4px 0; color: var(--text-main); font-size: 0.95rem;">Vous n'êtes pas connecté</h4>
+                    <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4;">Vos statistiques de révision sont stockées localement. <a href="#" onclick="if(window.FirebaseAuthEngine) window.FirebaseAuthEngine.openAuthModal(); return false;" style="color: var(--accent-blue); text-decoration: underline;">Créez un compte gratuit</a> pour les synchroniser sur tous vos appareils.</p>
+                </div>
+            </div>
+            
+            <div id="stats-content" style="margin-top: 24px;">
                 <!-- Injected by JS -->
             </div>
         </div>
@@ -223,6 +258,8 @@
                     <button id="sort-TITLE" class="sort-btn" onclick="Engine.setLibrarySort('TITLE')">A-Z</button>
                     <button id="sort-CATEGORY" class="sort-btn active" onclick="Engine.setLibrarySort('CATEGORY')">PAR
                         CATÉGORIE</button>
+                    <button class="sort-btn" onclick="Engine.showManual('library')" title="Mode d'emploi"><i
+                            class="ri-question-line"></i></button>
                 </div>
             </div>
 
@@ -260,7 +297,12 @@
     <!-- SITES SCREEN -->
     <div id="sites-screen" class="mode-screen">
         <div class="library-container">
-            <h2 class="section-title section-title-sites">SITES DE VOL</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 class="section-title section-title-sites" style="margin-bottom: 0;">SITES DE VOL</h2>
+                <button class="action-btn-secondary" onclick="Engine.showManual('sites')"
+                    style="padding: 4px 8px; font-size: 0.9rem; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary);"
+                    title="Mode d'emploi"><i class="ri-question-line" style="font-size: 1.2rem;"></i></button>
+            </div>
 
             <!-- Modern Map Panel (Always Visible) -->
             <div id="sites-map-view" class="sites-map-view">
@@ -303,11 +345,25 @@
                                 style="margin-left:2px;"></i>
                         </button>
                     </div>
-                    <button id="map-toggle-fullscreen" class="action-btn-secondary map-toggle-btn"
-                        onclick="SitesEngine.toggleFullscreen()"
-                        style="color: var(--text-secondary); border-color: var(--border-color);">
-                        <i class="ri-fullscreen-line"></i> <span>Plein écran</span>
-                    </button>
+                    <div class="map-toggles-right" style="display: flex; gap: 8px; align-items: center;">
+                        <button id="map-toggle-fullscreen" class="action-btn-secondary map-toggle-btn"
+                            onclick="SitesEngine.toggleFullscreen()"
+                            style="color: var(--text-secondary); border-color: var(--border-color);">
+                            <i class="ri-fullscreen-line"></i> <span>Plein écran</span>
+                        </button>
+                        <div class="filter-dropdown-container" id="dropdown-map-settings">
+                            <button class="action-btn-secondary map-toggle-btn"
+                                onclick="SitesEngine.toggleDropdown('map-settings')"
+                                style="color: var(--text-secondary); border-color: var(--border-color);"
+                                title="Cartes actives">
+                                <i class="ri-settings-3-line"></i>
+                            </button>
+                            <div class="filter-dropdown-menu" id="menu-map-settings"
+                                style="right: 0; left: auto; min-width: 220px; text-align: left; padding: 8px; z-index: 1000;">
+                                <!-- Options generated by JS -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <!-- Container Leaflet -->
                 <div id="sites-map-canvas" class="sites-map-canvas"></div>
@@ -459,6 +515,11 @@
                                 style="padding: 4px 12px; font-size: 0.8rem; height: 28px; border-radius: var(--radius-sm); border: none; cursor: pointer; flex-shrink: 0;">
                                 Valider
                             </button>
+                            <button id="btn-save-location" onclick="SitesEngine.saveCurrentLocation()"
+                                title="Enregistrer ce lieu"
+                                style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; display: none;">
+                                <i class="ri-star-line" style="font-size: 1.2rem;"></i>
+                            </button>
                         </div>
                         <button id="btn-use-gps" class="action-btn-secondary" onclick="SitesEngine.requestGpsLocation()"
                             style="height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: rgba(0,0,0,0.15); color: var(--text-secondary); cursor: pointer; font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">
@@ -468,6 +529,9 @@
                     <div id="address-status-message"
                         style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; font-weight: 500;">
                         <i class="ri-information-line"></i> Aucun point de référence (GPS désactivé).
+                    </div>
+                    <div id="saved-locations-list" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
+                        <!-- Saved locations will be inserted here -->
                     </div>
                 </div>
             </div>
@@ -516,13 +580,20 @@
             <!-- Sticky Forecast Time Slider Card -->
             <div class="forecast-sticky-container">
                 <div class="slider-row" style="border-bottom: none; padding-bottom: 0;">
-                    <div class="slider-labels">
-                        <span class="slider-label-left">
-                            <i class="ri-time-line"></i> Échéance Prévision :
+                    <div class="slider-labels" style="align-items: center;">
+                        <span class="slider-label-left" style="display: flex; align-items: center; gap: 8px;">
+                            <i class="ri-time-line"></i> Échéance Prévision
+                            <select id="forecast-range-select" onchange="SitesEngine.changeForecastMaxRange(this.value)"
+                                style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); border-radius: 4px; padding: 2px 6px; font-size: 0.8rem; outline: none;">
+                                <option value="24">24h (1 jour)</option>
+                                <option value="48">48h (2 jours)</option>
+                                <option value="72">72h (3 jours)</option>
+                                <option value="120" selected>120h (5 jours)</option>
+                            </select>
                         </span>
                         <span id="forecast-time-label" class="slider-label-right">Chargement des prévisions...</span>
                     </div>
-                    <input type="range" id="forecast-slider" min="0" max="48" value="0" step="1"
+                    <input type="range" id="forecast-slider" min="0" max="120" value="0" step="1"
                         oninput="SitesEngine.setForecastOffset(parseInt(this.value))" class="slider-input" disabled>
                 </div>
             </div>
@@ -588,13 +659,20 @@
                 </div>
             </div>
 
-            <!-- SITES SEARCH BAR -->
-            <div class="search-box site-search-box"
-                style="margin-bottom: 24px; width: 100%; min-width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 2px 24px; height: 48px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-pill); color: var(--text-main);">
-                <i class="ri-search-line" style="font-size: 1.25rem; color: var(--text-muted); flex-shrink: 0;"></i>
-                <input type="text" id="site-search" placeholder="Rechercher un site, ville, code postal..."
-                    style="background: transparent; border: none; outline: none; color: var(--text-main); width: 100%; font-size: 0.95rem;"
-                    oninput="SitesEngine.updateSearchQuery(this.value)">
+            <!-- SITES SEARCH BAR & FAVORITES -->
+            <div style="display: flex; gap: 12px; margin-bottom: 24px; width: 100%; flex-wrap: wrap;">
+                <div class="search-box site-search-box"
+                    style="flex: 1; min-width: 250px; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 2px 24px; height: 48px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-pill); color: var(--text-main);">
+                    <i class="ri-search-line" style="font-size: 1.25rem; color: var(--text-muted); flex-shrink: 0;"></i>
+                    <input type="text" id="site-search" placeholder="Rechercher un site, ville, code postal..."
+                        style="background: transparent; border: none; outline: none; color: var(--text-main); width: 100%; font-size: 0.95rem;"
+                        oninput="SitesEngine.updateSearchQuery(this.value)">
+                </div>
+                <button id="btn-filter-favorites" class="action-btn-secondary"
+                    onclick="SitesEngine.toggleFilterFavoritesOnly()"
+                    style="height: 48px; border-radius: var(--radius-pill); padding: 0 20px; white-space: nowrap; font-weight: 600;">
+                    <i class="ri-star-line"></i> Favoris
+                </button>
             </div>
 
             <!-- UNIFIED SITE CARD LIST -->
@@ -603,11 +681,13 @@
                 <!-- Les cartes des sites seront injectées ici par sites_ui.js -->
             </div>
 
-            <button id="btn-back-to-top" class="back-to-top-btn" onclick="SitesEngine.scrollToTop()"
-                title="Remonter en haut">
-                <i class="ri-arrow-up-line"></i>
-            </button>
-        </div>
+        </div> <!-- End library-container -->
+
+        <button id="btn-back-to-top" class="back-to-top-btn" onclick="SitesEngine.scrollToTop()"
+            title="Remonter en haut">
+            <i class="ri-arrow-up-line"></i>
+        </button>
+
         <div class="app-footer-placeholder"></div>
     </div>
 
@@ -616,25 +696,25 @@
 
 
     <!-- SCRIPTS -->
-    <script src="js/data/courses_data.js?v=2026.05.21_v1"></script>
-    <script src="js/data/sites_data.js?v=2026.05.21_v1"></script>
-    <script src="js/sites_engine.js?v=2026.05.21_v1"></script>
-    <script src="js/sites_filter.js?v=2026.05.21_v1"></script>
-    <script src="js/weatherScoring.js?v=2026.05.21_v1"></script>
-    <script src="js/sites_weather.js?v=2026.05.21_v1"></script>
-    <script src="js/sites_ui.js?v=2026.05.21_v1"></script>
-    <script src="js/sites_map.js?v=2026.05.21_v1"></script>
+    <script src="js/data/courses_data.js?v=2026.05.22_v1"></script>
+    <script src="js/data/sites_data.js?v=2026.05.22_v1"></script>
+    <script src="js/sites_engine.js?v=2026.05.22_v1"></script>
+    <script src="js/sites_filter.js?v=2026.05.22_v1"></script>
+    <script src="js/weatherScoring.js?v=2026.05.22_v1"></script>
+    <script src="js/sites_weather.js?v=2026.05.22_v1"></script>
+    <script src="js/sites_ui.js?v=2026.05.22_v1"></script>
+    <script src="js/sites_map.js?v=2026.05.22_v1"></script>
 
     <!-- Firebase Sync Config & Engine -->
-    <script src="js/firebase_config.js?v=2026.05.21_v1"></script>
-    <script src="js/gdpr_engine.js?v=2026.05.21_v1"></script>
-    <script type="module" src="js/firebase_engine.js?v=2026.05.21_v1"></script>
+    <script src="js/firebase_config.js?v=2026.05.22_v1"></script>
+    <script src="js/gdpr_engine.js?v=2026.05.22_v1"></script>
+    <script type="module" src="js/firebase_engine.js?v=2026.05.22_v1"></script>
 
     <!-- Quiz Engine Version 4.8 (Theme Fix & Button Alignment) -->
-    <script src="js/quiz_engine_v4_7.js?v=2026.05.21_v1"></script>
-    <script src="js/library_engine.js?v=2026.05.21_v1"></script>
+    <script src="js/quiz_engine_v4_7.js?v=2026.05.22_v1"></script>
+    <script src="js/library_engine.js?v=2026.05.22_v1"></script>
     <!-- Engine v4.70 (Level Persistence Fix) -->
-    <script src="js/engine_v4_6.js?v=2026.05.21_v1"></script>
+    <script src="js/engine_v4_6.js?v=2026.05.22_v1"></script>
 
     <script>
         // Load Components and Initialize
@@ -1108,6 +1188,358 @@
             </div>
             <div class="gdpr-modal-footer">
                 <button class="gdpr-btn-accept" onclick="GdprEngine.hideModal('gdpr-legal-modal')">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MANUAL MODAL -->
+    <div id="manual-modal" class="gdpr-modal-overlay" onclick="if(event.target === this) Engine.hideManual()"
+        style="display: none;">
+        <div class="gdpr-modal" style="max-width: 800px; max-height: 90vh; display: flex; flex-direction: column;">
+            <div class="gdpr-modal-header">
+                <div class="gdpr-modal-title">
+                    <i class="ri-book-read-line"></i>
+                    <span>Mode d'emploi</span>
+                </div>
+                <button class="gdpr-modal-close-btn" onclick="Engine.hideManual()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="gdpr-modal-body" style="padding-top: 16px; overflow-y: auto; flex: 1;">
+                <div class="manual-nav"
+                    style="display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">
+                    <button class="manual-tab-btn active" onclick="Engine.showManualSection('about')"
+                        id="manual-tab-about"
+                        style="padding: 8px 12px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary); cursor: pointer; white-space: nowrap;">À
+                        propos</button>
+                    <button class="manual-tab-btn" onclick="Engine.showManualSection('dashboard')"
+                        id="manual-tab-dashboard"
+                        style="padding: 8px 12px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary); cursor: pointer; white-space: nowrap;">Général</button>
+                    <button class="manual-tab-btn" onclick="Engine.showManualSection('sites')" id="manual-tab-sites"
+                        style="padding: 8px 12px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary); cursor: pointer; white-space: nowrap;">Sites
+                        de vol</button>
+                    <button class="manual-tab-btn" onclick="Engine.showManualSection('qcm')" id="manual-tab-qcm"
+                        style="padding: 8px 12px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary); cursor: pointer; white-space: nowrap;">QCM</button>
+                    <button class="manual-tab-btn" onclick="Engine.showManualSection('library')" id="manual-tab-library"
+                        style="padding: 8px 12px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary); cursor: pointer; white-space: nowrap;">Bibliothèque</button>
+                    <button class="manual-tab-btn" onclick="Engine.showManualSection('stats')" id="manual-tab-stats"
+                        style="padding: 8px 12px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary); cursor: pointer; white-space: nowrap;">Statistiques</button>
+                </div>
+
+                <div class="manual-content">
+                    <!-- A PROPOS -->
+                    <div id="manual-section-about" class="manual-section active">
+                        <div
+                            style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding: 20px; background: rgba(14,165,233,0.07); border-radius: var(--radius-lg); border: 1px solid rgba(14,165,233,0.2);">
+                            <i class="ri-parachute-line"
+                                style="font-size: 3rem; color: var(--accent-blue); flex-shrink: 0;"></i>
+                            <div>
+                                <h4
+                                    style="margin: 0 0 4px 0; color: var(--text-main); font-size: 1.1rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                    <span>Assistant Parapente</span>
+                                    <span
+                                        style="font-size: 0.72rem; font-weight: 800; background: var(--accent-blue); color: white; padding: 2px 8px; border-radius: var(--radius-pill); text-transform: uppercase; letter-spacing: 0.5px;">100%
+                                        Gratuit</span>
+                                </h4>
+                                <p
+                                    style="margin: 0; color: var(--text-secondary); font-size: 0.88rem; line-height: 1.4;">
+                                    Un projet bénévole, entièrement gratuit et sans publicité, conçu pour les élèves et
+                                    pilotes du club-école <strong>Le Fil d'Ariane</strong> (Nord-Pas-de-Calais), mais
+                                    dédié à toute la communauté de vol libre francophone.</p>
+                            </div>
+                        </div>
+
+                        <h5 style="margin-top: 0; margin-bottom: 8px;">Pourquoi cette application ?</h5>
+                        <p
+                            style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; margin-bottom: 12px;">
+                            La préparation aux brevets de parapente peut être longue et morcelée : les questions
+                            officielles de la FFVL sont dispersées dans des documents PDF peu pratiques sur téléphone,
+                            les cours théoriques ne sont pas toujours réunis au même endroit, et la lecture des
+                            conditions météo sur un décollage demande de jongler entre plusieurs outils différents
+                            (Windy, Météo-Parapente, PiouPiou, les données FFVL...).</p>
+                        <p
+                            style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; margin-bottom: 20px;">
+                            L'<strong>Assistant Parapente</strong> est né de la volonté de regrouper tout cela en un
+                            seul endroit, pensé pour fonctionner parfaitement sur mobile depuis le décollage, et adapté
+                            à toutes les étapes du parcours d'un pilote — du tout débutant (BI) au confirmé (BPC).</p>
+
+                        <h5 style="margin-top: 0; margin-bottom: 8px;">Une application 100% gratuite &amp; sans
+                            publicité</h5>
+                        <p
+                            style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; margin-bottom: 20px;">
+                            L'<strong>Assistant Parapente</strong> est mis à disposition de la communauté
+                            <strong>entièrement gratuitement</strong>. Il n'y a aucune fonctionnalité payante, aucune
+                            collecte de données commerciales, aucun abonnement, et aucune publicité. Il s'agit d'une
+                            initiative bénévole et personnelle pour soutenir l'apprentissage théorique et la sécurité
+                            des pilotes de vol libre.
+                        </p>
+
+                        <h5 style="margin-top: 0; margin-bottom: 8px;">Ce que l'application fait concrètement</h5>
+                        <ul
+                            style="color: var(--text-secondary); line-height: 1.7; font-size: 0.95rem; padding-left: 20px; margin-bottom: 20px;">
+                            <li style="margin-bottom: 6px;">Elle centralise les <strong>questions officielles
+                                    FFVL</strong> dans un QCM interactif avec correction et explications pédagogiques,
+                                accessible à tout moment, même hors ligne.</li>
+                            <li style="margin-bottom: 6px;">Elle croise en temps réel les <strong>données géographiques
+                                    des sites de vol</strong> (orientation des décollages, altitude, type) avec les
+                                <strong>prévisions météo multi-modèles</strong> (AROME, ICON, GFS…) pour indiquer quels
+                                sites sont potentiellement volables et à quelle heure.
+                            </li>
+                            <li style="margin-bottom: 6px;">Elle regroupe les <strong>cours, manuels et fiches
+                                    synthèse</strong> du brevet de pilote dans une bibliothèque consultable et
+                                téléchargeable.</li>
+                            <li style="margin-bottom: 6px;">Elle suit votre <strong>progression dans le temps</strong>
+                                et identifie précisément les thèmes où vous avez le plus de lacunes, pour orienter vos
+                                révisions efficacement.</li>
+                        </ul>
+
+                        <h5 style="margin-top: 0; margin-bottom: 8px;">Ce que l'application ne fait PAS</h5>
+                        <p
+                            style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; margin-bottom: 12px;">
+                            L'application est un <strong>outil d'accompagnement et d'aide à la décision</strong>, pas un
+                            outil de décision. Les prévisions météo affichées proviennent de modèles automatiques et ne
+                            remplacent pas une analyse aérologique complète et officielle. <strong>La décision de voler
+                                reste toujours et uniquement celle du pilote.</strong></p>
+                        <p
+                            style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; margin-bottom: 20px;">
+                            De même, la réussite aux QCM de l'application ne garantit pas la réussite aux examens
+                            officiels organisés par la FFVL.</p>
+
+                        <h5 style="margin-top: 0; margin-bottom: 8px;">Qui l'a développée ?</h5>
+                        <p
+                            style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; margin-bottom: 12px;">
+                            Cette application a été développée bénévolement par <strong>Maxime Urbaniak</strong>, élève
+                            pilote du club-école <em>Le Fil d'Ariane</em> (Nord - Pas-de-Calais, France). Elle n'a
+                            aucune vocation commerciale. Le club décline toute responsabilité éditoriale sur le contenu
+                            de cette application.</p>
+                        <p style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem;">Les données de
+                            questions QCM et les informations sur les sites de vol libre sont issues de la <strong>FFVL
+                                (Fédération Française de Vol Libre)</strong> et sont utilisées à des fins strictement
+                            éducatives.</p>
+                    </div>
+
+                    <!-- GENERAL -->
+                    <div id="manual-section-dashboard" class="manual-section" style="display: none;">
+                        <h4 style="margin-top: 0; color: var(--accent-blue);">Bienvenue sur l'Assistant Parapente</h4>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">L'Assistant
+                            Parapente est une application tout-en-un conçue pour accompagner les pilotes de vol libre,
+                            de l'apprentissage théorique jusqu'à la préparation météo de leurs vols. Voici les concepts
+                            clés du fonctionnement général :</p>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">1. Profil et Niveau de Pilotage</h5>
+                        <p
+                            style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem; margin-bottom: 8px;">
+                            En haut de l'écran, un menu déroulant vous permet de sélectionner votre niveau actuel
+                            (Brevet Initial, Brevet de Pilote, Brevet de Pilote Confirmé). Ce réglage est fondamental
+                            car il adapte automatiquement le contenu de l'application : les questions des QCM seront
+                            filtrées selon votre niveau, le temps imparti pour les examens sera ajusté, et la couleur
+                            dominante de l'interface changera pour refléter votre progression (Vert pour BI, Bleu pour
+                            BP, Marron pour BPC).</p>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">2. Thème Visuel (Clair / Sombre)</h5>
+                        <p
+                            style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem; margin-bottom: 8px;">
+                            L'application dispose d'un bouton ☀️/🌙 (en haut à droite). Il bascule entre le mode Clair,
+                            le mode Sombre, et le mode "Auto" (qui suit les réglages de votre système d'exploitation).
+                            Le mode sombre est particulièrement recommandé pour réduire la fatigue visuelle et
+                            économiser la batterie sur le terrain.</p>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">3. Créer son compte : pourquoi c'est important
+                        </h5>
+
+                        <!-- CTA Banner -->
+                        <div
+                            style="margin-bottom: 16px; padding: 16px 20px; background: linear-gradient(135deg, rgba(14,165,233,0.12), rgba(99,102,241,0.08)); border-radius: var(--radius-lg); border: 1px solid rgba(14,165,233,0.3); display: flex; align-items: flex-start; gap: 14px;">
+                            <i class="ri-user-add-line"
+                                style="font-size: 2rem; color: var(--accent-blue); flex-shrink: 0; margin-top: 2px;"></i>
+                            <div>
+                                <p
+                                    style="margin: 0 0 6px 0; color: var(--text-main); font-weight: 700; font-size: 0.95rem;">
+                                    Sans compte, vous perdez tout en changeant d'appareil.</p>
+                                <p
+                                    style="margin: 0; color: var(--text-secondary); font-size: 0.88rem; line-height: 1.5;">
+                                    Vos scores, votre historique d'examens, vos sites favoris et vos préférences sont
+                                    stockés localement dans votre navigateur. Si vous changez de téléphone, effacez le
+                                    cache, ou passez de votre mobile à votre PC, tout disparaît. Un compte résout ce
+                                    problème en 30 secondes.</p>
+                            </div>
+                        </div>
+
+                        <p
+                            style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; margin-bottom: 12px;">
+                            Concrètement, voici ce qu'un compte vous apporte :</p>
+                        <ul
+                            style="color: var(--text-secondary); line-height: 1.7; font-size: 0.95rem; padding-left: 20px; margin-bottom: 16px;">
+                            <li style="margin-bottom: 8px;"><strong>Continuité parfaite :</strong> Commencez votre
+                                révision QCM sur votre téléphone au décollage, et retrouvez exactement le même état de
+                                progression le soir sur votre ordinateur — sans aucune manipulation manuelle.</li>
+                            <li style="margin-bottom: 8px;"><strong>Mémoire longue durée du mode Révision :</strong> Le
+                                mode Révision se base sur l'historique de vos erreurs pour vous reposer les bonnes
+                                questions. Sans compte, cet historique ne survit pas à un changement d'appareil. Avec un
+                                compte, l'algorithme garde une mémoire complète de toutes vos sessions passées.</li>
+                            <li style="margin-bottom: 8px;"><strong>Sauvegarde de vos préférences :</strong> Votre
+                                niveau de brevet sélectionné, votre thème visuel préféré, et vos paramètres météo
+                                (limites de vent, modèle préféré) sont synchronisés automatiquement.</li>
+                            <li style="margin-bottom: 8px;"><strong>Protection contre la perte de données :</strong> Un
+                                effacement accidentel du cache du navigateur, un reset de téléphone, ou un changement
+                                d'appareil en urgence ne vous feront plus perdre des semaines de progression.</li>
+                        </ul>
+
+                        <p
+                            style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; margin-bottom: 8px;">
+                            Pour créer votre compte, cliquez sur l'icône <strong>👤</strong> en haut à droite de
+                            l'application (Espace Synchro). La création prend moins d'une minute : une adresse e-mail et
+                            un mot de passe suffisent. Aucune information personnelle supplémentaire n'est requise.</p>
+                        <p style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem;"><strong>Vos
+                                données restent les vôtres :</strong> elles sont hébergées sur l'infrastructure Firebase
+                            (Google Ireland, serveurs européens) et ne sont jamais partagées ni vendues. Vous pouvez les
+                            supprimer à tout moment depuis l'Espace Synchro ou en contactant l'éditeur.</p>
+                    </div>
+
+                    <div id="manual-section-sites" class="manual-section" style="display: none;">
+                        <h4 style="margin-top: 0; color: var(--accent-blue);">Préparation des Vols (Sites & Météo)</h4>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">Ce module est un
+                            puissant outil d'analyse aérologique croisant les données géographiques des sites de vol
+                            libre (fournies par la FFVL) avec de multiples modèles météorologiques.</p>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">1. Géolocalisation et Rayon de Recherche</h5>
+                        <ul
+                            style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; padding-left: 20px;">
+                            <li style="margin-bottom: 8px;"><strong>Le GPS ou la Recherche Manuelle :</strong> Vous
+                                pouvez autoriser le GPS (bouton "GPS") pour centrer la recherche sur vous, ou taper
+                                manuellement le nom d'une ville/adresse (ex: Annecy) et cliquer sur "Valider".</li>
+                            <li style="margin-bottom: 8px;"><strong>Le Rayon :</strong> Le curseur "Rayon maximal"
+                                définit la zone de recherche autour de ce point de référence (de 10 km à Illimité).</li>
+                        </ul>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">2. Modèles Météo et Limites de Vent</h5>
+                        <ul
+                            style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; padding-left: 20px;">
+                            <li style="margin-bottom: 8px;"><strong>Choix du Modèle :</strong> AROME (Haute définition,
+                                très précis sur 2 jours en France), ICON (Bon compromis Europe), GFS (Long terme
+                                mondial). Changer de modèle recalcule instantanément les prévisions.</li>
+                            <li style="margin-bottom: 8px;"><strong>Vos Limites :</strong> Définissez votre plage de
+                                vent idéal (ex: Min 5 km/h, Max 20 km/h) et la rafale maximale tolérée. Si les
+                                prévisions dépassent ces limites, le site sera marqué en rouge (non volable pour vous).
+                            </li>
+                        </ul>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">3. Score de "Flyability" et Stratégies</h5>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">L'application
+                            calcule un score pour chaque site, vérifiant si l'orientation du vent est compatible avec
+                            les décollages du site, et si la force du vent respecte vos limites.</p>
+                        <ul
+                            style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; padding-left: 20px;">
+                            <li style="margin-bottom: 8px;"><strong>Créneau Continu :</strong> Cherche la plus longue
+                                période d'heures consécutives volables (idéal pour un long vol).</li>
+                            <li style="margin-bottom: 8px;"><strong>Demi-journée active :</strong> Se concentre sur une
+                                fenêtre de quelques heures l'après-midi ou le matin.</li>
+                            <li style="margin-bottom: 8px;"><strong>Volume Total :</strong> Cumule toutes les heures
+                                potentiellement volables sur les 48 prochaines heures, même si elles sont hachées.</li>
+                        </ul>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">4. Cartographie Embarquée</h5>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">Au-dessus de la
+                            liste des sites, la carte interactive permet d'afficher les décollages, mais aussi
+                            d'incruster des services externes en un clic : Windy (pour le vent animé), Météo-Parapente
+                            (pour l'émagramme et les thermiques), Paragliding Earth (pour les balises) ou les cartes des
+                            fronts Isobares.</p>
+                    </div>
+
+                    <div id="manual-section-qcm" class="manual-section" style="display: none;">
+                        <h4 style="margin-top: 0; color: var(--accent-blue);">Entraînement aux QCM Officiels</h4>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">Ce module utilise
+                            la base de données officielle des questions de la Fédération Française de Vol Libre (FFVL)
+                            pour préparer vos brevets théoriques.</p>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">1. Les Trois Modes d'Apprentissage</h5>
+                        <ul
+                            style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; padding-left: 20px;">
+                            <li style="margin-bottom: 8px;"><strong>Mode Entraînement :</strong> C'est le mode par
+                                défaut. Lorsque vous répondez à une question, la correction est affichée immédiatement,
+                                accompagnée d'une explication pédagogique détaillée. Il n'y a pas de limite de temps.
+                                C'est le meilleur mode pour apprendre.</li>
+                            <li style="margin-bottom: 8px;"><strong>Mode Examen :</strong> Une simulation réaliste. Vous
+                                êtes chronométré (30 minutes pour le BI, 60 minutes pour le BP, etc.). Vous ne savez pas
+                                si votre réponse est juste avant d'avoir terminé la totalité des questions. Un rapport
+                                détaillé est fourni à la fin.</li>
+                            <li style="margin-bottom: 8px;"><strong>Mode Révision :</strong> L'algorithme se concentre
+                                exclusivement sur les questions auxquelles vous avez répondu de manière incorrecte par
+                                le passé. Très utile pour corriger ses faiblesses avant le jour J.</li>
+                        </ul>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">2. Paramétrage Avancé</h5>
+                        <p
+                            style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem; margin-bottom: 8px;">
+                            Avant de lancer une session, vous pouvez choisir le nombre de questions (10, 20, 30, 40 ou
+                            TOUTES) et forcer le QCM sur un thème précis (ex: uniquement la Météo, ou uniquement la
+                            Réglementation).</p>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">3. La Banque de Questions</h5>
+                        <p
+                            style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem; margin-bottom: 8px;">
+                            Accessible depuis le menu QCM, ce répertoire permet de consulter librement l'intégralité des
+                            questions existantes. Une barre de recherche vous permet de taper un mot-clé (ex:
+                            "Cumulonimbus", "Finesse") pour retrouver instantanément la question officielle
+                            correspondante et son explication.</p>
+                    </div>
+
+                    <div id="manual-section-library" class="manual-section" style="display: none;">
+                        <h4 style="margin-top: 0; color: var(--accent-blue);">La Bibliothèque de Cours</h4>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">Un espace
+                            centralisant de nombreux supports de cours, manuels de vol libre et affiches pédagogiques
+                            pour consolider la théorie.</p>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">1. Navigation et Tri</h5>
+                        <ul
+                            style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; padding-left: 20px;">
+                            <li style="margin-bottom: 8px;"><strong>Catégorisation :</strong> Les documents sont classés
+                                de manière logique (Mécanique de vol, Météorologie, Matériel, Réglementation...).
+                                Utilisez les boutons de tri pour regrouper les documents par catégorie ou par ordre
+                                alphabétique.</li>
+                            <li style="margin-bottom: 8px;"><strong>Recherche Rapide :</strong> La barre de recherche
+                                filtre instantanément les documents selon leur titre ou leur description.</li>
+                        </ul>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">2. Visionneuse Intégrée</h5>
+                        <p
+                            style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem; margin-bottom: 8px;">
+                            En cliquant sur un cours, celui-ci s'ouvre dans une visionneuse PDF directement intégrée à
+                            l'application. Si vous préférez lire le document en plein écran ou l'imprimer, un bouton
+                            dans la barre supérieure permet d'ouvrir le fichier original dans un nouvel onglet de votre
+                            navigateur.</p>
+                    </div>
+
+                    <div id="manual-section-stats" class="manual-section" style="display: none;">
+                        <h4 style="margin-top: 0; color: var(--accent-blue);">Suivi et Statistiques</h4>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">Ce tableau de
+                            bord personnel agrège l'ensemble de vos résultats aux QCM pour vous aider à cibler vos
+                            révisions.</p>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">1. Analyse par Thème</h5>
+                        <p
+                            style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem; margin-bottom: 8px;">
+                            L'application calcule votre pourcentage de réussite exact pour chaque grande famille (Météo,
+                            Mécavol, Pilotage...). Des barres de progression visuelles vous indiquent d'un coup d'œil où
+                            se situent vos lacunes (en orange ou rouge) et vos points forts (en vert).</p>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">2. Historique des Sessions</h5>
+                        <p
+                            style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem; margin-bottom: 8px;">
+                            En bas de l'écran des statistiques, vous retrouverez le journal de bord de vos derniers
+                            examens et entraînements, avec la date, le score obtenu et la durée de l'épreuve.</p>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">3. Réinitialisation</h5>
+                        <p
+                            style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem; margin-bottom: 8px;">
+                            Si vous souhaitez recommencer à zéro (par exemple pour préparer le niveau supérieur l'année
+                            suivante), un bouton de réinitialisation vous permet d'effacer vos statistiques locales.
+                            Attention, cette action est irréversible !</p>
+                    </div>
+                </div>
+            </div>
+            <div class="gdpr-modal-footer">
+                <button class="gdpr-btn-accept" onclick="Engine.hideManual()">Fermer</button>
             </div>
         </div>
     </div>

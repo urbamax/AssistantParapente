@@ -5,42 +5,45 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 140px;
+    height: 115px;
     padding: 0 40px;
-    background: var(--bg-overlay);
-    backdrop-filter: blur(24px);
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
     z-index: 99999 !important;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    border-bottom: 1px solid var(--border-color);
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(150, 150, 150, 0.15);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.header-top-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
+body.dark-theme .top-controls {
+    background: rgba(18, 18, 18, 0.75);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.header-nav-slot,
-.header-actions-slot {
+.header-nav-slot {
     flex: 1;
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 12px;
 }
 
 .header-actions-slot {
+    flex: 1;
+    display: flex;
+    align-items: center;
     justify-content: flex-end;
+    gap: 15px;
 }
 
 .header-branding {
-    flex: 2;
-    text-align: center;
+    flex: 1;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
 }
@@ -60,117 +63,248 @@
     font-style: italic;
 }
 
-.header-level-row {
-    margin-top: 15px;
+/* --- PARAGLIDER WING TITLE --- */
+.paraglider-title {
     display: flex;
     justify-content: center;
-    width: 100%;
+    padding: 0;
 }
 
-/* Nav Buttons (Glass Style) */
+.logo-image {
+    max-width: 450px;
+    height: auto;
+    max-height: 120px;
+    object-fit: contain;
+}
+
+.header-level-row {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding-right: 20px;
+}
+
+/* Nav Buttons (Modern Glass Pill) */
 .nav-btn-glass {
     text-decoration: none;
     display: flex;
     align-items: center;
     gap: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 10px 24px;
+    background: rgba(120, 120, 120, 0.08);
+    padding: 8px 20px;
     border-radius: 50px;
-    border: 1px solid var(--border-color);
+    border: 1px solid rgba(150, 150, 150, 0.1);
     color: var(--text-main);
     font-weight: 700;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(10px);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 2px 8px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+body.dark-theme .nav-btn-glass {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.08);
 }
 
 .nav-btn-glass:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-1px);
+    background: rgba(120, 120, 120, 0.15);
+    transform: scale(1.05) translateY(-1px);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 6px 16px rgba(0, 122, 255, 0.15);
     border-color: var(--accent-blue);
-}
-
-.nav-btn-glass.secondary {
-    background: rgba(0, 92, 169, 0.1);
     color: var(--accent-blue);
 }
 
-/* Nav Buttons (Glass Style) */
+body.dark-theme .nav-btn-glass:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-btn-glass.secondary {
+    background: rgba(0, 122, 255, 0.08);
+    color: var(--accent-blue);
+    border-color: rgba(0, 122, 255, 0.2);
+}
+
+.nav-btn-glass.secondary:hover {
+    background: rgba(0, 122, 255, 0.15);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 6px 16px rgba(0, 122, 255, 0.25);
+}
 
 /* Level Selector */
 .level-select-container {
     display: flex;
     align-items: center;
+    background: rgba(120, 120, 120, 0.08);
+    padding: 6px 18px;
+    border-radius: 50px;
+    border: 1px solid rgba(150, 150, 150, 0.15);
+    transition: all 0.3s ease;
+}
+
+body.dark-theme .level-select-container {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.level-select-container:hover {
+    background: rgba(120, 120, 120, 0.12);
+    border-color: var(--accent-blue);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 122, 255, 0.15);
+}
+
+body.dark-theme .level-select-container:hover {
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .level-select-container label {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--text-muted);
-    margin-right: 8px;
-    font-weight: 500;
+    margin-right: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .level-select-container select {
-    background: var(--bg-input);
+    background: transparent;
     color: var(--text-main);
-    border: 1px solid var(--border-color);
-    padding: 6px 12px;
-    border-radius: var(--radius-md);
+    border: none;
+    font-weight: 700;
+    font-size: 0.85rem;
     cursor: pointer;
     font-family: inherit;
+    outline: none;
+}
+
+/* Desktop Main Navigation Menu */
+.desktop-main-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(120, 120, 120, 0.05);
+    padding: 6px 12px;
+    border-radius: 100px;
+    border: 1px solid rgba(150, 150, 150, 0.1);
+    backdrop-filter: blur(12px);
+}
+
+body.dark-theme .desktop-main-nav {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.nav-menu-btn {
+    background: transparent;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 50px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    outline: none;
+}
+
+.nav-menu-btn:hover {
+    color: var(--text-main);
+    background: rgba(120, 120, 120, 0.1);
+    transform: translateY(-1px);
+}
+
+body.dark-theme .nav-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-menu-btn.active {
+    background: var(--bg-card);
+    color: var(--accent-blue);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    font-weight: 700;
+}
+
+body.dark-theme .nav-menu-btn.active {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.nav-menu-btn i {
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+.nav-menu-btn.active i {
+    opacity: 1;
+}
+
+/* Hide back button on desktop since we have the top nav */
+@media (min-width: 1025px) {
+    .header-nav-slot {
+        display: none !important;
+    }
 }
 
 /* Mobile Overrides (from main style.css) */
+@media (max-width: 1024px) {
+    .desktop-main-nav {
+        display: none !important;
+    }
+}
+
 @media (max-width: 768px) {
     .top-controls {
         height: auto;
         padding: 10px 14px !important;
-        flex-direction: column;
-        align-items: center;
-        gap: 6px !important;
-    }
-
-    .header-top-row {
         flex-direction: row;
-        justify-content: space-between;
+        flex-wrap: wrap;
         align-items: center;
-        gap: 8px;
-        width: 100%;
+        justify-content: space-between;
+        gap: 10px !important;
     }
 
     .header-nav-slot {
         order: 1;
         width: auto;
-        flex: 1;
-        justify-content: flex-start;
     }
 
     .header-branding {
         order: 2;
-        width: auto;
-        flex: 2;
-        text-align: center;
+        flex: 1;
+        justify-content: center;
+        padding-left: 0;
         margin-bottom: 0;
     }
 
     .header-actions-slot {
         order: 3;
         width: auto;
-        flex: 1;
-        justify-content: flex-end;
     }
 
     .header-branding .dashboard-title {
         font-size: 1rem;
         font-weight: 800;
-        letter-spacing: 0.04em;
         white-space: nowrap;
+    }
+
+    .logo-image {
+        max-width: 320px;
+        max-height: 84px;
     }
 
     /* Extra small screens title scale down */
     @media (max-width: 360px) {
         .header-branding .dashboard-title {
             font-size: 0.85rem;
+        }
+
+        .logo-image {
+            max-width: 280px;
+            max-height: 73px;
         }
     }
 
@@ -202,7 +336,10 @@
 
     .header-level-row {
         order: 4;
+        width: 100%;
+        justify-content: center;
         margin-top: 5px;
+        padding-right: 0;
     }
 
     .level-select-container {

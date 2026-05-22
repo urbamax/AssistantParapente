@@ -114,6 +114,18 @@ const FirebaseAuthEngine = {
                 authBtn.title = this.enabled ? "Se connecter / S'enregistrer" : "Synchronisation désactivée (Cliquez pour configurer)";
             }
         }
+        
+        // Update guest warnings
+        const qcmWarning = document.getElementById('qcm-guest-warning');
+        const statsWarning = document.getElementById('stats-guest-warning');
+        
+        if (this.currentUser) {
+            if (qcmWarning) qcmWarning.style.display = 'none';
+            if (statsWarning) statsWarning.style.display = 'none';
+        } else if (this.enabled) {
+            if (qcmWarning) qcmWarning.style.display = 'flex';
+            if (statsWarning) statsWarning.style.display = 'flex';
+        }
     },
 
     // Update the contents of the modal based on connection state
@@ -296,9 +308,52 @@ const FirebaseAuthEngine = {
             localStorage.setItem('parapente_exam_history', JSON.stringify(finalExamHistory));
             await setDoc(examDocRef, finalExamHistory);
 
+            // --- Sync Preferences ---
+            const localPrefs = this.getLocalPreferences();
+            const prefsDocRef = doc(db, "users", uid, "preferences", "user_prefs");
+            const prefsDocSnap = await getDoc(prefsDocRef);
+            
+            let finalPrefs = localPrefs;
+            if (prefsDocSnap.exists()) {
+                const cloudPrefs = prefsDocSnap.data();
+                finalPrefs = this.mergePreferences(localPrefs, cloudPrefs);
+            }
+            
+            localStorage.setItem('parapente_user_prefs', JSON.stringify(finalPrefs));
+            
+            // Update global userLevel from merged preferences if it's different
+            this.syncingData = true;
+            if (finalPrefs.pilotLevel && finalPrefs.pilotLevel !== localStorage.getItem('userLevel')) {
+                if (window.Engine) {
+                    window.Engine.changeLevel(finalPrefs.pilotLevel);
+                } else {
+                    localStorage.setItem('userLevel', finalPrefs.pilotLevel);
+                }
+            }
+            if (finalPrefs.themeMode && finalPrefs.themeMode !== localStorage.getItem('themeMode')) {
+                if (window.Engine) {
+                    window.Engine.state.themeMode = finalPrefs.themeMode;
+                    localStorage.setItem('themeMode', finalPrefs.themeMode);
+                    window.Engine.applyThemeMode();
+                } else {
+                    localStorage.setItem('themeMode', finalPrefs.themeMode);
+                }
+            }
+            this.syncingData = false;
+            
+            await setDoc(prefsDocRef, finalPrefs);
+
             // Refresh UI if QuizEngine stats are currently visible
             if (typeof QuizEngine !== 'undefined' && typeof QuizEngine.renderStats === 'function') {
                 QuizEngine.renderStats();
+            }
+
+            // Refresh SitesEngine if it exists so that limits, favorites and locations are re-applied
+            if (typeof SitesEngine !== 'undefined' && typeof SitesEngine.loadUserPreferences === 'function') {
+                SitesEngine.loadUserPreferences();
+                if (typeof SitesEngine.renderList === 'function') {
+                    SitesEngine.renderList();
+                }
             }
 
             console.log("Sync complete!");
@@ -351,6 +406,24 @@ const FirebaseAuthEngine = {
             console.log("Incremental exam history synced.");
         } catch (error) {
             console.error("Incremental exam history sync failed:", error);
+        }
+    },
+
+    savePreferencesToCloud: async function() {
+        if (!this.currentUser || !this.enabled || this.syncingData) return;
+        
+        try {
+            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+            
+            const prefs = this.getLocalPreferences();
+            const prefsDocRef = doc(db, "users", uid, "preferences", "user_prefs");
+            await setDoc(prefsDocRef, prefs);
+            
+            this.lastSyncTime = new Date().toLocaleTimeString();
+            console.log("Incremental preferences synced.");
+        } catch (error) {
+            console.error("Incremental preferences sync failed:", error);
         }
     },
 
@@ -435,6 +508,34 @@ const FirebaseAuthEngine = {
         };
     },
 
+    mergePreferences: function(local, cloud) {
+        if (!cloud) return local;
+        if (!local) return cloud;
+        
+        // 1. Le Cloud est la source de vérité absolue (recharge à la connexion)
+        let merged = { ...cloud };
+        
+        // 2. On récupère les valeurs locales qui n'existent pas du tout dans le cloud
+        // (Utile pour rétrocompatibilité lors de l'ajout d'une nouvelle option locale)
+        for (const key in local) {
+            if (merged[key] === undefined) {
+                merged[key] = local[key];
+            }
+        }
+        
+        // 3. Cas spécifiques : Fusion intelligente des tableaux pour ne pas perdre les données des deux côtés
+        const localFavs = local.favoriteSites || [];
+        const cloudFavs = cloud.favoriteSites || [];
+        merged.favoriteSites = Array.from(new Set([...localFavs, ...cloudFavs]));
+        
+        const mergedLocsMap = new Map();
+        (cloud.savedLocations || []).forEach(loc => mergedLocsMap.set(loc.name, loc));
+        (local.savedLocations || []).forEach(loc => mergedLocsMap.set(loc.name, loc));
+        merged.savedLocations = Array.from(mergedLocsMap.values());
+        
+        return merged;
+    },
+
     // LocalStorage Getters
     getLocalQcmStats: function() {
         try {
@@ -452,6 +553,30 @@ const FirebaseAuthEngine = {
         } catch(e) {
             return { exams: [] };
         }
+    },
+
+    getLocalPreferences: function() {
+        let prefs = { pilotLevel: 'ALL', themeMode: 'auto', favoriteSites: [], savedLocations: [], activeMapLayers: ['leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'paraglidable', 'isofronts'] };
+        try {
+            const saved = localStorage.getItem('parapente_user_prefs');
+            if (saved) {
+                prefs = JSON.parse(saved);
+                if (!prefs.activeMapLayers) prefs.activeMapLayers = ['leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'paraglidable', 'isofronts'];
+            }
+        } catch(e) {}
+        
+        // Always read latest pilot level from main app logic (userLevel)
+        const globalLevel = localStorage.getItem('userLevel');
+        if (globalLevel) {
+            prefs.pilotLevel = globalLevel;
+        }
+        
+        const themeMode = localStorage.getItem('themeMode');
+        if (themeMode) {
+            prefs.themeMode = themeMode;
+        }
+
+        return prefs;
     },
 
     // Alert UI management

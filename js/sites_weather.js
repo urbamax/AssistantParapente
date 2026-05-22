@@ -20,7 +20,7 @@ SitesEngine.fetchWeatherForSites = async function () {
         modelParam = '&models=icon_global';
     }
 
-    const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${lats}&longitude=${lons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation&daily=sunrise,sunset&timezone=Europe%2FParis&forecast_days=3${modelParam}`;
+    const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${lats}&longitude=${lons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation&daily=sunrise,sunset&timezone=Europe%2FParis&forecast_days=6${modelParam}`;
 
     try {
         const response = await fetch(url);
@@ -55,8 +55,8 @@ SitesEngine.fetchWeatherForSites = async function () {
                     const windGustKey = Object.keys(hourly).find(k => k.startsWith('wind_gusts_10m')) || 'wind_gusts_10m';
                     const precipKey = Object.keys(hourly).find(k => k.startsWith('precipitation')) || 'precipitation';
 
-                    // Keep up to 48 hours starting from currentHourIndex
-                    for (let i = 0; i <= 48; i++) {
+                    // Keep up to 120 hours starting from currentHourIndex
+                    for (let i = 0; i <= 120; i++) {
                         const idx = currentHourIndex + i;
                         if (idx < hourly.time.length) {
                             const dirDeg = hourly[windDirKey][idx];
@@ -137,8 +137,8 @@ SitesEngine.fetchWeatherForSites = async function () {
         const slider = document.getElementById('forecast-slider');
         if (slider) {
             slider.disabled = false;
-            slider.max = Math.max(0, (results[0]?.hourly?.time?.length || 49) - currentHourIndex - 1);
-            slider.max = Math.min(slider.max, 48); // cap at 48h
+            slider.max = Math.max(0, (results[0]?.hourly?.time?.length || 121) - currentHourIndex - 1);
+            slider.max = Math.min(slider.max, 120); // cap at 120h
         }
 
         this.updateForecastLabel();

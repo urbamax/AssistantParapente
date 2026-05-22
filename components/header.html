@@ -1,34 +1,46 @@
-<div class="header-top-row">
+<div class="header-left-zone" style="flex: 1; display: flex; align-items: center; justify-content: flex-start; gap: 15px;">
     <div class="header-nav-slot"></div>
     <div class="header-branding">
-        <h1 class="dashboard-title" onclick="if(window.Engine) Engine.showDashboard()" style="cursor:pointer;">ASSISTANT <em>PARAPENTE</em></h1>
-    </div>
-    <div class="header-actions-slot">
-        <button id="theme-toggle" class="icon-btn" onclick="if(window.Engine) Engine.toggleTheme()"
-            title="Mode: Auto (Système)">
-            <div class="auto-icon-composite">
-                <i class="ri-sun-line"></i>
-                <i class="ri-moon-line"></i>
-            </div>
-        </button>
-        <div class="auth-btn-wrapper">
-            <button id="auth-btn" class="icon-btn" onclick="if(window.FirebaseAuthEngine) window.FirebaseAuthEngine.openAuthModal()" title="Espace Personnel / Connexion">
-                <i class="ri-user-line"></i>
-            </button>
-            <div id="auth-active-dot" class="auth-active-dot"></div>
+        <div class="dashboard-title paraglider-title" onclick="if(window.Engine) Engine.showManual('about')" style="cursor:pointer; display: flex; flex-direction: column; align-items: center;">
+            <img src="img/logo.png?v=2026.05.22_v1" alt="Assistant Parapente" class="logo-image" style="max-height: 85px; width: auto; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />
         </div>
     </div>
 </div>
-<div class="header-level-row">
-    <div class="level-select-container">
-        <label for="global-level-select">
-            <i class="ri-graduation-cap-line"></i> NIVEAU</label>
-        <select id="global-level-select" onchange="if(window.Engine) Engine.changeLevel(this.value)" autocomplete="off">
-            <option value="ALL">TOUS LES NIVEAUX</option>
-            <option value="BI">BREVET INITIAL</option>
-            <option value="BP">BREVET PILOTE</option>
-            <option value="BPC">BREVET PILOTE CONFIRMÉ</option>
-            <option value="TREUIL">TREUIL</option>
-        </select>
+
+<nav class="desktop-main-nav" id="desktop-main-nav" style="flex: 2; display: flex; justify-content: center; align-items: center; gap: 8px;">
+    <button class="nav-menu-btn" data-target="SITES" onclick="if(window.Engine) Engine.startMode('SITES')"><i class="ri-map-pin-line"></i> Sites</button>
+    <button class="nav-menu-btn" data-target="QCM" onclick="if(window.Engine) Engine.startMode('QCM')"><i class="ri-file-list-3-line"></i> QCM</button>
+    <button class="nav-menu-btn" data-target="LIBRARY" onclick="if(window.Engine) Engine.startMode('LIBRARY')"><i class="ri-book-open-line"></i> Biblio</button>
+    <button class="nav-menu-btn" data-target="STATS" onclick="if(window.Engine) Engine.showStats()"><i class="ri-bar-chart-2-line"></i> Stats</button>
+    <div style="width: 1px; height: 24px; background: rgba(150,150,150,0.2); margin: 0 4px;"></div>
+    <button class="nav-menu-btn" data-target="MANUAL" onclick="if(window.Engine) Engine.showManual('about')"><i class="ri-book-read-line"></i> Mode d'emploi</button>
+</nav>
+
+<div class="header-actions-slot" style="flex: 1; display: flex; justify-content: flex-end; align-items: center;">
+    <div class="header-level-row">
+        <div class="level-select-container">
+            <label for="global-level-select"><i class="ri-graduation-cap-line"></i> NIVEAU</label>
+            <select id="global-level-select" onchange="if(window.Engine) Engine.changeLevel(this.value)" autocomplete="off">
+                <option value="ALL">TOUS LES NIVEAUX</option>
+                <option value="BI">BREVET INITIAL</option>
+                <option value="BP">BREVET PILOTE</option>
+                <option value="BPC">BREVET PILOTE CONFIRMÉ</option>
+                <option value="TREUIL">TREUIL</option>
+            </select>
+        </div>
+    </div>
+    
+    <button id="theme-toggle" class="icon-btn" onclick="if(window.Engine) Engine.toggleTheme()" title="Mode: Auto (Système)">
+        <div class="auto-icon-composite">
+            <i class="ri-sun-line"></i>
+            <i class="ri-moon-line"></i>
+        </div>
+    </button>
+    
+    <div class="auth-btn-wrapper">
+        <button id="auth-btn" class="icon-btn" onclick="if(window.FirebaseAuthEngine) window.FirebaseAuthEngine.openAuthModal()" title="Espace Personnel / Connexion">
+            <i class="ri-user-line"></i>
+        </button>
+        <div id="auth-active-dot" class="auth-active-dot"></div>
     </div>
 </div>

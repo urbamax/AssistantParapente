@@ -942,7 +942,7 @@ body.light-mode .leaflet-tile-pane {
 /* --- MAP & TOGGLES --- */
 .sites-map-view { width: 100%; margin-bottom: 32px; display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 140px; }
 
-.map-toggles-container { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; flex-wrap: wrap; background: rgba(0,0,0,0.15); padding: 6px; border-radius: var(--radius-pill); border: var(--border-glass); backdrop-filter: blur(10px); }
+.map-toggles-container { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; flex-wrap: wrap; background: rgba(0,0,0,0.15); padding: 6px; border-radius: var(--radius-pill); border: var(--border-glass); backdrop-filter: blur(10px); position: relative; z-index: 110; }
 .map-toggles-left { display: flex; gap: 8px; flex-wrap: wrap; }
 .map-toggle-btn { padding: 10px 20px; font-size: 0.9rem; font-weight: 700; border-radius: var(--radius-pill); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border: none; transition: all 0.3s ease; }
 .map-toggle-btn.action-btn-primary { background: var(--text-main); color: var(--bg-app); box-shadow: 0 4px 12px rgba(255,255,255,0.2); }
@@ -1139,7 +1139,7 @@ body.light-mode .isofronts-footer {
     padding: 16px 24px;
     border-radius: var(--radius-card);
     box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px); /* Keep blur for edge anti-aliasing but make bg solid */
     margin-bottom: 24px;
     overflow: hidden;
     transition: box-shadow 0.3s ease;
@@ -1154,7 +1154,7 @@ body.light-mode .isofronts-footer {
     background: var(--grad-primary);
 }
 body.light-mode .forecast-sticky-container {
-    background: rgba(255, 255, 255, 0.85);
+    background: rgb(255, 255, 255); /* Fully solid in light mode to prevent text overlap */
     border-color: rgba(0, 0, 0, 0.1);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
@@ -1228,8 +1228,16 @@ body.light-mode .forecast-sticky-container {
 
 @media (max-width: 768px) {
     .forecast-sticky-container {
-        top: var(--header-height, 110px);
+        top: var(--header-height, 130px);
         padding: 12px 16px;
+    }
+    
+    .forecast-sticky-container.js-fixed {
+        position: fixed !important;
+        top: var(--header-height, 130px) !important;
+        z-index: 1000 !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+        margin-top: 0 !important;
     }
 }
 
@@ -1866,3 +1874,34 @@ body.light-mode .action-btn-spot:hover {
 body.light-mode .back-to-top-btn {
     box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
+
+/* Specific override for the map settings dropdown container to prevent it from inheriting global filter card styles */
+#dropdown-map-settings.filter-dropdown-container {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    transform: none !important;
+    flex: none !important;
+    transition: none !important;
+    position: relative !important;
+    display: inline-block !important;
+}
+
+#dropdown-map-settings .map-toggle-btn {
+    width: 38px;
+    height: 38px;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+}
+
+@media (max-width: 768px) {
+    #dropdown-map-settings .map-toggle-btn {
+        width: 32px !important;
+        height: 32px !important;
+    }
+}
+

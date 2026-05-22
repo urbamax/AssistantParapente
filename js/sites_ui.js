@@ -63,7 +63,8 @@ SitesEngine.renderList = function () {
                 const halfDayCounts = {};
                 const dailyCounts = {};
 
-                for (let i = 0; i < Math.min(forecasts.length, 48); i++) {
+                const maxRange = this.state.forecastMaxRange || 120;
+                for (let i = 0; i < Math.min(forecasts.length, maxRange); i++) {
                     const weather = forecasts[i];
                     const status = this.isForecastFlyable(site, weather);
 
@@ -197,6 +198,10 @@ SitesEngine.renderList = function () {
                 activeSites = activeSites.filter(site => site.flyableHours > 0);
             }
 
+            if (this.state.filterFavoritesOnly && this.state.userPreferences) {
+                activeSites = activeSites.filter(site => this.state.userPreferences.favoriteSites.includes(site.id));
+            }
+
             if (this.state.sortMode === 'CONDITIONS') {
                 const strat = this.state.conditionsStrategy || 'CONSECUTIVE';
 
@@ -248,6 +253,17 @@ SitesEngine.renderList = function () {
                 activeSites.sort((a, b) => (a.distance || 9999) - (b.distance || 9999));
             } else {
                 activeSites.sort((a, b) => a.nom.localeCompare(b.nom));
+            }
+
+            // Always push favorites to the top if not specifically filtering for them
+            if (!this.state.filterFavoritesOnly && this.state.userPreferences) {
+                activeSites.sort((a, b) => {
+                    const aFav = this.state.userPreferences.favoriteSites.includes(a.id);
+                    const bFav = this.state.userPreferences.favoriteSites.includes(b.id);
+                    if (aFav && !bFav) return -1;
+                    if (!aFav && bFav) return 1;
+                    return 0;
+                });
             }
 
             container.innerHTML = '';
@@ -341,16 +357,18 @@ SitesEngine.renderList = function () {
                         </div>
                     `;
                 } else {
+                    const maxRange = this.state.forecastMaxRange || 120;
                     slotsTextHtml = `
                         <div class="creneaux-list bad">
-                            <i class="ri-error-warning-line"></i> Aucun créneau favorable dans les prochaines 48 heures
+                            <i class="ri-error-warning-line"></i> Aucun créneau favorable dans les prochaines ${maxRange} heures
                         </div>
                     `;
                 }
 
                 let timelineBarsHtml = '';
-                const forecastsToUse = forecasts.slice(0, 48);
-                for (let i = 0; i < 48; i++) {
+                const maxRange = this.state.forecastMaxRange || 120;
+                const forecastsToUse = forecasts.slice(0, maxRange);
+                for (let i = 0; i < maxRange; i++) {
                     const w = forecastsToUse[i];
                     let barColor = 'rgba(255,255,255,0.05)';
                     let statusLabel = 'Inconnu';
@@ -399,9 +417,16 @@ SitesEngine.renderList = function () {
     };
 
 SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtml, flyableHoursHtml, weatherHtml, timelineBarsHtml, slotsTextHtml) {
+        const isFav = this.state.userPreferences && this.state.userPreferences.favoriteSites.includes(site.id);
+        const starIcon = isFav ? 'ri-star-fill' : 'ri-star-line';
+        const starColor = isFav ? '#fbbf24' : 'var(--text-muted)';
+
         return `
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
+                    <button class="favorite-toggle-btn" onclick="SitesEngine.toggleFavorite('${site.id}'); event.stopPropagation();" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: ${starColor}; cursor: pointer; padding: 0; margin-right: 8px;">
+                        <i class="${starIcon}"></i>
+                    </button>
                     <h3 class="site-card-title">${site.nom}</h3>
                     ${site.altitude ? `
                     <span class="site-coords-badge site-altitude-badge" title="Altitude du site">
@@ -433,7 +458,7 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
             ${weatherHtml}
             <div style="margin-top: 14px;">
                 <div class="timeline-labels">
-                    <span>Maintenant</span><span>Prévisions (48h)</span><span>Dans 2 jours</span>
+                    <span>Maintenant</span><span>Prévisions (${this.state.forecastMaxRange || 120}h)</span><span>Dans ${(this.state.forecastMaxRange || 120) / 24} jours</span>
                 </div>
                 <div class="ranking-timeline">
                     ${timelineBarsHtml}

@@ -23,14 +23,107 @@ const SitesEngine = {
         tileLayer: null,
         mapExpanded: true,
         expandedSites: {},
-        searchQuery: '' // Text search query
+        searchQuery: '', // Text search query
+        filterFavoritesOnly: false,
+        forecastMaxRange: 120, // max offset value (24, 48, 72, 120)
+        userPreferences: {
+            pilotLevel: 'ALL',
+            favoriteSites: [],
+            savedLocations: [], // array of {name, lat, lng}
+            forecastMaxRange: 120,
+            activeMapLayers: ['leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'paraglidable', 'isofronts']
+        },
+        activeMapLayers: ['leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'paraglidable', 'isofronts']
     }
 };
 
 SitesEngine.init = function (engineRef) {
         console.log("SitesEngine Initialized");
         this.engine = engineRef;
+        this.loadUserPreferences();
     };
+
+SitesEngine.loadUserPreferences = function() {
+    if (window.FirebaseAuthEngine) {
+        this.state.userPreferences = window.FirebaseAuthEngine.getLocalPreferences();
+    } else {
+        try {
+            const saved = localStorage.getItem('parapente_user_prefs');
+            this.state.userPreferences = saved ? JSON.parse(saved) : { pilotLevel: 'ALL', favoriteSites: [], savedLocations: [], forecastMaxRange: 120 };
+        } catch(e) {
+            this.state.userPreferences = { pilotLevel: 'ALL', favoriteSites: [], savedLocations: [], forecastMaxRange: 120 };
+        }
+        const globalLevel = localStorage.getItem('userLevel');
+        if (globalLevel) {
+            this.state.userPreferences.pilotLevel = globalLevel;
+        }
+    }
+    
+    // Ensure arrays exist
+    if (!this.state.userPreferences.savedLocations) this.state.userPreferences.savedLocations = [];
+    if (!this.state.userPreferences.forecastMaxRange) this.state.userPreferences.forecastMaxRange = 120;
+    
+    // Apply saved limit and filter settings if they exist dynamically
+    const prefs = this.state.userPreferences;
+    for (const key of this.PREFERENCE_KEYS) {
+        if (prefs[key] !== undefined) {
+            this.state[key] = prefs[key];
+        }
+    }
+    
+    // Sync UI with state
+    const maxInput = document.getElementById('limit-wind-max');
+    const gustInput = document.getElementById('limit-gust-delta');
+    const forecastRangeSelect = document.getElementById('forecast-range-select');
+    
+    if (maxInput) maxInput.value = this.state.limitWindMax;
+    if (gustInput) gustInput.value = this.state.limitGustDelta;
+    if (forecastRangeSelect) forecastRangeSelect.value = this.state.forecastMaxRange;
+    
+    this.renderSavedLocations();
+    if (this.updateMapTogglesVisibility) {
+        this.updateMapTogglesVisibility();
+    }
+};
+
+SitesEngine.savePreferences = function() {
+    if (!this.state.userPreferences) this.state.userPreferences = { pilotLevel: 'ALL', favoriteSites: [] };
+    
+    // Save all dynamic preferences
+    for (const key of this.PREFERENCE_KEYS) {
+        this.state.userPreferences[key] = this.state[key];
+    }
+    // savedLocations is mutated directly in the array, but let's be sure
+    
+    localStorage.setItem('parapente_user_prefs', JSON.stringify(this.state.userPreferences));
+    if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.currentUser) {
+        window.FirebaseAuthEngine.savePreferencesToCloud();
+    }
+};
+
+SitesEngine.changeForecastMaxRange = function(value) {
+    const range = parseInt(value);
+    if (!isNaN(range)) {
+        this.state.forecastMaxRange = range;
+        
+        const slider = document.getElementById('forecast-slider');
+        if (slider) {
+            slider.max = range;
+            if (parseInt(slider.value) > range) {
+                slider.value = range;
+                this.setForecastOffset(range);
+            }
+        }
+        this.savePreferences();
+        this.renderList();
+    }
+};
+
+SitesEngine.PREFERENCE_KEYS = [
+    'limitWindMax', 'limitGustDelta', 'filterWindInclude', 'filterWindExclude', 
+    'filterTypeInclude', 'filterTypeExclude', 'filterFavoritesOnly', 
+    'forecastMaxRange', 'activeMapLayers'
+];
 
 SitesEngine.removeAccents = function (str) {
     if (!str) return '';
@@ -85,7 +178,10 @@ SitesEngine.requestGpsLocation = function (isInitialLoad = false) {
                 lng: position.coords.longitude
             };
             
-            if (inputEl) inputEl.value = "Ma position GPS";
+            if (inputEl) {
+                inputEl.value = "";
+                inputEl.placeholder = "Ma position GPS";
+            }
             if (statusEl) {
                 statusEl.innerHTML = `<i class="ri-checkbox-circle-line" style="color: var(--accent-green);"></i> Position GPS actuelle activée.`;
                 statusEl.style.color = 'var(--accent-green)';
