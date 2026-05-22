@@ -333,8 +333,8 @@ const Engine = {
         this.state.basePath = basePath;
 
         const componentMap = [
-            { id: 'app-header', url: basePath + '/components/header.html?v=2026.05.22_v5' },
-            { id: 'app-footer', url: basePath + '/components/footer.html?v=2026.05.22_v5', selector: '.app-footer-placeholder' }
+            { id: 'app-header', url: basePath + '/components/header.html?v=2026.05.22_v6' },
+            { id: 'app-footer', url: basePath + '/components/footer.html?v=2026.05.22_v6', selector: '.app-footer-placeholder' }
         ];
 
         const self = this;

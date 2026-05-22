@@ -1274,14 +1274,6 @@ body.light-mode .forecast-sticky-container {
 /* --- MINIMIZED SITE CARDS --- */
 .site-card.minimized { padding: 12px 28px; }
 .site-card.minimized .site-card-header-row { margin-bottom: 0; }
-.site-card.minimized .site-info-row > *:not(.favorite-toggle-btn):not(.minimize-toggle-btn):not(.site-card-title) { display: none !important; }
-.site-card.minimized .site-actions-container,
-.site-card.minimized .site-weather-row,
-.site-card.minimized .timeline-labels,
-.site-card.minimized .ranking-timeline,
-.site-card.minimized .timeline-legend,
-.site-card.minimized .site-slots-row,
-.site-card.minimized .site-slots-text { display: none !important; }
 
 
 .site-card-header-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; width: 100%; margin-bottom: 12px; }

@@ -459,6 +459,7 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                     </button>
                 </div>
             </div>
+            ${isMinimized ? '' : `
             ${weatherHtml}
             <div style="margin-top: 14px;">
                 <div class="timeline-labels">
@@ -577,6 +578,7 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                     </details>
                 `;
             })()}
+            `}
         `;
     };
 
