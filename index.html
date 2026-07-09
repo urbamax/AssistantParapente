@@ -6,23 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
     <title>Assistant Parapente</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="img/logo.png">
+    <link rel="apple-touch-icon" href="img/logo.png">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap"
         rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <link rel="stylesheet" href="css/base.css?v=2026.05.22_v6">
-    <link rel="stylesheet" href="css/components.css?v=2026.05.22_v6">
-    <link rel="stylesheet" href="css/header.css?v=2026.05.22_v6">
-    <link rel="stylesheet" href="css/footer.css?v=2026.05.22_v6">
-    <link rel="stylesheet" href="css/dashboard.css?v=2026.05.22_v6">
-    <link rel="stylesheet" href="css/quiz.css?v=2026.05.22_v6">
-    <link rel="stylesheet" href="css/library.css?v=2026.05.22_v6">
-    <link rel="stylesheet" href="css/sites.css?v=2026.05.22_v6">
-    <link rel="stylesheet" href="css/auth.css?v=2026.05.22_v6">
-    <link rel="stylesheet" href="css/gdpr.css?v=2026.05.22_v6">
+    <script src="https://unpkg.com/maplibre-gl@4.x/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@4.x/dist/maplibre-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/base.css?v=2026.07.08_v30">
+    <link rel="stylesheet" href="css/components.css?v=2026.07.08_v30">
+    <link rel="stylesheet" href="css/header.css?v=2026.07.08_v30">
+    <link rel="stylesheet" href="css/footer.css?v=2026.07.08_v30">
+        <link rel="stylesheet" href="css/quiz.css?v=2026.07.08_v30">
+    <link rel="stylesheet" href="css/library.css?v=2026.07.08_v30">
+    <link rel="stylesheet" href="css/sites.css?v=2026.07.08_v30">
+    <link rel="stylesheet" href="css/auth.css?v=2026.07.08_v30">
+    <link rel="stylesheet" href="css/gdpr.css?v=2026.07.08_v30">
+    <link rel="stylesheet" href="css/logbook.css?v=2026.07.08_v30">
 </head>
 
 <body>
@@ -30,71 +37,24 @@
     <!-- Top Controls (Level Select & Theme) -->
     <div id="app-header" class="top-controls"></div>
 
-    <!-- START SCREEN (Dashboard) -->
-    <div id="start-screen" class="mode-screen active">
-        <div class="dashboard-content">
-            <!-- SECTION 1: APPS (Hero) -->
-            <section class="apps-section">
-
-                <div class="apps-grid">
-
-                    <button class="app-card sites-mode" onclick="Engine.startMode('SITES')">
-                        <div class="app-icon" style="color: var(--accent-blue);"><i class="ri-map-pin-line"></i></div>
-                        <div class="app-info">
-                            <h3>Sites de vol</h3>
-                            <p>Décollages & Itinéraires</p>
-                        </div>
-                    </button>
-
-
-                    <button class="app-card accent-qcm" onclick="Engine.startMode('QCM')">
-                        <div class="app-icon"><i class="ri-file-list-3-line"></i></div>
-                        <div class="app-info">
-                            <h3>QCM Officiel</h3>
-                            <p>Entraînement questions FFVL</p>
-                        </div>
-                    </button>
-                    <button class="app-card accent-library" onclick="Engine.startMode('LIBRARY')">
-                        <div class="app-icon"><i class="ri-book-open-line"></i></div>
-                        <div class="app-info">
-                            <h3>Bibliothèque</h3>
-                            <p>Cours, manuels & affiches</p>
-                        </div>
-                    </button>
-                    <button class="app-card accent-qcm stats-mode" onclick="Engine.showStats()">
-                        <div class="app-icon"><i class="ri-bar-chart-2-line"></i></div>
-                        <div class="app-info">
-                            <h3>Statistiques</h3>
-                            <p>Historique & Progression</p>
-                        </div>
-                    </button>
-
-                    <button class="app-card"
-                        style="border: 1px dashed var(--border-color); background: rgba(0,0,0,0.05);"
-                        onclick="Engine.showManual('about')">
-                        <div class="app-icon" style="color: var(--text-main);"><i class="ri-book-read-line"></i></div>
-                        <div class="app-info">
-                            <h3 style="color: var(--text-main);">Mode d'emploi</h3>
-                            <p style="color: var(--text-secondary);"></p>
-                        </div>
-                    </button>
-                </div>
-
-            </section>
-
-        </div>
-        <div class="app-footer-placeholder"></div>
-    </div>
+    
 
 
 
     <div id="qcm-setup-screen" class="mode-screen">
         <div class="course-container">
-            <div id="qcm-guest-warning" style="display: none; background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: var(--radius-md); padding: 12px 16px; margin-bottom: 20px; align-items: flex-start; gap: 12px;">
-                <i class="ri-error-warning-line" style="color: #fbbf24; font-size: 1.5rem; margin-top: 2px; flex-shrink: 0;"></i>
+            <div id="qcm-guest-warning"
+                style="display: none; background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: var(--radius-md); padding: 12px 16px; margin-bottom: 20px; align-items: flex-start; gap: 12px;">
+                <i class="ri-error-warning-line"
+                    style="color: #fbbf24; font-size: 1.5rem; margin-top: 2px; flex-shrink: 0;"></i>
                 <div>
-                    <h4 style="margin: 0 0 4px 0; color: var(--text-main); font-size: 0.95rem;">Vous n'êtes pas connecté</h4>
-                    <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4;">Vos résultats d'examens sont stockés localement. <a href="#" onclick="if(window.FirebaseAuthEngine) window.FirebaseAuthEngine.openAuthModal(); return false;" style="color: var(--accent-blue); text-decoration: underline;">Créez un compte (100% gratuit)</a> pour synchroniser votre progression et ne jamais la perdre.</p>
+                    <h4 style="margin: 0 0 4px 0; color: var(--text-main); font-size: 0.95rem;">Vous n'êtes pas connecté
+                    </h4>
+                    <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4;">Vos
+                        résultats d'examens sont stockés localement. <a href="#"
+                            onclick="if(window.FirebaseAuthEngine) window.FirebaseAuthEngine.openAuthModal(); return false;"
+                            style="color: var(--accent-blue); text-decoration: underline;">Créez un compte (100%
+                            gratuit)</a> pour synchroniser votre progression et ne jamais la perdre.</p>
                 </div>
             </div>
             <div class="setup-grid">
@@ -191,15 +151,22 @@
                     style="position: absolute; right: 0; padding: 4px 8px; font-size: 0.9rem; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary);"
                     title="Mode d'emploi"><i class="ri-question-line" style="font-size: 1.2rem;"></i></button>
             </div>
-            
-            <div id="stats-guest-warning" style="display: none; background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: var(--radius-md); padding: 12px 16px; margin-top: 20px; align-items: flex-start; gap: 12px;">
-                <i class="ri-error-warning-line" style="color: #fbbf24; font-size: 1.5rem; margin-top: 2px; flex-shrink: 0;"></i>
+
+            <div id="stats-guest-warning"
+                style="display: none; background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: var(--radius-md); padding: 12px 16px; margin-top: 20px; align-items: flex-start; gap: 12px;">
+                <i class="ri-error-warning-line"
+                    style="color: #fbbf24; font-size: 1.5rem; margin-top: 2px; flex-shrink: 0;"></i>
                 <div>
-                    <h4 style="margin: 0 0 4px 0; color: var(--text-main); font-size: 0.95rem;">Vous n'êtes pas connecté</h4>
-                    <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4;">Vos statistiques de révision sont stockées localement. <a href="#" onclick="if(window.FirebaseAuthEngine) window.FirebaseAuthEngine.openAuthModal(); return false;" style="color: var(--accent-blue); text-decoration: underline;">Créez un compte (100% gratuit)</a> pour les synchroniser sur tous vos appareils.</p>
+                    <h4 style="margin: 0 0 4px 0; color: var(--text-main); font-size: 0.95rem;">Vous n'êtes pas connecté
+                    </h4>
+                    <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4;">Vos
+                        statistiques de révision sont stockées localement. <a href="#"
+                            onclick="if(window.FirebaseAuthEngine) window.FirebaseAuthEngine.openAuthModal(); return false;"
+                            style="color: var(--accent-blue); text-decoration: underline;">Créez un compte (100%
+                            gratuit)</a> pour les synchroniser sur tous vos appareils.</p>
                 </div>
             </div>
-            
+
             <div id="stats-content" style="margin-top: 24px;">
                 <!-- Injected by JS -->
             </div>
@@ -331,7 +298,7 @@
                         <button id="map-toggle-paraglidable" class="action-btn-secondary map-toggle-btn"
                             onclick="SitesEngine.switchMapMode('paraglidable')"
                             style="color: var(--text-secondary); border-color: var(--border-color);">
-                            <i class="ri-flight-takeoff-line"></i> <span>Paraglidable</span>
+                            <i class="ri-windy-line"></i> <span>Paraglidable</span>
                         </button>
                         <button id="map-toggle-isofronts" class="action-btn-secondary map-toggle-btn"
                             onclick="SitesEngine.switchMapMode('isofronts')"
@@ -424,7 +391,7 @@
                 <div id="sites-paraglidable-canvas" class="sites-map-canvas-custom" style="display: none;">
                     <div id="paraglidable-active-spot-header" class="windy-active-spot-header">
                         <div class="isofronts-header-left">
-                            <i class="ri-flight-takeoff-line windy-spot-icon"></i>
+                            <i class="ri-windy-line windy-spot-icon"></i>
                             <span>Paraglidable :</span>
                             <span id="paraglidable-active-spot-name" class="windy-spot-name">Général</span>
                         </div>
@@ -691,30 +658,152 @@
         <div class="app-footer-placeholder"></div>
     </div>
 
+    <!-- LOGBOOK SCREEN -->
+    <div id="logbook-screen" class="mode-screen">
+        <div class="library-container">
+            <div style="display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 32px;">
+                <h2 class="section-title section-title-center" style="margin-bottom: 0;">CARNET DE VOL</h2>
+                <button class="action-btn-secondary" onclick="Engine.showManual('logbook')"
+                    style="position: absolute; right: 0; padding: 4px 8px; font-size: 0.9rem; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary);"
+                    title="Mode d'emploi"><i class="ri-question-line" style="font-size: 1.2rem;"></i></button>
+            </div>
+            
+            <div class="logbook-tabs">
+                <button class="logbook-tab-btn active" onclick="LogbookEngine.switchTab('history')">Historique</button>
+                <button class="logbook-tab-btn" onclick="LogbookEngine.switchTab('add')">Ajouter</button>
+                <button class="logbook-tab-btn" onclick="LogbookEngine.switchTab('stats')">Statistiques</button>
+                <button class="logbook-tab-btn" data-tab="equip" onclick="LogbookEngine.switchTab('equip')">Matériel</button>
+            </div>
+
+            <!-- Tab: History -->
+            <div id="logbook-tab-history" class="logbook-tab-content active">
+                <div id="logbook-history-list" class="logbook-list">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+
+            <!-- Tab: Add -->
+            <div id="logbook-tab-add" class="logbook-tab-content">
+                <div class="logbook-form-container">
+                    <div class="logbook-type-toggle">
+                        <button id="btn-type-vol" class="type-btn active" onclick="LogbookEngine.setFormType('vol')">Vol</button>
+                        <button id="btn-type-gonflage" class="type-btn" onclick="LogbookEngine.setFormType('gonflage')">Gonflage</button>
+                    </div>
+                    <form id="logbook-add-form" onsubmit="event.preventDefault(); LogbookEngine.submitForm();">
+                        <input type="hidden" id="lb-id-edit">
+                        <div id="form-fields-container">
+                            <!-- Injected by JS based on type -->
+                        </div>
+                        <div style="display:flex; gap:10px; margin-top: 16px;">
+                            <button type="submit" id="lb-submit-btn" class="action-btn-primary" style="flex:1;">Enregistrer</button>
+                            <button type="button" id="lb-cancel-btn" style="padding: 10px 15px; background-color: #6b7280; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight:bold; display: none;" onclick="LogbookEngine.resetForm()">Annuler</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tab: Stats -->
+            <div id="logbook-tab-stats" class="logbook-tab-content">
+                <div id="logbook-stats-container">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+
+            <!-- Tab: Matériel -->
+            <div id="logbook-tab-equip" class="logbook-tab-content">
+                <form id="equip-form" class="logbook-form" style="margin-bottom: 20px; padding: 15px; border: 1px solid var(--border-light, #ddd); border-radius: 8px; background: var(--bg-card, #fff);">
+                    <h3 style="margin-top:0;" id="eq-form-title">Ajouter un Équipement</h3>
+                    <input type="hidden" id="eq-id-edit">
+                    <div class="form-row" style="display:flex; gap:15px; margin-bottom:10px;">
+                        <div class="form-group" style="flex:1;">
+                            <label for="eq-nom" style="display:block; margin-bottom:5px;">Nom du matériel :</label>
+                            <input type="text" id="eq-nom" placeholder="Ex: Supair Birdy 2" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label for="eq-type" style="display:block; margin-bottom:5px;">Type :</label>
+                            <select id="eq-type" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                                <option value="voile">Voile</option>
+                                <option value="sellette">Sellette</option>
+                                <option value="secours">Parachute de Secours</option>
+                                <option value="accessoire">Accessoire</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row" style="display:flex; gap:15px; margin-bottom:10px;">
+                        <div class="form-group" style="flex:1;">
+                            <label for="eq-achat" style="display:block; margin-bottom:5px;">Date d'achat :</label>
+                            <input type="date" id="eq-achat" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label for="eq-derniere-revision" style="display:block; margin-bottom:5px;">Dernière révision (optionnel) :</label>
+                            <input type="date" id="eq-derniere-revision" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                        </div>
+                    </div>
+                    <div class="form-row" style="display:flex; gap:15px; margin-bottom:15px;">
+                        <div class="form-group" style="flex:1;">
+                            <label for="eq-periodicite" style="display:block; margin-bottom:5px;">Périodicité (Temps) :</label>
+                            <select id="eq-periodicite" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;" required>
+                                <option value="12">Tous les 12 mois (1 an)</option>
+                                <option value="24" selected>Tous les 24 mois (2 ans)</option>
+                                <option value="6">Tous les 6 mois</option>
+                                <option value="0">Aucun contrôle requis / Jamais</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label for="eq-periodicite-heures" style="display:block; margin-bottom:5px;">Périodicité (Heures) :</label>
+                            <select id="eq-periodicite-heures" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                                <option value="0">Non applicable</option>
+                                <option value="50">Toutes les 50 heures</option>
+                                <option value="100" selected>Toutes les 100 heures</option>
+                                <option value="150">Toutes les 150 heures</option>
+                                <option value="200">Toutes les 200 heures</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button type="submit" id="eq-submit-btn" class="btn-submit" style="padding: 10px 15px; background-color: #007bc4; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight:bold;">Enregistrer l'équipement</button>
+                        <button type="button" id="eq-cancel-btn" style="padding: 10px 15px; background-color: #6b7280; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight:bold; display: none;" onclick="LogbookEngine.resetEquipmentForm()">Annuler</button>
+                    </div>
+                </form>
+
+                <div id="logbook-equip-container" class="equip-grid">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+            
+        </div>
+        <div class="app-footer-placeholder"></div>
+    </div>
+
     <!-- GLOBAL FOOTER -->
     <div id="app-footer"></div>
 
 
     <!-- SCRIPTS -->
-    <script src="js/data/courses_data.js?v=2026.05.22_v6"></script>
-    <script src="js/data/sites_data.js?v=2026.05.22_v6"></script>
-    <script src="js/sites_engine.js?v=2026.05.22_v6"></script>
-    <script src="js/sites_filter.js?v=2026.05.22_v6"></script>
-    <script src="js/weatherScoring.js?v=2026.05.22_v6"></script>
-    <script src="js/sites_weather.js?v=2026.05.22_v6"></script>
-    <script src="js/sites_ui.js?v=2026.05.22_v6"></script>
-    <script src="js/sites_map.js?v=2026.05.22_v6"></script>
+    <script src="js/config.js?v=2026.07.08_v30"></script>
+    <script src="js/data/courses_data.js?v=2026.07.08_v30"></script>
+    <script src="js/data/sites_data.js?v=2026.07.08_v30"></script>
+    <script src="js/services/igc_parser.js?v=2026.07.08_v30"></script>
+    <script src="js/components/map_3d.js?v=2026.07.08_v30"></script>
+    <script src="js/sites_engine.js?v=2026.07.08_v30"></script>
+    <script src="js/sites_filter.js?v=2026.07.08_v30"></script>
+    <script src="js/weatherScoring.js?v=2026.07.08_v30"></script>
+    <script src="js/sites_weather.js?v=2026.07.08_v30"></script>
+    <script src="js/sites_ui.js?v=2026.07.08_v30"></script>
+    <script src="js/sites_map.js?v=2026.07.08_v30"></script>
 
     <!-- Firebase Sync Config & Engine -->
-    <script src="js/firebase_config.js?v=2026.05.22_v6"></script>
-    <script src="js/gdpr_engine.js?v=2026.05.22_v6"></script>
-    <script type="module" src="js/firebase_engine.js?v=2026.05.22_v6"></script>
+    <script src="js/firebase_config.js?v=2026.07.08_v30"></script>
+    <script src="js/gdpr_engine.js?v=2026.07.08_v30"></script>
+    <script type="module" src="js/firebase_engine.js?v=2026.07.08_v30"></script>
 
     <!-- Quiz Engine Version 4.8 (Theme Fix & Button Alignment) -->
-    <script src="js/quiz_engine_v4_7.js?v=2026.05.22_v6"></script>
-    <script src="js/library_engine.js?v=2026.05.22_v6"></script>
+    <script src="js/quiz_engine_v4_7.js?v=2026.07.08_v30"></script>
+    <script src="js/library_engine.js?v=2026.07.08_v30"></script>
+    <!-- Logbook Engine -->
+    <script src="js/logbook_engine.js?v=2026.07.08_v30"></script>
     <!-- Engine v4.70 (Level Persistence Fix) -->
-    <script src="js/engine_v4_6.js?v=2026.05.22_v6"></script>
+    <script src="js/engine_v4_6.js?v=2026.07.08_v30"></script>
 
     <script>
         // Load Components and Initialize
@@ -788,7 +877,9 @@
                     <div id="tab-login" class="auth-tab active" onclick="FirebaseAuthEngine.switchTab('login')">
                         Connexion</div>
                     <div id="tab-register" class="auth-tab" onclick="FirebaseAuthEngine.switchTab('register')">
-                        S'inscrire <span style="font-size: 0.65rem; background: var(--accent-green); color: #fff; padding: 2px 6px; border-radius: 8px; margin-left: 4px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Gratuit</span></div>
+                        S'inscrire <span
+                            style="font-size: 0.65rem; background: var(--accent-green); color: #fff; padding: 2px 6px; border-radius: 8px; margin-left: 4px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Gratuit</span>
+                    </div>
                 </div>
 
                 <!-- Form Login -->
@@ -828,9 +919,12 @@
 
                 <!-- Form Register -->
                 <div id="form-register-container" class="auth-form-container">
-                    <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: var(--radius-md); padding: 10px 14px; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; display: flex; align-items: flex-start; gap: 8px; margin-bottom: 4px;">
-                        <i class="ri-checkbox-circle-line" style="color: var(--accent-green); font-size: 1.1rem; margin-top: 1px; flex-shrink: 0;"></i>
-                        <span><strong>L'inscription est 100% gratuite</strong> et sans publicité. Elle vous permet de sauvegarder vos statistiques d'entraînement.</span>
+                    <div
+                        style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: var(--radius-md); padding: 10px 14px; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; display: flex; align-items: flex-start; gap: 8px; margin-bottom: 4px;">
+                        <i class="ri-checkbox-circle-line"
+                            style="color: var(--accent-green); font-size: 1.1rem; margin-top: 1px; flex-shrink: 0;"></i>
+                        <span><strong>L'inscription est 100% gratuite</strong> et sans publicité. Elle vous permet de
+                            sauvegarder vos statistiques d'entraînement.</span>
                     </div>
                     <div class="auth-field">
                         <label for="register-email">Adresse Email</label>
@@ -872,7 +966,7 @@
                 <div class="auth-user-card">
                     <div id="auth-user-avatar" class="auth-user-avatar">P</div>
                     <div class="auth-user-info">
-                        <div id="auth-user-email" class="auth-user-email">pilote@email.com</div>
+                        <div id="auth-user-email" class="auth-user-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5c2c35303328391c39313d3530723f3331">[email&#160;protected]</a></div>
                         <div class="auth-user-status">Compte connecté & synchronisé</div>
                     </div>
                 </div>
@@ -1222,6 +1316,13 @@
                     <button class="manual-tab-btn" onclick="Engine.showManualSection('sites')" id="manual-tab-sites"
                         style="padding: 8px 12px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary); cursor: pointer; white-space: nowrap;">Sites
                         de vol</button>
+                    <button class="manual-tab-btn" onclick="Engine.showManualSection('scoring')" id="manual-tab-scoring"
+                        style="padding: 8px 12px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary); cursor: pointer; white-space: nowrap;">Calcul
+                        Volabilité</button>
+                    <button class="manual-tab-btn" onclick="Engine.showManualSection('logbook')" id="manual-tab-logbook"
+                        style="padding: 8px 12px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary); cursor: pointer; white-space: nowrap;">Carnet de Vol</button>
+                    <button class="manual-tab-btn" onclick="Engine.showManualSection('equipment')" id="manual-tab-equipment"
+                        style="padding: 8px 12px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary); cursor: pointer; white-space: nowrap;">Matériel &amp; Usure</button>
                     <button class="manual-tab-btn" onclick="Engine.showManualSection('qcm')" id="manual-tab-qcm"
                         style="padding: 8px 12px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary); cursor: pointer; white-space: nowrap;">QCM</button>
                     <button class="manual-tab-btn" onclick="Engine.showManualSection('library')" id="manual-tab-library"
@@ -1381,9 +1482,8 @@
                                 mode Révision se base sur l'historique de vos erreurs pour vous reposer les bonnes
                                 questions. Sans compte, cet historique ne survit pas à un changement d'appareil. Avec un
                                 compte, l'algorithme garde une mémoire complète de toutes vos sessions passées.</li>
-                            <li style="margin-bottom: 8px;"><strong>Sauvegarde de vos préférences :</strong> Votre
-                                niveau de brevet sélectionné, votre thème visuel préféré, et vos paramètres météo
-                                (limites de vent, modèle préféré) sont synchronisés automatiquement.</li>
+                            <li style="margin-bottom: 8px;"><strong>Carnet de Vol &amp; Équipement :</strong> Vos vols, vos sessions de gonflage, vos voiles/sellettes enregistrées et l'usure calculée de votre matériel sont sauvegardés de manière sécurisée.</li>
+                            <li style="margin-bottom: 8px;"><strong>Sauvegarde de vos préférences :</strong> Votre niveau de brevet sélectionné, vos filtres de recherche météo, votre thème visuel, et vos configurations météo personnalisées (limites de vent, modèle préféré, rayon GPS, tri) sont synchronisés automatiquement.</li>
                             <li style="margin-bottom: 8px;"><strong>Protection contre la perte de données :</strong> Un
                                 effacement accidentel du cache du navigateur, un reset de téléphone, ou un changement
                                 d'appareil en urgence ne vous feront plus perdre des semaines de progression.</li>
@@ -1391,7 +1491,8 @@
 
                         <p
                             style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; margin-bottom: 8px;">
-                            Pour créer votre compte (ce qui est <strong>100% gratuit</strong>), cliquez sur l'icône <strong>👤</strong> en haut à droite de
+                            Pour créer votre compte (ce qui est <strong>100% gratuit</strong>), cliquez sur l'icône
+                            <strong>👤</strong> en haut à droite de
                             l'application (Espace Synchro). La création prend moins d'une minute : une adresse e-mail et
                             un mot de passe suffisent. Aucune information personnelle supplémentaire n'est requise.</p>
                         <p style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem;"><strong>Vos
@@ -1448,6 +1549,150 @@
                             d'incruster des services externes en un clic : Windy (pour le vent animé), Météo-Parapente
                             (pour l'émagramme et les thermiques), Paragliding Earth (pour les balises) ou les cartes des
                             fronts Isobares.</p>
+                    </div>
+
+                    <div id="manual-section-scoring" class="manual-section" style="display: none;">
+                        <h4 style="margin-top: 0; color: var(--accent-blue);">Calcul de la Volabilité (Scoring météo)
+                        </h4>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">L'application
+                            évalue en temps réel la "volabilité" de chaque spot de parapente selon un algorithme qui
+                            croise les prévisions météo avec vos filtres personnels. Ce calcul s'effectue en deux étapes
+                            successives.</p>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">1. Les Verrous de Sécurité (Kill Switches)
+                        </h5>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">Avant d'estimer
+                            un score de vol, l'application vérifie 6 verrous de sécurité fondamentaux. <strong>Si un
+                                seul verrou est actif, le spot est déclaré "Non Volable" (0/100) :</strong></p>
+                        <ul
+                            style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; padding-left: 20px; margin-bottom: 16px;">
+                            <li style="margin-bottom: 6px;"><strong>🌙 Nuit :</strong> Le vol est bloqué si le soleil
+                                est couché.</li>
+                            <li style="margin-bottom: 6px;"><strong>🌧️ Pluie :</strong> Bloqué dès le premier
+                                millimètre de pluie (> 0 mm).</li>
+                            <li style="margin-bottom: 6px;"><strong>💨 Vent moyen hors limites :</strong> Bloqué si le
+                                vent moyen est inférieur à votre limite minimale (vMin) ou supérieur à votre limite
+                                maximale (vMax).</li>
+                            <li style="margin-bottom: 6px;"><strong>🌪️ Rafales excessives :</strong> Bloqué si l'écart
+                                entre les rafales et le vent moyen dépasse votre seuil de rafales toléré.</li>
+                            <li style="margin-bottom: 6px;"><strong>⚡ Risque orageux :</strong> Bloqué si l'énergie
+                                potentielle convective (CAPE) de l'air dépasse 1000 J/kg, signe d'une forte instabilité
+                                convective et de danger.</li>
+                            <li style="margin-bottom: 6px;"><strong>🧭 Orientation incompatible :</strong> Bloqué si la
+                                direction d'où vient le vent ne correspond pas à l'orientation de décollage enregistrée
+                                pour ce site.</li>
+                        </ul>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">2. Calcul du Score Continu (de 0 à 100)</h5>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">Si tous les
+                            verrous sont au vert, l'algorithme calcule un score de qualité du vol basé sur deux critères
+                            pondérés à 50% chacun :</p>
+                        <ul
+                            style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; padding-left: 20px; margin-bottom: 16px;">
+                            <li style="margin-bottom: 8px;"><strong>Note de la Vitesse du Vent (50%) :</strong> Plus le
+                                vent moyen est proche du milieu de votre plage idéale, plus la note se rapproche de
+                                100/100. À l'extrême limite (vent égal à vMin ou vMax), la note descend à 0/100.
+                                <br><span style="font-size: 0.85rem; opacity: 0.8; font-style: italic;">Vent idéal =
+                                    (vMin + vMax) / 2</span>
+                            </li>
+                            <li style="margin-bottom: 8px;"><strong>Note de l'Orientation (50%) :</strong> Évaluée selon la précision de l'alignement face à la pente :
+                                <ul style="margin-top: 6px; padding-left: 16px; font-size: 0.88rem; opacity: 0.9;">
+                                    <li><strong>Parfait (100/100) :</strong> Vent de face à ±11.25° près.</li>
+                                    <li><strong>Bon (100 à 70/100) :</strong> Écart entre 11.25° et 22.5°.</li>
+                                    <li><strong>Passable (70 à 0/100) :</strong> Écart entre 22.5° et 45°.</li>
+                                    <li><strong>Hors-jeu (0/100) :</strong> Écart supérieur à 45° (ou rejeté par le filtre cardinal).</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div
+                            style="padding: 12px; background: rgba(14, 165, 233, 0.07); border-left: 4px solid var(--accent-blue); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin-top: 16px; font-size: 0.9rem; color: var(--text-main); font-weight: 500;">
+                            💡 Score Final = (Note Vent * 0.5) + (Note Orientation * 0.5).
+                            <br><span style="font-size: 0.82rem; font-weight: 400; color: var(--text-secondary);">Un
+                                spot jugé sécuritaire (volable) aura son score global pondéré de manière fluide selon la force du vent et son alignement.</span>
+                        </div>
+
+
+                    </div>
+
+                    <!-- CARNET DE VOL -->
+                    <div id="manual-section-logbook" class="manual-section" style="display: none;">
+                        <h4 style="margin-top: 0; color: var(--accent-blue);">Le Carnet de Vol (Logbook)</h4>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">Ce module vous permet d'enregistrer et de conserver l'historique complet de vos activités en vol libre et au sol (vols et sessions de gonflage).</p>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">1. Ajouter un Vol</h5>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">Pour enregistrer un nouveau vol :</p>
+                        <ul style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; padding-left: 20px; margin-bottom: 16px;">
+                            <li style="margin-bottom: 6px;"><strong>Importer une trace GPS (.igc) :</strong> Vous pouvez glisser-déposer ou sélectionner un fichier de trace de vol au format IGC. L'application calculera automatiquement la durée du vol. Une fois enregistré, un lecteur interactif vous permettra de revoir le vol sur une carte avec l'évolution de la trajectoire, de l'altitude et de l'heure.</li>
+                            <li style="margin-bottom: 6px;"><strong>Sélection du site :</strong> Saisissez le nom du site. Le système propose une <strong>autocomplétion intelligente</strong> basée sur la base de données officielle des sites de la FFVL.</li>
+                            <li style="margin-bottom: 6px;"><strong>Choix du matériel :</strong> Associez la voile et la sellette utilisées pour ce vol (choix parmi vos équipements enregistrés).</li>
+                            <li style="margin-bottom: 6px;"><strong>Technique de décollage (Obligatoire) :</strong> Indiquez si le décollage a été effectué en technique <strong>"Face"</strong> (idéal par vent faible à modéré) ou <strong>"Dos"</strong> à la voile (technique classique par vent soutenu).</li>
+                            <li style="margin-bottom: 6px;"><strong>Commentaires &amp; Observations :</strong> Notez vos impressions, conditions aérologiques locales, ou faits marquants de votre vol.</li>
+                        </ul>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">2. Session de Gonflage (Jeux de Voile / Groundhandling)</h5>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">Le travail au sol est crucial pour la sécurité. Enregistrez vos sessions de gonflage :</p>
+                        <ul style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; padding-left: 20px; margin-bottom: 16px;">
+                            <li style="margin-bottom: 6px;"><strong>Lieu &amp; Autocomplétion :</strong> Saisissez le lieu ou le décollage où vous avez gonflé, également assisté par l'autocomplétion des sites.</li>
+                            <li style="margin-bottom: 6px;"><strong>Exercices travaillés (Multi-sélection) :</strong> Cochez tous les thèmes travaillés au cours de la session (ex: montée de voile, affalement, pilotage sans suspentes, contrôle visuel, tempo, etc.) pour garder une trace précise de votre progression technique.</li>
+                        </ul>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">3. Fonctionnement de l'Historique</h5>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">Toutes vos sessions sont répertoriées chronologiquement avec un code couleur clair :</p>
+                        <ul style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; padding-left: 20px; margin-bottom: 16px;">
+                            <li style="margin-bottom: 6px;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: var(--accent-blue); margin-right: 8px; vertical-align: middle;"></span><strong>Bleu (Vols) :</strong> Sessions de vol en conditions réelles.</li>
+                            <li style="margin-bottom: 6px;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: #f59e0b; margin-right: 8px; vertical-align: middle;"></span><strong>Orange (Gonflages) :</strong> Séances d'entraînement au sol.</li>
+                            <li style="margin-bottom: 6px;"><strong>Édition et Suppression :</strong> Chaque entrée peut être modifiée (icône crayon) ou supprimée définitivement (icône poubelle). Les heures et l'usure de votre matériel lié seront automatiquement recalculées.</li>
+                        </ul>
+
+                        <!-- CAPTURE METEO AUTOMATIQUE -->
+                        <div style="margin-top: 24px; padding: 16px 20px; background: rgba(34,197,94,0.07); border-radius: var(--radius-lg); border: 1px solid rgba(34,197,94,0.2); display: flex; align-items: flex-start; gap: 14px;">
+                            <i class="ri-cloud-windy-line" style="font-size: 2rem; color: #22c55e; flex-shrink: 0; margin-top: 2px;"></i>
+                            <div>
+                                <h5 style="margin: 0 0 6px 0; color: var(--text-main); font-weight: 700; font-size: 1rem;">Capture Météo Automatique (Open-Meteo)</h5>
+                                <p style="margin: 0; color: var(--text-secondary); font-size: 0.88rem; line-height: 1.5;">Lors de la validation d'un vol ou d'une session de gonflage, l'application interroge automatiquement en arrière-plan le service météorologique <strong>Open-Meteo</strong>. En se basant sur les coordonnées géographiques du site choisi et l'heure de votre activité, elle récupère et enregistre automatiquement les conditions météo exactes : <strong>vitesse du vent, rafales, direction (en degrés et cardinal), température, et état du ciel (nuageux, ensoleillé...)</strong>. Pas besoin de saisie manuelle !</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MATERIEL & USURE -->
+                    <div id="manual-section-equipment" class="manual-section" style="display: none;">
+                        <h4 style="margin-top: 0; color: var(--accent-blue);">Gestion du Matériel &amp; Suivi d'Usure</h4>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">Pour voler sereinement, l'application intègre un suivi complet de la durée de vie et de la périodicité de maintenance de vos équipements (ailes, sellettes, secours, accessoires).</p>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">1. Enregistrer son Équipement</h5>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">Pour chaque matériel, vous pouvez définir : le type (Voile, Sellette, Secours, Accessoire), la marque et le modèle, la date d'achat, ainsi que la date de sa dernière révision en atelier certifié.</p>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">2. Périodicité Combinée (Temps et Heures)</h5>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">Sélectionnez l'intervalle temporel recommandé par le constructeur (<strong>6 mois</strong>, <strong>12 mois</strong>, ou <strong>24 mois</strong>) ET la limite d'heures de vol (ex: <strong>100h</strong> ou <strong>150h</strong>). L'application surveillera les deux compteurs en temps réel grâce au logbook, et déclenchera une alerte au premier des deux termes échu.</p>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">3. Code Couleur &amp; Alertes Visuelles de Maintenance</h5>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">Pour repérer rapidement le matériel nécessitant votre attention, l'application utilise des indicateurs visuels :</p>
+                        <ul style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; padding-left: 20px; margin-bottom: 16px;">
+                            <li style="margin-bottom: 6px;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: var(--accent-green); margin-right: 8px; vertical-align: middle;"></span><strong>Vert (OK) :</strong> Matériel révisé récemment. La date de prochaine révision est lointaine.</li>
+                            <li style="margin-bottom: 6px;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: #f59e0b; margin-right: 8px; vertical-align: middle;"></span><strong>Orange (Proche) :</strong> Date de révision prévue dans <strong>moins de 30 jours</strong> OU limite d'heures de vol approchant à <strong>moins de 15h</strong>. Préparez votre envoi en atelier.</li>
+                            <li style="margin-bottom: 6px;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: #ef4444; margin-right: 8px; vertical-align: middle;"></span><strong>Rouge (Dépassée) :</strong> Date de révision expirée OU volume d'heures maximum atteint. Par sécurité, faites contrôler votre équipement.</li>
+                        </ul>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">4. Archiver ou Supprimer définitivement</h5>
+                        <p style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; margin-bottom: 16px;">Lorsque vous changez de matériel, vous avez deux options :</p>
+                        <ul style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; padding-left: 20px; margin-bottom: 16px;">
+                            <li style="margin-bottom: 8px;"><strong>Archiver :</strong> Masque l'équipement des menus d'ajout (lors de la saisie d'un nouveau vol), mais conserve tout son historique d'heures de vol et de gonflage associés. Idéal pour garder des statistiques correctes de vos anciennes ailes.</li>
+                            <li style="margin-bottom: 8px;"><strong>Supprimer définitivement :</strong> Efface complètement le matériel et rompt l'association avec vos vols passés.</li>
+                        </ul>
+
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">5. Usure en Heures d'Utilisation Réelles</h5>
+                        <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem; margin-bottom: 24px;">Le système croise automatiquement chaque équipement avec votre carnet de vol. Pour chaque aile, sellette ou secours, elle affiche le <strong>cumul d'heures réelles passées en l'air</strong> ainsi que le nombre de séances de gonflage au sol. Un indicateur fiable et automatisé de l'usure de votre matériel !</p>
+
+                        <!-- SYNCHRONISATION CLOUD & PREFERENCES -->
+                        <div style="padding: 16px 20px; background: linear-gradient(135deg, rgba(14,165,233,0.12), rgba(99,102,241,0.08)); border-radius: var(--radius-lg); border: 1px solid rgba(14,165,233,0.3); display: flex; align-items: flex-start; gap: 14px;">
+                            <i class="ri-cloud-sync-line" style="font-size: 2.2rem; color: var(--accent-blue); flex-shrink: 0; margin-top: 2px;"></i>
+                            <div>
+                                <h5 style="margin: 0 0 6px 0; color: var(--text-main); font-weight: 700; font-size: 1rem;">Synchronisation Cloud (Firebase) &amp; Préférences</h5>
+                                <p style="margin: 0; color: var(--text-secondary); font-size: 0.88rem; line-height: 1.5;">Dès que vous êtes connecté à votre compte, l'application synchronise instantanément en tâche de fond votre <strong>Carnet de Vol</strong>, votre <strong>Équipement</strong>, et l'intégralité de vos configurations : modèles de prévision météo préférés, rayon GPS, tri des sites, limites de vent moyen et de rafales personnalisées. Retrouvez votre espace de pilotage personnalisé sur n'importe quel ordinateur, tablette ou smartphone sans aucune perte de données.</p>
+                            </div>
+                        </div>
+                    </div>
+
                     </div>
 
                     <div id="manual-section-qcm" class="manual-section" style="display: none;">
@@ -1542,12 +1787,10 @@
                     </div>
                 </div>
             </div>
-            <div class="gdpr-modal-footer">
-                <button class="gdpr-btn-accept" onclick="Engine.hideManual()">Fermer</button>
-            </div>
+
         </div>
     </div>
 
-</body>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
 
 </html>

@@ -8,10 +8,10 @@
 const Engine = {
     state: {
         level: 'ALL',        // BI, BP, BPC, ALL
-        mode: 'MENU',
+        mode: 'SITES',
         themeMode: 'auto',
         currentCourseId: null,
-        lastMode: 'MENU',
+        lastMode: 'SITES',
         basePath: '.'
     },
 
@@ -22,6 +22,7 @@ const Engine = {
         if (typeof QuizEngine !== 'undefined') QuizEngine.init(this);
         if (typeof LibraryEngine !== 'undefined') LibraryEngine.init(this);
         if (typeof SitesEngine !== 'undefined') SitesEngine.init(this);
+        if (typeof LogbookEngine !== 'undefined') LogbookEngine.init(this);
 
         // Setup Theme Toggle Listener safely
         const themeBtn = document.getElementById('theme-toggle');
@@ -116,6 +117,16 @@ const Engine = {
             if (e.key === 'Escape') this.goBack();
         });
 
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('header-theory-dropdown');
+            if (dropdown && dropdown.classList.contains('show')) {
+                if (!e.target.closest('.nav-dropdown')) {
+                    dropdown.classList.remove('show');
+                }
+            }
+        });
+
         console.log("Engine v4.5 Initialized");
     },
 
@@ -174,6 +185,7 @@ const Engine = {
             case 'STATS':
             case 'LIBRARY':
             case 'SITES':
+            case 'LOGBOOK':
                 this.startMode(mode);
                 return true;
 
@@ -206,6 +218,9 @@ const Engine = {
             if (typeof SitesEngine !== 'undefined') SitesEngine.show();
         } else if (mode === 'LIBRARY') {
             if (typeof LibraryEngine !== 'undefined') LibraryEngine.show();
+        } else if (mode === 'LOGBOOK') {
+            document.getElementById('logbook-screen').classList.add('active');
+            if (typeof LogbookEngine !== 'undefined') LogbookEngine.show();
         }
         this.updateHeaderNavigation();
         this.saveState();
@@ -317,12 +332,9 @@ const Engine = {
             });
             
             // Handle sub-modes that map to parent modes
-            if (this.state.mode === 'COURSE' || this.state.mode === 'ADVENTURE') {
-                const libBtn = document.querySelector('.desktop-main-nav .nav-menu-btn[data-target="LIBRARY"]');
-                if (libBtn) libBtn.classList.add('active');
-            } else if (this.state.mode === 'QCM_BANK') {
-                const qcmBtn = document.querySelector('.desktop-main-nav .nav-menu-btn[data-target="QCM"]');
-                if (qcmBtn) qcmBtn.classList.add('active');
+            if (['QCM', 'QCM_BANK', 'LIBRARY', 'COURSE', 'STATS', 'ADVENTURE'].includes(this.state.mode)) {
+                const theoryBtn = document.querySelector('.desktop-main-nav .nav-menu-btn[data-target="THEORY"]');
+                if (theoryBtn) theoryBtn.classList.add('active');
             }
         }
     },
@@ -333,8 +345,8 @@ const Engine = {
         this.state.basePath = basePath;
 
         const componentMap = [
-            { id: 'app-header', url: basePath + '/components/header.html?v=2026.05.22_v6' },
-            { id: 'app-footer', url: basePath + '/components/footer.html?v=2026.05.22_v6', selector: '.app-footer-placeholder' }
+            { id: 'app-header', url: basePath + '/components/header.html?v=2026.07.08_v30' },
+            { id: 'app-footer', url: basePath + '/components/footer.html?v=2026.07.08_v30', selector: '.app-footer-placeholder' }
         ];
 
         const self = this;
@@ -482,7 +494,7 @@ const Engine = {
         const iconMoon = document.querySelector('.ri-moon-line');
         const btn = document.getElementById('theme-toggle');
 
-        body.classList.remove('light-mode', 'dark-mode');
+        body.classList.remove('light-mode', 'dark-mode', 'dark-theme');
         // Reset Icons opacity
         if (iconSun) iconSun.style.opacity = '0.5';
         if (iconMoon) iconMoon.style.opacity = '0.5';
@@ -504,7 +516,11 @@ const Engine = {
                 if (iconMoon) iconMoon.style.opacity = '1';
             }
         }
-        if (effectiveMode === 'light') body.classList.add('light-mode');
+        if (effectiveMode === 'light') {
+            body.classList.add('light-mode');
+        } else {
+            body.classList.add('dark-mode', 'dark-theme');
+        }
 
         // Dynamically update paragliding map tiles theme if initialized
         if (window.SitesEngine && typeof SitesEngine.updateMapTiles === 'function') {
@@ -521,6 +537,19 @@ const Engine = {
     showQcmBank: () => typeof QuizEngine !== 'undefined' && QuizEngine.showBank(),
     renderQcmBank: () => typeof QuizEngine !== 'undefined' && QuizEngine.renderBank(),
     showStats: function () { this.startMode('STATS'); },
+    toggleTheoryDropdown: function (event) {
+        if (event) event.stopPropagation();
+        const dropdown = document.getElementById('header-theory-dropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('show');
+        }
+    },
+    closeTheoryDropdown: function () {
+        const dropdown = document.getElementById('header-theory-dropdown');
+        if (dropdown) {
+            dropdown.classList.remove('show');
+        }
+    },
     checkGenAnswer: (e, q, o, c) => typeof QuizEngine !== 'undefined' && QuizEngine.checkGenAnswer && QuizEngine.checkGenAnswer(e, q, o, c),
     // note: checkGenAnswer was in engine.js for review mode. I extracted it in my head? 
     // Wait, the review/generated content logic (lines 894-972) was NOT extracted to QuizEngine yet!
@@ -655,6 +684,15 @@ document.addEventListener('DOMContentLoaded', () => {
     Engine.init();
 });
 
-if (document.body && window.matchMedia && !window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    document.body.classList.add('light-mode');
+if (document.body) {
+    const savedTheme = localStorage.getItem('themeMode') || 'auto';
+    let effective = savedTheme;
+    if (effective === 'auto' && window.matchMedia) {
+        effective = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    if (effective === 'light') {
+        document.body.classList.add('light-mode');
+    } else {
+        document.body.classList.add('dark-mode', 'dark-theme');
+    }
 }
