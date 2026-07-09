@@ -7,311 +7,311 @@ SitesEngine.updateSearchQuery = function (val) {
 };
 
 SitesEngine.renderList = function () {
-        const container = document.getElementById('sites-list-container');
-        if (!container) return;
+    const container = document.getElementById('sites-list-container');
+    if (!container) return;
 
-        try {
-            if (typeof SITES_DATA === 'undefined') {
-                container.innerHTML = '<div style="color:red; font-size: 20px; text-align: center; margin-top: 40px; background: rgba(255,0,0,0.1); padding: 20px; border-radius: 12px;">ERREUR CRITIQUE: Le fichier sites_data.js n\'a pas été chargé correctement (SITES_DATA est indéfini).</div>';
-                return;
-            }
+    try {
+        if (typeof SITES_DATA === 'undefined') {
+            container.innerHTML = '<div style="color:red; font-size: 20px; text-align: center; margin-top: 40px; background: rgba(255,0,0,0.1); padding: 20px; border-radius: 12px;">ERREUR CRITIQUE: Le fichier sites_data.js n\'a pas été chargé correctement (SITES_DATA est indéfini).</div>';
+            return;
+        }
 
-            let activeSites = SITES_DATA.filter(s => s.affiche !== false);
+        let activeSites = SITES_DATA.filter(s => s.affiche !== false);
 
-            // Filter by search query
-            const searchQuery = (this.state.searchQuery || '').trim().toLowerCase();
-            if (searchQuery) {
-                const queryCleaned = this.removeAccents(searchQuery);
-                activeSites = activeSites.filter(site => {
-                    const name = this.removeAccents(site.nom || '').toLowerCase();
-                    const city = this.removeAccents(site.ville || '').toLowerCase();
-                    const zip = (site.code_postal || '').toLowerCase();
-                    
-                    let dept = '';
-                    if (Array.isArray(site.departement)) {
-                        dept = this.removeAccents(site.departement.join(' ')).toLowerCase();
-                    } else if (site.departement) {
-                        dept = this.removeAccents(site.departement).toLowerCase();
-                    }
-                    
-                    const region = this.removeAccents(site.region || '').toLowerCase();
-                    const obs = this.removeAccents(site.description || '').toLowerCase();
-                    const topo = this.removeAccents(site.acces || '').toLowerCase();
-                    const dangers = this.removeAccents(site.dangers || '').toLowerCase();
-                    const practice = this.removeAccents(site.praticabilite || '').toLowerCase();
-
-                    return name.includes(queryCleaned) ||
-                           city.includes(queryCleaned) ||
-                           zip.includes(queryCleaned) ||
-                           dept.includes(queryCleaned) ||
-                           region.includes(queryCleaned) ||
-                           obs.includes(queryCleaned) ||
-                           topo.includes(queryCleaned) ||
-                           dangers.includes(queryCleaned) ||
-                           practice.includes(queryCleaned);
-                });
-            }
-
-            activeSites.forEach(site => {
-                const forecasts = this.state.weatherForecasts[site.id] || [];
-                let flyableHoursCount = 0;
-                let maxConsecutiveHours = 0;
-                let currentConsecutiveStreak = 0;
-                const flyableSlots = [];
-                let currentSlot = null;
-
-                const halfDayCounts = {};
-                const dailyCounts = {};
-
-                const maxRange = this.state.forecastMaxRange || 120;
-                for (let i = 0; i < Math.min(forecasts.length, maxRange); i++) {
-                    const weather = forecasts[i];
-                    const status = this.isForecastFlyable(site, weather);
-
-                    if (status.flyable) {
-                        flyableHoursCount++;
-                        currentConsecutiveStreak++;
-                        if (currentConsecutiveStreak > maxConsecutiveHours) {
-                            maxConsecutiveHours = currentConsecutiveStreak;
-                        }
-
-                        const date = new Date(weather.time);
-                        const hour = date.getHours();
-                        const dayStr = date.toDateString();
-                        const halfDayStr = hour < 12 ? 'M' : 'A';
-                        const halfDayKey = `${dayStr}_${halfDayStr}`;
-
-                        halfDayCounts[halfDayKey] = (halfDayCounts[halfDayKey] || 0) + 1;
-                        dailyCounts[dayStr] = (dailyCounts[dayStr] || 0) + 1;
-
-                        const today = new Date();
-                        const tomorrow = new Date(today);
-                        tomorrow.setDate(today.getDate() + 1);
-
-                        let dayLabel = '';
-                        if (date.toDateString() === today.toDateString()) {
-                            dayLabel = "Aujourd'hui";
-                        } else if (date.toDateString() === tomorrow.toDateString()) {
-                            dayLabel = "Demain";
-                        } else {
-                            const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-                            dayLabel = days[date.getDay()];
-                        }
-
-                        if (!currentSlot) {
-                            currentSlot = { start: hour, end: hour + 1, dayLabel: dayLabel };
-                        } else {
-                            if (currentSlot.dayLabel === dayLabel && hour === currentSlot.end) {
-                                currentSlot.end = hour + 1;
-                            } else {
-                                flyableSlots.push(currentSlot);
-                                currentSlot = { start: hour, end: hour + 1, dayLabel: dayLabel };
-                            }
-                        }
-                    } else {
-                        currentConsecutiveStreak = 0;
-                        if (currentSlot) {
-                            flyableSlots.push(currentSlot);
-                            currentSlot = null;
-                        }
-                    }
-                }
-                if (currentSlot) {
-                    flyableSlots.push(currentSlot);
-                }
-
-                let maxHalfDayHours = 0;
-                for (const key in halfDayCounts) {
-                    if (halfDayCounts[key] > maxHalfDayHours) {
-                        maxHalfDayHours = halfDayCounts[key];
-                    }
-                }
-
-                let maxDailyHours = 0;
-                for (const key in dailyCounts) {
-                    if (dailyCounts[key] > maxDailyHours) {
-                        maxDailyHours = dailyCounts[key];
-                    }
-                }
-
-                site.flyableHours = flyableHoursCount;
-                site.maxConsecutiveHours = maxConsecutiveHours;
-                site.maxHalfDayHours = maxHalfDayHours;
-                site.maxDailyHours = maxDailyHours;
-                site.flyableSlots = flyableSlots;
-
-                if (this.state.userLocation) {
-                    site.distance = this.calculateDistance(
-                        this.state.userLocation.lat,
-                        this.state.userLocation.lng,
-                        parseFloat(site.lat),
-                        parseFloat(site.lon)
-                    );
-                }
-            });
-
-            // Filter by distance if radius limit is set and user's location is known
-            if (this.state.userLocation && this.state.radiusLimit < 210) {
-                activeSites = activeSites.filter(site => site.distance !== undefined && site.distance <= this.state.radiusLimit);
-            }
-
-            // 3-State Wind Filtering
-            if (this.state.filterWindExclude && this.state.filterWindExclude.length > 0) {
-                activeSites = activeSites.filter(site => {
-                    const orientations = site.orientation ? site.orientation.split(',').map(v => v.trim()) : [];
-                    return !orientations.some(w => this.state.filterWindExclude.includes(w));
-                });
-            }
-            if (this.state.filterWindInclude && this.state.filterWindInclude.length > 0) {
-                activeSites = activeSites.filter(site => {
-                    const orientations = site.orientation ? site.orientation.split(',').map(v => v.trim()) : [];
-                    return orientations.some(w => this.state.filterWindInclude.includes(w));
-                });
-            }
-
-            // Type Filtering (with Landing-only default hide & independent type priority)
+        // Filter by search query
+        const searchQuery = (this.state.searchQuery || '').trim().toLowerCase();
+        if (searchQuery) {
+            const queryCleaned = this.removeAccents(searchQuery);
             activeSites = activeSites.filter(site => {
-                let siteTypes = Array.isArray(site.site_sous_type) ? site.site_sous_type : [site.site_sous_type];
+                const name = this.removeAccents(site.nom || '').toLowerCase();
+                const city = this.removeAccents(site.ville || '').toLowerCase();
+                const zip = (site.code_postal || '').toLowerCase();
 
-                // 1. Landing-only hidden by default (can be revealed by including Atterrissage)
-                const isLandingOnly = siteTypes.includes('Atterrissage') && siteTypes.every(t => t === 'Atterrissage');
-                if (isLandingOnly) {
-                    if (!this.state.filterTypeInclude.includes('Atterrissage')) {
-                        return false;
-                    }
+                let dept = '';
+                if (Array.isArray(site.departement)) {
+                    dept = this.removeAccents(site.departement.join(' ')).toLowerCase();
+                } else if (site.departement) {
+                    dept = this.removeAccents(site.departement).toLowerCase();
                 }
 
-                // 2. 3-state inclusion and exclusion logic with independence
-                const hasIncludedType = this.state.filterTypeInclude && this.state.filterTypeInclude.length > 0 && siteTypes.some(t => this.state.filterTypeInclude.includes(t));
-                const hasExcludedType = this.state.filterTypeExclude && this.state.filterTypeExclude.length > 0 && siteTypes.some(t => this.state.filterTypeExclude.includes(t));
+                const region = this.removeAccents(site.region || '').toLowerCase();
+                const obs = this.removeAccents(site.description || '').toLowerCase();
+                const topo = this.removeAccents(site.acces || '').toLowerCase();
+                const dangers = this.removeAccents(site.dangers || '').toLowerCase();
+                const practice = this.removeAccents(site.praticabilite || '').toLowerCase();
 
-                if (this.state.filterTypeInclude && this.state.filterTypeInclude.length > 0) {
-                    if (hasIncludedType) return true;
+                return name.includes(queryCleaned) ||
+                    city.includes(queryCleaned) ||
+                    zip.includes(queryCleaned) ||
+                    dept.includes(queryCleaned) ||
+                    region.includes(queryCleaned) ||
+                    obs.includes(queryCleaned) ||
+                    topo.includes(queryCleaned) ||
+                    dangers.includes(queryCleaned) ||
+                    practice.includes(queryCleaned);
+            });
+        }
+
+        activeSites.forEach(site => {
+            const forecasts = this.state.weatherForecasts[site.id] || [];
+            let flyableHoursCount = 0;
+            let maxConsecutiveHours = 0;
+            let currentConsecutiveStreak = 0;
+            const flyableSlots = [];
+            let currentSlot = null;
+
+            const halfDayCounts = {};
+            const dailyCounts = {};
+
+            const maxRange = this.state.forecastMaxRange || 120;
+            for (let i = 0; i < Math.min(forecasts.length, maxRange); i++) {
+                const weather = forecasts[i];
+                const status = this.isForecastFlyable(site, weather);
+
+                if (status.flyable) {
+                    flyableHoursCount++;
+                    currentConsecutiveStreak++;
+                    if (currentConsecutiveStreak > maxConsecutiveHours) {
+                        maxConsecutiveHours = currentConsecutiveStreak;
+                    }
+
+                    const date = new Date(weather.time);
+                    const hour = date.getHours();
+                    const dayStr = date.toDateString();
+                    const halfDayStr = hour < 12 ? 'M' : 'A';
+                    const halfDayKey = `${dayStr}_${halfDayStr}`;
+
+                    halfDayCounts[halfDayKey] = (halfDayCounts[halfDayKey] || 0) + 1;
+                    dailyCounts[dayStr] = (dailyCounts[dayStr] || 0) + 1;
+
+                    const today = new Date();
+                    const tomorrow = new Date(today);
+                    tomorrow.setDate(today.getDate() + 1);
+
+                    let dayLabel = '';
+                    if (date.toDateString() === today.toDateString()) {
+                        dayLabel = "Aujourd'hui";
+                    } else if (date.toDateString() === tomorrow.toDateString()) {
+                        dayLabel = "Demain";
+                    } else {
+                        const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+                        dayLabel = days[date.getDay()];
+                    }
+
+                    if (!currentSlot) {
+                        currentSlot = { start: hour, end: hour + 1, dayLabel: dayLabel };
+                    } else {
+                        if (currentSlot.dayLabel === dayLabel && hour === currentSlot.end) {
+                            currentSlot.end = hour + 1;
+                        } else {
+                            flyableSlots.push(currentSlot);
+                            currentSlot = { start: hour, end: hour + 1, dayLabel: dayLabel };
+                        }
+                    }
+                } else {
+                    currentConsecutiveStreak = 0;
+                    if (currentSlot) {
+                        flyableSlots.push(currentSlot);
+                        currentSlot = null;
+                    }
+                }
+            }
+            if (currentSlot) {
+                flyableSlots.push(currentSlot);
+            }
+
+            let maxHalfDayHours = 0;
+            for (const key in halfDayCounts) {
+                if (halfDayCounts[key] > maxHalfDayHours) {
+                    maxHalfDayHours = halfDayCounts[key];
+                }
+            }
+
+            let maxDailyHours = 0;
+            for (const key in dailyCounts) {
+                if (dailyCounts[key] > maxDailyHours) {
+                    maxDailyHours = dailyCounts[key];
+                }
+            }
+
+            site.flyableHours = flyableHoursCount;
+            site.maxConsecutiveHours = maxConsecutiveHours;
+            site.maxHalfDayHours = maxHalfDayHours;
+            site.maxDailyHours = maxDailyHours;
+            site.flyableSlots = flyableSlots;
+
+            if (this.state.userLocation) {
+                site.distance = this.calculateDistance(
+                    this.state.userLocation.lat,
+                    this.state.userLocation.lng,
+                    parseFloat(site.latitude),
+                    parseFloat(site.longitude)
+                );
+            }
+        });
+
+        // Filter by distance if radius limit is set and user's location is known
+        if (this.state.userLocation && this.state.radiusLimit < 210) {
+            activeSites = activeSites.filter(site => site.distance !== undefined && site.distance <= this.state.radiusLimit);
+        }
+
+        // 3-State Wind Filtering
+        if (this.state.filterWindExclude && this.state.filterWindExclude.length > 0) {
+            activeSites = activeSites.filter(site => {
+                const orientations = site.orientation ? site.orientation.split(',').map(v => v.trim()) : [];
+                return !orientations.some(w => this.state.filterWindExclude.includes(w));
+            });
+        }
+        if (this.state.filterWindInclude && this.state.filterWindInclude.length > 0) {
+            activeSites = activeSites.filter(site => {
+                const orientations = site.orientation ? site.orientation.split(',').map(v => v.trim()) : [];
+                return orientations.some(w => this.state.filterWindInclude.includes(w));
+            });
+        }
+
+        // Type Filtering (with Landing-only default hide & independent type priority)
+        activeSites = activeSites.filter(site => {
+            let siteTypes = Array.isArray(site.site_sous_type) ? site.site_sous_type : [site.site_sous_type];
+
+            // 1. Landing-only hidden by default (can be revealed by including Atterrissage)
+            const isLandingOnly = siteTypes.includes('Atterrissage') && siteTypes.every(t => t === 'Atterrissage');
+            if (isLandingOnly) {
+                if (!this.state.filterTypeInclude.includes('Atterrissage')) {
                     return false;
                 }
+            }
 
-                if (hasExcludedType) return false;
+            // 2. 3-state inclusion and exclusion logic with independence
+            const hasIncludedType = this.state.filterTypeInclude && this.state.filterTypeInclude.length > 0 && siteTypes.some(t => this.state.filterTypeInclude.includes(t));
+            const hasExcludedType = this.state.filterTypeExclude && this.state.filterTypeExclude.length > 0 && siteTypes.some(t => this.state.filterTypeExclude.includes(t));
 
-                return true;
+            if (this.state.filterTypeInclude && this.state.filterTypeInclude.length > 0) {
+                if (hasIncludedType) return true;
+                return false;
+            }
+
+            if (hasExcludedType) return false;
+
+            return true;
+        });
+
+        if (this.state.hideUnflyable) {
+            activeSites = activeSites.filter(site => site.flyableHours > 0);
+        }
+
+        if (this.state.filterFavoritesOnly && this.state.userPreferences) {
+            activeSites = activeSites.filter(site => this.state.userPreferences.favoriteSites.includes(site.id));
+        }
+
+        if (this.state.sortMode === 'CONDITIONS') {
+            const strat = this.state.conditionsStrategy || 'CONSECUTIVE';
+
+            activeSites.sort((a, b) => {
+                let priorities = [];
+
+                if (strat === 'CONSECUTIVE') {
+                    priorities = [
+                        (b.maxConsecutiveHours || 0) - (a.maxConsecutiveHours || 0),
+                        (b.maxHalfDayHours || 0) - (a.maxHalfDayHours || 0),
+                        (b.maxDailyHours || 0) - (a.maxDailyHours || 0),
+                        (b.flyableHours || 0) - (a.flyableHours || 0)
+                    ];
+                } else if (strat === 'HALF_DAY') {
+                    priorities = [
+                        (b.maxHalfDayHours || 0) - (a.maxHalfDayHours || 0),
+                        (b.maxConsecutiveHours || 0) - (a.maxConsecutiveHours || 0),
+                        (b.maxDailyHours || 0) - (a.maxDailyHours || 0),
+                        (b.flyableHours || 0) - (a.flyableHours || 0)
+                    ];
+                } else if (strat === 'DAILY') {
+                    priorities = [
+                        (b.maxDailyHours || 0) - (a.maxDailyHours || 0),
+                        (b.maxConsecutiveHours || 0) - (a.maxConsecutiveHours || 0),
+                        (b.maxHalfDayHours || 0) - (a.maxHalfDayHours || 0),
+                        (b.flyableHours || 0) - (a.flyableHours || 0)
+                    ];
+                } else { // TOTAL
+                    priorities = [
+                        (b.flyableHours || 0) - (a.flyableHours || 0),
+                        (b.maxConsecutiveHours || 0) - (a.maxConsecutiveHours || 0),
+                        (b.maxHalfDayHours || 0) - (a.maxHalfDayHours || 0),
+                        (b.maxDailyHours || 0) - (a.maxDailyHours || 0)
+                    ];
+                }
+
+                // Go down priorities until a non-zero difference is found
+                for (const diff of priorities) {
+                    if (diff !== 0) return diff;
+                }
+
+                // Fallbacks: Distance -> Name
+                if (this.state.userLocation) {
+                    return (a.distance || 9999) - (b.distance || 9999);
+                }
+                return a.nom.localeCompare(b.nom);
             });
+        } else if (this.state.sortMode === 'DISTANCE' && this.state.userLocation) {
+            activeSites.sort((a, b) => (a.distance || 9999) - (b.distance || 9999));
+        } else {
+            activeSites.sort((a, b) => a.nom.localeCompare(b.nom));
+        }
 
-            if (this.state.hideUnflyable) {
-                activeSites = activeSites.filter(site => site.flyableHours > 0);
-            }
+        // Always push favorites to the top if not specifically filtering for them
+        if (!this.state.filterFavoritesOnly && this.state.userPreferences) {
+            activeSites.sort((a, b) => {
+                const aFav = this.state.userPreferences.favoriteSites.includes(a.id);
+                const bFav = this.state.userPreferences.favoriteSites.includes(b.id);
+                if (aFav && !bFav) return -1;
+                if (!aFav && bFav) return 1;
+                return 0;
+            });
+        }
 
-            if (this.state.filterFavoritesOnly && this.state.userPreferences) {
-                activeSites = activeSites.filter(site => this.state.userPreferences.favoriteSites.includes(site.id));
-            }
+        container.innerHTML = '';
 
-            if (this.state.sortMode === 'CONDITIONS') {
-                const strat = this.state.conditionsStrategy || 'CONSECUTIVE';
-
-                activeSites.sort((a, b) => {
-                    let priorities = [];
-
-                    if (strat === 'CONSECUTIVE') {
-                        priorities = [
-                            (b.maxConsecutiveHours || 0) - (a.maxConsecutiveHours || 0),
-                            (b.maxHalfDayHours || 0) - (a.maxHalfDayHours || 0),
-                            (b.maxDailyHours || 0) - (a.maxDailyHours || 0),
-                            (b.flyableHours || 0) - (a.flyableHours || 0)
-                        ];
-                    } else if (strat === 'HALF_DAY') {
-                        priorities = [
-                            (b.maxHalfDayHours || 0) - (a.maxHalfDayHours || 0),
-                            (b.maxConsecutiveHours || 0) - (a.maxConsecutiveHours || 0),
-                            (b.maxDailyHours || 0) - (a.maxDailyHours || 0),
-                            (b.flyableHours || 0) - (a.flyableHours || 0)
-                        ];
-                    } else if (strat === 'DAILY') {
-                        priorities = [
-                            (b.maxDailyHours || 0) - (a.maxDailyHours || 0),
-                            (b.maxConsecutiveHours || 0) - (a.maxConsecutiveHours || 0),
-                            (b.maxHalfDayHours || 0) - (a.maxHalfDayHours || 0),
-                            (b.flyableHours || 0) - (a.flyableHours || 0)
-                        ];
-                    } else { // TOTAL
-                        priorities = [
-                            (b.flyableHours || 0) - (a.flyableHours || 0),
-                            (b.maxConsecutiveHours || 0) - (a.maxConsecutiveHours || 0),
-                            (b.maxHalfDayHours || 0) - (a.maxHalfDayHours || 0),
-                            (b.maxDailyHours || 0) - (a.maxDailyHours || 0)
-                        ];
-                    }
-
-                    // Go down priorities until a non-zero difference is found
-                    for (const diff of priorities) {
-                        if (diff !== 0) return diff;
-                    }
-
-                    // Fallbacks: Distance -> Name
-                    if (this.state.userLocation) {
-                        return (a.distance || 9999) - (b.distance || 9999);
-                    }
-                    return a.nom.localeCompare(b.nom);
-                });
-            } else if (this.state.sortMode === 'DISTANCE' && this.state.userLocation) {
-                activeSites.sort((a, b) => (a.distance || 9999) - (b.distance || 9999));
-            } else {
-                activeSites.sort((a, b) => a.nom.localeCompare(b.nom));
-            }
-
-            // Always push favorites to the top if not specifically filtering for them
-            if (!this.state.filterFavoritesOnly && this.state.userPreferences) {
-                activeSites.sort((a, b) => {
-                    const aFav = this.state.userPreferences.favoriteSites.includes(a.id);
-                    const bFav = this.state.userPreferences.favoriteSites.includes(b.id);
-                    if (aFav && !bFav) return -1;
-                    if (!aFav && bFav) return 1;
-                    return 0;
-                });
-            }
-
-            container.innerHTML = '';
-
-            if (activeSites.length === 0) {
-                container.innerHTML = `
+        if (activeSites.length === 0) {
+            container.innerHTML = `
                     <div class="empty-state site-empty-state">
                         <i class="ri-landscape-line site-empty-icon"></i>
                         <p class="site-empty-text">Aucun site ne correspond à ces critères.</p>
                     </div>
                 `;
-                return;
-            }
+            return;
+        }
 
-            activeSites.forEach(site => {
-                const orientations = site.orientation ? site.orientation.split(',').map(v => v.trim()) : [];
-                const windTags = orientations.map(w => `<span class="wind-tag" onclick="SitesEngine.filterByTag('${w}')" title="Filtrer par vent ${w}">${w}</span>`).join('');
+        activeSites.forEach(site => {
+            const orientations = site.orientation ? site.orientation.split(',').map(v => v.trim()) : [];
+            const windTags = orientations.map(w => `<span class="wind-tag" onclick="SitesEngine.filterByTag('${w}')" title="Filtrer par vent ${w}">${w}</span>`).join('');
 
-                let siteTypes = Array.isArray(site.site_sous_type) ? site.site_sous_type : [site.site_sous_type];
-                const typeLabel = siteTypes.map(t => {
-                    return `<span class="site-coords-badge site-type-badge">${t}</span>`;
-                }).join(' ');
+            let siteTypes = Array.isArray(site.site_sous_type) ? site.site_sous_type : [site.site_sous_type];
+            const typeLabel = siteTypes.map(t => {
+                return `<span class="site-coords-badge site-type-badge">${t}</span>`;
+            }).join(' ');
 
-                let distanceHtml = '';
-                if (site.distance !== undefined) {
-                    distanceHtml = `
+            let distanceHtml = '';
+            if (site.distance !== undefined) {
+                distanceHtml = `
                         <span class="site-coords-badge site-dist-badge">
                             <i class="ri-navigation-fill"></i> ${site.distance.toFixed(1)} km
                         </span>
                     `;
-                }
+            }
 
-                const flyableHoursHtml = `
+            const flyableHoursHtml = `
                     <span class="site-coords-badge" style="background: ${site.flyableHours > 0 ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.03)'}; border-color: ${site.flyableHours > 0 ? 'rgba(34,197,94,0.3)' : 'var(--border-color)'}; color: ${site.flyableHours > 0 ? 'var(--accent-green)' : 'var(--text-muted)'}; font-weight: 700;">
                         <i class="ri-time-line"></i> ${site.flyableHours}h volables ${site.maxConsecutiveHours > 0 ? `(${site.maxConsecutiveHours}h conséc.)` : ''}
                     </span>
                 `;
 
-                let weatherHtml = '';
-                let weather = null;
-                const forecasts = this.state.weatherForecasts[site.id] || [];
-                if (forecasts && forecasts[this.state.forecastOffset]) {
-                    weather = forecasts[this.state.forecastOffset];
-                }
-                if (weather) {
-                    const status = this.isForecastFlyable(site, weather);
-                    weatherHtml = `
+            let weatherHtml = '';
+            let weather = null;
+            const forecasts = this.state.weatherForecasts[site.id] || [];
+            if (forecasts && forecasts[this.state.forecastOffset]) {
+                weather = forecasts[this.state.forecastOffset];
+            }
+            if (weather) {
+                const status = this.isForecastFlyable(site, weather);
+                weatherHtml = `
                         <div class="site-weather-row ${status.class}" style="display: flex; flex-direction: column; gap: 6px; margin-top: 12px; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 500;">
                             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;">
                                 <span style="display: flex; align-items: center; gap: 6px;">
@@ -324,97 +324,97 @@ SitesEngine.renderList = function () {
                             </div>
                         </div>
                     `;
-                } else {
-                    weatherHtml = `
+            } else {
+                weatherHtml = `
                         <div class="weather-loading">
                             <i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i>
                             <span>Chargement météo ${this.state.weatherModel.toUpperCase()}...</span>
                         </div>
                     `;
-                }
+            }
 
-                let slotsTextHtml = '';
-                if (site.flyableSlots.length > 0) {
-                    const groupedByDay = {};
-                    site.flyableSlots.forEach(slot => {
-                        if (!groupedByDay[slot.dayLabel]) groupedByDay[slot.dayLabel] = [];
-                        groupedByDay[slot.dayLabel].push(`${slot.start}h - ${slot.end}h`);
-                    });
-                    const slotsDetails = Object.keys(groupedByDay).map(day => {
-                        return `<span><b>${day}</b> (${groupedByDay[day].join(', ')})</span>`;
-                    }).join(' | ');
-                    slotsTextHtml = `
+            let slotsTextHtml = '';
+            if (site.flyableSlots.length > 0) {
+                const groupedByDay = {};
+                site.flyableSlots.forEach(slot => {
+                    if (!groupedByDay[slot.dayLabel]) groupedByDay[slot.dayLabel] = [];
+                    groupedByDay[slot.dayLabel].push(`${slot.start}h - ${slot.end}h`);
+                });
+                const slotsDetails = Object.keys(groupedByDay).map(day => {
+                    return `<span><b>${day}</b> (${groupedByDay[day].join(', ')})</span>`;
+                }).join(' | ');
+                slotsTextHtml = `
                         <div class="creneaux-list good">
                             <i class="ri-calendar-todo-line"></i> Prochains créneaux : ${slotsDetails}
                         </div>
                     `;
-                } else {
-                    const maxRange = this.state.forecastMaxRange || 120;
-                    slotsTextHtml = `
+            } else {
+                const maxRange = this.state.forecastMaxRange || 120;
+                slotsTextHtml = `
                         <div class="creneaux-list bad">
                             <i class="ri-error-warning-line"></i> Aucun créneau favorable dans les prochaines ${maxRange} heures
                         </div>
                     `;
-                }
+            }
 
-                let timelineBarsHtml = '';
-                const maxRange = this.state.forecastMaxRange || 120;
-                const forecastsToUse = forecasts.slice(0, maxRange);
-                for (let i = 0; i < maxRange; i++) {
-                    const w = forecastsToUse[i];
-                    let barColor = 'rgba(255,255,255,0.05)';
-                    let statusLabel = 'Inconnu';
-                    let timeStr = `+${i}h`;
+            let timelineBarsHtml = '';
+            const maxRange = this.state.forecastMaxRange || 120;
+            const forecastsToUse = forecasts.slice(0, maxRange);
+            for (let i = 0; i < maxRange; i++) {
+                const w = forecastsToUse[i];
+                let barColor = 'rgba(255,255,255,0.05)';
+                let statusLabel = 'Inconnu';
+                let timeStr = `+${i}h`;
 
-                    if (w) {
-                        const status = this.isForecastFlyable(site, w);
-                        const date = new Date(w.time);
-                        const h = String(date.getHours()).padStart(2, '0');
-                        const m = String(date.getMinutes()).padStart(2, '0');
-                        const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-                        timeStr = `${days[date.getDay()]} ${h}:${m}`;
-                        if (status.flyable) {
-                            if (status.warning) {
-                                barColor = '#eab308'; // yellow for uncertain
-                                statusLabel = `${w.windCard} ${w.windSpeed} km/h — ${status.reason}`;
-                            } else {
-                                barColor = 'var(--accent-green)';
-                                statusLabel = `Volable — ${w.windCard} ${w.windSpeed} km/h (raf. ${w.windGust})`;
-                            }
+                if (w) {
+                    const status = this.isForecastFlyable(site, w);
+                    const date = new Date(w.time);
+                    const h = String(date.getHours()).padStart(2, '0');
+                    const m = String(date.getMinutes()).padStart(2, '0');
+                    const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+                    timeStr = `${days[date.getDay()]} ${h}:${m}`;
+                    if (status.flyable) {
+                        if (status.warning) {
+                            barColor = '#eab308'; // yellow for uncertain
+                            statusLabel = `${w.windCard} ${w.windSpeed} km/h — ${status.reason}`;
                         } else {
-                            statusLabel = status.reason;
-                            if (status.reason === 'Nuit') barColor = 'rgba(100,100,120,0.3)';
-                            else if (status.reason.startsWith('Pluie')) barColor = '#3b82f6';
-                            else if (status.reason === 'Mauvaise orientation') barColor = '#f97316';
-                            else barColor = '#ef4444';
+                            barColor = 'var(--accent-green)';
+                            statusLabel = `Volable — ${w.windCard} ${w.windSpeed} km/h (raf. ${w.windGust})`;
                         }
+                    } else {
+                        statusLabel = status.reason;
+                        if (status.reason === 'Nuit') barColor = 'rgba(100,100,120,0.3)';
+                        else if (status.reason.startsWith('Pluie')) barColor = '#3b82f6';
+                        else if (status.reason === 'Mauvaise orientation') barColor = '#f97316';
+                        else barColor = '#ef4444';
                     }
-                    let dotStyle = `flex: 1; height: 100%; background: ${barColor}; transition: all 0.2s; cursor: pointer;`;
-                    if (i === this.state.forecastOffset) {
-                        dotStyle += ` outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);`;
-                    }
-                    timelineBarsHtml += `<div class="timeline-hour-dot" style="${dotStyle}" title="${timeStr} : ${statusLabel}" onclick="event.stopPropagation(); SitesEngine.setForecastOffset(${i});"></div>`;
                 }
+                let dotStyle = `flex: 1; height: 100%; background: ${barColor}; transition: all 0.2s; cursor: pointer;`;
+                if (i === this.state.forecastOffset) {
+                    dotStyle += ` outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);`;
+                }
+                timelineBarsHtml += `<div class="timeline-hour-dot" style="${dotStyle}" title="${timeStr} : ${statusLabel}" onclick="event.stopPropagation(); SitesEngine.setForecastOffset(${i});"></div>`;
+            }
 
 
-                const card = document.createElement('div');
-                const isMinimized = this.state.userPreferences && this.state.userPreferences.minimizedSites && this.state.userPreferences.minimizedSites.includes(site.id);
-                card.className = isMinimized ? 'site-card minimized' : 'site-card';
-                card.innerHTML = this.buildSiteCardHtml(site, windTags, typeLabel, distanceHtml, flyableHoursHtml, weatherHtml, timelineBarsHtml, slotsTextHtml, isMinimized);
-                container.appendChild(card);
-            });
-        } catch (err) {
-            container.innerHTML = '<div class="site-error-container">ERREUR JS: ' + err.toString() + '</div>';
-        }
-    };
+            const card = document.createElement('div');
+            const isMinimized = this.state.userPreferences && this.state.userPreferences.minimizedSites && this.state.userPreferences.minimizedSites.includes(site.id);
+            card.className = isMinimized ? 'site-card minimized' : 'site-card';
+            card.innerHTML = this.buildSiteCardHtml(site, windTags, typeLabel, distanceHtml, flyableHoursHtml, weatherHtml, timelineBarsHtml, slotsTextHtml, isMinimized);
+            container.appendChild(card);
+        });
+    } catch (err) {
+        container.innerHTML = '<div class="site-error-container">ERREUR JS: ' + err.toString() + '</div>';
+    }
+};
 
 SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtml, flyableHoursHtml, weatherHtml, timelineBarsHtml, slotsTextHtml, isMinimized) {
-        const isFav = this.state.userPreferences && this.state.userPreferences.favoriteSites.includes(site.id);
-        const starIcon = isFav ? 'ri-star-fill' : 'ri-star-line';
-        const starColor = isFav ? '#fbbf24' : 'var(--text-muted)';
-        const minIcon = isMinimized ? 'ri-add-line' : 'ri-subtract-line';
+    const isFav = this.state.userPreferences && this.state.userPreferences.favoriteSites.includes(site.id);
+    const starIcon = isFav ? 'ri-star-fill' : 'ri-star-line';
+    const starColor = isFav ? '#fbbf24' : 'var(--text-muted)';
+    const minIcon = isMinimized ? 'ri-add-line' : 'ri-subtract-line';
 
-        return `
+    return `
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <button class="favorite-toggle-btn" onclick="SitesEngine.toggleFavorite('${site.id}'); event.stopPropagation();" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: ${starColor}; cursor: pointer; padding: 0; margin-right: 4px;">
@@ -431,8 +431,8 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                     ` : ''}
                     <div class="site-wind-tags site-wind-tags-row">${windTags}</div>
                     ${typeLabel}
-                    <button class="site-coords-badge copy-coords-btn" onclick="SitesEngine.copyCoords(${parseFloat(site.lat)}, ${parseFloat(site.lon)}, this)" title="Copier les coordonnées">
-                        <i class="ri-map-pin-2-line"></i> <span class="coords-text">${parseFloat(site.lat)}, ${parseFloat(site.lon)}</span>
+                    <button class="site-coords-badge copy-coords-btn" onclick="SitesEngine.copyCoords(${parseFloat(site.latitude)}, ${parseFloat(site.longitude)}, this)" title="Copier les coordonnées">
+                        <i class="ri-map-pin-2-line"></i> <span class="coords-text">${parseFloat(site.latitude)}, ${parseFloat(site.longitude)}</span>
                     </button>
                     ${distanceHtml}
                     ${flyableHoursHtml}
@@ -443,10 +443,10 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                         <img src="https://federation.ffvl.fr/sites/all/themes/ffvl/favicon.ico" alt="FFVL"> FFVL
                     </a>
                     ` : ''}
-                    <button class="action-btn-spot spot-it-btn" onclick="SitesEngine.spotSite(${parseFloat(site.lat)}, ${parseFloat(site.lon)}, '${site.nom.replace(/'/g, "\\'")}', '${site.id || ''}'); event.stopPropagation();" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                    <button class="action-btn-spot spot-it-btn" onclick="SitesEngine.spotSite(${parseFloat(site.latitude)}, ${parseFloat(site.longitude)}, '${site.nom.replace(/'/g, "\\'")}', '${site.id || ''}'); event.stopPropagation();" title="Spot It — Paramétrer toutes les cartes sur ce site">
                         <i class="ri-focus-3-line"></i> Spot It
                     </button>
-                    <button class="action-btn-primary gps-btn" onclick="SitesEngine.openGpsMenu(${parseFloat(site.lat)}, ${parseFloat(site.lon)}); event.stopPropagation();">
+                    <button class="action-btn-primary gps-btn" onclick="SitesEngine.openGpsMenu(${parseFloat(site.latitude)}, ${parseFloat(site.longitude)}); event.stopPropagation();">
                         <i class="ri-navigation-line"></i> S'y rendre
                     </button>
                 </div>
@@ -485,7 +485,7 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
 
                 const isOpen = this.state.expandedSites[site.id] ? 'open' : '';
                 const toggleText = this.state.expandedSites[site.id] ? 'Masquer les détails' : "Voir plus d'infos";
-                
+
                 return `
                     <details class="site-details-toggle" ${isOpen} ontoggle="SitesEngine.handleDetailsToggle(${site.id}, this)">
                         <summary>
@@ -572,56 +572,56 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
             })()}
             `}
         `;
-    };
+};
 
 SitesEngine.copyCoords = function (lat, lng, btnRef) {
-        const coords = lat + ', ' + lng;
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(coords).then(() => {
-                const originalHtml = btnRef.innerHTML;
-                btnRef.innerHTML = '<i class="ri-check-line" style="color: var(--accent-green);"></i> <span style="color: var(--accent-green);">Copié !</span>';
-                btnRef.style.borderColor = 'var(--accent-green)';
-                setTimeout(() => {
-                    btnRef.innerHTML = originalHtml;
-                    btnRef.style.borderColor = '';
-                }, 2000);
-            }).catch(err => { console.error('Failed to copy: ', err); });
-        } else {
-            const textarea = document.createElement('textarea');
-            textarea.value = coords;
-            textarea.style.position = 'fixed';
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                const originalHtml = btnRef.innerHTML;
-                btnRef.innerHTML = '<i class="ri-check-line" style="color: var(--accent-green);"></i> <span style="color: var(--accent-green);">Copié !</span>';
-                btnRef.style.borderColor = 'var(--accent-green)';
-                setTimeout(() => {
-                    btnRef.innerHTML = originalHtml;
-                    btnRef.style.borderColor = '';
-                }, 2000);
-            } catch (err) { console.error('Fallback copy failed', err); }
-            document.body.removeChild(textarea);
-        }
-    };
+    const coords = lat + ', ' + lng;
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(coords).then(() => {
+            const originalHtml = btnRef.innerHTML;
+            btnRef.innerHTML = '<i class="ri-check-line" style="color: var(--accent-green);"></i> <span style="color: var(--accent-green);">Copié !</span>';
+            btnRef.style.borderColor = 'var(--accent-green)';
+            setTimeout(() => {
+                btnRef.innerHTML = originalHtml;
+                btnRef.style.borderColor = '';
+            }, 2000);
+        }).catch(err => { console.error('Failed to copy: ', err); });
+    } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = coords;
+        textarea.style.position = 'fixed';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            const originalHtml = btnRef.innerHTML;
+            btnRef.innerHTML = '<i class="ri-check-line" style="color: var(--accent-green);"></i> <span style="color: var(--accent-green);">Copié !</span>';
+            btnRef.style.borderColor = 'var(--accent-green)';
+            setTimeout(() => {
+                btnRef.innerHTML = originalHtml;
+                btnRef.style.borderColor = '';
+            }, 2000);
+        } catch (err) { console.error('Fallback copy failed', err); }
+        document.body.removeChild(textarea);
+    }
+};
 
 SitesEngine.jumpToSiteCard = function (siteId) {
-        const target = document.getElementById(`site-card-${siteId}`);
-        if (target) {
-            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            target.classList.add('highlight-glow');
-            setTimeout(() => { target.classList.remove('highlight-glow'); }, 2000);
-        }
-    };
+    const target = document.getElementById(`site-card-${siteId}`);
+    if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.classList.add('highlight-glow');
+        setTimeout(() => { target.classList.remove('highlight-glow'); }, 2000);
+    }
+};
 
 SitesEngine.handleDetailsToggle = function (siteId, detailsEl) {
-        if (!this.state.expandedSites) {
-            this.state.expandedSites = {};
-        }
-        this.state.expandedSites[siteId] = detailsEl.open;
-        const toggleTextEl = detailsEl.querySelector('.toggle-text');
-        if (toggleTextEl) {
-            toggleTextEl.textContent = detailsEl.open ? 'Masquer les détails' : "Voir plus d'infos";
-        }
-    };
+    if (!this.state.expandedSites) {
+        this.state.expandedSites = {};
+    }
+    this.state.expandedSites[siteId] = detailsEl.open;
+    const toggleTextEl = detailsEl.querySelector('.toggle-text');
+    if (toggleTextEl) {
+        toggleTextEl.textContent = detailsEl.open ? 'Masquer les détails' : "Voir plus d'infos";
+    }
+};

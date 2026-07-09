@@ -47,7 +47,8 @@
     height: 40px;
     transition: all 0.3s ease;
     filter: opacity(0.85);
-    background: rgba(255, 255, 255, 0.85); /* Requis pour la lisibilitÃ© sur fond sombre */
+    background: rgba(255, 255, 255, 0.85);
+    /* Requis pour la lisibilitÃ© sur fond sombre */
     padding: 4px 8px;
     border-radius: 8px;
 }
@@ -72,9 +73,11 @@ body.light-mode .club-logo:hover {
         padding: 20px 16px;
         margin-top: 40px;
     }
+
     .footer-logos {
         gap: 16px;
     }
+
     .ffvl-logo,
     .club-logo {
         height: 50px;
@@ -121,6 +124,7 @@ body.light-mode .club-logo:hover {
         gap: 6px;
         margin-top: 12px;
     }
+
     .footer-gdpr-links .separator {
         display: none;
     }

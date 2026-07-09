@@ -7,7 +7,7 @@
 const GdprEngine = {
     consentKey: 'parapente_gdpr_consent',
     consentVersion: 2026,
-    
+
     // Default consent settings
     consent: {
         stats: false,      // progression stats and QCM history
@@ -16,9 +16,9 @@ const GdprEngine = {
         date: null
     },
 
-    init: function() {
+    init: function () {
         console.log("GdprEngine: Initializing...");
-        
+
         // Load consent from localStorage
         const stored = localStorage.getItem(this.consentKey);
         if (stored) {
@@ -34,32 +34,32 @@ const GdprEngine = {
                 console.warn("GdprEngine: Corrupt consent in localStorage, resetting.", e);
             }
         }
-        
+
         // If no valid consent found, show the banner with a short delay
         setTimeout(() => {
             this.showBanner();
         }, 800);
     },
 
-    showBanner: function() {
+    showBanner: function () {
         const banner = document.getElementById('gdpr-banner');
         if (banner) {
             banner.classList.add('active');
         }
     },
 
-    hideBanner: function() {
+    hideBanner: function () {
         const banner = document.getElementById('gdpr-banner');
         if (banner) {
             banner.classList.remove('active');
         }
     },
 
-    showModal: function(modalId) {
+    showModal: function (modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.classList.add('active');
-            
+
             // If it's the settings modal, synchronize toggles
             if (modalId === 'gdpr-settings-modal') {
                 this.syncTogglesToState();
@@ -67,7 +67,7 @@ const GdprEngine = {
         }
     },
 
-    hideModal: function(modalId) {
+    hideModal: function (modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.classList.remove('active');
@@ -75,7 +75,7 @@ const GdprEngine = {
     },
 
     // Accept all cookies / tracking / data features
-    acceptAll: function() {
+    acceptAll: function () {
         this.consent = {
             stats: true,
             firebase: true,
@@ -90,7 +90,7 @@ const GdprEngine = {
     },
 
     // Refuse all non-essential data features
-    refuseAll: function() {
+    refuseAll: function () {
         this.consent = {
             stats: false,
             firebase: false,
@@ -106,7 +106,7 @@ const GdprEngine = {
     },
 
     // Save custom settings from toggles
-    saveCustomSettings: function() {
+    saveCustomSettings: function () {
         const statsVal = document.getElementById('gdpr-toggle-stats')?.checked || false;
         const firebaseVal = document.getElementById('gdpr-toggle-firebase')?.checked || false;
         const gpsVal = document.getElementById('gdpr-toggle-gps')?.checked || false;
@@ -118,23 +118,23 @@ const GdprEngine = {
             version: this.consentVersion,
             date: new Date().toISOString()
         };
-        
+
         this.saveConsent();
         this.hideBanner();
         this.hideModal('gdpr-settings-modal');
         this.applyConsentGuards();
-        
+
         // Clean up data if toggled off
         this.clearDeclinedData();
     },
 
-    saveConsent: function() {
+    saveConsent: function () {
         localStorage.setItem(this.consentKey, JSON.stringify(this.consent));
         console.log("GdprEngine: Consent saved", this.consent);
     },
 
     // Sync toggle switches in the settings modal to current consent state
-    syncTogglesToState: function() {
+    syncTogglesToState: function () {
         const toggleStats = document.getElementById('gdpr-toggle-stats');
         const toggleFirebase = document.getElementById('gdpr-toggle-firebase');
         const toggleGps = document.getElementById('gdpr-toggle-gps');
@@ -145,12 +145,12 @@ const GdprEngine = {
     },
 
     // Helper to query consent state from other scripts
-    isConsentGranted: function(category) {
+    isConsentGranted: function (category) {
         return this.consent && this.consent[category] === true;
     },
 
     // Apply logic controls immediately after consent state changes
-    applyConsentGuards: function() {
+    applyConsentGuards: function () {
         // 1. Firebase Guard
         if (this.isConsentGranted('firebase')) {
             // Enable Firebase engine if not already enabled
@@ -199,13 +199,13 @@ const GdprEngine = {
     },
 
     // Clean up local data if a user revokes consent for it
-    clearDeclinedData: function() {
+    clearDeclinedData: function () {
         // If stats consent revoked, clear QCM stats & history
         if (!this.isConsentGranted('stats')) {
             console.log("GdprEngine: Clearing progression statistics & exam history from localStorage.");
             localStorage.removeItem('parapente_qcm_stats');
             localStorage.removeItem('parapente_exam_history');
-            
+
             // Refresh QCM UI if stats screen is active
             if (window.QuizEngine && typeof window.QuizEngine.renderStats === 'function' && window.Engine && window.Engine.state.mode === 'STATS') {
                 window.QuizEngine.renderStats();

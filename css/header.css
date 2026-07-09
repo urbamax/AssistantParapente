@@ -93,8 +93,7 @@ body.dark-theme .top-controls {
 /* Halo lumineux en mode sombre pour dÃ©tacher le pilote et les suspentes noirs */
 body.dark-theme .logo-image {
     filter:
-        drop-shadow(0px 0px 6px rgba(255, 255, 255, 0.7))
-        drop-shadow(0px 0px 2px rgba(255, 255, 255, 0.9));
+        drop-shadow(0px 0px 6px rgba(255, 255, 255, 0.7)) drop-shadow(0px 0px 2px rgba(255, 255, 255, 0.9));
 }
 
 .header-level-row {
@@ -248,12 +247,12 @@ body.dark-theme .nav-menu-btn:hover {
 .nav-menu-btn.active {
     background: var(--bg-card);
     color: var(--accent-blue);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     font-weight: 700;
 }
 
 body.dark-theme .nav-menu-btn.active {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .nav-menu-btn i {
@@ -280,6 +279,7 @@ body.dark-theme .nav-menu-btn.active {
 }
 
 @media (max-width: 768px) {
+
     /* === HEADER MOBILE === */
     .top-controls {
         height: auto !important;
@@ -443,8 +443,15 @@ body.dark-theme .dropdown-item:hover {
         opacity: 0;
         transform: translate(-50%, -10px);
     }
+
     to {
         opacity: 1;
         transform: translate(-50%, 0);
     }
+}
+
+/* --- THEORIE SUB-BAR (HEADER) --- */
+.sub-bar.active {
+    display: flex !important;
+    animation: slideDown 0.2s ease-out forwards;
 }

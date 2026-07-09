@@ -11,7 +11,7 @@ const Map3DComponent = {
      * @param {Array} traceGps Le tableau de points GPS
      * @param {HTMLElement} container L'élément DOM conteneur
      */
-    showTrace: function(sessionId, traceGps, container) {
+    showTrace: function (sessionId, traceGps, container) {
         if (!traceGps || traceGps.length === 0) return;
 
         if (typeof maplibregl === 'undefined') {
@@ -49,24 +49,24 @@ const Map3DComponent = {
         const updatePosition = () => {
             const index = parseInt(slider.value, 10);
             const pt = traceGps[index];
-            
+
             // Update Map Center and Symbol
             if (map3D && map3D.isStyleLoaded()) {
                 const source = map3D.getSource('pilot-source');
                 if (source) {
                     const previous = traceGps[index > 0 ? index - 1 : index];
-                    const timeToSecs = (tStr) => { const p = tStr.split(':'); return parseInt(p[0])*3600 + parseInt(p[1])*60 + parseInt(p[2]); };
+                    const timeToSecs = (tStr) => { const p = tStr.split(':'); return parseInt(p[0]) * 3600 + parseInt(p[1]) * 60 + parseInt(p[2]); };
                     const timeDiff = timeToSecs(pt.time) - timeToSecs(previous.time);
                     const altitudeDiff = pt.alt - previous.alt;
                     const vario = timeDiff > 0 ? (altitudeDiff / timeDiff).toFixed(1) : "0.0";
-                    
+
                     source.setData({
                         type: 'Feature',
                         properties: { altitude: Math.round(pt.alt).toString(), vario: vario.toString() },
                         geometry: { type: 'Point', coordinates: [pt.lon, pt.lat, pt.alt] }
                     });
                 }
-                
+
                 if (!map3D.isDragging()) {
                     map3D.easeTo({
                         center: [pt.lon, pt.lat],
@@ -99,7 +99,7 @@ const Map3DComponent = {
                     let step = 1;
                     if (traceGps.length > 2000) step = 3;
                     else if (traceGps.length > 1000) step = 2;
-                    
+
                     if (val < traceGps.length - 1) {
                         slider.value = Math.min(val + step, traceGps.length - 1);
                         updatePosition();
@@ -150,7 +150,7 @@ const Map3DComponent = {
             bearing: 0,
             interactive: true
         });
-        
+
         map3D.dragRotate.enable();
         map3D.touchZoomRotate.enable();
 
@@ -159,7 +159,7 @@ const Map3DComponent = {
             showZoom: true,
             showCompass: true
         }));
-        
+
         map3D.addControl(new maplibregl.FullscreenControl({
             container: document.getElementById(`player-3d-wrapper-${sessionId}`)
         }));
@@ -177,7 +177,7 @@ const Map3DComponent = {
                     }
                 }
             });
-            
+
             // Calque filaire 3D (Line)
             map3D.addLayer({
                 id: 'trace-line-3d',
@@ -228,7 +228,7 @@ const Map3DComponent = {
             });
 
             updatePosition();
-            
+
             const bounds = new maplibregl.LngLatBounds(
                 [traceGps[0].lon, traceGps[0].lat],
                 [traceGps[0].lon, traceGps[0].lat]
@@ -248,7 +248,7 @@ const Map3DComponent = {
         });
     },
 
-    clearPlayback: function() {
+    clearPlayback: function () {
         if (this.activeInterval) {
             clearInterval(this.activeInterval);
             this.activeInterval = null;

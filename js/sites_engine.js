@@ -47,19 +47,19 @@ const SitesEngine = {
 };
 
 SitesEngine.init = function (engineRef) {
-        console.log("SitesEngine Initialized");
-        this.engine = engineRef;
-        this.loadUserPreferences();
-    };
+    console.log("SitesEngine Initialized");
+    this.engine = engineRef;
+    this.loadUserPreferences();
+};
 
-SitesEngine.loadUserPreferences = function() {
+SitesEngine.loadUserPreferences = function () {
     if (window.FirebaseAuthEngine) {
         this.state.userPreferences = window.FirebaseAuthEngine.getLocalPreferences();
     } else {
         try {
             const saved = localStorage.getItem('parapente_user_prefs');
             this.state.userPreferences = saved ? JSON.parse(saved) : { pilotLevel: 'ALL', favoriteSites: [], minimizedSites: [], savedLocations: [], forecastMaxRange: 120 };
-        } catch(e) {
+        } catch (e) {
             this.state.userPreferences = { pilotLevel: 'ALL', favoriteSites: [], minimizedSites: [], savedLocations: [], forecastMaxRange: 120 };
         }
         const globalLevel = localStorage.getItem('userLevel');
@@ -67,11 +67,11 @@ SitesEngine.loadUserPreferences = function() {
             this.state.userPreferences.pilotLevel = globalLevel;
         }
     }
-    
+
     // Ensure arrays exist
     if (!this.state.userPreferences.savedLocations) this.state.userPreferences.savedLocations = [];
     if (!this.state.userPreferences.forecastMaxRange) this.state.userPreferences.forecastMaxRange = 120;
-    
+
     // Apply saved limit and filter settings if they exist dynamically
     const prefs = this.state.userPreferences;
     for (const key of this.PREFERENCE_KEYS) {
@@ -79,42 +79,42 @@ SitesEngine.loadUserPreferences = function() {
             this.state[key] = prefs[key];
         }
     }
-    
+
     // Sync UI with state
     const maxInput = document.getElementById('limit-wind-max');
     const gustInput = document.getElementById('limit-gust-delta');
     const forecastRangeSelect = document.getElementById('forecast-range-select');
-    
+
     if (maxInput) maxInput.value = this.state.limitWindMax;
     if (gustInput) gustInput.value = this.state.limitGustDelta;
     if (forecastRangeSelect) forecastRangeSelect.value = this.state.forecastMaxRange;
-    
+
     this.renderSavedLocations();
     if (this.updateMapTogglesVisibility) {
         this.updateMapTogglesVisibility();
     }
 };
 
-SitesEngine.savePreferences = function() {
+SitesEngine.savePreferences = function () {
     if (!this.state.userPreferences) this.state.userPreferences = { pilotLevel: 'ALL', favoriteSites: [], minimizedSites: [] };
-    
+
     // Save all dynamic preferences
     for (const key of this.PREFERENCE_KEYS) {
         this.state.userPreferences[key] = this.state[key];
     }
     // savedLocations is mutated directly in the array, but let's be sure
-    
+
     localStorage.setItem('parapente_user_prefs', JSON.stringify(this.state.userPreferences));
     if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.currentUser) {
         window.FirebaseAuthEngine.savePreferencesToCloud();
     }
 };
 
-SitesEngine.changeForecastMaxRange = function(value) {
+SitesEngine.changeForecastMaxRange = function (value) {
     const range = parseInt(value);
     if (!isNaN(range)) {
         this.state.forecastMaxRange = range;
-        
+
         const slider = document.getElementById('forecast-slider');
         if (slider) {
             slider.max = range;
@@ -131,9 +131,9 @@ SitesEngine.changeForecastMaxRange = function(value) {
 };
 
 SitesEngine.PREFERENCE_KEYS = [
-    'limitWindMin', 'limitWindMax', 'limitGustDelta', 'filterWindInclude', 'filterWindExclude', 
-    'filterTypeInclude', 'filterTypeExclude', 'filterFavoritesOnly', 
-    'forecastMaxRange', 'activeMapLayers', 'hideUnflyable', 'radiusLimit', 
+    'limitWindMin', 'limitWindMax', 'limitGustDelta', 'filterWindInclude', 'filterWindExclude',
+    'filterTypeInclude', 'filterTypeExclude', 'filterFavoritesOnly',
+    'forecastMaxRange', 'activeMapLayers', 'hideUnflyable', 'radiusLimit',
     'sortMode', 'conditionsStrategy', 'weatherModel'
 ];
 
@@ -189,7 +189,7 @@ SitesEngine.requestGpsLocation = function (isInitialLoad = false) {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             };
-            
+
             if (inputEl) {
                 inputEl.value = "";
                 inputEl.placeholder = "Ma position GPS";
@@ -222,61 +222,61 @@ SitesEngine.requestGpsLocation = function (isInitialLoad = false) {
 };
 
 SitesEngine.show = function () {
-        if (!this.initialized) {
-            this.setupDropdowns();
+    if (!this.initialized) {
+        this.setupDropdowns();
 
-            // Prefill limits inputs and select from state
-            const minInput = document.getElementById('limit-wind-min');
-            const maxInput = document.getElementById('limit-wind-max');
-            const deltaInput = document.getElementById('limit-gust-delta');
-            const hideUnflyableCheckbox = document.getElementById('hide-unflyable-checkbox');
-            const modelSelect = document.getElementById('weather-model-select');
-            const sortSelect = document.getElementById('select-sort-mode');
-            const radiusSlider = document.getElementById('radius-slider');
-            const radiusLabel = document.getElementById('radius-val-label');
+        // Prefill limits inputs and select from state
+        const minInput = document.getElementById('limit-wind-min');
+        const maxInput = document.getElementById('limit-wind-max');
+        const deltaInput = document.getElementById('limit-gust-delta');
+        const hideUnflyableCheckbox = document.getElementById('hide-unflyable-checkbox');
+        const modelSelect = document.getElementById('weather-model-select');
+        const sortSelect = document.getElementById('select-sort-mode');
+        const radiusSlider = document.getElementById('radius-slider');
+        const radiusLabel = document.getElementById('radius-val-label');
 
-            if (minInput) minInput.value = this.state.limitWindMin;
-            if (maxInput) maxInput.value = this.state.limitWindMax;
-            if (deltaInput) deltaInput.value = this.state.limitGustDelta;
-            if (hideUnflyableCheckbox) hideUnflyableCheckbox.checked = this.state.hideUnflyable;
-            if (modelSelect) modelSelect.value = this.state.weatherModel;
-            if (sortSelect) sortSelect.value = this.state.sortMode;
-            if (radiusSlider) radiusSlider.value = this.state.radiusLimit;
-            if (radiusLabel) radiusLabel.textContent = this.state.radiusLimit === 210 ? 'Illimité' : `${this.state.radiusLimit} km`;
+        if (minInput) minInput.value = this.state.limitWindMin;
+        if (maxInput) maxInput.value = this.state.limitWindMax;
+        if (deltaInput) deltaInput.value = this.state.limitGustDelta;
+        if (hideUnflyableCheckbox) hideUnflyableCheckbox.checked = this.state.hideUnflyable;
+        if (modelSelect) modelSelect.value = this.state.weatherModel;
+        if (sortSelect) sortSelect.value = this.state.sortMode;
+        if (radiusSlider) radiusSlider.value = this.state.radiusLimit;
+        if (radiusLabel) radiusLabel.textContent = this.state.radiusLimit === 210 ? 'Illimité' : `${this.state.radiusLimit} km`;
 
-            // Adjust strategy display panel & strategy buttons active classes
-            const strategyPanel = document.getElementById('conditions-strategy-panel');
-            if (strategyPanel) {
-                strategyPanel.style.display = (this.state.sortMode === 'CONDITIONS') ? 'flex' : 'none';
-            }
-
-            const strategies = ['CONSECUTIVE', 'HALF_DAY', 'DAILY', 'TOTAL'];
-            strategies.forEach(s => {
-                const btn = document.getElementById(`strat-${s}`);
-                if (btn) {
-                    if (s === this.state.conditionsStrategy) {
-                        btn.classList.add('active');
-                        btn.style.background = 'rgba(14, 165, 233, 0.15)';
-                        btn.style.borderColor = 'rgba(14, 165, 233, 0.3)';
-                        btn.style.color = 'var(--accent-blue)';
-                    } else {
-                        btn.classList.remove('active');
-                        btn.style.background = 'rgba(255, 255, 255, 0.03)';
-                        btn.style.borderColor = 'var(--border-color)';
-                        btn.style.color = 'var(--text-secondary)';
-                    }
-                }
-            });
-
-            this.fetchWeatherForSites();
-            this.initialized = true;
+        // Adjust strategy display panel & strategy buttons active classes
+        const strategyPanel = document.getElementById('conditions-strategy-panel');
+        if (strategyPanel) {
+            strategyPanel.style.display = (this.state.sortMode === 'CONDITIONS') ? 'flex' : 'none';
         }
-        this.initMap();
-        if (this.state.map) setTimeout(() => { this.state.map.invalidateSize(); }, 100);
 
-        // Trigger central GPS request
-        this.requestGpsLocation(true);
+        const strategies = ['CONSECUTIVE', 'HALF_DAY', 'DAILY', 'TOTAL'];
+        strategies.forEach(s => {
+            const btn = document.getElementById(`strat-${s}`);
+            if (btn) {
+                if (s === this.state.conditionsStrategy) {
+                    btn.classList.add('active');
+                    btn.style.background = 'rgba(14, 165, 233, 0.15)';
+                    btn.style.borderColor = 'rgba(14, 165, 233, 0.3)';
+                    btn.style.color = 'var(--accent-blue)';
+                } else {
+                    btn.classList.remove('active');
+                    btn.style.background = 'rgba(255, 255, 255, 0.03)';
+                    btn.style.borderColor = 'var(--border-color)';
+                    btn.style.color = 'var(--text-secondary)';
+                }
+            }
+        });
 
-        this.renderList();
-        this.switchMapMode('leaflet');
-    };
+        this.fetchWeatherForSites();
+        this.initialized = true;
+    }
+    this.initMap();
+    if (this.state.map) setTimeout(() => { this.state.map.invalidateSize(); }, 100);
+
+    // Trigger central GPS request
+    this.requestGpsLocation(true);
+
+    this.renderList();
+    this.switchMapMode('leaflet');
+};

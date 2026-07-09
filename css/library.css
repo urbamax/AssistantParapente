@@ -9,14 +9,16 @@
     border-radius: 32px;
     padding: 48px;
     box-shadow: var(--shadow-card);
-    position: relative; /* Needed for pseudo-element */
+    position: relative;
+    /* Needed for pseudo-element */
     z-index: 1;
 }
 
-.library-container > * {
+.library-container>* {
     margin-bottom: 32px;
 }
-.library-container > *:last-child {
+
+.library-container>*:last-child {
     margin-bottom: 0;
 }
 
@@ -535,11 +537,12 @@ body.light-mode .list-item-icon {
         width: 100% !important;
         box-sizing: border-box;
     }
-    
-    .library-container > * {
+
+    .library-container>* {
         margin-bottom: 16px !important;
     }
-    .library-container > *:last-child {
+
+    .library-container>*:last-child {
         margin-bottom: 0 !important;
     }
 

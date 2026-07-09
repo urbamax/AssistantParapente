@@ -228,8 +228,8 @@
     color: #ef4444;
 }
 
-.form-group input, 
-.form-group select, 
+.form-group input,
+.form-group select,
 .form-group textarea {
     padding: 10px 12px;
     border: 1px solid var(--border-color);

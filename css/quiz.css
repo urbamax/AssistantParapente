@@ -17,7 +17,8 @@
     position: relative;
     transition: all 0.3s ease;
     color: var(--text-main);
-    flex-shrink: 0; /* Ã‰vite l'Ã©crasement sur mobile */
+    flex-shrink: 0;
+    /* Ã‰vite l'Ã©crasement sur mobile */
 }
 
 /* Explicit Redundancy for QCM Stage */
@@ -419,6 +420,7 @@ body.light-mode .choice-btn {
 
 /* ========================================= */
 @media (max-width: 1024px) {
+
     /* TABLET (max-width: 1024px) */
     .mode-screen {
         padding: 0 24px 40px 24px;
@@ -432,6 +434,7 @@ body.light-mode .choice-btn {
 }
 
 @media (max-width: 768px) {
+
     /* Screens & Containers */
     .mode-screen {
         padding: 0 16px 80px 16px;

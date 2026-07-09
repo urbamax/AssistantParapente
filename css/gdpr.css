@@ -405,15 +405,15 @@ body.light-mode .gdpr-slider {
     background-color: var(--text-main);
     transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
     border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-input:checked + .gdpr-slider {
+input:checked+.gdpr-slider {
     background-color: var(--accent-blue);
     border-color: var(--accent-blue);
 }
 
-input:checked + .gdpr-slider:before {
+input:checked+.gdpr-slider:before {
     transform: translateX(20px);
 }
 
@@ -431,7 +431,7 @@ input:checked + .gdpr-slider:before {
         bottom: -280px;
         gap: 10px !important;
     }
-    
+
     .gdpr-banner.active {
         bottom: 12px;
     }
@@ -439,9 +439,11 @@ input:checked + .gdpr-slider:before {
     .gdpr-banner-title {
         font-size: 0.85rem !important;
     }
+
     .gdpr-banner-title i {
         font-size: 1.1rem !important;
     }
+
     .gdpr-banner-text {
         font-size: 0.74rem !important;
         line-height: 1.4 !important;
@@ -465,9 +467,11 @@ input:checked + .gdpr-slider:before {
         order: 3 !important;
         grid-column: span 2 !important;
     }
+
     .gdpr-btn-refuse {
         order: 1 !important;
     }
+
     .gdpr-btn-accept {
         order: 2 !important;
     }

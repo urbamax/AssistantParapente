@@ -10,7 +10,7 @@ const FirebaseAuthEngine = {
     lastSyncTime: null,
 
     // Initialize Firebase
-    init: async function() {
+    init: async function () {
         if (typeof IS_FIREBASE_ENABLED === 'undefined' || !IS_FIREBASE_ENABLED) {
             console.log("Firebase sync is disabled (IS_FIREBASE_ENABLED is false).");
             this.updateHeaderUI();
@@ -45,7 +45,7 @@ const FirebaseAuthEngine = {
                     this.currentUser = user;
                     this.updateHeaderUI();
                     this.updateModalUI();
-                    
+
                     // Sync stats
                     await this.syncDataWithCloud();
                 } else {
@@ -64,7 +64,7 @@ const FirebaseAuthEngine = {
     },
 
     // UI Helpers
-    openAuthModal: function() {
+    openAuthModal: function () {
         const overlay = document.getElementById('auth-modal-overlay');
         if (overlay) {
             overlay.classList.add('active');
@@ -73,19 +73,19 @@ const FirebaseAuthEngine = {
         }
     },
 
-    closeAuthModal: function() {
+    closeAuthModal: function () {
         const overlay = document.getElementById('auth-modal-overlay');
         if (overlay) {
             overlay.classList.remove('active');
         }
     },
 
-    switchTab: function(tabName) {
+    switchTab: function (tabName) {
         const loginTab = document.getElementById('tab-login');
         const registerTab = document.getElementById('tab-register');
         const loginForm = document.getElementById('form-login-container');
         const registerForm = document.getElementById('form-register-container');
-        
+
         if (tabName === 'login') {
             loginTab.classList.add('active');
             registerTab.classList.remove('active');
@@ -101,10 +101,10 @@ const FirebaseAuthEngine = {
     },
 
     // Update the Auth Button in the header
-    updateHeaderUI: function() {
+    updateHeaderUI: function () {
         const activeDot = document.getElementById('auth-active-dot');
         const authBtn = document.getElementById('auth-btn');
-        
+
         if (activeDot && authBtn) {
             if (this.currentUser) {
                 activeDot.classList.add('active');
@@ -114,11 +114,11 @@ const FirebaseAuthEngine = {
                 authBtn.title = this.enabled ? "Se connecter / S'enregistrer" : "Synchronisation désactivée (Cliquez pour configurer)";
             }
         }
-        
+
         // Update guest warnings
         const qcmWarning = document.getElementById('qcm-guest-warning');
         const statsWarning = document.getElementById('stats-guest-warning');
-        
+
         if (this.currentUser) {
             if (qcmWarning) qcmWarning.style.display = 'none';
             if (statsWarning) statsWarning.style.display = 'none';
@@ -129,11 +129,11 @@ const FirebaseAuthEngine = {
     },
 
     // Update the contents of the modal based on connection state
-    updateModalUI: function() {
+    updateModalUI: function () {
         const setupRequiredView = document.getElementById('auth-setup-required-view');
         const anonymousView = document.getElementById('auth-anonymous-view');
         const loggedInView = document.getElementById('auth-logged-in-view');
-        
+
         if (!setupRequiredView || !anonymousView || !loggedInView) return;
 
         // Hide all first
@@ -145,7 +145,7 @@ const FirebaseAuthEngine = {
             setupRequiredView.style.display = 'block';
             const devDesc = document.getElementById('auth-setup-required-desc');
             const gdprDesc = document.getElementById('auth-gdpr-required-desc');
-            
+
             if (typeof IS_FIREBASE_ENABLED === 'undefined' || !IS_FIREBASE_ENABLED) {
                 if (devDesc) devDesc.style.display = 'block';
                 if (gdprDesc) gdprDesc.style.display = 'none';
@@ -155,11 +155,11 @@ const FirebaseAuthEngine = {
             }
         } else if (this.currentUser) {
             loggedInView.style.display = 'flex';
-            
+
             // Set user email
             const emailEl = document.getElementById('auth-user-email');
             if (emailEl) emailEl.textContent = this.currentUser.email;
-            
+
             // Set avatar letter
             const avatarEl = document.getElementById('auth-user-avatar');
             if (avatarEl && this.currentUser.email) {
@@ -177,10 +177,10 @@ const FirebaseAuthEngine = {
     },
 
     // Auth actions
-    signUp: async function(email, password, confirmPassword) {
+    signUp: async function (email, password, confirmPassword) {
         if (!isInitialized) return;
         this.clearAlerts();
-        
+
         if (password !== confirmPassword) {
             this.showAlert("Les mots de passe ne correspondent pas.", "error");
             return;
@@ -189,7 +189,7 @@ const FirebaseAuthEngine = {
         try {
             const { createUserWithEmailAndPassword, setPersistence, indexedDBLocalPersistence, browserSessionPersistence } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
             this.showStatus("Création du compte...", "info");
-            
+
             // Set persistence dynamically
             const rememberMeEl = document.getElementById('register-remember-me');
             const rememberMe = rememberMeEl ? rememberMeEl.checked : true;
@@ -211,14 +211,14 @@ const FirebaseAuthEngine = {
         }
     },
 
-    signIn: async function(email, password) {
+    signIn: async function (email, password) {
         if (!isInitialized) return;
         this.clearAlerts();
 
         try {
             const { signInWithEmailAndPassword, setPersistence, indexedDBLocalPersistence, browserSessionPersistence } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
             this.showStatus("Connexion...", "info");
-            
+
             // Set persistence dynamically
             const rememberMeEl = document.getElementById('login-remember-me');
             const rememberMe = rememberMeEl ? rememberMeEl.checked : true;
@@ -237,7 +237,7 @@ const FirebaseAuthEngine = {
         }
     },
 
-    signOut: async function() {
+    signOut: async function () {
         if (!isInitialized) return;
         try {
             const { signOut } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
@@ -249,7 +249,7 @@ const FirebaseAuthEngine = {
         }
     },
 
-    forgotPassword: async function(email) {
+    forgotPassword: async function (email) {
         if (!isInitialized) return;
         if (!email) {
             this.showAlert("Veuillez saisir votre email.", "error");
@@ -268,89 +268,89 @@ const FirebaseAuthEngine = {
     },
 
     // Stats Cloud Synchronization Logic
-    syncDataWithCloud: async function(silent = false) {
+    syncDataWithCloud: async function (silent = false) {
         if (!this.currentUser) return;
-        
+
         if (!silent) {
             this.showStatus("Synchronisation en cours...", "info");
         }
-        
+
         try {
             const { doc, getDoc, setDoc, collection, getDocs, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
             const uid = this.currentUser.uid;
-            
+
             // --- Sync Logbook ---
             const localLogbookStr = localStorage.getItem('tp_logbook_data');
             let localLogbook = [];
             if (localLogbookStr) {
-                try { localLogbook = JSON.parse(localLogbookStr); } catch(e){}
+                try { localLogbook = JSON.parse(localLogbookStr); } catch (e) { }
             }
-            
+
             const logbookColRef = collection(db, "users", uid, "logbook");
             const logbookSnap = await getDocs(logbookColRef);
-            
+
             let cloudLogbook = [];
             logbookSnap.forEach(docSnap => {
                 cloudLogbook.push(docSnap.data());
             });
-            
+
             // Merge: Cloud wins on conflict
             let mergedLogbookMap = new Map();
             localLogbook.forEach(session => mergedLogbookMap.set(session.id, session));
             cloudLogbook.forEach(session => mergedLogbookMap.set(session.id, session));
-            
+
             let mergedLogbook = Array.from(mergedLogbookMap.values());
             mergedLogbook.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
-            
+
             localStorage.setItem('tp_logbook_data', JSON.stringify(mergedLogbook));
-            
+
             // Upload missing ones to cloud
             for (const session of mergedLogbook) {
                 const sRef = doc(db, "users", uid, "logbook", session.id);
                 await setDoc(sRef, session);
             }
-            
+
             // --- Sync Equipment ---
             const localEquipStr = localStorage.getItem('tp_equipment_data');
             let localEquip = [];
             if (localEquipStr) {
-                try { localEquip = JSON.parse(localEquipStr); } catch(e){}
+                try { localEquip = JSON.parse(localEquipStr); } catch (e) { }
             }
-            
+
             const equipColRef = collection(db, "users", uid, "equipment");
             const equipSnap = await getDocs(equipColRef);
-            
+
             let cloudEquip = [];
             equipSnap.forEach(docSnap => {
                 cloudEquip.push(docSnap.data());
             });
-            
+
             // Merge: Cloud wins on conflict
             let mergedEquipMap = new Map();
             localEquip.forEach(item => mergedEquipMap.set(item.id, item));
             cloudEquip.forEach(item => mergedEquipMap.set(item.id, item));
-            
+
             let mergedEquip = Array.from(mergedEquipMap.values());
-            
+
             localStorage.setItem('tp_equipment_data', JSON.stringify(mergedEquip));
-            
+
             // Upload missing ones to cloud
             for (const item of mergedEquip) {
                 const eRef = doc(db, "users", uid, "equipment", item.id);
                 await setDoc(eRef, item);
             }
-            
+
             // --- Sync QCM Stats ---
             const localQcmStats = this.getLocalQcmStats();
             const qcmDocRef = doc(db, "users", uid, "stats", "qcm_stats");
             const qcmDocSnap = await getDoc(qcmDocRef);
-            
+
             let finalQcmStats = localQcmStats;
             if (qcmDocSnap.exists()) {
                 const cloudQcmStats = qcmDocSnap.data();
                 finalQcmStats = this.mergeQcmStats(localQcmStats, cloudQcmStats);
             }
-            
+
             // Save back merged stats to both LocalStorage and Cloud
             localStorage.setItem('parapente_qcm_stats', JSON.stringify(finalQcmStats));
             await setDoc(qcmDocRef, finalQcmStats);
@@ -359,13 +359,13 @@ const FirebaseAuthEngine = {
             const localExamHistory = this.getLocalExamHistory();
             const examDocRef = doc(db, "users", uid, "stats", "exam_history");
             const examDocSnap = await getDoc(examDocRef);
-            
+
             let finalExamHistory = localExamHistory;
             if (examDocSnap.exists()) {
                 const cloudExamHistory = examDocSnap.data();
                 finalExamHistory = this.mergeExamHistory(localExamHistory, cloudExamHistory);
             }
-            
+
             localStorage.setItem('parapente_exam_history', JSON.stringify(finalExamHistory));
             await setDoc(examDocRef, finalExamHistory);
 
@@ -373,15 +373,15 @@ const FirebaseAuthEngine = {
             const localPrefs = this.getLocalPreferences();
             const prefsDocRef = doc(db, "users", uid, "preferences", "user_prefs");
             const prefsDocSnap = await getDoc(prefsDocRef);
-            
+
             let finalPrefs = localPrefs;
             if (prefsDocSnap.exists()) {
                 const cloudPrefs = prefsDocSnap.data();
                 finalPrefs = this.mergePreferences(localPrefs, cloudPrefs);
             }
-            
+
             localStorage.setItem('parapente_user_prefs', JSON.stringify(finalPrefs));
-            
+
             // Update global userLevel from merged preferences if it's different
             this.syncingData = true;
             if (finalPrefs.pilotLevel && finalPrefs.pilotLevel !== localStorage.getItem('userLevel')) {
@@ -401,7 +401,7 @@ const FirebaseAuthEngine = {
                 }
             }
             this.syncingData = false;
-            
+
             await setDoc(prefsDocRef, finalPrefs);
 
             // Refresh UI if QuizEngine stats are currently visible
@@ -427,7 +427,7 @@ const FirebaseAuthEngine = {
             }
 
             console.log("Sync complete!");
-            
+
             this.lastSyncTime = new Date().toLocaleTimeString();
             if (!silent) {
                 this.showStatus("Synchronisé avec le cloud !", "success");
@@ -443,17 +443,17 @@ const FirebaseAuthEngine = {
     },
 
     // Write-through updates to Cloud when user makes progress
-    saveStatsToCloud: async function() {
+    saveStatsToCloud: async function () {
         if (!this.currentUser || !this.enabled) return;
-        
+
         try {
             const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
             const uid = this.currentUser.uid;
-            
+
             const qcmStats = this.getLocalQcmStats();
             const qcmDocRef = doc(db, "users", uid, "stats", "qcm_stats");
             await setDoc(qcmDocRef, qcmStats);
-            
+
             this.lastSyncTime = new Date().toLocaleTimeString();
             console.log("Incremental QCM stats synced.");
         } catch (error) {
@@ -461,17 +461,17 @@ const FirebaseAuthEngine = {
         }
     },
 
-    saveHistoryToCloud: async function() {
+    saveHistoryToCloud: async function () {
         if (!this.currentUser || !this.enabled) return;
-        
+
         try {
             const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
             const uid = this.currentUser.uid;
-            
+
             const examHistory = this.getLocalExamHistory();
             const examDocRef = doc(db, "users", uid, "stats", "exam_history");
             await setDoc(examDocRef, examHistory);
-            
+
             this.lastSyncTime = new Date().toLocaleTimeString();
             console.log("Incremental exam history synced.");
         } catch (error) {
@@ -479,17 +479,17 @@ const FirebaseAuthEngine = {
         }
     },
 
-    savePreferencesToCloud: async function() {
+    savePreferencesToCloud: async function () {
         if (!this.currentUser || !this.enabled || this.syncingData) return;
-        
+
         try {
             const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
             const uid = this.currentUser.uid;
-            
+
             const prefs = this.getLocalPreferences();
             const prefsDocRef = doc(db, "users", uid, "preferences", "user_prefs");
             await setDoc(prefsDocRef, prefs);
-            
+
             this.lastSyncTime = new Date().toLocaleTimeString();
             console.log("Incremental preferences synced.");
         } catch (error) {
@@ -497,19 +497,19 @@ const FirebaseAuthEngine = {
         }
     },
 
-    syncLogbookData: async function(data) {
+    syncLogbookData: async function (data) {
         if (!this.currentUser || !this.enabled || this.syncingData) return;
-        
+
         try {
             const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
             const uid = this.currentUser.uid;
-            
+
             // Save all locally present to cloud
             for (const session of data) {
                 const docRef = doc(db, "users", uid, "logbook", session.id);
                 await setDoc(docRef, session);
             }
-            
+
             this.lastSyncTime = new Date().toLocaleTimeString();
             console.log("Logbook data synced incrementally.");
         } catch (error) {
@@ -517,13 +517,13 @@ const FirebaseAuthEngine = {
         }
     },
 
-    deleteLogbookEntry: async function(id) {
+    deleteLogbookEntry: async function (id) {
         if (!this.currentUser || !this.enabled) return;
-        
+
         try {
             const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
             const uid = this.currentUser.uid;
-            
+
             const docRef = doc(db, "users", uid, "logbook", id);
             await deleteDoc(docRef);
             console.log(`Logbook entry ${id} deleted from cloud.`);
@@ -532,19 +532,19 @@ const FirebaseAuthEngine = {
         }
     },
 
-    syncEquipmentData: async function(data) {
+    syncEquipmentData: async function (data) {
         if (!this.currentUser || !this.enabled || this.syncingData) return;
-        
+
         try {
             const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
             const uid = this.currentUser.uid;
-            
+
             // Save all locally present to cloud
             for (const item of data) {
                 const docRef = doc(db, "users", uid, "equipment", item.id);
                 await setDoc(docRef, item);
             }
-            
+
             this.lastSyncTime = new Date().toLocaleTimeString();
             console.log("Equipment data synced incrementally.");
         } catch (error) {
@@ -552,13 +552,13 @@ const FirebaseAuthEngine = {
         }
     },
 
-    deleteEquipmentEntry: async function(id) {
+    deleteEquipmentEntry: async function (id) {
         if (!this.currentUser || !this.enabled) return;
-        
+
         try {
             const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
             const uid = this.currentUser.uid;
-            
+
             const docRef = doc(db, "users", uid, "equipment", id);
             await deleteDoc(docRef);
             console.log(`Equipment entry ${id} deleted from cloud.`);
@@ -567,16 +567,16 @@ const FirebaseAuthEngine = {
         }
     },
 
-    syncEquipmentEntry: async function(item) {
+    syncEquipmentEntry: async function (item) {
         if (!this.currentUser || !this.enabled || this.syncingData) return;
-        
+
         try {
             const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
             const uid = this.currentUser.uid;
-            
+
             const docRef = doc(db, "users", uid, "equipment", item.id);
             await setDoc(docRef, item);
-            
+
             this.lastSyncTime = new Date().toLocaleTimeString();
             console.log("Equipment entry synced successfully:", item.id);
         } catch (error) {
@@ -584,16 +584,16 @@ const FirebaseAuthEngine = {
         }
     },
 
-    syncLogbookEntry: async function(session) {
+    syncLogbookEntry: async function (session) {
         if (!this.currentUser || !this.enabled || this.syncingData) return;
-        
+
         try {
             const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
             const uid = this.currentUser.uid;
-            
+
             const docRef = doc(db, "users", uid, "logbook", session.id);
             await setDoc(docRef, session);
-            
+
             this.lastSyncTime = new Date().toLocaleTimeString();
             console.log("Logbook entry synced successfully:", session.id);
         } catch (error) {
@@ -602,7 +602,7 @@ const FirebaseAuthEngine = {
     },
 
     // Merge algorithms
-    mergeQcmStats: function(local, cloud) {
+    mergeQcmStats: function (local, cloud) {
         const merged = {
             totalQuestions: 0,
             totalCorrect: 0,
@@ -650,25 +650,25 @@ const FirebaseAuthEngine = {
         return merged;
     },
 
-    mergeExamHistory: function(local, cloud) {
+    mergeExamHistory: function (local, cloud) {
         const localExams = local.exams || [];
         const cloudExams = cloud.exams || [];
-        
+
         // Use a Map keyed by exam ID or ISO string date to remove duplicates
         const examMap = new Map();
-        
+
         localExams.forEach(exam => {
             const key = exam.id || exam.date;
             examMap.set(key, exam);
         });
-        
+
         cloudExams.forEach(exam => {
             const key = exam.id || exam.date;
             // In case of conflict, we keep the one already present or cloud.
             // Since exam logs are read-only historic records, duplicates are identical.
             examMap.set(key, exam);
         });
-        
+
         // Convert map back to list, sort descending by date (newest first), and limit to 10
         const mergedExams = Array.from(examMap.values());
         mergedExams.sort((a, b) => {
@@ -682,13 +682,13 @@ const FirebaseAuthEngine = {
         };
     },
 
-    mergePreferences: function(local, cloud) {
+    mergePreferences: function (local, cloud) {
         if (!cloud) return local;
         if (!local) return cloud;
-        
+
         // 1. Le Cloud est la source de vérité absolue (recharge à la connexion)
         let merged = { ...cloud };
-        
+
         // 2. On récupère les valeurs locales qui n'existent pas du tout dans le cloud
         // (Utile pour rétrocompatibilité lors de l'ajout d'une nouvelle option locale)
         for (const key in local) {
@@ -696,44 +696,44 @@ const FirebaseAuthEngine = {
                 merged[key] = local[key];
             }
         }
-        
+
         // 3. Cas spécifiques : Fusion intelligente des tableaux pour ne pas perdre les données des deux côtés
         const localFavs = local.favoriteSites || [];
         const cloudFavs = cloud.favoriteSites || [];
         merged.favoriteSites = Array.from(new Set([...localFavs, ...cloudFavs]));
-        
+
         const localMin = local.minimizedSites || [];
         const cloudMin = cloud.minimizedSites || [];
         merged.minimizedSites = Array.from(new Set([...localMin, ...cloudMin]));
-        
+
         const mergedLocsMap = new Map();
         (cloud.savedLocations || []).forEach(loc => mergedLocsMap.set(loc.name, loc));
         (local.savedLocations || []).forEach(loc => mergedLocsMap.set(loc.name, loc));
         merged.savedLocations = Array.from(mergedLocsMap.values());
-        
+
         return merged;
     },
 
     // LocalStorage Getters
-    getLocalQcmStats: function() {
+    getLocalQcmStats: function () {
         try {
             const saved = localStorage.getItem('parapente_qcm_stats');
             return saved ? JSON.parse(saved) : { totalQuestions: 0, totalCorrect: 0, themes: {}, questions: {} };
-        } catch(e) {
+        } catch (e) {
             return { totalQuestions: 0, totalCorrect: 0, themes: {}, questions: {} };
         }
     },
 
-    getLocalExamHistory: function() {
+    getLocalExamHistory: function () {
         try {
             const saved = localStorage.getItem('parapente_exam_history');
             return saved ? JSON.parse(saved) : { exams: [] };
-        } catch(e) {
+        } catch (e) {
             return { exams: [] };
         }
     },
 
-    getLocalPreferences: function() {
+    getLocalPreferences: function () {
         const defaults = {
             pilotLevel: 'ALL',
             themeMode: 'auto',
@@ -762,14 +762,14 @@ const FirebaseAuthEngine = {
                 if (!prefs.savedLocations) prefs.savedLocations = [];
                 if (!prefs.activeMapLayers) prefs.activeMapLayers = [...defaults.activeMapLayers];
             }
-        } catch(e) {}
-        
+        } catch (e) { }
+
         // Always read latest pilot level from main app logic (userLevel)
         const globalLevel = localStorage.getItem('userLevel');
         if (globalLevel) {
             prefs.pilotLevel = globalLevel;
         }
-        
+
         const themeMode = localStorage.getItem('themeMode');
         if (themeMode) {
             prefs.themeMode = themeMode;
@@ -779,7 +779,7 @@ const FirebaseAuthEngine = {
     },
 
     // Alert UI management
-    showAlert: function(message, type) {
+    showAlert: function (message, type) {
         const alertEl = document.getElementById('auth-alert');
         if (alertEl) {
             alertEl.className = `auth-alert ${type}`;
@@ -788,11 +788,11 @@ const FirebaseAuthEngine = {
         }
     },
 
-    showStatus: function(message, type) {
+    showStatus: function (message, type) {
         this.showAlert(message, type);
     },
 
-    clearAlerts: function() {
+    clearAlerts: function () {
         const alertEl = document.getElementById('auth-alert');
         if (alertEl) {
             alertEl.className = 'auth-alert';

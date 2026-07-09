@@ -1,208 +1,208 @@
 SitesEngine.initMap = function () {
-        if (this.state.map) return;
-        this.state.map = L.map('sites-map-canvas');
-        this.updateMapTiles();
-        this.state.markersGroup = L.featureGroup().addTo(this.state.map);
-        this.updateMapMarkers();
-        
-        // Fix Leaflet tile loading issue on mobile/resize using ResizeObserver
-        const mapCanvas = document.getElementById('sites-map-canvas');
-        if (mapCanvas && window.ResizeObserver) {
-            this.state.mapResizeObserver = new ResizeObserver(() => {
-                if (this.state.map) {
-                    this.state.map.invalidateSize();
-                }
-            });
-            this.state.mapResizeObserver.observe(mapCanvas);
-        }
+    if (this.state.map) return;
+    this.state.map = L.map('sites-map-canvas');
+    this.updateMapTiles();
+    this.state.markersGroup = L.featureGroup().addTo(this.state.map);
+    this.updateMapMarkers();
 
-        try {
-            const bounds = this.state.markersGroup.getBounds();
-            if (bounds.isValid()) this.state.map.fitBounds(bounds, { padding: [30, 30] });
-            else this.state.map.setView([50.5, 2.5], 9);
-        } catch (e) { this.state.map.setView([50.5, 2.5], 9); }
-    };
+    // Fix Leaflet tile loading issue on mobile/resize using ResizeObserver
+    const mapCanvas = document.getElementById('sites-map-canvas');
+    if (mapCanvas && window.ResizeObserver) {
+        this.state.mapResizeObserver = new ResizeObserver(() => {
+            if (this.state.map) {
+                this.state.map.invalidateSize();
+            }
+        });
+        this.state.mapResizeObserver.observe(mapCanvas);
+    }
+
+    try {
+        const bounds = this.state.markersGroup.getBounds();
+        if (bounds.isValid()) this.state.map.fitBounds(bounds, { padding: [30, 30] });
+        else this.state.map.setView([50.5, 2.5], 9);
+    } catch (e) { this.state.map.setView([50.5, 2.5], 9); }
+};
 
 SitesEngine.updateMapTiles = function () {
-        if (!this.state.map) return;
+    if (!this.state.map) return;
 
-        // Toggle dark-map class based on current theme mode
-        const mapCanvas = document.getElementById('sites-map-canvas');
-        if (mapCanvas) {
-            const isLightMode = document.body.classList.contains('light-mode');
-            if (isLightMode) {
-                mapCanvas.classList.remove('dark-map');
-            } else {
-                mapCanvas.classList.add('dark-map');
-            }
+    // Toggle dark-map class based on current theme mode
+    const mapCanvas = document.getElementById('sites-map-canvas');
+    if (mapCanvas) {
+        const isLightMode = document.body.classList.contains('light-mode');
+        if (isLightMode) {
+            mapCanvas.classList.remove('dark-map');
+        } else {
+            mapCanvas.classList.add('dark-map');
         }
+    }
 
-        if (this.state.tileLayer) return; // No need to recreate the tile layer!
+    if (this.state.tileLayer) return; // No need to recreate the tile layer!
 
-        // 1. Couche de base (Esri World Topo Map) - Rendu beaucoup plus "dessin/vectoriel" et épuré que OpenTopoMap
-        this.state.tileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri',
-            maxZoom: 17,
-            maxNativeZoom: 15 // Astuce Ligne Claire : Étire les tuiles (lignes épaisses, pas de lissage)
-        }).addTo(this.state.map);
+    // 1. Couche de base (Esri World Topo Map) - Rendu beaucoup plus "dessin/vectoriel" et épuré que OpenTopoMap
+    this.state.tileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri',
+        maxZoom: 17,
+        maxNativeZoom: 15 // Astuce Ligne Claire : Étire les tuiles (lignes épaisses, pas de lissage)
+    }).addTo(this.state.map);
 
-        // 2. On supprime la surcouche de relief car Esri intègre déjà un relief très doux et plat
-        if (this.state.hillshadeLayer) {
-            this.state.map.removeLayer(this.state.hillshadeLayer);
-            this.state.hillshadeLayer = null;
-        }
-    };
+    // 2. On supprime la surcouche de relief car Esri intègre déjà un relief très doux et plat
+    if (this.state.hillshadeLayer) {
+        this.state.map.removeLayer(this.state.hillshadeLayer);
+        this.state.hillshadeLayer = null;
+    }
+};
 
 SitesEngine.updateMapMarkers = function () {
-        if (!this.state.map || !this.state.markersGroup) return;
-        this.state.markersGroup.clearLayers();
-        let activeSites = SITES_DATA.filter(s => s.affiche !== false);
+    if (!this.state.map || !this.state.markersGroup) return;
+    this.state.markersGroup.clearLayers();
+    let activeSites = SITES_DATA.filter(s => s.affiche !== false);
 
-        // Filter map markers by search query
-        if (this.state.searchQuery) {
-            const queryCleaned = this.removeAccents(this.state.searchQuery.trim().toLowerCase());
-            activeSites = activeSites.filter(site => {
-                const name = this.removeAccents(site.nom || '').toLowerCase();
-                const city = this.removeAccents(site.ville || '').toLowerCase();
-                const zip = (site.code_postal || '').toLowerCase();
-                
-                let dept = '';
-                if (Array.isArray(site.departement)) {
-                    dept = this.removeAccents(site.departement.join(' ')).toLowerCase();
-                } else if (site.departement) {
-                    dept = this.removeAccents(site.departement).toLowerCase();
-                }
-                
-                const region = this.removeAccents(site.region || '').toLowerCase();
-                const obs = this.removeAccents(site.observations || '').toLowerCase();
-                const topo = this.removeAccents(site.acces_topo || '').toLowerCase();
-                const dangers = this.removeAccents(site.dangers || '').toLowerCase();
-                const practice = this.removeAccents(site.praticabilite || '').toLowerCase();
-
-                return name.includes(queryCleaned) ||
-                       city.includes(queryCleaned) ||
-                       zip.includes(queryCleaned) ||
-                       dept.includes(queryCleaned) ||
-                       region.includes(queryCleaned) ||
-                       obs.includes(queryCleaned) ||
-                       topo.includes(queryCleaned) ||
-                       dangers.includes(queryCleaned) ||
-                       practice.includes(queryCleaned);
-            });
-        }
-
-        // 3-State Wind Map Filtering
-        if (this.state.filterWindExclude && this.state.filterWindExclude.length > 0) {
-            activeSites = activeSites.filter(s => {
-                const orientations = s.orientation ? s.orientation.split(',').map(v => v.trim()) : [];
-                return !orientations.some(w => this.state.filterWindExclude.includes(w));
-            });
-        }
-        if (this.state.filterWindInclude && this.state.filterWindInclude.length > 0) {
-            activeSites = activeSites.filter(s => {
-                const orientations = s.orientation ? s.orientation.split(',').map(v => v.trim()) : [];
-                return orientations.some(w => this.state.filterWindInclude.includes(w));
-            });
-        }
-
-        // Type Map Filtering (with Landing-only default hide & independent type priority)
+    // Filter map markers by search query
+    if (this.state.searchQuery) {
+        const queryCleaned = this.removeAccents(this.state.searchQuery.trim().toLowerCase());
         activeSites = activeSites.filter(site => {
-            let siteTypes = Array.isArray(site.site_sous_type) ? site.site_sous_type : [site.site_sous_type];
+            const name = this.removeAccents(site.nom || '').toLowerCase();
+            const city = this.removeAccents(site.ville || '').toLowerCase();
+            const zip = (site.code_postal || '').toLowerCase();
 
-            // 1. Landing-only hidden by default (can be revealed by including Atterrissage)
-            const isLandingOnly = siteTypes.includes('Atterrissage') && siteTypes.every(t => t === 'Atterrissage');
-            if (isLandingOnly) {
-                if (!this.state.filterTypeInclude.includes('Atterrissage')) {
-                    return false;
-                }
+            let dept = '';
+            if (Array.isArray(site.departement)) {
+                dept = this.removeAccents(site.departement.join(' ')).toLowerCase();
+            } else if (site.departement) {
+                dept = this.removeAccents(site.departement).toLowerCase();
             }
 
-            // 2. 3-state inclusion and exclusion logic with independence
-            const hasIncludedType = this.state.filterTypeInclude && this.state.filterTypeInclude.length > 0 && siteTypes.some(t => this.state.filterTypeInclude.includes(t));
-            const hasExcludedType = this.state.filterTypeExclude && this.state.filterTypeExclude.length > 0 && siteTypes.some(t => this.state.filterTypeExclude.includes(t));
+            const region = this.removeAccents(site.region || '').toLowerCase();
+            const obs = this.removeAccents(site.observations || '').toLowerCase();
+            const topo = this.removeAccents(site.acces_topo || '').toLowerCase();
+            const dangers = this.removeAccents(site.dangers || '').toLowerCase();
+            const practice = this.removeAccents(site.praticabilite || '').toLowerCase();
 
-            if (this.state.filterTypeInclude && this.state.filterTypeInclude.length > 0) {
-                if (hasIncludedType) return true;
+            return name.includes(queryCleaned) ||
+                city.includes(queryCleaned) ||
+                zip.includes(queryCleaned) ||
+                dept.includes(queryCleaned) ||
+                region.includes(queryCleaned) ||
+                obs.includes(queryCleaned) ||
+                topo.includes(queryCleaned) ||
+                dangers.includes(queryCleaned) ||
+                practice.includes(queryCleaned);
+        });
+    }
+
+    // 3-State Wind Map Filtering
+    if (this.state.filterWindExclude && this.state.filterWindExclude.length > 0) {
+        activeSites = activeSites.filter(s => {
+            const orientations = s.orientation ? s.orientation.split(',').map(v => v.trim()) : [];
+            return !orientations.some(w => this.state.filterWindExclude.includes(w));
+        });
+    }
+    if (this.state.filterWindInclude && this.state.filterWindInclude.length > 0) {
+        activeSites = activeSites.filter(s => {
+            const orientations = s.orientation ? s.orientation.split(',').map(v => v.trim()) : [];
+            return orientations.some(w => this.state.filterWindInclude.includes(w));
+        });
+    }
+
+    // Type Map Filtering (with Landing-only default hide & independent type priority)
+    activeSites = activeSites.filter(site => {
+        let siteTypes = Array.isArray(site.site_sous_type) ? site.site_sous_type : [site.site_sous_type];
+
+        // 1. Landing-only hidden by default (can be revealed by including Atterrissage)
+        const isLandingOnly = siteTypes.includes('Atterrissage') && siteTypes.every(t => t === 'Atterrissage');
+        if (isLandingOnly) {
+            if (!this.state.filterTypeInclude.includes('Atterrissage')) {
                 return false;
             }
-
-            if (hasExcludedType) return false;
-
-            return true;
-        });
-        if (this.state.hideUnflyable) {
-            activeSites = activeSites.filter(site => {
-                const forecasts = this.state.weatherForecasts[site.id] || [];
-                let hours = 0;
-                for (let i = 0; i < Math.min(forecasts.length, 48); i++) {
-                    if (this.isForecastFlyable(site, forecasts[i]).flyable) hours++;
-                }
-                return hours > 0;
-            });
         }
 
-        // Apply radius filter on map markers if user location and limit are active
-        if (this.state.userLocation && this.state.radiusLimit < 210) {
-            activeSites = activeSites.filter(site => {
-                if (site.distance === undefined) {
-                    site.distance = this.calculateDistance(
-                        this.state.userLocation.lat,
-                        this.state.userLocation.lng,
-                        parseFloat(site.lat),
-                        parseFloat(site.lon)
-                    );
-                }
-                return site.distance <= this.state.radiusLimit;
-            });
+        // 2. 3-state inclusion and exclusion logic with independence
+        const hasIncludedType = this.state.filterTypeInclude && this.state.filterTypeInclude.length > 0 && siteTypes.some(t => this.state.filterTypeInclude.includes(t));
+        const hasExcludedType = this.state.filterTypeExclude && this.state.filterTypeExclude.length > 0 && siteTypes.some(t => this.state.filterTypeExclude.includes(t));
+
+        if (this.state.filterTypeInclude && this.state.filterTypeInclude.length > 0) {
+            if (hasIncludedType) return true;
+            return false;
         }
 
-        activeSites.forEach(site => {
-            let color = '#94a3b8';
-            let flyableClass = 'weather-unknown';
-            let weather = (this.state.weatherForecasts[site.id] || [])[this.state.forecastOffset];
-            if (weather) {
-                const status = this.isForecastFlyable(site, weather);
-                flyableClass = status.class;
-                if (status.flyable) color = status.warning ? '#eab308' : '#22c55e';
-                else {
-                    if (status.reason === 'Nuit') color = '#475569';
-                    else if (status.reason.startsWith('Pluie')) color = '#3b82f6';
-                    else if (status.reason === 'Mauvaise orientation') color = '#f97316';
-                    else color = '#ef4444';
-                }
+        if (hasExcludedType) return false;
+
+        return true;
+    });
+    if (this.state.hideUnflyable) {
+        activeSites = activeSites.filter(site => {
+            const forecasts = this.state.weatherForecasts[site.id] || [];
+            let hours = 0;
+            for (let i = 0; i < Math.min(forecasts.length, 48); i++) {
+                if (this.isForecastFlyable(site, forecasts[i]).flyable) hours++;
             }
-            const isCurrentlyFlyable = weather && this.isForecastFlyable(site, weather).flyable;
-            const pulseHtml = isCurrentlyFlyable
-                ? `<div class="marker-pulse" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; background: ${color}; opacity: 0.35; animation: marker-pulse-anim 1.8s infinite ease-out;"></div>`
-                : '';
-            const iconHtml = `<div class="custom-map-marker ${flyableClass}" style="position: relative; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">${pulseHtml}<div class="marker-core" style="width: 14px; height: 14px; border-radius: 50%; background: ${color}; border: 2px solid var(--bg-surface); box-shadow: 0 2px 6px rgba(0,0,0,0.4); z-index: 2; transition: background-color 0.3s;"></div></div>`;
-            const marker = L.marker([parseFloat(site.lat), parseFloat(site.lon)], { icon: L.divIcon({ html: iconHtml, className: 'leaflet-custom-icon', iconSize: [30, 30], iconAnchor: [15, 15] }) });
-            marker.on('click', (e) => {
-                this.spotSite(parseFloat(site.lat), parseFloat(site.lon), site.nom, site.id || "");
-            });
-            this.state.markersGroup.addLayer(marker);
+            return hours > 0;
         });
+    }
 
-        // Fit Leaflet map bounds to show only the active markers
-        if (activeSites.length > 0 && this.state.map) {
-            const coords = activeSites.map(s => [parseFloat(s.lat), parseFloat(s.lon)]);
-            this.state.map.fitBounds(coords, { padding: [30, 30] });
+    // Apply radius filter on map markers if user location and limit are active
+    if (this.state.userLocation && this.state.radiusLimit < 210) {
+        activeSites = activeSites.filter(site => {
+            if (site.distance === undefined) {
+                site.distance = this.calculateDistance(
+                    this.state.userLocation.lat,
+                    this.state.userLocation.lng,
+                    parseFloat(site.latitude),
+                    parseFloat(site.longitude)
+                );
+            }
+            return site.distance <= this.state.radiusLimit;
+        });
+    }
+
+    activeSites.forEach(site => {
+        let color = '#94a3b8';
+        let flyableClass = 'weather-unknown';
+        let weather = (this.state.weatherForecasts[site.id] || [])[this.state.forecastOffset];
+        if (weather) {
+            const status = this.isForecastFlyable(site, weather);
+            flyableClass = status.class;
+            if (status.flyable) color = status.warning ? '#eab308' : '#22c55e';
+            else {
+                if (status.reason === 'Nuit') color = '#475569';
+                else if (status.reason.startsWith('Pluie')) color = '#3b82f6';
+                else if (status.reason === 'Mauvaise orientation') color = '#f97316';
+                else color = '#ef4444';
+            }
         }
-    };
+        const isCurrentlyFlyable = weather && this.isForecastFlyable(site, weather).flyable;
+        const pulseHtml = isCurrentlyFlyable
+            ? `<div class="marker-pulse" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; background: ${color}; opacity: 0.35; animation: marker-pulse-anim 1.8s infinite ease-out;"></div>`
+            : '';
+        const iconHtml = `<div class="custom-map-marker ${flyableClass}" style="position: relative; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">${pulseHtml}<div class="marker-core" style="width: 14px; height: 14px; border-radius: 50%; background: ${color}; border: 2px solid var(--bg-surface); box-shadow: 0 2px 6px rgba(0,0,0,0.4); z-index: 2; transition: background-color 0.3s;"></div></div>`;
+        const marker = L.marker([parseFloat(site.latitude), parseFloat(site.longitude)], { icon: L.divIcon({ html: iconHtml, className: 'leaflet-custom-icon', iconSize: [30, 30], iconAnchor: [15, 15] }) });
+        marker.on('click', (e) => {
+            this.spotSite(parseFloat(site.latitude), parseFloat(site.longitude), site.nom, site.id || "");
+        });
+        this.state.markersGroup.addLayer(marker);
+    });
+
+    // Fit Leaflet map bounds to show only the active markers
+    if (activeSites.length > 0 && this.state.map) {
+        const coords = activeSites.map(s => [parseFloat(s.latitude), parseFloat(s.longitude)]);
+        this.state.map.fitBounds(coords, { padding: [30, 30] });
+    }
+};
 
 SitesEngine.buildWeatherPopupHtml = function (weather, color, site) {
-        const status = this.isForecastFlyable(site, weather);
-        return `<div style="margin-top: 8px; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.1); border: 1px solid var(--border-color); font-size: 0.85rem;">
+    const status = this.isForecastFlyable(site, weather);
+    return `<div style="margin-top: 8px; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.1); border: 1px solid var(--border-color); font-size: 0.85rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; gap: 8px;">
                 <span style="font-weight: 700; white-space: nowrap;"><i class="ri-windy-line"></i> ${weather.windCard} ${weather.windSpeed} km/h</span>
                 <span style="color: ${color}; font-weight: bold; font-size: 0.75rem;"><i class="${status.icon}"></i> ${status.reason}</span>
             </div>
             <div style="opacity: 0.8; font-size: 0.8rem;">Rafales : ${weather.windGust} km/h</div>
         </div>`;
-    };
+};
 
 SitesEngine.buildMapPopupHtml = function (site, weatherPopupHtml) {
-        return `<div class="map-popup-card" style="font-family: var(--font-main); color: var(--text-main); width: 220px;">
+    return `<div class="map-popup-card" style="font-family: var(--font-main); color: var(--text-main); width: 220px;">
             <h4 style="margin: 0 0 4px 0; font-size: 1rem; font-weight: 700;">${site.nom}</h4>
             ${weatherPopupHtml}
             <div style="display: flex; gap: 6px; margin-top: 10px;">
@@ -211,52 +211,52 @@ SitesEngine.buildMapPopupHtml = function (site, weatherPopupHtml) {
                     <img src="https://federation.ffvl.fr/sites/all/themes/ffvl/favicon.ico" alt="FFVL" style="width: 14px; height: 14px; border-radius: 2px;">
                 </a>
                 ` : ''}
-                <button class="action-btn-primary" onclick="SitesEngine.openGpsMenu(${parseFloat(site.lat)}, ${parseFloat(site.lon)}); event.stopPropagation();" style="flex: 1; padding: 6px 10px; font-size: 0.8rem; justify-content: center;">
+                <button class="action-btn-primary" onclick="SitesEngine.openGpsMenu(${parseFloat(site.latitude)}, ${parseFloat(site.longitude)}); event.stopPropagation();" style="flex: 1; padding: 6px 10px; font-size: 0.8rem; justify-content: center;">
                     <i class="ri-navigation-line"></i> S'y rendre
                 </button>
-                <button class="action-btn-secondary windy-btn" onclick="SitesEngine.focusSiteWindy(${parseFloat(site.lat)}, ${parseFloat(site.lon)}, '${site.nom.replace(/'/g, "\\'")}'); event.stopPropagation();" style="padding: 6px 8px;" title="Afficher le vent sur le radar">
+                <button class="action-btn-secondary windy-btn" onclick="SitesEngine.focusSiteWindy(${parseFloat(site.latitude)}, ${parseFloat(site.longitude)}, '${site.nom.replace(/'/g, "\\'")}'); event.stopPropagation();" style="padding: 6px 8px;" title="Afficher le vent sur le radar">
                     <i class="ri-windy-line"></i>
                 </button>
-                <button class="action-btn-secondary paraglidable-btn" onclick="SitesEngine.focusSiteMap('paraglidable', ${parseFloat(site.lat)}, ${parseFloat(site.lon)}, '${site.nom.replace(/'/g, "\\'")}'); event.stopPropagation();" style="padding: 6px 8px;" title="Afficher sur Paraglidable">
+                <button class="action-btn-secondary paraglidable-btn" onclick="SitesEngine.focusSiteMap('paraglidable', ${parseFloat(site.latitude)}, ${parseFloat(site.longitude)}, '${site.nom.replace(/'/g, "\\'")}'); event.stopPropagation();" style="padding: 6px 8px;" title="Afficher sur Paraglidable">
                     <i class="ri-flight-takeoff-line"></i>
                 </button>
             </div>
         </div>`;
-    };
+};
 
 SitesEngine.openGpsMenu = function (lat, lng) {
-        this.state.currentSiteCoords = { lat, lng };
-        const sheet = document.getElementById('gps-bottom-sheet');
-        if (sheet) sheet.classList.add('active');
-    };
+    this.state.currentSiteCoords = { lat, lng };
+    const sheet = document.getElementById('gps-bottom-sheet');
+    if (sheet) sheet.classList.add('active');
+};
 
 SitesEngine.closeGpsMenu = function () {
-        const sheet = document.getElementById('gps-bottom-sheet');
-        if (sheet) sheet.classList.remove('active');
-        this.state.currentSiteCoords = null;
-    };
+    const sheet = document.getElementById('gps-bottom-sheet');
+    if (sheet) sheet.classList.remove('active');
+    this.state.currentSiteCoords = null;
+};
 
 SitesEngine.launchGps = function (app) {
-        const coords = this.state.currentSiteCoords;
-        if (!coords) return;
-        const { lat, lng } = coords;
-        let url = '';
-        if (app === 'waze') {
-            url = `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
-        } else if (app === 'gmaps') {
-            url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-        } else if (app === 'apple') {
-            url = `http://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`;
-        }
-        if (url) window.open(url, '_blank');
-        this.closeGpsMenu();
-    };
+    const coords = this.state.currentSiteCoords;
+    if (!coords) return;
+    const { lat, lng } = coords;
+    let url = '';
+    if (app === 'waze') {
+        url = `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
+    } else if (app === 'gmaps') {
+        url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+    } else if (app === 'apple') {
+        url = `http://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`;
+    }
+    if (url) window.open(url, '_blank');
+    this.closeGpsMenu();
+};
 
 SitesEngine.switchMapMode = function (mode) {
     const modes = [
         'leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'isofronts', 'paraglidable'
     ];
-    
+
     // Toggle buttons
     modes.forEach(m => {
         const btn = document.getElementById(`map-toggle-${m}`);
@@ -310,7 +310,7 @@ SitesEngine.switchMapMode = function (mode) {
         let name = "France";
         let extraId = "";
         let isGeneric = true;
-        
+
         if (this.state._spottedSite) {
             lat = this.state._spottedSite.lat;
             lon = this.state._spottedSite.lon;
@@ -322,7 +322,7 @@ SitesEngine.switchMapMode = function (mode) {
             lon = this.state.userLocation.lng;
             isGeneric = false;
         }
-        
+
         if (mode === 'isofronts') {
             this.initIsofronts();
         } else {
@@ -428,46 +428,46 @@ SitesEngine.focusSiteWindy = function (lat, lon, siteName) {
 };
 
 SitesEngine.toggleFullscreen = function () {
-        const mapView = document.getElementById('sites-map-view');
-        const fsBtn = document.getElementById('map-toggle-fullscreen');
-        if (!mapView || !fsBtn) return;
+    const mapView = document.getElementById('sites-map-view');
+    const fsBtn = document.getElementById('map-toggle-fullscreen');
+    if (!mapView || !fsBtn) return;
 
-        const isFullscreen = mapView.classList.toggle('map-view-fullscreen');
+    const isFullscreen = mapView.classList.toggle('map-view-fullscreen');
 
-        if (isFullscreen) {
-            document.body.style.overflow = 'hidden';
-            document.documentElement.style.overflow = 'hidden';
-            fsBtn.innerHTML = '<i class="ri-fullscreen-exit-line"></i> <span>Réduire</span>';
-            fsBtn.classList.add('active-fs');
-            if (this.state.map && document.getElementById('sites-map-canvas').style.display !== 'none') {
-                setTimeout(() => {
-                    this.state.map.invalidateSize();
-                    if (this.state.markersGroup) {
-                        const bounds = this.state.markersGroup.getBounds();
-                        if (bounds.isValid()) {
-                            this.state.map.fitBounds(bounds, { padding: [30, 30] });
-                        }
+    if (isFullscreen) {
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+        fsBtn.innerHTML = '<i class="ri-fullscreen-exit-line"></i> <span>Réduire</span>';
+        fsBtn.classList.add('active-fs');
+        if (this.state.map && document.getElementById('sites-map-canvas').style.display !== 'none') {
+            setTimeout(() => {
+                this.state.map.invalidateSize();
+                if (this.state.markersGroup) {
+                    const bounds = this.state.markersGroup.getBounds();
+                    if (bounds.isValid()) {
+                        this.state.map.fitBounds(bounds, { padding: [30, 30] });
                     }
-                }, 150);
-            }
-        } else {
-            document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
-            fsBtn.innerHTML = '<i class="ri-fullscreen-line"></i> <span>Plein écran</span>';
-            fsBtn.classList.remove('active-fs');
-            if (this.state.map && document.getElementById('sites-map-canvas').style.display !== 'none') {
-                setTimeout(() => {
-                    this.state.map.invalidateSize();
-                    if (this.state.markersGroup) {
-                        const bounds = this.state.markersGroup.getBounds();
-                        if (bounds.isValid()) {
-                            this.state.map.fitBounds(bounds, { padding: [30, 30] });
-                        }
-                    }
-                }, 150);
-            }
+                }
+            }, 150);
         }
-    };
+    } else {
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+        fsBtn.innerHTML = '<i class="ri-fullscreen-line"></i> <span>Plein écran</span>';
+        fsBtn.classList.remove('active-fs');
+        if (this.state.map && document.getElementById('sites-map-canvas').style.display !== 'none') {
+            setTimeout(() => {
+                this.state.map.invalidateSize();
+                if (this.state.markersGroup) {
+                    const bounds = this.state.markersGroup.getBounds();
+                    if (bounds.isValid()) {
+                        this.state.map.fitBounds(bounds, { padding: [30, 30] });
+                    }
+                }
+            }, 150);
+        }
+    }
+};
 
 /* ============================================================
    ISOFRONTS
@@ -495,7 +495,7 @@ SitesEngine.spotSite = function (lat, lon, siteName, extraId) {
     this.switchMapMode('windy');
 
     // 3. Load all iframe maps with the site coordinates
-    ['windy', 'meteoparapente', 'paraglidingearth', 'paraglidable'].forEach(function(mode) {
+    ['windy', 'meteoparapente', 'paraglidingearth', 'paraglidable'].forEach(function (mode) {
         SitesEngine.loadIframeContent(mode, lat, lon, siteName, extraId);
     });
 
@@ -522,7 +522,7 @@ SitesEngine.showSpotItToast = function (siteName) {
     toast.innerHTML = '<i class="ri-focus-3-line"></i> Cartes centrees sur <strong>' + siteName + '</strong>';
     toast.classList.add('visible');
     clearTimeout(toast._hideTimer);
-    toast._hideTimer = setTimeout(function() {
+    toast._hideTimer = setTimeout(function () {
         toast.classList.remove('visible');
     }, 2500);
 };
@@ -591,7 +591,7 @@ SitesEngine.openMoreMapsDropdown = function () {
         { id: 'isofronts', label: 'Fronts & Isobares', icon: 'ri-mist-line' }
     ];
 
-    internalMaps.forEach(function(m) {
+    internalMaps.forEach(function (m) {
         if (!SitesEngine.state.activeMapLayers.includes(m.id)) {
             links.push({
                 label: m.label,
@@ -605,7 +605,7 @@ SitesEngine.openMoreMapsDropdown = function () {
 
     var grid = document.getElementById('more-maps-grid');
     if (grid) {
-        grid.innerHTML = links.map(function(link) {
+        grid.innerHTML = links.map(function (link) {
             if (link.onclick) {
                 return '<a href="#" class="external-link-btn ' + link.cls + ' more-map-link" onclick="' + link.onclick + ' event.preventDefault();">' +
                     '<i class="' + link.icon + '"></i> ' + link.label + '</a>';

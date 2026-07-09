@@ -2,7 +2,7 @@
     <div class="header-nav-slot"></div>
     <div class="header-branding">
         <div class="dashboard-title paraglider-title" onclick="if(window.Engine) Engine.showManual('about')" style="cursor:pointer; display: flex; flex-direction: column; align-items: center;">
-            <img src="img/logo.png?v=2026.05.22_v6" alt="Assistant Parapente" class="logo-image" style="max-height: 85px; width: auto; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />
+            <img src="img/logo.png?v=2026.07.10_v3" alt="Assistant Parapente" class="logo-image" style="max-height: 85px; width: auto; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />
         </div>
     </div>
 </div>
@@ -10,9 +10,16 @@
 <nav class="desktop-main-nav" id="desktop-main-nav" style="flex: 2; display: flex; justify-content: center; align-items: center; gap: 8px;">
     <button class="nav-menu-btn" data-target="SITES" onclick="if(window.Engine) Engine.startMode('SITES')"><i class="ri-map-pin-line"></i> Sites</button>
         <button class="nav-menu-btn" data-target="LOGBOOK" onclick="if(window.Engine) Engine.startMode('LOGBOOK')"><i class="ri-booklet-line"></i> Carnet</button>
-    <button class="nav-menu-btn" data-target="QCM" onclick="if(window.Engine) Engine.startMode('QCM')"><i class="ri-file-list-3-line"></i> QCM</button>
-    <button class="nav-menu-btn" data-target="LIBRARY" onclick="if(window.Engine) Engine.startMode('LIBRARY')"><i class="ri-book-open-line"></i> Biblio</button>
-    <button class="nav-menu-btn" data-target="STATS" onclick="if(window.Engine) Engine.showStats()"><i class="ri-bar-chart-2-line"></i> Stats</button>
+    <div class="theory-nav-group nav-dropdown" style="position: relative; display: flex; align-items: center;">
+        <button class="nav-menu-btn" data-target="THEORY" onclick="document.getElementById('theory-sub-bar').classList.toggle('active')">
+            <i class="ri-graduation-cap-line"></i> Théorie
+        </button>
+        <div id="theory-sub-bar" class="sub-bar nav-dropdown-menu" style="display: none; position: absolute; top: calc(100% + 5px); left: 50%; transform: translateX(-50%); background: var(--bg-card, #fff); border: 1px solid var(--border-color, #eee); border-radius: 8px; padding: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 1000; flex-direction: column; min-width: 120px;">
+            <button class="nav-menu-btn" data-target="QCM" onclick="document.getElementById('theory-sub-bar').classList.remove('active'); if(window.Engine) Engine.startMode('QCM')" style="width: 100%; justify-content: flex-start;"><i class="ri-file-list-3-line"></i> QCM</button>
+            <button class="nav-menu-btn" data-target="LIBRARY" onclick="document.getElementById('theory-sub-bar').classList.remove('active'); if(window.Engine) Engine.startMode('LIBRARY')" style="width: 100%; justify-content: flex-start;"><i class="ri-book-open-line"></i> Biblio</button>
+            <button class="nav-menu-btn" data-target="STATS" onclick="document.getElementById('theory-sub-bar').classList.remove('active'); if(window.Engine) Engine.showStats()" style="width: 100%; justify-content: flex-start;"><i class="ri-bar-chart-2-line"></i> Stats</button>
+        </div>
+    </div>
     <div style="width: 1px; height: 24px; background: rgba(150,150,150,0.2); margin: 0 4px;"></div>
     <button class="nav-menu-btn" data-target="MANUAL" onclick="if(window.Engine) Engine.showManual('about')"><i class="ri-book-read-line"></i> Mode d'emploi</button>
 </nav>

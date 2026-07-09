@@ -30,10 +30,10 @@ function getAngularDifference(angle1, angle2) {
  */
 function degreesToCardinal(deg) {
     if (typeof deg !== 'number' || isNaN(deg)) return "";
-    
+
     // Normaliser les degrés entre 0 et 360
     const normalizedDeg = ((deg % 360) + 360) % 360;
-    
+
     const directions = ["N", "NE", "E", "SE", "S", "SO", "O", "NO"];
     const index = Math.round(normalizedDeg / 45) % 8;
     return directions[index];
@@ -107,15 +107,15 @@ function evaluateSpotForecast(site, weather, userPreferences) {
     const orientations = (typeof site.orientation === 'string' && site.orientation.length > 0) ? site.orientation.split(',').map(v => v.trim()) : [];
     if (orientations.length > 0) {
         let ventCardinal = "";
-        
+
         if (weather.windCard && String(weather.windCard).trim() !== "") {
             ventCardinal = String(weather.windCard);
         } else if (weather.windDir !== undefined && weather.windDir !== null && String(weather.windDir).trim() !== "") {
             ventCardinal = degreesToCardinal(Number(weather.windDir));
         }
-        
+
         ventCardinal = ventCardinal.trim().toUpperCase();
-        
+
         if (!orientations.includes(ventCardinal)) {
             return { score: 0, flyable: false, reason: 'Mauvaise orientation', class: 'weather-unflyable', icon: 'ri-close-circle-fill' };
         }
@@ -128,7 +128,7 @@ function evaluateSpotForecast(site, weather, userPreferences) {
     // A. Note de Vitesse du Vent (0 à 100)
     const vIdeal = (userPreferences.vMin + userPreferences.vMax) / 2;
     const demiPlage = (userPreferences.vMax - userPreferences.vMin) / 2;
-    
+
     let scoreVentMoyen = 100;
     if (demiPlage > 0) {
         const ecartVent = Math.abs(weather.windSpeed - vIdeal);
@@ -154,7 +154,7 @@ function evaluateSpotForecast(site, weather, userPreferences) {
             }
         }
     }
-    
+
     if (windDirDeg === null && weather.windCard) {
         const CARD_TO_DEG = { "N": 0, "NE": 45, "E": 90, "SE": 135, "S": 180, "SO": 225, "O": 270, "NO": 315 };
         const cleanCard = String(weather.windCard).trim().toUpperCase();
@@ -168,10 +168,10 @@ function evaluateSpotForecast(site, weather, userPreferences) {
     const hasOrientation = site.orientation_ideale_deg !== undefined && site.orientation_ideale_deg !== null && windDirDeg !== null;
     let angularDiff = 0;
     let scoreOrientation = 100; // 100 par défaut si pas d'orientation idéale spécifiée
-    
+
     if (hasOrientation) {
         angularDiff = getAngularDifference(windDirDeg, site.orientation_ideale_deg);
-        
+
         // Logique de paliers pour le rendement en soaring / thermique
         if (angularDiff <= 11.25) {
             // Zone 1 : Parfait (±11.25°)
@@ -192,7 +192,7 @@ function evaluateSpotForecast(site, weather, userPreferences) {
 
     // C. Calcul du score final pondéré
     const finalScore = Math.round(
-        (scoreVentMoyen * SCORING_WEIGHTS.WIND_SPEED) + 
+        (scoreVentMoyen * SCORING_WEIGHTS.WIND_SPEED) +
         (scoreOrientation * SCORING_WEIGHTS.WIND_DIRECTION)
     ) || 0;
 

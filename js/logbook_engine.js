@@ -5,26 +5,26 @@ const LogbookEngine = {
     currentTab: 'history',
     currentFormType: 'vol',
 
-    init: function(mainEngine) {
+    init: function (mainEngine) {
         this.engine = mainEngine;
         this.loadData();
         this.initEquipment();
         console.log("LogbookEngine initialized.");
     },
 
-    normalizeString: function(str) {
+    normalizeString: function (str) {
         if (!str) return '';
         return str.toLowerCase()
-                  .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Enlève les accents
-                  .replace(/[^a-z0-9]/g, ''); // Enlève tout ce qui n'est pas alphanumérique
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Enlève les accents
+            .replace(/[^a-z0-9]/g, ''); // Enlève tout ce qui n'est pas alphanumérique
     },
 
-    show: function() {
+    show: function () {
         this.loadData();
         this.switchTab(this.currentTab);
     },
 
-    loadData: function() {
+    loadData: function () {
         const saved = localStorage.getItem('tp_logbook_data');
         if (saved) {
             try {
@@ -40,38 +40,119 @@ const LogbookEngine = {
         this.data.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
     },
 
-    saveData: function() {
+    saveData: function () {
         localStorage.setItem('tp_logbook_data', JSON.stringify(this.data));
-        
+
         // Trigger Cloud Sync if user is logged in
         if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.currentUser) {
             window.FirebaseAuthEngine.syncLogbookData(this.data);
         }
     },
 
-    initEquipment: function() {
+    initEquipment: function () {
         this.loadEquipmentData();
+        
+        // Populate dropdowns initially
+        this.populateEquipmentDropdowns();
+
+        const eqTypeSelect = document.getElementById('eq-type');
+        const windLimitsDiv = document.getElementById('eq-wind-limits');
+        
+        if (eqTypeSelect && windLimitsDiv) {
+            eqTypeSelect.addEventListener('change', function(e) {
+                windLimitsDiv.style.display = e.target.value === 'voile' ? 'flex' : 'none';
+            });
+            // Initiale state
+            windLimitsDiv.style.display = eqTypeSelect.value === 'voile' ? 'flex' : 'none';
+        }
+
+        // Setup event listeners for the dropdowns
+        const setupAutreListener = (selectId, autreId) => {
+            const selectEl = document.getElementById(selectId);
+            const autreEl = document.getElementById(autreId);
+            if (selectEl && autreEl) {
+                selectEl.addEventListener('change', () => {
+                    autreEl.style.display = (selectEl.value === 'Autre') ? 'block' : 'none';
+                    if (selectEl.value !== 'Autre') {
+                        autreEl.value = '';
+                    }
+                    this.updateEquipmentNomPreview();
+                });
+                autreEl.addEventListener('input', () => {
+                    this.updateEquipmentNomPreview();
+                });
+            }
+        };
+
+        setupAutreListener('eq-marque', 'eq-marque-autre');
+        setupAutreListener('eq-modele', 'eq-modele-autre');
+        setupAutreListener('eq-taille', 'eq-taille-autre');
+        setupAutreListener('eq-couleur', 'eq-couleur-autre');
 
         const equipForm = document.getElementById('equip-form');
         if (equipForm) {
             equipForm.onsubmit = (e) => {
                 e.preventDefault();
-                
+
                 const idEdit = document.getElementById('eq-id-edit').value;
                 const periodicite = parseInt(document.getElementById('eq-periodicite').value, 10);
                 const periodiciteHeures = parseInt(document.getElementById('eq-periodicite-heures').value, 10);
                 const dateAchat = document.getElementById('eq-achat').value;
                 const derniereRevision = document.getElementById('eq-derniere-revision').value;
                 
+                const type = document.getElementById('eq-type').value;
+
+                // Extraire Marque, Modele, Taille, Couleur avec la logique "Autre"
+                const getValOrAutre = (selectId, autreId, localStorageKey, defaultList) => {
+                    const selectEl = document.getElementById(selectId);
+                    if (!selectEl) return '';
+                    let value = selectEl.value;
+                    if (value === 'Autre') {
+                        const inputEl = document.getElementById(autreId);
+                        const rawVal = inputEl ? inputEl.value.trim() : '';
+                        if (rawVal) {
+                            value = rawVal;
+                            // Enregistrer dans localStorage
+                            let customVals = [];
+                            try {
+                                const stored = localStorage.getItem(localStorageKey);
+                                if (stored) customVals = JSON.parse(stored);
+                            } catch(err){}
+                            if (!Array.isArray(customVals)) customVals = [];
+                            if (!customVals.includes(value) && !defaultList.includes(value)) {
+                                customVals.push(value);
+                                localStorage.setItem(localStorageKey, JSON.stringify(customVals));
+                            }
+                        } else {
+                            value = '';
+                        }
+                    }
+                    return value;
+                };
+
+                const marque = getValOrAutre('eq-marque', 'eq-marque-autre', 'customEquipMarques', ['Advance', 'BGD', 'Gin', 'Niviuk', 'Ozone', 'Phi', 'Nova', 'Supair', 'Skywalk', 'Triple Seven', 'AirDesign', 'Flow']);
+                const modele = getValOrAutre('eq-modele', 'eq-modele-autre', 'customEquipModeles', []);
+                const taille = getValOrAutre('eq-taille', 'eq-taille-autre', 'customEquipTailles', ['XS', 'S', 'M', 'ML', 'L', 'XL']);
+                const couleur = getValOrAutre('eq-couleur', 'eq-couleur-autre', 'customEquipCouleurs', ['Rouge', 'Bleu', 'Vert', 'Jaune', 'Orange', 'Blanc', 'Noir', 'Gris', 'Violet', 'Rose']);
+
                 const equipDataObj = {
-                    nom: document.getElementById('eq-nom').value,
-                    type: document.getElementById('eq-type').value,
+                    nom: document.getElementById('eq-nom').value.trim() || `${marque} ${modele}`.trim(),
+                    marque: marque,
+                    modele: modele,
+                    taille: taille,
+                    couleur: couleur,
+                    type: type,
                     dateAchat: dateAchat,
                     derniereRevision: derniereRevision,
                     periodicite: periodicite,
                     periodiciteHeures: periodiciteHeures,
                     statut: 'actif'
                 };
+                
+                if (type === 'voile') {
+                    equipDataObj.ventMin = parseInt(document.getElementById('eq-vent-min').value, 10) || 0;
+                    equipDataObj.ventMax = parseInt(document.getElementById('eq-vent-max').value, 10) || 25;
+                }
 
                 let currentEquip = JSON.parse(localStorage.getItem('tp_equipment_data')) || [];
                 let savedEquip = null;
@@ -94,7 +175,7 @@ const LogbookEngine = {
                 }
 
                 localStorage.setItem('tp_equipment_data', JSON.stringify(currentEquip));
-                
+
                 // Mettre à jour l'instance
                 if (typeof LogbookEngine !== 'undefined') {
                     LogbookEngine.equipData = currentEquip;
@@ -125,7 +206,7 @@ const LogbookEngine = {
         }
     },
 
-    loadEquipmentData: function() {
+    loadEquipmentData: function () {
         const saved = localStorage.getItem('tp_equipment_data');
         if (saved) {
             try {
@@ -139,7 +220,7 @@ const LogbookEngine = {
         }
     },
 
-    saveEquipmentData: function() {
+    saveEquipmentData: function () {
         localStorage.setItem('tp_equipment_data', JSON.stringify(this.equipData));
         if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.currentUser) {
             if (typeof window.FirebaseAuthEngine.syncEquipmentData === 'function') {
@@ -148,9 +229,113 @@ const LogbookEngine = {
         }
     },
 
-    switchTab: function(tabName) {
-        this.currentTab = tabName;
+    setSelectOrAutre: function(selectId, autreId, value) {
+        const selectEl = document.getElementById(selectId);
+        const autreEl = document.getElementById(autreId);
+        if (!selectEl) return;
+        if (!value) {
+            selectEl.value = '';
+            if (autreEl) {
+                autreEl.style.display = 'none';
+                autreEl.value = '';
+            }
+            return;
+        }
         
+        const options = Array.from(selectEl.options).map(o => o.value);
+        if (options.includes(value)) {
+            selectEl.value = value;
+            if (autreEl) {
+                autreEl.style.display = 'none';
+                autreEl.value = '';
+            }
+        } else {
+            selectEl.value = 'Autre';
+            if (autreEl) {
+                autreEl.style.display = 'block';
+                autreEl.value = value;
+            }
+        }
+    },
+
+    populateEquipmentDropdowns: function() {
+        const getUniqueValues = (field) => {
+            const vals = new Set();
+            if (Array.isArray(this.equipData)) {
+                this.equipData.forEach(e => {
+                    if (e[field]) vals.add(e[field].trim());
+                });
+            }
+            return Array.from(vals);
+        };
+
+        const populateSelect = (selectId, defaultList, storedKey, uniqueValues) => {
+            const selectEl = document.getElementById(selectId);
+            if (!selectEl) return;
+
+            let customVals = [];
+            try {
+                const stored = localStorage.getItem(storedKey);
+                if (stored) customVals = JSON.parse(stored);
+            } catch(e){}
+            if (!Array.isArray(customVals)) customVals = [];
+
+            const allValsSet = new Set([...defaultList, ...customVals, ...uniqueValues]);
+            const sortedVals = Array.from(allValsSet).filter(Boolean).sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
+
+            // Save back to local storage
+            const newCustomVals = sortedVals.filter(v => !defaultList.includes(v));
+            localStorage.setItem(storedKey, JSON.stringify(newCustomVals));
+
+            let html = '<option value="">-- Choisir ou Saisie Libre --</option>';
+            sortedVals.forEach(val => {
+                html += `<option value="${val}">${val}</option>`;
+            });
+            html += '<option value="Autre">Autre...</option>';
+            selectEl.innerHTML = html;
+        };
+
+        populateSelect('eq-marque', ['Advance', 'BGD', 'Gin', 'Niviuk', 'Ozone', 'Phi', 'Nova', 'Supair', 'Skywalk', 'Triple Seven', 'AirDesign', 'Flow'], 'customEquipMarques', getUniqueValues('marque'));
+        populateSelect('eq-modele', [], 'customEquipModeles', getUniqueValues('modele'));
+        populateSelect('eq-taille', ['XS', 'S', 'M', 'ML', 'L', 'XL'], 'customEquipTailles', getUniqueValues('taille'));
+        populateSelect('eq-couleur', ['Rouge', 'Bleu', 'Vert', 'Jaune', 'Orange', 'Blanc', 'Noir', 'Gris', 'Violet', 'Rose'], 'customEquipCouleurs', getUniqueValues('couleur'));
+    },
+
+    updateEquipmentNomPreview: function() {
+        const marqueEl = document.getElementById('eq-marque');
+        const modeleEl = document.getElementById('eq-modele');
+        const tailleEl = document.getElementById('eq-taille');
+        const couleurEl = document.getElementById('eq-couleur');
+        const nomEl = document.getElementById('eq-nom');
+
+        if (!nomEl) return;
+
+        const getVal = (selectEl, autreId) => {
+            if (!selectEl) return '';
+            if (selectEl.value === 'Autre') {
+                const autreEl = document.getElementById(autreId);
+                return autreEl ? autreEl.value.trim() : '';
+            }
+            return selectEl.value;
+        };
+
+        const marque = getVal(marqueEl, 'eq-marque-autre');
+        const modele = getVal(modeleEl, 'eq-modele-autre');
+        const taille = getVal(tailleEl, 'eq-taille-autre');
+        const couleur = getVal(couleurEl, 'eq-couleur-autre');
+
+        let generatedNom = "";
+        if (marque) generatedNom += marque;
+        if (modele) generatedNom += (generatedNom ? " | " : "") + modele;
+        if (couleur) generatedNom += (generatedNom ? " | " : "") + couleur;
+        if (taille) generatedNom += (generatedNom ? " | " : "") + taille;
+
+        nomEl.value = generatedNom.toUpperCase();
+    },
+
+    switchTab: function (tabName) {
+        this.currentTab = tabName;
+
         // Update Buttons
         document.querySelectorAll('.logbook-tab-btn').forEach(btn => {
             btn.classList.remove('active');
@@ -177,20 +362,20 @@ const LogbookEngine = {
         }
     },
 
-    setFormType: function(type) {
+    setFormType: function (type) {
         if (this.currentFormType === type) return;
 
         // 1. Sauvegarder les valeurs des champs communs
         const editId = document.getElementById('lb-id-edit')?.value || '';
         const datetime = document.getElementById('lb-datetime')?.value || '';
-        const location = this.currentFormType === 'vol' ? 
-            document.getElementById('lb-site')?.value : 
+        const location = this.currentFormType === 'vol' ?
+            document.getElementById('lb-site')?.value :
             document.getElementById('lb-lieu')?.value;
-        
+
         const voile = document.getElementById('lb-voile')?.value || '';
         const voileAutre = document.getElementById('lb-voile-autre')?.value || '';
         const voileAutreVisible = document.getElementById('lb-voile-autre')?.style.display === 'block';
-        
+
         const sellette = document.getElementById('lb-sellette')?.value || '';
         const selletteAutre = document.getElementById('lb-sellette-autre')?.value || '';
         const selletteAutreVisible = document.getElementById('lb-sellette-autre')?.style.display === 'block';
@@ -202,10 +387,10 @@ const LogbookEngine = {
         const cancelBtnVisible = document.getElementById('lb-cancel-btn')?.style.display || 'none';
 
         this.currentFormType = type;
-        
+
         document.getElementById('btn-type-vol').classList.toggle('active', type === 'vol');
         document.getElementById('btn-type-gonflage').classList.toggle('active', type === 'gonflage');
-        
+
         this.renderForm();
 
         // 2. Réinjecter les valeurs dans le nouveau formulaire
@@ -263,7 +448,7 @@ const LogbookEngine = {
         if (cancelBtn) cancelBtn.style.display = cancelBtnVisible;
     },
 
-    getCurrentDateTimeLocal: function() {
+    getCurrentDateTimeLocal: function () {
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -273,7 +458,7 @@ const LogbookEngine = {
         return `${year}-${month}-${day}T${hours}:${minutes}`;
     },
 
-    renderForm: function() {
+    renderForm: function () {
         const container = document.getElementById('form-fields-container');
         if (!container) return;
 
@@ -335,15 +520,15 @@ const LogbookEngine = {
                         <option value="Face voile">Face voile</option>
                         <option value="Dos voile">Dos voile</option>
                         ${(() => {
-                            try {
-                                const stored = localStorage.getItem('customDecollageTechniques');
-                                if (stored) {
-                                    const parsed = JSON.parse(stored);
-                                    if (Array.isArray(parsed)) return parsed.map(t => `<option value="${t}">${t}</option>`).join('');
-                                }
-                            } catch(e) {}
-                            return '';
-                        })()}
+                    try {
+                        const stored = localStorage.getItem('customDecollageTechniques');
+                        if (stored) {
+                            const parsed = JSON.parse(stored);
+                            if (Array.isArray(parsed)) return parsed.map(t => `<option value="${t}">${t}</option>`).join('');
+                        }
+                    } catch (e) { }
+                    return '';
+                })()}
                         <option value="Autre">Autre...</option>
                     </select>
                     <input type="text" id="lb-tech-decollage-autre" placeholder="Spécifiez la technique..." style="display:none; margin-top: 5px; width: 100%;">
@@ -426,7 +611,7 @@ const LogbookEngine = {
         }
     },
 
-    populateDropdowns: function() {
+    populateDropdowns: function () {
         // Populate Sites
         const datalist = document.getElementById('sites-list');
         if (datalist && typeof SITES_DATA !== 'undefined') {
@@ -447,7 +632,7 @@ const LogbookEngine = {
         // Populate Equipment
         const voilesSelect = document.getElementById('lb-voile');
         const sellettesSelect = document.getElementById('lb-sellette');
-        
+
         let voilesHtml = '<option value="">-- Saisie libre (ou choisir) --</option>';
         let sellettesHtml = '<option value="">-- Saisie libre (ou choisir) --</option>';
 
@@ -472,7 +657,7 @@ const LogbookEngine = {
         }
     },
 
-    fillLastEquipment: function() {
+    fillLastEquipment: function () {
         // Automatically fill voile and sellette with the last used ones
         if (this.data.length > 0) {
             const lastSession = this.data[0];
@@ -485,7 +670,7 @@ const LogbookEngine = {
 
     currentTraceData: null,
 
-    handleIgcUpload: function(event) {
+    handleIgcUpload: function (event) {
         const file = event.target.files[0];
         if (!file) return;
 
@@ -499,7 +684,7 @@ const LogbookEngine = {
                 const parsed = IGCParser.parse(text);
                 if (parsed && parsed.points && parsed.points.length > 0) {
                     this.currentTraceData = parsed.points;
-                    
+
                     const durationInput = document.getElementById('lb-duree');
                     if (durationInput && parsed.duration > 0) {
                         durationInput.value = parsed.duration;
@@ -544,11 +729,11 @@ const LogbookEngine = {
         reader.readAsText(file);
     },
 
-    submitForm: function() {
+    submitForm: function () {
         const datetime = document.getElementById('lb-datetime').value;
         let voile = document.getElementById('lb-voile').value.trim();
         let sellette = document.getElementById('lb-sellette') ? document.getElementById('lb-sellette').value.trim() : '';
-        
+
         if (voile === 'Autre') {
             const voileAutreInput = document.getElementById('lb-voile-autre');
             voile = voileAutreInput ? voileAutreInput.value.trim() : "";
@@ -575,7 +760,7 @@ const LogbookEngine = {
         if (this.currentFormType === 'vol') {
             session.site = document.getElementById('lb-site').value.trim();
             session.typeVol = document.getElementById('lb-typeVol').value;
-            
+
             const techDecoEl = document.getElementById('lb-tech-decollage');
             if (techDecoEl) {
                 let techDecollage = techDecoEl.value;
@@ -585,13 +770,13 @@ const LogbookEngine = {
                     if (rawTech) {
                         rawTech = rawTech.charAt(0).toUpperCase() + rawTech.slice(1).toLowerCase();
                         techDecollage = rawTech;
-                        
+
                         let customTechs = [];
                         try {
                             const stored = localStorage.getItem('customDecollageTechniques');
                             if (stored) customTechs = JSON.parse(stored);
-                        } catch(e) {}
-                        
+                        } catch (e) { }
+
                         if (Array.isArray(customTechs) && !customTechs.includes(techDecollage) && techDecollage !== 'Face voile' && techDecollage !== 'Dos voile') {
                             customTechs.push(techDecollage);
                             localStorage.setItem('customDecollageTechniques', JSON.stringify(customTechs));
@@ -600,13 +785,13 @@ const LogbookEngine = {
                 }
                 session.techDecollage = techDecollage;
             }
-            
+
             const altMax = document.getElementById('lb-altMax').value;
             if (altMax) session.altitudeMax = parseInt(altMax, 10);
-            
+
             const gain = document.getElementById('lb-gain').value;
             if (gain) session.gain = parseInt(gain, 10);
-            
+
             if (this.currentTraceData) {
                 session.traceGps = this.currentTraceData;
                 if (this.currentTraceData.length > 0) {
@@ -641,9 +826,9 @@ const LogbookEngine = {
         }
 
         this.data.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
-        
+
         this.saveData();
-        
+
         // Show success, reset and go to history
         alert(editId ? "Session modifiée avec succès !" : "Session enregistrée avec succès !");
         this.resetForm();
@@ -660,12 +845,12 @@ const LogbookEngine = {
             if (siteName && typeof SITES_DATA !== 'undefined') {
                 const sessionSiteStr = this.normalizeString(siteName);
                 console.log("[Météo Logbook] Saisie normalisée :", sessionSiteStr);
-                
+
                 const foundSite = SITES_DATA.find(s => {
                     const dataSiteStr = this.normalizeString(s.nom || "");
                     return dataSiteStr === sessionSiteStr || dataSiteStr.includes(sessionSiteStr) || sessionSiteStr.includes(dataSiteStr);
                 });
-                
+
                 if (foundSite) {
                     console.log("[Météo Logbook] Site trouvé :", foundSite.nom);
                     if (foundSite.lat && foundSite.lon) {
@@ -702,7 +887,7 @@ const LogbookEngine = {
         }
     },
 
-    resetForm: function() {
+    resetForm: function () {
         const form = document.getElementById('logbook-add-form');
         if (form) form.reset();
         const idEditField = document.getElementById('lb-id-edit');
@@ -717,25 +902,25 @@ const LogbookEngine = {
         this.renderForm();
     },
 
-    editEntry: function(id) {
+    editEntry: function (id) {
         const session = this.data.find(s => s.id === id);
         if (!session) return;
 
         this.currentFormType = session.type;
-        
+
         // Change la vue en premier pour générer les champs HTML
         this.switchTab('add');
 
         // Populate common fields
         document.getElementById('lb-id-edit').value = session.id;
         document.getElementById('lb-datetime').value = session.datetime;
-        
+
         // Helper pour "Autre..."
         const setSelectOrAutre = (selectId, autreId, value) => {
             const selectEl = document.getElementById(selectId);
             const autreEl = document.getElementById(autreId);
             if (!selectEl || !value) return;
-            
+
             // On regarde si la valeur existe dans les options
             const options = Array.from(selectEl.options).map(o => o.value);
             if (options.includes(value)) {
@@ -752,7 +937,7 @@ const LogbookEngine = {
 
         setSelectOrAutre('lb-voile', 'lb-voile-autre', session.voile);
         setSelectOrAutre('lb-sellette', 'lb-sellette-autre', session.sellette);
-        
+
         document.getElementById('lb-duree').value = session.duree;
         document.getElementById('lb-commentaire').value = session.commentaire || '';
 
@@ -760,15 +945,15 @@ const LogbookEngine = {
         if (session.type === 'vol') {
             document.getElementById('lb-site').value = session.site || '';
             document.getElementById('lb-typeVol').value = session.typeVol || 'Plouf';
-            
+
             setSelectOrAutre('lb-tech-decollage', 'lb-tech-decollage-autre', session.techDecollage);
 
             if (session.altitudeMax) document.getElementById('lb-altMax').value = session.altitudeMax;
             if (session.gain) document.getElementById('lb-gain').value = session.gain;
-            
+
             if (session.traceGps && session.traceGps.length > 0) {
-                 const filenameLabel = document.getElementById('igc-upload-filename');
-                 if (filenameLabel) filenameLabel.textContent = "Trace GPS (existante)";
+                const filenameLabel = document.getElementById('igc-upload-filename');
+                if (filenameLabel) filenameLabel.textContent = "Trace GPS (existante)";
             }
         } else {
             document.getElementById('lb-lieu').value = session.lieu || '';
@@ -791,40 +976,40 @@ const LogbookEngine = {
         if (formEl) formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     },
 
-    deleteEntry: function(id) {
+    deleteEntry: function (id) {
         if (confirm("Voulez-vous vraiment supprimer cette session ?")) {
             this.data = this.data.filter(s => s.id !== id);
             this.saveData();
-            
+
             // Sync deletion to cloud if implemented
             if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.currentUser) {
                 window.FirebaseAuthEngine.deleteLogbookEntry(id);
             }
-            
+
             this.renderHistory();
         }
     },
 
-    formatDuration: function(minutes) {
+    formatDuration: function (minutes) {
         const h = Math.floor(minutes / 60);
         const m = minutes % 60;
         if (h === 0) return `${m}min`;
         return `${h}h ${m.toString().padStart(2, '0')}min`;
     },
 
-    formatDate: function(dateStr) {
+    formatDate: function (dateStr) {
         const d = new Date(dateStr);
-        return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) + 
-               ' à ' + 
-               d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute:'2-digit' });
+        return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+            ' à ' +
+            d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     },
 
-    formatDateOnly: function(dateStr) {
+    formatDateOnly: function (dateStr) {
         const d = new Date(dateStr);
         return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
     },
 
-    renderHistory: function() {
+    renderHistory: function () {
         const container = document.getElementById('logbook-history-list');
         if (!container) return;
 
@@ -846,14 +1031,14 @@ const LogbookEngine = {
             const typeColor = isVol ? 'var(--accent-blue)' : '#f59e0b';
             const location = isVol ? session.site : session.lieu;
             const subtitle = isVol ? session.typeVol : (Array.isArray(session.typeExercice) ? session.typeExercice.join(', ') : session.typeExercice);
-            
+
             let extraInfo = '';
             if (isVol) {
                 const badgeStyle = "background: var(--bg-card-hover, rgba(0,0,0,0.05)); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-light, rgba(0,0,0,0.05)); font-weight: 500; display: inline-flex; align-items: center; gap: 4px;";
                 let decoInfo = session.techDecollage ? `<span style="${badgeStyle}" title="Décollage"><i class="ri-takeaway-line"></i> Décollage : ${session.techDecollage}</span>` : '';
                 let altInfo = session.altitudeMax ? `<span style="${badgeStyle}" title="Alt Max">⛰️ Alt Max : ${session.altitudeMax}m</span>` : '';
                 let gainInfo = (session.gain !== undefined && session.gain !== null && session.gain !== '') ? `<span style="${badgeStyle}" title="Gain">📈 Gain : ${session.gain}m</span>` : '';
-                
+
                 if (decoInfo || altInfo || gainInfo) {
                     extraInfo = `<div class="session-extra-info" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; font-size: 0.82rem; color: var(--text-secondary);">
                         ${decoInfo}
@@ -868,7 +1053,7 @@ const LogbookEngine = {
                 const m = session.meteo;
                 const weatherIcon = m.weatherCode !== null && m.weatherCode !== undefined ? this.getWeatherEmoji(m.weatherCode) : '🌤️';
                 const dirStr = m.ventDirection !== null && m.ventDirection !== undefined ? this.getWindDirectionString(m.ventDirection) : '';
-                
+
                 meteoHtml = `
                 <div class="logbook-card-weather" style="margin-top: 10px; padding: 10px; background: rgba(14,165,233,0.06); border-radius: var(--radius-sm); border: 1px solid rgba(14,165,233,0.15); display: flex; align-items: center; gap: 12px; font-size: 0.85rem; color: var(--text-secondary); flex-wrap: wrap;">
                     <span title="Température"><strong>${weatherIcon} ${m.temperature}°C</strong></span>
@@ -926,7 +1111,7 @@ const LogbookEngine = {
         container.innerHTML = html;
     },
 
-    showTrace: function(sessionId) {
+    showTrace: function (sessionId) {
         const container = document.getElementById(`trace-container-${sessionId}`);
         if (!container) return;
 
@@ -948,7 +1133,7 @@ const LogbookEngine = {
         }
     },
 
-    renderStats: function() {
+    renderStats: function () {
         const container = document.getElementById('logbook-stats-container');
         if (!container) return;
 
@@ -966,13 +1151,13 @@ const LogbookEngine = {
         let totalTimeVols = 0;
         let totalGonflages = 0;
         let totalTimeGonflages = 0;
-        
+
         let equipStats = {}; // { voileName: { vols: 0, timeVols: 0, gonflages: 0, timeGonflages: 0 } }
         let sitesStats = {}; // { siteName: count }
         let volTypes = {};   // { typeName: count }
         let exoTypes = {};   // { typeName: count }
         let decoTypes = {};  // { typeName: count }
-        
+
         let maxAltitudeReached = 0;
         let totalGain = 0;
 
@@ -980,7 +1165,7 @@ const LogbookEngine = {
             if (s.type === 'vol') {
                 totalVols++;
                 totalTimeVols += s.duree;
-                
+
                 // Location
                 sitesStats[s.site] = (sitesStats[s.site] || 0) + 1;
                 // Type
@@ -996,11 +1181,11 @@ const LogbookEngine = {
                 if (s.gain && s.gain > 0) {
                     totalGain += s.gain;
                 }
-                
+
             } else {
                 totalGonflages++;
                 totalTimeGonflages += s.duree;
-                
+
                 // Location
                 sitesStats[s.lieu] = (sitesStats[s.lieu] || 0) + 1;
                 // Type
@@ -1131,7 +1316,7 @@ const LogbookEngine = {
         // Techniques de déco
         if (Object.keys(decoTypes).length > 0) {
             html += `<h3 class="stats-section-title">Techniques de décollage</h3><div class="chart-container">`;
-            let totalDeco = Object.values(decoTypes).reduce((a,b) => a+b, 0);
+            let totalDeco = Object.values(decoTypes).reduce((a, b) => a + b, 0);
             for (const [type, count] of Object.entries(decoTypes)) {
                 const percent = (count / totalDeco) * 100;
                 html += `
@@ -1168,9 +1353,9 @@ const LogbookEngine = {
         container.innerHTML = html;
     },
 
-    calculateNextRevision: function(equip) {
+    calculateNextRevision: function (equip) {
         if (!equip.periodicite || equip.periodicite <= 0) return null;
-        
+
         // Date de référence: dernière révision, ou date d'achat, ou rien
         let refDateStr = equip.derniereRevision || equip.dateAchat;
         if (!refDateStr) return null;
@@ -1184,7 +1369,7 @@ const LogbookEngine = {
         return nextRevDate;
     },
 
-    renderEquipment: function() {
+    renderEquipment: function () {
         const container = document.getElementById('logbook-equip-container');
         if (!container) return;
 
@@ -1204,7 +1389,7 @@ const LogbookEngine = {
         this.data.forEach(s => {
             const voileName = (s.voile || "").toLowerCase();
             const selletteName = (s.sellette || "").toLowerCase();
-            
+
             if (equipStats[voileName]) {
                 equipStats[voileName].totalSessions++;
                 equipStats[voileName].totalTime += s.duree;
@@ -1225,14 +1410,14 @@ const LogbookEngine = {
             html += `<div class="equip-list">`;
             sortedEquip.forEach(equip => {
                 const stats = equipStats[equip.nom.toLowerCase()];
-                
+
                 let alertHtml = '';
                 let statusClass = 'status-ok';
                 let revisionDateStr = '';
-                
+
                 // Calcul par Temps
                 const nextRevDate = this.calculateNextRevision(equip) || (equip.dateControle ? new Date(equip.dateControle) : null);
-                
+
                 let diffDays = Infinity;
                 if (nextRevDate) {
                     revisionDateStr = this.formatDateOnly(nextRevDate.toISOString().split('T')[0]);
@@ -1244,7 +1429,7 @@ const LogbookEngine = {
                 let hoursWarning = false;
                 let hoursRemaining = null;
                 const equipHours = stats ? (stats.totalTime / 60) : 0;
-                
+
                 if (equip.periodiciteHeures && equip.periodiciteHeures > 0) {
                     hoursRemaining = equip.periodiciteHeures - equipHours;
                     if (hoursRemaining <= 0) {
@@ -1253,21 +1438,21 @@ const LogbookEngine = {
                         hoursWarning = true;
                     }
                 }
-                
+
                 // Logique des alertes combinées (OU)
                 if (diffDays < 0 || hoursExceeded) {
                     statusClass = 'status-danger';
                     let reason = [];
                     if (diffDays < 0) reason.push(`Date dépassée (${revisionDateStr})`);
                     if (hoursExceeded) reason.push(`Heures dépassées (${Math.round(equipHours)}h / ${equip.periodiciteHeures}h)`);
-                    
+
                     alertHtml = `<div class="equip-alert text-danger" style="color:#ef4444; font-weight:bold; margin-bottom:8px;"><i class="ri-tools-line"></i> ⚠️ ATTENTION : Révision requise - ${reason.join(' ET ')}</div>`;
                 } else if (diffDays <= 30 || hoursWarning) {
                     statusClass = 'status-warning';
                     let reason = [];
                     if (diffDays <= 30 && diffDays !== Infinity) reason.push(`Dans ${diffDays} jours`);
                     if (hoursWarning) reason.push(`Dans ${Math.round(hoursRemaining)}h`);
-                    
+
                     alertHtml = `<div class="equip-alert text-warning" style="color:#f59e0b; font-weight:bold; margin-bottom:8px;"><i class="ri-tools-line"></i> ⚠️ À réviser bientôt : ${reason.join(' OU ')}</div>`;
                 }
 
@@ -1277,12 +1462,18 @@ const LogbookEngine = {
                     'secours': 'background: rgba(239, 68, 68, 0.1); color: #ef4444;',
                     'accessoire': 'background: rgba(156, 163, 175, 0.1); color: #9ca3af;'
                 };
-                
+
                 const equipIcon = equip.type === 'voile' ? 'ri-parachute-line' : equip.type === 'sellette' ? 'ri-shield-line' : equip.type === 'secours' ? 'ri-lifebuoy-line' : 'ri-settings-4-line';
 
-                
+
                 const isArchive = equip.statut === 'archive';
                 const cardStyle = isArchive ? 'opacity: 0.6; filter: grayscale(0.8);' : '';
+
+                let detailsStr = [];
+                if (equip.marque) detailsStr.push(`<strong>Marque:</strong> ${equip.marque}`);
+                if (equip.modele) detailsStr.push(`<strong>Modèle:</strong> ${equip.modele}`);
+                if (equip.taille) detailsStr.push(`<strong>Taille:</strong> ${equip.taille}`);
+                if (equip.couleur) detailsStr.push(`<strong>Couleur:</strong> ${equip.couleur}`);
 
                 html += `
                     <div class="equip-card ${statusClass}" style="${cardStyle} border:1px solid #eee; padding:15px; border-radius:8px; margin-bottom:15px; background:var(--bg-card);">
@@ -1292,6 +1483,7 @@ const LogbookEngine = {
                                 ${equip.nom}
                                 <span class="session-badge" style="margin-left: 8px; font-size:0.75rem; padding:2px 6px; border-radius:4px; ${typeBadgeColors[equip.type] || ''}">${equip.type.toUpperCase()}</span>
                                 ${isArchive ? '<span class="session-badge" style="margin-left: 4px; background: #333; color: white; font-size:0.75rem; padding:2px 6px; border-radius:4px;">ARCHIVÉ</span>' : ''}
+                                ${detailsStr.length > 0 ? `<div style="font-size:0.85rem; color:var(--text-secondary, #6b7280); font-weight:normal; margin-top:4px; display:flex; gap:10px; flex-wrap:wrap;">${detailsStr.join(' | ')}</div>` : ''}
                             </div>
                             <div class="equip-actions" style="display:flex; gap:8px;">
                                 <button class="action-btn" onclick="LogbookEngine.editEquipment('${equip.id}')" title="Modifier" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:var(--accent-blue);">
@@ -1314,6 +1506,7 @@ const LogbookEngine = {
                             ${equip.derniereRevision ? `<span class="detail-item"><strong>Dernière révision:</strong> ${this.formatDateOnly(equip.derniereRevision)}</span>` : ''}
                             ${nextRevDate ? `<span class="detail-item"><strong>Prochaine révision:</strong> ${revisionDateStr}</span>` : ''}
                             ${hoursRemaining !== null ? `<span class="detail-item"><strong>Heures avant révision:</strong> ${hoursRemaining <= 0 ? `<span style="color:#ef4444; font-weight:bold;">Dépassé de ${Math.abs(Math.round(hoursRemaining * 10) / 10)}h</span>` : `${Math.round(hoursRemaining * 10) / 10}h`} (sur ${equip.periodiciteHeures}h)</span>` : ''}
+                            ${equip.type === 'voile' && equip.ventMin !== undefined ? `<span class="detail-item"><strong>Plage de Vent:</strong> ${equip.ventMin} - ${equip.ventMax} km/h</span>` : ''}
                         </div>
                     </div>
                 `;
@@ -1324,16 +1517,37 @@ const LogbookEngine = {
         container.innerHTML = html;
     },
 
-    editEquipment: function(id) {
+    editEquipment: function (id) {
         const equip = this.equipData.find(e => e.id === id);
         if (!equip) return;
 
         document.getElementById('eq-id-edit').value = equip.id;
         document.getElementById('eq-nom').value = equip.nom || '';
-        document.getElementById('eq-type').value = equip.type || 'voile';
+
+        // Populate and set dropdowns for brand, model, size, color
+        this.populateEquipmentDropdowns();
+        this.setSelectOrAutre('eq-marque', 'eq-marque-autre', equip.marque || '');
+        this.setSelectOrAutre('eq-modele', 'eq-modele-autre', equip.modele || '');
+        this.setSelectOrAutre('eq-taille', 'eq-taille-autre', equip.taille || '');
+        this.setSelectOrAutre('eq-couleur', 'eq-couleur-autre', equip.couleur || '');
+        
+        const typeSelect = document.getElementById('eq-type');
+        typeSelect.value = equip.type || 'voile';
+        
+        const windLimitsDiv = document.getElementById('eq-wind-limits');
+        if (windLimitsDiv) {
+            windLimitsDiv.style.display = typeSelect.value === 'voile' ? 'flex' : 'none';
+        }
+
+        const minField = document.getElementById('eq-vent-min');
+        if (minField) minField.value = equip.ventMin !== undefined ? equip.ventMin : 0;
+        
+        const maxField = document.getElementById('eq-vent-max');
+        if (maxField) maxField.value = equip.ventMax !== undefined ? equip.ventMax : 25;
+
         document.getElementById('eq-achat').value = equip.dateAchat || '';
         document.getElementById('eq-derniere-revision').value = equip.derniereRevision || '';
-        
+
         const periodiciteSelect = document.getElementById('eq-periodicite');
         if (equip.periodicite !== undefined) {
             periodiciteSelect.value = equip.periodicite;
@@ -1358,15 +1572,15 @@ const LogbookEngine = {
         document.getElementById('equip-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
     },
 
-    deleteEquipment: function(id) {
+    deleteEquipment: function (id) {
         if (confirm("Voulez-vous vraiment supprimer définitivement cet équipement ?")) {
             // Remove from local array
             this.equipData = this.equipData.filter(e => e.id !== id);
             this.saveEquipmentData();
-            
+
             // Re-render
             this.renderEquipment();
-            
+
             // Delete from Cloud
             if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.currentUser && typeof window.FirebaseAuthEngine.deleteEquipmentEntry === 'function') {
                 window.FirebaseAuthEngine.deleteEquipmentEntry(id);
@@ -1374,24 +1588,39 @@ const LogbookEngine = {
         }
     },
 
-    resetEquipmentForm: function() {
+    resetEquipmentForm: function () {
         const form = document.getElementById('equip-form');
         if (form) form.reset();
+
+        // Hide all "Autre" text inputs
+        ['eq-marque-autre', 'eq-modele-autre', 'eq-taille-autre', 'eq-couleur-autre'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.display = 'none';
+                el.value = '';
+            }
+        });
         
+        const windLimitsDiv = document.getElementById('eq-wind-limits');
+        if (windLimitsDiv) windLimitsDiv.style.display = 'flex'; // Default type is 'voile'
+
         const idEditField = document.getElementById('eq-id-edit');
         if (idEditField) idEditField.value = '';
-        
+
         const submitBtn = document.getElementById('eq-submit-btn');
         if (submitBtn) submitBtn.innerText = "Enregistrer l'équipement";
-        
+
         const cancelBtn = document.getElementById('eq-cancel-btn');
         if (cancelBtn) cancelBtn.style.display = "none";
-        
+
         const formTitle = document.getElementById('eq-form-title');
         if (formTitle) formTitle.innerText = "Ajouter un Équipement";
+
+        // Refresh dropdown lists
+        this.populateEquipmentDropdowns();
     },
 
-    toggleEquipmentStatus: function(id) {
+    toggleEquipmentStatus: function (id) {
         const equip = this.equipData.find(e => e.id === id);
         if (equip) {
             equip.statut = equip.statut === 'actif' ? 'archive' : 'actif';
@@ -1400,7 +1629,7 @@ const LogbookEngine = {
         }
     },
 
-    getWeatherEmoji: function(code) {
+    getWeatherEmoji: function (code) {
         if (code === 0) return '☀️';
         if (code === 1 || code === 2) return '🌤️';
         if (code === 3) return '☁️';
@@ -1412,25 +1641,25 @@ const LogbookEngine = {
         return '☀️';
     },
 
-    getWindDirectionString: function(deg) {
+    getWindDirectionString: function (deg) {
         if (deg === null || deg === undefined) return '';
         const dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
         const val = Math.floor((deg / 22.5) + 0.5);
         return dirs[(val % 16)];
     },
 
-    forceWeatherRefresh: function(sessionId) {
+    forceWeatherRefresh: function (sessionId) {
         const session = this.data.find(s => s.id === sessionId);
         if (!session) return;
-        
+
         // 1. Immediately show loading state in the UI to remove any error banner
         const container = document.getElementById('weather-container-' + sessionId);
         if (container) {
             container.innerHTML = '<div style="color: var(--accent-blue); font-size: 0.85rem; padding: 8px 12px; background: rgba(14,165,233,0.08); border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 6px;"><i class="ri-loader-4-line ri-spin"></i> <strong>Récupération AROME en cours...</strong></div>';
         }
-        
+
         let lat = null, lon = null;
-        
+
         if (session.lat && session.lon) {
             lat = session.lat;
             lon = session.lon;
@@ -1440,12 +1669,12 @@ const LogbookEngine = {
             if (siteName && typeof SITES_DATA !== 'undefined') {
                 const sessionSiteStr = this.normalizeString(siteName);
                 console.log("[Météo Logbook] Saisie normalisée (Refresh) :", sessionSiteStr);
-                
+
                 const foundSite = SITES_DATA.find(s => {
                     const dataSiteStr = this.normalizeString(s.nom || "");
                     return dataSiteStr === sessionSiteStr || dataSiteStr.includes(sessionSiteStr) || sessionSiteStr.includes(dataSiteStr);
                 });
-                
+
                 if (foundSite) {
                     console.log("[Météo Logbook] Site trouvé au rafraîchissement :", foundSite.nom);
                     if (foundSite.lat && foundSite.lon) {
@@ -1459,7 +1688,7 @@ const LogbookEngine = {
                 }
             }
         }
-        
+
         if (lat && lon) {
             this.fetchWeatherForSession(lat, lon, session.datetime, session.id);
         } else {
@@ -1472,24 +1701,24 @@ const LogbookEngine = {
     },
 
     // --- WEATHER MODULE (Open-Meteo) ---
-    fetchWeatherForSession: async function(lat, lon, datetimeStr, sessionId) {
+    fetchWeatherForSession: async function (lat, lon, datetimeStr, sessionId) {
         try {
             const dateObj = new Date(datetimeStr);
             const dateStrQuery = datetimeStr.split('T')[0];
             const hour = dateObj.getHours(); // 0-23
-            
+
             // L'API Open-Meteo "forecast" avec start_date et end_date permet de récupérer
             // les données passées récentes. On utilise models=meteofrance_seamless qui encapsule AROME/ARPEGE.
             const parsedLat = parseFloat(lat);
             const parsedLon = parseFloat(lon);
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${parsedLat}&longitude=${parsedLon}&hourly=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code&wind_speed_unit=kmh&timezone=auto&start_date=${dateStrQuery}&end_date=${dateStrQuery}&models=meteofrance_seamless`;
-            
+
             console.log(`Fetching weather for session ${sessionId}...`);
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`Open-Meteo API error: ${response.status}`);
             }
-            
+
             const result = await response.json();
             if (result && result.hourly && result.hourly.temperature_2m) {
                 const temp = result.hourly.temperature_2m[hour];
@@ -1497,7 +1726,7 @@ const LogbookEngine = {
                 const windGusts = result.hourly.wind_gusts_10m[hour];
                 const windDir = result.hourly.wind_direction_10m[hour];
                 const weatherCode = result.hourly.weather_code[hour];
-                
+
                 if (temp !== undefined && temp !== null && windSpeed !== undefined && windSpeed !== null) {
                     const sessionIndex = this.data.findIndex(s => s.id === sessionId);
                     if (sessionIndex !== -1) {
@@ -1510,7 +1739,7 @@ const LogbookEngine = {
                             source: "auto"
                         };
                         this.saveData(); // This persists to localStorage and triggers Firestore Sync
-                        
+
                         // IMPORTANT: Force complete UI rerender to visually inject the block
                         this.renderHistory();
                         console.log(`Weather data fetched successfully for session ${sessionId}.`);

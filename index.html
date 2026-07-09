@@ -20,17 +20,17 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://unpkg.com/maplibre-gl@4.x/dist/maplibre-gl.js"></script>
     <link href="https://unpkg.com/maplibre-gl@4.x/dist/maplibre-gl.css" rel="stylesheet" />
-    <link rel="stylesheet" href="css/base.css?v=2026.07.09_v18">
-    <link rel="stylesheet" href="css/components.css?v=2026.07.09_v17">
-    <link rel="stylesheet" href="css/header.css?v=2026.07.09_v17">
-    <link rel="stylesheet" href="css/footer.css?v=2026.07.08_v30">
+    <link rel="stylesheet" href="css/base.css?v=2026.07.10_v3">
+    <link rel="stylesheet" href="css/components.css?v=2026.07.10_v3">
+    <link rel="stylesheet" href="css/header.css?v=2026.07.10_v3">
+    <link rel="stylesheet" href="css/footer.css?v=2026.07.10_v3">
     
-        <link rel="stylesheet" href="css/quiz.css?v=2026.07.09_v17">
-    <link rel="stylesheet" href="css/library.css?v=2026.07.09_v17">
-    <link rel="stylesheet" href="css/sites.css?v=2026.07.09_v17">
-    <link rel="stylesheet" href="css/auth.css?v=2026.07.09_v17">
-    <link rel="stylesheet" href="css/gdpr.css?v=2026.07.09_v17">
-    <link rel="stylesheet" href="css/logbook.css?v=2026.07.09_v17">
+        <link rel="stylesheet" href="css/quiz.css?v=2026.07.10_v3">
+    <link rel="stylesheet" href="css/library.css?v=2026.07.10_v3">
+    <link rel="stylesheet" href="css/sites.css?v=2026.07.10_v3">
+    <link rel="stylesheet" href="css/auth.css?v=2026.07.10_v3">
+    <link rel="stylesheet" href="css/gdpr.css?v=2026.07.10_v3">
+    <link rel="stylesheet" href="css/logbook.css?v=2026.07.10_v3">
 </head>
 
 <body>
@@ -715,12 +715,8 @@
                 <form id="equip-form" class="logbook-form" style="margin-bottom: 20px; padding: 15px; border: 1px solid var(--border-light, #ddd); border-radius: 8px; background: var(--bg-card, #fff);">
                     <h3 style="margin-top:0;" id="eq-form-title">Ajouter un Équipement</h3>
                     <input type="hidden" id="eq-id-edit">
-                    <div class="form-row" style="display:flex; gap:15px; margin-bottom:10px;">
-                        <div class="form-group" style="flex:1;">
-                            <label for="eq-nom" style="display:block; margin-bottom:5px;">Nom du matériel :</label>
-                            <input type="text" id="eq-nom" placeholder="Ex: Supair Birdy 2" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
-                        </div>
-                        <div class="form-group" style="flex:1;">
+                    <div class="form-row" style="display:flex; gap:15px; margin-bottom:10px; flex-wrap: wrap;">
+                        <div class="form-group" style="flex:1; min-width: 200px;">
                             <label for="eq-type" style="display:block; margin-bottom:5px;">Type :</label>
                             <select id="eq-type" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
                                 <option value="voile">Voile</option>
@@ -728,6 +724,56 @@
                                 <option value="secours">Parachute de Secours</option>
                                 <option value="accessoire">Accessoire</option>
                             </select>
+                        </div>
+                        <div class="form-group" style="flex:1; min-width: 200px;">
+                            <label for="eq-marque" style="display:block; margin-bottom:5px;">Marque :</label>
+                            <select id="eq-marque" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                                <option value="">-- Choisir ou Saisie Libre --</option>
+                                <option value="Autre">Autre...</option>
+                            </select>
+                            <input type="text" id="eq-marque-autre" placeholder="Spécifiez la marque..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                        </div>
+                    </div>
+                    <div class="form-row" style="display:flex; gap:15px; margin-bottom:10px; flex-wrap: wrap;">
+                        <div class="form-group" style="flex:1; min-width: 200px;">
+                            <label for="eq-modele" style="display:block; margin-bottom:5px;">Modèle :</label>
+                            <select id="eq-modele" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                                <option value="">-- Choisir ou Saisie Libre --</option>
+                                <option value="Autre">Autre...</option>
+                            </select>
+                            <input type="text" id="eq-modele-autre" placeholder="Spécifiez le modèle..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                        </div>
+                        <div class="form-group" style="flex:1; min-width: 200px;">
+                            <label for="eq-taille" style="display:block; margin-bottom:5px;">Taille :</label>
+                            <select id="eq-taille" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                                <option value="">-- Choisir ou Saisie Libre --</option>
+                                <option value="Autre">Autre...</option>
+                            </select>
+                            <input type="text" id="eq-taille-autre" placeholder="Spécifiez la taille..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                        </div>
+                    </div>
+                    <div class="form-row" style="display:flex; gap:15px; margin-bottom:10px; flex-wrap: wrap;">
+                        <div class="form-group" style="flex:1; min-width: 200px;">
+                            <label for="eq-couleur" style="display:block; margin-bottom:5px;">Couleur :</label>
+                            <select id="eq-couleur" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                                <option value="">-- Choisir ou Saisie Libre --</option>
+                                <option value="Autre">Autre...</option>
+                            </select>
+                            <input type="text" id="eq-couleur-autre" placeholder="Spécifiez la couleur..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                        </div>
+                        <div class="form-group" style="flex:1; min-width: 200px;">
+                            <label for="eq-nom" style="display:block; margin-bottom:5px;">Nom du matériel (auto) :</label>
+                            <input type="text" id="eq-nom" placeholder="Ex: Supair Birdy 2 M" required style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc; background-color: var(--bg-input-disabled, #f9f9f9);">
+                        </div>
+                    </div>
+                    <div class="form-row" id="eq-wind-limits" style="display:none; gap:15px; margin-bottom:10px;">
+                        <div class="form-group" style="flex:1;">
+                            <label for="eq-vent-min" style="display:block; margin-bottom:5px;">Vent min (km/h) :</label>
+                            <input type="number" id="eq-vent-min" value="0" min="0" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label for="eq-vent-max" style="display:block; margin-bottom:5px;">Vent max (km/h) :</label>
+                            <input type="number" id="eq-vent-max" value="25" min="0" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
                         </div>
                     </div>
                     <div class="form-row" style="display:flex; gap:15px; margin-bottom:10px;">
@@ -781,30 +827,30 @@
 
 
     <!-- SCRIPTS -->
-    <script src="js/config.js?v=2026.07.09_v17"></script>
-    <script src="js/data/courses_data.js?v=2026.07.09_v17"></script>
-    <script src="js/data/sites_data.js?v=2026.07.09_v17"></script>
-    <script src="js/services/igc_parser.js?v=2026.07.09_v17"></script>
-    <script src="js/components/map_3d.js?v=2026.07.09_v17"></script>
-    <script src="js/sites_engine.js?v=2026.07.09_v17"></script>
-    <script src="js/sites_filter.js?v=2026.07.09_v17"></script>
-    <script src="js/weatherScoring.js?v=2026.07.09_v17"></script>
-    <script src="js/sites_weather.js?v=2026.07.09_v17"></script>
-    <script src="js/sites_ui.js?v=2026.07.09_v17"></script>
-    <script src="js/sites_map.js?v=2026.07.09_v17"></script>
+
+    <script src="js/data/courses_data.js?v=2026.07.10_v3"></script>
+    <script src="js/data/sites_data.js?v=2026.07.10_v3"></script>
+    <script src="js/services/igc_parser.js?v=2026.07.10_v3"></script>
+    <script src="js/components/map_3d.js?v=2026.07.10_v3"></script>
+    <script src="js/sites_engine.js?v=2026.07.10_v3"></script>
+    <script src="js/sites_filter.js?v=2026.07.10_v3"></script>
+    <script src="js/weatherScoring.js?v=2026.07.10_v3"></script>
+    <script src="js/sites_weather.js?v=2026.07.10_v3"></script>
+    <script src="js/sites_ui.js?v=2026.07.10_v3"></script>
+    <script src="js/sites_map.js?v=2026.07.10_v3"></script>
 
     <!-- Firebase Sync Config & Engine -->
-    <script src="js/firebase_config.js?v=2026.07.09_v17"></script>
-    <script src="js/gdpr_engine.js?v=2026.07.09_v17"></script>
-    <script type="module" src="js/firebase_engine.js?v=2026.07.09_v17"></script>
+    <script src="js/firebase_config.js?v=2026.07.10_v3"></script>
+    <script src="js/gdpr_engine.js?v=2026.07.10_v3"></script>
+    <script type="module" src="js/firebase_engine.js?v=2026.07.10_v3"></script>
 
     <!-- Quiz Engine Version 4.8 (Theme Fix & Button Alignment) -->
-    <script src="js/quiz_engine_v4_7.js?v=2026.07.09_v17"></script>
-    <script src="js/library_engine.js?v=2026.07.09_v17"></script>
+    <script src="js/quiz_engine_v4_7.js?v=2026.07.10_v3"></script>
+    <script src="js/library_engine.js?v=2026.07.10_v3"></script>
     <!-- Logbook Engine -->
-    <script src="js/logbook_engine.js?v=2026.07.09_v17"></script>
+    <script src="js/logbook_engine.js?v=2026.07.10_v3"></script>
     <!-- Engine v4.70 (Level Persistence Fix) -->
-    <script src="js/engine_v4_6.js?v=2026.07.09_v17"></script>
+    <script src="js/engine_v4_6.js?v=2026.07.10_v3"></script>
 
     <script>
         // Load Components and Initialize

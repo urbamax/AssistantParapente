@@ -556,11 +556,7 @@ const QuizEngine = {
 
         // Check End
         if (this.state.qcmIndex >= sessionData.length) {
-            if (this.state.qcmConfig.mode === 'EXAM') {
-                this.showExamResults();
-            } else {
-                this.finishTraining();
-            }
+            this.showExamResults();
             return;
         }
 
@@ -579,17 +575,17 @@ const QuizEngine = {
             const isLight = document.body.classList.contains('light-mode');
 
             // Theme-aware styles for badges to ensure premium design and high contrast/readability
-            const styleBI = isLight 
-                ? 'background:rgba(34, 197, 94, 0.1); color:#16a34a; border:1px solid rgba(34, 197, 94, 0.4);' 
+            const styleBI = isLight
+                ? 'background:rgba(34, 197, 94, 0.1); color:#16a34a; border:1px solid rgba(34, 197, 94, 0.4);'
                 : 'background:rgba(74, 222, 128, 0.2); color:#4ade80; border:1px solid #4ade80;';
-            const styleBP = isLight 
-                ? 'background:rgba(37, 99, 235, 0.1); color:#2563eb; border:1px solid rgba(37, 99, 235, 0.4);' 
+            const styleBP = isLight
+                ? 'background:rgba(37, 99, 235, 0.1); color:#2563eb; border:1px solid rgba(37, 99, 235, 0.4);'
                 : 'background:rgba(96, 165, 250, 0.2); color:#60a5fa; border:1px solid #60a5fa;';
-            const styleBPC = isLight 
-                ? 'background:rgba(121, 85, 72, 0.15); color:#5d4037; border:1px solid rgba(121, 85, 72, 0.4);' 
+            const styleBPC = isLight
+                ? 'background:rgba(121, 85, 72, 0.15); color:#5d4037; border:1px solid rgba(121, 85, 72, 0.4);'
                 : 'background:rgba(121, 85, 72, 0.3); color:#e6ceca; border:1px solid #bcaaa4;';
-            const styleTreuil = isLight 
-                ? 'background:rgba(79, 70, 229, 0.1); color:#4f46e5; border:1px solid rgba(79, 70, 229, 0.4);' 
+            const styleTreuil = isLight
+                ? 'background:rgba(79, 70, 229, 0.1); color:#4f46e5; border:1px solid rgba(79, 70, 229, 0.4);'
                 : 'background:rgba(99, 102, 241, 0.2); color:#6366f1; border:1px solid #6366f1;';
 
             if (hasV) badgesHtml += `<div class="level-tag" style="margin:0; font-size:0.75rem; ${styleBI}">BI</div>`;
@@ -771,6 +767,21 @@ const QuizEngine = {
             });
 
             const isSuccess = (userScore === maxScore) && !hasNegativeEffect;
+
+            const resultData = {
+                question: question,
+                selected: selectedOptions,
+                correct: question.choices.filter(c => parseInt(c.pts || 0) > 0),
+                isCorrect: isSuccess,
+                userPoints: userScore,
+                maxPoints: maxScore
+            };
+
+            if (this.state.examResults[this.state.qcmIndex]) {
+                this.state.examResults[this.state.qcmIndex] = resultData;
+            } else {
+                this.state.examResults.push(resultData);
+            }
 
             allBtns.forEach(btn => {
                 btn.disabled = true;

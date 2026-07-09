@@ -8,10 +8,10 @@
 const Engine = {
     state: {
         level: 'ALL',        // BI, BP, BPC, ALL
-        mode: 'SITES',
+        mode: 'MENU',
         themeMode: 'auto',
         currentCourseId: null,
-        lastMode: 'SITES',
+        lastMode: 'MENU',
         basePath: '.'
     },
 
@@ -235,7 +235,13 @@ const Engine = {
         this.state.currentCourseId = null;
         document.body.classList.remove('course-open');
         document.querySelectorAll('.mode-screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('start-screen').classList.add('active');
+        const startScreen = document.getElementById('start-screen');
+        if (startScreen) {
+            startScreen.classList.add('active');
+        } else {
+            this.startMode('SITES');
+            return;
+        }
 
         // Hide specific containers if needed
         const dashContent = document.querySelector('.dashboard-content');
@@ -266,7 +272,7 @@ const Engine = {
 
         // Update Theme
         this.updateAppTheme(newLevel);
-        
+
         if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled && window.FirebaseAuthEngine.currentUser) {
             window.FirebaseAuthEngine.savePreferencesToCloud();
         }
@@ -311,8 +317,8 @@ const Engine = {
             // Clear slot
             navSlot.innerHTML = '';
 
-            // Only show back button if not on MENU
-            if (this.state.mode !== 'MENU') {
+            // Only show back button if not on MENU and not on SITES (which is now the root)
+            if (this.state.mode !== 'MENU' && this.state.mode !== 'SITES') {
                 const backBtn = document.createElement('button');
                 backBtn.className = 'nav-btn-glass';
                 backBtn.innerHTML = '<i class="ri-arrow-left-line"></i> <span>RETOUR</span>';
@@ -330,7 +336,7 @@ const Engine = {
                     btn.classList.add('active');
                 }
             });
-            
+
             // Handle sub-modes that map to parent modes
             if (['QCM', 'QCM_BANK', 'LIBRARY', 'COURSE', 'STATS', 'ADVENTURE'].includes(this.state.mode)) {
                 const theoryBtn = document.querySelector('.desktop-main-nav .nav-menu-btn[data-target="THEORY"]');
@@ -345,8 +351,8 @@ const Engine = {
         this.state.basePath = basePath;
 
         const componentMap = [
-            { id: 'app-header', url: basePath + '/components/header.html?v=2026.07.08_v30' },
-            { id: 'app-footer', url: basePath + '/components/footer.html?v=2026.07.08_v30', selector: '.app-footer-placeholder' }
+            { id: 'app-header', url: basePath + '/components/header.html?v=2026.07.10_v3' },
+            { id: 'app-footer', url: basePath + '/components/footer.html?v=2026.07.10_v3', selector: '.app-footer-placeholder' }
         ];
 
         const self = this;
@@ -482,7 +488,7 @@ const Engine = {
         this.state.themeMode = next;
         localStorage.setItem('themeMode', next);
         this.applyThemeMode();
-        
+
         if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled && window.FirebaseAuthEngine.currentUser) {
             window.FirebaseAuthEngine.savePreferencesToCloud();
         }

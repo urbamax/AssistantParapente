@@ -8,7 +8,7 @@ const IGCParser = {
      * @param {string} igcText Le contenu texte complet du fichier .igc
      * @returns {Object} Objet contenant la trace, la date, la durée, le gain et l'altitude max.
      */
-    parse: function(igcText) {
+    parse: function (igcText) {
         const lines = igcText.split(/\r?\n/);
         const trace = [];
         let baseDate = new Date();
@@ -90,7 +90,7 @@ const IGCParser = {
         }
 
         const duration = this.calculateDurationMinutes(trace);
-        
+
         let startAltitude = trace.length > 0 ? trace[0].alt : 0;
         let gain = maxAltitude !== -Infinity ? Math.max(0, Math.round(maxAltitude - startAltitude)) : 0;
 
@@ -108,7 +108,7 @@ const IGCParser = {
     /**
      * Convertit une chaîne de coordonnées IGC en degrés décimaux.
      */
-    _parseCoordinate: function(coordStr, isLat) {
+    _parseCoordinate: function (coordStr, isLat) {
         try {
             const degLen = isLat ? 2 : 3;
             const deg = parseInt(coordStr.substring(0, degLen), 10);
@@ -131,16 +131,16 @@ const IGCParser = {
     /**
      * Calcule la durée totale en minutes à partir du tableau de trace.
      */
-    calculateDurationMinutes: function(trace) {
+    calculateDurationMinutes: function (trace) {
         if (!trace || trace.length < 2) return 0;
         const first = trace[0];
         const last = trace[trace.length - 1];
-        
+
         const diffMs = last.timestamp - first.timestamp;
         let diffMinutes = Math.round(diffMs / 60000);
-        
+
         if (diffMinutes < 0) {
-             diffMinutes += 24 * 60;
+            diffMinutes += 24 * 60;
         }
 
         return diffMinutes;

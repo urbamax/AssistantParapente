@@ -1,7 +1,7 @@
 SitesEngine.fetchWeatherForSites = async function () {
     if (typeof SITES_DATA === 'undefined' || SITES_DATA.length === 0) return;
 
-    const activeSites = SITES_DATA.filter(s => s.affiche !== false);
+    const activeSites = SITES_DATA.filter(s => s.affiche !== false && !isNaN(parseFloat(s.latitude)) && !isNaN(parseFloat(s.longitude)));
     if (activeSites.length === 0) return;
 
     const lats = activeSites.map(s => parseFloat(s.latitude)).join(',');
