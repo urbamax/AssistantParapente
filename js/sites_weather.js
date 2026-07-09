@@ -4,8 +4,8 @@ SitesEngine.fetchWeatherForSites = async function () {
     const activeSites = SITES_DATA.filter(s => s.affiche !== false);
     if (activeSites.length === 0) return;
 
-    const lats = activeSites.map(s => parseFloat(s.lat)).join(',');
-    const lons = activeSites.map(s => parseFloat(s.lon)).join(',');
+    const lats = activeSites.map(s => parseFloat(s.latitude)).join(',');
+    const lons = activeSites.map(s => parseFloat(s.longitude)).join(',');
 
     let apiEndpoint = 'meteofrance'; // default AROME
     if (this.state.weatherModel === 'icon' || this.state.weatherModel === 'iconeu') apiEndpoint = 'dwd-icon';
@@ -139,7 +139,7 @@ SitesEngine.fetchWeatherForSites = async function () {
             slider.disabled = false;
             const maxVal = Math.max(0, (results[0]?.hourly?.time?.length || 121) - currentHourIndex - 1);
             slider.max = Math.min(maxVal, this.state.forecastMaxRange || 120);
-            
+
             // Adjust offset if it exceeds new max
             if (this.state.forecastOffset > slider.max) {
                 this.state.forecastOffset = parseInt(slider.max);
@@ -199,19 +199,19 @@ SitesEngine.isForecastFlyable = function (site, weather) {
 
     // 2. Déterminer la meilleure orientation du site par rapport au vent actuel
     let bestOrientation = undefined;
-    
+
     const orientations = site.orientation ? site.orientation.split(',').map(v => v.trim()) : [];
     if (orientations.length > 0 && weather) {
         const CARD_TO_DEG = { "N": 0, "NE": 45, "E": 90, "SE": 135, "S": 180, "SO": 225, "O": 270, "NO": 315 };
         let minDiff = 180;
-        
+
         orientations.forEach(card => {
             const deg = CARD_TO_DEG[card];
             if (deg !== undefined) {
                 // Trouver la différence angulaire
                 let diff = Math.abs(weather.windDirDeg - deg) % 360;
                 diff = diff > 180 ? 360 - diff : diff;
-                
+
                 if (diff < minDiff) {
                     minDiff = diff;
                     bestOrientation = deg;
