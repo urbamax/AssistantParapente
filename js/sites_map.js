@@ -56,7 +56,7 @@ SitesEngine.updateMapTiles = function () {
 SitesEngine.updateMapMarkers = function () {
     if (!this.state.map || !this.state.markersGroup) return;
     this.state.markersGroup.clearLayers();
-    let activeSites = SITES_DATA.filter(s => s.affiche !== false);
+    let activeSites = SITES_DATA.filter(s => s.affiche !== false && !isNaN(parseFloat(s.latitude)) && !isNaN(parseFloat(s.longitude)));
 
     // Filter map markers by search query
     if (this.state.searchQuery) {

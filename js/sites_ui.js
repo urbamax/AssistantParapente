@@ -16,7 +16,7 @@ SitesEngine.renderList = function () {
             return;
         }
 
-        let activeSites = SITES_DATA.filter(s => s.affiche !== false);
+        let activeSites = SITES_DATA.filter(s => s.affiche !== false && !isNaN(parseFloat(s.latitude)) && !isNaN(parseFloat(s.longitude)));
 
         // Filter by search query
         const searchQuery = (this.state.searchQuery || '').trim().toLowerCase();

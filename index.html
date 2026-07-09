@@ -727,39 +727,39 @@
                         </div>
                         <div class="form-group" style="flex:1; min-width: 200px;">
                             <label for="eq-marque" style="display:block; margin-bottom:5px;">Marque :</label>
-                            <select id="eq-marque" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                            <select id="eq-marque" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;" onchange="document.getElementById('eq-marque-autre').style.display = (this.value === 'Autre') ? 'block' : 'none'; if(this.value !== 'Autre') { document.getElementById('eq-marque-autre').value = ''; } if(window.LogbookEngine && LogbookEngine.updateEquipmentNomPreview) { LogbookEngine.updateEquipmentNomPreview(); }">
                                 <option value="">-- Choisir ou Saisie Libre --</option>
                                 <option value="Autre">Autre...</option>
                             </select>
-                            <input type="text" id="eq-marque-autre" placeholder="Spécifiez la marque..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                            <input type="text" id="eq-marque-autre" placeholder="Spécifiez la marque..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;" oninput="if(window.LogbookEngine && LogbookEngine.updateEquipmentNomPreview) { LogbookEngine.updateEquipmentNomPreview(); }">
                         </div>
                     </div>
                     <div class="form-row" style="display:flex; gap:15px; margin-bottom:10px; flex-wrap: wrap;">
                         <div class="form-group" style="flex:1; min-width: 200px;">
                             <label for="eq-modele" style="display:block; margin-bottom:5px;">Modèle :</label>
-                            <select id="eq-modele" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                            <select id="eq-modele" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;" onchange="document.getElementById('eq-modele-autre').style.display = (this.value === 'Autre') ? 'block' : 'none'; if(this.value !== 'Autre') { document.getElementById('eq-modele-autre').value = ''; } if(window.LogbookEngine && LogbookEngine.updateEquipmentNomPreview) { LogbookEngine.updateEquipmentNomPreview(); }">
                                 <option value="">-- Choisir ou Saisie Libre --</option>
                                 <option value="Autre">Autre...</option>
                             </select>
-                            <input type="text" id="eq-modele-autre" placeholder="Spécifiez le modèle..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                            <input type="text" id="eq-modele-autre" placeholder="Spécifiez le modèle..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;" oninput="if(window.LogbookEngine && LogbookEngine.updateEquipmentNomPreview) { LogbookEngine.updateEquipmentNomPreview(); }">
                         </div>
                         <div class="form-group" style="flex:1; min-width: 200px;">
                             <label for="eq-taille" style="display:block; margin-bottom:5px;">Taille :</label>
-                            <select id="eq-taille" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                            <select id="eq-taille" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;" onchange="document.getElementById('eq-taille-autre').style.display = (this.value === 'Autre') ? 'block' : 'none'; if(this.value !== 'Autre') { document.getElementById('eq-taille-autre').value = ''; } if(window.LogbookEngine && LogbookEngine.updateEquipmentNomPreview) { LogbookEngine.updateEquipmentNomPreview(); }">
                                 <option value="">-- Choisir ou Saisie Libre --</option>
                                 <option value="Autre">Autre...</option>
                             </select>
-                            <input type="text" id="eq-taille-autre" placeholder="Spécifiez la taille..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                            <input type="text" id="eq-taille-autre" placeholder="Spécifiez la taille..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;" oninput="if(window.LogbookEngine && LogbookEngine.updateEquipmentNomPreview) { LogbookEngine.updateEquipmentNomPreview(); }">
                         </div>
                     </div>
                     <div class="form-row" style="display:flex; gap:15px; margin-bottom:10px; flex-wrap: wrap;">
                         <div class="form-group" style="flex:1; min-width: 200px;">
                             <label for="eq-couleur" style="display:block; margin-bottom:5px;">Couleur :</label>
-                            <select id="eq-couleur" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                            <select id="eq-couleur" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc;" onchange="document.getElementById('eq-couleur-autre').style.display = (this.value === 'Autre') ? 'block' : 'none'; if(this.value !== 'Autre') { document.getElementById('eq-couleur-autre').value = ''; } if(window.LogbookEngine && LogbookEngine.updateEquipmentNomPreview) { LogbookEngine.updateEquipmentNomPreview(); }">
                                 <option value="">-- Choisir ou Saisie Libre --</option>
                                 <option value="Autre">Autre...</option>
                             </select>
-                            <input type="text" id="eq-couleur-autre" placeholder="Spécifiez la couleur..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                            <input type="text" id="eq-couleur-autre" placeholder="Spécifiez la couleur..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;" oninput="if(window.LogbookEngine && LogbookEngine.updateEquipmentNomPreview) { LogbookEngine.updateEquipmentNomPreview(); }">
                         </div>
                         <div class="form-group" style="flex:1; min-width: 200px;">
                             <label for="eq-nom" style="display:block; margin-bottom:5px;">Nom du matériel (auto) :</label>
