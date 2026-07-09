@@ -4,8 +4,8 @@ SitesEngine.fetchWeatherForSites = async function () {
     const activeSites = SITES_DATA.filter(s => s.affiche !== false);
     if (activeSites.length === 0) return;
 
-    const lats = activeSites.map(s => s.latitude).join(',');
-    const lons = activeSites.map(s => s.longitude).join(',');
+    const lats = activeSites.map(s => parseFloat(s.lat)).join(',');
+    const lons = activeSites.map(s => parseFloat(s.lon)).join(',');
 
     let apiEndpoint = 'meteofrance'; // default AROME
     if (this.state.weatherModel === 'icon' || this.state.weatherModel === 'iconeu') apiEndpoint = 'dwd-icon';
@@ -137,8 +137,16 @@ SitesEngine.fetchWeatherForSites = async function () {
         const slider = document.getElementById('forecast-slider');
         if (slider) {
             slider.disabled = false;
-            slider.max = Math.max(0, (results[0]?.hourly?.time?.length || 121) - currentHourIndex - 1);
-            slider.max = Math.min(slider.max, 120); // cap at 120h
+            const maxVal = Math.max(0, (results[0]?.hourly?.time?.length || 121) - currentHourIndex - 1);
+            slider.max = Math.min(maxVal, this.state.forecastMaxRange || 120);
+            
+            // Adjust offset if it exceeds new max
+            if (this.state.forecastOffset > slider.max) {
+                this.state.forecastOffset = parseInt(slider.max);
+            }
+            slider.value = this.state.forecastOffset;
+            const percentage = slider.max > 0 ? (this.state.forecastOffset / slider.max) * 100 : 0;
+            slider.style.background = `linear-gradient(to right, var(--accent-blue) 0%, var(--accent-blue) ${percentage}%, rgba(255,255,255,0.1) ${percentage}%, rgba(255,255,255,0.1) 100%)`;
         }
 
         this.updateForecastLabel();
@@ -177,6 +185,7 @@ SitesEngine.changeWeatherModel = function (model) {
             `;
     }
 
+    this.savePreferences();
     this.fetchWeatherForSites();
 };
 
@@ -191,11 +200,12 @@ SitesEngine.isForecastFlyable = function (site, weather) {
     // 2. Déterminer la meilleure orientation du site par rapport au vent actuel
     let bestOrientation = undefined;
     
-    if (site.orientations_vent && site.orientations_vent.length > 0 && weather) {
+    const orientations = site.orientation ? site.orientation.split(',').map(v => v.trim()) : [];
+    if (orientations.length > 0 && weather) {
         const CARD_TO_DEG = { "N": 0, "NE": 45, "E": 90, "SE": 135, "S": 180, "SO": 225, "O": 270, "NO": 315 };
         let minDiff = 180;
         
-        site.orientations_vent.forEach(card => {
+        orientations.forEach(card => {
             const deg = CARD_TO_DEG[card];
             if (deg !== undefined) {
                 // Trouver la différence angulaire
@@ -213,7 +223,7 @@ SitesEngine.isForecastFlyable = function (site, weather) {
     // 3. Préparer l'objet site pour l'évaluateur (on ne modifie pas l'objet original)
     const siteGeometry = {
         ...site,
-        orientation: bestOrientation
+        orientation_ideale_deg: bestOrientation
     };
 
     // 4. Appel du nouveau module de scoring

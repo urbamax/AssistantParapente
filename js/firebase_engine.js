@@ -276,8 +276,69 @@ const FirebaseAuthEngine = {
         }
         
         try {
-            const { doc, getDoc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const { doc, getDoc, setDoc, collection, getDocs, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
             const uid = this.currentUser.uid;
+            
+            // --- Sync Logbook ---
+            const localLogbookStr = localStorage.getItem('tp_logbook_data');
+            let localLogbook = [];
+            if (localLogbookStr) {
+                try { localLogbook = JSON.parse(localLogbookStr); } catch(e){}
+            }
+            
+            const logbookColRef = collection(db, "users", uid, "logbook");
+            const logbookSnap = await getDocs(logbookColRef);
+            
+            let cloudLogbook = [];
+            logbookSnap.forEach(docSnap => {
+                cloudLogbook.push(docSnap.data());
+            });
+            
+            // Merge: Cloud wins on conflict
+            let mergedLogbookMap = new Map();
+            localLogbook.forEach(session => mergedLogbookMap.set(session.id, session));
+            cloudLogbook.forEach(session => mergedLogbookMap.set(session.id, session));
+            
+            let mergedLogbook = Array.from(mergedLogbookMap.values());
+            mergedLogbook.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+            
+            localStorage.setItem('tp_logbook_data', JSON.stringify(mergedLogbook));
+            
+            // Upload missing ones to cloud
+            for (const session of mergedLogbook) {
+                const sRef = doc(db, "users", uid, "logbook", session.id);
+                await setDoc(sRef, session);
+            }
+            
+            // --- Sync Equipment ---
+            const localEquipStr = localStorage.getItem('tp_equipment_data');
+            let localEquip = [];
+            if (localEquipStr) {
+                try { localEquip = JSON.parse(localEquipStr); } catch(e){}
+            }
+            
+            const equipColRef = collection(db, "users", uid, "equipment");
+            const equipSnap = await getDocs(equipColRef);
+            
+            let cloudEquip = [];
+            equipSnap.forEach(docSnap => {
+                cloudEquip.push(docSnap.data());
+            });
+            
+            // Merge: Cloud wins on conflict
+            let mergedEquipMap = new Map();
+            localEquip.forEach(item => mergedEquipMap.set(item.id, item));
+            cloudEquip.forEach(item => mergedEquipMap.set(item.id, item));
+            
+            let mergedEquip = Array.from(mergedEquipMap.values());
+            
+            localStorage.setItem('tp_equipment_data', JSON.stringify(mergedEquip));
+            
+            // Upload missing ones to cloud
+            for (const item of mergedEquip) {
+                const eRef = doc(db, "users", uid, "equipment", item.id);
+                await setDoc(eRef, item);
+            }
             
             // --- Sync QCM Stats ---
             const localQcmStats = this.getLocalQcmStats();
@@ -356,6 +417,15 @@ const FirebaseAuthEngine = {
                 }
             }
 
+            // Refresh LogbookEngine if it exists
+            if (typeof LogbookEngine !== 'undefined' && typeof LogbookEngine.loadData === 'function') {
+                LogbookEngine.loadData();
+                if (typeof LogbookEngine.loadEquipmentData === 'function') {
+                    LogbookEngine.loadEquipmentData();
+                }
+                LogbookEngine.switchTab(LogbookEngine.currentTab);
+            }
+
             console.log("Sync complete!");
             
             this.lastSyncTime = new Date().toLocaleTimeString();
@@ -424,6 +494,110 @@ const FirebaseAuthEngine = {
             console.log("Incremental preferences synced.");
         } catch (error) {
             console.error("Incremental preferences sync failed:", error);
+        }
+    },
+
+    syncLogbookData: async function(data) {
+        if (!this.currentUser || !this.enabled || this.syncingData) return;
+        
+        try {
+            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+            
+            // Save all locally present to cloud
+            for (const session of data) {
+                const docRef = doc(db, "users", uid, "logbook", session.id);
+                await setDoc(docRef, session);
+            }
+            
+            this.lastSyncTime = new Date().toLocaleTimeString();
+            console.log("Logbook data synced incrementally.");
+        } catch (error) {
+            console.error("Logbook incremental sync failed:", error);
+        }
+    },
+
+    deleteLogbookEntry: async function(id) {
+        if (!this.currentUser || !this.enabled) return;
+        
+        try {
+            const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+            
+            const docRef = doc(db, "users", uid, "logbook", id);
+            await deleteDoc(docRef);
+            console.log(`Logbook entry ${id} deleted from cloud.`);
+        } catch (error) {
+            console.error("Logbook entry delete failed:", error);
+        }
+    },
+
+    syncEquipmentData: async function(data) {
+        if (!this.currentUser || !this.enabled || this.syncingData) return;
+        
+        try {
+            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+            
+            // Save all locally present to cloud
+            for (const item of data) {
+                const docRef = doc(db, "users", uid, "equipment", item.id);
+                await setDoc(docRef, item);
+            }
+            
+            this.lastSyncTime = new Date().toLocaleTimeString();
+            console.log("Equipment data synced incrementally.");
+        } catch (error) {
+            console.error("Equipment incremental sync failed:", error);
+        }
+    },
+
+    deleteEquipmentEntry: async function(id) {
+        if (!this.currentUser || !this.enabled) return;
+        
+        try {
+            const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+            
+            const docRef = doc(db, "users", uid, "equipment", id);
+            await deleteDoc(docRef);
+            console.log(`Equipment entry ${id} deleted from cloud.`);
+        } catch (error) {
+            console.error("Equipment entry delete failed:", error);
+        }
+    },
+
+    syncEquipmentEntry: async function(item) {
+        if (!this.currentUser || !this.enabled || this.syncingData) return;
+        
+        try {
+            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+            
+            const docRef = doc(db, "users", uid, "equipment", item.id);
+            await setDoc(docRef, item);
+            
+            this.lastSyncTime = new Date().toLocaleTimeString();
+            console.log("Equipment entry synced successfully:", item.id);
+        } catch (error) {
+            console.error("Equipment entry sync failed:", error);
+        }
+    },
+
+    syncLogbookEntry: async function(session) {
+        if (!this.currentUser || !this.enabled || this.syncingData) return;
+        
+        try {
+            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+            
+            const docRef = doc(db, "users", uid, "logbook", session.id);
+            await setDoc(docRef, session);
+            
+            this.lastSyncTime = new Date().toLocaleTimeString();
+            console.log("Logbook entry synced successfully:", session.id);
+        } catch (error) {
+            console.error("Logbook entry sync failed:", error);
         }
     },
 
@@ -560,12 +734,33 @@ const FirebaseAuthEngine = {
     },
 
     getLocalPreferences: function() {
-        let prefs = { pilotLevel: 'ALL', themeMode: 'auto', favoriteSites: [], minimizedSites: [], savedLocations: [], activeMapLayers: ['leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'paraglidable', 'isofronts'] };
+        const defaults = {
+            pilotLevel: 'ALL',
+            themeMode: 'auto',
+            favoriteSites: [],
+            minimizedSites: [],
+            savedLocations: [],
+            activeMapLayers: ['leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'paraglidable', 'isofronts'],
+            limitWindMin: 0,
+            limitWindMax: 25,
+            limitGustDelta: 10,
+            hideUnflyable: false,
+            radiusLimit: 210,
+            sortMode: 'CONDITIONS',
+            conditionsStrategy: 'CONSECUTIVE',
+            weatherModel: 'meteofrance'
+        };
+        let prefs = { ...defaults };
         try {
             const saved = localStorage.getItem('parapente_user_prefs');
             if (saved) {
-                prefs = JSON.parse(saved);
-                if (!prefs.activeMapLayers) prefs.activeMapLayers = ['leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'paraglidable', 'isofronts'];
+                const parsed = JSON.parse(saved);
+                prefs = { ...prefs, ...parsed };
+                // Ensure arrays exist
+                if (!prefs.favoriteSites) prefs.favoriteSites = [];
+                if (!prefs.minimizedSites) prefs.minimizedSites = [];
+                if (!prefs.savedLocations) prefs.savedLocations = [];
+                if (!prefs.activeMapLayers) prefs.activeMapLayers = [...defaults.activeMapLayers];
             }
         } catch(e) {}
         

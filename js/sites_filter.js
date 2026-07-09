@@ -10,11 +10,12 @@ SitesEngine.setupDropdowns = function () {
 SitesEngine.renderDropdowns = function () {
         const winds = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
         const types = [
-            { id: 'ATTERRO', label: 'Atterrissage' },
-            { id: 'NATUREL', label: 'Site Naturel' },
-            { id: 'DUNE', label: 'Dune' },
-            { id: 'TREUIL', label: 'Piste de Treuil' },
-            { id: 'GONFLAGE', label: 'Gonflage' }
+            { id: 'Atterrissage', label: 'Atterrissage' },
+            { id: 'Naturel', label: 'Site Naturel' },
+            { id: 'Dune', label: 'Dune' },
+            { id: 'Soaring', label: 'Soaring' },
+            { id: 'Treuil', label: 'Piste de Treuil' },
+            { id: 'Pente école', label: 'Gonflage' }
         ];
 
         const windMenu = document.getElementById('menu-wind');
@@ -269,6 +270,8 @@ SitesEngine.changeSortMode = function (mode) {
             strategyPanel.style.display = (mode === 'CONDITIONS') ? 'flex' : 'none';
         }
 
+        this.savePreferences();
+
         if (mode === 'DISTANCE') {
             if (this.state.userLocation) {
                 this.renderList();
@@ -412,6 +415,7 @@ SitesEngine.changeStrategy = function (strategy) {
             }
         });
 
+        this.savePreferences();
         this.renderList();
         if (this.state.mapExpanded) {
             this.updateMapMarkers();
@@ -753,14 +757,4 @@ SitesEngine.toggleFilterFavoritesOnly = function() {
     this.savePreferences();
     this.renderList();
     if (this.state.mapExpanded) this.updateMapMarkers();
-};
-
-SitesEngine.saveUserPreferences = function() {
-    try {
-        localStorage.setItem('parapente_user_prefs', JSON.stringify(this.state.userPreferences));
-    } catch(e) {}
-    
-    if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled && window.FirebaseAuthEngine.currentUser) {
-        window.FirebaseAuthEngine.savePreferencesToCloud();
-    }
 };

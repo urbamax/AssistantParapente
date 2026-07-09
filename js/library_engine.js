@@ -148,7 +148,7 @@ const LibraryEngine = {
 
             const section = document.createElement('div');
             section.className = 'library-section';
-            section.innerHTML = `<h3 class="library-section-header"><i class="ri-folder-open-line"></i> ${cat}</h3>`;
+            section.innerHTML = `<h3 class="library-section-header"><i class="ri-archive-line"></i> ${cat}</h3>`;
 
             const listContainer = document.createElement('div');
             listContainer.className = 'library-list';

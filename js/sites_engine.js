@@ -5,7 +5,7 @@ const SitesEngine = {
         filterWindInclude: [],
         filterWindExclude: [],
         filterTypeInclude: [],
-        filterTypeExclude: ['ATTERRO'],
+        filterTypeExclude: ['Atterrissage'],
         currentSiteCoords: null,
         userLocation: null, // {lat, lng}
         radiusLimit: 210, // Max distance radius limit (210 = Illimité)
@@ -32,7 +32,15 @@ const SitesEngine = {
             minimizedSites: [],
             savedLocations: [], // array of {name, lat, lng}
             forecastMaxRange: 120,
-            activeMapLayers: ['leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'paraglidable', 'isofronts']
+            activeMapLayers: ['leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'paraglidable', 'isofronts'],
+            limitWindMin: 0,
+            limitWindMax: 25,
+            limitGustDelta: 10,
+            hideUnflyable: false,
+            radiusLimit: 210,
+            sortMode: 'CONDITIONS',
+            conditionsStrategy: 'CONSECUTIVE',
+            weatherModel: 'meteofrance'
         },
         activeMapLayers: ['leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'paraglidable', 'isofronts']
     }
@@ -110,20 +118,23 @@ SitesEngine.changeForecastMaxRange = function(value) {
         const slider = document.getElementById('forecast-slider');
         if (slider) {
             slider.max = range;
-            if (parseInt(slider.value) > range) {
-                slider.value = range;
-                this.setForecastOffset(range);
+            let currentOffset = this.state.forecastOffset;
+            if (currentOffset > range) {
+                currentOffset = range;
             }
+            this.setForecastOffset(currentOffset);
+        } else {
+            this.renderList();
         }
         this.savePreferences();
-        this.renderList();
     }
 };
 
 SitesEngine.PREFERENCE_KEYS = [
-    'limitWindMax', 'limitGustDelta', 'filterWindInclude', 'filterWindExclude', 
+    'limitWindMin', 'limitWindMax', 'limitGustDelta', 'filterWindInclude', 'filterWindExclude', 
     'filterTypeInclude', 'filterTypeExclude', 'filterFavoritesOnly', 
-    'forecastMaxRange', 'activeMapLayers'
+    'forecastMaxRange', 'activeMapLayers', 'hideUnflyable', 'radiusLimit', 
+    'sortMode', 'conditionsStrategy', 'weatherModel'
 ];
 
 SitesEngine.removeAccents = function (str) {
@@ -232,6 +243,30 @@ SitesEngine.show = function () {
             if (sortSelect) sortSelect.value = this.state.sortMode;
             if (radiusSlider) radiusSlider.value = this.state.radiusLimit;
             if (radiusLabel) radiusLabel.textContent = this.state.radiusLimit === 210 ? 'Illimité' : `${this.state.radiusLimit} km`;
+
+            // Adjust strategy display panel & strategy buttons active classes
+            const strategyPanel = document.getElementById('conditions-strategy-panel');
+            if (strategyPanel) {
+                strategyPanel.style.display = (this.state.sortMode === 'CONDITIONS') ? 'flex' : 'none';
+            }
+
+            const strategies = ['CONSECUTIVE', 'HALF_DAY', 'DAILY', 'TOTAL'];
+            strategies.forEach(s => {
+                const btn = document.getElementById(`strat-${s}`);
+                if (btn) {
+                    if (s === this.state.conditionsStrategy) {
+                        btn.classList.add('active');
+                        btn.style.background = 'rgba(14, 165, 233, 0.15)';
+                        btn.style.borderColor = 'rgba(14, 165, 233, 0.3)';
+                        btn.style.color = 'var(--accent-blue)';
+                    } else {
+                        btn.classList.remove('active');
+                        btn.style.background = 'rgba(255, 255, 255, 0.03)';
+                        btn.style.borderColor = 'var(--border-color)';
+                        btn.style.color = 'var(--text-secondary)';
+                    }
+                }
+            });
 
             this.fetchWeatherForSites();
             this.initialized = true;

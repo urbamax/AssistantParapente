@@ -47,7 +47,7 @@
     height: 40px;
     transition: all 0.3s ease;
     filter: opacity(0.85);
-    background: rgba(255, 255, 255, 0.85); /* Requis pour la lisibilité sur fond sombre */
+    background: rgba(255, 255, 255, 0.85); /* Requis pour la lisibilitÃ© sur fond sombre */
     padding: 4px 8px;
     border-radius: 8px;
 }

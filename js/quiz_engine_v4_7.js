@@ -420,7 +420,8 @@ const QuizEngine = {
 
         const mode = this.state.qcmConfig.mode;
         let count = this.state.qcmConfig.count;
-        const selectedTheme = document.getElementById('qcm-theme-select') ? document.getElementById('qcm-theme-select').value : 'ALL';
+        // In EXAM mode, theme filtering must be ignored (always 'ALL')
+        const selectedTheme = mode === 'EXAM' ? 'ALL' : (document.getElementById('qcm-theme-select') ? document.getElementById('qcm-theme-select').value : 'ALL');
 
         if (count === 'ALL') {
             count = sourceData.length;

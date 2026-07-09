@@ -9,7 +9,7 @@
 // Configuration des pondérations pour le score final (ajustable)
 const SCORING_WEIGHTS = {
     WIND_SPEED: 0.5,     // 50% du score basé sur la vitesse du vent
-    WIND_DIRECTION: 0.5  // 50% du score basé sur l'alignement du vent avec la pente
+    WIND_DIRECTION: 0.5  // 50% du score basé sur l'orientation
 };
 
 /**
@@ -24,16 +24,35 @@ function getAngularDifference(angle1, angle2) {
 }
 
 /**
+ * Convertit un cap en degrés (0-360) en direction cardinale.
+ * @param {number} deg - Cap en degrés
+ * @returns {string} Direction cardinale ("N", "NE", "E", "SE", "S", "SO", "O", "NO")
+ */
+function degreesToCardinal(deg) {
+    if (typeof deg !== 'number' || isNaN(deg)) return "";
+    
+    // Normaliser les degrés entre 0 et 360
+    const normalizedDeg = ((deg % 360) + 360) % 360;
+    
+    const directions = ["N", "NE", "E", "SE", "S", "SO", "O", "NO"];
+    const index = Math.round(normalizedDeg / 45) % 8;
+    return directions[index];
+}
+
+/**
  * Évalue la météo d'un spot et calcule son score global.
  * 
  * @param {Object} site - Caractéristiques géographiques du spot.
- * @param {number} site.orientation - Orientation de la pente en degrés (0-360).
+ * @param {string} site.orientation - Orientations acceptées séparées par des virgules (ex: "S,SO").
+ * @param {number} [site.orientation_ideale_deg] - Orientation idéale du site en degrés (le cas échéant).
  * 
  * @param {Object} weather - Prévisions météo actuelles fournies par l'API.
  * @param {boolean} weather.isDaytime - Indique s'il fait jour.
  * @param {number} weather.windSpeed - Vitesse du vent moyen.
  * @param {number} weather.windGust - Vitesse des rafales.
- * @param {number} weather.windDir - Direction d'où vient le vent en degrés (0-360).
+ * @param {number|string} weather.windDir - Direction d'où vient le vent (degrés ou cardinal).
+ * @param {number} [weather.windDirDeg] - Direction d'où vient le vent en degrés (degrés).
+ * @param {string} [weather.windCard] - Direction cardinale du vent.
  * @param {number} weather.precipitation - Quantité de précipitations (mm).
  * @param {number} [weather.cape] - (Optionnel) CAPE / Index de stabilité (J/kg).
  * 
@@ -84,14 +103,20 @@ function evaluateSpotForecast(site, weather, userPreferences) {
         return { score: 0, flyable: false, reason: 'Risque orageux (CAPE)', class: 'weather-unflyable', icon: 'ri-thunderstorms-line' };
     }
 
-    // F. Orientation du vent (Déphasage angulaire > 45°)
-    // Si le site n'a pas d'orientation définie (ex: site 360°), on ignore ce filtre
-    const hasOrientation = site.orientation !== undefined && site.orientation !== null;
-    let angularDiff = 0;
-    
-    if (hasOrientation) {
-        angularDiff = getAngularDifference(weather.windDir, site.orientation);
-        if (angularDiff > 45) {
+    // F. Orientation du vent (Filtrage par Point Cardinal - Tolérance Zéro)
+    const orientations = (typeof site.orientation === 'string' && site.orientation.length > 0) ? site.orientation.split(',').map(v => v.trim()) : [];
+    if (orientations.length > 0) {
+        let ventCardinal = "";
+        
+        if (weather.windCard && String(weather.windCard).trim() !== "") {
+            ventCardinal = String(weather.windCard);
+        } else if (weather.windDir !== undefined && weather.windDir !== null && String(weather.windDir).trim() !== "") {
+            ventCardinal = degreesToCardinal(Number(weather.windDir));
+        }
+        
+        ventCardinal = ventCardinal.trim().toUpperCase();
+        
+        if (!orientations.includes(ventCardinal)) {
             return { score: 0, flyable: false, reason: 'Mauvaise orientation', class: 'weather-unflyable', icon: 'ri-close-circle-fill' };
         }
     }
@@ -109,23 +134,71 @@ function evaluateSpotForecast(site, weather, userPreferences) {
         const ecartVent = Math.abs(weather.windSpeed - vIdeal);
         scoreVentMoyen = Math.max(0, 100 * (1 - (ecartVent / demiPlage)));
     } else {
+        // Protection division par zéro si vMin == vMax
         scoreVentMoyen = weather.windSpeed === vIdeal ? 100 : 0;
     }
 
+    // Extraction et conversion de la direction du vent en degrés
+    let windDirDeg = null;
+    if (weather.windDirDeg !== undefined && weather.windDirDeg !== null) {
+        windDirDeg = Number(weather.windDirDeg);
+    } else if (weather.windDir !== undefined && weather.windDir !== null) {
+        const parsed = Number(weather.windDir);
+        if (!isNaN(parsed)) {
+            windDirDeg = parsed;
+        } else {
+            const CARD_TO_DEG = { "N": 0, "NE": 45, "E": 90, "SE": 135, "S": 180, "SO": 225, "O": 270, "NO": 315 };
+            const cleanCard = String(weather.windDir).trim().toUpperCase();
+            if (CARD_TO_DEG[cleanCard] !== undefined) {
+                windDirDeg = CARD_TO_DEG[cleanCard];
+            }
+        }
+    }
+    
+    if (windDirDeg === null && weather.windCard) {
+        const CARD_TO_DEG = { "N": 0, "NE": 45, "E": 90, "SE": 135, "S": 180, "SO": 225, "O": 270, "NO": 315 };
+        const cleanCard = String(weather.windCard).trim().toUpperCase();
+        if (CARD_TO_DEG[cleanCard] !== undefined) {
+            windDirDeg = CARD_TO_DEG[cleanCard];
+        }
+    }
+
     // B. Note d'Orientation (0 à 100)
-    // Si pas d'orientation spécifiée, on accorde 100 points par défaut
-    const scoreOrientation = hasOrientation ? Math.max(0, 100 * (1 - (angularDiff / 45))) : 100;
+    // Plus le vent est aligné avec l'orientation de la pente, plus le score est élevé.
+    const hasOrientation = site.orientation_ideale_deg !== undefined && site.orientation_ideale_deg !== null && windDirDeg !== null;
+    let angularDiff = 0;
+    let scoreOrientation = 100; // 100 par défaut si pas d'orientation idéale spécifiée
+    
+    if (hasOrientation) {
+        angularDiff = getAngularDifference(windDirDeg, site.orientation_ideale_deg);
+        
+        // Logique de paliers pour le rendement en soaring / thermique
+        if (angularDiff <= 11.25) {
+            // Zone 1 : Parfait (±11.25°)
+            scoreOrientation = 100;
+        } else if (angularDiff <= 22.5) {
+            // Zone 2 : Bon (décroît de 100 à 70 entre 11.25° et 22.5°)
+            const progress = (angularDiff - 11.25) / (22.5 - 11.25);
+            scoreOrientation = 100 - (progress * 30);
+        } else if (angularDiff <= 45) {
+            // Zone 3 : Passable (décroît de 70 à 0 entre 22.5° et 45°)
+            const progress = (angularDiff - 22.5) / (45 - 22.5);
+            scoreOrientation = 70 - (progress * 70);
+        } else {
+            // Zone 4 : Hors-jeu (> 45°)
+            scoreOrientation = 0;
+        }
+    }
 
     // C. Calcul du score final pondéré
     const finalScore = Math.round(
         (scoreVentMoyen * SCORING_WEIGHTS.WIND_SPEED) + 
         (scoreOrientation * SCORING_WEIGHTS.WIND_DIRECTION)
-    );
+    ) || 0;
 
     // ---------------------------------------------------------
     // 4. RETOUR DU DIAGNOSTIC COMPLET
     // ---------------------------------------------------------
-    // On peut définir un seuil (ex: score >= 70) pour dire si le spot est "Idéal" ou simplement "Volable"
     let reasonText = `Excellent (${finalScore}/100)`;
     if (finalScore < 50) reasonText = `Passable (${finalScore}/100)`;
     else if (finalScore < 80) reasonText = `Bon (${finalScore}/100)`;

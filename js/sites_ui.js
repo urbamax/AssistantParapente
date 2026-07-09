@@ -35,8 +35,8 @@ SitesEngine.renderList = function () {
                     }
                     
                     const region = this.removeAccents(site.region || '').toLowerCase();
-                    const obs = this.removeAccents(site.observations || '').toLowerCase();
-                    const topo = this.removeAccents(site.acces_topo || '').toLowerCase();
+                    const obs = this.removeAccents(site.description || '').toLowerCase();
+                    const topo = this.removeAccents(site.acces || '').toLowerCase();
                     const dangers = this.removeAccents(site.dangers || '').toLowerCase();
                     const practice = this.removeAccents(site.praticabilite || '').toLowerCase();
 
@@ -144,8 +144,8 @@ SitesEngine.renderList = function () {
                     site.distance = this.calculateDistance(
                         this.state.userLocation.lat,
                         this.state.userLocation.lng,
-                        site.latitude,
-                        site.longitude
+                        parseFloat(site.lat),
+                        parseFloat(site.lon)
                     );
                 }
             });
@@ -158,24 +158,25 @@ SitesEngine.renderList = function () {
             // 3-State Wind Filtering
             if (this.state.filterWindExclude && this.state.filterWindExclude.length > 0) {
                 activeSites = activeSites.filter(site => {
-                    return !site.orientations_vent.some(w => this.state.filterWindExclude.includes(w));
+                    const orientations = site.orientation ? site.orientation.split(',').map(v => v.trim()) : [];
+                    return !orientations.some(w => this.state.filterWindExclude.includes(w));
                 });
             }
             if (this.state.filterWindInclude && this.state.filterWindInclude.length > 0) {
                 activeSites = activeSites.filter(site => {
-                    return site.orientations_vent.some(w => this.state.filterWindInclude.includes(w));
+                    const orientations = site.orientation ? site.orientation.split(',').map(v => v.trim()) : [];
+                    return orientations.some(w => this.state.filterWindInclude.includes(w));
                 });
             }
 
             // Type Filtering (with Landing-only default hide & independent type priority)
             activeSites = activeSites.filter(site => {
-                let siteTypes = Array.isArray(site.type) ? site.type : [site.type];
-                siteTypes = siteTypes.map(t => t === 'ATTERO' ? 'ATTERRO' : t);
+                let siteTypes = Array.isArray(site.site_sous_type) ? site.site_sous_type : [site.site_sous_type];
 
-                // 1. Landing-only hidden by default (can be revealed by including ATTERRO)
-                const isLandingOnly = siteTypes.includes('ATTERRO') && siteTypes.every(t => t === 'ATTERRO');
+                // 1. Landing-only hidden by default (can be revealed by including Atterrissage)
+                const isLandingOnly = siteTypes.includes('Atterrissage') && siteTypes.every(t => t === 'Atterrissage');
                 if (isLandingOnly) {
-                    if (!this.state.filterTypeInclude.includes('ATTERRO')) {
+                    if (!this.state.filterTypeInclude.includes('Atterrissage')) {
                         return false;
                     }
                 }
@@ -271,7 +272,7 @@ SitesEngine.renderList = function () {
             if (activeSites.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state site-empty-state">
-                        <i class="ri-map-pin-line site-empty-icon"></i>
+                        <i class="ri-landscape-line site-empty-icon"></i>
                         <p class="site-empty-text">Aucun site ne correspond à ces critères.</p>
                     </div>
                 `;
@@ -279,21 +280,12 @@ SitesEngine.renderList = function () {
             }
 
             activeSites.forEach(site => {
-                const windTags = site.orientations_vent.map(w => `<span class="wind-tag" onclick="SitesEngine.filterByTag('${w}')" title="Filtrer par vent ${w}">${w}</span>`).join('');
+                const orientations = site.orientation ? site.orientation.split(',').map(v => v.trim()) : [];
+                const windTags = orientations.map(w => `<span class="wind-tag" onclick="SitesEngine.filterByTag('${w}')" title="Filtrer par vent ${w}">${w}</span>`).join('');
 
-                const typeLabels = {
-                    'DECO': 'Décollage',
-                    'ATTERRO': 'Atterrissage',
-                    'NATUREL': 'Naturel',
-                    'DUNE': 'Dune',
-                    'TREUIL': 'Treuil',
-                    'GONFLAGE': 'Gonflage'
-                };
-                let siteTypes = Array.isArray(site.type) ? site.type : [site.type];
-                siteTypes = siteTypes.map(t => t === 'ATTERO' ? 'ATTERRO' : t);
+                let siteTypes = Array.isArray(site.site_sous_type) ? site.site_sous_type : [site.site_sous_type];
                 const typeLabel = siteTypes.map(t => {
-                    const label = typeLabels[t] || t;
-                    return `<span class="site-coords-badge site-type-badge">${label}</span>`;
+                    return `<span class="site-coords-badge site-type-badge">${t}</span>`;
                 }).join(' ');
 
                 let distanceHtml = '';
@@ -432,15 +424,15 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                         <i class="${minIcon}"></i>
                     </button>
                     <h3 class="site-card-title">${site.nom}</h3>
-                    ${site.altitude ? `
+                    ${site.alt ? `
                     <span class="site-coords-badge site-altitude-badge" title="Altitude du site">
-                        <i class="ri-landscape-line"></i> ${site.altitude} m
+                        <i class="ri-landscape-fill"></i> ${site.alt} m
                     </span>
                     ` : ''}
                     <div class="site-wind-tags site-wind-tags-row">${windTags}</div>
                     ${typeLabel}
-                    <button class="site-coords-badge copy-coords-btn" onclick="SitesEngine.copyCoords(${site.latitude}, ${site.longitude}, this)" title="Copier les coordonnées">
-                        <i class="ri-map-pin-2-line"></i> <span class="coords-text">${site.latitude}, ${site.longitude}</span>
+                    <button class="site-coords-badge copy-coords-btn" onclick="SitesEngine.copyCoords(${parseFloat(site.lat)}, ${parseFloat(site.lon)}, this)" title="Copier les coordonnées">
+                        <i class="ri-map-pin-2-line"></i> <span class="coords-text">${parseFloat(site.lat)}, ${parseFloat(site.lon)}</span>
                     </button>
                     ${distanceHtml}
                     ${flyableHoursHtml}
@@ -451,10 +443,10 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                         <img src="https://federation.ffvl.fr/sites/all/themes/ffvl/favicon.ico" alt="FFVL"> FFVL
                     </a>
                     ` : ''}
-                    <button class="action-btn-spot spot-it-btn" onclick="SitesEngine.spotSite(${site.latitude}, ${site.longitude}, '${site.nom.replace(/'/g, "\\'")}', '${site.referecence_terrain || ''}'); event.stopPropagation();" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                    <button class="action-btn-spot spot-it-btn" onclick="SitesEngine.spotSite(${parseFloat(site.lat)}, ${parseFloat(site.lon)}, '${site.nom.replace(/'/g, "\\'")}', '${site.id || ''}'); event.stopPropagation();" title="Spot It — Paramétrer toutes les cartes sur ce site">
                         <i class="ri-focus-3-line"></i> Spot It
                     </button>
-                    <button class="action-btn-primary gps-btn" onclick="SitesEngine.openGpsMenu(${site.latitude}, ${site.longitude}); event.stopPropagation();">
+                    <button class="action-btn-primary gps-btn" onclick="SitesEngine.openGpsMenu(${parseFloat(site.lat)}, ${parseFloat(site.lon)}); event.stopPropagation();">
                         <i class="ri-navigation-line"></i> S'y rendre
                     </button>
                 </div>
@@ -482,12 +474,12 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                 const showConv = this.isFieldFilled(site.conventionnement);
                 const showPrat = this.isFieldFilled(site.praticabilite);
                 const showGest = this.isFieldFilled(site.structure_gestionnaire);
-                const showAero = this.isFieldFilled(site.aerologie_ideale);
+                const showAero = this.isFieldFilled(site.vent_favo);
                 const showSec = this.isFieldFilled(site.secours_acces);
                 const showDang = this.isFieldFilled(site.dangers);
-                const showTopo = this.isFieldFilled(site.acces_topo);
+                const showTopo = this.isFieldFilled(site.acces);
 
-                const rawObs = site.observations || '';
+                const rawObs = site.description || '';
                 const cleanObs = rawObs.replace(/^Altitude\s*:\s*\d+\s*m\.?\s*/i, '').trim();
                 const showObs = this.isFieldFilled(cleanObs);
 
@@ -534,7 +526,7 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                                 <i class="ri-compass-3-line rich-detail-icon blue"></i>
                                 <div>
                                     <strong class="rich-detail-label muted">Aérologie Idéale</strong>
-                                    <span class="rich-detail-value">${site.aerologie_ideale}</span>
+                                    <span class="rich-detail-value">${site.vent_favo || 'Non renseigné'}</span>
                                 </div>
                             </div>
                             ` : ''}
@@ -543,7 +535,7 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                                 <i class="ri-heart-pulse-line rich-detail-icon red"></i>
                                 <div>
                                     <strong class="rich-detail-label muted">Secours & Accès</strong>
-                                    <span class="rich-detail-value">${site.secours_acces}</span>
+                                    <span class="rich-detail-value">${site.secours_acces || 'Non renseigné'}</span>
                                 </div>
                             </div>
                             ` : ''}
@@ -552,7 +544,7 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                                 <i class="ri-error-warning-line rich-detail-icon red"></i>
                                 <div>
                                     <strong class="rich-detail-label red">Dangers Signalés</strong>
-                                    <span class="rich-detail-value">${site.dangers}</span>
+                                    <span class="rich-detail-value">${site.dangers || 'Non renseigné'}</span>
                                 </div>
                             </div>
                             ` : ''}
@@ -561,7 +553,7 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                                 <i class="ri-walk-line rich-detail-icon secondary"></i>
                                 <div>
                                     <strong class="rich-detail-label muted">Accès & Topo</strong>
-                                    <span class="rich-detail-value">${site.acces_topo}</span>
+                                    <span class="rich-detail-value">${site.acces || 'Non renseigné'}</span>
                                 </div>
                             </div>
                             ` : ''}
@@ -570,7 +562,7 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                                 <i class="ri-information-line rich-detail-icon blue"></i>
                                 <div>
                                     <strong class="rich-detail-label muted">Observations & Réglementation</strong>
-                                    <span class="rich-detail-value">${cleanObs}</span>
+                                    <span class="rich-detail-value">${cleanObs || 'Non renseigné'}</span>
                                 </div>
                             </div>
                             ` : ''}

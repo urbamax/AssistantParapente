@@ -65,6 +65,9 @@
     --radius-lg: 16px;
     --radius-md: 8px;
     --radius-sm: 4px;
+
+    /* Layout */
+    --header-height: 100px;
 }
 
 /* --- LIGHT MODE THEME REDEFINITION --- */

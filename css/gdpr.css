@@ -486,3 +486,103 @@ input:checked + .gdpr-slider:before {
         width: 100%;
     }
 }
+
+/* =============================================
+   MODAL MODE D'EMPLOI â€” MOBILE
+   ============================================= */
+@media (max-width: 768px) {
+
+    /* Le modal prend presque tout l'Ã©cran */
+    #manual-modal .gdpr-modal {
+        width: 96% !important;
+        max-width: 96% !important;
+        max-height: 92vh !important;
+        padding: 14px 14px 16px !important;
+        border-radius: 20px !important;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Header : titre + bouton close sur une ligne serrÃ©e */
+    #manual-modal .gdpr-modal-header {
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+        flex-shrink: 0;
+    }
+
+    #manual-modal .gdpr-modal-title {
+        font-size: 1.05rem;
+    }
+
+    /* Body scrollable occupe tout l'espace restant */
+    #manual-modal .gdpr-modal-body {
+        padding-right: 4px;
+        padding-top: 0 !important;
+        max-height: none !important;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    /* Onglets : barre horizontale scrollable, tabs compacts */
+    #manual-modal .manual-nav {
+        gap: 4px !important;
+        margin-bottom: 14px !important;
+        padding-bottom: 6px !important;
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        -webkit-overflow-scrolling: touch;
+        /* Masque la scrollbar mais garde le scroll */
+        scrollbar-width: none;
+    }
+
+    #manual-modal .manual-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    #manual-modal .manual-tab-btn {
+        padding: 6px 10px !important;
+        font-size: 0.78rem !important;
+        white-space: nowrap !important;
+        border-radius: 6px !important;
+        flex-shrink: 0;
+    }
+
+    /* Contenu des sections : marges rÃ©duites */
+    #manual-modal .manual-section h4,
+    #manual-modal .manual-section h5 {
+        font-size: 0.95rem;
+        margin-top: 14px;
+    }
+
+    #manual-modal .manual-section p,
+    #manual-modal .manual-section li {
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+
+    /* Blocs mise en avant (about hero) */
+    #manual-modal [style*="display: flex; align-items: center; gap: 16px"] {
+        flex-direction: column !important;
+        gap: 10px !important;
+        padding: 14px !important;
+    }
+
+    /* Image logo dans le bloc about */
+    #manual-modal img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+@media (max-width: 400px) {
+    #manual-modal .gdpr-modal {
+        width: 99% !important;
+        padding: 10px 10px 12px !important;
+    }
+
+    #manual-modal .manual-tab-btn {
+        padding: 5px 8px !important;
+        font-size: 0.72rem !important;
+    }
+}

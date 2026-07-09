@@ -5,8 +5,8 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 115px;
-    padding: 0 40px;
+    height: 100px;
+    padding: 0 32px;
     background: rgba(255, 255, 255, 0.65);
     backdrop-filter: blur(24px) saturate(160%);
     -webkit-backdrop-filter: blur(24px) saturate(160%);
@@ -15,6 +15,8 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    gap: 16px;
+    overflow: visible;
     border-bottom: 1px solid rgba(150, 150, 150, 0.15);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -46,6 +48,7 @@ body.dark-theme .top-controls {
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
 .dashboard-title {
@@ -67,21 +70,43 @@ body.dark-theme .top-controls {
 .paraglider-title {
     display: flex;
     justify-content: center;
+    align-items: center;
     padding: 0;
+    height: 100%;
 }
 
 .logo-image {
-    max-width: 450px;
-    height: auto;
-    max-height: 120px;
+    max-width: 400px;
+    width: auto;
+    max-height: 80px;
+    height: 80px;
     object-fit: contain;
+    display: block;
+    filter: drop-shadow(0px 0px 6px rgba(0, 0, 0, 0.55)) drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.75));
+    transition: filter 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.logo-image:hover {
+    transform: scale(1.05);
+}
+
+/* Halo lumineux en mode sombre pour dÃ©tacher le pilote et les suspentes noirs */
+body.dark-theme .logo-image {
+    filter:
+        drop-shadow(0px 0px 6px rgba(255, 255, 255, 0.7))
+        drop-shadow(0px 0px 2px rgba(255, 255, 255, 0.9));
 }
 
 .header-level-row {
     display: flex;
     align-items: center;
+    /* Same pill wrapper as .desktop-main-nav */
+    background: rgba(120, 120, 120, 0.05);
+    padding: 6px 12px;
+    border-radius: 100px;
+    border: 1px solid rgba(150, 150, 150, 0.1);
+    backdrop-filter: blur(12px);
     margin: 0;
-    padding-right: 20px;
 }
 
 /* Nav Buttons (Modern Glass Pill) */
@@ -132,51 +157,46 @@ body.dark-theme .nav-btn-glass:hover {
     box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 6px 16px rgba(0, 122, 255, 0.25);
 }
 
-/* Level Selector */
+/* Level Selector â€” mirrors nav-menu-btn exactly */
 .level-select-container {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    background: rgba(120, 120, 120, 0.08);
-    padding: 6px 18px;
+    gap: 7px;
+    background: transparent;
+    padding: 0 6px;
     border-radius: 50px;
-    border: 1px solid rgba(150, 150, 150, 0.15);
-    transition: all 0.3s ease;
+    border: none;
+    height: 36px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 body.dark-theme .level-select-container {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: transparent;
 }
 
 .level-select-container:hover {
-    background: rgba(120, 120, 120, 0.12);
-    border-color: var(--accent-blue);
+    background: rgba(120, 120, 120, 0.1);
     transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(0, 122, 255, 0.15);
 }
 
 body.dark-theme .level-select-container:hover {
     background: rgba(255, 255, 255, 0.08);
 }
 
-.level-select-container label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-right: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
 .level-select-container select {
     background: transparent;
-    color: var(--text-main);
+    color: var(--text-secondary);
     border: none;
-    font-weight: 700;
-    font-size: 0.85rem;
+    font-weight: 600;
+    font-size: 0.88rem;
     cursor: pointer;
     font-family: inherit;
     outline: none;
+    height: 100%;
+    padding: 0;
+    line-height: 1;
 }
 
 /* Desktop Main Navigation Menu */
@@ -199,16 +219,19 @@ body.dark-theme .desktop-main-nav {
 .nav-menu-btn {
     background: transparent;
     border: none;
-    padding: 10px 18px;
+    padding: 7px 16px;
     border-radius: 50px;
     color: var(--text-secondary);
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 7px;
+    height: 36px;
+    white-space: nowrap;
     outline: none;
 }
 
@@ -257,118 +280,171 @@ body.dark-theme .nav-menu-btn.active {
 }
 
 @media (max-width: 768px) {
+    /* === HEADER MOBILE === */
     .top-controls {
-        height: auto;
-        padding: 10px 14px !important;
-        flex-direction: row;
-        flex-wrap: wrap;
+        height: auto !important;
+        min-height: 56px;
+        padding: 8px 12px !important;
+        flex-wrap: nowrap !important;
+        gap: 8px !important;
         align-items: center;
         justify-content: space-between;
-        gap: 10px !important;
     }
 
-    .header-nav-slot {
-        order: 1;
-        width: auto;
-    }
-
-    .header-branding {
-        order: 2;
-        flex: 1;
-        justify-content: center;
-        padding-left: 0;
-        margin-bottom: 0;
-    }
-
-    .header-actions-slot {
-        order: 3;
-        width: auto;
-    }
-
-    .header-branding .dashboard-title {
-        font-size: 1rem;
-        font-weight: 800;
-        white-space: nowrap;
+    /* Le logo reste Ã  gauche, compact */
+    .header-left-zone {
+        flex: 0 0 auto !important;
+        gap: 6px !important;
     }
 
     .logo-image {
-        max-width: 320px;
-        max-height: 84px;
+        max-height: 44px !important;
+        height: 44px !important;
+        max-width: 180px !important;
     }
 
-    /* Extra small screens title scale down */
-    @media (max-width: 360px) {
-        .header-branding .dashboard-title {
-            font-size: 0.85rem;
-        }
+    /* Nav centrale masquÃ©e sur mobile */
+    .desktop-main-nav {
+        display: none !important;
+    }
 
-        .logo-image {
-            max-width: 280px;
-            max-height: 73px;
-        }
+    /* Actions Ã  droite : icones + sÃ©lecteur sur une seule ligne */
+    .header-actions-slot {
+        flex: 0 0 auto !important;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Pill sÃ©lecteur de niveau compact */
+    .header-level-row {
+        padding: 4px 10px !important;
+        border-radius: 50px !important;
+        order: unset;
+        width: auto !important;
+        margin-top: 0 !important;
+    }
+
+    .level-select-container {
+        width: auto !important;
+        height: 32px !important;
+        padding: 0 8px !important;
+        gap: 4px !important;
+    }
+
+    .level-select-container select {
+        font-size: 0.78rem !important;
+        max-width: 110px;
+    }
+
+    .icon-btn {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 1rem !important;
     }
 
     .nav-btn-glass {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
         padding: 0;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
 
     .nav-btn-glass span {
-        display: none; /* Cache le texte 'RETOUR' pour gagner de la place */
+        display: none;
     }
+}
 
-    .icon-btn {
-        width: 40px !important;
-        height: 40px !important;
-        font-size: 1.1rem !important;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-    }
-
-
-    .header-level-row {
-        order: 4;
-        width: 100%;
-        justify-content: center;
-        margin-top: 5px;
-        padding-right: 0;
-    }
-
-    .level-select-container {
-        width: 100%;
-        padding: 5px 12px !important;
-        border-radius: 50px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid var(--border-color);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
-    }
-
-    .level-select-container label {
-        font-size: 0.7rem !important;
-        font-weight: 700;
-        letter-spacing: 0.02em;
-        color: var(--text-muted);
-        text-transform: uppercase;
-    }
-
+@media (max-width: 400px) {
     .level-select-container select {
+        max-width: 85px;
         font-size: 0.72rem !important;
-        font-weight: 700;
-        padding: 4px;
-        background: transparent;
-        border: none;
-        color: var(--text-main);
-        text-align: right;
+    }
+
+    .logo-image {
+        max-height: 38px !important;
+        height: 38px !important;
+        max-width: 150px !important;
+    }
+}
+
+/* --- THEORY HEADER DROPDOWN --- */
+.nav-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    min-width: 180px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(150, 150, 150, 0.15);
+    border-radius: var(--radius-md, 12px);
+    z-index: 999999;
+    overflow: hidden;
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.dark-theme .dropdown-content {
+    background: rgba(25, 25, 25, 0.85);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+.dropdown-item {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 12px 18px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.dropdown-item:hover {
+    color: var(--text-main);
+    background: rgba(120, 120, 120, 0.08);
+}
+
+body.dark-theme .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.dropdown-item i {
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -10px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
     }
 }

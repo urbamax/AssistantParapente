@@ -34,7 +34,7 @@
     max-width: 1800px;
     margin: 0 auto;
     width: 100%;
-    margin-top: calc(var(--header-height, 140px) + 20px);
+    margin-top: calc(var(--header-height, 100px) + 20px);
 }
 
 .apps-grid {
@@ -135,7 +135,7 @@ body.light-mode .accent-qcm .app-icon {
 @media (max-width: 768px) {
     /* Dashboard */
     .dashboard-content {
-        margin-top: calc(var(--header-height, 140px) + 12px) !important;
+        margin-top: calc(var(--header-height, 100px) + 12px) !important;
     }
 
     .apps-grid {
@@ -168,5 +168,41 @@ body.light-mode .accent-qcm .app-icon {
     .app-info p {
         font-size: 0.85rem;
         color: var(--text-muted);
+    }
+}
+
+/* --- THEORIE SUB-MENU --- */
+.sub-menu {
+    display: none;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-card);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    margin-top: -12px; /* Pull it slightly up towards the Theory button */
+}
+
+body.light-mode .sub-menu {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.sub-menu.active {
+    display: grid;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.sub-menu .app-card {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .sub-menu {
+        grid-template-columns: 1fr;
+        padding: 16px;
+        gap: 12px;
+        margin-top: -8px;
     }
 }
