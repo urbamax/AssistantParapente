@@ -1,11 +1,11 @@
 SitesEngine.fetchWeatherForSites = async function () {
     if (typeof SITES_DATA === 'undefined' || SITES_DATA.length === 0) return;
 
-    const activeSites = SITES_DATA.filter(s => s.affiche !== false && !isNaN(parseFloat(s.latitude)) && !isNaN(parseFloat(s.longitude)));
+    const activeSites = SITES_DATA.filter(s => s.affiche !== false && !isNaN(parseFloat((s.latitude || s.lat))) && !isNaN(parseFloat((s.longitude || s.lon))));
     if (activeSites.length === 0) return;
 
-    const lats = activeSites.map(s => parseFloat(s.latitude)).join(',');
-    const lons = activeSites.map(s => parseFloat(s.longitude)).join(',');
+    const lats = activeSites.map(s => parseFloat((s.latitude || s.lat))).join(',');
+    const lons = activeSites.map(s => parseFloat((s.longitude || s.lon))).join(',');
 
     let apiEndpoint = 'meteofrance'; // default AROME
     if (this.state.weatherModel === 'icon' || this.state.weatherModel === 'iconeu') apiEndpoint = 'dwd-icon';
@@ -194,13 +194,17 @@ SitesEngine.isForecastFlyable = function (site, weather) {
     const userPrefs = {
         vMin: this.state.limitWindMin,
         vMax: this.state.limitWindMax,
-        deltaRafaleMax: this.state.limitGustDelta
+        deltaRafaleMax: this.state.limitGustDelta,
+        filterMode: this.state.filterMode
     };
 
     // 2. Déterminer la meilleure orientation du site par rapport au vent actuel
     let bestOrientation = undefined;
 
-    const orientations = site.orientation ? site.orientation.split(',').map(v => v.trim()) : [];
+    let orientations = [];
+    if (Array.isArray(site.orientations_vent)) orientations = site.orientations_vent;
+    else if (typeof site.orientations_vent === 'string') orientations = site.orientations_vent.split(',').map(v => v.trim());
+    else if (site.orientation) orientations = site.orientation.split(',').map(v => v.trim());
     if (orientations.length > 0 && weather) {
         const CARD_TO_DEG = { "N": 0, "NE": 45, "E": 90, "SE": 135, "S": 180, "SO": 225, "O": 270, "NO": 315 };
         let minDiff = 180;

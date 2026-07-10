@@ -84,10 +84,12 @@ SitesEngine.loadUserPreferences = function () {
     const maxInput = document.getElementById('limit-wind-max');
     const gustInput = document.getElementById('limit-gust-delta');
     const forecastRangeSelect = document.getElementById('forecast-range-select');
+    const filterModeSelect = document.getElementById('filter-mode-select');
 
     if (maxInput) maxInput.value = this.state.limitWindMax;
     if (gustInput) gustInput.value = this.state.limitGustDelta;
     if (forecastRangeSelect) forecastRangeSelect.value = this.state.forecastMaxRange;
+    if (filterModeSelect && this.state.filterMode) filterModeSelect.value = this.state.filterMode;
 
     this.renderSavedLocations();
     if (this.updateMapTogglesVisibility) {
@@ -134,7 +136,7 @@ SitesEngine.PREFERENCE_KEYS = [
     'limitWindMin', 'limitWindMax', 'limitGustDelta', 'filterWindInclude', 'filterWindExclude',
     'filterTypeInclude', 'filterTypeExclude', 'filterFavoritesOnly',
     'forecastMaxRange', 'activeMapLayers', 'hideUnflyable', 'radiusLimit',
-    'sortMode', 'conditionsStrategy', 'weatherModel'
+    'sortMode', 'conditionsStrategy', 'weatherModel', 'filterMode'
 ];
 
 SitesEngine.removeAccents = function (str) {

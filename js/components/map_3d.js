@@ -120,13 +120,13 @@ const Map3DComponent = {
                 sources: {
                     'satellite': {
                         type: 'raster',
-                        tiles: [AppConfig.MAPS.ARCGIS_SATELLITE_URL],
+                        tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
                         tileSize: 256,
                         attribution: 'Tiles &copy; Esri'
                     },
                     'terrainSource': {
                         type: 'raster-dem',
-                        tiles: [AppConfig.MAPS.TERRARIUM_DEM_URL],
+                        tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
                         encoding: 'terrarium',
                         tileSize: 256,
                         maxzoom: 14

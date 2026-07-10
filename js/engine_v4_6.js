@@ -351,8 +351,8 @@ const Engine = {
         this.state.basePath = basePath;
 
         const componentMap = [
-            { id: 'app-header', url: basePath + '/components/header.html?v=2026.07.10_v3' },
-            { id: 'app-footer', url: basePath + '/components/footer.html?v=2026.07.10_v3', selector: '.app-footer-placeholder' }
+            { id: 'app-header', url: basePath + '/components/header.html?v=2026.07.10_v8' },
+            { id: 'app-footer', url: basePath + '/components/footer.html?v=2026.07.10_v8', selector: '.app-footer-placeholder' }
         ];
 
         const self = this;

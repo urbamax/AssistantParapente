@@ -706,7 +706,7 @@ const LogbookEngine = {
                     const siteInput = document.getElementById('lb-site');
                     if (siteInput && !siteInput.value.trim()) {
                         siteInput.value = "Recherche du lieu...";
-                        fetch(`${AppConfig.API.NOMINATIM_BASE}/reverse?format=json&lat=${parsed.points[0].lat}&lon=${parsed.points[0].lon}`)
+                        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${parsed.points[0].lat}&lon=${parsed.points[0].lon}`)
                             .then(res => res.json())
                             .then(data => {
                                 const city = data.address.village || data.address.town || data.address.city || data.address.municipality || "Lieu inconnu";
@@ -1265,11 +1265,23 @@ const LogbookEngine = {
             for (const [voile, st] of Object.entries(equipStats)) {
                 html += `
                     <div class="equip-card">
-                        <div class="equip-name"><i class="ri-parachute-line"></i> ${voile}</div>
+                        <div class="equip-name">${voile}</div>
                         <div class="equip-details">
                             <span style="color: var(--accent-blue)">Vols: ${st.vols} (${this.formatDuration(st.timeVols)})</span>
                             <span style="color: #f59e0b">Gonflage: ${st.gonflages} (${this.formatDuration(st.timeGonflages)})</span>
                         </div>
+                        ${ (() => {
+                            const equipObj = this.equipData.find(e => e.nom.toLowerCase() === voile.toLowerCase());
+                            if (equipObj && equipObj.periodiciteHeures > 0) {
+                                const totalHours = (st.timeVols + st.timeGonflages) / 60;
+                                const hoursRemaining = equipObj.periodiciteHeures - totalHours;
+                                const hoursText = hoursRemaining <= 0 
+                                    ? `<span style="color:#ef4444; font-weight:bold;">Dépassé de ${Math.abs(Math.round(hoursRemaining * 10) / 10)}h</span>`
+                                    : `${Math.round(hoursRemaining * 10) / 10}h restantes`;
+                                return `<div style="font-size: 0.8rem; margin-top: 6px; color: var(--text-secondary);"><strong>Avant révision:</strong> ${hoursText} (sur ${equipObj.periodiciteHeures}h)</div>`;
+                            }
+                            return '';
+                        })() }
                     </div>
                 `;
             }
@@ -1469,44 +1481,39 @@ const LogbookEngine = {
                 const isArchive = equip.statut === 'archive';
                 const cardStyle = isArchive ? 'opacity: 0.6; filter: grayscale(0.8);' : '';
 
-                let detailsStr = [];
-                if (equip.marque) detailsStr.push(`<strong>Marque:</strong> ${equip.marque}`);
-                if (equip.modele) detailsStr.push(`<strong>Modèle:</strong> ${equip.modele}`);
-                if (equip.taille) detailsStr.push(`<strong>Taille:</strong> ${equip.taille}`);
-                if (equip.couleur) detailsStr.push(`<strong>Couleur:</strong> ${equip.couleur}`);
-
                 html += `
-                    <div class="equip-card ${statusClass}" style="${cardStyle} border:1px solid #eee; padding:15px; border-radius:8px; margin-bottom:15px; background:var(--bg-card);">
+                    <div class="equip-card ${statusClass}" style="${cardStyle} border:1px solid #eee; padding:15px; border-radius:8px; margin-bottom:15px; background:var(--bg-card); display:flex; flex-direction:column; justify-content:space-between; min-height:160px;">
                         ${alertHtml}
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <div class="equip-name" style="font-size:1.1rem; font-weight:600;">
-                                ${equip.nom}
-                                <span class="session-badge" style="margin-left: 8px; font-size:0.75rem; padding:2px 6px; border-radius:4px; ${typeBadgeColors[equip.type] || ''}">${equip.type.toUpperCase()}</span>
-                                ${isArchive ? '<span class="session-badge" style="margin-left: 4px; background: #333; color: white; font-size:0.75rem; padding:2px 6px; border-radius:4px;">ARCHIVÉ</span>' : ''}
-                                ${detailsStr.length > 0 ? `<div style="font-size:0.85rem; color:var(--text-secondary, #6b7280); font-weight:normal; margin-top:4px; display:flex; gap:10px; flex-wrap:wrap;">${detailsStr.join(' | ')}</div>` : ''}
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                <div class="equip-name" style="font-size:1.1rem; font-weight:600;">
+                                    ${equip.nom}
+                                    <span class="session-badge" style="margin-left: 8px; font-size:0.75rem; padding:2px 6px; border-radius:4px; ${typeBadgeColors[equip.type] || ''}">${equip.type.toUpperCase()}</span>
+                                    ${isArchive ? '<span class="session-badge" style="margin-left: 4px; background: #333; color: white; font-size:0.75rem; padding:2px 6px; border-radius:4px;">ARCHIVÉ</span>' : ''}
+                                </div>
                             </div>
-                            <div class="equip-actions" style="display:flex; gap:8px;">
-                                <button class="action-btn" onclick="LogbookEngine.editEquipment('${equip.id}')" title="Modifier" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:var(--accent-blue);">
-                                    ✏️
-                                </button>
-                                <button class="action-btn" onclick="LogbookEngine.toggleEquipmentStatus('${equip.id}')" title="${isArchive ? 'Désarchiver' : 'Archiver'}" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:#6b7280;">
-                                    <i class="${isArchive ? 'ri-arrow-go-back-line' : 'ri-archive-line'}"></i>
-                                </button>
-                                <button class="action-btn" onclick="LogbookEngine.deleteEquipment('${equip.id}')" title="Supprimer définitivement" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:#ef4444;">
-                                    🗑️
-                                </button>
+                            <div class="session-details" style="font-size: 0.85rem; display:flex; gap:15px; margin-bottom: 6px;">
+                                <span class="detail-item"><i class="ri-windy-line"></i> ${stats ? stats.totalSessions : 0} sessions</span>
+                                <span class="detail-item"><i class="ri-time-line"></i> ${stats ? this.formatDuration(stats.totalTime) : '0h 00m'}</span>
+                            </div>
+                            <div class="session-details" style="font-size: 0.8rem; opacity: 0.8; display:flex; gap:15px; flex-wrap:wrap; margin-bottom: 12px;">
+                                ${equip.dateAchat ? `<span class="detail-item"><strong>Achat:</strong> ${this.formatDateOnly(equip.dateAchat)}</span>` : ''}
+                                ${equip.derniereRevision ? `<span class="detail-item"><strong>Dernière révision:</strong> ${this.formatDateOnly(equip.derniereRevision)}</span>` : ''}
+                                ${nextRevDate ? `<span class="detail-item"><strong>Prochaine révision:</strong> ${revisionDateStr}</span>` : ''}
+                                ${hoursRemaining !== null ? `<span class="detail-item"><strong>Heures avant révision:</strong> ${hoursRemaining <= 0 ? `<span style="color:#ef4444; font-weight:bold;">Dépassé de ${Math.abs(Math.round(hoursRemaining * 10) / 10)}h</span>` : `${Math.round(hoursRemaining * 10) / 10}h`} (sur ${equip.periodiciteHeures}h)</span>` : ''}
+                                ${equip.type === 'voile' && equip.ventMin !== undefined ? `<span class="detail-item"><strong>Plage de Vent:</strong> ${equip.ventMin} - ${equip.ventMax} km/h</span>` : ''}
                             </div>
                         </div>
-                        <div class="session-details" style="margin-top: 12px; font-size: 0.85rem; display:flex; gap:15px;">
-                            <span class="detail-item"><i class="ri-windy-line"></i> ${stats ? stats.totalSessions : 0} sessions</span>
-                            <span class="detail-item"><i class="ri-time-line"></i> ${stats ? this.formatDuration(stats.totalTime) : '0h 00m'}</span>
-                        </div>
-                        <div class="session-details" style="margin-top: 6px; font-size: 0.8rem; opacity: 0.8; display:flex; gap:15px; flex-wrap:wrap;">
-                            ${equip.dateAchat ? `<span class="detail-item"><strong>Achat:</strong> ${this.formatDateOnly(equip.dateAchat)}</span>` : ''}
-                            ${equip.derniereRevision ? `<span class="detail-item"><strong>Dernière révision:</strong> ${this.formatDateOnly(equip.derniereRevision)}</span>` : ''}
-                            ${nextRevDate ? `<span class="detail-item"><strong>Prochaine révision:</strong> ${revisionDateStr}</span>` : ''}
-                            ${hoursRemaining !== null ? `<span class="detail-item"><strong>Heures avant révision:</strong> ${hoursRemaining <= 0 ? `<span style="color:#ef4444; font-weight:bold;">Dépassé de ${Math.abs(Math.round(hoursRemaining * 10) / 10)}h</span>` : `${Math.round(hoursRemaining * 10) / 10}h`} (sur ${equip.periodiciteHeures}h)</span>` : ''}
-                            ${equip.type === 'voile' && equip.ventMin !== undefined ? `<span class="detail-item"><strong>Plage de Vent:</strong> ${equip.ventMin} - ${equip.ventMax} km/h</span>` : ''}
+                        <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid rgba(0,0,0,0.05); padding-top:8px; margin-top: auto;">
+                            <button class="action-btn" onclick="LogbookEngine.editEquipment('${equip.id}')" title="Modifier" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-blue);">
+                                ✏️
+                            </button>
+                            <button class="action-btn" onclick="LogbookEngine.toggleEquipmentStatus('${equip.id}')" title="${isArchive ? 'Désarchiver' : 'Archiver'}" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#6b7280;">
+                                <i class="${isArchive ? 'ri-arrow-go-back-line' : 'ri-archive-line'}"></i>
+                            </button>
+                            <button class="action-btn" onclick="LogbookEngine.deleteEquipment('${equip.id}')" title="Supprimer définitivement" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#ef4444;">
+                                🗑️
+                            </button>
                         </div>
                     </div>
                 `;

@@ -16,7 +16,7 @@ SitesEngine.renderList = function () {
             return;
         }
 
-        let activeSites = SITES_DATA.filter(s => s.affiche !== false && !isNaN(parseFloat(s.latitude)) && !isNaN(parseFloat(s.longitude)));
+        let activeSites = SITES_DATA.filter(s => s.affiche !== false && !isNaN(parseFloat((s.latitude || s.lat))) && !isNaN(parseFloat((s.longitude || s.lon))));
 
         // Filter by search query
         const searchQuery = (this.state.searchQuery || '').trim().toLowerCase();
@@ -144,8 +144,8 @@ SitesEngine.renderList = function () {
                 site.distance = this.calculateDistance(
                     this.state.userLocation.lat,
                     this.state.userLocation.lng,
-                    parseFloat(site.latitude),
-                    parseFloat(site.longitude)
+                    parseFloat((site.latitude || site.lat)),
+                    parseFloat((site.longitude || site.lon))
                 );
             }
         });
@@ -158,13 +158,21 @@ SitesEngine.renderList = function () {
         // 3-State Wind Filtering
         if (this.state.filterWindExclude && this.state.filterWindExclude.length > 0) {
             activeSites = activeSites.filter(site => {
-                const orientations = site.orientation ? site.orientation.split(',').map(v => v.trim()) : [];
+                let orientations = [];
+                if (Array.isArray(site.orientations_vent)) orientations = site.orientations_vent;
+                else if (typeof site.orientations_vent === 'string') orientations = site.orientations_vent.split(',').map(v => v.trim());
+                else if (site.orientation) orientations = site.orientation.split(',').map(v => v.trim());
+                
                 return !orientations.some(w => this.state.filterWindExclude.includes(w));
             });
         }
         if (this.state.filterWindInclude && this.state.filterWindInclude.length > 0) {
             activeSites = activeSites.filter(site => {
-                const orientations = site.orientation ? site.orientation.split(',').map(v => v.trim()) : [];
+                let orientations = [];
+                if (Array.isArray(site.orientations_vent)) orientations = site.orientations_vent;
+                else if (typeof site.orientations_vent === 'string') orientations = site.orientations_vent.split(',').map(v => v.trim());
+                else if (site.orientation) orientations = site.orientation.split(',').map(v => v.trim());
+                
                 return orientations.some(w => this.state.filterWindInclude.includes(w));
             });
         }
@@ -280,10 +288,15 @@ SitesEngine.renderList = function () {
         }
 
         activeSites.forEach(site => {
-            const orientations = site.orientation ? site.orientation.split(',').map(v => v.trim()) : [];
+            let orientations = [];
+            if (Array.isArray(site.orientations_vent)) orientations = site.orientations_vent;
+            else if (typeof site.orientations_vent === 'string') orientations = site.orientations_vent.split(',').map(v => v.trim());
+            else if (site.orientation) orientations = site.orientation.split(',').map(v => v.trim());
+            
             const windTags = orientations.map(w => `<span class="wind-tag" onclick="SitesEngine.filterByTag('${w}')" title="Filtrer par vent ${w}">${w}</span>`).join('');
 
-            let siteTypes = Array.isArray(site.site_sous_type) ? site.site_sous_type : [site.site_sous_type];
+            let st = site.site_sous_type || site.type || "Inconnu";
+            let siteTypes = Array.isArray(st) ? st : [st];
             const typeLabel = siteTypes.map(t => {
                 return `<span class="site-coords-badge site-type-badge">${t}</span>`;
             }).join(' ');
@@ -398,7 +411,14 @@ SitesEngine.renderList = function () {
 
 
             const card = document.createElement('div');
-            const isMinimized = this.state.userPreferences && this.state.userPreferences.minimizedSites && this.state.userPreferences.minimizedSites.includes(site.id);
+            const isFav = this.state.userPreferences && this.state.userPreferences.favoriteSites && this.state.userPreferences.favoriteSites.includes(site.id);
+            const userToggled = this.state.userPreferences && this.state.userPreferences.minimizedSites && this.state.userPreferences.minimizedSites.includes(site.id);
+            
+            // Logique d'affichage inversée :
+            // Favoris = déplié par défaut (minimisé si userToggled)
+            // Autres = replié par défaut (minimisé SAUF si userToggled)
+            const isMinimized = isFav ? userToggled : !userToggled;
+
             card.className = isMinimized ? 'site-card minimized' : 'site-card';
             card.innerHTML = this.buildSiteCardHtml(site, windTags, typeLabel, distanceHtml, flyableHoursHtml, weatherHtml, timelineBarsHtml, slotsTextHtml, isMinimized);
             container.appendChild(card);
@@ -417,25 +437,29 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
     return `
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
-                    <button class="favorite-toggle-btn" onclick="SitesEngine.toggleFavorite('${site.id}'); event.stopPropagation();" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: ${starColor}; cursor: pointer; padding: 0; margin-right: 4px;">
-                        <i class="${starIcon}"></i>
-                    </button>
-                    <button class="minimize-toggle-btn" onclick="SitesEngine.toggleMinimize('${site.id}'); event.stopPropagation();" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0; margin-right: 8px;">
-                        <i class="${minIcon}"></i>
-                    </button>
-                    <h3 class="site-card-title">${site.nom}</h3>
-                    ${site.alt ? `
-                    <span class="site-coords-badge site-altitude-badge" title="Altitude du site">
-                        <i class="ri-landscape-fill"></i> ${site.alt} m
-                    </span>
-                    ` : ''}
-                    <div class="site-wind-tags site-wind-tags-row">${windTags}</div>
-                    ${typeLabel}
-                    <button class="site-coords-badge copy-coords-btn" onclick="SitesEngine.copyCoords(${parseFloat(site.latitude)}, ${parseFloat(site.longitude)}, this)" title="Copier les coordonnées">
-                        <i class="ri-map-pin-2-line"></i> <span class="coords-text">${parseFloat(site.latitude)}, ${parseFloat(site.longitude)}</span>
-                    </button>
-                    ${distanceHtml}
-                    ${flyableHoursHtml}
+                    <div class="site-title-row">
+                        <button class="favorite-toggle-btn" onclick="SitesEngine.toggleFavorite('${site.id}'); event.stopPropagation();" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: ${starColor}; cursor: pointer; padding: 0;">
+                            <i class="${starIcon}"></i>
+                        </button>
+                        <button class="minimize-toggle-btn" onclick="SitesEngine.toggleMinimize('${site.id}'); event.stopPropagation();" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="${minIcon}"></i>
+                        </button>
+                        <h3 class="site-card-title">${site.nom}</h3>
+                    </div>
+                    <div class="site-badges-row">
+                        ${site.alt ? `
+                        <span class="site-coords-badge site-altitude-badge" title="Altitude du site">
+                            <i class="ri-landscape-fill"></i> ${site.alt} m
+                        </span>
+                        ` : ''}
+                        <div class="site-wind-tags site-wind-tags-row">${windTags}</div>
+                        ${typeLabel}
+                        <button class="site-coords-badge copy-coords-btn" onclick="SitesEngine.copyCoords(${parseFloat((site.latitude || site.lat))}, ${parseFloat((site.longitude || site.lon))}, this)" title="Copier les coordonnées">
+                            <i class="ri-map-pin-2-line"></i> <span class="coords-text">${parseFloat((site.latitude || site.lat))}, ${parseFloat((site.longitude || site.lon))}</span>
+                        </button>
+                        ${distanceHtml}
+                        ${flyableHoursHtml}
+                    </div>
                 </div>
                 <div class="site-actions-container">
                     ${site.url ? `
@@ -443,10 +467,10 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                         <img src="https://federation.ffvl.fr/sites/all/themes/ffvl/favicon.ico" alt="FFVL"> FFVL
                     </a>
                     ` : ''}
-                    <button class="action-btn-spot spot-it-btn" onclick="SitesEngine.spotSite(${parseFloat(site.latitude)}, ${parseFloat(site.longitude)}, '${site.nom.replace(/'/g, "\\'")}', '${site.id || ''}'); event.stopPropagation();" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                    <button class="action-btn-spot spot-it-btn" onclick="SitesEngine.spotSite(${parseFloat((site.latitude || site.lat))}, ${parseFloat((site.longitude || site.lon))}, '${site.nom.replace(/'/g, "\\'")}', '${site.id || ''}'); event.stopPropagation();" title="Spot It — Paramétrer toutes les cartes sur ce site">
                         <i class="ri-focus-3-line"></i> Spot It
                     </button>
-                    <button class="action-btn-primary gps-btn" onclick="SitesEngine.openGpsMenu(${parseFloat(site.latitude)}, ${parseFloat(site.longitude)}); event.stopPropagation();">
+                    <button class="action-btn-primary gps-btn" onclick="SitesEngine.openGpsMenu(${parseFloat((site.latitude || site.lat))}, ${parseFloat((site.longitude || site.lon))}); event.stopPropagation();">
                         <i class="ri-navigation-line"></i> S'y rendre
                     </button>
                 </div>
@@ -487,7 +511,7 @@ SitesEngine.buildSiteCardHtml = function (site, windTags, typeLabel, distanceHtm
                 const toggleText = this.state.expandedSites[site.id] ? 'Masquer les détails' : "Voir plus d'infos";
 
                 return `
-                    <details class="site-details-toggle" ${isOpen} ontoggle="SitesEngine.handleDetailsToggle(${site.id}, this)">
+                    <details class="site-details-toggle" ${isOpen} ontoggle="SitesEngine.handleDetailsToggle('${site.id}', this)">
                         <summary>
                             <span class="toggle-text">${toggleText}</span>
                             <i class="ri-arrow-down-s-line"></i>

@@ -87,8 +87,20 @@ function evaluateSpotForecast(site, weather, userPreferences) {
     }
 
     // C. Limites de vitesse du vent moyen (vMin / vMax de l'utilisateur)
-    if (weather.windSpeed < userPreferences.vMin || weather.windSpeed > userPreferences.vMax) {
-        return { score: 0, flyable: false, reason: 'Vent hors limites', class: 'weather-unflyable', icon: 'ri-close-circle-fill' };
+    let hardwareWingsNames = [];
+    if (userPreferences.filterMode === 'hardware') {
+        const wings = JSON.parse(localStorage.getItem('tp_equipment_data')) || [];
+        const flyableWings = wings.filter(wing => wing.type === 'voile' && wing.ventMin !== undefined && wing.ventMax !== undefined && weather.windSpeed >= wing.ventMin && weather.windSpeed <= wing.ventMax);
+        
+        if (flyableWings.length > 0) {
+            hardwareWingsNames = flyableWings.map(w => w.nom);
+        } else {
+            return { score: 0, flyable: false, reason: 'Vent hors limites (Matériel)', class: 'weather-unflyable', icon: 'ri-close-circle-fill' };
+        }
+    } else {
+        if (weather.windSpeed < userPreferences.vMin || weather.windSpeed > userPreferences.vMax) {
+            return { score: 0, flyable: false, reason: 'Vent hors limites', class: 'weather-unflyable', icon: 'ri-close-circle-fill' };
+        }
     }
 
     // D. Limite de la turbulence (delta rafale de l'utilisateur)
@@ -104,7 +116,10 @@ function evaluateSpotForecast(site, weather, userPreferences) {
     }
 
     // F. Orientation du vent (Filtrage par Point Cardinal - Tolérance Zéro)
-    const orientations = (typeof site.orientation === 'string' && site.orientation.length > 0) ? site.orientation.split(',').map(v => v.trim()) : [];
+    let orientations = [];
+    if (Array.isArray(site.orientations_vent)) orientations = site.orientations_vent;
+    else if (typeof site.orientations_vent === 'string') orientations = site.orientations_vent.split(',').map(v => v.trim());
+    else if (typeof site.orientation === 'string' && site.orientation.length > 0) orientations = site.orientation.split(',').map(v => v.trim());
     if (orientations.length > 0) {
         let ventCardinal = "";
 
@@ -202,6 +217,10 @@ function evaluateSpotForecast(site, weather, userPreferences) {
     let reasonText = `Excellent (${finalScore}/100)`;
     if (finalScore < 50) reasonText = `Passable (${finalScore}/100)`;
     else if (finalScore < 80) reasonText = `Bon (${finalScore}/100)`;
+
+    if (hardwareWingsNames && hardwareWingsNames.length > 0) {
+        reasonText += ` avec ${hardwareWingsNames.join(', ')}`;
+    }
 
     return {
         score: finalScore,

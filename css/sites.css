@@ -1984,10 +1984,23 @@ body.light-mode .forecast-sticky-container {
 
 .site-info-row {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.site-title-row {
+    display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
+}
+
+.site-badges-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .site-card-title {

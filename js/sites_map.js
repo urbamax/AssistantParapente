@@ -56,7 +56,7 @@ SitesEngine.updateMapTiles = function () {
 SitesEngine.updateMapMarkers = function () {
     if (!this.state.map || !this.state.markersGroup) return;
     this.state.markersGroup.clearLayers();
-    let activeSites = SITES_DATA.filter(s => s.affiche !== false && !isNaN(parseFloat(s.latitude)) && !isNaN(parseFloat(s.longitude)));
+    let activeSites = SITES_DATA.filter(s => s.affiche !== false && !isNaN(parseFloat((s.latitude || s.lat))) && !isNaN(parseFloat((s.longitude || s.lon))));
 
     // Filter map markers by search query
     if (this.state.searchQuery) {
@@ -148,8 +148,8 @@ SitesEngine.updateMapMarkers = function () {
                 site.distance = this.calculateDistance(
                     this.state.userLocation.lat,
                     this.state.userLocation.lng,
-                    parseFloat(site.latitude),
-                    parseFloat(site.longitude)
+                    parseFloat((site.latitude || site.lat)),
+                    parseFloat((site.longitude || site.lon))
                 );
             }
             return site.distance <= this.state.radiusLimit;
@@ -176,16 +176,16 @@ SitesEngine.updateMapMarkers = function () {
             ? `<div class="marker-pulse" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; background: ${color}; opacity: 0.35; animation: marker-pulse-anim 1.8s infinite ease-out;"></div>`
             : '';
         const iconHtml = `<div class="custom-map-marker ${flyableClass}" style="position: relative; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">${pulseHtml}<div class="marker-core" style="width: 14px; height: 14px; border-radius: 50%; background: ${color}; border: 2px solid var(--bg-surface); box-shadow: 0 2px 6px rgba(0,0,0,0.4); z-index: 2; transition: background-color 0.3s;"></div></div>`;
-        const marker = L.marker([parseFloat(site.latitude), parseFloat(site.longitude)], { icon: L.divIcon({ html: iconHtml, className: 'leaflet-custom-icon', iconSize: [30, 30], iconAnchor: [15, 15] }) });
+        const marker = L.marker([parseFloat((site.latitude || site.lat)), parseFloat((site.longitude || site.lon))], { icon: L.divIcon({ html: iconHtml, className: 'leaflet-custom-icon', iconSize: [30, 30], iconAnchor: [15, 15] }) });
         marker.on('click', (e) => {
-            this.spotSite(parseFloat(site.latitude), parseFloat(site.longitude), site.nom, site.id || "");
+            this.spotSite(parseFloat((site.latitude || site.lat)), parseFloat((site.longitude || site.lon)), site.nom, site.id || "");
         });
         this.state.markersGroup.addLayer(marker);
     });
 
     // Fit Leaflet map bounds to show only the active markers
     if (activeSites.length > 0 && this.state.map) {
-        const coords = activeSites.map(s => [parseFloat(s.latitude), parseFloat(s.longitude)]);
+        const coords = activeSites.map(s => [parseFloat((s.latitude || s.lat)), parseFloat((s.longitude || s.lon))]);
         this.state.map.fitBounds(coords, { padding: [30, 30] });
     }
 };
@@ -211,13 +211,13 @@ SitesEngine.buildMapPopupHtml = function (site, weatherPopupHtml) {
                     <img src="https://federation.ffvl.fr/sites/all/themes/ffvl/favicon.ico" alt="FFVL" style="width: 14px; height: 14px; border-radius: 2px;">
                 </a>
                 ` : ''}
-                <button class="action-btn-primary" onclick="SitesEngine.openGpsMenu(${parseFloat(site.latitude)}, ${parseFloat(site.longitude)}); event.stopPropagation();" style="flex: 1; padding: 6px 10px; font-size: 0.8rem; justify-content: center;">
+                <button class="action-btn-primary" onclick="SitesEngine.openGpsMenu(${parseFloat((site.latitude || site.lat))}, ${parseFloat((site.longitude || site.lon))}); event.stopPropagation();" style="flex: 1; padding: 6px 10px; font-size: 0.8rem; justify-content: center;">
                     <i class="ri-navigation-line"></i> S'y rendre
                 </button>
-                <button class="action-btn-secondary windy-btn" onclick="SitesEngine.focusSiteWindy(${parseFloat(site.latitude)}, ${parseFloat(site.longitude)}, '${site.nom.replace(/'/g, "\\'")}'); event.stopPropagation();" style="padding: 6px 8px;" title="Afficher le vent sur le radar">
+                <button class="action-btn-secondary windy-btn" onclick="SitesEngine.focusSiteWindy(${parseFloat((site.latitude || site.lat))}, ${parseFloat((site.longitude || site.lon))}, '${site.nom.replace(/'/g, "\\'")}'); event.stopPropagation();" style="padding: 6px 8px;" title="Afficher le vent sur le radar">
                     <i class="ri-windy-line"></i>
                 </button>
-                <button class="action-btn-secondary paraglidable-btn" onclick="SitesEngine.focusSiteMap('paraglidable', ${parseFloat(site.latitude)}, ${parseFloat(site.longitude)}, '${site.nom.replace(/'/g, "\\'")}'); event.stopPropagation();" style="padding: 6px 8px;" title="Afficher sur Paraglidable">
+                <button class="action-btn-secondary paraglidable-btn" onclick="SitesEngine.focusSiteMap('paraglidable', ${parseFloat((site.latitude || site.lat))}, ${parseFloat((site.longitude || site.lon))}, '${site.nom.replace(/'/g, "\\'")}'); event.stopPropagation();" style="padding: 6px 8px;" title="Afficher sur Paraglidable">
                     <i class="ri-flight-takeoff-line"></i>
                 </button>
             </div>

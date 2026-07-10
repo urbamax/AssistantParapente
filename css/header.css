@@ -271,10 +271,85 @@ body.dark-theme .nav-menu-btn.active {
     }
 }
 
-/* Mobile Overrides (from main style.css) */
+/* Mobile Bottom Navigation Bar */
 @media (max-width: 1024px) {
+    body {
+        padding-bottom: 75px !important;
+    }
+    
+    /* Remove backdrop-filter from top-controls so fixed children are positioned relative to viewport */
+    .top-controls {
+        background: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border-bottom: none !important;
+        box-shadow: none !important;
+    }
+    
+    /* Add the blur and background to a pseudo-element instead */
+    .top-controls::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(24px) saturate(160%);
+        -webkit-backdrop-filter: blur(24px) saturate(160%);
+        border-bottom: 1px solid rgba(150, 150, 150, 0.15);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+        z-index: -1;
+    }
+
+    body.dark-theme .top-controls::before {
+        background: rgba(18, 18, 18, 0.85);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
     .desktop-main-nav {
-        display: none !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 65px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(24px) saturate(160%);
+        -webkit-backdrop-filter: blur(24px) saturate(160%);
+        display: flex !important;
+        justify-content: space-around;
+        align-items: center;
+        padding: 0 5px;
+        margin: 0;
+        border-radius: 0;
+        border-top: 1px solid rgba(150, 150, 150, 0.15);
+        border-bottom: none;
+        border-left: none;
+        border-right: none;
+        z-index: 99999;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+    }
+    
+    body.dark-theme .desktop-main-nav {
+        background: rgba(18, 18, 18, 0.85);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .desktop-main-nav .nav-menu-btn {
+        flex-direction: column;
+        gap: 4px;
+        font-size: 0.70rem;
+        height: 100%;
+        padding: 8px 4px;
+        border-radius: 8px;
+        width: 100%;
+    }
+
+    .desktop-main-nav .nav-menu-btn i {
+        font-size: 1.4rem;
+    }
+    
+    /* Reposition dropdown to open upwards on mobile */
+    .theory-nav-group .sub-bar {
+        bottom: calc(100% + 10px);
+        top: auto !important;
     }
 }
 
@@ -303,10 +378,7 @@ body.dark-theme .nav-menu-btn.active {
         max-width: 180px !important;
     }
 
-    /* Nav centrale masquÃ©e sur mobile */
-    .desktop-main-nav {
-        display: none !important;
-    }
+    /* Bottom nav is styled in max-width 1024px above, no need to hide it here */
 
     /* Actions Ã  droite : icones + sÃ©lecteur sur une seule ligne */
     .header-actions-slot {
