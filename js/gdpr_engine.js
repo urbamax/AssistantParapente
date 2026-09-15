@@ -150,7 +150,7 @@ const GdprEngine = {
     },
 
     // Apply logic controls immediately after consent state changes
-    applyConsentGuards: function () {
+    applyConsentGuards: async function () {
         // 1. Firebase Guard
         if (this.isConsentGranted('firebase')) {
             // Enable Firebase engine if not already enabled
@@ -173,12 +173,16 @@ const GdprEngine = {
         }
 
         // 2. GPS Guard
+        // window.SitesEngine n'existe plus (ancien nom, remplacé par SitesService/SitesView
+        // lors du refactor) : SitesService n'étant exporté qu'en module ES, on y accède ici
+        // via import() dynamique (valide même dans ce script classique).
+        const { default: SitesService } = await import('./services/sites_service.js');
         const gpsStatusEl = document.getElementById('address-status-message');
         const gpsBtn = document.getElementById('btn-use-gps');
         if (!this.isConsentGranted('gps')) {
             // Nullify user position in sites engine to clean UI
-            if (window.SitesEngine && window.SitesEngine.state) {
-                window.SitesEngine.state.userLocation = null;
+            if (SitesService && SitesService.state) {
+                SitesService.state.userLocation = null;
             }
             if (gpsStatusEl) {
                 gpsStatusEl.innerHTML = `<i class="ri-shield-user-line" style="color: var(--text-muted);"></i> Géolocalisation désactivée par vos choix de confidentialité.`;
@@ -190,9 +194,9 @@ const GdprEngine = {
             }
         } else {
             // If GPS is approved and we are in SITES mode, attempt to fetch position if not set
-            if (window.SitesEngine && window.SitesEngine.state && window.Engine && window.Engine.state.mode === 'SITES') {
-                if (!window.SitesEngine.state.userLocation) {
-                    window.SitesEngine.requestGpsLocation(true);
+            if (SitesService && SitesService.state && window.Engine && window.Engine.state.mode === 'SITES') {
+                if (!SitesService.state.userLocation && window.SitesView) {
+                    window.SitesView.requestGpsLocation(true);
                 }
             }
         }
