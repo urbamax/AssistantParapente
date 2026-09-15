@@ -4,6 +4,9 @@
  */
 import StorageService from './storage.js';
 import GlobalState from '../core/app_state.js';
+import SitesService from './sites_service.js';
+import LogbookService from './logbook_service.js';
+import QuizView from '../views/quiz.js';
 
 // We inject the original code but export the Engine
 // --- FIREBASE AUTHENTICATION & SYNC ENGINE ---
@@ -604,26 +607,22 @@ export const FirebaseAuthEngine = {
 
             await setDoc(prefsDocRef, finalPrefs);
 
-            // Refresh UI if QuizEngine stats are currently visible
-            if (typeof QuizEngine !== 'undefined' && typeof QuizEngine.renderStats === 'function') {
-                QuizEngine.renderStats();
-            }
+            // Refresh UI if quiz stats are currently visible.
+            // NB : ces trois blocs référençaient auparavant les anciens globals
+            // QuizEngine/SitesEngine/LogbookEngine, qui n'existent plus depuis le passage à
+            // l'architecture services/vues (js/core/main.js) — ce rafraîchissement post-sync
+            // ne faisait donc plus jamais rien. Corrigé en important directement les modules
+            // (SitesService/LogbookService/QuizView).
+            QuizView.renderStats();
 
-            // Refresh SitesEngine if it exists so that limits, favorites and locations are re-applied
-            if (typeof SitesEngine !== 'undefined' && typeof SitesEngine.loadUserPreferences === 'function') {
-                SitesEngine.loadUserPreferences();
-                if (typeof SitesEngine.renderList === 'function') {
-                    SitesEngine.renderList();
-                }
-            }
+            // Refresh sites list so that limits, favorites and locations are re-applied
+            SitesService.loadUserPreferences();
+            SitesService.renderList();
 
-            // Refresh LogbookEngine if it exists
-            if (typeof LogbookEngine !== 'undefined' && typeof LogbookEngine.loadData === 'function') {
-                LogbookEngine.loadData();
-                if (typeof LogbookEngine.loadEquipmentData === 'function') {
-                    LogbookEngine.loadEquipmentData();
-                }
-                LogbookEngine.switchTab(LogbookEngine.currentTab);
+            // Refresh logbook (flights + equipment) and re-render whichever tab is open
+            LogbookService.loadData();
+            if (window.LogbookView) {
+                window.LogbookView.switchTab(window.LogbookView.currentTab);
             }
 
             console.log("Sync complete!");
