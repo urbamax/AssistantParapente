@@ -3,9 +3,13 @@
 /* 1. FLOATING GDPR CONSENT BANNER */
 .gdpr-banner {
     position: fixed;
-    bottom: -200px;
+    bottom: 24px;
     left: 50%;
-    transform: translateX(-50%);
+    /* Hidden state slides the banner down by its own height (+ margin), so it
+       always clears the viewport fully no matter how tall its content gets —
+       unlike a fixed pixel offset (e.g. "bottom: -200px"), which used to leave
+       the top of the banner stuck on screen whenever its height exceeded 200px. */
+    transform: translateX(-50%) translateY(calc(100% + 40px));
     width: 92%;
     max-width: 850px;
     background: var(--bg-card);
@@ -13,18 +17,23 @@
     border-radius: var(--radius-card);
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     padding: 24px;
-    z-index: 9999;
+    /* Above .desktop-main-nav (z-index: 9999, css/header.css) — the consent
+       banner shares the same bottom-anchored screen region as the pill nav,
+       so it must paint (and stay clickable) above it, not behind it. */
+    z-index: 10000;
     display: flex;
     flex-direction: column;
     gap: 20px;
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     background-image: var(--glass-shine);
+    pointer-events: none;
 }
 
 .gdpr-banner.active {
-    bottom: 24px;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
 }
 
 .gdpr-banner-content {
@@ -428,12 +437,8 @@ input:checked+.gdpr-slider:before {
     .gdpr-banner {
         width: 95%;
         padding: 12px 14px !important;
-        bottom: -280px;
-        gap: 10px !important;
-    }
-
-    .gdpr-banner.active {
         bottom: 12px;
+        gap: 10px !important;
     }
 
     .gdpr-banner-title {
@@ -533,11 +538,7 @@ input:checked+.gdpr-slider:before {
         gap: 4px !important;
         margin-bottom: 14px !important;
         padding-bottom: 6px !important;
-        overflow-x: auto !important;
-        flex-wrap: nowrap !important;
-        -webkit-overflow-scrolling: touch;
-        /* Masque la scrollbar mais garde le scroll */
-        scrollbar-width: none;
+        flex-wrap: wrap !important;
     }
 
     #manual-modal .manual-nav::-webkit-scrollbar {

@@ -1,0 +1,57 @@
+{
+  "name": "assistantparapente",
+  "version": "1.0.0",
+  "description": "**Assistant Parapente** est une application web progressive (SPA) moderne dédiée aux pilotes de parapente. Elle centralise la recherche de sites de vol avec calcul d'exploitabilité météo en temps réel (AROME/GFS), un carnet de vol numérique avec analyseur de traces GPS `.igc` et suivi d'usure des voiles, la préparation aux brevets théoriques FFVL (BI, BP, BPC), ainsi qu'une bibliothèque de cours et de manuels.",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/urbamax/TheorieParapente.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/urbamax/TheorieParapente/issues"
+  },
+  "homepage": "https://github.com/urbamax/TheorieParapente#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@vitest/ui": "^4.1.11",
+    "ansi-regex": "^6.2.2",
+    "ansi-styles": "^6.2.3",
+    "chromium-bidi": "^16.0.1",
+    "cliui": "^9.0.1",
+    "devtools-protocol": "^0.0.1638949",
+    "emoji-regex": "^10.6.0",
+    "escalade": "^3.2.0",
+    "get-caller-file": "^2.0.5",
+    "get-east-asian-width": "^1.6.0",
+    "happy-dom": "^20.11.6",
+    "http-server": "^14.1.1",
+    "lilconfig": "^3.1.3",
+    "mitt": "^3.0.1",
+    "modern-tar": "^0.7.6",
+    "puppeteer": "^25.3.0",
+    "puppeteer-core": "^25.3.0",
+    "string-width": "^7.2.0",
+    "strip-ansi": "^7.2.0",
+    "typed-query-selector": "^2.12.2",
+    "vitest": "^4.1.11",
+    "webdriver-bidi-protocol": "^0.4.2",
+    "wrap-ansi": "^9.0.2",
+    "ws": "^8.21.0",
+    "y18n": "^5.0.8",
+    "yargs": "^18.0.0",
+    "yargs-parser": "^22.0.0",
+    "zod": "^3.25.76"
+  }
+}

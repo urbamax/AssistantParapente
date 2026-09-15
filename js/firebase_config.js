@@ -10,6 +10,12 @@ const FIREBASE_CONFIG = {
     measurementId: "G-PERCHHV7ZZ"
 };
 
-// Variable d'activation globale. 
+// Variable d'activation globale.
 // Mettez cette variable à true une fois que vous avez renseigné les identifiants ci-dessus.
 const IS_FIREBASE_ENABLED = true;
+
+// Clé VAPID pour les notifications push (Firebase Cloud Messaging).
+// À générer dans la console Firebase : Project Settings > Cloud Messaging > Web configuration
+// > Web Push certificates > "Generate key pair". Tant que ce champ est vide, le bouton
+// "Activer les alertes météo" affichera une erreur explicite au lieu d'échouer silencieusement.
+const FCM_VAPID_KEY = "";

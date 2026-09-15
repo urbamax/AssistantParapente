@@ -31,7 +31,7 @@ const Engine = {
         }
 
         // Load saved theme
-        const savedTheme = localStorage.getItem('themeMode');
+        const savedTheme = StorageService.get(StorageService.KEYS.THEME_MODE);
         if (savedTheme) {
             this.state.themeMode = savedTheme;
         }
@@ -45,7 +45,7 @@ const Engine = {
         });
 
         // Load saved level
-        const savedLevel = localStorage.getItem('userLevel');
+        const savedLevel = StorageService.get(StorageService.KEYS.USER_LEVEL);
         if (savedLevel) {
             this.state.level = savedLevel;
             const levelSelect = document.getElementById('global-level-select');
@@ -137,19 +137,16 @@ const Engine = {
             currentCourseId: this.state.currentCourseId,
             level: this.state.level
         };
-        localStorage.setItem('parapente_state', JSON.stringify(persist));
+        StorageService.set(StorageService.KEYS.STATE, persist);
     },
 
     restoreState: function () {
-        const saved = localStorage.getItem('parapente_state');
-        if (!saved) return false;
+        const stateToRestore = StorageService.get(StorageService.KEYS.STATE);
+        if (!stateToRestore) return false;
 
-        let stateToRestore;
-        try {
-            stateToRestore = JSON.parse(saved);
-        } catch (e) {
-            console.warn("Corrupted state in localStorage, resetting.", e);
-            localStorage.removeItem('parapente_state');
+        if (typeof stateToRestore !== 'object') {
+            console.warn("Corrupted state in localStorage, resetting.");
+            StorageService.remove(StorageService.KEYS.STATE);
             return false;
         }
 
@@ -267,7 +264,7 @@ const Engine = {
 
     changeLevel: function (newLevel) {
         this.state.level = newLevel;
-        localStorage.setItem('userLevel', newLevel);
+        StorageService.set(StorageService.KEYS.USER_LEVEL, newLevel);
         this.saveState(); // Ensure session state is updated
 
         // Update Theme
@@ -275,6 +272,10 @@ const Engine = {
 
         if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled && window.FirebaseAuthEngine.currentUser) {
             window.FirebaseAuthEngine.savePreferencesToCloud();
+            // Mise à jour en temps réel de "Dernière synchro" après changement de niveau
+            if (typeof window.FirebaseAuthEngine.triggerDebouncedSync === 'function') {
+                window.FirebaseAuthEngine.triggerDebouncedSync();
+            }
         }
 
         console.log("DEBUG: Engine.changeLevel called with", newLevel, "State updated to", this.state.level);
@@ -486,11 +487,15 @@ const Engine = {
         const modes = ['auto', 'light', 'dark'];
         const next = modes[(modes.indexOf(this.state.themeMode) + 1) % modes.length];
         this.state.themeMode = next;
-        localStorage.setItem('themeMode', next);
+        StorageService.set(StorageService.KEYS.THEME_MODE, next);
         this.applyThemeMode();
 
         if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled && window.FirebaseAuthEngine.currentUser) {
             window.FirebaseAuthEngine.savePreferencesToCloud();
+            // Mise à jour en temps réel de "Dernière synchro" après changement de thème
+            if (typeof window.FirebaseAuthEngine.triggerDebouncedSync === 'function') {
+                window.FirebaseAuthEngine.triggerDebouncedSync();
+            }
         }
     },
 
@@ -651,6 +656,21 @@ const Engine = {
 
     /* --- MANUAL / MODE D'EMPLOI --- */
     showManual: function (section = 'about') {
+        if (section === 'contextual') {
+            const activeScreen = document.querySelector('.mode-screen.active');
+            if (activeScreen) {
+                const id = activeScreen.id;
+                if (id.includes('sites')) section = 'sites';
+                else if (id.includes('logbook')) section = 'logbook';
+                else if (id.includes('library') || id.includes('course')) section = 'library';
+                else if (id.includes('qcm')) section = 'qcm';
+                else if (id.includes('stats')) section = 'stats';
+                else section = 'about';
+            } else {
+                section = 'about';
+            }
+        }
+        
         const modal = document.getElementById('manual-modal');
         if (modal) {
             modal.style.display = 'flex'; // ensure display
@@ -691,7 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 if (document.body) {
-    const savedTheme = localStorage.getItem('themeMode') || 'auto';
+    const savedTheme = StorageService.get(StorageService.KEYS.THEME_MODE, 'auto');
     let effective = savedTheme;
     if (effective === 'auto' && window.matchMedia) {
         effective = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';

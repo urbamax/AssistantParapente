@@ -38,7 +38,6 @@ function degreesToCardinal(deg) {
     const index = Math.round(normalizedDeg / 45) % 8;
     return directions[index];
 }
-
 /**
  * Évalue la météo d'un spot et calcule son score global.
  * 

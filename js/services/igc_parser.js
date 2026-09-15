@@ -58,21 +58,24 @@ const IGCParser = {
                     const mins = parseInt(timeStr.substring(2, 4), 10);
                     const secs = parseInt(timeStr.substring(4, 6), 10);
 
-                    if (!firstPointTime) {
-                        firstPointTime = { h: hours, m: mins };
-                    }
-
-                    // Calcul du timestamp absolu
+                    // Calcul du timestamp absolu (les heures IGC sont toujours en UTC)
                     const pointDate = new Date(baseDate.getTime());
                     pointDate.setUTCHours(hours, mins, secs);
 
+                    if (!firstPointTime) {
+                        firstPointTime = pointDate;
+                    }
+
                     if (alt > maxAltitude) maxAltitude = alt;
+
+                    // Heure affichée à l'utilisateur : convertie dans son fuseau local
+                    const localTime = `${String(pointDate.getHours()).padStart(2, '0')}:${String(pointDate.getMinutes()).padStart(2, '0')}:${String(pointDate.getSeconds()).padStart(2, '0')}`;
 
                     trace.push({
                         lat: lat,
                         lon: lon,
                         alt: alt,
-                        time: `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`,
+                        time: localTime,
                         timestamp: pointDate.getTime()
                     });
                 }
@@ -81,11 +84,12 @@ const IGCParser = {
 
         let dateStr = "";
         if (firstPointTime) {
-            const yyyy = baseDate.getFullYear();
-            const mm = String(baseDate.getMonth() + 1).padStart(2, '0');
-            const dd = String(baseDate.getDate()).padStart(2, '0');
-            const hh = String(firstPointTime.h).padStart(2, '0');
-            const mnm = String(firstPointTime.m).padStart(2, '0');
+            // Conversion en heure locale de l'utilisateur (les champs datetime-local attendent une heure locale)
+            const yyyy = firstPointTime.getFullYear();
+            const mm = String(firstPointTime.getMonth() + 1).padStart(2, '0');
+            const dd = String(firstPointTime.getDate()).padStart(2, '0');
+            const hh = String(firstPointTime.getHours()).padStart(2, '0');
+            const mnm = String(firstPointTime.getMinutes()).padStart(2, '0');
             dateStr = `${yyyy}-${mm}-${dd}T${hh}:${mnm}`;
         }
 
@@ -94,6 +98,8 @@ const IGCParser = {
         let startAltitude = trace.length > 0 ? trace[0].alt : 0;
         let gain = maxAltitude !== -Infinity ? Math.max(0, Math.round(maxAltitude - startAltitude)) : 0;
 
+        const { distanceKm, maxClimbRate, maxSpeedKmh, avgSpeedKmh } = this._computeFlightStats(trace, duration);
+
         console.log("Points IGC extraits avec succès :", trace.length);
 
         return {
@@ -101,7 +107,67 @@ const IGCParser = {
             dateStr: dateStr,
             duration: duration,
             maxAltitude: maxAltitude !== -Infinity ? Math.round(maxAltitude) : 0,
-            gain: gain
+            gain: gain,
+            distanceKm: distanceKm,
+            maxClimbRate: maxClimbRate,
+            maxSpeedKmh: maxSpeedKmh,
+            avgSpeedKmh: avgSpeedKmh
+        };
+    },
+
+    /**
+     * Distance en km entre deux points GPS (formule de Haversine). Dupliquée depuis
+     * js/utils/geo_utils.js car ce fichier est chargé en script classique (pas en module ES)
+     * et ne peut donc pas faire d'import.
+     */
+    _distanceKm: function (lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    },
+
+    /**
+     * Calcule distance parcourue, vario max et vitesses à partir de la trace déjà parsée.
+     * Le vario/vitesse instantanés sont lissés sur une fenêtre de quelques points (WINDOW)
+     * pour absorber le bruit GPS/baro typique d'un enregistrement à 1-5s ; sans ce lissage,
+     * deux points bruités consécutifs peuvent donner un pic de vario ou de vitesse irréaliste.
+     */
+    _computeFlightStats: function (trace, durationMinutes) {
+        const WINDOW = 3;
+        const MAX_PLAUSIBLE_SPEED_KMH = 200; // au-delà, quasi certainement un glitch GPS
+
+        let distanceKm = 0;
+        for (let i = 1; i < trace.length; i++) {
+            distanceKm += this._distanceKm(trace[i - 1].lat, trace[i - 1].lon, trace[i].lat, trace[i].lon);
+        }
+
+        let maxClimbRate = 0;
+        let maxSpeedKmh = 0;
+        for (let i = WINDOW; i < trace.length; i++) {
+            const prev = trace[i - WINDOW];
+            const curr = trace[i];
+            const dtSec = (curr.timestamp - prev.timestamp) / 1000;
+            if (dtSec <= 0) continue;
+
+            const climb = (curr.alt - prev.alt) / dtSec;
+            if (climb > maxClimbRate) maxClimbRate = climb;
+
+            const segKm = this._distanceKm(prev.lat, prev.lon, curr.lat, curr.lon);
+            const speedKmh = segKm / (dtSec / 3600);
+            if (speedKmh > maxSpeedKmh && speedKmh < MAX_PLAUSIBLE_SPEED_KMH) maxSpeedKmh = speedKmh;
+        }
+
+        const avgSpeedKmh = durationMinutes > 0 ? distanceKm / (durationMinutes / 60) : 0;
+
+        return {
+            distanceKm: Math.round(distanceKm * 10) / 10,
+            maxClimbRate: Math.round(maxClimbRate * 10) / 10,
+            maxSpeedKmh: Math.round(maxSpeedKmh * 10) / 10,
+            avgSpeedKmh: Math.round(avgSpeedKmh * 10) / 10
         };
     },
 
