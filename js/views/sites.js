@@ -467,41 +467,6 @@ bindMapSync() {
 }
     // Génère l'URL de l'icône SVG officielle FFVL/SpotAir pour un site (type de pratique +
     // secteurs de vent favorables), voir ideas_roadmap.md section 1 pour la spec de l'API.
-    // Remplace le point coloré générique par l'iconographie officielle de la fédération ; la
-    // couleur/pulsation de volabilité en direct est conservée en petit badge en surimpression
-    // car SpotAir n'encode pas la météo temps réel.
-    buildSpotairMarkerIconUrl(site) {
-        const WIND_BIT = { N: 1, NE: 2, E: 4, SE: 8, S: 16, SO: 32, O: 64, NO: 128 };
-
-        const st = site.site_sous_type || site.type || [];
-        const siteTypes = Array.isArray(st) ? st : [st];
-
-        let t = 1; // Déco par défaut (couvre aussi NATUREL/SOARING/DUNE)
-        if (siteTypes.includes('TREUIL')) t = 8;
-        else if (siteTypes.includes('GONFLAGE')) t = 4;
-        else if (siteTypes.includes('ATTERRO')) t = 2;
-
-        let orientations = [];
-        if (Array.isArray(site.orientations_vent)) orientations = site.orientations_vent;
-        else if (typeof site.orientations_vent === 'string') orientations = site.orientations_vent.split(',').map(v => v.trim());
-        else if (site.orientation) orientations = site.orientation.split(',').map(v => v.trim());
-
-        let windMask = 0;
-        orientations.forEach(card => {
-            const bit = WIND_BIT[String(card).trim().toUpperCase()];
-            if (bit) windMask += bit;
-        });
-
-        const params = new URLSearchParams({ p: '1', t: String(t) });
-        if (windMask > 0) params.set('o', String(windMask));
-
-        // NB : l'URL "spots" documentée dans ideas_roadmap.md (icones/spots/spot.svg) ne
-        // répond plus (testé en direct, échec quels que soient les paramètres) — seule
-        // icones/pois/poi.svg répond correctement et accepte les mêmes paramètres p/t/n/h/o.
-        // À corriger si SpotAiR republie un endpoint "spots" dédié.
-        return `https://www.spotair.mobi/icones/pois/poi.svg?${params.toString()}`;
-    }
-
     updateMapMarkers() {
         if (!this.state.map || !this.state.markersGroup) return;
         this.state.markersGroup.clearLayers();
@@ -527,15 +492,8 @@ bindMapSync() {
             const pulseHtml = isCurrentlyFlyable
                 ? `<div class="marker-pulse" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; background: ${color}; opacity: 0.35; animation: marker-pulse-anim 1.8s infinite ease-out;"></div>`
                 : '';
-            const spotairIconUrl = this.buildSpotairMarkerIconUrl(site);
-            const iconHtml = `<div class="custom-map-marker ${flyableClass}" style="position: relative; width: 32px; height: 32px;" title="${escapeHTML(site.nom)}">
-                <img src="${spotairIconUrl}" alt="" style="width: 32px; height: 32px; display: block;" onerror="this.style.display='none';">
-                <div style="position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px;">
-                    ${pulseHtml}
-                    <div class="marker-core" style="position: relative; width: 100%; height: 100%; border-radius: 50%; background: ${color}; border: 2px solid var(--bg-surface); box-shadow: 0 1px 3px rgba(0,0,0,0.4); z-index: 2; transition: background-color 0.3s;"></div>
-                </div>
-            </div>`;
-            const marker = L.marker([parseFloat((site.latitude || site.lat)), parseFloat((site.longitude || site.lon))], { icon: L.divIcon({ html: iconHtml, className: 'leaflet-custom-icon', iconSize: [32, 32], iconAnchor: [16, 16] }), title: site.nom });
+            const iconHtml = `<div class="custom-map-marker ${flyableClass}" style="position: relative; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;" title="${escapeHTML(site.nom)}">${pulseHtml}<div class="marker-core" style="width: 14px; height: 14px; border-radius: 50%; background: ${color}; border: 2px solid var(--bg-surface); box-shadow: 0 2px 6px rgba(0,0,0,0.4); z-index: 2; transition: background-color 0.3s;"></div></div>`;
+            const marker = L.marker([parseFloat((site.latitude || site.lat)), parseFloat((site.longitude || site.lon))], { icon: L.divIcon({ html: iconHtml, className: 'leaflet-custom-icon', iconSize: [30, 30], iconAnchor: [15, 15] }), title: site.nom });
             marker.bindTooltip(site.nom, { direction: 'top', offset: [0, -15], opacity: 0.9 });
             marker.on('click', (e) => {
                 this.spotSite(parseFloat((site.latitude || site.lat)), parseFloat((site.longitude || site.lon)), site.nom, site.reference_terrain || site.id || "");

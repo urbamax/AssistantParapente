@@ -4,10 +4,10 @@ Ce fichier centralise les concepts techniques et les idées d'amélioration vali
 
 ---
 
-## 🎨 1. Iconographie Officielle FFVL & SpotAir — ✅ FAIT (2026-09-15)
+## 🎨 1. Iconographie Officielle FFVL & SpotAir — ❌ ABANDONNÉ (vérifié 2026-09-15)
 *Objectif : Remplacer les marqueurs génériques de la carte des sites par les icônes vectorielles dynamiques de la fédération.*
 
-**Implémenté** dans `js/views/sites.js` (`buildSpotairMarkerIconUrl` + `updateMapMarkers`) : type de pratique et masque de vent binaire calculés depuis les données de site existantes, badge de couleur (volabilité en direct) conservé en surimpression puisque SpotAir n'encode pas la météo. **Écart avec la spec ci-dessous** : l'URL "Spots" (`icones/spots/spot.svg`) ne répond plus du tout, testée en direct avec toutes les combinaisons de paramètres — seule l'URL "POI" (`icones/pois/poi.svg`) répond et accepte les mêmes paramètres p/t/n/h/o, donc c'est celle-ci qui est utilisée en prod. À corriger si SpotAiR republie un endpoint "spots" dédié.
+**Tenté puis annulé.** L'URL "Spots" (`icones/spots/spot.svg`) ne répond plus du tout, quels que soient les paramètres. L'URL "POI" (`icones/pois/poi.svg`) répond bien (HTTP 200, SVG valide) mais **ignore silencieusement tous les paramètres** (`p`, `t`, `o`, absents ou non) et renvoie toujours la même icône générique — vérifié en comparant 6 combinaisons de paramètres côte à côte, pixels identiques. Inspection du vrai site spotair.mobi (onglet réseau sur leur carte en direct) : aucune requête vers `icones/spots/` ou `icones/pois/` n'a lieu pour afficher leurs propres marqueurs — ils sont rendus autrement (tuiles vectorielles/canvas via leur propre lib JS), pas via cette API. Cette spec d'URL paramétrée ne correspond donc à aucun comportement observable de leur service actuel ; les marqueurs colorés d'origine (volabilité en direct) ont été restaurés dans `js/views/sites.js`. À revisiter uniquement si un vrai endpoint public équivalent est retrouvé/documenté.
 
 ### Spécifications de l'API SpotAir
 Les icônes SVG sont générées à la volée via des paramètres d'URL :
