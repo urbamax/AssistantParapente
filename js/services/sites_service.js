@@ -811,6 +811,7 @@ setRadiusLimit(value) {
 
     this.savePreferences();
     this.renderList();
+    this.scheduleWeatherRescopeIfNeeded();
     if ((window.SitesView && SitesView.state && SitesView.state.mapExpanded)) {
         this.updateMapMarkers();
     }
@@ -910,6 +911,7 @@ toggleFilterFavoritesOnly() {
 
     this.savePreferences();
     this.renderList();
+    this.scheduleWeatherRescopeIfNeeded();
     if ((window.SitesView && SitesView.state && SitesView.state.mapExpanded)) this.updateMapMarkers();
 };
 
@@ -944,6 +946,7 @@ toggleMinimize(siteId) {
 updateSearchQuery(val) {
     this.state.searchQuery = val || '';
     this.renderList();
+    this.scheduleWeatherRescopeIfNeeded();
     if ((window.SitesView && SitesView.state && SitesView.state.map)) {
         this.updateMapMarkers();
     }
@@ -1005,6 +1008,7 @@ cycleFilterState(category, value) {
     this.renderDropdowns();
     this.savePreferences();
     this.renderList();
+    this.scheduleWeatherRescopeIfNeeded();
     if ((window.SitesView && SitesView.state && SitesView.state.map)) {
         this.updateMapMarkers();
     }
@@ -1125,6 +1129,7 @@ geocodeAddress(query) {
                 }
 
                 this.renderList();
+                this.scheduleWeatherRescopeIfNeeded();
                 if ((window.SitesView && SitesView.state && SitesView.state.map)) {
                     this.updateMapMarkers();
                     (window.SitesView && SitesView.state && SitesView.state.map).setView([lat, lng], 10);
@@ -1178,6 +1183,7 @@ loadSavedLocation(index) {
         if (btnSave) btnSave.style.display = 'inline-block';
 
         this.renderList();
+        this.scheduleWeatherRescopeIfNeeded();
         if ((window.SitesView && SitesView.state && SitesView.state.mapExpanded)) this.updateMapMarkers();
     }
 };

@@ -241,6 +241,7 @@ class SitesViewClass extends BaseView {
                 }
 
                 this.renderList();
+                SitesService.scheduleWeatherRescopeIfNeeded();
                 if (this.state.map) this.updateMapMarkers();
             },
             (error) => {
@@ -494,7 +495,11 @@ bindMapSync() {
         const params = new URLSearchParams({ p: '1', t: String(t) });
         if (windMask > 0) params.set('o', String(windMask));
 
-        return `https://www.spotair.mobi/icones/spots/spot.svg?${params.toString()}`;
+        // NB : l'URL "spots" documentée dans ideas_roadmap.md (icones/spots/spot.svg) ne
+        // répond plus (testé en direct, échec quels que soient les paramètres) — seule
+        // icones/pois/poi.svg répond correctement et accepte les mêmes paramètres p/t/n/h/o.
+        // À corriger si SpotAiR republie un endpoint "spots" dédié.
+        return `https://www.spotair.mobi/icones/pois/poi.svg?${params.toString()}`;
     }
 
     updateMapMarkers() {
@@ -1140,6 +1145,7 @@ buildWeatherPopupHtml(weather, color, site) {
     this.renderDropdowns();
     this.savePreferences();
     this.renderList();
+    SitesService.scheduleWeatherRescopeIfNeeded();
     if (this.state.map) {
         this.updateMapMarkers();
     }
@@ -1174,6 +1180,7 @@ buildWeatherPopupHtml(weather, color, site) {
     this.renderDropdowns();
     SitesService.savePreferences();
     this.renderList();
+    SitesService.scheduleWeatherRescopeIfNeeded();
     if (this.state.map) {
         this.updateMapMarkers();
     }
@@ -1193,6 +1200,7 @@ filterByType(type) {
     this.renderDropdowns();
     SitesService.savePreferences();
     this.renderList();
+    SitesService.scheduleWeatherRescopeIfNeeded();
     if (this.state.map) {
         this.updateMapMarkers();
     }
