@@ -339,12 +339,6 @@ body.light-mode .auth-sync-status {
     flex: 1;
 }
 
-/* User status badge next to user icon in header */
-.header-actions-slot {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
 
 .auth-btn-wrapper {
     position: relative;
@@ -364,6 +358,28 @@ body.light-mode .auth-sync-status {
 
 .auth-active-dot.active {
     display: block;
+}
+
+.sync-active-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-blue, #3b82f6);
+    border: 2px solid var(--bg-surface);
+    display: none;
+    animation: sync-pulse 1s ease-in-out infinite;
+}
+
+.sync-active-dot.active {
+    display: block;
+}
+
+@keyframes sync-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.75); }
 }
 
 /* Checkbox / Remember Me */

@@ -66,11 +66,12 @@
     --radius-md: 8px;
     --radius-sm: 4px;
 
-    /* Layout */
-    --header-height: 100px;
 }
 
 /* --- LIGHT MODE THEME REDEFINITION --- */
+/* html.light-mode is set synchronously in <head> to avoid a dark flash on load;
+   body.light-mode is set later by UIManager once the app boots. */
+html.light-mode,
 body.light-mode {
     --bg-app: var(--p-light-deep);
     --bg-surface: var(--p-light-surface);
@@ -141,6 +142,18 @@ button {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+.page-title {
+    text-align: center !important;
+    font-size: 36px !important; /* Beaucoup plus grand */
+    font-weight: 900 !important;
+    color: #E65100 !important; /* Force le orange */
+    margin: 0 auto 20px auto !important; /* Retire la marge haute */
+    padding-top: 0 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 2px !important;
+    width: 100% !important;
 }
 
 @media (max-width: 768px) {

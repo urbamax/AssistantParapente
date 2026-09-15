@@ -1,0 +1,16 @@
+{
+  "name": "assistantparapente-functions",
+  "description": "Cloud Function planifiée : alertes météo push (FCM) sur les sites favoris.",
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "scripts": {
+    "deploy": "firebase deploy --only functions"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.5.0",
+    "firebase-functions": "^5.1.1"
+  },
+  "private": true
+}

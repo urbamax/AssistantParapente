@@ -1,0 +1,602 @@
+[
+  {
+    "event": "click",
+    "action": "if",
+    "code": "if(window.FirebaseAuthEngine) window.FirebaseAuthEngine.openAuthModal(); return false;",
+    "args": "window.FirebaseAuthEngine"
+  },
+  {
+    "event": "click",
+    "action": "setQcmMode",
+    "code": "Engine.setQcmMode('TRAINING')",
+    "args": "'TRAINING'"
+  },
+  {
+    "event": "click",
+    "action": "setQcmMode",
+    "code": "Engine.setQcmMode('EXAM')",
+    "args": "'EXAM'"
+  },
+  {
+    "event": "click",
+    "action": "setQcmMode",
+    "code": "Engine.setQcmMode('REVISION')",
+    "args": "'REVISION'"
+  },
+  {
+    "event": "click",
+    "action": "setQcmCount",
+    "code": "Engine.setQcmCount(10)",
+    "args": "10"
+  },
+  {
+    "event": "click",
+    "action": "setQcmCount",
+    "code": "Engine.setQcmCount(20)",
+    "args": "20"
+  },
+  {
+    "event": "click",
+    "action": "setQcmCount",
+    "code": "Engine.setQcmCount(30)",
+    "args": "30"
+  },
+  {
+    "event": "click",
+    "action": "setQcmCount",
+    "code": "Engine.setQcmCount(40)",
+    "args": "40"
+  },
+  {
+    "event": "click",
+    "action": "setQcmCount",
+    "code": "Engine.setQcmCount('ALL')",
+    "args": "'ALL'"
+  },
+  {
+    "event": "click",
+    "action": "startQcmSession",
+    "code": "Engine.startQcmSession()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "showQcmBank",
+    "code": "Engine.showQcmBank()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "showManual",
+    "code": "Engine.showManual('qcm')",
+    "args": "'qcm'"
+  },
+  {
+    "event": "click",
+    "action": "showManual",
+    "code": "Engine.showManual('stats')",
+    "args": "'stats'"
+  },
+  {
+    "event": "click",
+    "action": "if",
+    "code": "if(window.FirebaseAuthEngine) window.FirebaseAuthEngine.openAuthModal(); return false;",
+    "args": "window.FirebaseAuthEngine"
+  },
+  {
+    "event": "change",
+    "action": "renderQcmBank",
+    "code": "Engine.renderQcmBank()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "setLibrarySort",
+    "code": "Engine.setLibrarySort('TITLE')",
+    "args": "'TITLE'"
+  },
+  {
+    "event": "click",
+    "action": "setLibrarySort",
+    "code": "Engine.setLibrarySort('CATEGORY')",
+    "args": "'CATEGORY'"
+  },
+  {
+    "event": "click",
+    "action": "showManual",
+    "code": "Engine.showManual('library')",
+    "args": "'library'"
+  },
+  {
+    "event": "click",
+    "action": "goBack",
+    "code": "Engine.goBack()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "showManual",
+    "code": "Engine.showManual('sites')",
+    "args": "'sites'"
+  },
+  {
+    "event": "click",
+    "action": "SitesswitchMapMode",
+    "code": "SitesEngine.switchMapMode('leaflet')",
+    "args": "'leaflet'"
+  },
+  {
+    "event": "click",
+    "action": "SitesswitchMapMode",
+    "code": "SitesEngine.switchMapMode('windy')",
+    "args": "'windy'"
+  },
+  {
+    "event": "click",
+    "action": "SitesswitchMapMode",
+    "code": "SitesEngine.switchMapMode('meteoparapente')",
+    "args": "'meteoparapente'"
+  },
+  {
+    "event": "click",
+    "action": "SitesswitchMapMode",
+    "code": "SitesEngine.switchMapMode('paraglidingearth')",
+    "args": "'paraglidingearth'"
+  },
+  {
+    "event": "click",
+    "action": "SitesswitchMapMode",
+    "code": "SitesEngine.switchMapMode('paraglidable')",
+    "args": "'paraglidable'"
+  },
+  {
+    "event": "click",
+    "action": "SitesswitchMapMode",
+    "code": "SitesEngine.switchMapMode('isofronts')",
+    "args": "'isofronts'"
+  },
+  {
+    "event": "click",
+    "action": "SitesopenMoreMapsDropdown",
+    "code": "SitesEngine.openMoreMapsDropdown()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "SitestoggleFullscreen",
+    "code": "SitesEngine.toggleFullscreen()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "SitestoggleDropdown",
+    "code": "SitesEngine.toggleDropdown('map-settings')",
+    "args": "'map-settings'"
+  },
+  {
+    "event": "click",
+    "action": "SitesgeocodeAddress",
+    "code": "SitesEngine.geocodeAddress(document.getElementById('address-input').value)",
+    "args": "document.getElementById('address-input'"
+  },
+  {
+    "event": "click",
+    "action": "SitessaveCurrentLocation",
+    "code": "SitesEngine.saveCurrentLocation()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "SitesrequestGpsLocation",
+    "code": "SitesEngine.requestGpsLocation()",
+    "args": ""
+  },
+  {
+    "event": "change",
+    "action": "SiteschangeWeatherModel",
+    "code": "SitesEngine.changeWeatherModel(this.value)",
+    "args": "this.value"
+  },
+  {
+    "event": "change",
+    "action": "SitesupdateWindLimits",
+    "code": "SitesEngine.updateWindLimits()",
+    "args": ""
+  },
+  {
+    "event": "change",
+    "action": "SiteschangeForecastMaxRange",
+    "code": "SitesEngine.changeForecastMaxRange(this.value)",
+    "args": "this.value"
+  },
+  {
+    "event": "click",
+    "action": "SitestoggleDropdown",
+    "code": "SitesEngine.toggleDropdown('wind')",
+    "args": "'wind'"
+  },
+  {
+    "event": "click",
+    "action": "SitestoggleDropdown",
+    "code": "SitesEngine.toggleDropdown('type')",
+    "args": "'type'"
+  },
+  {
+    "event": "change",
+    "action": "SiteschangeSortMode",
+    "code": "SitesEngine.changeSortMode(this.value)",
+    "args": "this.value"
+  },
+  {
+    "event": "click",
+    "action": "SiteschangeStrategy",
+    "code": "SitesEngine.changeStrategy('CONSECUTIVE')",
+    "args": "'CONSECUTIVE'"
+  },
+  {
+    "event": "click",
+    "action": "SiteschangeStrategy",
+    "code": "SitesEngine.changeStrategy('HALF_DAY')",
+    "args": "'HALF_DAY'"
+  },
+  {
+    "event": "click",
+    "action": "SiteschangeStrategy",
+    "code": "SitesEngine.changeStrategy('DAILY')",
+    "args": "'DAILY'"
+  },
+  {
+    "event": "click",
+    "action": "SiteschangeStrategy",
+    "code": "SitesEngine.changeStrategy('TOTAL')",
+    "args": "'TOTAL'"
+  },
+  {
+    "event": "click",
+    "action": "SitestoggleFilterFavoritesOnly",
+    "code": "SitesEngine.toggleFilterFavoritesOnly()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "SitesscrollToTop",
+    "code": "SitesEngine.scrollToTop()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "showManual",
+    "code": "Engine.showManual('logbook')",
+    "args": "'logbook'"
+  },
+  {
+    "event": "click",
+    "action": "LogbookswitchTab",
+    "code": "LogbookEngine.switchTab('history')",
+    "args": "'history'"
+  },
+  {
+    "event": "click",
+    "action": "LogbookswitchTab",
+    "code": "LogbookEngine.switchTab('add')",
+    "args": "'add'"
+  },
+  {
+    "event": "click",
+    "action": "LogbookswitchTab",
+    "code": "LogbookEngine.switchTab('stats')",
+    "args": "'stats'"
+  },
+  {
+    "event": "click",
+    "action": "LogbookswitchTab",
+    "code": "LogbookEngine.switchTab('equip')",
+    "args": "'equip'"
+  },
+  {
+    "event": "click",
+    "action": "LogbooksetFormType",
+    "code": "LogbookEngine.setFormType('vol')",
+    "args": "'vol'"
+  },
+  {
+    "event": "click",
+    "action": "LogbooksetFormType",
+    "code": "LogbookEngine.setFormType('gonflage')",
+    "args": "'gonflage'"
+  },
+  {
+    "event": "submit",
+    "action": "event_preventDefault",
+    "code": "event.preventDefault(); LogbookEngine.submitForm();",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "LogbookresetForm",
+    "code": "LogbookEngine.resetForm()",
+    "args": ""
+  },
+  {
+    "event": "change",
+    "action": "document_getElementById",
+    "code": "document.getElementById('eq-marque-autre').style.display = (this.value === 'Autre') ? 'block' : 'none'; if(this.value !== 'Autre') { document.getElementById('eq-marque-autre').value = ''; } if(window.LogbookEngine && LogbookEngine.updateEquipmentNomPreview) { LogbookEngine.updateEquipmentNomPreview(); }",
+    "args": "'eq-marque-autre'"
+  },
+  {
+    "event": "change",
+    "action": "document_getElementById",
+    "code": "document.getElementById('eq-modele-autre').style.display = (this.value === 'Autre') ? 'block' : 'none'; if(this.value !== 'Autre') { document.getElementById('eq-modele-autre').value = ''; } if(window.LogbookEngine && LogbookEngine.updateEquipmentNomPreview) { LogbookEngine.updateEquipmentNomPreview(); }",
+    "args": "'eq-modele-autre'"
+  },
+  {
+    "event": "change",
+    "action": "document_getElementById",
+    "code": "document.getElementById('eq-taille-autre').style.display = (this.value === 'Autre') ? 'block' : 'none'; if(this.value !== 'Autre') { document.getElementById('eq-taille-autre').value = ''; } if(window.LogbookEngine && LogbookEngine.updateEquipmentNomPreview) { LogbookEngine.updateEquipmentNomPreview(); }",
+    "args": "'eq-taille-autre'"
+  },
+  {
+    "event": "change",
+    "action": "document_getElementById",
+    "code": "document.getElementById('eq-couleur-autre').style.display = (this.value === 'Autre') ? 'block' : 'none'; if(this.value !== 'Autre') { document.getElementById('eq-couleur-autre').value = ''; } if(window.LogbookEngine && LogbookEngine.updateEquipmentNomPreview) { LogbookEngine.updateEquipmentNomPreview(); }",
+    "args": "'eq-couleur-autre'"
+  },
+  {
+    "event": "click",
+    "action": "LogbookresetEquipmentForm",
+    "code": "LogbookEngine.resetEquipmentForm()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "if",
+    "code": "if(event.target === this) FirebaseAuthEngine.closeAuthModal()",
+    "args": "event.target === this"
+  },
+  {
+    "event": "click",
+    "action": "FirebaseAuthcloseAuthModal",
+    "code": "FirebaseAuthEngine.closeAuthModal()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "if",
+    "code": "if(window.GdprEngine) { window.GdprEngine.showModal('gdpr-settings-modal'); window.FirebaseAuthEngine.closeAuthModal(); }",
+    "args": "window.GdprEngine"
+  },
+  {
+    "event": "click",
+    "action": "FirebaseAuthswitchTab",
+    "code": "FirebaseAuthEngine.switchTab('login')",
+    "args": "'login'"
+  },
+  {
+    "event": "click",
+    "action": "FirebaseAuthswitchTab",
+    "code": "FirebaseAuthEngine.switchTab('register')",
+    "args": "'register'"
+  },
+  {
+    "event": "click",
+    "action": "FirebaseAuthforgotPassword",
+    "code": "FirebaseAuthEngine.forgotPassword(document.getElementById('login-email').value)",
+    "args": "document.getElementById('login-email'"
+  },
+  {
+    "event": "click",
+    "action": "FirebaseAuthsignIn",
+    "code": "FirebaseAuthEngine.signIn(document.getElementById('login-email').value, document.getElementById('login-password').value)",
+    "args": "document.getElementById('login-email'"
+  },
+  {
+    "event": "click",
+    "action": "FirebaseAuthsignUp",
+    "code": "FirebaseAuthEngine.signUp(document.getElementById('register-email').value, document.getElementById('register-password').value, document.getElementById('register-confirm-password').value)",
+    "args": "document.getElementById('register-email'"
+  },
+  {
+    "event": "click",
+    "action": "FirebaseAuthsyncDataWithCloud",
+    "code": "FirebaseAuthEngine.syncDataWithCloud()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "FirebaseAuthsignOut",
+    "code": "FirebaseAuthEngine.signOut()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "if",
+    "code": "if(event.target===this) SitesEngine.closeMoreMapsDropdown()",
+    "args": "event.target===this"
+  },
+  {
+    "event": "click",
+    "action": "SitescloseMoreMapsDropdown",
+    "code": "SitesEngine.closeMoreMapsDropdown()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "if",
+    "code": "if(event.target === this) SitesEngine.closeGpsMenu()",
+    "args": "event.target === this"
+  },
+  {
+    "event": "click",
+    "action": "SitescloseGpsMenu",
+    "code": "SitesEngine.closeGpsMenu()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "SiteslaunchGps",
+    "code": "SitesEngine.launchGps('waze')",
+    "args": "'waze'"
+  },
+  {
+    "event": "click",
+    "action": "SiteslaunchGps",
+    "code": "SitesEngine.launchGps('gmaps')",
+    "args": "'gmaps'"
+  },
+  {
+    "event": "click",
+    "action": "SiteslaunchGps",
+    "code": "SitesEngine.launchGps('apple')",
+    "args": "'apple'"
+  },
+  {
+    "event": "click",
+    "action": "GdprshowModal",
+    "code": "GdprEngine.showModal('gdpr-privacy-modal')",
+    "args": "'gdpr-privacy-modal'"
+  },
+  {
+    "event": "click",
+    "action": "GdprshowModal",
+    "code": "GdprEngine.showModal('gdpr-settings-modal')",
+    "args": "'gdpr-settings-modal'"
+  },
+  {
+    "event": "click",
+    "action": "GdprrefuseAll",
+    "code": "GdprEngine.refuseAll()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "GdpracceptAll",
+    "code": "GdprEngine.acceptAll()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "if",
+    "code": "if(event.target === this) GdprEngine.hideModal('gdpr-settings-modal')",
+    "args": "event.target === this"
+  },
+  {
+    "event": "click",
+    "action": "GdprhideModal",
+    "code": "GdprEngine.hideModal('gdpr-settings-modal')",
+    "args": "'gdpr-settings-modal'"
+  },
+  {
+    "event": "click",
+    "action": "GdprrefuseAll",
+    "code": "GdprEngine.refuseAll()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "GdprsaveCustomSettings",
+    "code": "GdprEngine.saveCustomSettings()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "if",
+    "code": "if(event.target === this) GdprEngine.hideModal('gdpr-privacy-modal')",
+    "args": "event.target === this"
+  },
+  {
+    "event": "click",
+    "action": "GdprhideModal",
+    "code": "GdprEngine.hideModal('gdpr-privacy-modal')",
+    "args": "'gdpr-privacy-modal'"
+  },
+  {
+    "event": "click",
+    "action": "GdprhideModal",
+    "code": "GdprEngine.hideModal('gdpr-privacy-modal')",
+    "args": "'gdpr-privacy-modal'"
+  },
+  {
+    "event": "click",
+    "action": "if",
+    "code": "if(event.target === this) GdprEngine.hideModal('gdpr-legal-modal')",
+    "args": "event.target === this"
+  },
+  {
+    "event": "click",
+    "action": "GdprhideModal",
+    "code": "GdprEngine.hideModal('gdpr-legal-modal')",
+    "args": "'gdpr-legal-modal'"
+  },
+  {
+    "event": "click",
+    "action": "GdprhideModal",
+    "code": "GdprEngine.hideModal('gdpr-legal-modal')",
+    "args": "'gdpr-legal-modal'"
+  },
+  {
+    "event": "click",
+    "action": "if",
+    "code": "if(event.target === this) Engine.hideManual()",
+    "args": "event.target === this"
+  },
+  {
+    "event": "click",
+    "action": "hideManual",
+    "code": "Engine.hideManual()",
+    "args": ""
+  },
+  {
+    "event": "click",
+    "action": "showManualSection",
+    "code": "Engine.showManualSection('about')",
+    "args": "'about'"
+  },
+  {
+    "event": "click",
+    "action": "showManualSection",
+    "code": "Engine.showManualSection('dashboard')",
+    "args": "'dashboard'"
+  },
+  {
+    "event": "click",
+    "action": "showManualSection",
+    "code": "Engine.showManualSection('sites')",
+    "args": "'sites'"
+  },
+  {
+    "event": "click",
+    "action": "showManualSection",
+    "code": "Engine.showManualSection('scoring')",
+    "args": "'scoring'"
+  },
+  {
+    "event": "click",
+    "action": "showManualSection",
+    "code": "Engine.showManualSection('logbook')",
+    "args": "'logbook'"
+  },
+  {
+    "event": "click",
+    "action": "showManualSection",
+    "code": "Engine.showManualSection('equipment')",
+    "args": "'equipment'"
+  },
+  {
+    "event": "click",
+    "action": "showManualSection",
+    "code": "Engine.showManualSection('qcm')",
+    "args": "'qcm'"
+  },
+  {
+    "event": "click",
+    "action": "showManualSection",
+    "code": "Engine.showManualSection('library')",
+    "args": "'library'"
+  },
+  {
+    "event": "click",
+    "action": "showManualSection",
+    "code": "Engine.showManualSection('stats')",
+    "args": "'stats'"
+  }
+]

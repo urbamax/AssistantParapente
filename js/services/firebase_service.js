@@ -1,0 +1,1277 @@
+/**
+ * SERVICE - Firebase Wrapper (ES6)
+ * Wraps the legacy firebase_engine to preserve sync logic exactly as requested.
+ */
+import StorageService from './storage.js';
+import GlobalState from '../core/app_state.js';
+
+// We inject the original code but export the Engine
+// --- FIREBASE AUTHENTICATION & SYNC ENGINE ---
+
+let app, auth, db;
+let isInitialized = false;
+
+// Clé localStorage pour persister la date de dernière synchro entre sessions
+const LAST_SYNC_STORAGE_KEY = 'firebase_last_sync';
+
+// We will expose this engine to the window object so it can be called from non-module scripts
+export const FirebaseAuthEngine = {
+    enabled: false,
+    currentUser: null,
+
+    // --- Getter / Setter pour lastSyncTime ---
+    // Persisté dans le localStorage pour survivre aux rechargements de page.
+    get lastSyncTime() {
+        return localStorage.getItem(LAST_SYNC_STORAGE_KEY) || null;
+    },
+    set lastSyncTime(value) {
+        if (value) {
+            localStorage.setItem(LAST_SYNC_STORAGE_KEY, value);
+        } else {
+            localStorage.removeItem(LAST_SYNC_STORAGE_KEY);
+        }
+    },
+
+    // Initialize Firebase
+    init: async function () {
+        // Petit point de statut dans le header (à côté du bouton profil), indépendant de
+        // l'activation Firebase : reflète GlobalState.isSyncing pendant qu'une synchro cloud
+        // est en attente ou en cours.
+        GlobalState.subscribe('isSyncing', (isSyncing) => {
+            const dot = document.getElementById('sync-active-dot');
+            if (dot) dot.classList.toggle('active', !!isSyncing);
+        });
+
+        if (typeof IS_FIREBASE_ENABLED === 'undefined' || !IS_FIREBASE_ENABLED) {
+            console.log("Firebase sync is disabled (IS_FIREBASE_ENABLED is false).");
+            this.updateHeaderUI();
+            return;
+        }
+
+        // GDPR (RGPD) consent guard
+        if (window.GdprEngine && !window.GdprEngine.isConsentGranted('firebase')) {
+            console.log("Firebase initialization bypassed: waiting for user GDPR consent.");
+            this.enabled = false;
+            this.updateHeaderUI();
+            return;
+        }
+
+        try {
+            // Import Firebase SDKs dynamically from CDN
+            const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+            const { getAuth, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+            const { initializeFirestore } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+
+            app = initializeApp(FIREBASE_CONFIG);
+            auth = getAuth(app);
+            // Fix Safari CORS/ITP issues with WebChannel by forcing Long Polling
+            db = initializeFirestore(app, {
+                experimentalForceLongPolling: true
+            });
+            this.enabled = true;
+            isInitialized = true;
+            console.log("Firebase successfully initialized.");
+
+            // Listen to auth state changes
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    console.log("User logged in:", user.email);
+                    this.currentUser = user;
+                    this.updateHeaderUI();
+                    this.updateModalUI();
+
+                    // Synchro complète initiale à la connexion
+                    await this.syncDataWithCloud();
+
+                    // 1. Synchro automatique silencieuse toutes les 30 secondes
+                    if (!this._syncInterval) {
+                        this._syncInterval = setInterval(() => {
+                            if (navigator.onLine && this.currentUser) {
+                                this.syncDataWithCloud(true); // silent sync
+                            }
+                        }, 30 * 1000); // 30 secondes (réduit depuis 2 min)
+                    }
+
+                    // 2. Synchro instantanée dès le retour de la connexion internet
+                    if (!this._onlineListenerAttached) {
+                        window.addEventListener('online', () => {
+                            if (this.currentUser) {
+                                console.log("Réseau de retour : synchronisation de rattrapage en cours...");
+                                this.syncDataWithCloud(true);
+                            }
+                        });
+                        this._onlineListenerAttached = true;
+                    }
+                } else {
+                    console.log("User logged out");
+                    this.currentUser = null;
+                    // On réinitialise lastSyncTime à la déconnexion pour ne pas afficher
+                    // une heure de synchro qui appartient à une autre session.
+                    this.lastSyncTime = null;
+
+                    if (this._syncInterval) {
+                        clearInterval(this._syncInterval);
+                        this._syncInterval = null;
+                    }
+
+                    this.updateHeaderUI();
+                    this.updateModalUI();
+                }
+            });
+
+        } catch (error) {
+            console.error("Error initializing Firebase:", error);
+            this.enabled = false;
+        }
+    },
+
+    // UI Helpers
+    openAuthModal: function () {
+        const overlay = document.getElementById('auth-modal-overlay');
+        if (overlay) {
+            overlay.classList.add('active');
+            this.clearAlerts();
+            this.updateModalUI();
+        }
+    },
+
+    closeAuthModal: function () {
+        const overlay = document.getElementById('auth-modal-overlay');
+        if (overlay) {
+            overlay.classList.remove('active');
+        }
+    },
+
+    switchTab: function (tabName) {
+        const loginTab = document.getElementById('tab-login');
+        const registerTab = document.getElementById('tab-register');
+        const loginForm = document.getElementById('form-login-container');
+        const registerForm = document.getElementById('form-register-container');
+
+        if (tabName === 'login') {
+            loginTab.classList.add('active');
+            registerTab.classList.remove('active');
+            loginForm.classList.add('active');
+            registerForm.classList.remove('active');
+        } else {
+            loginTab.classList.remove('active');
+            registerTab.classList.add('active');
+            loginForm.classList.remove('active');
+            registerForm.classList.add('active');
+        }
+        this.clearAlerts();
+    },
+
+    // Update the Auth Button in the header
+    updateHeaderUI: function () {
+        const activeDot = document.getElementById('auth-active-dot');
+        const authBtn = document.getElementById('auth-btn');
+
+        if (activeDot && authBtn) {
+            if (this.currentUser) {
+                activeDot.classList.add('active');
+                authBtn.title = `Connecté (${this.currentUser.email})`;
+            } else {
+                activeDot.classList.remove('active');
+                authBtn.title = this.enabled ? "Se connecter / S'enregistrer" : "Synchronisation désactivée (Cliquez pour configurer)";
+            }
+        }
+
+        // Update guest warnings
+        const qcmWarning = document.getElementById('qcm-guest-warning');
+        const statsWarning = document.getElementById('stats-guest-warning');
+
+        if (this.currentUser) {
+            if (qcmWarning) qcmWarning.style.display = 'none';
+            if (statsWarning) statsWarning.style.display = 'none';
+        } else if (this.enabled) {
+            if (qcmWarning) qcmWarning.style.display = 'flex';
+            if (statsWarning) statsWarning.style.display = 'flex';
+        }
+    },
+
+    // Update the contents of the modal based on connection state
+    updateModalUI: function () {
+        const setupRequiredView = document.getElementById('auth-setup-required-view');
+        const anonymousView = document.getElementById('auth-anonymous-view');
+        const loggedInView = document.getElementById('auth-logged-in-view');
+
+        if (!setupRequiredView || !anonymousView || !loggedInView) return;
+
+        // Hide all first
+        setupRequiredView.style.display = 'none';
+        anonymousView.style.display = 'none';
+        loggedInView.style.display = 'none';
+
+        const hasConsent = window.GdprEngine ? window.GdprEngine.isConsentGranted('firebase') : false;
+        const isFirebaseEnabledGlobally = typeof IS_FIREBASE_ENABLED !== 'undefined' && IS_FIREBASE_ENABLED;
+
+        if (!isFirebaseEnabledGlobally) {
+            setupRequiredView.style.display = 'block';
+            const devDesc = document.getElementById('auth-setup-required-desc');
+            const gdprDesc = document.getElementById('auth-gdpr-required-desc');
+            if (devDesc) devDesc.style.display = 'block';
+            if (gdprDesc) gdprDesc.style.display = 'none';
+        } else if (this.currentUser) {
+            loggedInView.style.display = 'flex';
+
+            // Set user email
+            const emailEl = document.getElementById('auth-user-email');
+            if (emailEl) emailEl.textContent = this.currentUser.email;
+
+            // Set avatar letter
+            const avatarEl = document.getElementById('auth-user-avatar');
+            if (avatarEl && this.currentUser.email) {
+                avatarEl.textContent = this.currentUser.email.charAt(0).toUpperCase();
+            }
+
+            // Affiche la dernière heure de synchro lue depuis le localStorage
+            const syncTimeEl = document.getElementById('auth-sync-time');
+            if (syncTimeEl) {
+                syncTimeEl.textContent = this.lastSyncTime || "Jamais";
+            }
+        } else if (hasConsent) {
+            anonymousView.style.display = 'block';
+        } else {
+            setupRequiredView.style.display = 'block';
+            const devDesc = document.getElementById('auth-setup-required-desc');
+            const gdprDesc = document.getElementById('auth-gdpr-required-desc');
+            if (devDesc) devDesc.style.display = 'none';
+            if (gdprDesc) gdprDesc.style.display = 'block';
+        }
+    },
+
+    // Auth actions
+    signUp: async function (args, event, target) {
+        if (!isInitialized) return;
+        this.clearAlerts();
+
+        // Lire les champs directement dans le DOM
+        const emailEl = document.getElementById('register-email');
+        const passwordEl = document.getElementById('register-password');
+        const confirmEl = document.getElementById('register-confirm-password');
+        const email = emailEl ? emailEl.value.trim() : '';
+        const password = passwordEl ? passwordEl.value : '';
+        const confirmPassword = confirmEl ? confirmEl.value : '';
+
+        if (!email || !password || !confirmPassword) {
+            this.showAlert("Veuillez remplir tous les champs.", "error");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            this.showAlert("Les mots de passe ne correspondent pas.", "error");
+            return;
+        }
+
+        try {
+            const { createUserWithEmailAndPassword, setPersistence, indexedDBLocalPersistence, browserSessionPersistence } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+            this.showStatus("Création du compte...", "info");
+
+            // Set persistence dynamically
+            const rememberMeEl = document.getElementById('register-remember-me');
+            const rememberMe = rememberMeEl ? rememberMeEl.checked : true;
+            await setPersistence(auth, rememberMe ? indexedDBLocalPersistence : browserSessionPersistence);
+
+            await createUserWithEmailAndPassword(auth, email, password);
+            this.showAlert("Compte créé avec succès !", "success");
+        } catch (error) {
+            console.error("Signup error:", error.code, error.message);
+            let message = "Erreur lors de la création du compte.";
+            if (error.code === 'auth/email-already-in-use') {
+                message = "Cet email est déjà utilisé.";
+            } else if (error.code === 'auth/invalid-email') {
+                message = "Format d'adresse email invalide.";
+            } else if (error.code === 'auth/weak-password') {
+                message = "Le mot de passe doit contenir au moins 6 caractères.";
+            }
+            this.showAlert(message, "error");
+        }
+    },
+
+    signIn: async function (args, event, target) {
+        if (!isInitialized) return;
+        this.clearAlerts();
+
+        // Lire les champs directement dans le DOM (les args du dispatcher ne sont pas exploitables)
+        const emailEl = document.getElementById('login-email');
+        const passwordEl = document.getElementById('login-password');
+        const email = emailEl ? emailEl.value.trim() : '';
+        const password = passwordEl ? passwordEl.value : '';
+
+        if (!email || !password) {
+            this.showAlert("Veuillez remplir tous les champs.", "error");
+            return;
+        }
+
+        try {
+            const { signInWithEmailAndPassword, setPersistence, indexedDBLocalPersistence, browserSessionPersistence } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+            this.showStatus("Connexion...", "info");
+
+            // Set persistence dynamically
+            const rememberMeEl = document.getElementById('login-remember-me');
+            const rememberMe = rememberMeEl ? rememberMeEl.checked : true;
+            await setPersistence(auth, rememberMe ? indexedDBLocalPersistence : browserSessionPersistence);
+
+            await signInWithEmailAndPassword(auth, email, password);
+        } catch (error) {
+            console.error("Signin error:", error.code, error.message);
+            let message = "Identifiants incorrects ou compte inexistant.";
+            if (error.code === 'auth/invalid-email') {
+                message = "Format d'adresse email invalide.";
+            } else if (
+                error.code === 'auth/user-not-found' ||
+                error.code === 'auth/wrong-password' ||
+                error.code === 'auth/invalid-credential'
+            ) {
+                message = "Email ou mot de passe incorrect.";
+            } else if (error.code === 'auth/too-many-requests') {
+                message = "Trop de tentatives. Veuillez réessayer plus tard ou réinitialisez votre mot de passe.";
+            } else if (error.code === 'auth/user-disabled') {
+                message = "Ce compte a été désactivé.";
+            } else if (error.code === 'auth/network-request-failed') {
+                message = "Erreur réseau. Vérifiez votre connexion internet.";
+            }
+            this.showAlert(message, "error");
+        }
+    },
+
+    signOut: async function () {
+        if (!isInitialized) return;
+        try {
+            const { signOut } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+            await signOut(auth);
+            this.closeAuthModal();
+            alert("Vous avez été déconnecté.");
+        } catch (error) {
+            console.error("Signout error:", error);
+        }
+    },
+
+    resetPassword: async function (email) {
+        if (!isInitialized) return;
+        if (!email) {
+            return;
+        }
+        this.clearAlerts();
+
+        try {
+            const { sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+            await sendPasswordResetEmail(auth, email);
+            this.showAlert("Email de réinitialisation envoyé !", "success");
+        } catch (error) {
+            console.error("Forgot password error:", error);
+            this.showAlert("Erreur lors de l'envoi de l'email.", "error");
+        }
+    },
+
+    // -----------------------------------------------------------------------
+    // MÉTHODE CENTRALE : Synchro Cloud complète (toutes les données)
+    // -----------------------------------------------------------------------
+    syncDataWithCloud: async function (silent = false) {
+        if (!this.currentUser) return { success: false, data: null, error: "Not logged in" };
+
+        GlobalState.set('isSyncing', true);
+        if (!silent) {
+            this.showStatus("Synchronisation en cours...", "info");
+        }
+
+        try {
+            const { doc, getDoc, setDoc, collection, getDocs, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+
+            // --- Sync Logbook ---
+            // 0. Process Tombstones (Deleted items) FIRST
+            let deletedFlights = [];
+            try { deletedFlights = JSON.parse(localStorage.getItem('deleted_flights') || '[]'); } catch(e) {}
+            
+            if (deletedFlights.length > 0) {
+                for (const delId of deletedFlights) {
+                    // Guard : l'ID doit être une string non-vide pour Firestore
+                    if (!delId || typeof delId !== 'string') {
+                        console.warn("[Sync] Tombstone ignoré : ID invalide", delId);
+                        continue;
+                    }
+                    const sRef = doc(db, "users", uid, "logbook", delId);
+                    await deleteDoc(sRef);
+                }
+                localStorage.setItem('deleted_flights', '[]');
+                console.log(`Removed ${deletedFlights.length} deleted flights from Cloud.`);
+            }
+
+            let localLogbook = StorageService.get(StorageService.KEYS.LOGBOOK_DATA) || [];
+            if (!Array.isArray(localLogbook)) localLogbook = [];
+
+            // Sanitation : on retire tout enregistrement sans ID valide (données corrompues/anciennes)
+            localLogbook = localLogbook.filter(s => {
+                if (!s || !s.id || typeof s.id !== 'string') {
+                    console.warn("[Sync] Vol ignoré : ID invalide ou manquant", s);
+                    return false;
+                }
+                return true;
+            });
+
+            // 1. Process Pending Queue (Local -> Cloud)
+            const pendingLogbook = localLogbook.filter(s => s.syncPending);
+            for (const session of pendingLogbook) {
+                const sRef = doc(db, "users", uid, "logbook", session.id);
+                delete session.syncPending;
+                await setDoc(sRef, session);
+            }
+            if (pendingLogbook.length > 0) {
+                StorageService.set(StorageService.KEYS.LOGBOOK_DATA, localLogbook);
+            }
+
+            const logbookColRef = collection(db, "users", uid, "logbook");
+            const logbookSnap = await getDocs(logbookColRef);
+
+            let cloudLogbook = [];
+            logbookSnap.forEach(docSnap => {
+                const data = docSnap.data();
+                // Guard : on n'accepte que les docs avec un ID string valide
+                if (data && data.id && typeof data.id === 'string') {
+                    cloudLogbook.push(data);
+                }
+            });
+
+            // 2. Smart Merge: Compare updatedAt
+            let mergedLogbookMap = new Map();
+            localLogbook.forEach(session => mergedLogbookMap.set(session.id, session));
+            cloudLogbook.forEach(cloudSession => {
+                const localSession = mergedLogbookMap.get(cloudSession.id);
+                if (localSession) {
+                    const localTime = localSession.updatedAt || 0;
+                    const cloudTime = cloudSession.updatedAt || 0;
+                    if (cloudTime > localTime) {
+                        mergedLogbookMap.set(cloudSession.id, cloudSession);
+                    }
+                } else {
+                    mergedLogbookMap.set(cloudSession.id, cloudSession);
+                }
+            });
+
+            let mergedLogbook = Array.from(mergedLogbookMap.values());
+            mergedLogbook.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+
+            StorageService.set(StorageService.KEYS.LOGBOOK_DATA, mergedLogbook);
+
+            // Upload missing ones to cloud
+            for (const session of mergedLogbook) {
+                // Guard : double vérification avant l'appel doc()
+                if (!session.id || typeof session.id !== 'string') continue;
+                const cloudSession = cloudLogbook.find(s => s.id === session.id);
+                if (!cloudSession) {
+                    const sRef = doc(db, "users", uid, "logbook", session.id);
+                    await setDoc(sRef, session);
+                }
+            }
+
+            // --- Sync Equipment ---
+            let localEquip = StorageService.get(StorageService.KEYS.EQUIPMENT_DATA) || [];
+            if (!Array.isArray(localEquip)) localEquip = [];
+
+            // Sanitation : on retire tout élément sans ID valide
+            localEquip = localEquip.filter(e => {
+                if (!e || !e.id || typeof e.id !== 'string') {
+                    console.warn("[Sync] Équipement ignoré : ID invalide ou manquant", e);
+                    return false;
+                }
+                return true;
+            });
+
+            // 1. Process Pending Queue (Local -> Cloud)
+            const pendingEquip = localEquip.filter(e => e.syncPending);
+            for (const item of pendingEquip) {
+                // Guard : ID obligatoire en string
+                if (!item.id || typeof item.id !== 'string') continue;
+                const eRef = doc(db, "users", uid, "equipment", item.id);
+                delete item.syncPending;
+                await setDoc(eRef, item);
+            }
+            if (pendingEquip.length > 0) {
+                StorageService.set(StorageService.KEYS.EQUIPMENT_DATA, localEquip);
+            }
+
+            const equipColRef = collection(db, "users", uid, "equipment");
+            const equipSnap = await getDocs(equipColRef);
+
+            let cloudEquip = [];
+            equipSnap.forEach(docSnap => {
+                const data = docSnap.data();
+                // Guard : on n'accepte que les docs avec un ID string valide
+                if (data && data.id && typeof data.id === 'string') {
+                    cloudEquip.push(data);
+                }
+            });
+
+            // 2. Smart Merge: Compare updatedAt
+            let mergedEquipMap = new Map();
+            localEquip.forEach(item => mergedEquipMap.set(item.id, item));
+            cloudEquip.forEach(cloudItem => {
+                const localItem = mergedEquipMap.get(cloudItem.id);
+                if (localItem) {
+                    const localTime = localItem.updatedAt || 0;
+                    const cloudTime = cloudItem.updatedAt || 0;
+                    if (cloudTime > localTime) {
+                        mergedEquipMap.set(cloudItem.id, cloudItem);
+                    }
+                } else {
+                    mergedEquipMap.set(cloudItem.id, cloudItem);
+                }
+            });
+
+            let mergedEquip = Array.from(mergedEquipMap.values());
+
+            StorageService.set(StorageService.KEYS.EQUIPMENT_DATA, mergedEquip);
+
+            // Upload missing ones to cloud
+            for (const item of mergedEquip) {
+                // Guard : double vérification avant l'appel doc()
+                if (!item.id || typeof item.id !== 'string') continue;
+                const cloudItem = cloudEquip.find(e => e.id === item.id);
+                if (!cloudItem) {
+                    const eRef = doc(db, "users", uid, "equipment", item.id);
+                    await setDoc(eRef, item);
+                }
+            }
+
+            // --- Sync QCM Stats ---
+            const localQcmStats = this.getLocalQcmStats();
+            const qcmDocRef = doc(db, "users", uid, "stats", "qcm_stats");
+            const qcmDocSnap = await getDoc(qcmDocRef);
+
+            let finalQcmStats = localQcmStats;
+            if (qcmDocSnap.exists()) {
+                const cloudQcmStats = qcmDocSnap.data();
+                finalQcmStats = this.mergeQcmStats(localQcmStats, cloudQcmStats);
+            }
+
+            // Save back merged stats to both LocalStorage and Cloud
+            StorageService.set(StorageService.KEYS.QCM_STATS, finalQcmStats);
+            await setDoc(qcmDocRef, finalQcmStats);
+
+            // --- Sync Exam History ---
+            const localExamHistory = this.getLocalExamHistory();
+            const examDocRef = doc(db, "users", uid, "stats", "exam_history");
+            const examDocSnap = await getDoc(examDocRef);
+
+            let finalExamHistory = localExamHistory;
+            if (examDocSnap.exists()) {
+                const cloudExamHistory = examDocSnap.data();
+                finalExamHistory = this.mergeExamHistory(localExamHistory, cloudExamHistory);
+            }
+
+            StorageService.set(StorageService.KEYS.EXAM_HISTORY, finalExamHistory);
+            await setDoc(examDocRef, finalExamHistory);
+
+            // --- Sync Preferences ---
+            const localPrefs = this.getLocalPreferences();
+            const prefsDocRef = doc(db, "users", uid, "preferences", "user_prefs");
+            const prefsDocSnap = await getDoc(prefsDocRef);
+
+            let finalPrefs = localPrefs;
+            if (prefsDocSnap.exists()) {
+                const cloudPrefs = prefsDocSnap.data();
+                finalPrefs = this.mergePreferences(localPrefs, cloudPrefs);
+            }
+
+            StorageService.set(StorageService.KEYS.USER_PREFS, finalPrefs);
+
+            // Update global userLevel from merged preferences if it's different
+            this.syncingData = true;
+            if (finalPrefs.pilotLevel && finalPrefs.pilotLevel !== StorageService.get(StorageService.KEYS.USER_LEVEL)) {
+                StorageService.set(StorageService.KEYS.USER_LEVEL, finalPrefs.pilotLevel);
+                if (GlobalState) {
+                    GlobalState.set('level', finalPrefs.pilotLevel);
+                }
+                if (window.Engine && typeof window.Engine.changeLevel === 'function') {
+                    window.Engine.changeLevel(finalPrefs.pilotLevel);
+                }
+            }
+            if (finalPrefs.themeMode && finalPrefs.themeMode !== StorageService.get(StorageService.KEYS.THEME_MODE)) {
+                StorageService.set(StorageService.KEYS.THEME_MODE, finalPrefs.themeMode);
+                if (GlobalState) {
+                    GlobalState.set('themeMode', finalPrefs.themeMode);
+                }
+                if (window.Engine) {
+                    window.Engine.state.themeMode = finalPrefs.themeMode;
+                    if (typeof window.Engine.applyThemeMode === 'function') {
+                        window.Engine.applyThemeMode();
+                    }
+                }
+            }
+            this.syncingData = false;
+
+            await setDoc(prefsDocRef, finalPrefs);
+
+            // Refresh UI if QuizEngine stats are currently visible
+            if (typeof QuizEngine !== 'undefined' && typeof QuizEngine.renderStats === 'function') {
+                QuizEngine.renderStats();
+            }
+
+            // Refresh SitesEngine if it exists so that limits, favorites and locations are re-applied
+            if (typeof SitesEngine !== 'undefined' && typeof SitesEngine.loadUserPreferences === 'function') {
+                SitesEngine.loadUserPreferences();
+                if (typeof SitesEngine.renderList === 'function') {
+                    SitesEngine.renderList();
+                }
+            }
+
+            // Refresh LogbookEngine if it exists
+            if (typeof LogbookEngine !== 'undefined' && typeof LogbookEngine.loadData === 'function') {
+                LogbookEngine.loadData();
+                if (typeof LogbookEngine.loadEquipmentData === 'function') {
+                    LogbookEngine.loadEquipmentData();
+                }
+                LogbookEngine.switchTab(LogbookEngine.currentTab);
+            }
+
+            console.log("Sync complete!");
+
+            // Persistance de l'heure dans le localStorage (survit au rechargement)
+            this.lastSyncTime = new Date().toLocaleTimeString();
+
+            // On rafraîchit TOUJOURS la modal après une synchro réussie,
+            // y compris les synchros silencieuses, pour que l'heure soit à jour.
+            this.updateModalUI();
+
+            if (!silent) {
+                this.showStatus("Synchronisé avec le cloud !", "success");
+            }
+            GlobalState.set('isSyncing', false);
+            return { success: true, data: null, error: null };
+        } catch (error) {
+            console.error("Synchronization failed:", error);
+            if (!silent) {
+                const errorDetail = error.message ? ` : ${error.message}` : '';
+                this.showAlert(`La synchronisation a échoué${errorDetail}. Les données restent stockées localement.`, "error");
+            }
+            GlobalState.set('isSyncing', false);
+            return { success: false, data: null, error: error.message };
+        }
+    },
+
+    // -----------------------------------------------------------------------
+    // DEBOUNCE SYNC — Regroupe les micro-modifications en une seule synchro
+    // -----------------------------------------------------------------------
+    /**
+     * Déclenche une synchro cloud avec un délai de 2 secondes.
+     * Chaque appel annule et repousse le timer précédent.
+     * Appeler cette méthode après chaque modification utilisateur
+     * (vol, équipement, préférences, niveau, thème…).
+     */
+    triggerDebouncedSync: function () {
+        if (!this.currentUser || !this.enabled) return;
+
+        // Annule la synchro en attente si elle existe
+        if (this._debounceSyncTimer) {
+            clearTimeout(this._debounceSyncTimer);
+        }
+
+        // Dès qu'une synchro est mise en file (même avant le déclenchement réel après le
+        // délai), on affiche l'état "en attente" — GlobalState.isSyncing repasse à false
+        // seulement à la fin de syncDataWithCloud, une fois la synchro effective terminée.
+        GlobalState.set('isSyncing', true);
+
+        // Repousse de 2 secondes pour regrouper les changements rapides
+        this._debounceSyncTimer = setTimeout(() => {
+            this._debounceSyncTimer = null;
+            if (this.currentUser && navigator.onLine) {
+                console.log("[Firebase] Synchro debounced déclenchée après modification utilisateur.");
+                this.syncDataWithCloud(true); // silent = true (pas d'alerte UI intrusive)
+            } else {
+                // Hors ligne ou déconnecté : rien à synchroniser pour l'instant, on ne laisse
+                // pas l'indicateur bloqué sur "en cours" indéfiniment.
+                GlobalState.set('isSyncing', false);
+            }
+        }, 2000);
+    },
+
+    // Write-through updates to Cloud when user makes progress
+    saveStatsToCloud: async function () {
+        if (!this.currentUser || !this.enabled) return { success: false, data: null, error: "Not enabled or logged in" };
+
+        try {
+            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+
+            const qcmStats = this.getLocalQcmStats();
+            const qcmDocRef = doc(db, "users", uid, "stats", "qcm_stats");
+            await setDoc(qcmDocRef, qcmStats);
+
+            this.lastSyncTime = new Date().toLocaleTimeString();
+            this.updateModalUI(); // Toujours rafraîchir l'UI après une synchro partielle
+            console.log("Incremental QCM stats synced.");
+            return { success: true, data: null, error: null };
+        } catch (error) {
+            console.error("Incremental QCM stats sync failed:", error);
+            return { success: false, data: null, error: error.message };
+        }
+    },
+
+    saveHistoryToCloud: async function () {
+        if (!this.currentUser || !this.enabled) return { success: false, data: null, error: "Not enabled or logged in" };
+
+        try {
+            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+
+            const examHistory = this.getLocalExamHistory();
+            const examDocRef = doc(db, "users", uid, "stats", "exam_history");
+            await setDoc(examDocRef, examHistory);
+
+            this.lastSyncTime = new Date().toLocaleTimeString();
+            this.updateModalUI(); // Toujours rafraîchir l'UI après une synchro partielle
+            console.log("Incremental exam history synced.");
+            return { success: true, data: null, error: null };
+        } catch (error) {
+            console.error("Incremental exam history sync failed:", error);
+            return { success: false, data: null, error: error.message };
+        }
+    },
+
+    savePreferencesToCloud: async function () {
+        if (!this.currentUser || !this.enabled || this.syncingData) return { success: false, data: null, error: "Not enabled, syncing or not logged in" };
+
+        try {
+            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+
+            const prefs = this.getLocalPreferences();
+            const prefsDocRef = doc(db, "users", uid, "preferences", "user_prefs");
+            await setDoc(prefsDocRef, prefs);
+
+            this.lastSyncTime = new Date().toLocaleTimeString();
+            this.updateModalUI(); // Toujours rafraîchir l'UI après une synchro partielle
+            console.log("Incremental preferences synced.");
+            return { success: true, data: null, error: null };
+        } catch (error) {
+            console.error("Incremental preferences sync failed:", error);
+            return { success: false, data: null, error: error.message };
+        }
+    },
+
+    syncLogbookData: async function (data) {
+        if (!this.currentUser || !this.enabled || this.syncingData) return { success: false, data: null, error: "Not enabled, syncing or not logged in" };
+
+        try {
+            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+
+            // Save all locally present to cloud
+            for (const session of data) {
+                const docRef = doc(db, "users", uid, "logbook", session.id);
+                await setDoc(docRef, session);
+            }
+
+            this.lastSyncTime = new Date().toLocaleTimeString();
+            this.updateModalUI(); // Toujours rafraîchir l'UI après une synchro partielle
+            console.log("Logbook data synced incrementally.");
+            return { success: true, data: null, error: null };
+        } catch (error) {
+            console.error("Logbook incremental sync failed:", error);
+            return { success: false, data: null, error: error.message };
+        }
+    },
+
+    deleteLogbookEntry: async function (id) {
+        if (!this.currentUser || !this.enabled) return { success: false, data: null, error: "Not enabled or logged in" };
+
+        try {
+            const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+
+            const docRef = doc(db, "users", uid, "logbook", id);
+            await deleteDoc(docRef);
+            console.log(`Logbook entry ${id} deleted from cloud.`);
+            return { success: true, data: null, error: null };
+        } catch (error) {
+            console.error("Logbook entry delete failed:", error);
+            return { success: false, data: null, error: error.message };
+        }
+    },
+
+    syncEquipmentData: async function (data) {
+        if (!this.currentUser || !this.enabled || this.syncingData) return { success: false, data: null, error: "Not enabled, syncing or not logged in" };
+
+        try {
+            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+
+            // Save all locally present to cloud
+            for (const item of data) {
+                const docRef = doc(db, "users", uid, "equipment", item.id);
+                await setDoc(docRef, item);
+            }
+
+            this.lastSyncTime = new Date().toLocaleTimeString();
+            this.updateModalUI(); // Toujours rafraîchir l'UI après une synchro partielle
+            console.log("Equipment data synced incrementally.");
+            return { success: true, data: null, error: null };
+        } catch (error) {
+            console.error("Equipment incremental sync failed:", error);
+            return { success: false, data: null, error: error.message };
+        }
+    },
+
+    deleteEquipmentEntry: async function (id) {
+        if (!this.currentUser || !this.enabled) return { success: false, data: null, error: "Not enabled or logged in" };
+
+        try {
+            const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+
+            const docRef = doc(db, "users", uid, "equipment", id);
+            await deleteDoc(docRef);
+            console.log(`Equipment entry ${id} deleted from cloud.`);
+            return { success: true, data: null, error: null };
+        } catch (error) {
+            console.error("Equipment entry delete failed:", error);
+            return { success: false, data: null, error: error.message };
+        }
+    },
+
+    syncEquipmentEntry: async function (item) {
+        if (!this.currentUser || !this.enabled || this.syncingData) return { success: false, data: null, error: "Not enabled, syncing or not logged in" };
+
+        try {
+            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+
+            const docRef = doc(db, "users", uid, "equipment", item.id);
+            await setDoc(docRef, item);
+
+            this.lastSyncTime = new Date().toLocaleTimeString();
+            this.updateModalUI(); // Toujours rafraîchir l'UI après une synchro partielle
+            console.log("Equipment entry synced successfully:", item.id);
+            return { success: true, data: null, error: null };
+        } catch (error) {
+            console.error("Equipment entry sync failed:", error);
+            return { success: false, data: null, error: error.message };
+        }
+    },
+
+    syncLogbookEntry: async function (session) {
+        if (!this.currentUser || !this.enabled || this.syncingData) return { success: false, data: null, error: "Not enabled, syncing or not logged in" };
+
+        try {
+            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const uid = this.currentUser.uid;
+
+            const docRef = doc(db, "users", uid, "logbook", session.id);
+            await setDoc(docRef, session);
+
+            this.lastSyncTime = new Date().toLocaleTimeString();
+            this.updateModalUI(); // Toujours rafraîchir l'UI après une synchro partielle
+            console.log("Logbook entry synced successfully:", session.id);
+            return { success: true, data: null, error: null };
+        } catch (error) {
+            console.error("Logbook entry sync failed:", error);
+            return { success: false, data: null, error: error.message };
+        }
+    },
+
+    // -----------------------------------------------------------------------
+    // PUSH — Alertes météo en arrière-plan sur les sites favoris (FCM)
+    // -----------------------------------------------------------------------
+    /**
+     * Demande la permission de notification au navigateur, récupère un token FCM et le
+     * sauvegarde dans Firestore (users/{uid}, champ fcmToken). La Cloud Function planifiée
+     * (functions/index.js) lit ce champ pour savoir où envoyer les alertes météo favoris.
+     * Nécessite : un compte connecté, FCM_VAPID_KEY renseigné (js/firebase_config.js), et
+     * que le Service Worker (sw.js) soit actif — c'est lui qui gère la réception en arrière-plan.
+     */
+    enablePushNotifications: async function () {
+        if (!this.currentUser || !this.enabled) {
+            this.showAlert("Connectez-vous d'abord pour activer les alertes météo.", "error");
+            return { success: false, error: "Not logged in" };
+        }
+        if (typeof FCM_VAPID_KEY === 'undefined' || !FCM_VAPID_KEY) {
+            this.showAlert("Clé VAPID non configurée (js/firebase_config.js). Voir le Mode d'emploi.", "error");
+            return { success: false, error: "Missing VAPID key" };
+        }
+        if (!('serviceWorker' in navigator) || !('Notification' in window)) {
+            this.showAlert("Les notifications ne sont pas supportées par ce navigateur.", "error");
+            return { success: false, error: "Unsupported" };
+        }
+
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                this.showAlert("Permission de notification refusée.", "error");
+                return { success: false, error: "Permission denied" };
+            }
+
+            const swRegistration = await navigator.serviceWorker.ready;
+            const { getMessaging, getToken } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js");
+            const messaging = getMessaging(app);
+            const token = await getToken(messaging, {
+                vapidKey: FCM_VAPID_KEY,
+                serviceWorkerRegistration: swRegistration
+            });
+
+            if (!token) {
+                this.showAlert("Impossible d'obtenir un token de notification.", "error");
+                return { success: false, error: "No token" };
+            }
+
+            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            await setDoc(doc(db, "users", this.currentUser.uid), { fcmToken: token }, { merge: true });
+
+            this.showStatus("Alertes météo activées sur cet appareil !", "success");
+            return { success: true, data: token, error: null };
+        } catch (error) {
+            console.error("Échec de l'activation des notifications push:", error);
+            this.showAlert(`Échec de l'activation des alertes${error.message ? ` : ${error.message}` : ''}.`, "error");
+            return { success: false, data: null, error: error.message };
+        }
+    },
+
+    // -----------------------------------------------------------------------
+    // EXPORT — Compile toutes les données locales en un fichier JSON
+    // -----------------------------------------------------------------------
+    /**
+     * Exporte l'intégralité des données utilisateur (localStorage) en un fichier JSON.
+     * Couvre toutes les clés de StorageService.KEYS + les clés système associées.
+     * Le fichier est automatiquement téléchargé dans le navigateur.
+     */
+    exportAllData: function () {
+        // Récupère toutes les données connues de l'application
+        const exportPayload = {
+            // Méta-données pour identifier et valider l'import
+            _meta: {
+                appName: 'AssistantParapente',
+                exportVersion: '1.0',
+                exportedAt: new Date().toISOString(),
+                exportedBy: this.currentUser ? this.currentUser.email : 'anonymous'
+            },
+            // --- Données structurées via StorageService.KEYS ---
+            [StorageService.KEYS.STATE]:          StorageService.get(StorageService.KEYS.STATE),
+            [StorageService.KEYS.USER_LEVEL]:     StorageService.get(StorageService.KEYS.USER_LEVEL),
+            [StorageService.KEYS.THEME_MODE]:     StorageService.get(StorageService.KEYS.THEME_MODE),
+            [StorageService.KEYS.USER_PREFS]:     StorageService.get(StorageService.KEYS.USER_PREFS),
+            [StorageService.KEYS.LOGBOOK_DATA]:   StorageService.get(StorageService.KEYS.LOGBOOK_DATA),
+            [StorageService.KEYS.EQUIPMENT_DATA]: StorageService.get(StorageService.KEYS.EQUIPMENT_DATA),
+            [StorageService.KEYS.QCM_STATS]:      StorageService.get(StorageService.KEYS.QCM_STATS),
+            [StorageService.KEYS.EXAM_HISTORY]:   StorageService.get(StorageService.KEYS.EXAM_HISTORY),
+            [StorageService.KEYS.PENDING_QUIZ]:   StorageService.get(StorageService.KEYS.PENDING_QUIZ),
+            // --- Clés système supplémentaires ---
+            deleted_flights:    JSON.parse(localStorage.getItem('deleted_flights') || '[]'),
+            LAST_ACTIVE_ROUTE:  localStorage.getItem('LAST_ACTIVE_ROUTE'),
+            firebase_last_sync: localStorage.getItem(LAST_SYNC_STORAGE_KEY)
+        };
+
+        // Sérialise en JSON lisible
+        const jsonString = JSON.stringify(exportPayload, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        // Génère un nom de fichier avec date pour faciliter l'archivage
+        const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+        const filename = `parapente_backup_${date}.json`;
+
+        // Déclenche le téléchargement
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        console.log(`[Firebase] Export réussi : ${filename}`);
+        this.showAlert(`Backup téléchargé : ${filename}`, "success");
+    },
+
+    // -----------------------------------------------------------------------
+    // IMPORT — Restaure toutes les données depuis un fichier JSON exporté
+    // -----------------------------------------------------------------------
+    /**
+     * Importe toutes les données depuis un fichier JSON généré par exportAllData().
+     * Valide la structure avant d'écraser les données locales.
+     * Déclenche une synchro cloud immédiate après restauration.
+     * @param {File} file - Le fichier .json sélectionné par l'utilisateur.
+     */
+    importAllData: function (file) {
+        if (!file) {
+            this.showAlert("Aucun fichier sélectionné.", "error");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            try {
+                const data = JSON.parse(event.target.result);
+
+                // Validation minimale : vérifie la présence des méta-données
+                if (!data._meta || data._meta.appName !== 'AssistantParapente') {
+                    this.showAlert("Fichier invalide : ce n'est pas un backup AssistantParapente.", "error");
+                    return;
+                }
+
+                const confirm = window.confirm(
+                    `Importer le backup du ${new Date(data._meta.exportedAt).toLocaleString()} ?\n\nATTENTION : vos données locales actuelles seront remplacées par celles du backup.`
+                );
+                if (!confirm) return;
+
+                this.showStatus("Restauration en cours...", "info");
+
+                // --- Restauration de toutes les clés StorageService.KEYS ---
+                const keysToRestore = [
+                    StorageService.KEYS.STATE,
+                    StorageService.KEYS.USER_LEVEL,
+                    StorageService.KEYS.THEME_MODE,
+                    StorageService.KEYS.USER_PREFS,
+                    StorageService.KEYS.LOGBOOK_DATA,
+                    StorageService.KEYS.EQUIPMENT_DATA,
+                    StorageService.KEYS.QCM_STATS,
+                    StorageService.KEYS.EXAM_HISTORY,
+                    StorageService.KEYS.PENDING_QUIZ
+                ];
+
+                keysToRestore.forEach(key => {
+                    if (data[key] !== undefined && data[key] !== null) {
+                        StorageService.set(key, data[key]);
+                    }
+                });
+
+                // --- Restauration des clés système ---
+                if (Array.isArray(data.deleted_flights)) {
+                    localStorage.setItem('deleted_flights', JSON.stringify(data.deleted_flights));
+                }
+                if (data.LAST_ACTIVE_ROUTE) {
+                    localStorage.setItem('LAST_ACTIVE_ROUTE', data.LAST_ACTIVE_ROUTE);
+                }
+                if (data.firebase_last_sync) {
+                    localStorage.setItem(LAST_SYNC_STORAGE_KEY, data.firebase_last_sync);
+                }
+
+                console.log("[Firebase] Import local réussi. Déclenchement de la synchro cloud...");
+
+                // Synchro cloud complète pour envoyer les données restaurées vers le cloud
+                if (this.currentUser && this.enabled) {
+                    await this.syncDataWithCloud(false); // visible = non-silencieux
+                } else {
+                    this.showAlert("Données restaurées localement. Connectez-vous pour les synchroniser avec le cloud.", "success");
+                }
+
+                // Recharge l'UI pour refléter les nouvelles données
+                if (typeof QuizEngine !== 'undefined' && typeof QuizEngine.renderStats === 'function') {
+                    QuizEngine.renderStats();
+                }
+                if (typeof LogbookEngine !== 'undefined' && typeof LogbookEngine.loadData === 'function') {
+                    LogbookEngine.loadData();
+                    LogbookEngine.switchTab(LogbookEngine.currentTab);
+                }
+
+            } catch (parseError) {
+                console.error("[Firebase] Erreur lors de l'import :", parseError);
+                this.showAlert("Erreur de lecture du fichier. Vérifiez qu'il s'agit d'un fichier JSON valide.", "error");
+            }
+        };
+        reader.readAsText(file);
+    },
+
+    // Merge algorithms
+    mergeQcmStats: function (local, cloud) {
+        const merged = {
+            totalQuestions: 0,
+            totalCorrect: 0,
+            themes: {},
+            questions: {}
+        };
+
+        // Combine all question keys
+        const allQuestions = new Set([
+            ...Object.keys(local.questions || {}),
+            ...Object.keys(cloud.questions || {})
+        ]);
+
+        allQuestions.forEach(qCode => {
+            const lQ = (local.questions || {})[qCode] || { total: 0, correct: 0, streak: 0 };
+            const cQ = (cloud.questions || {})[qCode] || { total: 0, correct: 0, streak: 0 };
+
+            merged.questions[qCode] = {
+                total: Math.max(lQ.total, cQ.total),
+                correct: Math.max(lQ.correct, cQ.correct),
+                streak: Math.max(lQ.streak || 0, cQ.streak || 0)
+            };
+        });
+
+        // Combine themes keys
+        const allThemes = new Set([
+            ...Object.keys(local.themes || {}),
+            ...Object.keys(cloud.themes || {})
+        ]);
+
+        allThemes.forEach(theme => {
+            const lT = (local.themes || {})[theme] || { total: 0, correct: 0 };
+            const cT = (cloud.themes || {})[theme] || { total: 0, correct: 0 };
+
+            merged.themes[theme] = {
+                total: Math.max(lT.total, cT.total),
+                correct: Math.max(lT.correct, cT.correct)
+            };
+        });
+
+        // Global metrics
+        merged.totalQuestions = Math.max(local.totalQuestions || 0, cloud.totalQuestions || 0);
+        merged.totalCorrect = Math.max(local.totalCorrect || 0, cloud.totalCorrect || 0);
+
+        return merged;
+    },
+
+    mergeExamHistory: function (local, cloud) {
+        const localExams = local.exams || [];
+        const cloudExams = cloud.exams || [];
+
+        // Use a Map keyed by exam ID or ISO string date to remove duplicates
+        const examMap = new Map();
+
+        localExams.forEach(exam => {
+            const key = exam.id || exam.date;
+            examMap.set(key, exam);
+        });
+
+        cloudExams.forEach(exam => {
+            const key = exam.id || exam.date;
+            // In case of conflict, we keep the one already present or cloud.
+            // Since exam logs are read-only historic records, duplicates are identical.
+            examMap.set(key, exam);
+        });
+
+        // Convert map back to list, sort descending by date (newest first), and limit to 10
+        const mergedExams = Array.from(examMap.values());
+        mergedExams.sort((a, b) => {
+            const dateA = new Date(a.date).getTime();
+            const dateB = new Date(b.date).getTime();
+            return dateB - dateA;
+        });
+
+        return {
+            exams: mergedExams.slice(0, 10)
+        };
+    },
+
+    mergePreferences: function (local, cloud) {
+        if (!cloud) return local;
+        if (!local) return cloud;
+
+        // 1. Le Cloud est la source de vérité absolue (recharge à la connexion)
+        let merged = { ...cloud };
+
+        // 2. On récupère les valeurs locales qui n'existent pas du tout dans le cloud
+        // (Utile pour rétrocompatibilité lors de l'ajout d'une nouvelle option locale)
+        for (const key in local) {
+            if (merged[key] === undefined) {
+                merged[key] = local[key];
+            }
+        }
+
+        // 3. Cas spécifiques : Fusion intelligente des tableaux pour ne pas perdre les données des deux côtés
+        const localFavs = local.favoriteSites || [];
+        const cloudFavs = cloud.favoriteSites || [];
+        merged.favoriteSites = Array.from(new Set([...localFavs, ...cloudFavs]));
+
+        const localMin = local.minimizedSites || [];
+        const cloudMin = cloud.minimizedSites || [];
+        merged.minimizedSites = Array.from(new Set([...localMin, ...cloudMin]));
+
+        const mergedLocsMap = new Map();
+        (cloud.savedLocations || []).forEach(loc => mergedLocsMap.set(loc.name, loc));
+        (local.savedLocations || []).forEach(loc => mergedLocsMap.set(loc.name, loc));
+        merged.savedLocations = Array.from(mergedLocsMap.values());
+
+        return merged;
+    },
+
+    // LocalStorage Getters
+    getLocalQcmStats: function () {
+        const saved = StorageService.get(StorageService.KEYS.QCM_STATS);
+        if (saved && typeof saved === 'object') return saved;
+        return { totalQuestions: 0, totalCorrect: 0, themes: {}, questions: {} };
+    },
+
+    getLocalExamHistory: function () {
+        const saved = StorageService.get(StorageService.KEYS.EXAM_HISTORY);
+        if (Array.isArray(saved)) return { exams: saved };
+        if (saved && typeof saved === 'object' && saved.exams) return saved;
+        return { exams: [] };
+    },
+
+    getLocalPreferences: function () {
+        const defaults = {
+            pilotLevel: 'ALL',
+            themeMode: 'auto',
+            favoriteSites: [],
+            minimizedSites: [],
+            savedLocations: [],
+            activeMapLayers: ['leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'paraglidable', 'isofronts'],
+            limitWindMin: 0,
+            limitWindMax: 25,
+            limitGustDelta: 10,
+            hideUnflyable: false,
+            radiusLimit: 210,
+            sortMode: 'CONDITIONS',
+            conditionsStrategy: 'CONSECUTIVE',
+            weatherModel: 'meteofrance'
+        };
+        let prefs = { ...defaults };
+        const saved = StorageService.get(StorageService.KEYS.USER_PREFS);
+        if (saved && typeof saved === 'object') {
+            prefs = { ...prefs, ...saved };
+            // Ensure arrays exist
+            if (!prefs.favoriteSites) prefs.favoriteSites = [];
+            if (!prefs.minimizedSites) prefs.minimizedSites = [];
+            if (!prefs.savedLocations) prefs.savedLocations = [];
+            if (!prefs.activeMapLayers) prefs.activeMapLayers = [...defaults.activeMapLayers];
+        }
+
+        // Always read latest pilot level from main app logic (userLevel)
+        const globalLevel = StorageService.get(StorageService.KEYS.USER_LEVEL);
+        if (globalLevel) {
+            prefs.pilotLevel = globalLevel;
+        }
+
+        const themeMode = StorageService.get(StorageService.KEYS.THEME_MODE);
+        if (themeMode) {
+            prefs.themeMode = themeMode;
+        }
+
+        return prefs;
+    },
+
+    // Alert UI management
+    showAlert: function (message, type) {
+        const alertEl = document.getElementById('auth-alert');
+        if (alertEl) {
+            alertEl.className = `auth-alert ${type}`;
+            alertEl.textContent = message;
+            alertEl.style.display = 'block';
+        }
+    },
+
+    showStatus: function (message, type) {
+        this.showAlert(message, type);
+    },
+
+    clearAlerts: function () {
+        const alertEl = document.getElementById('auth-alert');
+        if (alertEl) {
+            alertEl.className = 'auth-alert';
+            alertEl.style.display = 'none';
+            alertEl.textContent = '';
+        }
+    }
+};
+
+// Bind to window immediately
+window.FirebaseAuthEngine = FirebaseAuthEngine;
+
+// Initialize on DOM load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => FirebaseAuthEngine.init());
+} else {
+    FirebaseAuthEngine.init();
+}
+export default FirebaseAuthEngine;

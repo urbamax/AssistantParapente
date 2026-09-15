@@ -1,17 +1,15 @@
 /* --- MODULE: GAME CONTAINERS (QUIZ/ADVENTURE) + LIBRARY/CONFIG --- */
-.qcm-container,
 .main-stage,
 .library-container,
 .course-container {
     max-width: 1800px;
     width: 98%;
-    margin: calc(var(--header-height, 140px) + 20px) auto 40px auto;
-    background: var(--bg-card);
-    border: var(--border-glass);
-    backdrop-filter: blur(24px);
-    border-radius: 32px;
-    padding: 48px;
-    box-shadow: var(--shadow-card);
+    margin: 0 auto 40px auto !important;
+    padding-top: 20px !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -21,23 +19,7 @@
     /* Ã‰vite l'Ã©crasement sur mobile */
 }
 
-/* Explicit Redundancy for QCM Stage */
-.main-stage {
-    background: var(--bg-card) !important;
-    border: var(--border-glass) !important;
-    box-shadow: var(--shadow-card) !important;
-    border-radius: 32px;
-    backdrop-filter: blur(24px);
-}
 
-/* Explicit Redundancy for Config/Stats */
-#qcm-setup-screen .course-container,
-#stats-screen .course-container {
-    background: var(--bg-card) !important;
-    border: var(--border-glass) !important;
-    box-shadow: var(--shadow-card) !important;
-    border-radius: 32px;
-}
 
 .choice-btn,
 .qcm-option {
@@ -140,13 +122,7 @@ body.light-mode .qcm-option.selected {
     font-weight: 500;
 }
 
-.qcm-text {
-    font-size: 1.5rem;
-    font-weight: 700;
-    line-height: 1.4;
-    color: var(--text-main);
-    margin-bottom: 32px;
-}
+
 
 /* --- MODULE: COURSE VIEWER --- */
 #course-screen .course-container {
@@ -307,78 +283,7 @@ body.light-mode .level-tag {
 }
 
 
-/* --- MODULE: ADVENTURE ENGINE (HUD & CARDS) --- */
-.hud-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 32px;
-    margin-bottom: 32px;
-    padding: 24px 40px;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-    border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-}
 
-body.light-mode .hud-container {
-    background: rgba(255, 255, 255, 0.8);
-    border-color: rgba(0, 0, 0, 0.05);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-}
-
-.hud-stat {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 120px;
-}
-
-.hud-stat-label {
-    font-size: 0.7rem;
-    font-weight: 800;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-}
-
-.hud-stat-value {
-    font-size: 1.5rem;
-    font-weight: 900;
-    color: var(--text-main);
-    font-family: 'Outfit', sans-serif;
-}
-
-.hud-progress-track {
-    flex: 1;
-    height: 12px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    overflow: hidden;
-    position: relative;
-    margin: 0 20px;
-}
-
-body.light-mode .hud-progress-track {
-    background: rgba(0, 0, 0, 0.05);
-}
-
-.hud-progress-fill {
-    height: 100%;
-    background: var(--grad-primary);
-    border-radius: 12px;
-    transition: width 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-    box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
-}
-
-.narrative-content {
-    font-size: 1.25rem;
-    line-height: 1.8;
-    color: var(--text-main);
-    margin: 40px 0;
-    font-weight: 500;
-}
 
 .choice-btn {
     width: 100%;
@@ -416,7 +321,125 @@ body.light-mode .choice-btn {
     color: var(--accent-blue);
 }
 
+/* --- MODULE: QCM BANK --- */
+.bank-item {
+    background: var(--bg-card);
+    border: var(--border-glass);
+    /* backdrop-filter: blur(24px); REMOVED: Causes severe memory leaks (OOM) on Safari for 800+ items */
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: var(--shadow-card);
+    margin-bottom: 24px;
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    /* Optimisation pour les longues listes */
+    content-visibility: auto;
+    contain: layout style paint;
+}
 
+body.light-mode .bank-item {
+    background: #ffffff;
+    border-color: rgba(0,0,0,0.05);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.bank-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+}
+
+.bank-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.bank-item-code {
+    font-family: monospace;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--text-muted);
+    background: rgba(255,255,255,0.05);
+    padding: 4px 8px;
+    border-radius: 8px;
+}
+
+body.light-mode .bank-item-code {
+    background: rgba(0,0,0,0.05);
+}
+
+.bank-item-theme {
+    font-size: 0.75rem;
+    color: var(--accent-blue);
+    background: rgba(14, 165, 233, 0.1);
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.bank-item-question {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--text-main);
+}
+
+.bank-item-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.bank-choice {
+    padding: 16px 24px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+body.light-mode .bank-choice {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+.bank-choice.correct {
+    background: rgba(74, 222, 128, 0.1) !important;
+    border-color: rgba(74, 222, 128, 0.3) !important;
+    color: var(--accent-green) !important;
+    font-weight: 600;
+}
+
+.bank-choice.incorrect {
+    background: rgba(248, 113, 113, 0.05) !important;
+    border-color: rgba(248, 113, 113, 0.2) !important;
+    color: var(--accent-red) !important;
+    opacity: 0.7;
+}
+
+.bank-item-explication {
+    margin-top: 16px;
+    padding: 20px;
+    background: rgba(14, 165, 233, 0.05);
+    border-left: 4px solid var(--accent-blue);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+body.light-mode .bank-item-explication {
+    background: #f0f9ff;
+    color: #334155;
+}
 
 /* ========================================= */
 @media (max-width: 1024px) {
@@ -426,8 +449,7 @@ body.light-mode .choice-btn {
         padding: 0 24px 40px 24px;
     }
 
-    .main-stage,
-    .qcm-container {
+    .main-stage {
         padding: 32px;
         margin-top: calc(var(--header-height, 140px) + 20px);
     }
@@ -441,11 +463,7 @@ body.light-mode .choice-btn {
         overflow-y: auto;
     }
 
-    /* Fixed Course Overlap */
-    .course-standalone-container {
-        margin-top: 200px !important;
-        /* Increased margin for standalone courses */
-    }
+
 
     /* QCM Setup Grid Fix */
     .setup-grid {
@@ -454,7 +472,6 @@ body.light-mode .choice-btn {
     }
 
     /* Critical Container Width Fixes */
-    .qcm-container,
     .main-stage,
     .library-container,
     .course-container {
@@ -467,13 +484,7 @@ body.light-mode .choice-btn {
         overflow-x: hidden !important;
     }
 
-    /* HUD */
-    .hud-container {
-        flex-direction: column;
-        gap: 8px;
-        align-items: flex-start;
-        padding: 12px;
-    }
+
 
     /* Review Overlay Mobile */
     .review-overlay {
@@ -499,8 +510,7 @@ body.light-mode .choice-btn {
     }
 
     /* Quiz Question Text Compact Sizing */
-    .quiz-question-text,
-    .qcm-text {
+    .quiz-question-text {
         font-size: 1.05rem !important;
         margin-bottom: 12px !important;
         line-height: 1.3 !important;
