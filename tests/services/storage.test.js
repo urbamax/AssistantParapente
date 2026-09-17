@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import StorageService from '../../js/services/storage.js';
 
 describe('StorageService', () => {
-
     beforeEach(() => {
         localStorage.clear();
     });
@@ -10,7 +9,7 @@ describe('StorageService', () => {
     it('set and get work correctly with JSON data', () => {
         const obj = { prop: 'value', num: 42 };
         StorageService.set(StorageService.KEYS.USER_PREFS, obj);
-        
+
         const retrieved = StorageService.get(StorageService.KEYS.USER_PREFS);
         expect(retrieved).toEqual(obj);
     });
@@ -23,7 +22,7 @@ describe('StorageService', () => {
 
     it('get handles corrupted JSON gracefully', () => {
         localStorage.setItem(StorageService.KEYS.STATE, '{invalid_json');
-        
+
         const retrieved = StorageService.get(StorageService.KEYS.STATE, 'fallback');
         // If JSON.parse fails, StorageService falls back to returning the raw string
         expect(retrieved).toBe('{invalid_json');
@@ -32,7 +31,7 @@ describe('StorageService', () => {
     it('remove deletes the key', () => {
         StorageService.set('test_key', 'test_val');
         expect(StorageService.get('test_key')).toBe('test_val');
-        
+
         StorageService.remove('test_key');
         expect(StorageService.get('test_key')).toBeNull();
     });

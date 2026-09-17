@@ -46,14 +46,14 @@ export const FirebaseAuthEngine = {
         });
 
         if (typeof IS_FIREBASE_ENABLED === 'undefined' || !IS_FIREBASE_ENABLED) {
-            console.log("Firebase sync is disabled (IS_FIREBASE_ENABLED is false).");
+            console.log('Firebase sync is disabled (IS_FIREBASE_ENABLED is false).');
             this.updateHeaderUI();
             return;
         }
 
         // GDPR (RGPD) consent guard
         if (window.GdprEngine && !window.GdprEngine.isConsentGranted('firebase')) {
-            console.log("Firebase initialization bypassed: waiting for user GDPR consent.");
+            console.log('Firebase initialization bypassed: waiting for user GDPR consent.');
             this.enabled = false;
             this.updateHeaderUI();
             return;
@@ -61,24 +61,26 @@ export const FirebaseAuthEngine = {
 
         try {
             // Import Firebase SDKs dynamically from CDN
-            const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-            const { getAuth, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
-            const { initializeFirestore } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+            const { getAuth, onAuthStateChanged } =
+                await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+            const { initializeFirestore } =
+                await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
 
             app = initializeApp(FIREBASE_CONFIG);
             auth = getAuth(app);
             // Fix Safari CORS/ITP issues with WebChannel by forcing Long Polling
             db = initializeFirestore(app, {
-                experimentalForceLongPolling: true
+                experimentalForceLongPolling: true,
             });
             this.enabled = true;
             isInitialized = true;
-            console.log("Firebase successfully initialized.");
+            console.log('Firebase successfully initialized.');
 
             // Listen to auth state changes
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
-                    console.log("User logged in:", user.email);
+                    console.log('User logged in:', user.email);
                     this.currentUser = user;
                     this.updateHeaderUI();
                     this.updateModalUI();
@@ -99,14 +101,14 @@ export const FirebaseAuthEngine = {
                     if (!this._onlineListenerAttached) {
                         window.addEventListener('online', () => {
                             if (this.currentUser) {
-                                console.log("Réseau de retour : synchronisation de rattrapage en cours...");
+                                console.log('Réseau de retour : synchronisation de rattrapage en cours...');
                                 this.syncDataWithCloud(true);
                             }
                         });
                         this._onlineListenerAttached = true;
                     }
                 } else {
-                    console.log("User logged out");
+                    console.log('User logged out');
                     this.currentUser = null;
                     // On réinitialise lastSyncTime à la déconnexion pour ne pas afficher
                     // une heure de synchro qui appartient à une autre session.
@@ -121,9 +123,8 @@ export const FirebaseAuthEngine = {
                     this.updateModalUI();
                 }
             });
-
         } catch (error) {
-            console.error("Error initializing Firebase:", error);
+            console.error('Error initializing Firebase:', error);
             this.enabled = false;
         }
     },
@@ -176,7 +177,9 @@ export const FirebaseAuthEngine = {
                 authBtn.title = `Connecté (${this.currentUser.email})`;
             } else {
                 activeDot.classList.remove('active');
-                authBtn.title = this.enabled ? "Se connecter / S'enregistrer" : "Synchronisation désactivée (Cliquez pour configurer)";
+                authBtn.title = this.enabled
+                    ? "Se connecter / S'enregistrer"
+                    : 'Synchronisation désactivée (Cliquez pour configurer)';
             }
         }
 
@@ -231,7 +234,7 @@ export const FirebaseAuthEngine = {
             // Affiche la dernière heure de synchro lue depuis le localStorage
             const syncTimeEl = document.getElementById('auth-sync-time');
             if (syncTimeEl) {
-                syncTimeEl.textContent = this.lastSyncTime || "Jamais";
+                syncTimeEl.textContent = this.lastSyncTime || 'Jamais';
             }
         } else if (hasConsent) {
             anonymousView.style.display = 'block';
@@ -258,18 +261,23 @@ export const FirebaseAuthEngine = {
         const confirmPassword = confirmEl ? confirmEl.value : '';
 
         if (!email || !password || !confirmPassword) {
-            this.showAlert("Veuillez remplir tous les champs.", "error");
+            this.showAlert('Veuillez remplir tous les champs.', 'error');
             return;
         }
 
         if (password !== confirmPassword) {
-            this.showAlert("Les mots de passe ne correspondent pas.", "error");
+            this.showAlert('Les mots de passe ne correspondent pas.', 'error');
             return;
         }
 
         try {
-            const { createUserWithEmailAndPassword, setPersistence, indexedDBLocalPersistence, browserSessionPersistence } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
-            this.showStatus("Création du compte...", "info");
+            const {
+                createUserWithEmailAndPassword,
+                setPersistence,
+                indexedDBLocalPersistence,
+                browserSessionPersistence,
+            } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+            this.showStatus('Création du compte...', 'info');
 
             // Set persistence dynamically
             const rememberMeEl = document.getElementById('register-remember-me');
@@ -277,18 +285,18 @@ export const FirebaseAuthEngine = {
             await setPersistence(auth, rememberMe ? indexedDBLocalPersistence : browserSessionPersistence);
 
             await createUserWithEmailAndPassword(auth, email, password);
-            this.showAlert("Compte créé avec succès !", "success");
+            this.showAlert('Compte créé avec succès !', 'success');
         } catch (error) {
-            console.error("Signup error:", error.code, error.message);
-            let message = "Erreur lors de la création du compte.";
+            console.error('Signup error:', error.code, error.message);
+            let message = 'Erreur lors de la création du compte.';
             if (error.code === 'auth/email-already-in-use') {
-                message = "Cet email est déjà utilisé.";
+                message = 'Cet email est déjà utilisé.';
             } else if (error.code === 'auth/invalid-email') {
                 message = "Format d'adresse email invalide.";
             } else if (error.code === 'auth/weak-password') {
-                message = "Le mot de passe doit contenir au moins 6 caractères.";
+                message = 'Le mot de passe doit contenir au moins 6 caractères.';
             }
-            this.showAlert(message, "error");
+            this.showAlert(message, 'error');
         }
     },
 
@@ -303,13 +311,14 @@ export const FirebaseAuthEngine = {
         const password = passwordEl ? passwordEl.value : '';
 
         if (!email || !password) {
-            this.showAlert("Veuillez remplir tous les champs.", "error");
+            this.showAlert('Veuillez remplir tous les champs.', 'error');
             return;
         }
 
         try {
-            const { signInWithEmailAndPassword, setPersistence, indexedDBLocalPersistence, browserSessionPersistence } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
-            this.showStatus("Connexion...", "info");
+            const { signInWithEmailAndPassword, setPersistence, indexedDBLocalPersistence, browserSessionPersistence } =
+                await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+            this.showStatus('Connexion...', 'info');
 
             // Set persistence dynamically
             const rememberMeEl = document.getElementById('login-remember-me');
@@ -318,8 +327,8 @@ export const FirebaseAuthEngine = {
 
             await signInWithEmailAndPassword(auth, email, password);
         } catch (error) {
-            console.error("Signin error:", error.code, error.message);
-            let message = "Identifiants incorrects ou compte inexistant.";
+            console.error('Signin error:', error.code, error.message);
+            let message = 'Identifiants incorrects ou compte inexistant.';
             if (error.code === 'auth/invalid-email') {
                 message = "Format d'adresse email invalide.";
             } else if (
@@ -327,27 +336,27 @@ export const FirebaseAuthEngine = {
                 error.code === 'auth/wrong-password' ||
                 error.code === 'auth/invalid-credential'
             ) {
-                message = "Email ou mot de passe incorrect.";
+                message = 'Email ou mot de passe incorrect.';
             } else if (error.code === 'auth/too-many-requests') {
-                message = "Trop de tentatives. Veuillez réessayer plus tard ou réinitialisez votre mot de passe.";
+                message = 'Trop de tentatives. Veuillez réessayer plus tard ou réinitialisez votre mot de passe.';
             } else if (error.code === 'auth/user-disabled') {
-                message = "Ce compte a été désactivé.";
+                message = 'Ce compte a été désactivé.';
             } else if (error.code === 'auth/network-request-failed') {
-                message = "Erreur réseau. Vérifiez votre connexion internet.";
+                message = 'Erreur réseau. Vérifiez votre connexion internet.';
             }
-            this.showAlert(message, "error");
+            this.showAlert(message, 'error');
         }
     },
 
     signOut: async function () {
         if (!isInitialized) return;
         try {
-            const { signOut } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+            const { signOut } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
             await signOut(auth);
             this.closeAuthModal();
-            alert("Vous avez été déconnecté.");
+            alert('Vous avez été déconnecté.');
         } catch (error) {
-            console.error("Signout error:", error);
+            console.error('Signout error:', error);
         }
     },
 
@@ -359,12 +368,13 @@ export const FirebaseAuthEngine = {
         this.clearAlerts();
 
         try {
-            const { sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+            const { sendPasswordResetEmail } =
+                await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
             await sendPasswordResetEmail(auth, email);
-            this.showAlert("Email de réinitialisation envoyé !", "success");
+            this.showAlert('Email de réinitialisation envoyé !', 'success');
         } catch (error) {
-            console.error("Forgot password error:", error);
-            this.showAlert("Erreur lors de l'envoi de l'email.", "error");
+            console.error('Forgot password error:', error);
+            this.showAlert("Erreur lors de l'envoi de l'email.", 'error');
         }
     },
 
@@ -372,30 +382,33 @@ export const FirebaseAuthEngine = {
     // MÉTHODE CENTRALE : Synchro Cloud complète (toutes les données)
     // -----------------------------------------------------------------------
     syncDataWithCloud: async function (silent = false) {
-        if (!this.currentUser) return { success: false, data: null, error: "Not logged in" };
+        if (!this.currentUser) return { success: false, data: null, error: 'Not logged in' };
 
         GlobalState.set('isSyncing', true);
         if (!silent) {
-            this.showStatus("Synchronisation en cours...", "info");
+            this.showStatus('Synchronisation en cours...', 'info');
         }
 
         try {
-            const { doc, getDoc, setDoc, collection, getDocs, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const { doc, getDoc, setDoc, collection, getDocs, deleteDoc } =
+                await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
             const uid = this.currentUser.uid;
 
             // --- Sync Logbook ---
             // 0. Process Tombstones (Deleted items) FIRST
             let deletedFlights = [];
-            try { deletedFlights = JSON.parse(localStorage.getItem('deleted_flights') || '[]'); } catch(e) {}
-            
+            try {
+                deletedFlights = JSON.parse(localStorage.getItem('deleted_flights') || '[]');
+            } catch (e) {}
+
             if (deletedFlights.length > 0) {
                 for (const delId of deletedFlights) {
                     // Guard : l'ID doit être une string non-vide pour Firestore
                     if (!delId || typeof delId !== 'string') {
-                        console.warn("[Sync] Tombstone ignoré : ID invalide", delId);
+                        console.warn('[Sync] Tombstone ignoré : ID invalide', delId);
                         continue;
                     }
-                    const sRef = doc(db, "users", uid, "logbook", delId);
+                    const sRef = doc(db, 'users', uid, 'logbook', delId);
                     await deleteDoc(sRef);
                 }
                 localStorage.setItem('deleted_flights', '[]');
@@ -406,18 +419,18 @@ export const FirebaseAuthEngine = {
             if (!Array.isArray(localLogbook)) localLogbook = [];
 
             // Sanitation : on retire tout enregistrement sans ID valide (données corrompues/anciennes)
-            localLogbook = localLogbook.filter(s => {
+            localLogbook = localLogbook.filter((s) => {
                 if (!s || !s.id || typeof s.id !== 'string') {
-                    console.warn("[Sync] Vol ignoré : ID invalide ou manquant", s);
+                    console.warn('[Sync] Vol ignoré : ID invalide ou manquant', s);
                     return false;
                 }
                 return true;
             });
 
             // 1. Process Pending Queue (Local -> Cloud)
-            const pendingLogbook = localLogbook.filter(s => s.syncPending);
+            const pendingLogbook = localLogbook.filter((s) => s.syncPending);
             for (const session of pendingLogbook) {
-                const sRef = doc(db, "users", uid, "logbook", session.id);
+                const sRef = doc(db, 'users', uid, 'logbook', session.id);
                 delete session.syncPending;
                 await setDoc(sRef, session);
             }
@@ -425,11 +438,11 @@ export const FirebaseAuthEngine = {
                 StorageService.set(StorageService.KEYS.LOGBOOK_DATA, localLogbook);
             }
 
-            const logbookColRef = collection(db, "users", uid, "logbook");
+            const logbookColRef = collection(db, 'users', uid, 'logbook');
             const logbookSnap = await getDocs(logbookColRef);
 
             const cloudLogbook = [];
-            logbookSnap.forEach(docSnap => {
+            logbookSnap.forEach((docSnap) => {
                 const data = docSnap.data();
                 // Guard : on n'accepte que les docs avec un ID string valide
                 if (data && data.id && typeof data.id === 'string') {
@@ -439,8 +452,8 @@ export const FirebaseAuthEngine = {
 
             // 2. Smart Merge: Compare updatedAt
             const mergedLogbookMap = new Map();
-            localLogbook.forEach(session => mergedLogbookMap.set(session.id, session));
-            cloudLogbook.forEach(cloudSession => {
+            localLogbook.forEach((session) => mergedLogbookMap.set(session.id, session));
+            cloudLogbook.forEach((cloudSession) => {
                 const localSession = mergedLogbookMap.get(cloudSession.id);
                 if (localSession) {
                     const localTime = localSession.updatedAt || 0;
@@ -462,9 +475,9 @@ export const FirebaseAuthEngine = {
             for (const session of mergedLogbook) {
                 // Guard : double vérification avant l'appel doc()
                 if (!session.id || typeof session.id !== 'string') continue;
-                const cloudSession = cloudLogbook.find(s => s.id === session.id);
+                const cloudSession = cloudLogbook.find((s) => s.id === session.id);
                 if (!cloudSession) {
-                    const sRef = doc(db, "users", uid, "logbook", session.id);
+                    const sRef = doc(db, 'users', uid, 'logbook', session.id);
                     await setDoc(sRef, session);
                 }
             }
@@ -474,20 +487,20 @@ export const FirebaseAuthEngine = {
             if (!Array.isArray(localEquip)) localEquip = [];
 
             // Sanitation : on retire tout élément sans ID valide
-            localEquip = localEquip.filter(e => {
+            localEquip = localEquip.filter((e) => {
                 if (!e || !e.id || typeof e.id !== 'string') {
-                    console.warn("[Sync] Équipement ignoré : ID invalide ou manquant", e);
+                    console.warn('[Sync] Équipement ignoré : ID invalide ou manquant', e);
                     return false;
                 }
                 return true;
             });
 
             // 1. Process Pending Queue (Local -> Cloud)
-            const pendingEquip = localEquip.filter(e => e.syncPending);
+            const pendingEquip = localEquip.filter((e) => e.syncPending);
             for (const item of pendingEquip) {
                 // Guard : ID obligatoire en string
                 if (!item.id || typeof item.id !== 'string') continue;
-                const eRef = doc(db, "users", uid, "equipment", item.id);
+                const eRef = doc(db, 'users', uid, 'equipment', item.id);
                 delete item.syncPending;
                 await setDoc(eRef, item);
             }
@@ -495,11 +508,11 @@ export const FirebaseAuthEngine = {
                 StorageService.set(StorageService.KEYS.EQUIPMENT_DATA, localEquip);
             }
 
-            const equipColRef = collection(db, "users", uid, "equipment");
+            const equipColRef = collection(db, 'users', uid, 'equipment');
             const equipSnap = await getDocs(equipColRef);
 
             const cloudEquip = [];
-            equipSnap.forEach(docSnap => {
+            equipSnap.forEach((docSnap) => {
                 const data = docSnap.data();
                 // Guard : on n'accepte que les docs avec un ID string valide
                 if (data && data.id && typeof data.id === 'string') {
@@ -509,8 +522,8 @@ export const FirebaseAuthEngine = {
 
             // 2. Smart Merge: Compare updatedAt
             const mergedEquipMap = new Map();
-            localEquip.forEach(item => mergedEquipMap.set(item.id, item));
-            cloudEquip.forEach(cloudItem => {
+            localEquip.forEach((item) => mergedEquipMap.set(item.id, item));
+            cloudEquip.forEach((cloudItem) => {
                 const localItem = mergedEquipMap.get(cloudItem.id);
                 if (localItem) {
                     const localTime = localItem.updatedAt || 0;
@@ -531,16 +544,16 @@ export const FirebaseAuthEngine = {
             for (const item of mergedEquip) {
                 // Guard : double vérification avant l'appel doc()
                 if (!item.id || typeof item.id !== 'string') continue;
-                const cloudItem = cloudEquip.find(e => e.id === item.id);
+                const cloudItem = cloudEquip.find((e) => e.id === item.id);
                 if (!cloudItem) {
-                    const eRef = doc(db, "users", uid, "equipment", item.id);
+                    const eRef = doc(db, 'users', uid, 'equipment', item.id);
                     await setDoc(eRef, item);
                 }
             }
 
             // --- Sync QCM Stats ---
             const localQcmStats = this.getLocalQcmStats();
-            const qcmDocRef = doc(db, "users", uid, "stats", "qcm_stats");
+            const qcmDocRef = doc(db, 'users', uid, 'stats', 'qcm_stats');
             const qcmDocSnap = await getDoc(qcmDocRef);
 
             let finalQcmStats = localQcmStats;
@@ -555,7 +568,7 @@ export const FirebaseAuthEngine = {
 
             // --- Sync Exam History ---
             const localExamHistory = this.getLocalExamHistory();
-            const examDocRef = doc(db, "users", uid, "stats", "exam_history");
+            const examDocRef = doc(db, 'users', uid, 'stats', 'exam_history');
             const examDocSnap = await getDoc(examDocRef);
 
             let finalExamHistory = localExamHistory;
@@ -569,7 +582,7 @@ export const FirebaseAuthEngine = {
 
             // --- Sync Preferences ---
             const localPrefs = this.getLocalPreferences();
-            const prefsDocRef = doc(db, "users", uid, "preferences", "user_prefs");
+            const prefsDocRef = doc(db, 'users', uid, 'preferences', 'user_prefs');
             const prefsDocSnap = await getDoc(prefsDocRef);
 
             let finalPrefs = localPrefs;
@@ -627,7 +640,7 @@ export const FirebaseAuthEngine = {
                 window.LogbookView.switchTab(window.LogbookView.currentTab);
             }
 
-            console.log("Sync complete!");
+            console.log('Sync complete!');
 
             // Persistance de l'heure dans le localStorage (survit au rechargement)
             this.lastSyncTime = new Date().toLocaleTimeString();
@@ -637,15 +650,18 @@ export const FirebaseAuthEngine = {
             this.updateModalUI();
 
             if (!silent) {
-                this.showStatus("Synchronisé avec le cloud !", "success");
+                this.showStatus('Synchronisé avec le cloud !', 'success');
             }
             GlobalState.set('isSyncing', false);
             return { success: true, data: null, error: null };
         } catch (error) {
-            console.error("Synchronization failed:", error);
+            console.error('Synchronization failed:', error);
             if (!silent) {
                 const errorDetail = error.message ? ` : ${error.message}` : '';
-                this.showAlert(`La synchronisation a échoué${errorDetail}. Les données restent stockées localement.`, "error");
+                this.showAlert(
+                    `La synchronisation a échoué${errorDetail}. Les données restent stockées localement.`,
+                    'error',
+                );
             }
             GlobalState.set('isSyncing', false);
             return { success: false, data: null, error: error.message };
@@ -678,7 +694,7 @@ export const FirebaseAuthEngine = {
         this._debounceSyncTimer = setTimeout(() => {
             this._debounceSyncTimer = null;
             if (this.currentUser && navigator.onLine) {
-                console.log("[Firebase] Synchro debounced déclenchée après modification utilisateur.");
+                console.log('[Firebase] Synchro debounced déclenchée après modification utilisateur.');
                 this.syncDataWithCloud(true); // silent = true (pas d'alerte UI intrusive)
             } else {
                 // Hors ligne ou déconnecté : rien à synchroniser pour l'instant, on ne laisse
@@ -690,184 +706,193 @@ export const FirebaseAuthEngine = {
 
     // Write-through updates to Cloud when user makes progress
     saveStatsToCloud: async function () {
-        if (!this.currentUser || !this.enabled) return { success: false, data: null, error: "Not enabled or logged in" };
+        if (!this.currentUser || !this.enabled)
+            return { success: false, data: null, error: 'Not enabled or logged in' };
 
         try {
-            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
             const uid = this.currentUser.uid;
 
             const qcmStats = this.getLocalQcmStats();
-            const qcmDocRef = doc(db, "users", uid, "stats", "qcm_stats");
+            const qcmDocRef = doc(db, 'users', uid, 'stats', 'qcm_stats');
             await setDoc(qcmDocRef, qcmStats);
 
             this.lastSyncTime = new Date().toLocaleTimeString();
             this.updateModalUI(); // Toujours rafraîchir l'UI après une synchro partielle
-            console.log("Incremental QCM stats synced.");
+            console.log('Incremental QCM stats synced.');
             return { success: true, data: null, error: null };
         } catch (error) {
-            console.error("Incremental QCM stats sync failed:", error);
+            console.error('Incremental QCM stats sync failed:', error);
             return { success: false, data: null, error: error.message };
         }
     },
 
     saveHistoryToCloud: async function () {
-        if (!this.currentUser || !this.enabled) return { success: false, data: null, error: "Not enabled or logged in" };
+        if (!this.currentUser || !this.enabled)
+            return { success: false, data: null, error: 'Not enabled or logged in' };
 
         try {
-            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
             const uid = this.currentUser.uid;
 
             const examHistory = this.getLocalExamHistory();
-            const examDocRef = doc(db, "users", uid, "stats", "exam_history");
+            const examDocRef = doc(db, 'users', uid, 'stats', 'exam_history');
             await setDoc(examDocRef, examHistory);
 
             this.lastSyncTime = new Date().toLocaleTimeString();
             this.updateModalUI(); // Toujours rafraîchir l'UI après une synchro partielle
-            console.log("Incremental exam history synced.");
+            console.log('Incremental exam history synced.');
             return { success: true, data: null, error: null };
         } catch (error) {
-            console.error("Incremental exam history sync failed:", error);
+            console.error('Incremental exam history sync failed:', error);
             return { success: false, data: null, error: error.message };
         }
     },
 
     savePreferencesToCloud: async function () {
-        if (!this.currentUser || !this.enabled || this.syncingData) return { success: false, data: null, error: "Not enabled, syncing or not logged in" };
+        if (!this.currentUser || !this.enabled || this.syncingData)
+            return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
-            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
             const uid = this.currentUser.uid;
 
             const prefs = this.getLocalPreferences();
-            const prefsDocRef = doc(db, "users", uid, "preferences", "user_prefs");
+            const prefsDocRef = doc(db, 'users', uid, 'preferences', 'user_prefs');
             await setDoc(prefsDocRef, prefs);
 
             this.lastSyncTime = new Date().toLocaleTimeString();
             this.updateModalUI(); // Toujours rafraîchir l'UI après une synchro partielle
-            console.log("Incremental preferences synced.");
+            console.log('Incremental preferences synced.');
             return { success: true, data: null, error: null };
         } catch (error) {
-            console.error("Incremental preferences sync failed:", error);
+            console.error('Incremental preferences sync failed:', error);
             return { success: false, data: null, error: error.message };
         }
     },
 
     syncLogbookData: async function (data) {
-        if (!this.currentUser || !this.enabled || this.syncingData) return { success: false, data: null, error: "Not enabled, syncing or not logged in" };
+        if (!this.currentUser || !this.enabled || this.syncingData)
+            return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
-            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
             const uid = this.currentUser.uid;
 
             // Save all locally present to cloud
             for (const session of data) {
-                const docRef = doc(db, "users", uid, "logbook", session.id);
+                const docRef = doc(db, 'users', uid, 'logbook', session.id);
                 await setDoc(docRef, session);
             }
 
             this.lastSyncTime = new Date().toLocaleTimeString();
             this.updateModalUI(); // Toujours rafraîchir l'UI après une synchro partielle
-            console.log("Logbook data synced incrementally.");
+            console.log('Logbook data synced incrementally.');
             return { success: true, data: null, error: null };
         } catch (error) {
-            console.error("Logbook incremental sync failed:", error);
+            console.error('Logbook incremental sync failed:', error);
             return { success: false, data: null, error: error.message };
         }
     },
 
     deleteLogbookEntry: async function (id) {
-        if (!this.currentUser || !this.enabled) return { success: false, data: null, error: "Not enabled or logged in" };
+        if (!this.currentUser || !this.enabled)
+            return { success: false, data: null, error: 'Not enabled or logged in' };
 
         try {
-            const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const { doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
             const uid = this.currentUser.uid;
 
-            const docRef = doc(db, "users", uid, "logbook", id);
+            const docRef = doc(db, 'users', uid, 'logbook', id);
             await deleteDoc(docRef);
             console.log(`Logbook entry ${id} deleted from cloud.`);
             return { success: true, data: null, error: null };
         } catch (error) {
-            console.error("Logbook entry delete failed:", error);
+            console.error('Logbook entry delete failed:', error);
             return { success: false, data: null, error: error.message };
         }
     },
 
     syncEquipmentData: async function (data) {
-        if (!this.currentUser || !this.enabled || this.syncingData) return { success: false, data: null, error: "Not enabled, syncing or not logged in" };
+        if (!this.currentUser || !this.enabled || this.syncingData)
+            return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
-            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
             const uid = this.currentUser.uid;
 
             // Save all locally present to cloud
             for (const item of data) {
-                const docRef = doc(db, "users", uid, "equipment", item.id);
+                const docRef = doc(db, 'users', uid, 'equipment', item.id);
                 await setDoc(docRef, item);
             }
 
             this.lastSyncTime = new Date().toLocaleTimeString();
             this.updateModalUI(); // Toujours rafraîchir l'UI après une synchro partielle
-            console.log("Equipment data synced incrementally.");
+            console.log('Equipment data synced incrementally.');
             return { success: true, data: null, error: null };
         } catch (error) {
-            console.error("Equipment incremental sync failed:", error);
+            console.error('Equipment incremental sync failed:', error);
             return { success: false, data: null, error: error.message };
         }
     },
 
     deleteEquipmentEntry: async function (id) {
-        if (!this.currentUser || !this.enabled) return { success: false, data: null, error: "Not enabled or logged in" };
+        if (!this.currentUser || !this.enabled)
+            return { success: false, data: null, error: 'Not enabled or logged in' };
 
         try {
-            const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const { doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
             const uid = this.currentUser.uid;
 
-            const docRef = doc(db, "users", uid, "equipment", id);
+            const docRef = doc(db, 'users', uid, 'equipment', id);
             await deleteDoc(docRef);
             console.log(`Equipment entry ${id} deleted from cloud.`);
             return { success: true, data: null, error: null };
         } catch (error) {
-            console.error("Equipment entry delete failed:", error);
+            console.error('Equipment entry delete failed:', error);
             return { success: false, data: null, error: error.message };
         }
     },
 
     syncEquipmentEntry: async function (item) {
-        if (!this.currentUser || !this.enabled || this.syncingData) return { success: false, data: null, error: "Not enabled, syncing or not logged in" };
+        if (!this.currentUser || !this.enabled || this.syncingData)
+            return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
-            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
             const uid = this.currentUser.uid;
 
-            const docRef = doc(db, "users", uid, "equipment", item.id);
+            const docRef = doc(db, 'users', uid, 'equipment', item.id);
             await setDoc(docRef, item);
 
             this.lastSyncTime = new Date().toLocaleTimeString();
             this.updateModalUI(); // Toujours rafraîchir l'UI après une synchro partielle
-            console.log("Equipment entry synced successfully:", item.id);
+            console.log('Equipment entry synced successfully:', item.id);
             return { success: true, data: null, error: null };
         } catch (error) {
-            console.error("Equipment entry sync failed:", error);
+            console.error('Equipment entry sync failed:', error);
             return { success: false, data: null, error: error.message };
         }
     },
 
     syncLogbookEntry: async function (session) {
-        if (!this.currentUser || !this.enabled || this.syncingData) return { success: false, data: null, error: "Not enabled, syncing or not logged in" };
+        if (!this.currentUser || !this.enabled || this.syncingData)
+            return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
-            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
             const uid = this.currentUser.uid;
 
-            const docRef = doc(db, "users", uid, "logbook", session.id);
+            const docRef = doc(db, 'users', uid, 'logbook', session.id);
             await setDoc(docRef, session);
 
             this.lastSyncTime = new Date().toLocaleTimeString();
             this.updateModalUI(); // Toujours rafraîchir l'UI après une synchro partielle
-            console.log("Logbook entry synced successfully:", session.id);
+            console.log('Logbook entry synced successfully:', session.id);
             return { success: true, data: null, error: null };
         } catch (error) {
-            console.error("Logbook entry sync failed:", error);
+            console.error('Logbook entry sync failed:', error);
             return { success: false, data: null, error: error.message };
         }
     },
@@ -884,46 +909,47 @@ export const FirebaseAuthEngine = {
      */
     enablePushNotifications: async function () {
         if (!this.currentUser || !this.enabled) {
-            this.showAlert("Connectez-vous d'abord pour activer les alertes météo.", "error");
-            return { success: false, error: "Not logged in" };
+            this.showAlert("Connectez-vous d'abord pour activer les alertes météo.", 'error');
+            return { success: false, error: 'Not logged in' };
         }
         if (typeof FCM_VAPID_KEY === 'undefined' || !FCM_VAPID_KEY) {
-            this.showAlert("Clé VAPID non configurée (js/firebase_config.js). Voir le Mode d'emploi.", "error");
-            return { success: false, error: "Missing VAPID key" };
+            this.showAlert("Clé VAPID non configurée (js/firebase_config.js). Voir le Mode d'emploi.", 'error');
+            return { success: false, error: 'Missing VAPID key' };
         }
         if (!('serviceWorker' in navigator) || !('Notification' in window)) {
-            this.showAlert("Les notifications ne sont pas supportées par ce navigateur.", "error");
-            return { success: false, error: "Unsupported" };
+            this.showAlert('Les notifications ne sont pas supportées par ce navigateur.', 'error');
+            return { success: false, error: 'Unsupported' };
         }
 
         try {
             const permission = await Notification.requestPermission();
             if (permission !== 'granted') {
-                this.showAlert("Permission de notification refusée.", "error");
-                return { success: false, error: "Permission denied" };
+                this.showAlert('Permission de notification refusée.', 'error');
+                return { success: false, error: 'Permission denied' };
             }
 
             const swRegistration = await navigator.serviceWorker.ready;
-            const { getMessaging, getToken } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js");
+            const { getMessaging, getToken } =
+                await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js');
             const messaging = getMessaging(app);
             const token = await getToken(messaging, {
                 vapidKey: FCM_VAPID_KEY,
-                serviceWorkerRegistration: swRegistration
+                serviceWorkerRegistration: swRegistration,
             });
 
             if (!token) {
-                this.showAlert("Impossible d'obtenir un token de notification.", "error");
-                return { success: false, error: "No token" };
+                this.showAlert("Impossible d'obtenir un token de notification.", 'error');
+                return { success: false, error: 'No token' };
             }
 
-            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-            await setDoc(doc(db, "users", this.currentUser.uid), { fcmToken: token }, { merge: true });
+            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            await setDoc(doc(db, 'users', this.currentUser.uid), { fcmToken: token }, { merge: true });
 
-            this.showStatus("Alertes météo activées sur cet appareil !", "success");
+            this.showStatus('Alertes météo activées sur cet appareil !', 'success');
             return { success: true, data: token, error: null };
         } catch (error) {
             console.error("Échec de l'activation des notifications push:", error);
-            this.showAlert(`Échec de l'activation des alertes${error.message ? ` : ${error.message}` : ''}.`, "error");
+            this.showAlert(`Échec de l'activation des alertes${error.message ? ` : ${error.message}` : ''}.`, 'error');
             return { success: false, data: null, error: error.message };
         }
     },
@@ -944,22 +970,22 @@ export const FirebaseAuthEngine = {
                 appName: 'AssistantParapente',
                 exportVersion: '1.0',
                 exportedAt: new Date().toISOString(),
-                exportedBy: this.currentUser ? this.currentUser.email : 'anonymous'
+                exportedBy: this.currentUser ? this.currentUser.email : 'anonymous',
             },
             // --- Données structurées via StorageService.KEYS ---
-            [StorageService.KEYS.STATE]:          StorageService.get(StorageService.KEYS.STATE),
-            [StorageService.KEYS.USER_LEVEL]:     StorageService.get(StorageService.KEYS.USER_LEVEL),
-            [StorageService.KEYS.THEME_MODE]:     StorageService.get(StorageService.KEYS.THEME_MODE),
-            [StorageService.KEYS.USER_PREFS]:     StorageService.get(StorageService.KEYS.USER_PREFS),
-            [StorageService.KEYS.LOGBOOK_DATA]:   StorageService.get(StorageService.KEYS.LOGBOOK_DATA),
+            [StorageService.KEYS.STATE]: StorageService.get(StorageService.KEYS.STATE),
+            [StorageService.KEYS.USER_LEVEL]: StorageService.get(StorageService.KEYS.USER_LEVEL),
+            [StorageService.KEYS.THEME_MODE]: StorageService.get(StorageService.KEYS.THEME_MODE),
+            [StorageService.KEYS.USER_PREFS]: StorageService.get(StorageService.KEYS.USER_PREFS),
+            [StorageService.KEYS.LOGBOOK_DATA]: StorageService.get(StorageService.KEYS.LOGBOOK_DATA),
             [StorageService.KEYS.EQUIPMENT_DATA]: StorageService.get(StorageService.KEYS.EQUIPMENT_DATA),
-            [StorageService.KEYS.QCM_STATS]:      StorageService.get(StorageService.KEYS.QCM_STATS),
-            [StorageService.KEYS.EXAM_HISTORY]:   StorageService.get(StorageService.KEYS.EXAM_HISTORY),
-            [StorageService.KEYS.PENDING_QUIZ]:   StorageService.get(StorageService.KEYS.PENDING_QUIZ),
+            [StorageService.KEYS.QCM_STATS]: StorageService.get(StorageService.KEYS.QCM_STATS),
+            [StorageService.KEYS.EXAM_HISTORY]: StorageService.get(StorageService.KEYS.EXAM_HISTORY),
+            [StorageService.KEYS.PENDING_QUIZ]: StorageService.get(StorageService.KEYS.PENDING_QUIZ),
             // --- Clés système supplémentaires ---
-            deleted_flights:    JSON.parse(localStorage.getItem('deleted_flights') || '[]'),
-            LAST_ACTIVE_ROUTE:  localStorage.getItem('LAST_ACTIVE_ROUTE'),
-            firebase_last_sync: localStorage.getItem(LAST_SYNC_STORAGE_KEY)
+            deleted_flights: JSON.parse(localStorage.getItem('deleted_flights') || '[]'),
+            LAST_ACTIVE_ROUTE: localStorage.getItem('LAST_ACTIVE_ROUTE'),
+            firebase_last_sync: localStorage.getItem(LAST_SYNC_STORAGE_KEY),
         };
 
         // Sérialise en JSON lisible
@@ -981,7 +1007,7 @@ export const FirebaseAuthEngine = {
         URL.revokeObjectURL(url);
 
         console.log(`[Firebase] Export réussi : ${filename}`);
-        this.showAlert(`Backup téléchargé : ${filename}`, "success");
+        this.showAlert(`Backup téléchargé : ${filename}`, 'success');
     },
 
     // -----------------------------------------------------------------------
@@ -995,7 +1021,7 @@ export const FirebaseAuthEngine = {
      */
     importAllData: function (file) {
         if (!file) {
-            this.showAlert("Aucun fichier sélectionné.", "error");
+            this.showAlert('Aucun fichier sélectionné.', 'error');
             return;
         }
 
@@ -1006,16 +1032,16 @@ export const FirebaseAuthEngine = {
 
                 // Validation minimale : vérifie la présence des méta-données
                 if (!data._meta || data._meta.appName !== 'AssistantParapente') {
-                    this.showAlert("Fichier invalide : ce n'est pas un backup AssistantParapente.", "error");
+                    this.showAlert("Fichier invalide : ce n'est pas un backup AssistantParapente.", 'error');
                     return;
                 }
 
                 const confirm = window.confirm(
-                    `Importer le backup du ${new Date(data._meta.exportedAt).toLocaleString()} ?\n\nATTENTION : vos données locales actuelles seront remplacées par celles du backup.`
+                    `Importer le backup du ${new Date(data._meta.exportedAt).toLocaleString()} ?\n\nATTENTION : vos données locales actuelles seront remplacées par celles du backup.`,
                 );
                 if (!confirm) return;
 
-                this.showStatus("Restauration en cours...", "info");
+                this.showStatus('Restauration en cours...', 'info');
 
                 // --- Restauration de toutes les clés StorageService.KEYS ---
                 const keysToRestore = [
@@ -1027,10 +1053,10 @@ export const FirebaseAuthEngine = {
                     StorageService.KEYS.EQUIPMENT_DATA,
                     StorageService.KEYS.QCM_STATS,
                     StorageService.KEYS.EXAM_HISTORY,
-                    StorageService.KEYS.PENDING_QUIZ
+                    StorageService.KEYS.PENDING_QUIZ,
                 ];
 
-                keysToRestore.forEach(key => {
+                keysToRestore.forEach((key) => {
                     if (data[key] !== undefined && data[key] !== null) {
                         StorageService.set(key, data[key]);
                     }
@@ -1047,13 +1073,16 @@ export const FirebaseAuthEngine = {
                     localStorage.setItem(LAST_SYNC_STORAGE_KEY, data.firebase_last_sync);
                 }
 
-                console.log("[Firebase] Import local réussi. Déclenchement de la synchro cloud...");
+                console.log('[Firebase] Import local réussi. Déclenchement de la synchro cloud...');
 
                 // Synchro cloud complète pour envoyer les données restaurées vers le cloud
                 if (this.currentUser && this.enabled) {
                     await this.syncDataWithCloud(false); // visible = non-silencieux
                 } else {
-                    this.showAlert("Données restaurées localement. Connectez-vous pour les synchroniser avec le cloud.", "success");
+                    this.showAlert(
+                        'Données restaurées localement. Connectez-vous pour les synchroniser avec le cloud.',
+                        'success',
+                    );
                 }
 
                 // Recharge l'UI pour refléter les nouvelles données
@@ -1064,10 +1093,12 @@ export const FirebaseAuthEngine = {
                     LogbookEngine.loadData();
                     LogbookEngine.switchTab(LogbookEngine.currentTab);
                 }
-
             } catch (parseError) {
                 console.error("[Firebase] Erreur lors de l'import :", parseError);
-                this.showAlert("Erreur de lecture du fichier. Vérifiez qu'il s'agit d'un fichier JSON valide.", "error");
+                this.showAlert(
+                    "Erreur de lecture du fichier. Vérifiez qu'il s'agit d'un fichier JSON valide.",
+                    'error',
+                );
             }
         };
         reader.readAsText(file);
@@ -1079,39 +1110,33 @@ export const FirebaseAuthEngine = {
             totalQuestions: 0,
             totalCorrect: 0,
             themes: {},
-            questions: {}
+            questions: {},
         };
 
         // Combine all question keys
-        const allQuestions = new Set([
-            ...Object.keys(local.questions || {}),
-            ...Object.keys(cloud.questions || {})
-        ]);
+        const allQuestions = new Set([...Object.keys(local.questions || {}), ...Object.keys(cloud.questions || {})]);
 
-        allQuestions.forEach(qCode => {
+        allQuestions.forEach((qCode) => {
             const lQ = (local.questions || {})[qCode] || { total: 0, correct: 0, streak: 0 };
             const cQ = (cloud.questions || {})[qCode] || { total: 0, correct: 0, streak: 0 };
 
             merged.questions[qCode] = {
                 total: Math.max(lQ.total, cQ.total),
                 correct: Math.max(lQ.correct, cQ.correct),
-                streak: Math.max(lQ.streak || 0, cQ.streak || 0)
+                streak: Math.max(lQ.streak || 0, cQ.streak || 0),
             };
         });
 
         // Combine themes keys
-        const allThemes = new Set([
-            ...Object.keys(local.themes || {}),
-            ...Object.keys(cloud.themes || {})
-        ]);
+        const allThemes = new Set([...Object.keys(local.themes || {}), ...Object.keys(cloud.themes || {})]);
 
-        allThemes.forEach(theme => {
+        allThemes.forEach((theme) => {
             const lT = (local.themes || {})[theme] || { total: 0, correct: 0 };
             const cT = (cloud.themes || {})[theme] || { total: 0, correct: 0 };
 
             merged.themes[theme] = {
                 total: Math.max(lT.total, cT.total),
-                correct: Math.max(lT.correct, cT.correct)
+                correct: Math.max(lT.correct, cT.correct),
             };
         });
 
@@ -1129,12 +1154,12 @@ export const FirebaseAuthEngine = {
         // Use a Map keyed by exam ID or ISO string date to remove duplicates
         const examMap = new Map();
 
-        localExams.forEach(exam => {
+        localExams.forEach((exam) => {
             const key = exam.id || exam.date;
             examMap.set(key, exam);
         });
 
-        cloudExams.forEach(exam => {
+        cloudExams.forEach((exam) => {
             const key = exam.id || exam.date;
             // In case of conflict, we keep the one already present or cloud.
             // Since exam logs are read-only historic records, duplicates are identical.
@@ -1150,7 +1175,7 @@ export const FirebaseAuthEngine = {
         });
 
         return {
-            exams: mergedExams.slice(0, 10)
+            exams: mergedExams.slice(0, 10),
         };
     },
 
@@ -1179,8 +1204,8 @@ export const FirebaseAuthEngine = {
         merged.minimizedSites = Array.from(new Set([...localMin, ...cloudMin]));
 
         const mergedLocsMap = new Map();
-        (cloud.savedLocations || []).forEach(loc => mergedLocsMap.set(loc.name, loc));
-        (local.savedLocations || []).forEach(loc => mergedLocsMap.set(loc.name, loc));
+        (cloud.savedLocations || []).forEach((loc) => mergedLocsMap.set(loc.name, loc));
+        (local.savedLocations || []).forEach((loc) => mergedLocsMap.set(loc.name, loc));
         merged.savedLocations = Array.from(mergedLocsMap.values());
 
         return merged;
@@ -1215,7 +1240,7 @@ export const FirebaseAuthEngine = {
             radiusLimit: 210,
             sortMode: 'CONDITIONS',
             conditionsStrategy: 'CONSECUTIVE',
-            weatherModel: 'meteofrance'
+            weatherModel: 'meteofrance',
         };
         let prefs = { ...defaults };
         const saved = StorageService.get(StorageService.KEYS.USER_PREFS);
@@ -1263,7 +1288,7 @@ export const FirebaseAuthEngine = {
             alertEl.style.display = 'none';
             alertEl.textContent = '';
         }
-    }
+    },
 };
 
 // Bind to window immediately

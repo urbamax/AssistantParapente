@@ -3,7 +3,6 @@ import UIManagerModule from '../../js/core/ui_manager.js';
 import GlobalState from '../../js/core/app_state.js';
 
 describe('UIManager', () => {
-
     beforeEach(() => {
         document.body.innerHTML = `
             <div id="app-header"></div>
@@ -13,11 +12,11 @@ describe('UIManager', () => {
         GlobalState.state.level = 'ALL';
         GlobalState.state.themeMode = 'auto';
         GlobalState.listeners.clear();
-        
+
         // Mock fetch for loadComponents
         global.fetch = vi.fn().mockResolvedValue({
             ok: true,
-            text: vi.fn().mockResolvedValue('<header>Mocked Header</header>')
+            text: vi.fn().mockResolvedValue('<header>Mocked Header</header>'),
         });
     });
 
@@ -39,7 +38,7 @@ describe('UIManager', () => {
 
     it('loadComponents fetches HTML and inserts it', async () => {
         await UIManagerModule.loadComponents();
-        
+
         expect(global.fetch).toHaveBeenCalled();
         expect(document.getElementById('app-header').innerHTML).toBe('<header>Mocked Header</header>');
     });

@@ -5,21 +5,20 @@
 
 /**
  * Calcule la distance en kilomètres entre deux points GPS en utilisant la formule de Haversine.
- * @param {number} lat1 
- * @param {number} lon1 
- * @param {number} lat2 
- * @param {number} lon2 
+ * @param {number} lat1
+ * @param {number} lon1
+ * @param {number} lat2
+ * @param {number} lon2
  * @returns {number} Distance en kilomètres
  */
 export function calculateDistance(lat1, lon1, lat2, lon2) {
     if (lat1 === undefined || lon1 === undefined || lat2 === undefined || lon2 === undefined) return Infinity;
     const R = 6371; // Rayon de la Terre en km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
     const a =
         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c; // Distance en km
 }
@@ -52,7 +51,7 @@ export function getAngularDifference(angle1, angle2) {
  */
 export function degreesToCardinal(deg) {
     const normalizedDeg = normalizeDegree(deg);
-    const directions = ["N", "NE", "E", "SE", "S", "SO", "O", "NO"];
+    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
     const index = Math.round(normalizedDeg / 45) % 8;
     return directions[index];
 }

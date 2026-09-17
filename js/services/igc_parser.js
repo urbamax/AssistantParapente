@@ -23,7 +23,7 @@ const IGCParser = {
                     const month = parseInt(dateMatch[2], 10) - 1; // 0-indexed
                     let year = parseInt(dateMatch[3], 10);
                     // Hypothèse pour l'année : 80-99 -> 1980-1999, 00-79 -> 2000-2079
-                    year += (year < 80) ? 2000 : 1900;
+                    year += year < 80 ? 2000 : 1900;
                     baseDate = new Date(Date.UTC(year, month, day));
                 }
                 break;
@@ -76,13 +76,13 @@ const IGCParser = {
                         lon: lon,
                         alt: alt,
                         time: localTime,
-                        timestamp: pointDate.getTime()
+                        timestamp: pointDate.getTime(),
                     });
                 }
             }
         }
 
-        let dateStr = "";
+        let dateStr = '';
         if (firstPointTime) {
             // Conversion en heure locale de l'utilisateur (les champs datetime-local attendent une heure locale)
             const yyyy = firstPointTime.getFullYear();
@@ -100,7 +100,7 @@ const IGCParser = {
 
         const { distanceKm, maxClimbRate, maxSpeedKmh, avgSpeedKmh } = this._computeFlightStats(trace, duration);
 
-        console.log("Points IGC extraits avec succès :", trace.length);
+        console.log('Points IGC extraits avec succès :', trace.length);
 
         return {
             points: trace,
@@ -111,7 +111,7 @@ const IGCParser = {
             distanceKm: distanceKm,
             maxClimbRate: maxClimbRate,
             maxSpeedKmh: maxSpeedKmh,
-            avgSpeedKmh: avgSpeedKmh
+            avgSpeedKmh: avgSpeedKmh,
         };
     },
 
@@ -122,11 +122,14 @@ const IGCParser = {
      */
     _distanceKm: function (lat1, lon1, lat2, lon2) {
         const R = 6371;
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const dLat = ((lat2 - lat1) * Math.PI) / 180;
+        const dLon = ((lon2 - lon1) * Math.PI) / 180;
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos((lat1 * Math.PI) / 180) *
+                Math.cos((lat2 * Math.PI) / 180) *
+                Math.sin(dLon / 2) *
+                Math.sin(dLon / 2);
         return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     },
 
@@ -167,7 +170,7 @@ const IGCParser = {
             distanceKm: Math.round(distanceKm * 10) / 10,
             maxClimbRate: Math.round(maxClimbRate * 10) / 10,
             maxSpeedKmh: Math.round(maxSpeedKmh * 10) / 10,
-            avgSpeedKmh: Math.round(avgSpeedKmh * 10) / 10
+            avgSpeedKmh: Math.round(avgSpeedKmh * 10) / 10,
         };
     },
 
@@ -182,7 +185,7 @@ const IGCParser = {
             const min = parseInt(minStr, 10) / 1000;
             const dir = coordStr.substring(degLen + 5, degLen + 6);
 
-            let decimal = deg + (min / 60);
+            let decimal = deg + min / 60;
 
             if (dir === 'S' || dir === 'W') {
                 decimal = decimal * -1;
@@ -210,7 +213,7 @@ const IGCParser = {
         }
 
         return diffMinutes;
-    }
+    },
 };
 
 window.IGCParser = IGCParser;

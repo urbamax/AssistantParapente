@@ -35,7 +35,7 @@ class BaseView {
      */
     renderErrorState(errorMsg, viewContainerId) {
         console.error(`[BaseView] Error state triggered:`, errorMsg);
-        
+
         // Hide the main view container if provided
         if (viewContainerId) {
             const screen = document.getElementById(viewContainerId);
@@ -48,7 +48,7 @@ class BaseView {
             errorContainer = document.createElement('div');
             errorContainer.id = 'global-view-error';
             errorContainer.className = 'container';
-            
+
             // Try to append it next to the failing screen, or body fallback
             const screen = viewContainerId ? document.getElementById(viewContainerId) : null;
             if (screen && screen.parentNode) {
@@ -59,11 +59,10 @@ class BaseView {
         }
 
         errorContainer.style.display = 'block';
-        
+
         // Secure error message
-        const safeError = (typeof Security !== 'undefined' && Security.escapeHTML) 
-            ? Security.escapeHTML(errorMsg) 
-            : errorMsg;
+        const safeError =
+            typeof Security !== 'undefined' && Security.escapeHTML ? Security.escapeHTML(errorMsg) : errorMsg;
 
         errorContainer.innerHTML = `
             <div class="empty-state" style="margin-top: 2rem;">

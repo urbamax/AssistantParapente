@@ -20,7 +20,7 @@ import LogbookService from '../services/logbook_service.js';
 
 async function bootApplication() {
     console.time('BOOT_TOTAL');
-    console.log("🚀 Booting Application...");
+    console.log('🚀 Booting Application...');
 
     // 1. Initialize State & Core Services
     console.time('INIT_STATE_EVENTS');
@@ -30,9 +30,11 @@ async function bootApplication() {
 
     console.time('UI_INIT');
     // Launch UI components loading in background without blocking the boot sequence
-    UIManager.init().then(() => {
-        console.timeEnd('UI_INIT');
-    }).catch(console.error);
+    UIManager.init()
+        .then(() => {
+            console.timeEnd('UI_INIT');
+        })
+        .catch(console.error);
 
     // Initialisation du Global IGC Input
     const globalInput = document.getElementById('global-igc-input');
@@ -63,7 +65,7 @@ async function bootApplication() {
     AppEvents.register('goBack', () => {
         if (GlobalState.get('mode') === 'COURSE') {
             const frame = document.getElementById('course-pdf-frame');
-            if (frame) frame.src = "";
+            if (frame) frame.src = '';
             document.body.classList.remove('course-open');
             AppRouter.navigate('LIBRARY');
         } else if (window.history.length > 1) {
@@ -91,47 +93,103 @@ async function bootApplication() {
     AppEvents.register('startQcmSession', () => QuizView.startSession());
     AppEvents.register('QuizreviewExam', (args) => QuizView.reviewExam(args));
     AppEvents.register('QuizshowStatsScreen', () => QuizView.showStatsScreen());
-    
+
     // Library Events
     AppEvents.register('setLibrarySort', (sort) => window.LibraryEngine && window.LibraryEngine.setSort(sort));
 
     // Logbook Events mappings from extracted data
-    ['switchTab', 'setFormType', 'resetForm', 'resetEquipmentForm', 'submitForm', 'updateEquipmentNomPreview', 'handleIgcUpload', 'forceWeatherRefresh', 'editEntry', 'deleteEntry', 'showTrace', 'editEquipment', 'deleteEquipment', 'toggleEquipmentStatus', 'triggerIgcUpload'].forEach(action => {
-        AppEvents.register('Logbook' + action, (args, e, t) => LogbookView[action] ? LogbookView[action](args || e, e, t) : null);
-        AppEvents.register(action, (args, e, t) => LogbookView[action] ? LogbookView[action](args || e, e, t) : null); // Map without prefix too
+    [
+        'switchTab',
+        'setFormType',
+        'resetForm',
+        'resetEquipmentForm',
+        'submitForm',
+        'updateEquipmentNomPreview',
+        'handleIgcUpload',
+        'forceWeatherRefresh',
+        'editEntry',
+        'deleteEntry',
+        'showTrace',
+        'editEquipment',
+        'deleteEquipment',
+        'toggleEquipmentStatus',
+        'triggerIgcUpload',
+    ].forEach((action) => {
+        AppEvents.register('Logbook' + action, (args, e, t) =>
+            LogbookView[action] ? LogbookView[action](args || e, e, t) : null,
+        );
+        AppEvents.register(action, (args, e, t) => (LogbookView[action] ? LogbookView[action](args || e, e, t) : null)); // Map without prefix too
     });
 
     // Sites Events mappings from extracted data
-    ['switchMapMode', 'openMoreMapsDropdown', 'toggleFullscreen', 'toggleDropdown', 'geocodeAddress', 'saveCurrentLocation', 'requestGpsLocation', 'changeWeatherModel', 'updateWindLimits', 'changeForecastMaxRange', 'changeSortMode', 'changeStrategy', 'toggleFilterFavoritesOnly', 'scrollToTop', 'filterByTag', 'renderList'].forEach(action => {
-        AppEvents.register('Sites' + action, (args, e, t) => SitesView[action] ? SitesView[action](args, e, t) : null);
+    [
+        'switchMapMode',
+        'openMoreMapsDropdown',
+        'toggleFullscreen',
+        'toggleDropdown',
+        'geocodeAddress',
+        'saveCurrentLocation',
+        'requestGpsLocation',
+        'changeWeatherModel',
+        'updateWindLimits',
+        'changeForecastMaxRange',
+        'changeSortMode',
+        'changeStrategy',
+        'toggleFilterFavoritesOnly',
+        'scrollToTop',
+        'filterByTag',
+        'renderList',
+    ].forEach((action) => {
+        AppEvents.register('Sites' + action, (args, e, t) =>
+            SitesView[action] ? SitesView[action](args, e, t) : null,
+        );
     });
 
     // FirebaseAuth Events
-    ['switchTab', 'signIn', 'signUp', 'signOut', 'forgotPassword', 'syncDataWithCloud', 'closeAuthModal', 'openAuthModal', 'exportAllData', 'importAllData'].forEach(action => {
-        AppEvents.register('FirebaseAuth' + action, (args, e, t) => window.FirebaseAuthEngine && window.FirebaseAuthEngine[action] ? window.FirebaseAuthEngine[action](args, e, t) : null);
+    [
+        'switchTab',
+        'signIn',
+        'signUp',
+        'signOut',
+        'forgotPassword',
+        'syncDataWithCloud',
+        'closeAuthModal',
+        'openAuthModal',
+        'exportAllData',
+        'importAllData',
+    ].forEach((action) => {
+        AppEvents.register('FirebaseAuth' + action, (args, e, t) =>
+            window.FirebaseAuthEngine && window.FirebaseAuthEngine[action]
+                ? window.FirebaseAuthEngine[action](args, e, t)
+                : null,
+        );
     });
 
     // GDPR Events
-    ['showModal', 'hideModal', 'acceptAll', 'refuseAll', 'saveCustomSettings'].forEach(action => {
-        AppEvents.register('Gdpr' + action, (args, e, t) => window.GdprEngine && window.GdprEngine[action] ? window.GdprEngine[action](args, e, t) : null);
+    ['showModal', 'hideModal', 'acceptAll', 'refuseAll', 'saveCustomSettings'].forEach((action) => {
+        AppEvents.register('Gdpr' + action, (args, e, t) =>
+            window.GdprEngine && window.GdprEngine[action] ? window.GdprEngine[action](args, e, t) : null,
+        );
     });
-    
+
     // --- LEGACY POLYFILLS ---
     // Ensure existing engines don't break when calling window.Engine.showDashboard()
     window.Engine = {
         state: GlobalState.state,
         showDashboard: () => AppRouter.navigate('MENU'),
         startMode: (mode) => AppRouter.navigate(mode),
-        hideManual: () => UIManager.hideManual()
+        hideManual: () => UIManager.hideManual(),
     };
-    
+
     // Polyfill FirebaseAuthEngine
-    import('../services/firebase_service.js?v=2026.09.17_v3').then(module => {
-        window.FirebaseAuthEngine = module.FirebaseAuthEngine;
-        if (window.FirebaseAuthEngine.init) {
-            window.FirebaseAuthEngine.init();
-        }
-    }).catch(err => console.log("Firebase module not loaded", err));
+    import('../services/firebase_service.js?v=2026.09.17_v3')
+        .then((module) => {
+            window.FirebaseAuthEngine = module.FirebaseAuthEngine;
+            if (window.FirebaseAuthEngine.init) {
+                window.FirebaseAuthEngine.init();
+            }
+        })
+        .catch((err) => console.log('Firebase module not loaded', err));
     // -------------------------
 
     // 3. Register Routes
@@ -151,7 +209,7 @@ async function bootApplication() {
         unmount: () => {
             const startScreen = document.getElementById('start-screen');
             if (startScreen) startScreen.classList.remove('active');
-        }
+        },
     });
     AppRouter.register('QCM', QuizView);
     AppRouter.register('QCM_BANK', QuizView);
@@ -166,19 +224,19 @@ async function bootApplication() {
     // 5. Restore State or Default
     const params = new URLSearchParams(window.location.search);
     let startMode = params.get('mode');
-    
+
     if (!startMode) {
         // Automatically load last active page, fallback to LIBRARY (Manuel) on first visit
         startMode = StorageService.get('LAST_ACTIVE_ROUTE') || 'LIBRARY';
     }
-    
+
     AppRouter.navigate(startMode);
 
     // 6. Connect to Firebase SDKs
     // Handled in Polyfills section
 
     console.timeEnd('BOOT_TOTAL');
-    console.log("✅ Application Booted Successfully.");
+    console.log('✅ Application Booted Successfully.');
 
     // Service Worker réactivé (cache offline pour les sites favoris + tuiles carte + assets
     // statiques) après un kill-switch temporaire : un ancien SW en "Cache First" sur
@@ -201,7 +259,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.SITES_DATA = await response.json();
         console.timeEnd('FETCH_SITES');
     } catch (e) {
-        console.error("Erreur de chargement de sites_data.json:", e);
+        console.error('Erreur de chargement de sites_data.json:', e);
         window.SITES_DATA = [];
     }
     bootApplication();

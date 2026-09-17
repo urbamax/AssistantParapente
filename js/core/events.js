@@ -16,7 +16,7 @@ class EventDelegator {
         document.addEventListener('click', (e) => {
             const target = e.target.closest('[data-action]');
             if (!target) return;
-            
+
             const action = target.getAttribute('data-action');
             let args = target.getAttribute('data-args');
             try {
@@ -25,9 +25,7 @@ class EventDelegator {
                     // IDs (e.g. Date.now().toString()) are passed unquoted and look like
                     // valid JSON numbers/booleans to JSON.parse. Keep them as strings so
                     // downstream `===` comparisons against stored string ids still match.
-                    args = (typeof parsed === 'number' || typeof parsed === 'boolean')
-                        ? args.replace(/'/g, '')
-                        : parsed;
+                    args = typeof parsed === 'number' || typeof parsed === 'boolean' ? args.replace(/'/g, '') : parsed;
                 }
             } catch (err) {
                 // If it's a simple string or single quote string
@@ -41,7 +39,7 @@ class EventDelegator {
         document.addEventListener('change', (e) => {
             const target = e.target.closest('[data-action]');
             if (!target) return;
-            
+
             const action = target.getAttribute('data-action');
             const args = target.value;
 
@@ -67,14 +65,14 @@ class EventDelegator {
             // Fallback for Engine methods
             let handled = false;
             const engines = [
-                window.SitesEngine, 
-                window.LogbookEngine, 
-                window.QuizEngine, 
-                window.LibraryEngine, 
-                window.FirebaseAuthEngine, 
-                window.GdprEngine
+                window.SitesEngine,
+                window.LogbookEngine,
+                window.QuizEngine,
+                window.LibraryEngine,
+                window.FirebaseAuthEngine,
+                window.GdprEngine,
             ];
-            
+
             for (const engine of engines) {
                 if (engine && typeof engine[action] === 'function') {
                     engine[action](args, event, target);
@@ -82,7 +80,7 @@ class EventDelegator {
                     break;
                 }
             }
-            
+
             if (!handled) {
                 console.warn(`Unregistered action triggered: ${action}`);
             }

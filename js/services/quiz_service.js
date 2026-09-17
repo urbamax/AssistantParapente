@@ -7,26 +7,26 @@ class QuizService {
             qcmConfig: {
                 mode: 'TRAINING', // TRAINING, EXAM, REVISION
                 count: 10,
-                theme: 'ALL'
+                theme: 'ALL',
             },
             qcmSessionData: [],
             currentQcmSelection: new Set(),
             examResults: [],
             isLoaded: false,
-            loadingError: null
+            loadingError: null,
         };
         this.basePath = '.';
     }
 
     async init(basePath = '.') {
-        console.log("QuizService.init() started, basePath:", basePath);
+        console.log('QuizService.init() started, basePath:', basePath);
         this.basePath = basePath;
         try {
             const res = await this.loadOfficialData();
-            console.log("QuizService.init() finished successfully", res);
+            console.log('QuizService.init() finished successfully', res);
             return res;
         } catch (e) {
-            console.error("QuizService.init() failed", e);
+            console.error('QuizService.init() failed', e);
             throw e;
         }
     }
@@ -41,10 +41,10 @@ class QuizService {
             const cacheBuster = `v=${Date.now()}`;
             const [questionsRes, explicationsRes] = await Promise.all([
                 fetch(`${this.basePath}/js/data/qcm_ffvl.csv?${cacheBuster}`),
-                fetch(`${this.basePath}/js/data/qcm_ffvl_explanations.csv?${cacheBuster}`)
+                fetch(`${this.basePath}/js/data/qcm_ffvl_explanations.csv?${cacheBuster}`),
             ]);
 
-            if (!questionsRes.ok || !explicationsRes.ok) throw new Error("Failed to load QCM CSV data");
+            if (!questionsRes.ok || !explicationsRes.ok) throw new Error('Failed to load QCM CSV data');
 
             const questionsCSV = await questionsRes.text();
             const explicationsCSV = await explicationsRes.text();
@@ -58,7 +58,7 @@ class QuizService {
             this.state.isLoaded = true;
             return { success: true, data: questions, error: null };
         } catch (err) {
-            this.state.loadingError = err.message || "Erreur inconnue";
+            this.state.loadingError = err.message || 'Erreur inconnue';
             this.state.isLoaded = true;
             return { success: false, data: null, error: err.message };
         }
@@ -89,8 +89,10 @@ class QuizService {
                 for (let i = 0; i < line.length; i++) {
                     const char = line[i];
                     if (char === '"') inQuotes = !inQuotes;
-                    else if (char === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
-                    else current += char;
+                    else if (char === ',' && !inQuotes) {
+                        result.push(current.trim());
+                        current = '';
+                    } else current += char;
                 }
                 result.push(current.trim());
                 return result;
@@ -127,16 +129,16 @@ class QuizService {
                 questions.push({
                     code,
                     question: questionText,
-                    choices: ans.map(a => ({ text: a.text, pts: parseInt(a.pts || 0) })),
+                    choices: ans.map((a) => ({ text: a.text, pts: parseInt(a.pts || 0) })),
                     niveau,
                     parapente: pFlag,
                     theme: this.getThemeForCode(code),
-                    explication: explications[code] || ""
+                    explication: explications[code] || '',
                 });
             }
             return questions;
         } catch (error) {
-            console.error("Erreur critique lors du parsing du fichier CSV des questions :", error);
+            console.error('Erreur critique lors du parsing du fichier CSV des questions :', error);
             return [];
         }
     }
@@ -144,13 +146,19 @@ class QuizService {
     getThemeForCode(code) {
         if (!code) return 'Autre';
         const map = {
-            'A': 'Météo',
-            'E': 'Mécavol', 'G': 'Mécavol', 'H': 'Mécavol',
-            'L': 'Matériel', 'N': 'Matériel', 'R': 'Matériel',
-            'U': 'Pilotage', 'W': 'Pilotage', 'X': 'Pilotage',
-            'S': 'Réglementation',
-            'F': 'Facteurs humains',
-            'P': 'Milieu naturel'
+            A: 'Météo',
+            E: 'Mécavol',
+            G: 'Mécavol',
+            H: 'Mécavol',
+            L: 'Matériel',
+            N: 'Matériel',
+            R: 'Matériel',
+            U: 'Pilotage',
+            W: 'Pilotage',
+            X: 'Pilotage',
+            S: 'Réglementation',
+            F: 'Facteurs humains',
+            P: 'Milieu naturel',
         };
         return map[code.charAt(0)] || 'Autre';
     }
@@ -167,7 +175,7 @@ class QuizService {
     getThemes() {
         const themes = new Set();
         if (typeof window !== 'undefined' && window.QCM_OFFICIAL && window.QCM_OFFICIAL.questions) {
-            window.QCM_OFFICIAL.questions.forEach(q => themes.add(q.theme));
+            window.QCM_OFFICIAL.questions.forEach((q) => themes.add(q.theme));
         }
         return [...themes].sort();
     }
@@ -178,25 +186,29 @@ class QuizService {
         // on force ce reset ici pour qu'un filtre thématique laissé actif en entraînement ne fuite jamais dans l'examen.
         if (mode === 'EXAM') this.state.qcmConfig.theme = 'ALL';
     }
-    setCount(count) { this.state.qcmConfig.count = count; }
-    setTheme(theme) { this.state.qcmConfig.theme = theme; }
+    setCount(count) {
+        this.state.qcmConfig.count = count;
+    }
+    setTheme(theme) {
+        this.state.qcmConfig.theme = theme;
+    }
 
     startSession(level = 'BI') {
-        if (!this.state.isLoaded) throw new Error("Données QCM non chargées");
+        if (!this.state.isLoaded) throw new Error('Données QCM non chargées');
 
-        let sourceData = (window.QCM_OFFICIAL && window.QCM_OFFICIAL.questions) ? window.QCM_OFFICIAL.questions : [];
-        const excludedPrefixes = ['H', 'R', 'X']; 
-        sourceData = sourceData.filter(q => !excludedPrefixes.includes(q.code.charAt(0)));
+        let sourceData = window.QCM_OFFICIAL && window.QCM_OFFICIAL.questions ? window.QCM_OFFICIAL.questions : [];
+        const excludedPrefixes = ['H', 'R', 'X'];
+        sourceData = sourceData.filter((q) => !excludedPrefixes.includes(q.code.charAt(0)));
 
         const hasLevel = (code, letter) => code.replace(/^[a-zA-Z]+\d+/, '').includes(letter);
         if (level === 'BI') {
-            sourceData = sourceData.filter(q => hasLevel(q.code, 'V'));
+            sourceData = sourceData.filter((q) => hasLevel(q.code, 'V'));
         } else if (level === 'BP') {
-            sourceData = sourceData.filter(q => hasLevel(q.code, 'B'));
+            sourceData = sourceData.filter((q) => hasLevel(q.code, 'B'));
         } else if (level === 'BPC') {
-            sourceData = sourceData.filter(q => hasLevel(q.code, 'M'));
+            sourceData = sourceData.filter((q) => hasLevel(q.code, 'M'));
         } else if (level === 'TREUIL') {
-            sourceData = sourceData.filter(q => hasLevel(q.code, 'T'));
+            sourceData = sourceData.filter((q) => hasLevel(q.code, 'T'));
         }
 
         let count = this.state.qcmConfig.count;
@@ -207,7 +219,7 @@ class QuizService {
         let questions;
         if (this.state.qcmConfig.mode === 'REVISION') {
             const stats = this.getPersistentStats();
-            if (selectedTheme !== 'ALL') sourceData = sourceData.filter(q => q.theme === selectedTheme);
+            if (selectedTheme !== 'ALL') sourceData = sourceData.filter((q) => q.theme === selectedTheme);
 
             // Spaced repetition : l'intervalle avant la prochaine révision grandit avec le nombre
             // de bonnes réponses consécutives (streak, déjà suivi dans updateStats), et repart de
@@ -231,31 +243,31 @@ class QuizService {
                 const streak = s.streak || 0;
                 const intervalDays = REVIEW_INTERVALS_DAYS[Math.min(streak, REVIEW_INTERVALS_DAYS.length - 1)];
                 const daysSinceSeen = (now - s.lastSeen) / DAY_MS;
-                return (daysSinceSeen - intervalDays) - ratio;
+                return daysSinceSeen - intervalDays - ratio;
             };
 
             // On mélange d'abord (comme l'ancienne implémentation) puis on trie par échéance :
             // le tri étant stable, les questions à égalité de priorité (ex: toutes "jamais vues")
             // gardent un ordre aléatoire au lieu de rester figées dans l'ordre du CSV source.
-            const scored = this.shuffle(sourceData).map(q => ({ q, dueScore: getDueScore(q) }));
-            const dueOnly = scored.filter(x => x.dueScore >= 0);
+            const scored = this.shuffle(sourceData).map((q) => ({ q, dueScore: getDueScore(q) }));
+            const dueOnly = scored.filter((x) => x.dueScore >= 0);
 
             // S'il n'y a rien d'échu (bon pilote, tout est encore "frais"), on retombe sur
             // l'ensemble des questions triées par échéance la plus proche, pour ne jamais bloquer
             // une session de révision sur un tableau vide.
             const pool = dueOnly.length > 0 ? dueOnly : scored;
-            const filteredData = pool.sort((a, b) => b.dueScore - a.dueScore).map(x => x.q);
+            const filteredData = pool.sort((a, b) => b.dueScore - a.dueScore).map((x) => x.q);
 
             questions = filteredData.slice(0, count);
         } else {
-            if (selectedTheme !== 'ALL') sourceData = sourceData.filter(q => q.theme === selectedTheme);
+            if (selectedTheme !== 'ALL') sourceData = sourceData.filter((q) => q.theme === selectedTheme);
             if (this.state.qcmConfig.mode === 'EXAM') {
-                count = (level === 'BP') ? 60 : 30;
+                count = level === 'BP' ? 60 : 30;
             }
             questions = this.shuffle(sourceData).slice(0, count);
         }
 
-        if (questions.length === 0) throw new Error("Aucune question trouvée");
+        if (questions.length === 0) throw new Error('Aucune question trouvée');
 
         this.state.qcmSessionData = questions;
         this.state.qcmIndex = 0;
@@ -284,7 +296,7 @@ class QuizService {
         let userScore = 0;
         let hasNegativeEffect = false;
 
-        question.choices.forEach(c => {
+        question.choices.forEach((c) => {
             if (c.pts > 0) maxScore += c.pts;
             if (this.state.currentQcmSelection.has(c)) {
                 userScore += c.pts;
@@ -292,25 +304,26 @@ class QuizService {
             }
         });
 
-        const isCorrect = this.state.qcmConfig.mode === 'EXAM' 
-            ? (userScore === maxScore) 
-            : ((userScore === maxScore) && !hasNegativeEffect);
+        const isCorrect =
+            this.state.qcmConfig.mode === 'EXAM'
+                ? userScore === maxScore
+                : userScore === maxScore && !hasNegativeEffect;
 
         const resultData = {
             question,
             selected: selectedOptions,
-            correct: question.choices.filter(c => c.pts > 0),
+            correct: question.choices.filter((c) => c.pts > 0),
             isCorrect,
             userPoints: userScore,
-            maxPoints: maxScore
+            maxPoints: maxScore,
         };
 
         this.state.examResults[this.state.qcmIndex] = resultData;
-        
+
         if (this.state.qcmConfig.mode !== 'EXAM') {
             this.updateStats(question, isCorrect);
         }
-        
+
         return resultData;
     }
 
@@ -362,7 +375,7 @@ class QuizService {
         if (isCorrect) tStat.correct++;
 
         StorageService.set(StorageService.KEYS.QCM_STATS, stats);
-        
+
         // Synchronisation immédiate vers Firebase si disponible
         if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
             window.FirebaseAuthEngine.saveStatsToCloud();
@@ -371,12 +384,15 @@ class QuizService {
 
     saveExamHistory(level) {
         const results = this.state.examResults;
-        const total = this.state.qcmSessionData && this.state.qcmSessionData.length > 0 ? this.state.qcmSessionData.length : results.length;
-        const score = results.filter(r => r.isCorrect).length;
+        const total =
+            this.state.qcmSessionData && this.state.qcmSessionData.length > 0
+                ? this.state.qcmSessionData.length
+                : results.length;
+        const score = results.filter((r) => r.isCorrect).length;
         const history = this.getExamHistory();
-        
+
         const isInvalidated = this.state.invalidated === true;
-        
+
         history.unshift({
             id: 'exam_' + Date.now(),
             date: new Date().toISOString(),
@@ -384,14 +400,14 @@ class QuizService {
             score: isInvalidated ? 0 : score,
             total: total,
             percentage: isInvalidated ? 0 : Math.round((score / total) * 100),
-            passed: isInvalidated ? false : score >= (total * 0.75), // 75% pour réussir
+            passed: isInvalidated ? false : score >= total * 0.75, // 75% pour réussir
             invalidated: isInvalidated,
-            results: results.map(r => ({
+            results: results.map((r) => ({
                 question: r.question,
                 isCorrect: r.isCorrect,
                 theme: r.question.theme,
-                selected: r.selected
-            }))
+                selected: r.selected,
+            })),
         });
 
         // Garder que les 20 derniers
@@ -408,15 +424,15 @@ class QuizService {
 
     getExamHistory() {
         const h = StorageService.get(StorageService.KEYS.EXAM_HISTORY, []);
-        
+
         // Handle legacy format: { exams: [...] }
         if (h && typeof h === 'object' && !Array.isArray(h) && Array.isArray(h.exams)) {
-            return h.exams.filter(e => e && typeof e === 'object' && e.date);
+            return h.exams.filter((e) => e && typeof e === 'object' && e.date);
         }
-        
+
         // Handle new format: [...]
         if (!Array.isArray(h)) return [];
-        return h.filter(e => e && typeof e === 'object' && e.date);
+        return h.filter((e) => e && typeof e === 'object' && e.date);
     }
 }
 

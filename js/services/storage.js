@@ -19,7 +19,7 @@ const StorageService = {
         EQUIPMENT_DATA: 'tp_equipment_data',
         QCM_STATS: 'parapente_qcm_stats',
         EXAM_HISTORY: 'parapente_exam_history',
-        PENDING_QUIZ: 'pending_quiz'
+        PENDING_QUIZ: 'pending_quiz',
     },
 
     /**
@@ -28,13 +28,13 @@ const StorageService = {
      * @param {*} defaultValue - Valeur par défaut si la clé n'existe pas ou en cas d'erreur.
      * @returns {*} - L'objet parsé ou la chaîne brute.
      */
-    get: function(key, defaultValue = null) {
+    get: function (key, defaultValue = null) {
         try {
             const item = localStorage.getItem(key);
-            
+
             // Si la clé n'existe pas, on retourne la valeur par défaut
             if (item === null) return defaultValue;
-            
+
             try {
                 // Tente de parser en JSON (valable pour les objets, tableaux, booléens, etc.)
                 return JSON.parse(item);
@@ -55,17 +55,17 @@ const StorageService = {
      * @param {*} value - La valeur à sauvegarder (objet, tableau, chaîne, etc.).
      * @returns {boolean} - true si l'écriture a réussi, false sinon.
      */
-    set: function(key, value) {
+    set: function (key, value) {
         try {
             // Pour ne pas corrompre les données existantes lues en chaîne brute (ex: themeMode),
             // on ne stringify que ce qui n'est pas déjà une chaîne de caractères.
-            const valueToStore = (typeof value === 'string') ? value : JSON.stringify(value);
-            
+            const valueToStore = typeof value === 'string' ? value : JSON.stringify(value);
+
             localStorage.setItem(key, valueToStore);
             return true;
         } catch (error) {
             console.error(`[StorageService] Erreur lors de l'écriture de la clé "${key}":`, error);
-            
+
             // Gestion d'erreur spécifique si le cache du navigateur est plein
             if (error.name === 'QuotaExceededError') {
                 console.warn("[StorageService] Le quota de stockage local est dépassé ! L'enregistrement a échoué.");
@@ -79,7 +79,7 @@ const StorageService = {
      * @param {string} key - La clé à supprimer.
      * @returns {boolean} - true si la suppression a réussi, false sinon.
      */
-    remove: function(key) {
+    remove: function (key) {
         try {
             localStorage.removeItem(key);
             return true;
@@ -93,15 +93,15 @@ const StorageService = {
      * Vide intégralement le LocalStorage.
      * @returns {boolean} - true en cas de succès, false sinon.
      */
-    clear: function() {
+    clear: function () {
         try {
             localStorage.clear();
             return true;
         } catch (error) {
-            console.error("[StorageService] Erreur lors du nettoyage total du LocalStorage:", error);
+            console.error('[StorageService] Erreur lors du nettoyage total du LocalStorage:', error);
             return false;
         }
-    }
+    },
 };
 
 // Exposition du service sur l'objet global (window) pour une utilisation partout dans l'application Vanilla JS

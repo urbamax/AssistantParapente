@@ -20,7 +20,7 @@ export function capitalizeFirstLetter(str) {
  * @param {string} [suffix="..."] - Le suffixe à ajouter si tronqué
  * @returns {string} La chaîne tronquée
  */
-export function truncate(str, length, suffix = "...") {
+export function truncate(str, length, suffix = '...') {
     if (typeof str !== 'string' || !str) return '';
     if (str.length <= length) return str;
     return str.substring(0, length) + suffix;
@@ -33,5 +33,5 @@ export function truncate(str, length, suffix = "...") {
  */
 export function removeAccents(str) {
     if (typeof str !== 'string' || !str) return '';
-    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
