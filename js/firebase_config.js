@@ -1,4 +1,4 @@
-// Configuration Firebase pour l'application Théorie Parapente.
+// Configuration Firebase pour l'application Assistant Parapente.
 // Remplacez ces valeurs par celles de votre propre projet Firebase (obtenues dans les paramètres de votre projet sur la console Firebase).
 const FIREBASE_CONFIG = {
     apiKey: 'AIzaSyAUdlM62YgZv5EshgfQE_qgIvPO9UoTaRc',

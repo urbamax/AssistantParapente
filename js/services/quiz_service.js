@@ -64,16 +64,41 @@ class QuizService {
         }
     }
 
+    // Parseur CSV respectant les guillemets : les questions/explications contiennent parfois
+    // des ';' littéraux à l'intérieur d'un champ (ex: "... vous avez perdu 600 m ; votre
+    // finesse-sol..."), qu'un simple split(';') découperait à tort en colonnes supplémentaires.
+    parseDelimitedLine(line, delimiter) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') {
+                if (inQuotes && line[i + 1] === '"') {
+                    current += '"';
+                    i++;
+                } else inQuotes = !inQuotes;
+            } else if (char === delimiter && !inQuotes) {
+                result.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        result.push(current.trim());
+        return result;
+    }
+
     parseExplicationsCSV(csvText) {
         const rows = csvText.split('\n');
         const data = {};
         for (let i = 1; i < rows.length; i++) {
             const row = rows[i].trim();
             if (!row) continue;
-            const parts = row.split(';');
+            const parts = this.parseDelimitedLine(row, ';');
             if (parts.length >= 3) {
-                const id = parts[0].replace(/"/g, '');
-                const expl = parts.slice(2).join(';').replace(/^"|"$/g, '').trim();
+                const id = parts[0];
+                const expl = parts.slice(2).join(';').trim();
                 data[id] = expl;
             }
         }

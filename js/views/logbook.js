@@ -1011,6 +1011,7 @@ class LogbookViewClass extends BaseView {
         // Extract coordinates and fetch weather asynchronously
         let lat = null,
             lon = null;
+        let baliseId = null;
         if (session.lat && session.lon) {
             lat = session.lat;
             lon = session.lon;
@@ -1023,6 +1024,7 @@ class LogbookViewClass extends BaseView {
                     lat = coords.lat;
                     lon = coords.lon;
                 }
+                baliseId = getSpotairWidgetId(foundSite);
             }
         }
 
@@ -1036,6 +1038,8 @@ class LogbookViewClass extends BaseView {
                         position.coords.longitude,
                         session.datetime,
                         session.id,
+                        session.duree,
+                        baliseId,
                     );
                 });
                 return;
@@ -1043,7 +1047,7 @@ class LogbookViewClass extends BaseView {
         }
 
         if (lat && lon) {
-            this.fetchWeatherForSession(lat, lon, session.datetime, session.id);
+            this.fetchWeatherForSession(lat, lon, session.datetime, session.id, session.duree, baliseId);
         }
     }
 
@@ -1793,7 +1797,7 @@ class LogbookViewClass extends BaseView {
                 m.ventDirection !== null && m.ventDirection !== undefined
                     ? `
             <span style="color: rgba(0,0,0,0.2);">|</span>
-            <span title="Direction"><i class="ri-navigation-line" style="color: #10b981; display:inline-block; transform: rotate(${m.ventDirection}deg);"></i> <strong>Dir :</strong> ${dirStr} (${m.ventDirection}°)</span>
+            <span title="Direction"><i class="ri-arrow-up-fill" style="color: #10b981; font-size: 1.05em; display:inline-block; transform: rotate(${m.ventDirection}deg);"></i> <strong>Dir :</strong> ${dirStr} (${m.ventDirection}°)</span>
             `
                     : ''
             }
@@ -1814,17 +1818,19 @@ class LogbookViewClass extends BaseView {
         const graphUrl = `https://balisemeteo.com/graphs/histo_vent.php?idBalise=${encodeURIComponent(session.baliseId)}&interval=1&marks=false&date=${encodeURIComponent(dateStr)}`;
 
         return `
-        <div class="logbook-card-balise" style="margin-top: 8px; padding: 10px; background: var(--bg-card-hover, rgba(0,0,0,0.03)); border-radius: var(--radius-sm); border: 1px solid var(--border-light, rgba(0,0,0,0.06)); font-size: 0.82rem; color: var(--text-secondary);">
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;">
-                <span><i class="ri-broadcast-line" style="color: var(--accent-blue);"></i> <strong>Vent réel (balise FFVL, ${escapeHTML(dateStr.split('-').reverse().join('/'))})</strong></span>
-                <a href="${histoPageUrl}" target="_blank" rel="noopener noreferrer" style="color: var(--accent-blue); text-decoration: none; font-size: 0.78rem;">
+        <details class="logbook-card-balise" style="margin-top: 8px; padding: 10px; background: var(--bg-card-hover, rgba(0,0,0,0.03)); border-radius: var(--radius-sm); border: 1px solid var(--border-light, rgba(0,0,0,0.06)); font-size: 0.82rem; color: var(--text-secondary);">
+            <summary style="cursor: pointer; display: flex; align-items: center; gap: 6px; list-style: revert;">
+                <i class="ri-broadcast-line" style="color: var(--accent-blue);"></i> <strong>Vent réel (balise FFVL, ${escapeHTML(dateStr.split('-').reverse().join('/'))})</strong>
+            </summary>
+            <div style="margin-top: 8px;">
+                <a href="${histoPageUrl}" target="_blank" rel="noopener noreferrer">
+                    <img src="${graphUrl}" alt="Historique du vent - balise FFVL" loading="lazy" style="width: 100%; max-width: 500px; height: auto; border-radius: 4px; display: block;">
+                </a>
+                <a href="${histoPageUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; margin-top: 6px; color: var(--accent-blue); text-decoration: none; font-size: 0.78rem;">
                     Voir l'historique complet <i class="ri-external-link-line"></i>
                 </a>
             </div>
-            <a href="${histoPageUrl}" target="_blank" rel="noopener noreferrer">
-                <img src="${graphUrl}" alt="Historique du vent - balise FFVL" style="width: 100%; max-width: 500px; height: auto; border-radius: 4px; display: block;">
-            </a>
-        </div>`;
+        </details>`;
     }
 
     forceWeatherRefresh(sessionId) {
