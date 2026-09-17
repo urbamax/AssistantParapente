@@ -53,6 +53,8 @@ describe('SitesService', () => {
         ];
 
         global.fetch.mockResolvedValue({
+            ok: true,
+            status: 200,
             json: vi.fn().mockResolvedValue(mockApiResponse)
         });
 
@@ -73,7 +75,7 @@ describe('SitesService', () => {
             { latitude: 45.9, longitude: 6.1, hourly: { time: ['2026-08-22T00:00'], wind_speed_10m: [10], wind_direction_10m: [45], wind_gusts_10m: [20], precipitation: [0] }, daily: { sunrise: ['2026-08-22T06:00'], sunset: ['2026-08-22T20:00'] } },
             { latitude: 45.92, longitude: 6.86, hourly: { time: ['2026-08-22T00:00'], wind_speed_10m: [5], wind_direction_10m: [180], wind_gusts_10m: [10], precipitation: [0] }, daily: { sunrise: ['2026-08-22T06:00'], sunset: ['2026-08-22T20:00'] } }
         ];
-        global.fetch.mockResolvedValue({ json: vi.fn().mockResolvedValue(mockApiResponse) });
+        global.fetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue(mockApiResponse) });
 
         await SitesService.fetchWeatherForSites();
         await SitesService.fetchWeatherForSites();
