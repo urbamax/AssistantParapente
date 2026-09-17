@@ -151,7 +151,7 @@ class QuizViewClass extends BaseView {
         if (!target) return;
 
         const action = target.getAttribute('data-action');
-        let rawValue = target.getAttribute('data-args') || target.getAttribute('data-value');
+        const rawValue = target.getAttribute('data-args') || target.getAttribute('data-value');
         let args = [];
         
         if (rawValue) {
@@ -160,16 +160,16 @@ class QuizViewClass extends BaseView {
                     // Convert faux-array "['alpha']" or "['PERFECT']" to valid JSON '["alpha"]'
                     args = JSON.parse(rawValue.replace(/'/g, '"'));
                 } else {
-                    let value = rawValue.replace(/^'|'$/g, '');
+                    const value = rawValue.replace(/^'|'$/g, '');
                     args = [value];
                 }
             } catch (err) {
-                let value = rawValue.replace(/^'|'$/g, '');
+                const value = rawValue.replace(/^'|'$/g, '');
                 args = [value];
             }
         }
         
-        let value = args[0] || null;
+        const value = args[0] || null;
 
         switch (action) {
             case 'QuizsetThemeSort': this.setThemeSort(args[0]); break;
@@ -295,7 +295,7 @@ class QuizViewClass extends BaseView {
             if (validLetters.length === 1) {
                 colorStyle = `background: ${colorMap[validLetters[0]]}; color: ${textColors[validLetters[0]]}; border: 1px solid ${colorMap[validLetters[0]].replace('0.2', '0.4')};`;
             } else if (validLetters.length > 1) {
-                let stops = [];
+                const stops = [];
                 const step = 100 / validLetters.length;
                 validLetters.forEach((l, i) => {
                     stops.push(`${colorMap[l]} ${i * step}%`);
@@ -460,7 +460,7 @@ class QuizViewClass extends BaseView {
 
             console.log("Rendering stats for normalized level:", currentLevel);
 
-            let levelQuestionCodes = new Set();
+            const levelQuestionCodes = new Set();
             let totalLevelQuestions = 0;
 
             let levelQs = [];
@@ -524,7 +524,7 @@ class QuizViewClass extends BaseView {
             }
 
             // Debug filtering
-            let levelQuestionEntries = allQuestionEntries.filter(([code, data]) => levelQuestionCodes.has(code));
+            const levelQuestionEntries = allQuestionEntries.filter(([code, data]) => levelQuestionCodes.has(code));
 
             // FALLBACK: If filtering returns 0 results but we have stats, it might be due to code mismatches.
             // In that case, we display everything to ensure the user sees their data.
@@ -1111,7 +1111,7 @@ class QuizViewClass extends BaseView {
                 (q.choices || q.ans || []).forEach(opt => {
                     const wasSelected = selectedOptions.some(s => s.text === opt.text);
                     const pts = parseInt(opt.pts || 0);
-                    let statusClass = '';
+                    let statusClass;
                     let icon = '';
 
                     if (pts > 0) {
@@ -1190,116 +1190,6 @@ class QuizViewClass extends BaseView {
         html += '</div>';
         return html;
     }
-
-    sortQuestions(sortBy) {
-        const list = document.getElementById('all-questions-list');
-        if (!list) return;
-
-        // Toggle direction if clicking same sort
-        if (QuizView.state.sortState.field === sortBy) {
-            QuizView.state.sortState.dir = QuizView.state.sortState.dir === 'asc' ? 'desc' : 'asc';
-        } else {
-            QuizView.state.sortState.field = sortBy;
-            // Default directions: Rate -> ASC (worst first), Attempts -> DESC (most first)
-            QuizView.state.sortState.dir = (sortBy === 'rate') ? 'asc' : 'desc';
-        }
-
-        const dir = QuizView.state.sortState.dir;
-        const items = Array.from(list.querySelectorAll('.question-stat-item'));
-
-        // Update button states & Icons
-        // Update button states & Icons - Scope only to Stats buttons
-        const statsButtons = ['sort-rate-btn', 'sort-attempts-btn', 'sort-streak-btn'];
-        statsButtons.forEach(id => {
-            const btn = document.getElementById(id);
-            if (!btn) return;
-
-            btn.style.background = 'transparent';
-            // Reset text (remove arrows)
-            let baseText = 'Par taux';
-            if (id === 'sort-attempts-btn') baseText = 'Par tentatives';
-            if (id === 'sort-streak-btn') baseText = 'Par série';
-            btn.innerHTML = baseText;
-        });
-
-        const activeBtn = document.getElementById(sortBy === 'rate' ? 'sort-rate-btn' : (sortBy === 'attempts' ? 'sort-attempts-btn' : 'sort-streak-btn'));
-        if (activeBtn) {
-            activeBtn.style.background = 'rgba(255,255,255,0.05)';
-            const arrow = dir === 'asc' ? ' <i class="ri-arrow-up-line"></i>' : ' <i class="ri-arrow-down-line"></i>';
-            activeBtn.innerHTML += arrow;
-        }
-
-        items.sort((a, b) => {
-            let valA, valB;
-            if (sortBy === 'rate') {
-                valA = parseInt(a.dataset.pct);
-                valB = parseInt(b.dataset.pct);
-            } else if (sortBy === 'streak') {
-                valA = parseInt(a.dataset.streak || 0);
-                valB = parseInt(b.dataset.streak || 0);
-            } else {
-                valA = parseInt(a.dataset.total);
-                valB = parseInt(b.dataset.total);
-            }
-
-            if (dir === 'asc') return valA - valB;
-            else return valB - valA;
-        });
-
-        list.innerHTML = '';
-        items.forEach(item => list.appendChild(item));
-    }
-
-    toggleQuestionDetails(code) {
-        const card = document.querySelector(`[data-code="${code}"]`);
-        if (!card) return;
-
-        const answersDiv = card.querySelector('.question-answers');
-        const arrow = document.getElementById('arrow-' + code);
-
-        if (!answersDiv) return;
-
-        const isExpanded = answersDiv.style.display !== 'none';
-
-        if (isExpanded) {
-            answersDiv.style.display = 'none';
-            if (arrow) arrow.style.transform = 'rotate(0deg)';
-        } else {
-            answersDiv.style.display = 'block';
-            if (arrow) arrow.style.transform = 'rotate(180deg)';
-        }
-    }
-
-    setMasteryFilter(filter) {
-        if (QuizView.state.masteryFilter === filter) {
-            QuizView.state.masteryFilter = 'ALL'; // Toggle off
-        } else {
-            QuizView.state.masteryFilter = filter;
-        }
-        this.renderStats();
-    }
-
-    setThemeFilter(theme) {
-        if (QuizView.state.themeFilter === theme) {
-            QuizView.state.themeFilter = null; // Toggle off
-        } else {
-            QuizView.state.themeFilter = theme;
-        }
-        this.renderStats();
-    }
-
-    setThemeSort(sortType) {
-        if (QuizView.state.themeSort === sortType) {
-            // Toggle direction
-            QuizView.state.themeSortDir = QuizView.state.themeSortDir === 'asc' ? 'desc' : 'asc';
-        } else {
-            QuizView.state.themeSort = sortType;
-            QuizView.state.themeSortDir = 'desc'; // Default to desc for new sort
-            if (sortType === 'alpha') QuizView.state.themeSortDir = 'asc'; // Default asc for alpha
-        }
-        this.renderStats();
-    }
-
 
     reviewExam(examIdArgs) {
         let examId = examIdArgs;
@@ -1409,7 +1299,7 @@ class QuizViewClass extends BaseView {
         if (validLetters.length === 1) {
             colorStyle = `background: ${colorMap[validLetters[0]]}; color: ${textColors[validLetters[0]]}; border: 1px solid ${colorMap[validLetters[0]].replace('0.2', '0.4')};`;
         } else if (validLetters.length > 1) {
-            let stops = [];
+            const stops = [];
             const step = 100 / validLetters.length;
             validLetters.forEach((l, i) => {
                 stops.push(`${colorMap[l]} ${i * step}%`);
@@ -1606,25 +1496,6 @@ class QuizViewClass extends BaseView {
         choicesDiv.innerHTML = '';
         actionsDiv.innerHTML = `<button class="next-btn" data-action="finish-session" style="width:100%;">TERMINER</button>`;
     }
-
-    setMasteryFilter(filter) {
-        if (QuizView.state.masteryFilter === filter) {
-            QuizView.state.masteryFilter = 'ALL'; // Toggle off
-        } else {
-            QuizView.state.masteryFilter = filter;
-        }
-        QuizView.renderStats();
-    }
-
-    setThemeFilter(theme) {
-        if (QuizView.state.themeFilter === theme) {
-            QuizView.state.themeFilter = null; // Toggle off
-        } else {
-            QuizView.state.themeFilter = theme;
-        }
-        QuizView.renderStats();
-    }
-
 
     sortQuestions(sortBy) {
         const list = document.getElementById('all-questions-list');
@@ -1892,65 +1763,9 @@ class QuizViewClass extends BaseView {
         }
     }
 
-    importData() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    const data = JSON.parse(event.target.result);
-
-                    if (!data.stats || !data.examHistory) {
-                        alert('❌ Fichier invalide');
-                        return;
-                    }
-
-                    if (confirm('⚠️ Cela va remplacer vos données actuelles. Continuer ?')) {
-                        StorageService.set(StorageService.KEYS.QCM_STATS, data.stats);
-                        StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: data.examHistory });
-
-                        alert('✅ Données importées avec succès !');
-                        QuizView.renderStats();
-                    }
-                } catch (e) {
-                    console.error('Import failed', e);
-                    alert('❌ Erreur lors de l\'import : fichier corrompu');
-                }
-            };
-            reader.readAsText(file);
-        };
-
-        input.click();
-    }
 
     getCourseUrl(questionCode, questionText) {
         return null;
-    }
-
-    toggleExamDetails(examId) {
-        const card = document.querySelector(`[data-exam-id="${examId}"]`);
-        if (!card) return;
-
-        const detailsDiv = card.querySelector('.exam-details');
-        const arrow = card.querySelector('.exam-arrow');
-
-        if (!detailsDiv) return;
-
-        const isExpanded = detailsDiv.style.display !== 'none';
-
-        if (isExpanded) {
-            detailsDiv.style.display = 'none';
-            if (arrow) arrow.style.transform = 'rotate(0deg)';
-        } else {
-            detailsDiv.style.display = 'block';
-            if (arrow) arrow.style.transform = 'rotate(180deg)';
-        }
     }
 
 } // End Class

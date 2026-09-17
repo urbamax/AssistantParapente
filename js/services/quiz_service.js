@@ -165,7 +165,7 @@ class QuizService {
     }
 
     getThemes() {
-        let themes = new Set();
+        const themes = new Set();
         if (typeof window !== 'undefined' && window.QCM_OFFICIAL && window.QCM_OFFICIAL.questions) {
             window.QCM_OFFICIAL.questions.forEach(q => themes.add(q.theme));
         }
@@ -204,7 +204,7 @@ class QuizService {
 
         if (count === 'ALL') count = sourceData.length;
 
-        let questions = [];
+        let questions;
         if (this.state.qcmConfig.mode === 'REVISION') {
             const stats = this.getPersistentStats();
             if (selectedTheme !== 'ALL') sourceData = sourceData.filter(q => q.theme === selectedTheme);
@@ -373,7 +373,7 @@ class QuizService {
         const results = this.state.examResults;
         const total = this.state.qcmSessionData && this.state.qcmSessionData.length > 0 ? this.state.qcmSessionData.length : results.length;
         const score = results.filter(r => r.isCorrect).length;
-        let history = this.getExamHistory();
+        const history = this.getExamHistory();
         
         const isInvalidated = this.state.invalidated === true;
         

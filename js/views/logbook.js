@@ -534,7 +534,7 @@ class LogbookViewClass extends BaseView {
         const container = document.getElementById('form-fields-container');
         if (!container) return;
 
-        let html = '';
+        let html;
         const defaultDateTime = this.getCurrentDateTimeLocal();
 
         if (this.currentFormType === 'vol') {
@@ -1108,12 +1108,12 @@ class LogbookViewClass extends BaseView {
             let extraInfo = '';
             if (isVol) {
                 const badgeStyle = "background: var(--bg-card-hover, rgba(0,0,0,0.05)); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-light, rgba(0,0,0,0.05)); font-weight: 500; display: inline-flex; align-items: center; gap: 4px;";
-                let decoInfo = session.techDecollage ? `<span style="${badgeStyle}" title="Décollage"><i class="ri-takeaway-line"></i> Décollage : ${escapeHTML(session.techDecollage)}</span>` : '';
-                let altInfo = session.altitudeMax ? `<span style="${badgeStyle}" title="Alt Max">⛰️ Alt Max : ${session.altitudeMax}m</span>` : '';
-                let gainInfo = (session.gain !== undefined && session.gain !== null && session.gain !== '') ? `<span style="${badgeStyle}" title="Gain">📈 Gain : ${session.gain}m</span>` : '';
-                let distanceInfo = session.distanceKm ? `<span style="${badgeStyle}" title="Distance parcourue">📏 Distance : ${session.distanceKm}km</span>` : '';
-                let climbInfo = session.maxClimbRate ? `<span style="${badgeStyle}" title="Vario max">🔼 Vario max : +${session.maxClimbRate}m/s</span>` : '';
-                let speedInfo = session.maxSpeedKmh ? `<span style="${badgeStyle}" title="Vitesse max / moyenne">💨 Vitesse : ${session.maxSpeedKmh}km/h max (${session.avgSpeedKmh}km/h moy.)</span>` : '';
+                const decoInfo = session.techDecollage ? `<span style="${badgeStyle}" title="Décollage"><i class="ri-takeaway-line"></i> Décollage : ${escapeHTML(session.techDecollage)}</span>` : '';
+                const altInfo = session.altitudeMax ? `<span style="${badgeStyle}" title="Alt Max">⛰️ Alt Max : ${session.altitudeMax}m</span>` : '';
+                const gainInfo = (session.gain !== undefined && session.gain !== null && session.gain !== '') ? `<span style="${badgeStyle}" title="Gain">📈 Gain : ${session.gain}m</span>` : '';
+                const distanceInfo = session.distanceKm ? `<span style="${badgeStyle}" title="Distance parcourue">📏 Distance : ${session.distanceKm}km</span>` : '';
+                const climbInfo = session.maxClimbRate ? `<span style="${badgeStyle}" title="Vario max">🔼 Vario max : +${session.maxClimbRate}m/s</span>` : '';
+                const speedInfo = session.maxSpeedKmh ? `<span style="${badgeStyle}" title="Vitesse max / moyenne">💨 Vitesse : ${session.maxSpeedKmh}km/h max (${session.avgSpeedKmh}km/h moy.)</span>` : '';
 
                 if (decoInfo || altInfo || gainInfo || distanceInfo || climbInfo || speedInfo) {
                     extraInfo = `<div class="session-extra-info" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; font-size: 0.82rem; color: var(--text-secondary);">
@@ -1127,7 +1127,7 @@ class LogbookViewClass extends BaseView {
                 }
             }
 
-            let meteoHtml = '';
+            let meteoHtml;
             if (session.meteo) {
                 const m = session.meteo;
                 const weatherIcon = m.weatherCode !== null && m.weatherCode !== undefined ? this.getWeatherEmoji(m.weatherCode) : '🌤️';
@@ -1250,11 +1250,11 @@ class LogbookViewClass extends BaseView {
         let totalGonflages = 0;
         let totalTimeGonflages = 0;
 
-        let equipStats = {}; // { voileName: { vols: 0, timeVols: 0, gonflages: 0, timeGonflages: 0 } }
-        let sitesStats = {}; // { siteName: count }
-        let volTypes = {};   // { typeName: count }
-        let exoTypes = {};   // { typeName: count }
-        let decoTypes = {};  // { typeName: count }
+        const equipStats = {}; // { voileName: { vols: 0, timeVols: 0, gonflages: 0, timeGonflages: 0 } }
+        const sitesStats = {}; // { siteName: count }
+        const volTypes = {};   // { typeName: count }
+        const exoTypes = {};   // { typeName: count }
+        const decoTypes = {};  // { typeName: count }
 
         let maxAltitudeReached = 0;
         let totalGain = 0;
@@ -1426,7 +1426,7 @@ class LogbookViewClass extends BaseView {
         // Techniques de déco
         if (Object.keys(decoTypes).length > 0) {
             html += `<h3 class="stats-section-title">Techniques de décollage</h3><div class="chart-container">`;
-            let totalDeco = Object.values(decoTypes).reduce((a, b) => a + b, 0);
+            const totalDeco = Object.values(decoTypes).reduce((a, b) => a + b, 0);
             for (const [type, count] of Object.entries(decoTypes)) {
                 const percent = (count / totalDeco) * 100;
                 html += `
@@ -1492,14 +1492,14 @@ class LogbookViewClass extends BaseView {
                 // Logique des alertes combinées
                 if (stats && (stats.alerts.dateAlert === 'red' || stats.alerts.hoursAlert === 'red')) {
                     statusClass = 'status-danger';
-                    let reason = [];
+                    const reason = [];
                     if (stats.alerts.dateAlert === 'red') reason.push(`Date dépassée (${stats.revisionDateStr})`);
                     if (stats.alerts.hoursAlert === 'red') reason.push(`Heures dépassées (${Math.round(stats.totalTime / 60)}h / ${equip.periodiciteHeures}h)`);
 
                     alertHtml = `<div class="equip-alert text-danger" style="color:#ef4444; font-weight:bold; margin-bottom:8px;"><i class="ri-tools-line"></i> ⚠️ ATTENTION : Révision requise - ${reason.join(' ET ')}</div>`;
                 } else if (stats && (stats.alerts.dateAlert === 'orange' || stats.alerts.hoursAlert === 'orange')) {
                     statusClass = 'status-warning';
-                    let reason = [];
+                    const reason = [];
                     if (stats.alerts.dateAlert === 'orange') reason.push(`Dans ${stats.diffDays} jours`);
                     if (stats.alerts.hoursAlert === 'orange') reason.push(`Dans ${Math.round(stats.hoursRemaining)}h`);
 
@@ -1692,7 +1692,7 @@ class LogbookViewClass extends BaseView {
         }
 
         let lat = null, lon = null;
-        let siteName = session.site || session.lieu || "";
+        const siteName = session.site || session.lieu || "";
 
         if (session.lat && session.lon) {
             lat = session.lat;

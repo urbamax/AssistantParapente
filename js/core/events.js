@@ -43,7 +43,7 @@ class EventDelegator {
             if (!target) return;
             
             const action = target.getAttribute('data-action');
-            let args = target.value;
+            const args = target.value;
 
             this.dispatch(action, args, e, target);
         });

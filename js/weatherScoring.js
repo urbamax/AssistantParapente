@@ -19,7 +19,7 @@ const SCORING_WEIGHTS = {
  * @returns {number} La différence angulaire entre 0 et 180 degrés.
  */
 function getAngularDifference(angle1, angle2) {
-    let diff = Math.abs(angle1 - angle2) % 360;
+    const diff = Math.abs(angle1 - angle2) % 360;
     return diff > 180 ? 360 - diff : diff;
 }
 
@@ -143,7 +143,7 @@ function evaluateSpotForecast(site, weather, userPreferences) {
     const vIdeal = (userPreferences.vMin + userPreferences.vMax) / 2;
     const demiPlage = (userPreferences.vMax - userPreferences.vMin) / 2;
 
-    let scoreVentMoyen = 100;
+    let scoreVentMoyen;
     if (demiPlage > 0) {
         const ecartVent = Math.abs(weather.windSpeed - vIdeal);
         scoreVentMoyen = Math.max(0, 100 * (1 - (ecartVent / demiPlage)));
@@ -180,7 +180,7 @@ function evaluateSpotForecast(site, weather, userPreferences) {
     // B. Note d'Orientation (0 à 100)
     // Plus le vent est aligné avec l'orientation de la pente, plus le score est élevé.
     const hasOrientation = site.orientation_ideale_deg !== undefined && site.orientation_ideale_deg !== null && windDirDeg !== null;
-    let angularDiff = 0;
+    let angularDiff;
     let scoreOrientation = 100; // 100 par défaut si pas d'orientation idéale spécifiée
 
     if (hasOrientation) {

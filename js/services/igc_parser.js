@@ -95,8 +95,8 @@ const IGCParser = {
 
         const duration = this.calculateDurationMinutes(trace);
 
-        let startAltitude = trace.length > 0 ? trace[0].alt : 0;
-        let gain = maxAltitude !== -Infinity ? Math.max(0, Math.round(maxAltitude - startAltitude)) : 0;
+        const startAltitude = trace.length > 0 ? trace[0].alt : 0;
+        const gain = maxAltitude !== -Infinity ? Math.max(0, Math.round(maxAltitude - startAltitude)) : 0;
 
         const { distanceKm, maxClimbRate, maxSpeedKmh, avgSpeedKmh } = this._computeFlightStats(trace, duration);
 

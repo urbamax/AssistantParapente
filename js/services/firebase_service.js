@@ -428,7 +428,7 @@ export const FirebaseAuthEngine = {
             const logbookColRef = collection(db, "users", uid, "logbook");
             const logbookSnap = await getDocs(logbookColRef);
 
-            let cloudLogbook = [];
+            const cloudLogbook = [];
             logbookSnap.forEach(docSnap => {
                 const data = docSnap.data();
                 // Guard : on n'accepte que les docs avec un ID string valide
@@ -438,7 +438,7 @@ export const FirebaseAuthEngine = {
             });
 
             // 2. Smart Merge: Compare updatedAt
-            let mergedLogbookMap = new Map();
+            const mergedLogbookMap = new Map();
             localLogbook.forEach(session => mergedLogbookMap.set(session.id, session));
             cloudLogbook.forEach(cloudSession => {
                 const localSession = mergedLogbookMap.get(cloudSession.id);
@@ -453,7 +453,7 @@ export const FirebaseAuthEngine = {
                 }
             });
 
-            let mergedLogbook = Array.from(mergedLogbookMap.values());
+            const mergedLogbook = Array.from(mergedLogbookMap.values());
             mergedLogbook.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
 
             StorageService.set(StorageService.KEYS.LOGBOOK_DATA, mergedLogbook);
@@ -498,7 +498,7 @@ export const FirebaseAuthEngine = {
             const equipColRef = collection(db, "users", uid, "equipment");
             const equipSnap = await getDocs(equipColRef);
 
-            let cloudEquip = [];
+            const cloudEquip = [];
             equipSnap.forEach(docSnap => {
                 const data = docSnap.data();
                 // Guard : on n'accepte que les docs avec un ID string valide
@@ -508,7 +508,7 @@ export const FirebaseAuthEngine = {
             });
 
             // 2. Smart Merge: Compare updatedAt
-            let mergedEquipMap = new Map();
+            const mergedEquipMap = new Map();
             localEquip.forEach(item => mergedEquipMap.set(item.id, item));
             cloudEquip.forEach(cloudItem => {
                 const localItem = mergedEquipMap.get(cloudItem.id);
@@ -523,7 +523,7 @@ export const FirebaseAuthEngine = {
                 }
             });
 
-            let mergedEquip = Array.from(mergedEquipMap.values());
+            const mergedEquip = Array.from(mergedEquipMap.values());
 
             StorageService.set(StorageService.KEYS.EQUIPMENT_DATA, mergedEquip);
 
@@ -1157,7 +1157,7 @@ export const FirebaseAuthEngine = {
         if (!local) return cloud;
 
         // 1. Le Cloud est la source de vérité absolue (recharge à la connexion)
-        let merged = { ...cloud };
+        const merged = { ...cloud };
 
         // 2. On récupère les valeurs locales qui n'existent pas du tout dans le cloud
         // (Utile pour rétrocompatibilité lors de l'ajout d'une nouvelle option locale)

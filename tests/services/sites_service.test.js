@@ -101,7 +101,7 @@ describe('SitesService', () => {
         expect(SitesService.state.filterWindInclude).toContain('NE');
         
         SitesService.toggleFavorite(1);
-        let prefs = JSON.parse(localStorage.getItem('parapente_user_prefs') || '{}');
+        const prefs = JSON.parse(localStorage.getItem('parapente_user_prefs') || '{}');
         expect(prefs.favoriteSites).toContain(1);
     });
 });
