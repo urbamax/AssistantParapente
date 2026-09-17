@@ -13,16 +13,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/urbamax/TheorieParapente.git"
+    "url": "git+https://github.com/urbamax/AssistantParapente.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/urbamax/TheorieParapente/issues"
+    "url": "https://github.com/urbamax/AssistantParapente/issues"
   },
-  "homepage": "https://github.com/urbamax/TheorieParapente#readme",
+  "homepage": "https://github.com/urbamax/AssistantParapente#readme",
   "devDependencies": {
     "@playwright/test": "^1.62.1",
     "@vitest/ui": "^4.1.11",
