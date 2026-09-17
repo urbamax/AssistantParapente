@@ -41,7 +41,7 @@ export function normalizeDegree(deg) {
  * @returns {number} La différence angulaire entre 0 et 180 degrés.
  */
 export function getAngularDifference(angle1, angle2) {
-    let diff = Math.abs(angle1 - angle2) % 360;
+    const diff = Math.abs(angle1 - angle2) % 360;
     return diff > 180 ? 360 - diff : diff;
 }
 

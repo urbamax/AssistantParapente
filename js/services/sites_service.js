@@ -170,7 +170,7 @@ isForecastFlyable(site, weather) {
             const deg = CARD_TO_DEG[card];
             if (deg !== undefined) {
                 // Trouver la différence angulaire
-                let diff = getAngularDifference(weather.windDirDeg, deg);
+                const diff = getAngularDifference(weather.windDirDeg, deg);
 
                 if (diff < minDiff) {
                     minDiff = diff;
@@ -589,8 +589,8 @@ async fetchWeatherForSites() {
         }
 
         activeSites = activeSites.filter(site => {
-            let st = site.site_sous_type || site.type || "Inconnu";
-            let siteTypes = Array.isArray(st) ? st : [st];
+            const st = site.site_sous_type || site.type || "Inconnu";
+            const siteTypes = Array.isArray(st) ? st : [st];
             const isLandingOnly = siteTypes.includes('ATTERRO') && siteTypes.every(t => t === 'ATTERRO');
             if (isLandingOnly && !(this.state.filterTypeInclude || []).includes('ATTERRO')) {
                 return false;
@@ -714,8 +714,8 @@ async fetchWeatherForSites() {
                 return (a.nom || '').localeCompare(b.nom || '');
             } else {
                 // Default CONDITIONS
-                let sA = a.conditionScore || 0;
-                let sB = b.conditionScore || 0;
+                const sA = a.conditionScore || 0;
+                const sB = b.conditionScore || 0;
 
                 if (sB !== sA) return sB - sA;
                 

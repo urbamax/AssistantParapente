@@ -206,7 +206,7 @@ class LogbookService {
 
     _calculateNextRevision(equip) {
         if (!equip.periodicite || equip.periodicite <= 0) return null;
-        let refDateStr = equip.derniereRevision || equip.dateAchat;
+        const refDateStr = equip.derniereRevision || equip.dateAchat;
         if (!refDateStr) return null;
 
         const refDate = new Date(refDateStr);

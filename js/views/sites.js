@@ -155,7 +155,7 @@ class SitesViewClass extends BaseView {
             if (el.id === 'radius-slider') {
                 SitesService.setRadiusLimit(el.value);
                 const label = document.getElementById('radius-val-label');
-                if (label) label.textContent = el.value == 210 ? 'Illimité' : `${el.value} km`;
+                if (label) label.textContent = Number(el.value) === 210 ? 'Illimité' : `${el.value} km`;
                 // Debounce rendering
                 clearTimeout(this._radiusTimeout);
                 this._radiusTimeout = setTimeout(() => {
@@ -407,7 +407,7 @@ bindMapSync() {
                     bounds.getSouthWest(), bounds.getSouthEast()
                 ];
                 let maxDistance = 0;
-                for (let corner of corners) {
+                for (const corner of corners) {
                     const dist = userLatLng.distanceTo(corner) / 1000;
                     if (dist > maxDistance) maxDistance = dist;
                 }
@@ -471,12 +471,12 @@ bindMapSync() {
         if (!this.state.map || !this.state.markersGroup) return;
         this.state.markersGroup.clearLayers();
         
-        let activeSites = SitesService.getFilteredAndSortedSites(typeof SITES_DATA !== 'undefined' ? SITES_DATA : []);
+        const activeSites = SitesService.getFilteredAndSortedSites(typeof SITES_DATA !== 'undefined' ? SITES_DATA : []);
 
         activeSites.forEach(site => {
             let color = '#94a3b8';
             let flyableClass = 'weather-unknown';
-            let weather = (SitesService.state.weatherForecasts[site.id] || [])[SitesService.state.forecastOffset];
+            const weather = (SitesService.state.weatherForecasts[site.id] || [])[SitesService.state.forecastOffset];
             if (weather) {
                 const status = SitesService.isForecastFlyable(site, weather);
                 flyableClass = status.class;
@@ -1460,7 +1460,7 @@ filterByType(type) {
         const listDiv = document.getElementById('sites-list-container');
         if (!listDiv) return;
 
-        let activeSites = SitesService.getFilteredAndSortedSites(typeof SITES_DATA !== 'undefined' ? SITES_DATA : []);
+        const activeSites = SitesService.getFilteredAndSortedSites(typeof SITES_DATA !== 'undefined' ? SITES_DATA : []);
 
         if (this.state.showComparator) {
             this.renderComparator(activeSites);
@@ -1484,8 +1484,8 @@ filterByType(type) {
                 
                 const windTags = orientations.map(w => `<span class="wind-tag" onclick="event.stopPropagation(); SitesView.filterByTag('${w}');" title="Filtrer par vent ${w}">${w}</span>`).join('');
 
-                let st = site.site_sous_type || site.type || "Inconnu";
-                let siteTypes = Array.isArray(st) ? st : [st];
+                const st = site.site_sous_type || site.type || "Inconnu";
+                const siteTypes = Array.isArray(st) ? st : [st];
                 const typeLabel = siteTypes.map(t => {
                     return `<span class="site-coords-badge site-type-badge" onclick="event.stopPropagation(); SitesView.filterByType('${t}');" style="cursor: pointer;" title="Filtrer par type ${t}">${t}</span>`;
                 }).join(' ');
@@ -1505,7 +1505,7 @@ filterByType(type) {
                     </span>
                 `;
 
-                let weatherHtml = '';
+                let weatherHtml;
                 let weather = null;
                 const forecasts = SitesService.state.weatherForecasts[site.id] || [];
                 if (forecasts && forecasts[SitesService.state.forecastOffset]) {
@@ -1899,23 +1899,6 @@ buildSiteCardHtml(site, windTags, typeLabel, distanceHtml, flyableHoursHtml, wea
     if (toggleTextEl) {
         toggleTextEl.textContent = detailsEl.open ? 'Masquer les détails' : "Voir plus d'infos";
     }
-    }
-
-    toggleAdvancedSettings(btn) {
-        const container = document.querySelector('.advanced-filters-container');
-        const icon = document.getElementById('advanced-settings-toggle-icon');
-        if (container) {
-            const isHidden = container.classList.contains('hidden');
-            if (isHidden) {
-                container.classList.remove('hidden');
-                container.style.display = 'flex';
-                if (icon) icon.style.transform = 'rotate(180deg)';
-            } else {
-                container.classList.add('hidden');
-                container.style.display = 'none';
-                if (icon) icon.style.transform = 'rotate(0deg)';
-            }
-        }
     }
 }
 
