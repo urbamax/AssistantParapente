@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { FirebaseAuthEngine } from '../js/services/firebase_service.js';
-import StorageService from '../js/services/storage.js';
+import { FirebaseAuthEngine } from '../../js/services/firebase_service.js';
+import StorageService from '../../js/services/storage.js';
 
 // Mock de FileReader car l'implémentation native peut varier avec l'asynchronisme dans les tests
 class MockFileReader {

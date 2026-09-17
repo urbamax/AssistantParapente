@@ -75,8 +75,7 @@ AssistantParapente/
 │   │   ├── qcm_ffvl_explanations.csv # Question explanations data
 │   │   └── question_course_mapping.json # Mapping between QCM questions and courses
 │   ├── weatherScoring.js       # Flyability scoring engine (AROME/GFS, gust & direction)
-│   ├── gdpr_engine.js          # GDPR consent logic
-│   └── engine_v4_6.js          # Legacy compatibility polyfills
+│   └── gdpr_engine.js          # GDPR consent logic
 └── courses/                    # Course PDF Documents categorized by level
     ├── BREVET INITIAL - VERT/
     ├── BREVET DE PILOTE - BLEU/
