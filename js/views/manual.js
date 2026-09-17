@@ -22,9 +22,8 @@ class LibraryViewClass extends BaseView {
             search: '',
             sort: 'CATEGORY', // TITLE, LEVEL, CATEGORY
             mainEngine: null,
-            courses: {}
+            courses: {},
         };
-
     }
     init(mainEngine) {
         this.state.mainEngine = mainEngine;
@@ -32,7 +31,7 @@ class LibraryViewClass extends BaseView {
         if (typeof COURSES_DATA !== 'undefined') {
             this.state.courses = COURSES_DATA;
         }
-        console.log("LibraryEngine Initialized");
+        console.log('LibraryEngine Initialized');
     }
 
     show() {
@@ -47,7 +46,7 @@ class LibraryViewClass extends BaseView {
 
     setSort(sortType) {
         this.state.sort = sortType;
-        document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.sort-btn').forEach((btn) => btn.classList.remove('active'));
         const activeBtn = document.getElementById(`sort-${sortType}`);
         if (activeBtn) activeBtn.classList.add('active');
         this.render();
@@ -68,23 +67,22 @@ class LibraryViewClass extends BaseView {
 
         // 1. Search Filter
         if (search) {
-            results = results.filter(c =>
-                c.title.toLowerCase().includes(search) ||
-                c.category.toLowerCase().includes(search)
+            results = results.filter(
+                (c) => c.title.toLowerCase().includes(search) || c.category.toLowerCase().includes(search),
             );
         }
 
         // 2. Level Filter (Global)
         if (globalLevel !== 'ALL') {
-            results = results.filter(c => {
+            results = results.filter((c) => {
                 const cLevels = Array.isArray(c.level) ? c.level : [c.level || 'GENERAL'];
-                
+
                 // Allow GENERAL courses for everyone
                 if (cLevels.includes('GENERAL')) return true;
-                
+
                 // Exact match (Strict segregation)
                 if (cLevels.includes(globalLevel)) return true;
-                
+
                 return false;
             });
         }
@@ -112,22 +110,21 @@ class LibraryViewClass extends BaseView {
     renderSimpleGrid(container, courses) {
         const listContainer = document.createElement('div');
         listContainer.className = 'library-list';
-        courses.forEach(c => listContainer.appendChild(this.createCourseListItem(c)));
+        courses.forEach((c) => listContainer.appendChild(this.createCourseListItem(c)));
         container.appendChild(listContainer);
     }
 
     renderGroupedByLevel(container, courses) {
-        const levels = { 'BI': [], 'BP': [], 'BPC': [], 'TREUIL': [], 'GENERAL': [] };
-        courses.forEach(c => {
-
+        const levels = { BI: [], BP: [], BPC: [], TREUIL: [], GENERAL: [] };
+        courses.forEach((c) => {
             const l = Array.isArray(c.level) ? c.level : [c.level || 'GENERAL'];
-            l.forEach(levelKey => {
+            l.forEach((levelKey) => {
                 if (levels[levelKey]) levels[levelKey].push(c);
                 else levels['GENERAL'].push(c); // Fallback
             });
         });
 
-        ['BI', 'BP', 'BPC', 'TREUIL', 'GENERAL'].forEach(lKey => {
+        ['BI', 'BP', 'BPC', 'TREUIL', 'GENERAL'].forEach((lKey) => {
             if (levels[lKey].length === 0) return;
 
             const section = document.createElement('div');
@@ -138,7 +135,7 @@ class LibraryViewClass extends BaseView {
             const listContainer = document.createElement('div');
             listContainer.className = 'library-list';
 
-            levels[lKey].forEach(c => listContainer.appendChild(this.createCourseCard(c)));
+            levels[lKey].forEach((c) => listContainer.appendChild(this.createCourseCard(c)));
             section.appendChild(listContainer);
             container.appendChild(section);
         });
@@ -148,8 +145,8 @@ class LibraryViewClass extends BaseView {
         // Group by the 'category' property defined in courses_data.js
         const categories = {};
 
-        courses.forEach(c => {
-            const cat = c.category || "Autre";
+        courses.forEach((c) => {
+            const cat = c.category || 'Autre';
             if (!categories[cat]) categories[cat] = [];
             categories[cat].push(c);
         });
@@ -164,7 +161,7 @@ class LibraryViewClass extends BaseView {
             return a.localeCompare(b);
         });
 
-        sortedCategories.forEach(cat => {
+        sortedCategories.forEach((cat) => {
             if (categories[cat].length === 0) return;
 
             const section = document.createElement('div');
@@ -175,21 +172,19 @@ class LibraryViewClass extends BaseView {
             listContainer.className = 'library-list';
 
             // Sort courses within each category by title
-            categories[cat].sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+            categories[cat].sort((a, b) => (a.title || '').localeCompare(b.title || ''));
 
-            categories[cat].forEach(c => listContainer.appendChild(this.createCourseListItem(c)));
+            categories[cat].forEach((c) => listContainer.appendChild(this.createCourseListItem(c)));
 
             section.appendChild(listContainer);
             container.appendChild(section);
         });
     }
 
-
     assignTheme(c) {
         // Logic removed: We now use the 'category' property directly from courses_data.js
-        return c.category || "Autre";
+        return c.category || 'Autre';
     }
-
 
     createCourseListItem(c) {
         const btn = document.createElement('div');
@@ -198,7 +193,7 @@ class LibraryViewClass extends BaseView {
 
         let levelBadges = '';
         const levels = Array.isArray(c.level) ? c.level : [c.level || 'GENERAL'];
-        levels.forEach(l => {
+        levels.forEach((l) => {
             levelBadges += `<span class="badge badge-${l}">${l}</span> `;
         });
 
@@ -225,9 +220,9 @@ class LibraryViewClass extends BaseView {
 
     openCourse(courseId) {
         const course = this.state.courses[courseId];
-        if (!course) return console.error("Course not found:", courseId);
+        if (!course) return console.error('Course not found:', courseId);
 
-        console.log("Opening course PDF:", course.title);
+        console.log('Opening course PDF:', course.title);
 
         // PREFER ORIGINAL PDF IF AVAILABLE (skips modernized HTML)
         let targetUrl = course.original_pdf || course.pdf;
@@ -240,22 +235,28 @@ class LibraryViewClass extends BaseView {
     }
 
     formatTitle(title) {
-        return escapeHTML(title || "");
+        return escapeHTML(title || '');
     }
 
     getLevelName(l) {
-        const names = { 'BI': 'BREVET INITIAL', 'BP': 'BREVET DE PILOTE', 'BPC': 'BREVET DE PILOTE CONFIRMÉ', 'TREUIL': 'TREUIL', 'GENERAL': 'GÉNÉRAL' };
+        const names = {
+            BI: 'BREVET INITIAL',
+            BP: 'BREVET DE PILOTE',
+            BPC: 'BREVET DE PILOTE CONFIRMÉ',
+            TREUIL: 'TREUIL',
+            GENERAL: 'GÉNÉRAL',
+        };
         return names[l] || l;
     }
 
     async mount(params) {
         await super.mount(params);
-        console.log("Mounting LibraryView with params", params);
+        console.log('Mounting LibraryView with params', params);
         try {
             if (this.init) {
                 this.init(window.Engine); // Pass a dummy or the global engine if needed
             }
-            
+
             // Auto-update library when level changes
             this._unsubscribeLevel = GlobalState.subscribe('level', () => {
                 if (this.render) {
@@ -265,7 +266,7 @@ class LibraryViewClass extends BaseView {
                     }
                 }
             });
-            
+
             if (this.show) {
                 this.show();
             }
@@ -274,14 +275,14 @@ class LibraryViewClass extends BaseView {
             const searchInput = document.getElementById('library-search');
             if (searchInput) searchInput.addEventListener('input', this._handleSearchInput);
         } catch (e) {
-            console.error("Erreur de montage de LibraryView", e);
-            super.renderErrorState(e.message || "Erreur de chargement de la bibliothèque", "library-screen");
+            console.error('Erreur de montage de LibraryView', e);
+            super.renderErrorState(e.message || 'Erreur de chargement de la bibliothèque', 'library-screen');
         }
     }
 
     async unmount() {
         await super.unmount();
-        console.log("Unmounting LibraryView");
+        console.log('Unmounting LibraryView');
         if (this._unsubscribeLevel) {
             this._unsubscribeLevel();
             this._unsubscribeLevel = null;

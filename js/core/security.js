@@ -18,7 +18,7 @@ export const Security = {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
-    }
+    },
 };
 
 export const escapeHTML = Security.escapeHTML;

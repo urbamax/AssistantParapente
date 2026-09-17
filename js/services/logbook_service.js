@@ -28,12 +28,14 @@ class LogbookService {
 
     syncCloud() {
         if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.currentUser) {
-            window.FirebaseAuthEngine.syncLogbookData(this.flights)
-                .catch(error => console.warn("Échec de la synchro Cloud en arrière-plan (vols) :", error));
-            
+            window.FirebaseAuthEngine.syncLogbookData(this.flights).catch((error) =>
+                console.warn('Échec de la synchro Cloud en arrière-plan (vols) :', error),
+            );
+
             if (typeof window.FirebaseAuthEngine.syncEquipmentData === 'function') {
-                window.FirebaseAuthEngine.syncEquipmentData(this.equipment)
-                    .catch(error => console.warn("Échec de la synchro Cloud en arrière-plan (équipement) :", error));
+                window.FirebaseAuthEngine.syncEquipmentData(this.equipment).catch((error) =>
+                    console.warn('Échec de la synchro Cloud en arrière-plan (équipement) :', error),
+                );
             }
 
             // Déclenche une synchro debounced pour regrouper les micro-modifications
@@ -56,7 +58,7 @@ class LogbookService {
     }
 
     updateFlight(id, updatedData) {
-        const index = this.flights.findIndex(f => f.id === id);
+        const index = this.flights.findIndex((f) => f.id === id);
         if (index !== -1) {
             this.flights[index] = { ...this.flights[index], ...updatedData, updatedAt: Date.now(), syncPending: true };
             this.flights.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
@@ -65,17 +67,23 @@ class LogbookService {
     }
 
     deleteFlight(id) {
-        this.flights = this.flights.filter(f => f.id !== id);
+        this.flights = this.flights.filter((f) => f.id !== id);
         this.saveFlights();
-        
+
         let deleted = [];
-        try { deleted = JSON.parse(localStorage.getItem('deleted_flights') || '[]'); } catch(e) {}
+        try {
+            deleted = JSON.parse(localStorage.getItem('deleted_flights') || '[]');
+        } catch (e) {}
         if (!deleted.includes(id)) {
             deleted.push(id);
             localStorage.setItem('deleted_flights', JSON.stringify(deleted));
         }
 
-        if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.currentUser && typeof window.FirebaseAuthEngine.deleteLogbookEntry === 'function') {
+        if (
+            window.FirebaseAuthEngine &&
+            window.FirebaseAuthEngine.currentUser &&
+            typeof window.FirebaseAuthEngine.deleteLogbookEntry === 'function'
+        ) {
             window.FirebaseAuthEngine.deleteLogbookEntry(id).catch(console.error);
         }
     }
@@ -83,9 +91,9 @@ class LogbookService {
     getFlights() {
         return this.flights;
     }
-    
+
     getFlightById(id) {
-        return this.flights.find(f => f.id === id);
+        return this.flights.find((f) => f.id === id);
     }
 
     // --- EQUIPMENT CRUD ---
@@ -100,26 +108,37 @@ class LogbookService {
     }
 
     updateEquipment(id, updatedData) {
-        const index = this.equipment.findIndex(e => e.id === id);
+        const index = this.equipment.findIndex((e) => e.id === id);
         if (index !== -1) {
             // Conserver le statut précédent si non fourni
             const statut = updatedData.statut || this.equipment[index].statut;
-            this.equipment[index] = { ...this.equipment[index], ...updatedData, id, statut, updatedAt: Date.now(), syncPending: true };
+            this.equipment[index] = {
+                ...this.equipment[index],
+                ...updatedData,
+                id,
+                statut,
+                updatedAt: Date.now(),
+                syncPending: true,
+            };
             this.saveEquipment();
         }
     }
 
     deleteEquipment(id) {
-        this.equipment = this.equipment.filter(e => e.id !== id);
+        this.equipment = this.equipment.filter((e) => e.id !== id);
         this.saveEquipment();
-        
-        if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.currentUser && typeof window.FirebaseAuthEngine.deleteEquipmentEntry === 'function') {
+
+        if (
+            window.FirebaseAuthEngine &&
+            window.FirebaseAuthEngine.currentUser &&
+            typeof window.FirebaseAuthEngine.deleteEquipmentEntry === 'function'
+        ) {
             window.FirebaseAuthEngine.deleteEquipmentEntry(id).catch(console.error);
         }
     }
 
     toggleEquipmentStatus(id) {
-        const index = this.equipment.findIndex(e => e.id === id);
+        const index = this.equipment.findIndex((e) => e.id === id);
         if (index !== -1) {
             this.equipment[index].statut = this.equipment[index].statut === 'actif' ? 'inactif' : 'actif';
             this.equipment[index].updatedAt = Date.now();
@@ -133,32 +152,32 @@ class LogbookService {
     }
 
     getEquipmentById(id) {
-        return this.equipment.find(e => e.id === id);
+        return this.equipment.find((e) => e.id === id);
     }
 
     // --- BUSINESS LOGIC ---
     computeEquipmentWear() {
         const stats = {};
-        
+
         // Init stats
-        this.equipment.forEach(e => {
-            const name = (e.nom || "").toLowerCase();
-            stats[name] = { 
+        this.equipment.forEach((e) => {
+            const name = (e.nom || '').toLowerCase();
+            stats[name] = {
                 equip: e,
-                totalSessions: 0, 
+                totalSessions: 0,
                 totalTime: 0,
                 nextRevisionDate: this._calculateNextRevision(e),
                 alerts: {
                     dateAlert: false, // Orange/Red if date is close/passed
-                    hoursAlert: false // Orange/Red if flight hours are close/passed to periodiciteHeures
-                }
+                    hoursAlert: false, // Orange/Red if flight hours are close/passed to periodiciteHeures
+                },
             };
         });
 
         // Compute from flights
-        this.flights.forEach(f => {
-            const voile = (f.voile || "").toLowerCase();
-            const sellette = (f.sellette || "").toLowerCase();
+        this.flights.forEach((f) => {
+            const voile = (f.voile || '').toLowerCase();
+            const sellette = (f.sellette || '').toLowerCase();
             const duree = parseInt(f.duree || 0, 10);
 
             if (stats[voile]) {
@@ -173,19 +192,19 @@ class LogbookService {
 
         // Calculate Alerts
         const today = new Date(); // Date de référence (peut être forcée si besoin)
-        Object.keys(stats).forEach(key => {
+        Object.keys(stats).forEach((key) => {
             const s = stats[key];
             const e = s.equip;
 
             s.diffDays = Infinity;
             s.revisionDateStr = '';
-            
+
             // Date alerts
             if (s.nextRevisionDate) {
                 s.revisionDateStr = s.nextRevisionDate.toISOString().split('T')[0];
                 const diffTime = s.nextRevisionDate.getTime() - today.getTime();
                 s.diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
+
                 if (s.diffDays <= 0) s.alerts.dateAlert = 'red';
                 else if (s.diffDays <= 30) s.alerts.dateAlert = 'orange';
             }
@@ -219,9 +238,9 @@ class LogbookService {
 
     parseIGC(rawText) {
         if (typeof window.IGCParser === 'undefined') {
-            return { success: false, data: null, error: "IGCParser library is not loaded." };
+            return { success: false, data: null, error: 'IGCParser library is not loaded.' };
         }
-        
+
         try {
             const parsed = window.IGCParser.parse(rawText);
             if (parsed && parsed.points && parsed.points.length > 0) {
@@ -231,13 +250,13 @@ class LogbookService {
                         duration: parsed.duration || 0,
                         dateStr: parsed.dateStr || null,
                         maxAltitude: parsed.maxAltitude > -1000 ? parsed.maxAltitude : null,
-                        gain: (typeof parsed.gain === 'number' && !isNaN(parsed.gain)) ? parsed.gain : null,
-                        points: parsed.points
+                        gain: typeof parsed.gain === 'number' && !isNaN(parsed.gain) ? parsed.gain : null,
+                        points: parsed.points,
                     },
-                    error: null
+                    error: null,
                 };
             }
-            return { success: false, data: null, error: "No valid GPS data found in file." };
+            return { success: false, data: null, error: 'No valid GPS data found in file.' };
         } catch (e) {
             return { success: false, data: null, error: e.message };
         }
@@ -247,10 +266,13 @@ class LogbookService {
         try {
             const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
             const data = await res.json();
-            const city = (data.address && (data.address.village || data.address.town || data.address.city || data.address.municipality)) || null;
+            const city =
+                (data.address &&
+                    (data.address.village || data.address.town || data.address.city || data.address.municipality)) ||
+                null;
             return { success: true, data: { city }, error: null };
         } catch (e) {
-            return { success: false, data: null, error: e.message || "Erreur de géocodage" };
+            return { success: false, data: null, error: e.message || 'Erreur de géocodage' };
         }
     }
 
@@ -289,7 +311,7 @@ class LogbookService {
             const weatherCode = result.hourly.weather_code[hour];
 
             if (temp === undefined || temp === null || windSpeed === undefined || windSpeed === null) {
-                return { success: false, data: null, error: "Données hors couverture (trop ancien)" };
+                return { success: false, data: null, error: 'Données hors couverture (trop ancien)' };
             }
 
             return {
@@ -297,15 +319,15 @@ class LogbookService {
                 data: {
                     temperature: Math.round(temp),
                     ventVitesse: Math.round(windSpeed),
-                    ventRafales: (windGusts !== undefined && windGusts !== null) ? Math.round(windGusts) : null,
-                    ventDirection: (windDir !== undefined && windDir !== null) ? Math.round(windDir) : null,
-                    weatherCode: (weatherCode !== undefined && weatherCode !== null) ? weatherCode : null,
-                    source: "auto"
+                    ventRafales: windGusts !== undefined && windGusts !== null ? Math.round(windGusts) : null,
+                    ventDirection: windDir !== undefined && windDir !== null ? Math.round(windDir) : null,
+                    weatherCode: weatherCode !== undefined && weatherCode !== null ? weatherCode : null,
+                    source: 'auto',
                 },
-                error: null
+                error: null,
             };
         } catch (e) {
-            return { success: false, data: null, error: e.message || "Erreur réseau" };
+            return { success: false, data: null, error: e.message || 'Erreur réseau' };
         }
     }
 }

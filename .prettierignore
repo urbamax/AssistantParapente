@@ -1,0 +1,10 @@
+node_modules/
+.venv/
+courses/
+css/
+img/
+playwright-report/
+test-results/
+js/data/*.json
+js/data/*.csv
+package-lock.json

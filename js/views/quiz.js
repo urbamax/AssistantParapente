@@ -15,30 +15,35 @@ import BaseView from '../core/base_view.js';
 class QuizViewClass extends BaseView {
     constructor() {
         super();
-        
+
         this.state = {
             masteryFilter: 'ALL',
             themeFilter: null,
             themeSort: 'alpha',
             themeSortDir: 'asc',
             questionSort: 'rate',
-            questionSortDir: 'asc'
+            questionSortDir: 'asc',
         };
 
         Object.assign(this, {
             handleClick: this.handleClick.bind(this),
-            handleChange: this.handleChange.bind(this)
+            handleChange: this.handleChange.bind(this),
         });
-        
+
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 const qcmScreen = document.getElementById('qcm-screen');
                 const isQcmScreenActive = qcmScreen && qcmScreen.classList.contains('active');
-                
-                if (isQcmScreenActive && typeof QuizService !== 'undefined' && QuizService.state && QuizService.state.qcmConfig.mode === 'EXAM') {
+
+                if (
+                    isQcmScreenActive &&
+                    typeof QuizService !== 'undefined' &&
+                    QuizService.state &&
+                    QuizService.state.qcmConfig.mode === 'EXAM'
+                ) {
                     const totalQuestions = QuizService.state.qcmSessionData.length;
                     const answeredQuestions = QuizService.state.examResults.length;
-                    
+
                     if (answeredQuestions < totalQuestions && !QuizService.state.invalidated) {
                         this.invalidateExam();
                     }
@@ -48,7 +53,7 @@ class QuizViewClass extends BaseView {
     }
 
     invalidateExam() {
-        alert("Examen invalidé : Vous avez quitté la page. Le mode examen requiert toute votre attention.");
+        alert('Examen invalidé : Vous avez quitté la page. Le mode examen requiert toute votre attention.');
         QuizService.state.invalidated = true;
         this.renderExamResults();
     }
@@ -56,11 +61,12 @@ class QuizViewClass extends BaseView {
     // Index QCM_OFFICIAL.questions par code/id une seule fois : évite un .find() linéaire
     // (O(n) par question affichée) répété sur ~850 questions à chaque rendu des stats.
     _getQuestionMap() {
-        const list = (typeof QCM_OFFICIAL !== 'undefined' && window.QCM_OFFICIAL.questions) ? window.QCM_OFFICIAL.questions : null;
+        const list =
+            typeof QCM_OFFICIAL !== 'undefined' && window.QCM_OFFICIAL.questions ? window.QCM_OFFICIAL.questions : null;
         if (!list) return null;
         if (this._questionMapSource !== list) {
             this._questionMap = new Map();
-            list.forEach(q => {
+            list.forEach((q) => {
                 this._questionMap.set(q.code, q);
                 if (q.id !== undefined && q.id !== q.code) this._questionMap.set(q.id, q);
             });
@@ -71,31 +77,33 @@ class QuizViewClass extends BaseView {
 
     getQuestionByCode(code) {
         const map = this._getQuestionMap();
-        return map ? (map.get(code) || null) : null;
+        return map ? map.get(code) || null : null;
     }
 
     async mount(container) {
         await super.mount(container);
-        console.log("QuizView: mount started");
-        
+        console.log('QuizView: mount started');
+
         try {
-            console.log("QuizView: Initializing QuizService in background...");
+            console.log('QuizView: Initializing QuizService in background...');
             // Non-blocking initialization
-            QuizService.init().then(() => {
-                console.log("QuizView: QuizService initialized successfully.");
-                if (this.renderThemeOptions) this.renderThemeOptions();
-                
-                // Re-render the correct screen based on routing mode if needed
-                const mode = GlobalState.get('mode');
-                if (mode === 'STATS') {
-                    this.renderStats();
-                } else if (mode === 'QCM_BANK') {
-                    this.showBankScreen();
-                }
-            }).catch(e => {
-                console.error("QuizView: Error initializing QuizService", e);
-            });
-            
+            QuizService.init()
+                .then(() => {
+                    console.log('QuizView: QuizService initialized successfully.');
+                    if (this.renderThemeOptions) this.renderThemeOptions();
+
+                    // Re-render the correct screen based on routing mode if needed
+                    const mode = GlobalState.get('mode');
+                    if (mode === 'STATS') {
+                        this.renderStats();
+                    } else if (mode === 'QCM_BANK') {
+                        this.showBankScreen();
+                    }
+                })
+                .catch((e) => {
+                    console.error('QuizView: Error initializing QuizService', e);
+                });
+
             // Show skeleton/UI instantly
             const mode = GlobalState.get('mode');
             if (mode === 'STATS') {
@@ -113,10 +121,10 @@ class QuizViewClass extends BaseView {
             this._handleChange = this.handleChange.bind(this);
             const themeSelect = document.getElementById('qcm-theme-select');
             if (themeSelect) themeSelect.addEventListener('change', this._handleChange);
-            
+
             const bankFilter = document.getElementById('bank-theme-filter');
             if (bankFilter) bankFilter.addEventListener('change', this._handleChange);
-            
+
             const bankSearch = document.getElementById('bank-search');
             if (bankSearch) bankSearch.addEventListener('input', this._handleChange);
 
@@ -126,40 +134,41 @@ class QuizViewClass extends BaseView {
                 if (bankScreen && bankScreen.classList.contains('active')) {
                     this.showBankScreen();
                 }
-                
+
                 const statsScreen = document.getElementById('stats-screen');
                 if (statsScreen && statsScreen.classList.contains('active')) {
                     this.renderStats();
                 }
             });
-
         } catch (e) {
-            console.error("QuizView: Error in mount", e);
-            this.renderErrorState("Impossible de charger la base de données théorique : " + (e.message || "Erreur inconnue"));
+            console.error('QuizView: Error in mount', e);
+            this.renderErrorState(
+                'Impossible de charger la base de données théorique : ' + (e.message || 'Erreur inconnue'),
+            );
         }
     }
 
     unmount() {
         super.unmount();
         if (this._handleClick) document.body.removeEventListener('click', this._handleClick);
-        
+
         if (this._unsubscribeLevel) {
             this._unsubscribeLevel();
             this._unsubscribeLevel = null;
         }
-        
+
         const themeSelect = document.getElementById('qcm-theme-select');
         if (themeSelect && this._handleChange) themeSelect.removeEventListener('change', this._handleChange);
-        
+
         const bankFilter = document.getElementById('bank-theme-filter');
         if (bankFilter && this._handleChange) bankFilter.removeEventListener('change', this._handleChange);
-        
+
         const bankSearch = document.getElementById('bank-search');
         if (bankSearch && this._handleChange) bankSearch.removeEventListener('input', this._handleChange);
-        
+
         // Cache les écrans
         const screens = ['qcm-setup-screen', 'qcm-screen', 'stats-screen', 'qcm-bank-screen'];
-        screens.forEach(id => {
+        screens.forEach((id) => {
             const el = document.getElementById(id);
             if (el) el.classList.remove('active');
         });
@@ -174,7 +183,7 @@ class QuizViewClass extends BaseView {
         const action = target.getAttribute('data-action');
         const rawValue = target.getAttribute('data-args') || target.getAttribute('data-value');
         let args = [];
-        
+
         if (rawValue) {
             try {
                 if (rawValue.startsWith('[')) {
@@ -189,20 +198,40 @@ class QuizViewClass extends BaseView {
                 args = [value];
             }
         }
-        
+
         const value = args[0] || null;
 
         switch (action) {
-            case 'QuizsetThemeSort': this.setThemeSort(args[0]); break;
-            case 'QuizsetMasteryFilter': this.setMasteryFilter(args[0]); break;
-            case 'QuizsetThemeFilter': this.setThemeFilter(args[0]); break;
-            case 'QuiztoggleQuestionDetails': this.toggleQuestionDetails(args[0]); break;
-            case 'QuizsortQuestions': this.sortQuestions(args[0]); break;
-            case 'QuizresetStats': this.resetStats(); break;
-            case 'QuizclearAllFilters': this.clearAllFilters(); break;
-            case 'QuiztoggleExamDetails': this.toggleExamDetails(args[0]); break;
-            case 'QuizexportData': if(this.exportData) this.exportData(); break;
-            case 'QuizimportData': if(this.importData) this.importData(); break;
+            case 'QuizsetThemeSort':
+                this.setThemeSort(args[0]);
+                break;
+            case 'QuizsetMasteryFilter':
+                this.setMasteryFilter(args[0]);
+                break;
+            case 'QuizsetThemeFilter':
+                this.setThemeFilter(args[0]);
+                break;
+            case 'QuiztoggleQuestionDetails':
+                this.toggleQuestionDetails(args[0]);
+                break;
+            case 'QuizsortQuestions':
+                this.sortQuestions(args[0]);
+                break;
+            case 'QuizresetStats':
+                this.resetStats();
+                break;
+            case 'QuizclearAllFilters':
+                this.clearAllFilters();
+                break;
+            case 'QuiztoggleExamDetails':
+                this.toggleExamDetails(args[0]);
+                break;
+            case 'QuizexportData':
+                if (this.exportData) this.exportData();
+                break;
+            case 'QuizimportData':
+                if (this.importData) this.importData();
+                break;
             case 'setQcmMode':
             case 'set-mode':
                 QuizService.setMode(value);
@@ -238,11 +267,11 @@ class QuizViewClass extends BaseView {
                 break;
         }
     }
-    
+
     handleChange(e) {
-        if(e.target.id === 'qcm-theme-select') {
+        if (e.target.id === 'qcm-theme-select') {
             QuizService.setTheme(e.target.value);
-        } else if(e.target.id === 'bank-theme-filter' || e.target.id === 'bank-search') {
+        } else if (e.target.id === 'bank-theme-filter' || e.target.id === 'bank-search') {
             const select = document.getElementById('bank-theme-filter');
             this.renderBankContent(select ? select.value : 'ALL');
         }
@@ -250,7 +279,7 @@ class QuizViewClass extends BaseView {
 
     // --- UI UPDATES ---
     showBankScreen() {
-        document.querySelectorAll('.mode-screen').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
         const bankScreen = document.getElementById('qcm-bank-screen');
         if (bankScreen) {
             bankScreen.classList.add('active');
@@ -266,53 +295,59 @@ class QuizViewClass extends BaseView {
         const searchInput = document.getElementById('bank-search');
         const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-        let sourceData = (window.QCM_OFFICIAL && window.QCM_OFFICIAL.questions) ? window.QCM_OFFICIAL.questions : [];
-        
+        let sourceData = window.QCM_OFFICIAL && window.QCM_OFFICIAL.questions ? window.QCM_OFFICIAL.questions : [];
+
         // Filter by selected level
         const level = GlobalState.get('level') || 'BI';
         const hasLevel = (code, letter) => code.replace(/^[a-zA-Z]+\d+/, '').includes(letter);
-        
+
         if (level === 'BI') {
-            sourceData = sourceData.filter(q => hasLevel(q.code, 'V'));
+            sourceData = sourceData.filter((q) => hasLevel(q.code, 'V'));
         } else if (level === 'BP') {
-            sourceData = sourceData.filter(q => hasLevel(q.code, 'B'));
+            sourceData = sourceData.filter((q) => hasLevel(q.code, 'B'));
         } else if (level === 'BPC') {
-            sourceData = sourceData.filter(q => hasLevel(q.code, 'M'));
+            sourceData = sourceData.filter((q) => hasLevel(q.code, 'M'));
         } else if (level === 'TREUIL') {
-            sourceData = sourceData.filter(q => hasLevel(q.code, 'T'));
+            sourceData = sourceData.filter((q) => hasLevel(q.code, 'T'));
         }
-        
+
         if (themeFilter && themeFilter !== 'ALL') {
-            sourceData = sourceData.filter(q => q.theme === themeFilter);
+            sourceData = sourceData.filter((q) => q.theme === themeFilter);
         }
-        
+
         if (searchTerm) {
-            sourceData = sourceData.filter(q => q.question.toLowerCase().includes(searchTerm) || q.code.toLowerCase().includes(searchTerm) || (q.explication && q.explication.toLowerCase().includes(searchTerm)));
+            sourceData = sourceData.filter(
+                (q) =>
+                    q.question.toLowerCase().includes(searchTerm) ||
+                    q.code.toLowerCase().includes(searchTerm) ||
+                    (q.explication && q.explication.toLowerCase().includes(searchTerm)),
+            );
         }
-        
+
         // Exclude specific prefixes that were skipped in actual quiz
-        const excludedPrefixes = ['H', 'R', 'X']; 
-        sourceData = sourceData.filter(q => !excludedPrefixes.includes(q.code.charAt(0)));
+        const excludedPrefixes = ['H', 'R', 'X'];
+        sourceData = sourceData.filter((q) => !excludedPrefixes.includes(q.code.charAt(0)));
 
         if (sourceData.length === 0) {
-            container.innerHTML = '<p style="text-align:center; opacity:0.6; padding: 2rem;">Aucune question trouvée.</p>';
+            container.innerHTML =
+                '<p style="text-align:center; opacity:0.6; padding: 2rem;">Aucune question trouvée.</p>';
             return;
         }
 
         let html = '';
-        sourceData.forEach(q => {
+        sourceData.forEach((q) => {
             const letters = q.code.replace(/^[a-zA-Z]+\d+/, '');
             let colorStyle = '';
-            
+
             const colorMap = {
-                'V': 'rgba(34, 197, 94, 0.2)', // Vert
-                'B': 'rgba(59, 130, 246, 0.2)', // Bleu
-                'M': 'rgba(139, 69, 19, 0.2)', // Marron
-                'T': 'rgba(168, 85, 247, 0.2)'  // Violet
+                V: 'rgba(34, 197, 94, 0.2)', // Vert
+                B: 'rgba(59, 130, 246, 0.2)', // Bleu
+                M: 'rgba(139, 69, 19, 0.2)', // Marron
+                T: 'rgba(168, 85, 247, 0.2)', // Violet
             };
-            const textColors = { 'V': '#4ade80', 'B': '#60a5fa', 'M': '#c0773d', 'T': '#c084fc' };
-            
-            const validLetters = letters.split('').filter(l => colorMap[l]);
+            const textColors = { V: '#4ade80', B: '#60a5fa', M: '#c0773d', T: '#c084fc' };
+
+            const validLetters = letters.split('').filter((l) => colorMap[l]);
             if (validLetters.length === 1) {
                 colorStyle = `background: ${colorMap[validLetters[0]]}; color: ${textColors[validLetters[0]]}; border: 1px solid ${colorMap[validLetters[0]].replace('0.2', '0.4')};`;
             } else if (validLetters.length > 1) {
@@ -333,41 +368,49 @@ class QuizViewClass extends BaseView {
                     </div>
                     <div class="bank-item-question">${escapeHTML(q.question)}</div>
                     <div class="bank-item-choices">
-                        ${q.choices.map(c => `
-                            <div class="bank-choice ${c.pts > 0 ? 'correct' : (c.pts < 0 ? 'incorrect' : '')}">
-                                ${escapeHTML(c.text)} ${c.pts > 0 ? '(+'+c.pts+')' : (c.pts < 0 ? '('+c.pts+')' : '')}
+                        ${q.choices
+                            .map(
+                                (c) => `
+                            <div class="bank-choice ${c.pts > 0 ? 'correct' : c.pts < 0 ? 'incorrect' : ''}">
+                                ${escapeHTML(c.text)} ${c.pts > 0 ? '(+' + c.pts + ')' : c.pts < 0 ? '(' + c.pts + ')' : ''}
                             </div>
-                        `).join('')}
+                        `,
+                            )
+                            .join('')}
                     </div>
                     ${q.explication ? `<div class="bank-item-explication">${escapeHTML(q.explication)}</div>` : ''}
                 </div>
             `;
         });
-        
+
         container.innerHTML = html;
     }
 
     updateModeUI(mode, targetBtn) {
-        document.querySelectorAll('.mode-toggle-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.mode-toggle-btn').forEach((btn) => btn.classList.remove('active'));
         if (targetBtn) {
             targetBtn.classList.add('active');
         } else {
             // fallback
-            const btn = document.querySelector(`[data-args="'${mode}'"]`) || document.querySelector(`[data-value="${mode}"]`);
+            const btn =
+                document.querySelector(`[data-args="'${mode}'"]`) || document.querySelector(`[data-value="${mode}"]`);
             if (btn) btn.classList.add('active');
         }
-        
+
         const descEl = document.getElementById('mode-description');
         if (descEl) {
             if (mode === 'EXAM') {
-                descEl.innerText = "Mode Examen : Simulation dans les conditions réelles d'examen (volume et thèmes imposés).";
+                descEl.innerText =
+                    "Mode Examen : Simulation dans les conditions réelles d'examen (volume et thèmes imposés).";
             } else if (mode === 'REVISION') {
-                descEl.innerText = "Mode Révision : Retravaillez vos points faibles et découvrez les questions jamais tentées.";
+                descEl.innerText =
+                    'Mode Révision : Retravaillez vos points faibles et découvrez les questions jamais tentées.';
             } else {
-                descEl.innerText = "Mode Entraînement : Choisissez votre thème et volume. Correction immédiate après chaque question.";
+                descEl.innerText =
+                    'Mode Entraînement : Choisissez votre thème et volume. Correction immédiate après chaque question.';
             }
         }
-        
+
         const trainingOptions = document.getElementById('training-options');
         if (trainingOptions) {
             if (mode === 'EXAM') {
@@ -381,21 +424,23 @@ class QuizViewClass extends BaseView {
     }
 
     updateCountUI(countVal, targetBtn) {
-        document.querySelectorAll('.count-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.count-btn').forEach((btn) => btn.classList.remove('active'));
         if (targetBtn) {
             targetBtn.classList.add('active');
         } else {
             // fallback
-            const btn = document.querySelector(`[data-args="${countVal}"]`) || document.querySelector(`[data-value="${countVal}"]`);
+            const btn =
+                document.querySelector(`[data-args="${countVal}"]`) ||
+                document.querySelector(`[data-value="${countVal}"]`);
             if (btn) btn.classList.add('active');
         }
     }
 
     renderThemeOptions() {
         const select = document.getElementById('qcm-theme-select');
-        if(!select) return;
+        if (!select) return;
         const themes = QuizService.getThemes();
-        themes.forEach(t => {
+        themes.forEach((t) => {
             const opt = document.createElement('option');
             opt.value = t;
             opt.innerText = t;
@@ -404,19 +449,19 @@ class QuizViewClass extends BaseView {
     }
 
     showSetupScreen() {
-        document.querySelectorAll('.mode-screen').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
         document.getElementById('qcm-setup-screen').classList.add('active');
     }
 
     showStatsScreen() {
-        document.querySelectorAll('.mode-screen').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
         const statsScreen = document.getElementById('stats-screen');
         if (statsScreen) statsScreen.classList.add('active');
         this.renderStats();
     }
 
     renderStats() {
-        console.log("QuizEngine.renderStats v4.4 - Starting");
+        console.log('QuizEngine.renderStats v4.4 - Starting');
         const container = document.getElementById('stats-content');
         if (!container) return;
 
@@ -477,71 +522,72 @@ class QuizViewClass extends BaseView {
             // Filter by current level
             let currentLevel = typeof GlobalState !== 'undefined' ? GlobalState.get('level') : 'BI';
             if (!currentLevel || currentLevel === '') currentLevel = 'BI';
-            
 
-            console.log("Rendering stats for normalized level:", currentLevel);
+            console.log('Rendering stats for normalized level:', currentLevel);
 
             const levelQuestionCodes = new Set();
             let totalLevelQuestions = 0;
 
             let levelQs = [];
-            console.log("DEBUG RENDER STATS: Normalized Level =", currentLevel);
-
-
-
-
+            console.log('DEBUG RENDER STATS: Normalized Level =', currentLevel);
 
             // Mapping levels to QCM_OFFICIAL 'niveau' property
             // 0: Vert (Intro)? 1: Bleu (BI)? 2: Marron (BP)? 3: Rouge/Confirme (BPC)?
 
             if (currentLevel === 'ALL') {
                 // For global view, use all PARAPENTE questions
-                levelQs = window.QCM_OFFICIAL.questions.filter(q => q.parapente === true);
-                console.log("DEBUG ALL FILTER: Total parapente questions:", levelQs.length);
+                levelQs = window.QCM_OFFICIAL.questions.filter((q) => q.parapente === true);
+                console.log('DEBUG ALL FILTER: Total parapente questions:', levelQs.length);
             } else if (currentLevel === 'BI') {
                 // BI = Contains suffix V AND parapente
-                levelQs = window.QCM_OFFICIAL.questions.filter(q => q.parapente === true && q.code && q.code.includes('V'));
+                levelQs = window.QCM_OFFICIAL.questions.filter(
+                    (q) => q.parapente === true && q.code && q.code.includes('V'),
+                );
                 console.log(`DEBUG BI FILTER: Found ${levelQs.length} questions (Suffix contains V).`);
             } else if (currentLevel === 'BP') {
                 // BP = Contains suffix B AND parapente
-                levelQs = window.QCM_OFFICIAL.questions.filter(q => q.parapente === true && q.code && q.code.includes('B'));
+                levelQs = window.QCM_OFFICIAL.questions.filter(
+                    (q) => q.parapente === true && q.code && q.code.includes('B'),
+                );
                 console.log(`DEBUG BP FILTER: Found ${levelQs.length} questions (Suffix contains B).`);
             } else if (currentLevel === 'BPC') {
                 // BPC = Contains suffix M AND parapente
-                levelQs = window.QCM_OFFICIAL.questions.filter(q => q.parapente === true && q.code && q.code.includes('M'));
+                levelQs = window.QCM_OFFICIAL.questions.filter(
+                    (q) => q.parapente === true && q.code && q.code.includes('M'),
+                );
                 console.log(`DEBUG BPC FILTER: Found ${levelQs.length} questions (Suffix contains M).`);
             } else if (currentLevel === 'TREUIL') {
                 // TREUIL = Contains suffix T AND parapente
-                levelQs = window.QCM_OFFICIAL.questions.filter(q => q.parapente === true && q.code && q.code.includes('T'));
+                levelQs = window.QCM_OFFICIAL.questions.filter(
+                    (q) => q.parapente === true && q.code && q.code.includes('T'),
+                );
                 console.log(`DEBUG TREUIL FILTER: Found ${levelQs.length} questions (Suffix contains T).`);
             } else {
-
                 // Fallback
-                levelQs = window.QCM_OFFICIAL.questions.filter(q => q.parapente === true && q.class && q.class.includes(currentLevel));
+                levelQs = window.QCM_OFFICIAL.questions.filter(
+                    (q) => q.parapente === true && q.class && q.class.includes(currentLevel),
+                );
             }
 
             // Deduplicate and Filter levelQs (Fix for erroneous 198 count vs 174)
             const excludedPrefixes = ['H', 'R', 'X']; // Delta specifics
-            levelQs = levelQs.filter(q => !excludedPrefixes.includes(q.code.charAt(0)));
-
+            levelQs = levelQs.filter((q) => !excludedPrefixes.includes(q.code.charAt(0)));
 
             if (levelQs.length > 0) {
                 totalLevelQuestions = levelQs.length;
-                levelQs.forEach(q => levelQuestionCodes.add(q.code));
+                levelQs.forEach((q) => levelQuestionCodes.add(q.code));
                 console.log(`Found ${totalLevelQuestions} questions for level ${currentLevel} in QCM_OFFICIAL`);
             }
-
-
 
             // Calculate question distribution for CURRENT LEVEL
             const allQuestionEntries = Object.entries(stats.questions);
 
             if (currentLevel === 'ALL') {
-                const sampleKeys = allQuestionEntries.slice(0, 5).map(e => e[0]);
-                console.log("DEBUG ALL: stats.questions keys sample:", sampleKeys);
-                console.log("DEBUG ALL: levelQuestionCodes size:", levelQuestionCodes.size);
+                const sampleKeys = allQuestionEntries.slice(0, 5).map((e) => e[0]);
+                console.log('DEBUG ALL: stats.questions keys sample:', sampleKeys);
+                console.log('DEBUG ALL: levelQuestionCodes size:', levelQuestionCodes.size);
                 const firstCode = Array.from(levelQuestionCodes)[0];
-                console.log("DEBUG ALL: First code in levelQuestionCodes:", firstCode);
+                console.log('DEBUG ALL: First code in levelQuestionCodes:', firstCode);
             }
 
             // Debug filtering
@@ -550,18 +596,23 @@ class QuizViewClass extends BaseView {
             // FALLBACK: If filtering returns 0 results but we have stats, it might be due to code mismatches.
             // In that case, we display everything to ensure the user sees their data.
 
-
-            let perfect = 0;      // 100%
-            let excellent = 0;    // 90-99%
-            let veryGood = 0;     // 75-89%
-            let good = 0;         // 50-74%
-            let poor = 0;         // 1-49%
-            let failed = 0;       // 0%
+            let perfect = 0; // 100%
+            let excellent = 0; // 90-99%
+            let veryGood = 0; // 75-89%
+            let good = 0; // 50-74%
+            let poor = 0; // 1-49%
+            let failed = 0; // 0%
             // notAttempted is relative to the level total
             let notAttempted = totalLevelQuestions - levelQuestionEntries.length;
 
             // Ensure non-negative (incase of data sync issues)
-            console.log("DEBUG NOT ATTEMPTED:", totalLevelQuestions, levelQuestionEntries.length, notAttempted, notAttempted < 0 ? "FIXED to 0" : "");
+            console.log(
+                'DEBUG NOT ATTEMPTED:',
+                totalLevelQuestions,
+                levelQuestionEntries.length,
+                notAttempted,
+                notAttempted < 0 ? 'FIXED to 0' : '',
+            );
             if (notAttempted < 0) notAttempted = 0;
 
             levelQuestionEntries.forEach(([code, data]) => {
@@ -569,8 +620,10 @@ class QuizViewClass extends BaseView {
                 const pct = Math.round((data.correct / data.total) * 100);
 
                 if (pct === 100) perfect++;
-                else if (pct >= 90) excellent++; // 90-99%
-                else if (pct >= 75) veryGood++;  // 75-89% (NEW)
+                else if (pct >= 90)
+                    excellent++; // 90-99%
+                else if (pct >= 75)
+                    veryGood++; // 75-89% (NEW)
                 else if (pct >= 50) good++;
                 else if (pct > 0) poor++;
                 else failed++;
@@ -586,7 +639,7 @@ class QuizViewClass extends BaseView {
             const levelThemes = {};
 
             if (levelQs) {
-                levelQs.forEach(q => {
+                levelQs.forEach((q) => {
                     const qStat = stats.questions[q.code];
                     const theme = q.theme || 'Autre';
 
@@ -599,17 +652,17 @@ class QuizViewClass extends BaseView {
 
                     // Per-question mastery score: correct/total ratio (0–1), or 0 if not attempted
                     if (qStat && qStat.total > 0) {
-                        levelThemes[theme].mastery += (qStat.correct / qStat.total);
+                        levelThemes[theme].mastery += qStat.correct / qStat.total;
                         levelThemes[theme].attemptedCount++;
                     }
                 });
             }
 
             // Iterate over ALL unique questions for this level (attempted or not)
-            levelQs.forEach(q => {
+            levelQs.forEach((q) => {
                 const stat = stats.questions[q.code];
                 if (stat && stat.total > 0) {
-                    accumulatedMastery += (stat.correct / stat.total);
+                    accumulatedMastery += stat.correct / stat.total;
                 } else {
                     // Unattempted or 0 total attempts = 0% mastery
                     accumulatedMastery += 0;
@@ -617,9 +670,9 @@ class QuizViewClass extends BaseView {
             });
 
             // If totalLevelQuestions is 0 (should not happen if data loaded), avoid division by zero
-            const globalPct = totalLevelQuestions > 0 ? Math.round((accumulatedMastery / totalLevelQuestions) * 100) : 0;
-            const color = globalPct >= 75 ? '#4ade80' : (globalPct >= 50 ? '#facc15' : '#f87171');
-
+            const globalPct =
+                totalLevelQuestions > 0 ? Math.round((accumulatedMastery / totalLevelQuestions) * 100) : 0;
+            const color = globalPct >= 75 ? '#4ade80' : globalPct >= 50 ? '#facc15' : '#f87171';
 
             const currentFilter = QuizView.state.masteryFilter || 'ALL';
             const getCardStyle = (baseColor, filterType) => {
@@ -685,8 +738,8 @@ class QuizViewClass extends BaseView {
                 let valA, valB;
 
                 if (QuizView.state.themeSort === 'rate') {
-                    valA = a[1].totalQuestions > 0 ? (a[1].mastery / a[1].totalQuestions) : 0;
-                    valB = b[1].totalQuestions > 0 ? (b[1].mastery / b[1].totalQuestions) : 0;
+                    valA = a[1].totalQuestions > 0 ? a[1].mastery / a[1].totalQuestions : 0;
+                    valB = b[1].totalQuestions > 0 ? b[1].mastery / b[1].totalQuestions : 0;
                 } else {
                     valA = a[0];
                     valB = b[0];
@@ -700,7 +753,9 @@ class QuizViewClass extends BaseView {
             // Sort Controls HTML — rendered separately above the grid
             const getSortIcon = (type) => {
                 if (QuizView.state.themeSort !== type) return '';
-                return QuizView.state.themeSortDir === 'asc' ? '<i class="ri-arrow-up-s-line"></i>' : '<i class="ri-arrow-down-s-line"></i>';
+                return QuizView.state.themeSortDir === 'asc'
+                    ? '<i class="ri-arrow-up-s-line"></i>'
+                    : '<i class="ri-arrow-down-s-line"></i>';
             };
 
             const sortBtnStyle = (type) => {
@@ -731,14 +786,36 @@ class QuizViewClass extends BaseView {
                 // This is identical to the global gauge formula and always stays 0–100%
                 const pct = totalQ > 0 ? Math.round((data.mastery / totalQ) * 100) : 0;
 
-                const tColor = pct >= 90 ? '#4ade80' : (pct >= 75 ? '#38bdf8' : (pct >= 50 ? '#facc15' : (totalQ === 0 ? 'var(--text-muted)' : '#f87171')));
-                const tColorRgb = pct >= 90 ? '74,222,128' : (pct >= 75 ? '56,189,248' : (pct >= 50 ? '250,204,21' : (totalQ === 0 ? '150,150,150' : '248,113,113')));
+                const tColor =
+                    pct >= 90
+                        ? '#4ade80'
+                        : pct >= 75
+                          ? '#38bdf8'
+                          : pct >= 50
+                            ? '#facc15'
+                            : totalQ === 0
+                              ? 'var(--text-muted)'
+                              : '#f87171';
+                const tColorRgb =
+                    pct >= 90
+                        ? '74,222,128'
+                        : pct >= 75
+                          ? '56,189,248'
+                          : pct >= 50
+                            ? '250,204,21'
+                            : totalQ === 0
+                              ? '150,150,150'
+                              : '248,113,113';
 
                 // Theme emoji icon
                 const themeIcons = {
-                    'Météo': '🌦️', 'Mécavol': '⚙️', 'Matériel': '🪂',
-                    'Pilotage': '🧭', 'Réglementation': '📋', 'Facteurs humains': '🧠',
-                    'Milieu naturel': '🏔️'
+                    Météo: '🌦️',
+                    Mécavol: '⚙️',
+                    Matériel: '🪂',
+                    Pilotage: '🧭',
+                    Réglementation: '📋',
+                    'Facteurs humains': '🧠',
+                    'Milieu naturel': '🏔️',
                 };
                 const icon = themeIcons[name] || '📚';
 
@@ -747,9 +824,7 @@ class QuizViewClass extends BaseView {
                 const cardBorder = isActive
                     ? `border:2px solid ${tColor}; box-shadow:0 0 20px -4px rgba(${tColorRgb},0.4);`
                     : `border:1px solid var(--border-color);`;
-                const cardBg = isActive
-                    ? `background:rgba(${tColorRgb},0.08);`
-                    : `background:var(--bg-card);`;
+                const cardBg = isActive ? `background:rgba(${tColorRgb},0.08);` : `background:var(--bg-card);`;
 
                 // Progress bar width
                 const barWidth = totalQ > 0 ? pct : 0;
@@ -784,19 +859,17 @@ class QuizViewClass extends BaseView {
             `;
             });
 
-
-
             // Build individual questions list (FILTERED BY LEVEL)
             let allQuestionsHtml = '';
             // Use levelQuestionEntries computed earlier to show only relevant questions
 
             if (levelQuestionEntries.length > 0) {
                 // Sort by success rate (worst first) by default
-                // Create a copy to avoid mutating the original array if used elsewhere? 
+                // Create a copy to avoid mutating the original array if used elsewhere?
                 // Although here it's fine as we are at the end.
                 const sortedQuestions = [...levelQuestionEntries].sort((a, b) => {
-                    const pctA = a[1].total > 0 ? (a[1].correct / a[1].total) : 0;
-                    const pctB = b[1].total > 0 ? (b[1].correct / b[1].total) : 0;
+                    const pctA = a[1].total > 0 ? a[1].correct / a[1].total : 0;
+                    const pctB = b[1].total > 0 ? b[1].correct / b[1].total : 0;
                     return pctA - pctB;
                 });
 
@@ -809,7 +882,7 @@ class QuizViewClass extends BaseView {
                     // Determine unattempted questions
                     // levelQs contains ALL valid questions for this level (excluding Delta)
                     // stats.questions contains history
-                    levelQs.forEach(q => {
+                    levelQs.forEach((q) => {
                         if (!stats.questions[q.code] || stats.questions[q.code].total === 0) {
                             // Create a mock "data" object for rendering
                             visibleQuestions.push([q.code, { total: 0, correct: 0 }]);
@@ -829,14 +902,14 @@ class QuizViewClass extends BaseView {
                 }
 
                 const filterLabel = {
-                    'ALL': 'Toutes les questions tentées',
-                    'PERFECT': 'Questions Maîtrisées (100%)',
-                    'EXCELLENT': 'Questions Excellentes (90-99%)',
-                    'VERY_GOOD': 'Questions Très Bonnes (75-89%)',
-                    'GOOD': 'Questions Satisfaisantes (50-74%)',
-                    'POOR': 'Questions À travailler (1-49%)',
-                    'FAILED': 'Questions Échouées (0%)',
-                    'NOT_ATTEMPTED': 'Questions Non Tentées'
+                    ALL: 'Toutes les questions tentées',
+                    PERFECT: 'Questions Maîtrisées (100%)',
+                    EXCELLENT: 'Questions Excellentes (90-99%)',
+                    VERY_GOOD: 'Questions Très Bonnes (75-89%)',
+                    GOOD: 'Questions Satisfaisantes (50-74%)',
+                    POOR: 'Questions À travailler (1-49%)',
+                    FAILED: 'Questions Échouées (0%)',
+                    NOT_ATTEMPTED: 'Questions Non Tentées',
                 }[QuizView.state.masteryFilter];
 
                 // Append theme filter label if active
@@ -847,19 +920,25 @@ class QuizViewClass extends BaseView {
                     visibleQuestions = visibleQuestions.filter(([code, data]) => {
                         const qObj = QuizView.getQuestionByCode(code);
 
-                        let qTheme = (qObj && qObj.theme) ? qObj.theme : null;
+                        let qTheme = qObj && qObj.theme ? qObj.theme : null;
 
                         // If theme is missing but we have a code, try to derive it
                         if (!qTheme && qObj && qObj.code) {
                             const letter = qObj.code.charAt(0);
                             const map = {
-                                'A': 'Météo',
-                                'E': 'Mécavol', 'G': 'Mécavol', 'H': 'Mécavol',
-                                'L': 'Matériel', 'N': 'Matériel', 'R': 'Matériel',
-                                'U': 'Pilotage', 'W': 'Pilotage', 'X': 'Pilotage',
-                                'S': 'Réglementation',
-                                'F': 'Facteurs humains',
-                                'P': 'Milieu naturel'
+                                A: 'Météo',
+                                E: 'Mécavol',
+                                G: 'Mécavol',
+                                H: 'Mécavol',
+                                L: 'Matériel',
+                                N: 'Matériel',
+                                R: 'Matériel',
+                                U: 'Pilotage',
+                                W: 'Pilotage',
+                                X: 'Pilotage',
+                                S: 'Réglementation',
+                                F: 'Facteurs humains',
+                                P: 'Milieu naturel',
                             };
                             qTheme = map[letter] || 'Autre';
                         }
@@ -869,13 +948,12 @@ class QuizViewClass extends BaseView {
                     });
                 }
 
-
                 allQuestionsHtml = `
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
                         <span style="font-weight:700; color:var(--text-main);">${visibleQuestions.length}</span> questions 
                         <span style="opacity:0.6;">(${displayLabel})</span>
-                        ${(QuizView.state.masteryFilter !== 'ALL' || QuizView.state.themeFilter) ? '<a data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">Tout effacer</a>' : ''}
+                        ${QuizView.state.masteryFilter !== 'ALL' || QuizView.state.themeFilter ? '<a data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">Tout effacer</a>' : ''}
                     </div>
                     <div style="display:flex; gap:8px;">
                         <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
@@ -895,37 +973,46 @@ class QuizViewClass extends BaseView {
                 visibleQuestions.forEach(([code, data]) => {
                     const qObj = QuizView.getQuestionByCode(code);
 
-                    let theme = qObj ? qObj.theme : "Autre";
+                    let theme = qObj ? qObj.theme : 'Autre';
 
                     // Derive theme if missing
                     if (!theme && code) {
                         const letter = code.charAt(0);
                         const map = {
-                            'A': 'Météo',
-                            'E': 'Mécavol', 'G': 'Mécavol', 'H': 'Mécavol',
-                            'L': 'Matériel', 'N': 'Matériel', 'R': 'Matériel',
-                            'U': 'Pilotage', 'W': 'Pilotage', 'X': 'Pilotage',
-                            'S': 'Réglementation',
-                            'F': 'Facteurs humains',
-                            'P': 'Milieu naturel'
+                            A: 'Météo',
+                            E: 'Mécavol',
+                            G: 'Mécavol',
+                            H: 'Mécavol',
+                            L: 'Matériel',
+                            N: 'Matériel',
+                            R: 'Matériel',
+                            U: 'Pilotage',
+                            W: 'Pilotage',
+                            X: 'Pilotage',
+                            S: 'Réglementation',
+                            F: 'Facteurs humains',
+                            P: 'Milieu naturel',
                         };
                         theme = map[letter] || 'Autre';
                     }
 
                     const pct = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
-                    const qColor = pct >= 90 ? '#4ade80' : (pct >= 75 ? '#38bdf8' : (pct >= 50 ? '#facc15' : '#f87171'));
+                    const qColor = pct >= 90 ? '#4ade80' : pct >= 75 ? '#38bdf8' : pct >= 50 ? '#facc15' : '#f87171';
                     const streak = data.streak || 0;
 
                     // Build answers HTML if available
                     let answersHtml = '';
                     if (qObj && qObj.choices) {
-                        answersHtml = '<div class="question-answers" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">';
+                        answersHtml =
+                            '<div class="question-answers" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">';
                         qObj.choices.forEach((ans, idx) => {
                             const isCorrect = parseInt(ans.pts) > 0;
                             const answerStyle = isCorrect
                                 ? 'background:rgba(74, 222, 128, 0.1); border-left:3px solid #4ade80;'
                                 : 'background:rgba(255,255,255,0.02);';
-                            const icon = isCorrect ? '<i class="ri-checkbox-circle-fill" style="color:#4ade80;"></i>' : '';
+                            const icon = isCorrect
+                                ? '<i class="ri-checkbox-circle-fill" style="color:#4ade80;"></i>'
+                                : '';
 
                             answersHtml += `
                             <div style="padding:8px 12px; margin-bottom:6px; border-radius:6px; ${answerStyle} display:flex; align-items:center; gap:8px; font-size:0.85rem;">
@@ -946,7 +1033,7 @@ class QuizViewClass extends BaseView {
                         answersHtml += '</div>';
                     }
 
-                    const qText = qObj ? qObj.question : "Question inconnue";
+                    const qText = qObj ? qObj.question : 'Question inconnue';
                     const displayText = truncate(qText, 80);
                     const hasAnswers = qObj && qObj.choices;
 
@@ -975,10 +1062,10 @@ class QuizViewClass extends BaseView {
                 `;
                 });
 
-
                 allQuestionsHtml += '</div>';
             } else {
-                allQuestionsHtml = '<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">Aucune question tentée pour le moment.</div>';
+                allQuestionsHtml =
+                    '<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">Aucune question tentée pour le moment.</div>';
             }
 
             // Premium Circular Gauge Calculation
@@ -1069,14 +1156,12 @@ class QuizViewClass extends BaseView {
             </div>
         `;
         } catch (e) {
-            console.error("Critical Error in renderStats:", e);
+            console.error('Critical Error in renderStats:', e);
             if (container) {
                 container.innerHTML = `<div style="padding:20px; color:#f87171; background:rgba(255,0,0,0.1); border-radius:12px;">Erreur d'affichage des statistiques: ${e.message}</div>`;
             }
         }
     }
-
-
 
     renderExamHistory() {
         let exams = QuizService.getExamHistory();
@@ -1085,9 +1170,8 @@ class QuizViewClass extends BaseView {
         let currentLevel = typeof GlobalState !== 'undefined' ? GlobalState.get('level') : 'BI';
         if (!currentLevel || currentLevel === '') currentLevel = 'BI';
 
-
         if (currentLevel !== 'ALL') {
-            exams = exams.filter(e => e.level === currentLevel);
+            exams = exams.filter((e) => e.level === currentLevel);
         }
 
         if (exams.length === 0) {
@@ -1096,39 +1180,54 @@ class QuizViewClass extends BaseView {
 
         let html = '<div style="display:flex; flex-direction:column; gap:12px;">';
 
-        exams.forEach(exam => {
+        exams.forEach((exam) => {
             const dateStr = formatDateTime(exam.date);
-            const pct = exam.percentage !== undefined ? exam.percentage : (exam.total > 0 ? Math.round((exam.score / exam.total) * 100) : 0);
-            const color = exam.invalidated ? '#f87171' : (pct >= 75 ? '#4ade80' : pct >= 50 ? '#facc15' : '#f87171');
-            const levelLabel = exam.level === 'BI' ? 'Brevet Initial' : exam.level === 'BP' ? 'Brevet de Pilote' : exam.level === 'BPC' ? 'Brevet de Pilote Confirmé' : 'Treuil';
+            const pct =
+                exam.percentage !== undefined
+                    ? exam.percentage
+                    : exam.total > 0
+                      ? Math.round((exam.score / exam.total) * 100)
+                      : 0;
+            const color = exam.invalidated ? '#f87171' : pct >= 75 ? '#4ade80' : pct >= 50 ? '#facc15' : '#f87171';
+            const levelLabel =
+                exam.level === 'BI'
+                    ? 'Brevet Initial'
+                    : exam.level === 'BP'
+                      ? 'Brevet de Pilote'
+                      : exam.level === 'BPC'
+                        ? 'Brevet de Pilote Confirmé'
+                        : 'Treuil';
 
             // Build questions HTML
 
-            let questionsHtml = '<div class="exam-details" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border-color);">';
+            let questionsHtml =
+                '<div class="exam-details" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border-color);">';
             questionsHtml += '<div style="display:flex; flex-direction:column; gap:16px;">';
 
             exam.results.forEach((r, idx) => {
                 let q = r.question;
-                
+
                 // Fallback: If question was saved as a string code (bug from early ES6 engine)
                 if (typeof q === 'string') {
                     q = QuizView.getQuestionByCode(r.question);
                 }
-                
+
                 if (!q) return; // Skip if question couldn't be resolved
-                
+
                 const selectedOptions = r.selected || [];
                 let optionsHtml = '';
 
-                (q.choices || q.ans || []).forEach(opt => {
-                    const wasSelected = selectedOptions.some(s => s.text === opt.text);
+                (q.choices || q.ans || []).forEach((opt) => {
+                    const wasSelected = selectedOptions.some((s) => s.text === opt.text);
                     const pts = parseInt(opt.pts || 0);
                     let statusClass;
                     let icon = '';
 
                     if (pts > 0) {
                         statusClass = 'background:rgba(74, 222, 128, 0.1); border-left:3px solid #4ade80;';
-                        icon = wasSelected ? '<i class="ri-check-double-line" style="color:#4ade80;"></i>' : '<i class="ri-checkbox-circle-line" style="color:#4ade80;"></i>';
+                        icon = wasSelected
+                            ? '<i class="ri-check-double-line" style="color:#4ade80;"></i>'
+                            : '<i class="ri-checkbox-circle-line" style="color:#4ade80;"></i>';
                     } else if (pts < 0 && wasSelected) {
                         statusClass = 'background:rgba(248, 113, 113, 0.1); border-left:3px solid #f87171;';
                         icon = '<i class="ri-close-circle-line" style="color:#f87171;"></i>';
@@ -1156,20 +1255,20 @@ class QuizViewClass extends BaseView {
                             ${optionsHtml}
                         </div>
                         ${(function () {
-                        // Try to get explanation from saved question, or lookup in current QCM_OFFICIAL
-                        let expl = q.explanation || q.explication;
-                        if (!expl) {
-                            const currentQ = QuizView.getQuestionByCode(q.code);
-                            if (currentQ) expl = currentQ.explication || currentQ.explanation;
-                        }
+                            // Try to get explanation from saved question, or lookup in current QCM_OFFICIAL
+                            let expl = q.explanation || q.explication;
+                            if (!expl) {
+                                const currentQ = QuizView.getQuestionByCode(q.code);
+                                if (currentQ) expl = currentQ.explication || currentQ.explanation;
+                            }
 
-                        if (expl) {
-                            return `<div style="margin-top:12px; padding:8px; background:rgba(251, 146, 60, 0.15); border-left:3px solid #fb923c; font-size:0.85rem; color:var(--text-main); border-radius:8px;">
+                            if (expl) {
+                                return `<div style="margin-top:12px; padding:8px; background:rgba(251, 146, 60, 0.15); border-left:3px solid #fb923c; font-size:0.85rem; color:var(--text-main); border-radius:8px;">
                                     <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">Explication</div>
                                     ${expl}</div>`;
-                        }
-                        return '';
-                    })()}
+                            }
+                            return '';
+                        })()}
                     </div >
     `;
             });
@@ -1209,27 +1308,27 @@ class QuizViewClass extends BaseView {
             examId = examIdArgs[0];
         }
         const history = QuizService.getExamHistory();
-        const exam = history.find(e => e.id === examId);
+        const exam = history.find((e) => e.id === examId);
         if (!exam) return;
-        
+
         const statsContent = document.getElementById('stats-content');
         if (!statsContent) return;
-        
+
         const date = formatDateTime(exam.date);
 
         let html = `<h2>Revue de l'examen du ${date}</h2>`;
         html += `<button class="action-btn-secondary" data-action="QuizshowStatsScreen" style="margin-bottom: 20px;">&larr; Retour aux statistiques</button>`;
-        
-        const errors = exam.results.filter(r => !r.isCorrect);
-        
+
+        const errors = exam.results.filter((r) => !r.isCorrect);
+
         if (errors.length === 0) {
             html += `<p class="success-text">Félicitations, aucune erreur !</p>`;
         } else {
             html += `<h3>Erreurs (${errors.length})</h3>`;
             html += `<div style="display: flex; flex-direction: column; gap: 15px;">`;
-            
-            errors.forEach(err => {
-                const q = QuizService.allQuestions.find(qq => qq.code === err.code);
+
+            errors.forEach((err) => {
+                const q = QuizService.allQuestions.find((qq) => qq.code === err.code);
                 if (q) {
                     html += `
                         <div class="card error-card" style="border-left: 3px solid #ef4444; padding: 15px; border-radius: 8px; background: var(--bg-card, #fff); box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
@@ -1238,10 +1337,12 @@ class QuizViewClass extends BaseView {
                                 <p style="margin: 8px 0; color: var(--text-main, #333);">${escapeHTML(q.texte)}</p>
                             </div>
                             <div style="font-size: 0.9em; background: var(--bg-secondary, #f9f9f9); padding: 10px; border-radius: 6px;">
-                                ${q.reponses.map((r, i) => {
-                                    const isGood = r.points > 0;
-                                    return `<div style="color: ${isGood ? '#22c55e' : 'var(--text-main, #666)'}; ${isGood ? 'font-weight: bold;' : 'margin-bottom: 4px;'}">${escapeHTML(r.texte)} ${isGood ? '✓' : ''}</div>`;
-                                }).join('')}
+                                ${q.reponses
+                                    .map((r, i) => {
+                                        const isGood = r.points > 0;
+                                        return `<div style="color: ${isGood ? '#22c55e' : 'var(--text-main, #666)'}; ${isGood ? 'font-weight: bold;' : 'margin-bottom: 4px;'}">${escapeHTML(r.texte)} ${isGood ? '✓' : ''}</div>`;
+                                    })
+                                    .join('')}
                             </div>
                         </div>
                     `;
@@ -1251,7 +1352,7 @@ class QuizViewClass extends BaseView {
             });
             html += `</div>`;
         }
-        
+
         statsContent.innerHTML = html;
     }
 
@@ -1259,12 +1360,12 @@ class QuizViewClass extends BaseView {
         try {
             const level = typeof GlobalState !== 'undefined' ? GlobalState.get('level') : 'BI';
             const firstQuestion = QuizService.startSession(level);
-            
-            document.querySelectorAll('.mode-screen').forEach(s => s.classList.remove('active'));
+
+            document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
             document.getElementById('qcm-screen').classList.add('active');
-            
+
             this.renderQuestion(firstQuestion);
-        } catch(e) {
+        } catch (e) {
             alert(e.message);
         }
     }
@@ -1272,11 +1373,11 @@ class QuizViewClass extends BaseView {
     renderQuestion(q) {
         const feedbackDiv = document.getElementById('qcm-feedback');
         feedbackDiv.style.display = 'none';
-        
+
         const container = document.getElementById('qcm-question-text');
         const choicesDiv = document.getElementById('qcm-choices');
         const actionsDiv = document.getElementById('qcm-actions-container');
-        
+
         if (!q) {
             // End of quiz
             this.renderExamResults();
@@ -1296,18 +1397,18 @@ class QuizViewClass extends BaseView {
                 badgeHtml = `<div class="quiz-theme-tag" style="background:#f87171; color:#fff; border-color:#f87171; margin-left: 8px;"><i class="ri-refresh-line"></i> À revoir</div>`;
             }
         }
-        
+
         const letters = q.code.replace(/^[a-zA-Z]+\d+/, '');
         let colorStyle = '';
         const colorMap = {
-            'V': 'rgba(34, 197, 94, 0.2)', // Vert
-            'B': 'rgba(59, 130, 246, 0.2)', // Bleu
-            'M': 'rgba(139, 69, 19, 0.2)', // Marron
-            'T': 'rgba(168, 85, 247, 0.2)'  // Violet
+            V: 'rgba(34, 197, 94, 0.2)', // Vert
+            B: 'rgba(59, 130, 246, 0.2)', // Bleu
+            M: 'rgba(139, 69, 19, 0.2)', // Marron
+            T: 'rgba(168, 85, 247, 0.2)', // Violet
         };
-        const textColors = { 'V': '#4ade80', 'B': '#60a5fa', 'M': '#c0773d', 'T': '#c084fc' };
-        
-        const validLetters = letters.split('').filter(l => colorMap[l]);
+        const textColors = { V: '#4ade80', B: '#60a5fa', M: '#c0773d', T: '#c084fc' };
+
+        const validLetters = letters.split('').filter((l) => colorMap[l]);
         if (validLetters.length === 1) {
             colorStyle = `background: ${colorMap[validLetters[0]]}; color: ${textColors[validLetters[0]]}; border: 1px solid ${colorMap[validLetters[0]].replace('0.2', '0.4')};`;
         } else if (validLetters.length > 1) {
@@ -1333,12 +1434,16 @@ class QuizViewClass extends BaseView {
         `;
 
         // Render choices
-        choicesDiv.innerHTML = q.choices.map((opt, idx) => `
+        choicesDiv.innerHTML = q.choices
+            .map(
+                (opt, idx) => `
             <button class="qcm-option" data-action="toggle-option" data-idx="${idx}">
                 ${escapeHTML(opt.text)}
             </button>
-        `).join('');
-        
+        `,
+            )
+            .join('');
+
         // Cache choices for reference during selection
         this._currentChoices = q.choices;
 
@@ -1362,7 +1467,7 @@ class QuizViewClass extends BaseView {
         const idx = parseInt(btnElement.getAttribute('data-idx'));
         const opt = this._currentChoices[idx];
         const selectedOptions = QuizService.toggleSelection(opt);
-        
+
         if (selectedOptions.includes(opt)) {
             btnElement.classList.add('selected');
         } else {
@@ -1372,7 +1477,7 @@ class QuizViewClass extends BaseView {
 
     validateQuestion() {
         const result = QuizService.validate();
-        if(!result) return;
+        if (!result) return;
 
         const isExam = QuizService.state.qcmConfig.mode === 'EXAM';
 
@@ -1388,7 +1493,7 @@ class QuizViewClass extends BaseView {
     showAnswerFeedback(result, showBackButton) {
         const btns = document.querySelectorAll('.qcm-option');
 
-        btns.forEach(btn => {
+        btns.forEach((btn) => {
             btn.disabled = true;
             const idx = parseInt(btn.getAttribute('data-idx'));
             const opt = this._currentChoices[idx];
@@ -1425,35 +1530,42 @@ class QuizViewClass extends BaseView {
 
     renderExamResults() {
         const isExam = QuizService.state.qcmConfig.mode === 'EXAM';
-        const modeTitle = isExam ? 'MODE EXAMEN' : (QuizService.state.qcmConfig.mode === 'REVISION' ? 'MODE RÉVISION' : 'MODE ENTRAÎNEMENT');
-        
+        const modeTitle = isExam
+            ? 'MODE EXAMEN'
+            : QuizService.state.qcmConfig.mode === 'REVISION'
+              ? 'MODE RÉVISION'
+              : 'MODE ENTRAÎNEMENT';
+
         if (isExam) {
             const level = typeof GlobalState !== 'undefined' ? GlobalState.get('level') : 'BI';
             QuizService.saveExamHistory(level);
         }
-        
+
         const container = document.getElementById('qcm-question-text');
         const choicesDiv = document.getElementById('qcm-choices');
         const actionsDiv = document.getElementById('qcm-actions-container');
         document.getElementById('qcm-feedback').style.display = 'none';
-        
+
         // Update the mode label dynamically based on mode
         const modeLabel = document.getElementById('qcm-mode-label');
         if (modeLabel) modeLabel.innerText = modeTitle;
-        
+
         const results = QuizService.state.examResults;
-        const total = QuizService.state.qcmSessionData && QuizService.state.qcmSessionData.length > 0 ? QuizService.state.qcmSessionData.length : results.length;
-        const score = results.filter(r => r.isCorrect).length;
+        const total =
+            QuizService.state.qcmSessionData && QuizService.state.qcmSessionData.length > 0
+                ? QuizService.state.qcmSessionData.length
+                : results.length;
+        const score = results.filter((r) => r.isCorrect).length;
         const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
         const passed = percentage >= 75;
         const isInvalidated = QuizService.state.invalidated === true;
-        
-        const badgeHtml = isInvalidated ? 
-            `<span style="background:rgba(248,113,113,0.1); color:#f87171; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #f87171;">INVALIDÉ</span>` :
-            (passed ? 
-            `<span style="background:rgba(74,222,128,0.1); color:#16a34a; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #4ade80;">RÉUSSI</span>` :
-            `<span style="background:rgba(248,113,113,0.1); color:#dc2626; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #f87171;">ÉCHOUÉ</span>`);
-        
+
+        const badgeHtml = isInvalidated
+            ? `<span style="background:rgba(248,113,113,0.1); color:#f87171; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #f87171;">INVALIDÉ</span>`
+            : passed
+              ? `<span style="background:rgba(74,222,128,0.1); color:#16a34a; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #4ade80;">RÉUSSI</span>`
+              : `<span style="background:rgba(248,113,113,0.1); color:#dc2626; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #f87171;">ÉCHOUÉ</span>`;
+
         container.innerHTML = `
             <div class="stats-circle-container" style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom: 32px;">
                 <h2 style="margin:0;">RÉSULTATS</h2>
@@ -1471,12 +1583,16 @@ class QuizViewClass extends BaseView {
             </div>
             
             <div class="bank-container" style="display: flex; flex-direction: column; gap: 20px;">
-                ${results.filter(r => !r.isCorrect).length === 0 ? 
-                    `<div style="text-align: center; padding: 32px; background: rgba(74, 222, 128, 0.1); border-radius: var(--radius-md); border:1px solid #4ade80; color: #16a34a;">
+                ${
+                    results.filter((r) => !r.isCorrect).length === 0
+                        ? `<div style="text-align: center; padding: 32px; background: rgba(74, 222, 128, 0.1); border-radius: var(--radius-md); border:1px solid #4ade80; color: #16a34a;">
                         <i class="ri-trophy-line" style="font-size: 3rem; margin-bottom:16px; display:block;"></i>
                         <span style="font-size:1.2rem; font-weight:bold;">Félicitations, vous n'avez fait aucune erreur !</span>
-                    </div>` 
-                : results.filter(r => !r.isCorrect).map((r, i) => `
+                    </div>`
+                        : results
+                              .filter((r) => !r.isCorrect)
+                              .map(
+                                  (r, i) => `
                     <div class="bank-item" style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; background: var(--bg-card); box-shadow:0 2px 4px rgba(0,0,0,0.02);">
                         <div class="bank-item-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items:center;">
                             <span class="bank-item-code" style="font-family:monospace; font-size:0.85rem; color:var(--text-secondary); background:rgba(0,0,0,0.05); padding:4px 8px; border-radius:4px;">#${r.question.code}</span>
@@ -1484,45 +1600,55 @@ class QuizViewClass extends BaseView {
                         </div>
                         <div class="bank-item-question" style="font-weight: 600; font-size:1.1rem; margin-bottom: 16px; color:var(--text-main); line-height:1.4;">${r.question.question}</div>
                         <div class="bank-item-choices" style="display: flex; flex-direction: column; gap: 10px;">
-                            ${r.question.choices.map(c => {
-                                const isUserSelected = r.selected.some(sel => sel.text === c.text);
-                                const isCorrectChoice = c.pts > 0;
-                                
-                                let bgStyle = 'background: transparent; border-color: var(--border-color); color: var(--text-secondary);';
-                                let icon = '<i class="ri-checkbox-blank-circle-line" style="color:var(--text-muted); margin-right: 8px;"></i>';
-                                let borderStyle = '1px solid var(--border-color)';
-                                
-                                if (isUserSelected && isCorrectChoice) {
-                                    // Cochee et Juste -> Vert
-                                    bgStyle = 'background: rgba(74, 222, 128, 0.15); color: var(--text-main);';
-                                    borderStyle = '2px solid #4ade80';
-                                    icon = '<i class="ri-checkbox-circle-fill" style="color:#16a34a; font-size:1.2rem; margin-right: 8px;"></i>';
-                                } else if (isUserSelected && !isCorrectChoice) {
-                                    // Cochee et Fausse -> Rouge
-                                    bgStyle = 'background: rgba(248, 113, 113, 0.15); color: var(--text-main);';
-                                    borderStyle = '2px solid #f87171';
-                                    icon = '<i class="ri-close-circle-fill" style="color:#dc2626; font-size:1.2rem; margin-right: 8px;"></i>';
-                                } else if (!isUserSelected && isCorrectChoice) {
-                                    // Non Cochee et Juste (Oubli) -> Orange
-                                    bgStyle = 'background: rgba(251, 146, 60, 0.15); color: var(--text-main);';
-                                    borderStyle = '2px solid #fb923c';
-                                    icon = '<i class="ri-error-warning-fill" style="color:#ea580c; font-size:1.2rem; margin-right: 8px;"></i>';
-                                }
-                                
-                                return `
+                            ${r.question.choices
+                                .map((c) => {
+                                    const isUserSelected = r.selected.some((sel) => sel.text === c.text);
+                                    const isCorrectChoice = c.pts > 0;
+
+                                    let bgStyle =
+                                        'background: transparent; border-color: var(--border-color); color: var(--text-secondary);';
+                                    let icon =
+                                        '<i class="ri-checkbox-blank-circle-line" style="color:var(--text-muted); margin-right: 8px;"></i>';
+                                    let borderStyle = '1px solid var(--border-color)';
+
+                                    if (isUserSelected && isCorrectChoice) {
+                                        // Cochee et Juste -> Vert
+                                        bgStyle = 'background: rgba(74, 222, 128, 0.15); color: var(--text-main);';
+                                        borderStyle = '2px solid #4ade80';
+                                        icon =
+                                            '<i class="ri-checkbox-circle-fill" style="color:#16a34a; font-size:1.2rem; margin-right: 8px;"></i>';
+                                    } else if (isUserSelected && !isCorrectChoice) {
+                                        // Cochee et Fausse -> Rouge
+                                        bgStyle = 'background: rgba(248, 113, 113, 0.15); color: var(--text-main);';
+                                        borderStyle = '2px solid #f87171';
+                                        icon =
+                                            '<i class="ri-close-circle-fill" style="color:#dc2626; font-size:1.2rem; margin-right: 8px;"></i>';
+                                    } else if (!isUserSelected && isCorrectChoice) {
+                                        // Non Cochee et Juste (Oubli) -> Orange
+                                        bgStyle = 'background: rgba(251, 146, 60, 0.15); color: var(--text-main);';
+                                        borderStyle = '2px solid #fb923c';
+                                        icon =
+                                            '<i class="ri-error-warning-fill" style="color:#ea580c; font-size:1.2rem; margin-right: 8px;"></i>';
+                                    }
+
+                                    return `
                                 <div class="bank-choice" style="${bgStyle} border: ${borderStyle}; padding: 12px 16px; border-radius: 8px; font-size: 0.95rem; display: flex; justify-content: space-between; align-items:center;">
                                     <span style="display:flex; align-items:center; flex:1;">${icon} <span style="flex:1;">${c.text}</span></span>
-                                    <span style="font-weight:bold; margin-left:12px; color:var(--text-secondary);">${isUserSelected ? '<i class="ri-user-line" style="margin-right: 4px;" title="Votre réponse"></i>' : ''}${c.pts > 0 ? '+'+c.pts : (c.pts < 0 ? c.pts : '')}</span>
+                                    <span style="font-weight:bold; margin-left:12px; color:var(--text-secondary);">${isUserSelected ? '<i class="ri-user-line" style="margin-right: 4px;" title="Votre réponse"></i>' : ''}${c.pts > 0 ? '+' + c.pts : c.pts < 0 ? c.pts : ''}</span>
                                 </div>
                                 `;
-                            }).join('')}
+                                })
+                                .join('')}
                         </div>
                         ${r.question.explication ? `<div class="bank-item-explication" style="margin-top: 20px; font-size: 0.95rem; color: var(--text-main); background: rgba(251, 146, 60, 0.1); border-left:4px solid #fb923c; padding: 16px; border-radius: 0 8px 8px 0;"><div style="font-weight:bold; color:#ea580c; margin-bottom:4px; font-size:0.8rem; text-transform:uppercase;"><i class="ri-information-fill" style="margin-right: 4px;"></i>Explication</div>${r.question.explication}</div>` : ''}
                     </div>
-                `).join('')}
+                `,
+                              )
+                              .join('')
+                }
             </div>
         `;
-        
+
         choicesDiv.innerHTML = '';
         actionsDiv.innerHTML = `<button class="next-btn" data-action="finish-session" style="width:100%;">TERMINER</button>`;
     }
@@ -1537,7 +1663,7 @@ class QuizViewClass extends BaseView {
         } else {
             QuizView.state.sortState.field = sortBy;
             // Default directions: Rate -> ASC (worst first), Attempts -> DESC (most first)
-            QuizView.state.sortState.dir = (sortBy === 'rate') ? 'asc' : 'desc';
+            QuizView.state.sortState.dir = sortBy === 'rate' ? 'asc' : 'desc';
         }
 
         const dir = QuizView.state.sortState.dir;
@@ -1546,7 +1672,7 @@ class QuizViewClass extends BaseView {
         // Update button states & Icons
         // Update button states & Icons - Scope only to Stats buttons
         const statsButtons = ['sort-rate-btn', 'sort-attempts-btn', 'sort-streak-btn'];
-        statsButtons.forEach(id => {
+        statsButtons.forEach((id) => {
             const btn = document.getElementById(id);
             if (!btn) return;
 
@@ -1558,7 +1684,9 @@ class QuizViewClass extends BaseView {
             btn.innerHTML = baseText;
         });
 
-        const activeBtn = document.getElementById(sortBy === 'rate' ? 'sort-rate-btn' : (sortBy === 'attempts' ? 'sort-attempts-btn' : 'sort-streak-btn'));
+        const activeBtn = document.getElementById(
+            sortBy === 'rate' ? 'sort-rate-btn' : sortBy === 'attempts' ? 'sort-attempts-btn' : 'sort-streak-btn',
+        );
         if (activeBtn) {
             activeBtn.style.background = 'rgba(255,255,255,0.05)';
             const arrow = dir === 'asc' ? ' <i class="ri-arrow-up-line"></i>' : ' <i class="ri-arrow-down-line"></i>';
@@ -1583,7 +1711,7 @@ class QuizViewClass extends BaseView {
         });
 
         list.innerHTML = '';
-        items.forEach(item => list.appendChild(item));
+        items.forEach((item) => list.appendChild(item));
     }
 
     toggleQuestionDetails(code) {
@@ -1642,8 +1770,6 @@ class QuizViewClass extends BaseView {
         QuizView.renderStats();
     }
 
-
-
     // --- STATISTICS MANAGEMENT ---
 
     resetStats() {
@@ -1659,7 +1785,7 @@ class QuizViewClass extends BaseView {
 
     saveExamHistory(level, score, total, results) {
         if (window.GdprEngine && !window.GdprEngine.isConsentGranted('stats')) {
-            console.log("Stats consent missing, skipping exam history save.");
+            console.log('Stats consent missing, skipping exam history save.');
             return;
         }
         try {
@@ -1675,7 +1801,7 @@ class QuizViewClass extends BaseView {
                 score: score,
                 total: total,
                 percentage: Math.round((score / total) * 100),
-                results: results
+                results: results,
             };
 
             history.exams.unshift(exam); // Add to beginning
@@ -1686,10 +1812,9 @@ class QuizViewClass extends BaseView {
                 window.FirebaseAuthEngine.saveHistoryToCloud();
             }
         } catch (e) {
-            console.error("Failed to save exam history", e);
+            console.error('Failed to save exam history', e);
         }
     }
-
 
     importData() {
         const input = document.createElement('input');
@@ -1716,7 +1841,7 @@ class QuizViewClass extends BaseView {
                         StorageService.set(StorageService.KEYS.QCM_STATS, data.stats);
                         StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: data.examHistory });
 
-                        // Force update of current runtime stats if needed? 
+                        // Force update of current runtime stats if needed?
                         // Actually getPersistentStats reads from localStorage so it's fine.
 
                         alert('✅ Données importées avec succès !');
@@ -1725,13 +1850,15 @@ class QuizViewClass extends BaseView {
                             // Refresh stats display
                             QuizView.renderStats();
                         } catch (renderError) {
-                            console.error("Render failed after import", renderError);
-                            alert("Données importées, mais une erreur est survenue lors de l'affichage. Veuillez recharger la page.");
+                            console.error('Render failed after import', renderError);
+                            alert(
+                                "Données importées, mais une erreur est survenue lors de l'affichage. Veuillez recharger la page.",
+                            );
                         }
                     }
                 } catch (e) {
                     console.error('Import failed', e);
-                    alert('❌ Erreur lors de l\'import : ' + e.message);
+                    alert("❌ Erreur lors de l'import : " + e.message);
                 }
             };
             reader.readAsText(file);
@@ -1768,7 +1895,7 @@ class QuizViewClass extends BaseView {
                 stats: stats,
                 examHistory: examHistory,
                 exportDate: new Date().toISOString(),
-                version: '1.0'
+                version: '1.0',
             };
 
             const json = JSON.stringify(data, null, 2);
@@ -1779,7 +1906,8 @@ class QuizViewClass extends BaseView {
             a.href = url;
             const now = new Date();
             const dateStr = now.toISOString().split('T')[0];
-            const timeStr = now.getHours().toString().padStart(2, '0') + '-' + now.getMinutes().toString().padStart(2, '0');
+            const timeStr =
+                now.getHours().toString().padStart(2, '0') + '-' + now.getMinutes().toString().padStart(2, '0');
             a.download = `parapente_stats_${dateStr}_${timeStr}.json`;
             document.body.appendChild(a);
             a.click();
@@ -1789,15 +1917,13 @@ class QuizViewClass extends BaseView {
             alert('✅ Données exportées avec succès !');
         } catch (e) {
             console.error('Export failed', e);
-            alert('❌ Erreur lors de l\'export');
+            alert("❌ Erreur lors de l'export");
         }
     }
-
 
     getCourseUrl(questionCode, questionText) {
         return null;
     }
-
 } // End Class
 
 const QuizView = new QuizViewClass();

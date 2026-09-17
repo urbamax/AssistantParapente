@@ -1,13 +1,17 @@
 import { describe, it, expect } from 'vitest';
-import { calculateDistance, normalizeDegree, getAngularDifference, degreesToCardinal } from '../../js/utils/geo_utils.js';
+import {
+    calculateDistance,
+    normalizeDegree,
+    getAngularDifference,
+    degreesToCardinal,
+} from '../../js/utils/geo_utils.js';
 
 describe('Geo Utils', () => {
-    
     it('calculateDistance returns correct Haversine distance', () => {
         // Paris to Lyon (approx 392km)
-        const d = calculateDistance(48.8566, 2.3522, 45.7640, 4.8357);
+        const d = calculateDistance(48.8566, 2.3522, 45.764, 4.8357);
         expect(d).toBeCloseTo(392, -1); // Within 10km tolerance
-        
+
         expect(calculateDistance(0, 0, 0, 0)).toBe(0);
         expect(calculateDistance(undefined, 0, 0, 0)).toBe(Infinity);
     });

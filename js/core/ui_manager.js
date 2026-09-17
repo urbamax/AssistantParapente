@@ -1,6 +1,6 @@
 /**
  * CORE - UI Manager
- * Handles loading of shared HTML components (header, footer), 
+ * Handles loading of shared HTML components (header, footer),
  * theme logic (dark/light mode), and global navigation UI updates.
  */
 
@@ -32,13 +32,13 @@ class UIManager {
 
     async loadComponents(basePath = '.') {
         this.basePath = basePath;
-        
+
         // Add cache buster to bypass old components cache
         const v = '?v=2026.07.10_v10';
-        
+
         const componentMap = [
             { id: 'app-header', url: basePath + '/components/header.html' + v },
-            { id: 'app-footer', url: basePath + '/components/footer.html' + v, selector: '.app-footer-placeholder' }
+            { id: 'app-footer', url: basePath + '/components/footer.html' + v, selector: '.app-footer-placeholder' },
         ];
 
         for (const comp of componentMap) {
@@ -47,17 +47,19 @@ class UIManager {
                 const response = await fetch(fetchUrl);
                 if (!response.ok) throw new Error(`Network response was not ok for ${comp.url}`);
                 const html = await response.text();
-                
-                const targets = comp.selector 
-                    ? document.querySelectorAll(comp.selector) 
-                    : (document.getElementById(comp.id) ? [document.getElementById(comp.id)] : []);
-                
-                targets.forEach(el => {
+
+                const targets = comp.selector
+                    ? document.querySelectorAll(comp.selector)
+                    : document.getElementById(comp.id)
+                      ? [document.getElementById(comp.id)]
+                      : [];
+
+                targets.forEach((el) => {
                     el.innerHTML = html;
 
                     // Path correction if not at root
                     if (basePath !== '.') {
-                        el.querySelectorAll('[src], [href]').forEach(node => {
+                        el.querySelectorAll('[src], [href]').forEach((node) => {
                             const attr = node.hasAttribute('src') ? 'src' : 'href';
                             const val = node.getAttribute(attr);
                             if (!val.match(/^(http|\/\/|#|mailto:)/)) {
@@ -85,7 +87,7 @@ class UIManager {
         const current = GlobalState.get('themeMode');
         const modes = ['auto', 'light', 'dark'];
         const next = modes[(modes.indexOf(current) + 1) % modes.length];
-        
+
         StorageService.set(StorageService.KEYS.THEME_MODE, next);
         GlobalState.set('themeMode', next);
 
@@ -112,13 +114,13 @@ class UIManager {
         if (effectiveMode === 'auto') {
             const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             effectiveMode = systemDark ? 'dark' : 'light';
-            if (btn) btn.title = "Mode: Auto";
+            if (btn) btn.title = 'Mode: Auto';
             if (iconSun && iconMoon) {
                 iconSun.style.opacity = '1';
                 iconMoon.style.opacity = '1';
             }
         } else {
-            if (btn) btn.title = "Mode: " + capitalizeFirstLetter(effectiveMode);
+            if (btn) btn.title = 'Mode: ' + capitalizeFirstLetter(effectiveMode);
             if (effectiveMode === 'light') {
                 if (iconSun) iconSun.style.opacity = '1';
             } else {
@@ -138,9 +140,12 @@ class UIManager {
         const root = document.documentElement;
         let color = '#0ea5e9'; // Default Blue (BP)
 
-        if (level === 'BI') color = '#22c55e'; // Green
-        else if (level === 'BPC') color = '#8B4513'; // Brown
-        else if (level === 'TREUIL') color = '#6366f1'; // Indigo
+        if (level === 'BI')
+            color = '#22c55e'; // Green
+        else if (level === 'BPC')
+            color = '#8B4513'; // Brown
+        else if (level === 'TREUIL')
+            color = '#6366f1'; // Indigo
         else if (level === 'ALL') color = '#64748b'; // Slate
 
         root.style.setProperty('--accent-blue', color);
@@ -158,7 +163,7 @@ class UIManager {
         // Update Desktop Nav Active State
         const desktopNavBtns = document.querySelectorAll('.desktop-main-nav .nav-menu-btn');
         if (desktopNavBtns.length > 0) {
-            desktopNavBtns.forEach(btn => {
+            desktopNavBtns.forEach((btn) => {
                 btn.classList.remove('active');
                 if (btn.getAttribute('data-target') === currentMode) {
                     btn.classList.add('active');
@@ -176,13 +181,13 @@ class UIManager {
     restoreLevelUI(attempts = 0) {
         const levelSelect = document.getElementById('global-level-select');
         const currentLevel = GlobalState.get('level');
-        
+
         if (levelSelect && currentLevel) {
             levelSelect.value = currentLevel;
             const targetOption = levelSelect.querySelector(`option[value="${currentLevel}"]`);
             if (targetOption) targetOption.selected = true;
 
-            if (attempts < 25) { 
+            if (attempts < 25) {
                 setTimeout(() => this.restoreLevelUI(attempts + 1), 100);
             }
         } else if (attempts < 50) {
@@ -205,7 +210,7 @@ class UIManager {
                 section = 'about';
             }
         }
-        
+
         const modal = document.getElementById('manual-modal');
         if (modal) {
             modal.style.display = 'flex';
@@ -226,11 +231,11 @@ class UIManager {
     }
 
     showManualSection(section) {
-        document.querySelectorAll('.manual-tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.manual-tab-btn').forEach((btn) => btn.classList.remove('active'));
         const tab = document.getElementById(`manual-tab-${section}`);
         if (tab) tab.classList.add('active');
 
-        document.querySelectorAll('.manual-section').forEach(sec => sec.style.display = 'none');
+        document.querySelectorAll('.manual-section').forEach((sec) => (sec.style.display = 'none'));
         const sec = document.getElementById(`manual-section-${section}`);
         if (sec) sec.style.display = 'block';
     }

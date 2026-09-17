@@ -26,7 +26,12 @@ try {
     importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
     importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
 
-    if (typeof firebase !== 'undefined' && typeof FIREBASE_CONFIG !== 'undefined' && typeof IS_FIREBASE_ENABLED !== 'undefined' && IS_FIREBASE_ENABLED) {
+    if (
+        typeof firebase !== 'undefined' &&
+        typeof FIREBASE_CONFIG !== 'undefined' &&
+        typeof IS_FIREBASE_ENABLED !== 'undefined' &&
+        IS_FIREBASE_ENABLED
+    ) {
         firebase.initializeApp(FIREBASE_CONFIG);
         const messaging = firebase.messaging();
 
@@ -37,7 +42,7 @@ try {
             const options = {
                 body: (payload.notification && payload.notification.body) || '',
                 icon: './img/icons/icon-192x192.png',
-                badge: './img/icons/icon-192x192.png'
+                badge: './img/icons/icon-192x192.png',
             };
             self.registration.showNotification(title, options);
         });
@@ -94,19 +99,21 @@ const CRITICAL_ASSETS = [
     './js/firebase_config.js',
     './img/logo.png',
     './img/icons/icon-192x192.png',
-    './img/icons/icon-512x512.png'
+    './img/icons/icon-512x512.png',
 ];
 
 async function precacheWithFreshNetwork(cache) {
-    await Promise.all(CRITICAL_ASSETS.map(async (url) => {
-        try {
-            const response = await fetch(url, { cache: 'reload' });
-            if (response.ok) await cache.put(url, response);
-        } catch (e) {
-            // Un asset manquant/injoignable ne doit pas bloquer l'installation des autres.
-            console.warn('[SW] Pré-cache ignoré (échec) :', url, e.message);
-        }
-    }));
+    await Promise.all(
+        CRITICAL_ASSETS.map(async (url) => {
+            try {
+                const response = await fetch(url, { cache: 'reload' });
+                if (response.ok) await cache.put(url, response);
+            } catch (e) {
+                // Un asset manquant/injoignable ne doit pas bloquer l'installation des autres.
+                console.warn('[SW] Pré-cache ignoré (échec) :', url, e.message);
+            }
+        }),
+    );
 }
 
 self.addEventListener('install', (event) => {
@@ -116,11 +123,12 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys()
-            .then((cacheNames) => Promise.all(
-                cacheNames.map((name) => name !== CACHE_NAME ? caches.delete(name) : null)
-            ))
-            .then(() => self.clients.claim())
+        caches
+            .keys()
+            .then((cacheNames) =>
+                Promise.all(cacheNames.map((name) => (name !== CACHE_NAME ? caches.delete(name) : null))),
+            )
+            .then(() => self.clients.claim()),
     );
 });
 
@@ -145,7 +153,7 @@ self.addEventListener('fetch', (event) => {
                     caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
                     return response;
                 })
-                .catch(() => caches.match(request).then((cached) => cached || caches.match('./index.html')))
+                .catch(() => caches.match(request).then((cached) => cached || caches.match('./index.html'))),
         );
         return;
     }
@@ -156,14 +164,16 @@ self.addEventListener('fetch', (event) => {
         event.respondWith(
             caches.match(request).then((cached) => {
                 if (cached) return cached;
-                return fetch(request).then((response) => {
-                    if (response.ok) {
-                        const copy = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-                    }
-                    return response;
-                }).catch(() => cached);
-            })
+                return fetch(request)
+                    .then((response) => {
+                        if (response.ok) {
+                            const copy = response.clone();
+                            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                        }
+                        return response;
+                    })
+                    .catch(() => cached);
+            }),
         );
         return;
     }
@@ -171,14 +181,16 @@ self.addEventListener('fetch', (event) => {
     // Assets statiques same-origin : cache-first avec revalidation réseau en arrière-plan.
     event.respondWith(
         caches.match(request).then((cached) => {
-            const networkFetch = fetch(request).then((response) => {
-                if (response.ok) {
-                    const copy = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-                }
-                return response;
-            }).catch(() => cached);
+            const networkFetch = fetch(request)
+                .then((response) => {
+                    if (response.ok) {
+                        const copy = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                    }
+                    return response;
+                })
+                .catch(() => cached);
             return cached || networkFetch;
-        })
+        }),
     );
 });

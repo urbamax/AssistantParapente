@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { formatDuration, formatDateOnly, formatDateTime, getFileTimestamp } from '../../js/utils/date_utils.js';
 
 describe('Date Utils', () => {
-    
     it('formatDuration handles minutes and hours', () => {
         expect(formatDuration(45)).toBe('45min');
         expect(formatDuration(60)).toBe('1h 00min');

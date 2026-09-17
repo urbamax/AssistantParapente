@@ -5,11 +5,11 @@
 
 /**
  * Format a duration in minutes into a human readable string.
- * @param {number} minutes 
+ * @param {number} minutes
  * @returns {string} (e.g. "1h 30min", "45min")
  */
 export function formatDuration(minutes) {
-    if (!minutes || isNaN(minutes)) return "0min";
+    if (!minutes || isNaN(minutes)) return '0min';
     const h = Math.floor(minutes / 60);
     const m = minutes % 60;
     if (h === 0) return `${m}min`;
@@ -18,28 +18,30 @@ export function formatDuration(minutes) {
 
 /**
  * Format a date string into a localized short date (DD/MM/YYYY).
- * @param {string|Date} dateStr 
+ * @param {string|Date} dateStr
  * @returns {string}
  */
 export function formatDateOnly(dateStr) {
-    if (!dateStr) return "";
+    if (!dateStr) return '';
     const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return "";
+    if (isNaN(d.getTime())) return '';
     return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 /**
  * Format a date string into a localized date and time (DD/MM/YYYY à HH:MM).
- * @param {string|Date} dateStr 
+ * @param {string|Date} dateStr
  * @returns {string}
  */
 export function formatDateTime(dateStr) {
-    if (!dateStr) return "";
+    if (!dateStr) return '';
     const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return "";
-    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+    if (isNaN(d.getTime())) return '';
+    return (
+        d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
         ' à ' +
-        d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    );
 }
 
 /**

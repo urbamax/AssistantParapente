@@ -1,15 +1,15 @@
 /**
  * weatherScoring.js
- * 
+ *
  * Module de scoring météo pour les spots de parapente.
- * Combine la validation de sécurité (Kill Switches) et un calcul de score 
+ * Combine la validation de sécurité (Kill Switches) et un calcul de score
  * continu de 0 à 100 pour classer les meilleurs spots.
  */
 
 // Configuration des pondérations pour le score final (ajustable)
 const SCORING_WEIGHTS = {
-    WIND_SPEED: 0.5,     // 50% du score basé sur la vitesse du vent
-    WIND_DIRECTION: 0.5  // 50% du score basé sur l'orientation
+    WIND_SPEED: 0.5, // 50% du score basé sur la vitesse du vent
+    WIND_DIRECTION: 0.5, // 50% du score basé sur l'orientation
 };
 
 /**
@@ -29,22 +29,22 @@ function getAngularDifference(angle1, angle2) {
  * @returns {string} Direction cardinale ("N", "NE", "E", "SE", "S", "SO", "O", "NO")
  */
 function degreesToCardinal(deg) {
-    if (typeof deg !== 'number' || isNaN(deg)) return "";
+    if (typeof deg !== 'number' || isNaN(deg)) return '';
 
     // Normaliser les degrés entre 0 et 360
     const normalizedDeg = ((deg % 360) + 360) % 360;
 
-    const directions = ["N", "NE", "E", "SE", "S", "SO", "O", "NO"];
+    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
     const index = Math.round(normalizedDeg / 45) % 8;
     return directions[index];
 }
 /**
  * Évalue la météo d'un spot et calcule son score global.
- * 
+ *
  * @param {Object} site - Caractéristiques géographiques du spot.
  * @param {string} site.orientation - Orientations acceptées séparées par des virgules (ex: "S,SO").
  * @param {number} [site.orientation_ideale_deg] - Orientation idéale du site en degrés (le cas échéant).
- * 
+ *
  * @param {Object} weather - Prévisions météo actuelles fournies par l'API.
  * @param {boolean} weather.isDaytime - Indique s'il fait jour.
  * @param {number} weather.windSpeed - Vitesse du vent moyen.
@@ -54,12 +54,12 @@ function degreesToCardinal(deg) {
  * @param {string} [weather.windCard] - Direction cardinale du vent.
  * @param {number} weather.precipitation - Quantité de précipitations (mm).
  * @param {number} [weather.cape] - (Optionnel) CAPE / Index de stabilité (J/kg).
- * 
+ *
  * @param {Object} userPreferences - Filtres dynamiques issus des champs de l'interface.
  * @param {number} userPreferences.vMin - Vitesse de vent minimale requise.
  * @param {number} userPreferences.vMax - Vitesse de vent maximale autorisée.
  * @param {number} userPreferences.deltaRafaleMax - Écart maximal toléré (rafale - vent moyen).
- * 
+ *
  * @returns {Object} Résultat complet du diagnostic pour l'affichage et le tri.
  */
 function evaluateSpotForecast(site, weather, userPreferences) {
@@ -67,7 +67,13 @@ function evaluateSpotForecast(site, weather, userPreferences) {
     // 1. CAS DE CHARGEMENT OU DONNÉES INCOMPLÈTES
     // ---------------------------------------------------------
     if (!weather) {
-        return { score: 0, flyable: false, reason: 'Chargement...', class: 'weather-unknown', icon: 'ri-loader-4-line' };
+        return {
+            score: 0,
+            flyable: false,
+            reason: 'Chargement...',
+            class: 'weather-unknown',
+            icon: 'ri-loader-4-line',
+        };
     }
 
     // ---------------------------------------------------------
@@ -82,23 +88,48 @@ function evaluateSpotForecast(site, weather, userPreferences) {
     // B. Précipitations (Pluie)
     const precip = weather.precipitation ?? 0;
     if (precip > 0) {
-        return { score: 0, flyable: false, reason: `Pluie (${precip.toFixed(1)} mm)`, class: 'weather-unflyable', icon: 'ri-showers-fill' };
+        return {
+            score: 0,
+            flyable: false,
+            reason: `Pluie (${precip.toFixed(1)} mm)`,
+            class: 'weather-unflyable',
+            icon: 'ri-showers-fill',
+        };
     }
 
     // C. Limites de vitesse du vent moyen (vMin / vMax de l'utilisateur)
     let hardwareWingsNames = [];
     if (userPreferences.filterMode === 'hardware') {
         const wings = JSON.parse(localStorage.getItem('tp_equipment_data')) || [];
-        const flyableWings = wings.filter(wing => wing.type === 'voile' && wing.ventMin !== undefined && wing.ventMax !== undefined && weather.windSpeed >= wing.ventMin && weather.windSpeed <= wing.ventMax);
-        
+        const flyableWings = wings.filter(
+            (wing) =>
+                wing.type === 'voile' &&
+                wing.ventMin !== undefined &&
+                wing.ventMax !== undefined &&
+                weather.windSpeed >= wing.ventMin &&
+                weather.windSpeed <= wing.ventMax,
+        );
+
         if (flyableWings.length > 0) {
-            hardwareWingsNames = flyableWings.map(w => w.nom);
+            hardwareWingsNames = flyableWings.map((w) => w.nom);
         } else {
-            return { score: 0, flyable: false, reason: 'Vent hors limites (Matériel)', class: 'weather-unflyable', icon: 'ri-close-circle-fill' };
+            return {
+                score: 0,
+                flyable: false,
+                reason: 'Vent hors limites (Matériel)',
+                class: 'weather-unflyable',
+                icon: 'ri-close-circle-fill',
+            };
         }
     } else {
         if (weather.windSpeed < userPreferences.vMin || weather.windSpeed > userPreferences.vMax) {
-            return { score: 0, flyable: false, reason: 'Vent hors limites', class: 'weather-unflyable', icon: 'ri-close-circle-fill' };
+            return {
+                score: 0,
+                flyable: false,
+                reason: 'Vent hors limites',
+                class: 'weather-unflyable',
+                icon: 'ri-close-circle-fill',
+            };
         }
     }
 
@@ -106,32 +137,52 @@ function evaluateSpotForecast(site, weather, userPreferences) {
     const rafalesEffectives = Math.max(weather.windGust || 0, weather.windSpeed);
     const deltaRafale = rafalesEffectives - weather.windSpeed;
     if (deltaRafale > userPreferences.deltaRafaleMax) {
-        return { score: 0, flyable: false, reason: 'Rafales hors limites', class: 'weather-unflyable', icon: 'ri-close-circle-fill' };
+        return {
+            score: 0,
+            flyable: false,
+            reason: 'Rafales hors limites',
+            class: 'weather-unflyable',
+            icon: 'ri-close-circle-fill',
+        };
     }
 
     // E. Risque orageux (CAPE)
     if (weather.cape !== undefined && weather.cape > 1000) {
-        return { score: 0, flyable: false, reason: 'Risque orageux (CAPE)', class: 'weather-unflyable', icon: 'ri-thunderstorms-line' };
+        return {
+            score: 0,
+            flyable: false,
+            reason: 'Risque orageux (CAPE)',
+            class: 'weather-unflyable',
+            icon: 'ri-thunderstorms-line',
+        };
     }
 
     // F. Orientation du vent (Filtrage par Point Cardinal - Tolérance Zéro)
     let orientations = [];
     if (Array.isArray(site.orientations_vent)) orientations = site.orientations_vent;
-    else if (typeof site.orientations_vent === 'string') orientations = site.orientations_vent.split(',').map(v => v.trim());
-    else if (typeof site.orientation === 'string' && site.orientation.length > 0) orientations = site.orientation.split(',').map(v => v.trim());
+    else if (typeof site.orientations_vent === 'string')
+        orientations = site.orientations_vent.split(',').map((v) => v.trim());
+    else if (typeof site.orientation === 'string' && site.orientation.length > 0)
+        orientations = site.orientation.split(',').map((v) => v.trim());
     if (orientations.length > 0) {
-        let ventCardinal = "";
+        let ventCardinal = '';
 
-        if (weather.windCard && String(weather.windCard).trim() !== "") {
+        if (weather.windCard && String(weather.windCard).trim() !== '') {
             ventCardinal = String(weather.windCard);
-        } else if (weather.windDir !== undefined && weather.windDir !== null && String(weather.windDir).trim() !== "") {
+        } else if (weather.windDir !== undefined && weather.windDir !== null && String(weather.windDir).trim() !== '') {
             ventCardinal = degreesToCardinal(Number(weather.windDir));
         }
 
         ventCardinal = ventCardinal.trim().toUpperCase();
 
         if (!orientations.includes(ventCardinal)) {
-            return { score: 0, flyable: false, reason: 'Mauvaise orientation', class: 'weather-unflyable', icon: 'ri-close-circle-fill' };
+            return {
+                score: 0,
+                flyable: false,
+                reason: 'Mauvaise orientation',
+                class: 'weather-unflyable',
+                icon: 'ri-close-circle-fill',
+            };
         }
     }
 
@@ -146,7 +197,7 @@ function evaluateSpotForecast(site, weather, userPreferences) {
     let scoreVentMoyen;
     if (demiPlage > 0) {
         const ecartVent = Math.abs(weather.windSpeed - vIdeal);
-        scoreVentMoyen = Math.max(0, 100 * (1 - (ecartVent / demiPlage)));
+        scoreVentMoyen = Math.max(0, 100 * (1 - ecartVent / demiPlage));
     } else {
         // Protection division par zéro si vMin == vMax
         scoreVentMoyen = weather.windSpeed === vIdeal ? 100 : 0;
@@ -161,7 +212,7 @@ function evaluateSpotForecast(site, weather, userPreferences) {
         if (!isNaN(parsed)) {
             windDirDeg = parsed;
         } else {
-            const CARD_TO_DEG = { "N": 0, "NE": 45, "E": 90, "SE": 135, "S": 180, "SO": 225, "O": 270, "NO": 315 };
+            const CARD_TO_DEG = { N: 0, NE: 45, E: 90, SE: 135, S: 180, SO: 225, O: 270, NO: 315 };
             const cleanCard = String(weather.windDir).trim().toUpperCase();
             if (CARD_TO_DEG[cleanCard] !== undefined) {
                 windDirDeg = CARD_TO_DEG[cleanCard];
@@ -170,7 +221,7 @@ function evaluateSpotForecast(site, weather, userPreferences) {
     }
 
     if (windDirDeg === null && weather.windCard) {
-        const CARD_TO_DEG = { "N": 0, "NE": 45, "E": 90, "SE": 135, "S": 180, "SO": 225, "O": 270, "NO": 315 };
+        const CARD_TO_DEG = { N: 0, NE: 45, E: 90, SE: 135, S: 180, SO: 225, O: 270, NO: 315 };
         const cleanCard = String(weather.windCard).trim().toUpperCase();
         if (CARD_TO_DEG[cleanCard] !== undefined) {
             windDirDeg = CARD_TO_DEG[cleanCard];
@@ -179,7 +230,8 @@ function evaluateSpotForecast(site, weather, userPreferences) {
 
     // B. Note d'Orientation (0 à 100)
     // Plus le vent est aligné avec l'orientation de la pente, plus le score est élevé.
-    const hasOrientation = site.orientation_ideale_deg !== undefined && site.orientation_ideale_deg !== null && windDirDeg !== null;
+    const hasOrientation =
+        site.orientation_ideale_deg !== undefined && site.orientation_ideale_deg !== null && windDirDeg !== null;
     let angularDiff;
     let scoreOrientation = 100; // 100 par défaut si pas d'orientation idéale spécifiée
 
@@ -193,11 +245,11 @@ function evaluateSpotForecast(site, weather, userPreferences) {
         } else if (angularDiff <= 22.5) {
             // Zone 2 : Bon (décroît de 100 à 70 entre 11.25° et 22.5°)
             const progress = (angularDiff - 11.25) / (22.5 - 11.25);
-            scoreOrientation = 100 - (progress * 30);
+            scoreOrientation = 100 - progress * 30;
         } else if (angularDiff <= 45) {
             // Zone 3 : Passable (décroît de 70 à 0 entre 22.5° et 45°)
             const progress = (angularDiff - 22.5) / (45 - 22.5);
-            scoreOrientation = 70 - (progress * 70);
+            scoreOrientation = 70 - progress * 70;
         } else {
             // Zone 4 : Hors-jeu (> 45°)
             scoreOrientation = 0;
@@ -205,10 +257,9 @@ function evaluateSpotForecast(site, weather, userPreferences) {
     }
 
     // C. Calcul du score final pondéré
-    const finalScore = Math.round(
-        (scoreVentMoyen * SCORING_WEIGHTS.WIND_SPEED) +
-        (scoreOrientation * SCORING_WEIGHTS.WIND_DIRECTION)
-    ) || 0;
+    const finalScore =
+        Math.round(scoreVentMoyen * SCORING_WEIGHTS.WIND_SPEED + scoreOrientation * SCORING_WEIGHTS.WIND_DIRECTION) ||
+        0;
 
     // ---------------------------------------------------------
     // 4. RETOUR DU DIAGNOSTIC COMPLET
@@ -226,6 +277,6 @@ function evaluateSpotForecast(site, weather, userPreferences) {
         flyable: true,
         reason: reasonText,
         class: 'weather-flyable',
-        icon: 'ri-checkbox-circle-fill'
+        icon: 'ri-checkbox-circle-fill',
     };
 }

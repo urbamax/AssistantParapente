@@ -1,428 +1,512 @@
 const COURSES_DATA = {
-
-    "general/20240409-ffvl-formation-espacesaeriens": {
-        "title": "Espaces Aériens - Les Fondamentaux",
-        "category": "Règlementation",
-        "path": "courses/GENERAL",
-        "pages": 26,
-        "pdf": "courses/GENERAL/20240409_FFVL-Formation-EspacesAeriens.pdf",
-        "keywords": ["espace", "aérien", "classe", "ctr", "tma", "zone", "r", "p", "zsm", "interdit", "autorisé", "vfr", "hauteur", "agl", "altitude", "amsl", "fl", "niveau de vol", "nuage", "collision"],
-        "level": [
-            "GENERAL"
-        ]
+    'general/20240409-ffvl-formation-espacesaeriens': {
+        title: 'Espaces Aériens - Les Fondamentaux',
+        category: 'Règlementation',
+        path: 'courses/GENERAL',
+        pages: 26,
+        pdf: 'courses/GENERAL/20240409_FFVL-Formation-EspacesAeriens.pdf',
+        keywords: [
+            'espace',
+            'aérien',
+            'classe',
+            'ctr',
+            'tma',
+            'zone',
+            'r',
+            'p',
+            'zsm',
+            'interdit',
+            'autorisé',
+            'vfr',
+            'hauteur',
+            'agl',
+            'altitude',
+            'amsl',
+            'fl',
+            'niveau de vol',
+            'nuage',
+            'collision',
+        ],
+        level: ['GENERAL'],
     },
-    "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques": {
-        "title": "Maitrise de l’aile en vol - Exercices spécifiques",
-        "category": "Mécanique et technique de vol",
-        "path": "courses/GENERAL",
-        "pages": 0,
-        "pdf": "courses/GENERAL/pratique_maitrise_aile_exercices.pdf",
-        "keywords": ["pratique", "exercices", "maîtrise", "gonflage", "pilotage", "sol", "tangage", "roulis"],
-        "level": [
-            "BI",
-            "BP"
-        ]
+    'general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques': {
+        title: 'Maitrise de l’aile en vol - Exercices spécifiques',
+        category: 'Mécanique et technique de vol',
+        path: 'courses/GENERAL',
+        pages: 0,
+        pdf: 'courses/GENERAL/pratique_maitrise_aile_exercices.pdf',
+        keywords: ['pratique', 'exercices', 'maîtrise', 'gonflage', 'pilotage', 'sol', 'tangage', 'roulis'],
+        level: ['BI', 'BP'],
     },
-    "general/2014-livret-ffvl-9bd": {
-        "title": "Le guide des bonnes pratiques chez les libéristes",
-        "category": "Général",
-        "path": "courses/GENERAL",
-        "pages": 0,
-        "pdf": "courses/GENERAL/2014_Livret_FFVL_9BD.pdf",
-        "keywords": ["progression", "livret", "niveau", "blanc", "jaune", "orange", "vert", "bleu", "marron", "compétence"],
-        "level": [
-            "GENERAL"
-        ]
+    'general/2014-livret-ffvl-9bd': {
+        title: 'Le guide des bonnes pratiques chez les libéristes',
+        category: 'Général',
+        path: 'courses/GENERAL',
+        pages: 0,
+        pdf: 'courses/GENERAL/2014_Livret_FFVL_9BD.pdf',
+        keywords: [
+            'progression',
+            'livret',
+            'niveau',
+            'blanc',
+            'jaune',
+            'orange',
+            'vert',
+            'bleu',
+            'marron',
+            'compétence',
+        ],
+        level: ['GENERAL'],
     },
-    "general/facteurs-humains/1-fh-check-list/1-fh-check-list": {
-        "title": "Facteurs Humains 04 - Votre check-list",
-        "category": "Facteurs Humains",
-        "path": "courses/GENERAL/facteurs_humains/1-fh-check-list",
-        "pages": 0,
-        "pdf": "courses/GENERAL/facteurs_humains/1-fh-check-list/1-fh-check-list.pdf",
-        "keywords": ["facteur humain", "check-list", "prévol", "sécurité", "oubli", "méthode", "vérification"],
-        "level": [
-            "GENERAL"
-        ]
+    'general/facteurs-humains/1-fh-check-list/1-fh-check-list': {
+        title: 'Facteurs Humains 04 - Votre check-list',
+        category: 'Facteurs Humains',
+        path: 'courses/GENERAL/facteurs_humains/1-fh-check-list',
+        pages: 0,
+        pdf: 'courses/GENERAL/facteurs_humains/1-fh-check-list/1-fh-check-list.pdf',
+        keywords: ['facteur humain', 'check-list', 'prévol', 'sécurité', 'oubli', 'méthode', 'vérification'],
+        level: ['GENERAL'],
     },
-    "general/facteurs-humains/5-fh-fiche-synthase-ressources-vl/5-fh-fiche-synthase-ressources-vl": {
-        "title": "Facteurs Humains 02 - Cartographie des Ressources",
-        "category": "Facteurs Humains",
-        "path": "courses/GENERAL/facteurs_humains/5-fh-fiche-synthase-ressources-vl",
-        "pages": 0,
-        "pdf": "courses/GENERAL/facteurs_humains/5-fh-fiche-synthase-ressources-vl/5-fh-fiche-synthase-ressources-vl.pdf",
-        "keywords": ["facteur humain", "ressources", "compétence", "forme", "mental", "énergie", "fatigue"],
-        "level": [
-            "GENERAL"
-        ]
+    'general/facteurs-humains/5-fh-fiche-synthase-ressources-vl/5-fh-fiche-synthase-ressources-vl': {
+        title: 'Facteurs Humains 02 - Cartographie des Ressources',
+        category: 'Facteurs Humains',
+        path: 'courses/GENERAL/facteurs_humains/5-fh-fiche-synthase-ressources-vl',
+        pages: 0,
+        pdf: 'courses/GENERAL/facteurs_humains/5-fh-fiche-synthase-ressources-vl/5-fh-fiche-synthase-ressources-vl.pdf',
+        keywords: ['facteur humain', 'ressources', 'compétence', 'forme', 'mental', 'énergie', 'fatigue'],
+        level: ['GENERAL'],
     },
-    "general/facteurs-humains/2-fh-le-vol-de-didier/2-fh-le-vol-de-didier": {
-        "title": "Facteurs Humains 05 - Le vol de Didier",
-        "category": "Facteurs Humains",
-        "path": "courses/GENERAL/facteurs_humains/2-fh-le-vol-de-didier",
-        "pages": 0,
-        "pdf": "courses/GENERAL/facteurs_humains/2-fh-le-vol-de-didier/2-fh-le-vol-de-didier.pdf",
-        "level": [
-            "GENERAL"
-        ]
+    'general/facteurs-humains/2-fh-le-vol-de-didier/2-fh-le-vol-de-didier': {
+        title: 'Facteurs Humains 05 - Le vol de Didier',
+        category: 'Facteurs Humains',
+        path: 'courses/GENERAL/facteurs_humains/2-fh-le-vol-de-didier',
+        pages: 0,
+        pdf: 'courses/GENERAL/facteurs_humains/2-fh-le-vol-de-didier/2-fh-le-vol-de-didier.pdf',
+        level: ['GENERAL'],
     },
-    "general/facteurs-humains/3-fh-fiche-synthase-attitude-vl/3-fh-fiche-synthase-attitude-vl": {
-        "title": "Facteurs Humains 03 - L'Attitude",
-        "category": "Facteurs Humains",
-        "path": "courses/GENERAL/facteurs_humains/3-fh-fiche-synthase-attitude-vl",
-        "pages": 0,
-        "pdf": "courses/GENERAL/facteurs_humains/3-fh-fiche-synthase-attitude-vl/3-fh-fiche-synthase-attitude-vl.pdf",
-        "level": [
-            "GENERAL"
-        ]
+    'general/facteurs-humains/3-fh-fiche-synthase-attitude-vl/3-fh-fiche-synthase-attitude-vl': {
+        title: "Facteurs Humains 03 - L'Attitude",
+        category: 'Facteurs Humains',
+        path: 'courses/GENERAL/facteurs_humains/3-fh-fiche-synthase-attitude-vl',
+        pages: 0,
+        pdf: 'courses/GENERAL/facteurs_humains/3-fh-fiche-synthase-attitude-vl/3-fh-fiche-synthase-attitude-vl.pdf',
+        level: ['GENERAL'],
     },
-    "general/facteurs-humains/4-fh-fiche-synthase-intro-vl/4-fh-fiche-synthase-intro-vl": {
-        "title": "Facteurs Humains 01 - Introduction",
-        "category": "Facteurs Humains",
-        "path": "courses/GENERAL/facteurs_humains/4-fh-fiche-synthase-intro-vl",
-        "pages": 0,
-        "pdf": "courses/GENERAL/facteurs_humains/4-fh-fiche-synthase-intro-vl/4-fh-fiche-synthase-intro-vl.pdf",
-        "level": [
-            "GENERAL"
-        ]
+    'general/facteurs-humains/4-fh-fiche-synthase-intro-vl/4-fh-fiche-synthase-intro-vl': {
+        title: 'Facteurs Humains 01 - Introduction',
+        category: 'Facteurs Humains',
+        path: 'courses/GENERAL/facteurs_humains/4-fh-fiche-synthase-intro-vl',
+        pages: 0,
+        pdf: 'courses/GENERAL/facteurs_humains/4-fh-fiche-synthase-intro-vl/4-fh-fiche-synthase-intro-vl.pdf',
+        level: ['GENERAL'],
     },
-    "general/passeport-telechargement-web/2012-passeportspeed12-hd/2012-passeportspeed12-hd": {
-        "title": "Passeport Speed Riding",
-        "category": "Passeports",
-        "path": "courses/GENERAL/passeport_telechargement_web/2012_passeportspeed12-hd",
-        "pages": 0,
-        "pdf": "courses/GENERAL/passeport_telechargement_web/2012_passeportspeed12-hd/2012_passeportspeed12-hd.pdf",
-        "keywords": ["passeport", "speed-riding", "formation", "cursus", "niveau"],
-        "level": [
-            "GENERAL"
-        ]
+    'general/passeport-telechargement-web/2012-passeportspeed12-hd/2012-passeportspeed12-hd': {
+        title: 'Passeport Speed Riding',
+        category: 'Passeports',
+        path: 'courses/GENERAL/passeport_telechargement_web/2012_passeportspeed12-hd',
+        pages: 0,
+        pdf: 'courses/GENERAL/passeport_telechargement_web/2012_passeportspeed12-hd/2012_passeportspeed12-hd.pdf',
+        keywords: ['passeport', 'speed-riding', 'formation', 'cursus', 'niveau'],
+        level: ['GENERAL'],
     },
-    "general/passeport-telechargement-web/2012-passeportmini2012-hd3/2012-passeportmini2012-hd3": {
-        "title": "Passeport Mini-Voile",
-        "category": "Passeports",
-        "path": "courses/GENERAL/passeport_telechargement_web/2012_passeportmini2012-hd3",
-        "pages": 0,
-        "pdf": "courses/GENERAL/passeport_telechargement_web/2012_passeportmini2012-hd3/2012_passeportmini2012-hd3.pdf",
-        "keywords": ["passeport", "mini-voile", "formation", "cursus", "niveau"],
-        "level": [
-            "GENERAL"
-        ]
+    'general/passeport-telechargement-web/2012-passeportmini2012-hd3/2012-passeportmini2012-hd3': {
+        title: 'Passeport Mini-Voile',
+        category: 'Passeports',
+        path: 'courses/GENERAL/passeport_telechargement_web/2012_passeportmini2012-hd3',
+        pages: 0,
+        pdf: 'courses/GENERAL/passeport_telechargement_web/2012_passeportmini2012-hd3/2012_passeportmini2012-hd3.pdf',
+        keywords: ['passeport', 'mini-voile', 'formation', 'cursus', 'niveau'],
+        level: ['GENERAL'],
     },
-    "general/affiches-pedagogiques-a3/16-sigr2019/16-sigr2019": {
-        "title": "La SIGR - Strategie Individuelle de Gestion des Risques",
-        "category": "Général",
-        "path": "courses/GENERAL/affiches-pedagogiques-a3/16-sigr2019",
-        "pages": 0,
-        "pdf": "courses/GENERAL/affiches-pedagogiques-a3/16-sigr2019/16-sigr2019.pdf",
-        "keywords": ["sigr", "signalisation", "site", "panneau", "information", "atterrissage", "décollage"],
-        "level": [
-            "GENERAL"
-        ]
+    'general/affiches-pedagogiques-a3/16-sigr2019/16-sigr2019': {
+        title: 'La SIGR - Strategie Individuelle de Gestion des Risques',
+        category: 'Général',
+        path: 'courses/GENERAL/affiches-pedagogiques-a3/16-sigr2019',
+        pages: 0,
+        pdf: 'courses/GENERAL/affiches-pedagogiques-a3/16-sigr2019/16-sigr2019.pdf',
+        keywords: ['sigr', 'signalisation', 'site', 'panneau', 'information', 'atterrissage', 'décollage'],
+        level: ['GENERAL'],
     },
-    "general/affiches-pedagogiques-a3/10-parachutes-types2019/10-parachutes-types2019": {
-        "title": "Les parachutes de secours",
-        "category": "Matériel",
-        "path": "courses/GENERAL/affiches-pedagogiques-a3/10-parachutes-types2019",
-        "pages": 0,
-        "pdf": "courses/GENERAL/affiches-pedagogiques-a3/10-parachutes-types2019/10-parachutes-types2019.pdf",
-        "keywords": ["parachute", "secours", "typologie", "coupole", "rogallo", "carré", "hémisphérique", "dirigeable"],
-        "level": [
-            "GENERAL"
-        ]
+    'general/affiches-pedagogiques-a3/10-parachutes-types2019/10-parachutes-types2019': {
+        title: 'Les parachutes de secours',
+        category: 'Matériel',
+        path: 'courses/GENERAL/affiches-pedagogiques-a3/10-parachutes-types2019',
+        pages: 0,
+        pdf: 'courses/GENERAL/affiches-pedagogiques-a3/10-parachutes-types2019/10-parachutes-types2019.pdf',
+        keywords: ['parachute', 'secours', 'typologie', 'coupole', 'rogallo', 'carré', 'hémisphérique', 'dirigeable'],
+        level: ['GENERAL'],
     },
-    "general/affiches-pedagogiques-a3/19-secours2022/19-secours2022": {
-        "title": "Secours en Vol Libre - Conseils aux pilotes",
-        "category": "Général",
-        "path": "courses/GENERAL/affiches-pedagogiques-a3/19-secours2022",
-        "pages": 0,
-        "pdf": "courses/GENERAL/affiches-pedagogiques-a3/19-secours2022/19-secours2022.pdf",
-        "keywords": ["parachute", "secours", "installation", "poignée", "container", "pod", "vérification"],
-        "level": [
-            "GENERAL"
-        ]
+    'general/affiches-pedagogiques-a3/19-secours2022/19-secours2022': {
+        title: 'Secours en Vol Libre - Conseils aux pilotes',
+        category: 'Général',
+        path: 'courses/GENERAL/affiches-pedagogiques-a3/19-secours2022',
+        pages: 0,
+        pdf: 'courses/GENERAL/affiches-pedagogiques-a3/19-secours2022/19-secours2022.pdf',
+        keywords: ['parachute', 'secours', 'installation', 'poignée', 'container', 'pod', 'vérification'],
+        level: ['GENERAL'],
     },
-    "brevet-de-pilote---bleu/fiche-eval-2025/2025-fiche-cval-modules-bp/2025-fiche-cval-modules-bp": {
-        "title": "Fiche d'évaluation - Brevet de Pilote",
-        "category": "Général",
-        "path": "courses/BREVET DE PILOTE - BLEU/fiche-eval-2025/2025-fiche-cval_modules-bp",
-        "pages": 0,
-        "pdf": "courses/BREVET DE PILOTE - BLEU/fiche-eval-2025/2025-fiche-cval_modules-bp/2025-fiche-cval_modules-bp.pdf",
-        "keywords": ["fiche", "évaluation", "grille", "notation", "examen", "brevet de pilote"],
-        "level": [
-            "BP"
-        ]
+    'brevet-de-pilote---bleu/fiche-eval-2025/2025-fiche-cval-modules-bp/2025-fiche-cval-modules-bp': {
+        title: "Fiche d'évaluation - Brevet de Pilote",
+        category: 'Général',
+        path: 'courses/BREVET DE PILOTE - BLEU/fiche-eval-2025/2025-fiche-cval_modules-bp',
+        pages: 0,
+        pdf: 'courses/BREVET DE PILOTE - BLEU/fiche-eval-2025/2025-fiche-cval_modules-bp/2025-fiche-cval_modules-bp.pdf',
+        keywords: ['fiche', 'évaluation', 'grille', 'notation', 'examen', 'brevet de pilote'],
+        level: ['BP'],
     },
-    "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-": {
-        "title": "Référentiel - Brevet de Pilote",
-        "category": "Général",
-        "path": "courses/BREVET DE PILOTE - BLEU/developpement-durable_0/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
-        "pages": 0,
-        "pdf": "courses/BREVET DE PILOTE - BLEU/developpement-durable_0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-.pdf",
-        "keywords": ["référentiel", "examen", "pratique", "théorie", "critère", "brevet de pilote"],
-        "level": [
-            "BP"
-        ]
+    'brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-':
+        {
+            title: 'Référentiel - Brevet de Pilote',
+            category: 'Général',
+            path: 'courses/BREVET DE PILOTE - BLEU/developpement-durable_0/rcfcrentiel-niveau-bleu-brevet-de-pilote-',
+            pages: 0,
+            pdf: 'courses/BREVET DE PILOTE - BLEU/developpement-durable_0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-.pdf',
+            keywords: ['référentiel', 'examen', 'pratique', 'théorie', 'critère', 'brevet de pilote'],
+            level: ['BP'],
+        },
+    'brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web': {
+        title: 'Livret Pédagogique - Cycle 02 - Brevet de Pilote',
+        category: 'Général',
+        path: 'courses/BREVET DE PILOTE - BLEU/livrets-pp-2025/cycle2-2025web',
+        pages: 0,
+        pdf: 'courses/BREVET DE PILOTE - BLEU/livrets-pp-2025/cycle2-2025web/cycle2-2025web.pdf',
+        keywords: ['cycle 2', 'progression', 'pédagogie', 'objectifs', 'autonomie'],
+        level: ['BP'],
     },
-    "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web": {
-        "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
-        "category": "Général",
-        "path": "courses/BREVET DE PILOTE - BLEU/livrets-pp-2025/cycle2-2025web",
-        "pages": 0,
-        "pdf": "courses/BREVET DE PILOTE - BLEU/livrets-pp-2025/cycle2-2025web/cycle2-2025web.pdf",
-        "keywords": ["cycle 2", "progression", "pédagogie", "objectifs", "autonomie"],
-        "level": [
-            "BP"
-        ]
+    'brevet-de-pilote---bleu/affiches-pedagogiques-a3/08-parachute-de-secours-affallement2021/08-parachute-de-secours-affallement2021':
+        {
+            title: 'Parachute de secours - Procédure d’affalement',
+            category: 'Mécanique et technique de vol',
+            path: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/08-parachute-de-secours-affallement2021',
+            pages: 0,
+            pdf: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/08-parachute-de-secours-affallement2021/08-parachute-de-secours-affallement2021.pdf',
+            keywords: ['parachute', 'secours', 'affalement', 'neutralisation', 'voile', 'miroir', 'procédure'],
+            level: ['BP'],
+        },
+    'brevet-de-pilote---bleu/affiches-pedagogiques-a3/11-rafales2019/11-rafales2019': {
+        title: 'Rafales - Effets instantanés des rafales sur l’incidence et la vitesse de vol',
+        category: 'Mécanique et technique de vol',
+        path: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/11-rafales2019',
+        pages: 0,
+        pdf: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/11-rafales2019/11-rafales2019.pdf',
+        keywords: ['rafale', 'vent', 'danger', 'turbulence', 'vitesse', 'météo'],
+        level: ['BP'],
     },
-    "brevet-de-pilote---bleu/affiches-pedagogiques-a3/08-parachute-de-secours-affallement2021/08-parachute-de-secours-affallement2021": {
-        "title": "Parachute de secours - Procédure d’affalement",
-        "category": "Mécanique et technique de vol",
-        "path": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/08-parachute-de-secours-affallement2021",
-        "pages": 0,
-        "pdf": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/08-parachute-de-secours-affallement2021/08-parachute-de-secours-affallement2021.pdf",
-        "keywords": ["parachute", "secours", "affalement", "neutralisation", "voile", "miroir", "procédure"],
-        "level": [
-            "BP"
-        ]
+    'brevet-de-pilote---bleu/affiches-pedagogiques-a3/13-roulis-sellette2025/13-roulis-sellette2025': {
+        title: 'Produire du roulis, de petite amplitude «à la sellette»',
+        category: 'Mécanique et technique de vol',
+        path: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/13-roulis-sellette2025',
+        pages: 0,
+        pdf: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/13-roulis-sellette2025/13-roulis-sellette2025.pdf',
+        keywords: ['roulis', 'sellette', 'appui', 'pilotage', 'stabilité', 'amortissement', 'virage'],
+        level: ['BP'],
     },
-    "brevet-de-pilote---bleu/affiches-pedagogiques-a3/11-rafales2019/11-rafales2019": {
-        "title": "Rafales - Effets instantanés des rafales sur l’incidence et la vitesse de vol",
-        "category": "Mécanique et technique de vol",
-        "path": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/11-rafales2019",
-        "pages": 0,
-        "pdf": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/11-rafales2019/11-rafales2019.pdf",
-        "keywords": ["rafale", "vent", "danger", "turbulence", "vitesse", "météo"],
-        "level": [
-            "BP"
-        ]
+    'brevet-de-pilote---bleu/affiches-pedagogiques-a3/20-milieux-naturels-rapaces2023/20-milieux-naturels-rapaces2023':
+        {
+            title: 'Vol libre et milieux naturels - Partageons le ciel',
+            category: 'Milieux naturels',
+            path: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/20-milieux-naturels-rapaces2023',
+            pages: 0,
+            pdf: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/20-milieux-naturels-rapaces2023/20-milieux-naturels-rapaces2023.pdf',
+            keywords: [
+                'milieu',
+                'naturel',
+                'faune',
+                'environnement',
+                'protection',
+                'nidification',
+                'rapace',
+                'vautour',
+                'gypaète',
+                'aigle',
+                'réserve',
+                'parc',
+            ],
+            level: ['BP'],
+        },
+    'brevet-de-pilote---bleu/affiches-pedagogiques-a3/17-facteurs-humains2023/17-facteurs-humains2023': {
+        title: 'Facteurs Humains',
+        category: 'Facteurs Humains',
+        path: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/17-facteurs-humains2023',
+        pages: 0,
+        pdf: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/17-facteurs-humains2023/17-facteurs-humains2023.pdf',
+        keywords: ['facteur humain', 'progression', 'apprentissage', 'palier', 'stress', 'nouveauté'],
+        level: ['BP'],
     },
-    "brevet-de-pilote---bleu/affiches-pedagogiques-a3/13-roulis-sellette2025/13-roulis-sellette2025": {
-        "title": "Produire du roulis, de petite amplitude «à la sellette»",
-        "category": "Mécanique et technique de vol",
-        "path": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/13-roulis-sellette2025",
-        "pages": 0,
-        "pdf": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/13-roulis-sellette2025/13-roulis-sellette2025.pdf",
-        "keywords": ["roulis", "sellette", "appui", "pilotage", "stabilité", "amortissement", "virage"],
-        "level": [
-            "BP"
-        ]
+    'brevet-de-pilote---bleu/affiches-pedagogiques-a3/04-les-fronts2019/04-les-fronts2019': {
+        title: 'Perturbation atmosphérique - Les fronts',
+        category: 'Météo',
+        path: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/04-les-fronts2019',
+        pages: 0,
+        pdf: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/04-les-fronts2019/04-les-fronts2019.pdf',
+        keywords: ['front', 'météo', 'nuage', 'perturbation', 'chaud', 'froid', 'occlusion', 'isobare', 'dépression'],
+        level: ['BP'],
     },
-    "brevet-de-pilote---bleu/affiches-pedagogiques-a3/20-milieux-naturels-rapaces2023/20-milieux-naturels-rapaces2023": {
-        "title": "Vol libre et milieux naturels - Partageons le ciel",
-        "category": "Milieux naturels",
-        "path": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/20-milieux-naturels-rapaces2023",
-        "pages": 0,
-        "pdf": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/20-milieux-naturels-rapaces2023/20-milieux-naturels-rapaces2023.pdf",
-        "keywords": ["milieu", "naturel", "faune", "environnement", "protection", "nidification", "rapace", "vautour", "gypaète", "aigle", "réserve", "parc"],
-        "level": [
-            "BP"
-        ]
+    'brevet-de-pilote---bleu/affiches-pedagogiques-a3/14-tangage2025/14-tangage2025': {
+        title: 'Tangage - Travail d’amortissement en tangage',
+        category: 'Mécanique et technique de vol',
+        path: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/14-tangage2025',
+        pages: 0,
+        pdf: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/14-tangage2025/14-tangage2025.pdf',
+        level: ['BP'],
     },
-    "brevet-de-pilote---bleu/affiches-pedagogiques-a3/17-facteurs-humains2023/17-facteurs-humains2023": {
-        "title": "Facteurs Humains",
-        "category": "Facteurs Humains",
-        "path": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/17-facteurs-humains2023",
-        "pages": 0,
-        "pdf": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/17-facteurs-humains2023/17-facteurs-humains2023.pdf",
-        "keywords": ["facteur humain", "progression", "apprentissage", "palier", "stress", "nouveauté"],
-        "level": [
-            "BP"
-        ]
+    'brevet-de-pilote---bleu/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025': {
+        title: 'Réglementation - La division de l’espace aérien',
+        category: 'Règlementation',
+        path: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/12-reglementation2025',
+        pages: 0,
+        pdf: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025.pdf',
+        keywords: [
+            'espace',
+            'aérien',
+            'classe',
+            'ctr',
+            'tma',
+            'zone',
+            'r',
+            'p',
+            'zsm',
+            'interdit',
+            'autorisé',
+            'vfr',
+            'hauteur',
+            'agl',
+            'altitude',
+            'amsl',
+            'fl',
+            'niveau de vol',
+            'nuage',
+            'collision',
+        ],
+        level: ['BP'],
     },
-    "brevet-de-pilote---bleu/affiches-pedagogiques-a3/04-les-fronts2019/04-les-fronts2019": {
-        "title": "Perturbation atmosphérique - Les fronts",
-        "category": "Météo",
-        "path": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/04-les-fronts2019",
-        "pages": 0,
-        "pdf": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/04-les-fronts2019/04-les-fronts2019.pdf",
-        "keywords": ["front", "météo", "nuage", "perturbation", "chaud", "froid", "occlusion", "isobare", "dépression"],
-        "level": [
-            "BP"
-        ]
+    'brevet-de-pilote---bleu/affiches-pedagogiques-a3/01-desequilibre-du-vol2021/01-desequilibre-du-vol2021': {
+        title: 'Déséquilibre du vol - Conséquence aérodynamique des variations de la vitesse sur les profils des parapentes',
+        category: 'Mécanique et technique de vol',
+        path: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/01-desequilibre-du-vol2021',
+        pages: 0,
+        pdf: 'courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/01-desequilibre-du-vol2021/01-desequilibre-du-vol2021.pdf',
+        keywords: [
+            'déséquilibre',
+            'tangage',
+            'abattée',
+            'ressource',
+            'fermeture',
+            'asymétrique',
+            'incidents',
+            'pendulaire',
+            'rfa',
+            'poids',
+            'frontale',
+            'temporisation',
+            'main basse',
+            'bras hauts',
+        ],
+        level: ['BP'],
     },
-    "brevet-de-pilote---bleu/affiches-pedagogiques-a3/14-tangage2025/14-tangage2025": {
-        "title": "Tangage - Travail d’amortissement en tangage",
-        "category": "Mécanique et technique de vol",
-        "path": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/14-tangage2025",
-        "pages": 0,
-        "pdf": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/14-tangage2025/14-tangage2025.pdf",
-        "level": [
-            "BP"
-        ]
+    'brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-':
+        {
+            title: 'Vol libre et milieux naturels - Référentiel de connaissances',
+            category: 'Milieux naturels',
+            path: 'courses/BREVET INITIAL - VERT/developpement-durable_0/rcfcrentiel-niveau-vert-brevet-initial-',
+            pages: 0,
+            pdf: 'courses/BREVET INITIAL - VERT/developpement-durable_0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-.pdf',
+            keywords: ['référentiel', 'examen', 'pratique', 'théorie', 'critère', 'brevet initial'],
+            level: ['BI'],
+        },
+    'brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web': {
+        title: 'Livret Pédagogique - Initiation',
+        category: 'Général',
+        path: 'courses/BREVET INITIAL - VERT/livrets-pp-2025/initiation-2025-web',
+        pages: 0,
+        pdf: 'courses/BREVET INITIAL - VERT/livrets-pp-2025/initiation-2025-web/initiation-2025-web.pdf',
+        keywords: ['initiation', 'découverte', 'premier vol', 'pente école', 'sécurité', 'bases'],
+        level: ['BI'],
     },
-    "brevet-de-pilote---bleu/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025": {
-        "title": "Réglementation - La division de l’espace aérien",
-        "category": "Règlementation",
-        "path": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/12-reglementation2025",
-        "pages": 0,
-        "pdf": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025.pdf",
-        "keywords": ["espace", "aérien", "classe", "ctr", "tma", "zone", "r", "p", "zsm", "interdit", "autorisé", "vfr", "hauteur", "agl", "altitude", "amsl", "fl", "niveau de vol", "nuage", "collision"],
-        "level": [
-            "BP"
-        ]
+    'brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web': {
+        title: 'Livret Pédagogique - Cycle 01 - Brevet Initial',
+        category: 'Général',
+        path: 'courses/BREVET INITIAL - VERT/livrets-pp-2025/cycle1-2025web',
+        pages: 0,
+        pdf: 'courses/BREVET INITIAL - VERT/livrets-pp-2025/cycle1-2025web/cycle1-2025web.pdf',
+        keywords: ['cycle 1', 'initiation', 'progression', 'bases', 'pédagogie'],
+        level: ['BI'],
     },
-    "brevet-de-pilote---bleu/affiches-pedagogiques-a3/01-desequilibre-du-vol2021/01-desequilibre-du-vol2021": {
-        "title": "Déséquilibre du vol - Conséquence aérodynamique des variations de la vitesse sur les profils des parapentes",
-        "category": "Mécanique et technique de vol",
-        "path": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/01-desequilibre-du-vol2021",
-        "pages": 0,
-        "pdf": "courses/BREVET DE PILOTE - BLEU/affiches-pedagogiques-a3/01-desequilibre-du-vol2021/01-desequilibre-du-vol2021.pdf",
-        "keywords": ["déséquilibre", "tangage", "abattée", "ressource", "fermeture", "asymétrique", "incidents", "pendulaire", "rfa", "poids", "frontale", "temporisation", "main basse", "bras hauts"],
-        "level": [
-            "BP"
-        ]
+    'brevet-initial---vert/affiches-pedagogiques-a3/05-les-pieges-aerologiques2019/05-les-pieges-aerologiques2019': {
+        title: 'Les pièges aérologiques',
+        category: 'Météo',
+        path: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/05-les-pieges-aerologiques2019',
+        pages: 0,
+        pdf: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/05-les-pieges-aerologiques2019/05-les-pieges-aerologiques2019.pdf',
+        keywords: [
+            'piège',
+            'danger',
+            'gradient',
+            'cisaillement',
+            'turbulence',
+            'rotor',
+            'sous le vent',
+            'venturi',
+            'accélération',
+            'orage',
+            'cumulonimbus',
+            'cb',
+            'rafale',
+            'atterrissage',
+        ],
+        level: ['BI'],
     },
-    "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-": {
-        "title": "Vol libre et milieux naturels - Référentiel de connaissances",
-        "category": "Milieux naturels",
-        "path": "courses/BREVET INITIAL - VERT/developpement-durable_0/rcfcrentiel-niveau-vert-brevet-initial-",
-        "pages": 0,
-        "pdf": "courses/BREVET INITIAL - VERT/developpement-durable_0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-.pdf",
-        "keywords": ["référentiel", "examen", "pratique", "théorie", "critère", "brevet initial"],
-        "level": [
-            "BI"
-        ]
+    'brevet-initial---vert/affiches-pedagogiques-a3/06-mecanique-du-vol2021/06-mecanique-du-vol2021': {
+        title: 'Mécanique du vol et angles',
+        category: 'Mécanique et technique de vol',
+        path: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/06-mecanique-du-vol2021',
+        pages: 0,
+        pdf: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/06-mecanique-du-vol2021/06-mecanique-du-vol2021.pdf',
+        keywords: [
+            'mécanique',
+            'force',
+            'portance',
+            'traînée',
+            'poids',
+            'rfa',
+            'vent relatif',
+            'incidence',
+            'assiette',
+            'pente',
+            'trajectoire',
+            'finesse',
+            'polaire',
+            'décrochage',
+            'fermeture',
+            'surpression',
+            'dépression',
+        ],
+        level: ['BI'],
     },
-    "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web": {
-        "title": "Livret Pédagogique - Initiation",
-        "category": "Général",
-        "path": "courses/BREVET INITIAL - VERT/livrets-pp-2025/initiation-2025-web",
-        "pages": 0,
-        "pdf": "courses/BREVET INITIAL - VERT/livrets-pp-2025/initiation-2025-web/initiation-2025-web.pdf",
-        "keywords": ["initiation", "découverte", "premier vol", "pente école", "sécurité", "bases"],
-        "level": [
-            "BI"
-        ]
+    'brevet-initial---vert/affiches-pedagogiques-a3/03-la-dynamique-du-vol2019/03-la-dynamique-du-vol2019': {
+        title: 'La dynamique du vol',
+        category: 'Mécanique et technique de vol',
+        path: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/03-la-dynamique-du-vol2019',
+        pages: 0,
+        pdf: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/03-la-dynamique-du-vol2019/03-la-dynamique-du-vol2019.pdf',
+        keywords: [
+            'dynamique',
+            'axe',
+            'roulis',
+            'tangage',
+            'lacet',
+            'stabilité',
+            'pendulaire',
+            'virage',
+            'coordonné',
+            'abattée',
+            'ressource',
+            'inertie',
+            'mouvement',
+        ],
+        level: ['BI'],
     },
-    "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web": {
-        "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
-        "category": "Général",
-        "path": "courses/BREVET INITIAL - VERT/livrets-pp-2025/cycle1-2025web",
-        "pages": 0,
-        "pdf": "courses/BREVET INITIAL - VERT/livrets-pp-2025/cycle1-2025web/cycle1-2025web.pdf",
-        "keywords": ["cycle 1", "initiation", "progression", "bases", "pédagogie"],
-        "level": [
-            "BI"
-        ]
+    'brevet-initial---vert/affiches-pedagogiques-a3/02-facteurs-humains2019/02-facteurs-humains2019': {
+        title: 'Facteurs humains - par JG Charrier',
+        category: 'Facteurs Humains',
+        path: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/02-facteurs-humains2019',
+        pages: 0,
+        pdf: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/02-facteurs-humains2019/02-facteurs-humains2019.pdf',
+        keywords: [
+            'facteur humain',
+            'attitude',
+            'sécurité',
+            'stress',
+            'fatigue',
+            'ressources',
+            'impulsivité',
+            'anti-autorité',
+            'invulnérabilité',
+            'macho',
+            'résignation',
+            'conscience',
+            'situation',
+            'décision',
+        ],
+        level: ['BI'],
     },
-    "brevet-initial---vert/affiches-pedagogiques-a3/05-les-pieges-aerologiques2019/05-les-pieges-aerologiques2019": {
-        "title": "Les pièges aérologiques",
-        "category": "Météo",
-        "path": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/05-les-pieges-aerologiques2019",
-        "pages": 0,
-        "pdf": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/05-les-pieges-aerologiques2019/05-les-pieges-aerologiques2019.pdf",
-        "keywords": ["piège", "danger", "gradient", "cisaillement", "turbulence", "rotor", "sous le vent", "venturi", "accélération", "orage", "cumulonimbus", "cb", "rafale", "atterrissage"],
-        "level": [
-            "BI"
-        ]
+    'brevet-initial---vert/affiches-pedagogiques-a3/18-milieux-naturels2022/18-milieux-naturels2022': {
+        title: 'Vol Libre et Milieux Naturels - Nous volons au sein d’écosystèmes avec lesquels nous entrons en interaction',
+        category: 'Milieux naturels',
+        path: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/18-milieux-naturels2022',
+        pages: 0,
+        pdf: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/18-milieux-naturels2022/18-milieux-naturels2022.pdf',
+        level: ['BI'],
     },
-    "brevet-initial---vert/affiches-pedagogiques-a3/06-mecanique-du-vol2021/06-mecanique-du-vol2021": {
-        "title": "Mécanique du vol et angles",
-        "category": "Mécanique et technique de vol",
-        "path": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/06-mecanique-du-vol2021",
-        "pages": 0,
-        "pdf": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/06-mecanique-du-vol2021/06-mecanique-du-vol2021.pdf",
-        "keywords": ["mécanique", "force", "portance", "traînée", "poids", "rfa", "vent relatif", "incidence", "assiette", "pente", "trajectoire", "finesse", "polaire", "décrochage", "fermeture", "surpression", "dépression"],
-        "level": [
-            "BI"
-        ]
+    'brevet-initial---vert/affiches-pedagogiques-a3/09-parachute-descriptif-chaine2019/09-parachute-descriptif-chaine2019':
+        {
+            title: 'Parachute de secours - Description',
+            category: 'Matériel',
+            path: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/09-parachute-descriptif-chaine2019',
+            pages: 0,
+            pdf: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/09-parachute-descriptif-chaine2019/09-parachute-descriptif-chaine2019.pdf',
+            keywords: ['parachute', 'secours', 'chaîne', 'cinématique', 'maillon', 'élévateur', 'sangle'],
+            level: ['BI'],
+        },
+    'brevet-initial---vert/affiches-pedagogiques-a3/21-mecavol-virage2024/21-mecavol-virage2024': {
+        title: 'Le virage en parapente',
+        category: 'Mécanique et technique de vol',
+        path: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/21-mecavol-virage2024',
+        pages: 0,
+        pdf: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/21-mecavol-virage2024/21-mecavol-virage2024.pdf',
+        keywords: ['mécanique', 'virage', 'force', 'centrifuge', 'roulis', 'lacet', 'trajectoire', 'inclinaison'],
+        level: ['BI'],
     },
-    "brevet-initial---vert/affiches-pedagogiques-a3/03-la-dynamique-du-vol2019/03-la-dynamique-du-vol2019": {
-        "title": "La dynamique du vol",
-        "category": "Mécanique et technique de vol",
-        "path": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/03-la-dynamique-du-vol2019",
-        "pages": 0,
-        "pdf": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/03-la-dynamique-du-vol2019/03-la-dynamique-du-vol2019.pdf",
-        "keywords": ["dynamique", "axe", "roulis", "tangage", "lacet", "stabilité", "pendulaire", "virage", "coordonné", "abattée", "ressource", "inertie", "mouvement"],
-        "level": [
-            "BI"
-        ]
+    'brevet-initial---vert/affiches-pedagogiques-a3/07-parachute-de-secours2019/07-parachute-de-secours2019': {
+        title: 'Le Parachute de secours',
+        category: 'Matériel',
+        path: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/07-parachute-de-secours2019',
+        pages: 0,
+        pdf: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/07-parachute-de-secours2019/07-parachute-de-secours2019.pdf',
+        keywords: ['parachute', 'secours', 'usage', 'quand', 'comment', 'décision', 'lancer'],
+        level: ['BI'],
     },
-    "brevet-initial---vert/affiches-pedagogiques-a3/02-facteurs-humains2019/02-facteurs-humains2019": {
-        "title": "Facteurs humains - par JG Charrier",
-        "category": "Facteurs Humains",
-        "path": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/02-facteurs-humains2019",
-        "pages": 0,
-        "pdf": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/02-facteurs-humains2019/02-facteurs-humains2019.pdf",
-        "keywords": ["facteur humain", "attitude", "sécurité", "stress", "fatigue", "ressources", "impulsivité", "anti-autorité", "invulnérabilité", "macho", "résignation", "conscience", "situation", "décision"],
-        "level": [
-            "BI"
-        ]
+    'brevet-initial---vert/affiches-pedagogiques-a3/15-les-brises2021/15-les-brises2021': {
+        title: 'Les brises',
+        category: 'Météo',
+        path: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/15-les-brises2021',
+        pages: 0,
+        pdf: 'courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/15-les-brises2021/15-les-brises2021.pdf',
+        keywords: [
+            'brise',
+            'pente',
+            'vallée',
+            'montante',
+            'anabatique',
+            'descendante',
+            'catabatique',
+            'thermique',
+            'cycle diurne',
+            'cycle nocturne',
+            'contraste',
+            'conduction',
+            'mer',
+            'terre',
+            'restitution',
+        ],
+        level: ['BI'],
     },
-    "brevet-initial---vert/affiches-pedagogiques-a3/18-milieux-naturels2022/18-milieux-naturels2022": {
-        "title": "Vol Libre et Milieux Naturels - Nous volons au sein d’écosystèmes avec lesquels nous entrons en interaction",
-        "category": "Milieux naturels",
-        "path": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/18-milieux-naturels2022",
-        "pages": 0,
-        "pdf": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/18-milieux-naturels2022/18-milieux-naturels2022.pdf",
-        "level": [
-            "BI"
-        ]
+    'brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-': {
+        title: 'Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit',
+        category: 'Général',
+        path: 'courses/BREVET DE PILOTE CONFIRMÉ - MARRON',
+        pages: 0,
+        pdf: 'courses/BREVET DE PILOTE CONFIRMÉ - MARRON/bpc_pp_delta_v2025_may.pdf',
+        keywords: ['bpc', 'confirmé', 'delta', 'règlementation', 'compétition', 'distance'],
+        level: ['BPC'],
     },
-    "brevet-initial---vert/affiches-pedagogiques-a3/09-parachute-descriptif-chaine2019/09-parachute-descriptif-chaine2019": {
-        "title": "Parachute de secours - Description",
-        "category": "Matériel",
-        "path": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/09-parachute-descriptif-chaine2019",
-        "pages": 0,
-        "pdf": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/09-parachute-descriptif-chaine2019/09-parachute-descriptif-chaine2019.pdf",
-        "keywords": ["parachute", "secours", "chaîne", "cinématique", "maillon", "élévateur", "sangle"],
-        "level": [
-            "BI"
-        ]
+    'brevet-de-pilote-confirme---marron/fiche-eval-2025/2025-fiche-cval-bpc-4-modules/2025-fiche-cval-bpc-4-modules': {
+        title: "Fiche d'évaluation - Brevet de Pilote Confirmé",
+        category: 'Général',
+        path: 'courses/BREVET DE PILOTE CONFIRMÉ - MARRON/fiche-eval-2025/2025-fiche-cval-bpc_4-modules',
+        pages: 0,
+        pdf: 'courses/BREVET DE PILOTE CONFIRMÉ - MARRON/fiche-eval-2025/2025-fiche-cval-bpc_4-modules/2025-fiche-cval-bpc_4-modules.pdf',
+        keywords: ['fiche', 'évaluation', 'bpc', 'confirmé', 'modules', 'examen'],
+        level: ['BPC'],
     },
-    "brevet-initial---vert/affiches-pedagogiques-a3/21-mecavol-virage2024/21-mecavol-virage2024": {
-        "title": "Le virage en parapente",
-        "category": "Mécanique et technique de vol",
-        "path": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/21-mecavol-virage2024",
-        "pages": 0,
-        "pdf": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/21-mecavol-virage2024/21-mecavol-virage2024.pdf",
-        "keywords": ["mécanique", "virage", "force", "centrifuge", "roulis", "lacet", "trajectoire", "inclinaison"],
-        "level": [
-            "BI"
-        ]
-    },
-    "brevet-initial---vert/affiches-pedagogiques-a3/07-parachute-de-secours2019/07-parachute-de-secours2019": {
-        "title": "Le Parachute de secours",
-        "category": "Matériel",
-        "path": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/07-parachute-de-secours2019",
-        "pages": 0,
-        "pdf": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/07-parachute-de-secours2019/07-parachute-de-secours2019.pdf",
-        "keywords": ["parachute", "secours", "usage", "quand", "comment", "décision", "lancer"],
-        "level": [
-            "BI"
-        ]
-    },
-    "brevet-initial---vert/affiches-pedagogiques-a3/15-les-brises2021/15-les-brises2021": {
-        "title": "Les brises",
-        "category": "Météo",
-        "path": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/15-les-brises2021",
-        "pages": 0,
-        "pdf": "courses/BREVET INITIAL - VERT/affiches-pedagogiques-a3/15-les-brises2021/15-les-brises2021.pdf",
-        "keywords": ["brise", "pente", "vallée", "montante", "anabatique", "descendante", "catabatique", "thermique", "cycle diurne", "cycle nocturne", "contraste", "conduction", "mer", "terre", "restitution"],
-        "level": [
-            "BI"
-        ]
-    },
-    "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-": {
-        "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-        "category": "Général",
-        "path": "courses/BREVET DE PILOTE CONFIRMÉ - MARRON",
-        "pages": 0,
-        "pdf": "courses/BREVET DE PILOTE CONFIRMÉ - MARRON/bpc_pp_delta_v2025_may.pdf",
-        "keywords": ["bpc", "confirmé", "delta", "règlementation", "compétition", "distance"],
-        "level": [
-            "BPC"
-        ]
-    },
-    "brevet-de-pilote-confirme---marron/fiche-eval-2025/2025-fiche-cval-bpc-4-modules/2025-fiche-cval-bpc-4-modules": {
-        "title": "Fiche d'évaluation - Brevet de Pilote Confirmé",
-        "category": "Général",
-        "path": "courses/BREVET DE PILOTE CONFIRMÉ - MARRON/fiche-eval-2025/2025-fiche-cval-bpc_4-modules",
-        "pages": 0,
-        "pdf": "courses/BREVET DE PILOTE CONFIRMÉ - MARRON/fiche-eval-2025/2025-fiche-cval-bpc_4-modules/2025-fiche-cval-bpc_4-modules.pdf",
-        "keywords": ["fiche", "évaluation", "bpc", "confirmé", "modules", "examen"],
-        "level": [
-            "BPC"
-        ]
-    }
 };

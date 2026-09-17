@@ -8,13 +8,13 @@ import StorageService from '../services/storage.js';
 class AppState {
     constructor() {
         this.state = {
-            level: 'ALL',        // BI, BP, BPC, ALL
+            level: 'ALL', // BI, BP, BPC, ALL
             mode: 'MENU',
             themeMode: 'auto',
             currentCourseId: null,
             lastMode: 'MENU',
             isOnline: navigator.onLine,
-            userPreferences: {}
+            userPreferences: {},
         };
         this.listeners = new Map();
     }
@@ -65,10 +65,10 @@ class AppState {
             this.listeners.set(key, new Set());
         }
         this.listeners.get(key).add(callback);
-        
+
         // Immediate call with current value
         callback(this.state[key]);
-        
+
         return () => this.unsubscribe(key, callback);
     }
 
@@ -80,7 +80,7 @@ class AppState {
 
     notify(key, value) {
         if (this.listeners.has(key)) {
-            this.listeners.get(key).forEach(cb => cb(value));
+            this.listeners.get(key).forEach((cb) => cb(value));
         }
     }
 }

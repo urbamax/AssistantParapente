@@ -8,10 +8,10 @@ import AppRouter from '../core/router.js';
 import LogbookService from '../services/logbook_service.js';
 import StorageService from '../services/storage.js'; // Retained just for custom select lists
 import { EXTENDED_WIND_DIRECTIONS } from '../data/weather_config.js';
-import { 
+import {
     DEFAULT_EQUIPMENT_BRANDS,
     DEFAULT_EQUIPMENT_SIZES,
-    DEFAULT_EQUIPMENT_COLORS
+    DEFAULT_EQUIPMENT_COLORS,
 } from '../data/equipment_config.js';
 import { escapeHTML } from '../core/security.js';
 import { formatDuration, formatDateOnly, formatDateTime, addMinutesToDatetimeLocal } from '../utils/date_utils.js';
@@ -26,7 +26,6 @@ class LogbookViewClass extends BaseView {
         this.engine = null;
         this.currentTab = 'history';
         this.currentFormType = 'vol';
-
     } // Ends constructor
 
     setupEventListeners() {
@@ -43,7 +42,12 @@ class LogbookViewClass extends BaseView {
                 const target = e.target;
                 if (target.id === 'lb-voile' || target.id === 'lb-sellette') {
                     LogbookView.setSelectOrAutre(target.id, target.id + '-autre', target.value);
-                } else if (target.id === 'eq-marque' || target.id === 'eq-modele' || target.id === 'eq-taille' || target.id === 'eq-couleur') {
+                } else if (
+                    target.id === 'eq-marque' ||
+                    target.id === 'eq-modele' ||
+                    target.id === 'eq-taille' ||
+                    target.id === 'eq-couleur'
+                ) {
                     LogbookView.setSelectOrAutre(target.id, target.id + '-autre', target.value);
                 } else if (target.id === 'eq-type') {
                     const windLimitsDiv = document.getElementById('eq-wind-limits');
@@ -52,7 +56,7 @@ class LogbookViewClass extends BaseView {
                     }
                 }
             });
-            
+
             // Logbook form submit
             container.addEventListener('submit', (e) => {
                 if (e.target.id === 'logbook-add-form') {
@@ -71,7 +75,7 @@ class LogbookViewClass extends BaseView {
         this.initEquipment();
         this.setupEventListeners();
         this.updateEquipmentAlertBadge();
-        console.log("LogbookView initialized.");
+        console.log('LogbookView initialized.');
     }
 
     // Petit badge rouge sur l'onglet nav "Carnet" comptant le matériel dont la révision
@@ -81,7 +85,7 @@ class LogbookViewClass extends BaseView {
         const badge = document.getElementById('logbook-nav-badge');
         if (!badge) return;
         const wear = LogbookService.computeEquipmentWear();
-        const alertCount = Object.values(wear).filter(s => s.alerts.dateAlert || s.alerts.hoursAlert).length;
+        const alertCount = Object.values(wear).filter((s) => s.alerts.dateAlert || s.alerts.hoursAlert).length;
         if (alertCount > 0) {
             badge.textContent = alertCount;
             badge.style.display = 'flex';
@@ -92,19 +96,23 @@ class LogbookViewClass extends BaseView {
 
     normalizeString(str) {
         if (!str) return '';
-        return str.toLowerCase()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        return str
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
             .replace(/[^a-z0-9]/g, '');
     }
 
     // Découpe en mots significatifs (≥3 chars) après nettoyage des accents/ponctuation
     normalizeWords(str) {
         if (!str) return [];
-        return str.toLowerCase()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        return str
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
             .replace(/[^a-z0-9\s]/g, ' ')
             .split(/\s+/)
-            .filter(w => w.length >= 3);
+            .filter((w) => w.length >= 3);
     }
 
     // Recherche le meilleur site par correspondance de mots-clés
@@ -115,10 +123,13 @@ class LogbookViewClass extends BaseView {
 
         let bestMatch = null;
         let bestScore = 0;
-        SITES_DATA.forEach(s => {
+        SITES_DATA.forEach((s) => {
             const siteWords = this.normalizeWords(s.nom || s.name || '');
-            const score = inputWords.filter(w => siteWords.some(sw => sw.includes(w) || w.includes(sw))).length;
-            if (score > bestScore) { bestScore = score; bestMatch = s; }
+            const score = inputWords.filter((w) => siteWords.some((sw) => sw.includes(w) || w.includes(sw))).length;
+            if (score > bestScore) {
+                bestScore = score;
+                bestMatch = s;
+            }
         });
         return bestScore >= 1 ? bestMatch : null;
     }
@@ -135,11 +146,10 @@ class LogbookViewClass extends BaseView {
     // Distance en km entre deux points (formule de Haversine)
     haversineDistanceKm(lat1, lon1, lat2, lon2) {
         const R = 6371;
-        const toRad = (deg) => deg * Math.PI / 180;
+        const toRad = (deg) => (deg * Math.PI) / 180;
         const dLat = toRad(lat2 - lat1);
         const dLon = toRad(lon2 - lon1);
-        const a = Math.sin(dLat / 2) ** 2 +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+        const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
         return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
@@ -150,16 +160,17 @@ class LogbookViewClass extends BaseView {
 
         let nearest = null;
         let nearestDist = Infinity;
-        SITES_DATA.forEach(site => {
+        SITES_DATA.forEach((site) => {
             const coords = this.getSiteCoords(site);
             if (coords.lat === null || coords.lon === null) return;
             const dist = this.haversineDistanceKm(lat, lon, coords.lat, coords.lon);
-            if (dist < nearestDist) { nearestDist = dist; nearest = site; }
+            if (dist < nearestDist) {
+                nearestDist = dist;
+                nearest = site;
+            }
         });
-        return (nearest && nearestDist <= maxDistanceKm) ? nearest : null;
+        return nearest && nearestDist <= maxDistanceKm ? nearest : null;
     }
-
-
 
     show() {
         this.switchTab(this.currentTab);
@@ -171,9 +182,9 @@ class LogbookViewClass extends BaseView {
 
         const eqTypeSelect = document.getElementById('eq-type');
         const windLimitsDiv = document.getElementById('eq-wind-limits');
-        
+
         if (eqTypeSelect && windLimitsDiv) {
-            eqTypeSelect.addEventListener('change', function(e) {
+            eqTypeSelect.addEventListener('change', function (e) {
                 windLimitsDiv.style.display = e.target.value === 'voile' ? 'flex' : 'none';
             });
             // Initiale state
@@ -186,7 +197,7 @@ class LogbookViewClass extends BaseView {
             const autreEl = document.getElementById(autreId);
             if (selectEl && autreEl) {
                 selectEl.addEventListener('change', () => {
-                    autreEl.style.display = (selectEl.value === 'Autre') ? 'block' : 'none';
+                    autreEl.style.display = selectEl.value === 'Autre' ? 'block' : 'none';
                     if (selectEl.value !== 'Autre') {
                         autreEl.value = '';
                     }
@@ -213,7 +224,7 @@ class LogbookViewClass extends BaseView {
                 const periodiciteHeures = parseInt(document.getElementById('eq-periodicite-heures').value, 10);
                 const dateAchat = document.getElementById('eq-achat').value;
                 const derniereRevision = document.getElementById('eq-derniere-revision').value;
-                
+
                 const type = document.getElementById('eq-type').value;
 
                 // Extraire Marque, Modele, Taille, Couleur avec la logique "Autre"
@@ -240,10 +251,41 @@ class LogbookViewClass extends BaseView {
                     return value;
                 };
 
-                const marque = getValOrAutre('eq-marque', 'eq-marque-autre', 'customEquipMarques', ['Advance', 'BGD', 'Gin', 'Niviuk', 'Ozone', 'Phi', 'Nova', 'Supair', 'Skywalk', 'Triple Seven', 'AirDesign', 'Flow']);
+                const marque = getValOrAutre('eq-marque', 'eq-marque-autre', 'customEquipMarques', [
+                    'Advance',
+                    'BGD',
+                    'Gin',
+                    'Niviuk',
+                    'Ozone',
+                    'Phi',
+                    'Nova',
+                    'Supair',
+                    'Skywalk',
+                    'Triple Seven',
+                    'AirDesign',
+                    'Flow',
+                ]);
                 const modele = getValOrAutre('eq-modele', 'eq-modele-autre', 'customEquipModeles', []);
-                const taille = getValOrAutre('eq-taille', 'eq-taille-autre', 'customEquipTailles', ['XS', 'S', 'M', 'ML', 'L', 'XL']);
-                const couleur = getValOrAutre('eq-couleur', 'eq-couleur-autre', 'customEquipCouleurs', ['Rouge', 'Bleu', 'Vert', 'Jaune', 'Orange', 'Blanc', 'Noir', 'Gris', 'Violet', 'Rose']);
+                const taille = getValOrAutre('eq-taille', 'eq-taille-autre', 'customEquipTailles', [
+                    'XS',
+                    'S',
+                    'M',
+                    'ML',
+                    'L',
+                    'XL',
+                ]);
+                const couleur = getValOrAutre('eq-couleur', 'eq-couleur-autre', 'customEquipCouleurs', [
+                    'Rouge',
+                    'Bleu',
+                    'Vert',
+                    'Jaune',
+                    'Orange',
+                    'Blanc',
+                    'Noir',
+                    'Gris',
+                    'Violet',
+                    'Rose',
+                ]);
 
                 const equipDataObj = {
                     nom: document.getElementById('eq-nom').value.trim() || `${marque} ${modele}`.trim(),
@@ -256,9 +298,9 @@ class LogbookViewClass extends BaseView {
                     derniereRevision: derniereRevision,
                     periodicite: periodicite,
                     periodiciteHeures: periodiciteHeures,
-                    statut: 'actif'
+                    statut: 'actif',
                 };
-                
+
                 if (type === 'voile') {
                     equipDataObj.ventMin = parseInt(document.getElementById('eq-vent-min').value, 10) || 0;
                     equipDataObj.ventMax = parseInt(document.getElementById('eq-vent-max').value, 10) || 25;
@@ -300,7 +342,7 @@ class LogbookViewClass extends BaseView {
             }
             return;
         }
-        
+
         // Sélection directe du sentinel "Autre" dans le menu déroulant : toujours révéler le
         // champ libre, même si "Autre" est lui-même une valeur d'option du select (sinon ce
         // branchement matcherait à tort la branche "option connue" juste en dessous et cacherait
@@ -311,7 +353,7 @@ class LogbookViewClass extends BaseView {
             return;
         }
 
-        const options = Array.from(selectEl.options).map(o => o.value);
+        const options = Array.from(selectEl.options).map((o) => o.value);
         if (options.includes(value)) {
             selectEl.value = value;
             if (autreEl) {
@@ -331,7 +373,7 @@ class LogbookViewClass extends BaseView {
         const getUniqueValues = (field) => {
             const vals = new Set();
             if (Array.isArray(LogbookService.getEquipment())) {
-                LogbookService.getEquipment().forEach(e => {
+                LogbookService.getEquipment().forEach((e) => {
                     if (e[field]) vals.add(e[field].trim());
                 });
             }
@@ -346,14 +388,16 @@ class LogbookViewClass extends BaseView {
             if (!Array.isArray(customVals)) customVals = [];
 
             const allValsSet = new Set([...defaultList, ...customVals, ...uniqueValues]);
-            const sortedVals = Array.from(allValsSet).filter(Boolean).sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
+            const sortedVals = Array.from(allValsSet)
+                .filter(Boolean)
+                .sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
 
             // Save back to storage
-            const newCustomVals = sortedVals.filter(v => !defaultList.includes(v));
+            const newCustomVals = sortedVals.filter((v) => !defaultList.includes(v));
             StorageService.set(storedKey, newCustomVals);
 
             let html = '<option value="">-- Choisir ou Saisie Libre --</option>';
-            sortedVals.forEach(val => {
+            sortedVals.forEach((val) => {
                 html += `<option value="${val}">${val}</option>`;
             });
             html += '<option value="Autre">Autre...</option>';
@@ -389,11 +433,11 @@ class LogbookViewClass extends BaseView {
         const taille = getVal(tailleEl, 'eq-taille-autre');
         const couleur = getVal(couleurEl, 'eq-couleur-autre');
 
-        let generatedNom = "";
+        let generatedNom = '';
         if (marque) generatedNom += marque;
-        if (modele) generatedNom += (generatedNom ? " | " : "") + modele;
-        if (couleur) generatedNom += (generatedNom ? " | " : "") + couleur;
-        if (taille) generatedNom += (generatedNom ? " | " : "") + taille;
+        if (modele) generatedNom += (generatedNom ? ' | ' : '') + modele;
+        if (couleur) generatedNom += (generatedNom ? ' | ' : '') + couleur;
+        if (taille) generatedNom += (generatedNom ? ' | ' : '') + taille;
 
         nomEl.value = generatedNom.toUpperCase();
     }
@@ -402,16 +446,17 @@ class LogbookViewClass extends BaseView {
         this.currentTab = tabName;
 
         // Update Buttons
-        document.querySelectorAll('.logbook-tab-btn').forEach(btn => {
+        document.querySelectorAll('.logbook-tab-btn').forEach((btn) => {
             btn.classList.remove('active');
         });
-        const activeBtn = Array.from(document.querySelectorAll('.logbook-tab-btn')).find(btn => 
-            (btn.getAttribute('data-args') || '').includes(tabName) || btn.getAttribute('data-tab') === tabName
+        const activeBtn = Array.from(document.querySelectorAll('.logbook-tab-btn')).find(
+            (btn) =>
+                (btn.getAttribute('data-args') || '').includes(tabName) || btn.getAttribute('data-tab') === tabName,
         );
         if (activeBtn) activeBtn.classList.add('active');
 
         // Update Content
-        document.querySelectorAll('.logbook-tab-content').forEach(content => {
+        document.querySelectorAll('.logbook-tab-content').forEach((content) => {
             content.classList.remove('active');
         });
         const activeContent = document.getElementById(`logbook-tab-${tabName}`);
@@ -436,9 +481,10 @@ class LogbookViewClass extends BaseView {
         // 1. Sauvegarder les valeurs des champs communs
         const editId = document.getElementById('lb-id-edit')?.value || '';
         const datetime = document.getElementById('lb-datetime')?.value || '';
-        const location = this.currentFormType === 'vol' ?
-            document.getElementById('lb-site')?.value :
-            document.getElementById('lb-lieu')?.value;
+        const location =
+            this.currentFormType === 'vol'
+                ? document.getElementById('lb-site')?.value
+                : document.getElementById('lb-lieu')?.value;
 
         const voile = document.getElementById('lb-voile')?.value || '';
         const voileAutre = document.getElementById('lb-voile-autre')?.value || '';
@@ -592,10 +638,11 @@ class LogbookViewClass extends BaseView {
                         <option value="Face voile">Face voile</option>
                         <option value="Dos voile">Dos voile</option>
                         ${(() => {
-                    const parsed = StorageService.get('customDecollageTechniques');
-                    if (Array.isArray(parsed)) return parsed.map(t => `<option value="${t}">${t}</option>`).join('');
-                    return '';
-                })()}
+                            const parsed = StorageService.get('customDecollageTechniques');
+                            if (Array.isArray(parsed))
+                                return parsed.map((t) => `<option value="${t}">${t}</option>`).join('');
+                            return '';
+                        })()}
                         <option value="Autre">Autre...</option>
                     </select>
                     <input type="text" id="lb-tech-decollage-autre" placeholder="Spécifiez la technique..." style="display:none; margin-top: 5px; width: 100%;">
@@ -709,17 +756,17 @@ class LogbookViewClass extends BaseView {
 
             // 1. Sites officiels (SITES_DATA)
             if (typeof SITES_DATA !== 'undefined') {
-                const officialSites = SITES_DATA
-                    .filter(site => site.affiche !== false && (site.nom || site.name))
-                    .map(site => (site.nom || site.name).trim().toUpperCase());
+                const officialSites = SITES_DATA.filter(
+                    (site) => site.affiche !== false && (site.nom || site.name),
+                ).map((site) => (site.nom || site.name).trim().toUpperCase());
                 allSites = allSites.concat(officialSites);
             }
 
             // 2. Sites personnalisés (Historique du carnet)
             const historySites = LogbookService.getFlights()
-                .map(session => session.site || session.lieu)
-                .filter(site => site && site.trim() !== '')
-                .map(site => site.trim().toUpperCase());
+                .map((session) => session.site || session.lieu)
+                .filter((site) => site && site.trim() !== '')
+                .map((site) => site.trim().toUpperCase());
             allSites = allSites.concat(historySites);
 
             // 3. Dédoublonnage et tri alphabétique
@@ -727,7 +774,9 @@ class LogbookViewClass extends BaseView {
             processedSites.sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
 
             // 4. Injection dans le DOM
-            datalist.innerHTML = processedSites.map(siteName => `<option value="${escapeHTML(siteName)}"></option>`).join('');
+            datalist.innerHTML = processedSites
+                .map((siteName) => `<option value="${escapeHTML(siteName)}"></option>`)
+                .join('');
         }
 
         // Populate Equipment
@@ -737,13 +786,15 @@ class LogbookViewClass extends BaseView {
         let voilesHtml = '<option value="">-- Saisie libre (ou choisir) --</option>';
         let sellettesHtml = '<option value="">-- Saisie libre (ou choisir) --</option>';
 
-        LogbookService.getEquipment().filter(e => e.statut !== 'archive').forEach(equip => {
-            if (equip.type === 'voile') {
-                voilesHtml += `<option value="${equip.nom}">${equip.nom}</option>`;
-            } else if (equip.type === 'sellette') {
-                sellettesHtml += `<option value="${equip.nom}">${equip.nom}</option>`;
-            }
-        });
+        LogbookService.getEquipment()
+            .filter((e) => e.statut !== 'archive')
+            .forEach((equip) => {
+                if (equip.type === 'voile') {
+                    voilesHtml += `<option value="${equip.nom}">${equip.nom}</option>`;
+                } else if (equip.type === 'sellette') {
+                    sellettesHtml += `<option value="${equip.nom}">${equip.nom}</option>`;
+                }
+            });
 
         if (voilesSelect) {
             voilesSelect.innerHTML = voilesHtml;
@@ -802,7 +853,7 @@ class LogbookViewClass extends BaseView {
                     distanceKm: parsed.distanceKm,
                     maxClimbRate: parsed.maxClimbRate,
                     maxSpeedKmh: parsed.maxSpeedKmh,
-                    avgSpeedKmh: parsed.avgSpeedKmh
+                    avgSpeedKmh: parsed.avgSpeedKmh,
                 };
 
                 const durationInput = document.getElementById('lb-duree');
@@ -832,20 +883,20 @@ class LogbookViewClass extends BaseView {
                         siteInput.value = nearestSite.nom || nearestSite.name;
                     } else {
                         // 2. Sinon, reverse-geocoding vers la ville/lieu-dit le plus proche.
-                        siteInput.value = "Recherche du lieu...";
-                        LogbookService.reverseGeocode(parsed.points[0].lat, parsed.points[0].lon).then(res => {
+                        siteInput.value = 'Recherche du lieu...';
+                        LogbookService.reverseGeocode(parsed.points[0].lat, parsed.points[0].lon).then((res) => {
                             if (res.success && res.data.city) {
                                 siteInput.value = `${res.data.city} (Import GPS)`;
                             } else {
-                                if (!res.success) console.error("[Geocoding] Erreur:", res.error);
-                                siteInput.value = res.success ? "Lieu inconnu (Import GPS)" : "Décollage importé (GPS)";
+                                if (!res.success) console.error('[Geocoding] Erreur:', res.error);
+                                siteInput.value = res.success ? 'Lieu inconnu (Import GPS)' : 'Décollage importé (GPS)';
                             }
                         });
                     }
                 }
-                console.log("[IGC] Trace parsée :", parsed.points.length, "points, durée :", parsed.duration, "min");
+                console.log('[IGC] Trace parsée :', parsed.points.length, 'points, durée :', parsed.duration, 'min');
             } else {
-                alert("Erreur lors du parsing IGC : " + flightStats.error);
+                alert('Erreur lors du parsing IGC : ' + flightStats.error);
                 this.currentTraceData = null;
                 this.currentRawIgc = null;
                 this.currentIgcStats = null;
@@ -857,15 +908,17 @@ class LogbookViewClass extends BaseView {
     submitForm() {
         const datetime = document.getElementById('lb-datetime').value;
         let voile = document.getElementById('lb-voile').value.trim();
-        let sellette = document.getElementById('lb-sellette') ? document.getElementById('lb-sellette').value.trim() : '';
+        let sellette = document.getElementById('lb-sellette')
+            ? document.getElementById('lb-sellette').value.trim()
+            : '';
 
         if (voile === 'Autre') {
             const voileAutreInput = document.getElementById('lb-voile-autre');
-            voile = voileAutreInput ? voileAutreInput.value.trim() : "";
+            voile = voileAutreInput ? voileAutreInput.value.trim() : '';
         }
         if (sellette === 'Autre') {
             const selletteAutreInput = document.getElementById('lb-sellette-autre');
-            sellette = selletteAutreInput ? selletteAutreInput.value.trim() : "";
+            sellette = selletteAutreInput ? selletteAutreInput.value.trim() : '';
         }
         const duree = parseInt(document.getElementById('lb-duree').value, 10);
         const commentaire = document.getElementById('lb-commentaire').value.trim();
@@ -879,7 +932,7 @@ class LogbookViewClass extends BaseView {
             voile: voile,
             sellette: sellette,
             duree: duree,
-            commentaire: commentaire
+            commentaire: commentaire,
         };
 
         if (this.currentFormType === 'vol') {
@@ -891,7 +944,7 @@ class LogbookViewClass extends BaseView {
                 let techDecollage = techDecoEl.value;
                 if (techDecollage === 'Autre') {
                     const techAutreInput = document.getElementById('lb-tech-decollage-autre');
-                    let rawTech = techAutreInput ? techAutreInput.value.trim() : "";
+                    let rawTech = techAutreInput ? techAutreInput.value.trim() : '';
                     if (rawTech) {
                         rawTech = capitalizeFirstLetter(rawTech);
                         techDecollage = rawTech;
@@ -899,7 +952,11 @@ class LogbookViewClass extends BaseView {
                         let customTechs = StorageService.get('customDecollageTechniques') || [];
                         if (!Array.isArray(customTechs)) customTechs = [];
 
-                        if (!customTechs.includes(techDecollage) && techDecollage !== 'Face voile' && techDecollage !== 'Dos voile') {
+                        if (
+                            !customTechs.includes(techDecollage) &&
+                            techDecollage !== 'Face voile' &&
+                            techDecollage !== 'Dos voile'
+                        ) {
                             customTechs.push(techDecollage);
                             StorageService.set('customDecollageTechniques', customTechs);
                         }
@@ -936,7 +993,7 @@ class LogbookViewClass extends BaseView {
             session.lieu = document.getElementById('lb-lieu').value.trim();
             const checkboxes = document.querySelectorAll('input[name="lb-typeExercice"]:checked');
             if (checkboxes.length > 0) {
-                session.typeExercice = Array.from(checkboxes).map(cb => cb.value);
+                session.typeExercice = Array.from(checkboxes).map((cb) => cb.value);
             } else {
                 session.typeExercice = [];
             }
@@ -952,13 +1009,14 @@ class LogbookViewClass extends BaseView {
         this.switchTab('history');
 
         // Extract coordinates and fetch weather asynchronously
-        let lat = null, lon = null;
+        let lat = null,
+            lon = null;
         let baliseId = null;
         if (session.lat && session.lon) {
             lat = session.lat;
             lon = session.lon;
         } else {
-            const siteName = session.site || session.lieu || "";
+            const siteName = session.site || session.lieu || '';
             if (siteName && typeof SITES_DATA !== 'undefined') {
                 const foundSite = this.findSiteByName(siteName);
                 const coords = this.getSiteCoords(foundSite);
@@ -974,11 +1032,16 @@ class LogbookViewClass extends BaseView {
             const sessionDate = new Date(session.datetime).toDateString();
             const todayDate = new Date().toDateString();
             if (sessionDate === todayDate && navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        this.fetchWeatherForSession(position.coords.latitude, position.coords.longitude, session.datetime, session.id, session.duree, baliseId);
-                    }
-                );
+                navigator.geolocation.getCurrentPosition((position) => {
+                    this.fetchWeatherForSession(
+                        position.coords.latitude,
+                        position.coords.longitude,
+                        session.datetime,
+                        session.id,
+                        session.duree,
+                        baliseId,
+                    );
+                });
                 return;
             }
         }
@@ -994,13 +1057,13 @@ class LogbookViewClass extends BaseView {
         const idEditField = document.getElementById('lb-id-edit');
         if (idEditField) idEditField.value = '';
         const submitBtn = document.getElementById('lb-submit-btn');
-        if (submitBtn) submitBtn.innerText = "Enregistrer";
+        if (submitBtn) submitBtn.innerText = 'Enregistrer';
         const cancelBtn = document.getElementById('lb-cancel-btn');
-        if (cancelBtn) cancelBtn.style.display = "none";
+        if (cancelBtn) cancelBtn.style.display = 'none';
         this.currentTraceData = null;
         this.currentIgcStats = null;
         const filenameLabel = document.getElementById('igc-upload-filename');
-        if (filenameLabel) filenameLabel.textContent = "Cliquez ou glissez-déposez le fichier";
+        if (filenameLabel) filenameLabel.textContent = 'Cliquez ou glissez-déposez le fichier';
         this.renderForm();
     }
 
@@ -1024,7 +1087,7 @@ class LogbookViewClass extends BaseView {
             if (!selectEl || !value) return;
 
             // On regarde si la valeur existe dans les options
-            const options = Array.from(selectEl.options).map(o => o.value);
+            const options = Array.from(selectEl.options).map((o) => o.value);
             if (options.includes(value)) {
                 selectEl.value = value;
                 if (autreEl) autreEl.style.display = 'none';
@@ -1055,14 +1118,14 @@ class LogbookViewClass extends BaseView {
 
             if (session.traceGps && session.traceGps.length > 0) {
                 const filenameLabel = document.getElementById('igc-upload-filename');
-                if (filenameLabel) filenameLabel.textContent = "Trace GPS (existante)";
+                if (filenameLabel) filenameLabel.textContent = 'Trace GPS (existante)';
             }
         } else {
             document.getElementById('lb-lieu').value = session.lieu || '';
             if (session.typeExercice) {
                 const checkboxes = document.querySelectorAll('input[name="lb-typeExercice"]');
                 const typesArray = Array.isArray(session.typeExercice) ? session.typeExercice : [session.typeExercice];
-                checkboxes.forEach(cb => {
+                checkboxes.forEach((cb) => {
                     cb.checked = typesArray.includes(cb.value);
                 });
             }
@@ -1070,16 +1133,16 @@ class LogbookViewClass extends BaseView {
 
         // Update UI buttons
         const submitBtn = document.getElementById('lb-submit-btn');
-        if (submitBtn) submitBtn.innerText = "Modifier la session";
+        if (submitBtn) submitBtn.innerText = 'Modifier la session';
         const cancelBtn = document.getElementById('lb-cancel-btn');
-        if (cancelBtn) cancelBtn.style.display = "inline-block";
+        if (cancelBtn) cancelBtn.style.display = 'inline-block';
 
         const formEl = document.getElementById('logbook-add-form');
         if (formEl) formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     deleteEntry(id) {
-        if (confirm("Voulez-vous vraiment supprimer cette session ?")) {
+        if (confirm('Voulez-vous vraiment supprimer cette session ?')) {
             LogbookService.deleteFlight(id);
             this.renderHistory();
         }
@@ -1101,22 +1164,40 @@ class LogbookViewClass extends BaseView {
         }
 
         let html = '';
-        LogbookService.getFlights().forEach(session => {
+        LogbookService.getFlights().forEach((session) => {
             const isVol = session.type === 'vol';
             const icon = isVol ? 'ri-windy-line' : 'ri-footprint-line';
             const typeColor = isVol ? 'var(--accent-blue)' : '#f59e0b';
             const location = isVol ? session.site : session.lieu;
-            const subtitle = isVol ? session.typeVol : (Array.isArray(session.typeExercice) ? session.typeExercice.join(', ') : session.typeExercice);
+            const subtitle = isVol
+                ? session.typeVol
+                : Array.isArray(session.typeExercice)
+                  ? session.typeExercice.join(', ')
+                  : session.typeExercice;
 
             let extraInfo = '';
             if (isVol) {
-                const badgeStyle = "background: var(--bg-card-hover, rgba(0,0,0,0.05)); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-light, rgba(0,0,0,0.05)); font-weight: 500; display: inline-flex; align-items: center; gap: 4px;";
-                const decoInfo = session.techDecollage ? `<span style="${badgeStyle}" title="Décollage"><i class="ri-takeaway-line"></i> Décollage : ${escapeHTML(session.techDecollage)}</span>` : '';
-                const altInfo = session.altitudeMax ? `<span style="${badgeStyle}" title="Alt Max">⛰️ Alt Max : ${session.altitudeMax}m</span>` : '';
-                const gainInfo = (session.gain !== undefined && session.gain !== null && session.gain !== '') ? `<span style="${badgeStyle}" title="Gain">📈 Gain : ${session.gain}m</span>` : '';
-                const distanceInfo = session.distanceKm ? `<span style="${badgeStyle}" title="Distance parcourue">📏 Distance : ${session.distanceKm}km</span>` : '';
-                const climbInfo = session.maxClimbRate ? `<span style="${badgeStyle}" title="Vario max">🔼 Vario max : +${session.maxClimbRate}m/s</span>` : '';
-                const speedInfo = session.maxSpeedKmh ? `<span style="${badgeStyle}" title="Vitesse max / moyenne">💨 Vitesse : ${session.maxSpeedKmh}km/h max (${session.avgSpeedKmh}km/h moy.)</span>` : '';
+                const badgeStyle =
+                    'background: var(--bg-card-hover, rgba(0,0,0,0.05)); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-light, rgba(0,0,0,0.05)); font-weight: 500; display: inline-flex; align-items: center; gap: 4px;';
+                const decoInfo = session.techDecollage
+                    ? `<span style="${badgeStyle}" title="Décollage"><i class="ri-takeaway-line"></i> Décollage : ${escapeHTML(session.techDecollage)}</span>`
+                    : '';
+                const altInfo = session.altitudeMax
+                    ? `<span style="${badgeStyle}" title="Alt Max">⛰️ Alt Max : ${session.altitudeMax}m</span>`
+                    : '';
+                const gainInfo =
+                    session.gain !== undefined && session.gain !== null && session.gain !== ''
+                        ? `<span style="${badgeStyle}" title="Gain">📈 Gain : ${session.gain}m</span>`
+                        : '';
+                const distanceInfo = session.distanceKm
+                    ? `<span style="${badgeStyle}" title="Distance parcourue">📏 Distance : ${session.distanceKm}km</span>`
+                    : '';
+                const climbInfo = session.maxClimbRate
+                    ? `<span style="${badgeStyle}" title="Vario max">🔼 Vario max : +${session.maxClimbRate}m/s</span>`
+                    : '';
+                const speedInfo = session.maxSpeedKmh
+                    ? `<span style="${badgeStyle}" title="Vitesse max / moyenne">💨 Vitesse : ${session.maxSpeedKmh}km/h max (${session.avgSpeedKmh}km/h moy.)</span>`
+                    : '';
 
                 if (decoInfo || altInfo || gainInfo || distanceInfo || climbInfo || speedInfo) {
                     extraInfo = `<div class="session-extra-info" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; font-size: 0.82rem; color: var(--text-secondary);">
@@ -1133,7 +1214,9 @@ class LogbookViewClass extends BaseView {
             let meteoHtml;
             if (session.meteo) {
                 const decollageRow = this.renderWeatherPointRow(session.meteo, 'Décollage');
-                const atterroRow = session.meteoAtterro ? this.renderWeatherPointRow(session.meteoAtterro, 'Atterrissage') : '';
+                const atterroRow = session.meteoAtterro
+                    ? this.renderWeatherPointRow(session.meteoAtterro, 'Atterrissage')
+                    : '';
                 const baliseHtml = this.renderBaliseHistoBlock(session);
 
                 meteoHtml = `
@@ -1213,7 +1296,7 @@ class LogbookViewClass extends BaseView {
             if (result.success && result.data.points) {
                 points = result.data.points;
             } else {
-                console.error("Erreur de parsing IGC à la volée :", result.error);
+                console.error('Erreur de parsing IGC à la volée :', result.error);
                 return;
             }
         }
@@ -1224,7 +1307,7 @@ class LogbookViewClass extends BaseView {
             try {
                 Map3DComponent.showTrace(sessionId, points, container);
             } catch (error) {
-                console.error("Map3DComponent Error: Erreur lors du dessin de la trace.", error);
+                console.error('Map3DComponent Error: Erreur lors du dessin de la trace.', error);
                 container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-secondary);">Impossible d'afficher la carte 3D. (${error.message})</div>`;
             }
         } else {
@@ -1254,14 +1337,14 @@ class LogbookViewClass extends BaseView {
 
         const equipStats = {}; // { voileName: { vols: 0, timeVols: 0, gonflages: 0, timeGonflages: 0 } }
         const sitesStats = {}; // { siteName: count }
-        const volTypes = {};   // { typeName: count }
-        const exoTypes = {};   // { typeName: count }
-        const decoTypes = {};  // { typeName: count }
+        const volTypes = {}; // { typeName: count }
+        const exoTypes = {}; // { typeName: count }
+        const decoTypes = {}; // { typeName: count }
 
         let maxAltitudeReached = 0;
         let totalGain = 0;
 
-        LogbookService.getFlights().forEach(s => {
+        LogbookService.getFlights().forEach((s) => {
             if (s.type === 'vol') {
                 totalVols++;
                 totalTimeVols += s.duree;
@@ -1281,7 +1364,6 @@ class LogbookViewClass extends BaseView {
                 if (s.gain && s.gain > 0) {
                     totalGain += s.gain;
                 }
-
             } else {
                 totalGonflages++;
                 totalTimeGonflages += s.duree;
@@ -1291,7 +1373,7 @@ class LogbookViewClass extends BaseView {
                 // Type
                 if (s.typeExercice) {
                     if (Array.isArray(s.typeExercice)) {
-                        s.typeExercice.forEach(exo => {
+                        s.typeExercice.forEach((exo) => {
                             exoTypes[exo] = (exoTypes[exo] || 0) + 1;
                         });
                     } else {
@@ -1370,18 +1452,21 @@ class LogbookViewClass extends BaseView {
                             <span style="color: var(--accent-blue)">Vols: ${st.vols} (${formatDuration(st.timeVols)})</span>
                             <span style="color: #f59e0b">Gonflage: ${st.gonflages} (${formatDuration(st.timeGonflages)})</span>
                         </div>
-                        ${ (() => {
-                            const equipObj = LogbookService.getEquipment().find(e => e.nom.toLowerCase() === voile.toLowerCase());
+                        ${(() => {
+                            const equipObj = LogbookService.getEquipment().find(
+                                (e) => e.nom.toLowerCase() === voile.toLowerCase(),
+                            );
                             if (equipObj && equipObj.periodiciteHeures > 0) {
                                 const totalHours = (st.timeVols + st.timeGonflages) / 60;
                                 const hoursRemaining = equipObj.periodiciteHeures - totalHours;
-                                const hoursText = hoursRemaining <= 0 
-                                    ? `<span style="color:#ef4444; font-weight:bold;">Dépassé de ${Math.abs(Math.round(hoursRemaining * 10) / 10)}h</span>`
-                                    : `${Math.round(hoursRemaining * 10) / 10}h restantes`;
+                                const hoursText =
+                                    hoursRemaining <= 0
+                                        ? `<span style="color:#ef4444; font-weight:bold;">Dépassé de ${Math.abs(Math.round(hoursRemaining * 10) / 10)}h</span>`
+                                        : `${Math.round(hoursRemaining * 10) / 10}h restantes`;
                                 return `<div style="font-size: 0.8rem; margin-top: 6px; color: var(--text-secondary);"><strong>Avant révision:</strong> ${hoursText} (sur ${equipObj.periodiciteHeures}h)</div>`;
                             }
                             return '';
-                        })() }
+                        })()}
                     </div>
                 `;
             }
@@ -1465,7 +1550,6 @@ class LogbookViewClass extends BaseView {
         container.innerHTML = html;
     }
 
-
     renderEquipment() {
         const container = document.getElementById('logbook-equip-container');
         if (!container) return;
@@ -1485,8 +1569,8 @@ class LogbookViewClass extends BaseView {
             html += `<div class="empty-state"><p>Aucun équipement enregistré.</p></div>`;
         } else {
             html += `<div class="equip-list">`;
-            sortedEquip.forEach(equip => {
-                const stats = equipStats[(equip.nom || "").toLowerCase()];
+            sortedEquip.forEach((equip) => {
+                const stats = equipStats[(equip.nom || '').toLowerCase()];
 
                 let alertHtml = '';
                 let statusClass = 'status-ok';
@@ -1496,7 +1580,10 @@ class LogbookViewClass extends BaseView {
                     statusClass = 'status-danger';
                     const reason = [];
                     if (stats.alerts.dateAlert === 'red') reason.push(`Date dépassée (${stats.revisionDateStr})`);
-                    if (stats.alerts.hoursAlert === 'red') reason.push(`Heures dépassées (${Math.round(stats.totalTime / 60)}h / ${equip.periodiciteHeures}h)`);
+                    if (stats.alerts.hoursAlert === 'red')
+                        reason.push(
+                            `Heures dépassées (${Math.round(stats.totalTime / 60)}h / ${equip.periodiciteHeures}h)`,
+                        );
 
                     alertHtml = `<div class="equip-alert text-danger" style="color:#ef4444; font-weight:bold; margin-bottom:8px;"><i class="ri-tools-line"></i> ⚠️ ATTENTION : Révision requise - ${reason.join(' ET ')}</div>`;
                 } else if (stats && (stats.alerts.dateAlert === 'orange' || stats.alerts.hoursAlert === 'orange')) {
@@ -1509,14 +1596,20 @@ class LogbookViewClass extends BaseView {
                 }
 
                 const typeBadgeColors = {
-                    'voile': 'background: rgba(14, 165, 233, 0.1); color: var(--accent-blue);',
-                    'sellette': 'background: rgba(245, 158, 11, 0.1); color: #f59e0b;',
-                    'secours': 'background: rgba(239, 68, 68, 0.1); color: #ef4444;',
-                    'accessoire': 'background: rgba(156, 163, 175, 0.1); color: #9ca3af;'
+                    voile: 'background: rgba(14, 165, 233, 0.1); color: var(--accent-blue);',
+                    sellette: 'background: rgba(245, 158, 11, 0.1); color: #f59e0b;',
+                    secours: 'background: rgba(239, 68, 68, 0.1); color: #ef4444;',
+                    accessoire: 'background: rgba(156, 163, 175, 0.1); color: #9ca3af;',
                 };
 
-                const equipIcon = equip.type === 'voile' ? 'ri-parachute-line' : equip.type === 'sellette' ? 'ri-shield-line' : equip.type === 'secours' ? 'ri-lifebuoy-line' : 'ri-settings-4-line';
-
+                const equipIcon =
+                    equip.type === 'voile'
+                        ? 'ri-parachute-line'
+                        : equip.type === 'sellette'
+                          ? 'ri-shield-line'
+                          : equip.type === 'secours'
+                            ? 'ri-lifebuoy-line'
+                            : 'ri-settings-4-line';
 
                 const isArchive = equip.statut === 'archive';
                 const cardStyle = isArchive ? 'opacity: 0.6; filter: grayscale(0.8);' : '';
@@ -1577,10 +1670,10 @@ class LogbookViewClass extends BaseView {
         this.setSelectOrAutre('eq-modele', 'eq-modele-autre', equip.modele || '');
         this.setSelectOrAutre('eq-taille', 'eq-taille-autre', equip.taille || '');
         this.setSelectOrAutre('eq-couleur', 'eq-couleur-autre', equip.couleur || '');
-        
+
         const typeSelect = document.getElementById('eq-type');
         typeSelect.value = equip.type || 'voile';
-        
+
         const windLimitsDiv = document.getElementById('eq-wind-limits');
         if (windLimitsDiv) {
             windLimitsDiv.style.display = typeSelect.value === 'voile' ? 'flex' : 'none';
@@ -1588,7 +1681,7 @@ class LogbookViewClass extends BaseView {
 
         const minField = document.getElementById('eq-vent-min');
         if (minField) minField.value = equip.ventMin !== undefined ? equip.ventMin : 0;
-        
+
         const maxField = document.getElementById('eq-vent-max');
         if (maxField) maxField.value = equip.ventMax !== undefined ? equip.ventMax : 25;
 
@@ -1599,7 +1692,7 @@ class LogbookViewClass extends BaseView {
         if (equip.periodicite !== undefined) {
             periodiciteSelect.value = equip.periodicite;
         } else {
-            periodiciteSelect.value = "24"; // Default
+            periodiciteSelect.value = '24'; // Default
         }
 
         const periodiciteHeuresSelect = document.getElementById('eq-periodicite-heures');
@@ -1607,12 +1700,12 @@ class LogbookViewClass extends BaseView {
             if (equip.periodiciteHeures !== undefined) {
                 periodiciteHeuresSelect.value = equip.periodiciteHeures;
             } else {
-                periodiciteHeuresSelect.value = "0"; // Default non applicable
+                periodiciteHeuresSelect.value = '0'; // Default non applicable
             }
         }
 
         document.getElementById('eq-submit-btn').innerText = "Modifier l'équipement";
-        document.getElementById('eq-cancel-btn').style.display = "inline-block";
+        document.getElementById('eq-cancel-btn').style.display = 'inline-block';
         document.getElementById('eq-form-title').innerText = "Modifier l'Équipement";
 
         // Scroll vers le formulaire
@@ -1620,7 +1713,7 @@ class LogbookViewClass extends BaseView {
     }
 
     deleteEquipment(id) {
-        if (confirm("Voulez-vous vraiment supprimer cet équipement ?")) {
+        if (confirm('Voulez-vous vraiment supprimer cet équipement ?')) {
             LogbookService.deleteEquipment(id);
             this.renderEquipment();
             this.populateEquipmentDropdowns();
@@ -1632,14 +1725,14 @@ class LogbookViewClass extends BaseView {
         if (form) form.reset();
 
         // Hide all "Autre" text inputs
-        ['eq-marque-autre', 'eq-modele-autre', 'eq-taille-autre', 'eq-couleur-autre'].forEach(id => {
+        ['eq-marque-autre', 'eq-modele-autre', 'eq-taille-autre', 'eq-couleur-autre'].forEach((id) => {
             const el = document.getElementById(id);
             if (el) {
                 el.style.display = 'none';
                 el.value = '';
             }
         });
-        
+
         const windLimitsDiv = document.getElementById('eq-wind-limits');
         if (windLimitsDiv) windLimitsDiv.style.display = 'flex'; // Default type is 'voile'
 
@@ -1650,10 +1743,10 @@ class LogbookViewClass extends BaseView {
         if (submitBtn) submitBtn.innerText = "Enregistrer l'équipement";
 
         const cancelBtn = document.getElementById('eq-cancel-btn');
-        if (cancelBtn) cancelBtn.style.display = "none";
+        if (cancelBtn) cancelBtn.style.display = 'none';
 
         const formTitle = document.getElementById('eq-form-title');
-        if (formTitle) formTitle.innerText = "Ajouter un Équipement";
+        if (formTitle) formTitle.innerText = 'Ajouter un Équipement';
 
         // Refresh dropdown lists
         this.populateEquipmentDropdowns();
@@ -1679,16 +1772,20 @@ class LogbookViewClass extends BaseView {
     getWindDirectionString(deg) {
         if (deg === null || deg === undefined) return '';
         const dirs = EXTENDED_WIND_DIRECTIONS;
-        const val = Math.floor((deg / 22.5) + 0.5);
-        return dirs[(val % 16)];
+        const val = Math.floor(deg / 22.5 + 0.5);
+        return dirs[val % 16];
     }
 
     // Une ligne "Décollage" ou "Atterrissage" du bloc météo (modèle Open-Meteo/AROME,
     // valeur estimée au point GPS du site à l'heure donnée).
     renderWeatherPointRow(m, label) {
         if (!m) return '';
-        const weatherIcon = m.weatherCode !== null && m.weatherCode !== undefined ? this.getWeatherEmoji(m.weatherCode) : '🌤️';
-        const dirStr = m.ventDirection !== null && m.ventDirection !== undefined ? this.getWindDirectionString(m.ventDirection) : '';
+        const weatherIcon =
+            m.weatherCode !== null && m.weatherCode !== undefined ? this.getWeatherEmoji(m.weatherCode) : '🌤️';
+        const dirStr =
+            m.ventDirection !== null && m.ventDirection !== undefined
+                ? this.getWindDirectionString(m.ventDirection)
+                : '';
 
         return `
         <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 4px 0;">
@@ -1696,10 +1793,14 @@ class LogbookViewClass extends BaseView {
             <span title="Température"><strong>${weatherIcon} ${m.temperature}°C</strong></span>
             <span style="color: rgba(0,0,0,0.2);">|</span>
             <span title="Vent"><i class="ri-windy-line" style="color: var(--accent-blue);"></i> <strong>Vent :</strong> ${m.ventVitesse} km/h ${m.ventRafales ? `(Rafales : ${m.ventRafales} km/h)` : ''}</span>
-            ${m.ventDirection !== null && m.ventDirection !== undefined ? `
+            ${
+                m.ventDirection !== null && m.ventDirection !== undefined
+                    ? `
             <span style="color: rgba(0,0,0,0.2);">|</span>
             <span title="Direction"><i class="ri-arrow-up-fill" style="color: #10b981; font-size: 1.05em; display:inline-block; transform: rotate(${m.ventDirection}deg);"></i> <strong>Dir :</strong> ${dirStr} (${m.ventDirection}°)</span>
-            ` : ''}
+            `
+                    : ''
+            }
         </div>`;
     }
 
@@ -1733,30 +1834,32 @@ class LogbookViewClass extends BaseView {
     }
 
     forceWeatherRefresh(sessionId) {
-        const session = LogbookService.getFlights().find(s => s.id === sessionId);
+        const session = LogbookService.getFlights().find((s) => s.id === sessionId);
         if (!session) return;
 
         // 1. Immediately show loading state in the UI to remove any error banner
         const container = document.getElementById('weather-container-' + sessionId);
         if (container) {
-            container.innerHTML = '<div style="color: var(--accent-blue); font-size: 0.85rem; padding: 8px 12px; background: rgba(14,165,233,0.08); border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 6px;"><i class="ri-loader-4-line ri-spin"></i> <strong>Récupération AROME en cours...</strong></div>';
+            container.innerHTML =
+                '<div style="color: var(--accent-blue); font-size: 0.85rem; padding: 8px 12px; background: rgba(14,165,233,0.08); border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 6px;"><i class="ri-loader-4-line ri-spin"></i> <strong>Récupération AROME en cours...</strong></div>';
         }
 
-        let lat = null, lon = null;
+        let lat = null,
+            lon = null;
         let baliseId = null;
-        const siteName = session.site || session.lieu || "";
+        const siteName = session.site || session.lieu || '';
 
         if (session.lat && session.lon) {
             lat = session.lat;
             lon = session.lon;
-            console.log("[Météo Logbook] Utilisation des coordonnées IGC en dur (Refresh) :", lat, lon);
+            console.log('[Météo Logbook] Utilisation des coordonnées IGC en dur (Refresh) :', lat, lon);
         } else {
             if (siteName && typeof SITES_DATA !== 'undefined') {
-                console.log("[Météo Logbook] Saisie (Refresh) :", siteName);
+                console.log('[Météo Logbook] Saisie (Refresh) :', siteName);
 
                 const foundSite = this.findSiteByName(siteName);
                 if (foundSite) {
-                    console.log("[Météo Logbook] Site trouvé au rafraîchissement :", foundSite.nom);
+                    console.log('[Météo Logbook] Site trouvé au rafraîchissement :', foundSite.nom);
                     const coords = this.getSiteCoords(foundSite);
                     if (coords.lat && coords.lon) {
                         lat = coords.lat;
@@ -1766,7 +1869,7 @@ class LogbookViewClass extends BaseView {
                     }
                     baliseId = getSpotairWidgetId(foundSite);
                 } else {
-                    console.error("[Météo Logbook] Aucun match pour :", siteName);
+                    console.error('[Météo Logbook] Aucun match pour :', siteName);
                 }
             }
         }
@@ -1775,8 +1878,13 @@ class LogbookViewClass extends BaseView {
             this.fetchWeatherForSession(lat, lon, session.datetime, session.id, session.duree, baliseId);
         } else {
             if (container) {
-                const searchedString = this.normalizeString(siteName || "VIDE");
-                const availableNamesSample = typeof SITES_DATA !== 'undefined' ? SITES_DATA.slice(0, 3).map(s => this.normalizeString(s.nom)).join(' | ') : 'SITES_DATA NOT FOUND';
+                const searchedString = this.normalizeString(siteName || 'VIDE');
+                const availableNamesSample =
+                    typeof SITES_DATA !== 'undefined'
+                        ? SITES_DATA.slice(0, 3)
+                              .map((s) => this.normalizeString(s.nom))
+                              .join(' | ')
+                        : 'SITES_DATA NOT FOUND';
                 container.innerHTML = `<div style="color: #ef4444; font-size: 0.85rem; padding: 8px 12px; background: rgba(239,68,68,0.08); border-radius: var(--radius-sm); line-height: 1.4;"><i class="ri-error-warning-line"></i> <strong>Erreur Météo :</strong> Saisie [${escapeHTML(searchedString)}] non trouvée dans SITES_DATA.<br><span style="font-size: 0.75rem; opacity: 0.8; word-break: break-all;">Échantillon base : [${availableNamesSample}]</span></div>`;
             }
         }
@@ -1791,11 +1899,11 @@ class LogbookViewClass extends BaseView {
             LogbookService.fetchSessionWeather(lat, lon, datetimeStr),
             landingDatetimeStr && landingDatetimeStr !== datetimeStr
                 ? LogbookService.fetchSessionWeather(lat, lon, landingDatetimeStr)
-                : Promise.resolve({ success: false, data: null, error: null })
+                : Promise.resolve({ success: false, data: null, error: null }),
         ]);
 
         if (decollageResult.success) {
-            const sessionIndex = LogbookService.getFlights().findIndex(s => s.id === sessionId);
+            const sessionIndex = LogbookService.getFlights().findIndex((s) => s.id === sessionId);
             if (sessionIndex !== -1) {
                 const target = LogbookService.getFlights()[sessionIndex];
                 target.meteo = decollageResult.data;
@@ -1808,7 +1916,7 @@ class LogbookViewClass extends BaseView {
                 console.log(`Weather data fetched successfully for session ${sessionId}.`);
             }
         } else {
-            console.error("Error fetching weather for session:", decollageResult.error);
+            console.error('Error fetching weather for session:', decollageResult.error);
             const container = document.getElementById('weather-container-' + sessionId);
             if (container) {
                 container.innerHTML = `<div style="color: #f59e0b; font-size: 0.85rem; padding: 8px 12px; background: rgba(245,158,11,0.08); border-radius: var(--radius-sm);"><i class="ri-alert-line"></i> Météo indisponible : ${escapeHTML(decollageResult.error)}</div>`;
@@ -1818,7 +1926,7 @@ class LogbookViewClass extends BaseView {
 
     async mount(params) {
         await super.mount(params);
-        console.log("Mounting LogbookView with params", params);
+        console.log('Mounting LogbookView with params', params);
         try {
             if (this.init) {
                 this.init(typeof Engine !== 'undefined' ? Engine : window.Engine);
@@ -1827,16 +1935,16 @@ class LogbookViewClass extends BaseView {
                 this.show();
             }
         } catch (e) {
-            console.error("Erreur de montage de LogbookView", e);
-            super.renderErrorState(e.message || "Erreur critique du carnet", "logbook-screen");
+            console.error('Erreur de montage de LogbookView', e);
+            super.renderErrorState(e.message || 'Erreur critique du carnet', 'logbook-screen');
         }
     }
 
     async unmount() {
         await super.unmount();
-        console.log("Unmounting LogbookView");
+        console.log('Unmounting LogbookView');
         // Le Carnet n'utilise aucune librairie de Chart externe (graphiques générés en HTML pur).
-        // Les écouteurs d'événements sont attachés à des éléments du DOM 
+        // Les écouteurs d'événements sont attachés à des éléments du DOM
         // recréés par innerHTML, et sont donc automatiquement garbage collected.
     }
 }

@@ -1,6 +1,6 @@
 /**
  * GDPR (RGPD) Engine - France 2026
- * Handles user data privacy consent banner, detailed preferences settings modal, 
+ * Handles user data privacy consent banner, detailed preferences settings modal,
  * and legal document overlays (Mentions Légales & Politique de Confidentialité).
  */
 
@@ -10,14 +10,14 @@ const GdprEngine = {
 
     // Default consent settings
     consent: {
-        stats: false,      // progression stats and QCM history
-        firebase: false,   // online firebase synchronization
-        gps: false,        // geolocation for flight sites distance
-        date: null
+        stats: false, // progression stats and QCM history
+        firebase: false, // online firebase synchronization
+        gps: false, // geolocation for flight sites distance
+        date: null,
     },
 
     init: function () {
-        console.log("GdprEngine: Initializing...");
+        console.log('GdprEngine: Initializing...');
 
         // Load consent from localStorage
         const stored = localStorage.getItem(this.consentKey);
@@ -26,12 +26,12 @@ const GdprEngine = {
                 const parsed = JSON.parse(stored);
                 if (parsed && parsed.version === this.consentVersion) {
                     this.consent = parsed;
-                    console.log("GdprEngine: Consent loaded", this.consent);
+                    console.log('GdprEngine: Consent loaded', this.consent);
                     this.applyConsentGuards();
                     return;
                 }
             } catch (e) {
-                console.warn("GdprEngine: Corrupt consent in localStorage, resetting.", e);
+                console.warn('GdprEngine: Corrupt consent in localStorage, resetting.', e);
             }
         }
 
@@ -81,7 +81,7 @@ const GdprEngine = {
             firebase: true,
             gps: true,
             version: this.consentVersion,
-            date: new Date().toISOString()
+            date: new Date().toISOString(),
         };
         this.saveConsent();
         this.hideBanner();
@@ -96,7 +96,7 @@ const GdprEngine = {
             firebase: false,
             gps: false,
             version: this.consentVersion,
-            date: new Date().toISOString()
+            date: new Date().toISOString(),
         };
         this.saveConsent();
         this.hideBanner();
@@ -116,7 +116,7 @@ const GdprEngine = {
             firebase: firebaseVal,
             gps: gpsVal,
             version: this.consentVersion,
-            date: new Date().toISOString()
+            date: new Date().toISOString(),
         };
 
         this.saveConsent();
@@ -130,7 +130,7 @@ const GdprEngine = {
 
     saveConsent: function () {
         localStorage.setItem(this.consentKey, JSON.stringify(this.consent));
-        console.log("GdprEngine: Consent saved", this.consent);
+        console.log('GdprEngine: Consent saved', this.consent);
     },
 
     // Sync toggle switches in the settings modal to current consent state
@@ -155,13 +155,13 @@ const GdprEngine = {
         if (this.isConsentGranted('firebase')) {
             // Enable Firebase engine if not already enabled
             if (window.FirebaseAuthEngine && !window.FirebaseAuthEngine.enabled) {
-                console.log("GdprEngine: Enabling Firebase sync engine...");
+                console.log('GdprEngine: Enabling Firebase sync engine...');
                 window.FirebaseAuthEngine.init();
             }
         } else {
             // If Firebase was enabled, log out user and turn off Firebase
             if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
-                console.log("GdprEngine: Consent revoked for Firebase. Signing out user...");
+                console.log('GdprEngine: Consent revoked for Firebase. Signing out user...');
                 // Force logout
                 if (window.FirebaseAuthEngine.currentUser) {
                     window.FirebaseAuthEngine.signOut();
@@ -206,16 +206,21 @@ const GdprEngine = {
     clearDeclinedData: function () {
         // If stats consent revoked, clear QCM stats & history
         if (!this.isConsentGranted('stats')) {
-            console.log("GdprEngine: Clearing progression statistics & exam history from localStorage.");
+            console.log('GdprEngine: Clearing progression statistics & exam history from localStorage.');
             localStorage.removeItem('parapente_qcm_stats');
             localStorage.removeItem('parapente_exam_history');
 
             // Refresh QCM UI if stats screen is active
-            if (window.QuizEngine && typeof window.QuizEngine.renderStats === 'function' && window.Engine && window.Engine.state.mode === 'STATS') {
+            if (
+                window.QuizEngine &&
+                typeof window.QuizEngine.renderStats === 'function' &&
+                window.Engine &&
+                window.Engine.state.mode === 'STATS'
+            ) {
                 window.QuizEngine.renderStats();
             }
         }
-    }
+    },
 };
 
 // Bind to window immediately

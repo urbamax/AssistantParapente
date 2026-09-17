@@ -44,11 +44,12 @@ function isFlyable(site, weather, prefs) {
     if (weather.windSpeed < prefs.limitWindMin || weather.windSpeed > prefs.limitWindMax) return false;
 
     const gust = Math.max(weather.windGust || 0, weather.windSpeed);
-    if ((gust - weather.windSpeed) > prefs.limitGustDelta) return false;
+    if (gust - weather.windSpeed > prefs.limitGustDelta) return false;
 
     let orientations = [];
     if (Array.isArray(site.orientations_vent)) orientations = site.orientations_vent;
-    else if (typeof site.orientations_vent === 'string') orientations = site.orientations_vent.split(',').map((v) => v.trim());
+    else if (typeof site.orientations_vent === 'string')
+        orientations = site.orientations_vent.split(',').map((v) => v.trim());
     else if (typeof site.orientation === 'string') orientations = site.orientation.split(',').map((v) => v.trim());
     if (orientations.length > 0 && !orientations.includes(weather.windCard)) return false;
 
@@ -71,7 +72,10 @@ async function fetchWeatherForSite(site) {
     let minDiff = Infinity;
     hourly.time.forEach((t, i) => {
         const diff = Math.abs(new Date(t).getTime() - now);
-        if (diff < minDiff) { minDiff = diff; idx = i; }
+        if (diff < minDiff) {
+            minDiff = diff;
+            idx = i;
+        }
     });
 
     let isDaytime = true;
@@ -87,7 +91,7 @@ async function fetchWeatherForSite(site) {
         windGust: Math.round(hourly.wind_gusts_10m[idx]),
         windCard: degreesToCardinal(hourly.wind_direction_10m[idx]),
         precipitation: hourly.precipitation ? (hourly.precipitation[idx] ?? 0) : 0,
-        isDaytime
+        isDaytime,
     };
 }
 
@@ -98,7 +102,12 @@ exports.checkFavoriteSitesWeather = onSchedule('every 30 minutes', async () => {
         const user = userDoc.data();
         if (!user.fcmToken) continue;
 
-        const prefsSnap = await db.collection('users').doc(userDoc.id).collection('preferences').doc('user_prefs').get();
+        const prefsSnap = await db
+            .collection('users')
+            .doc(userDoc.id)
+            .collection('preferences')
+            .doc('user_prefs')
+            .get();
         const prefs = { ...DEFAULT_PREFS, ...(prefsSnap.exists ? prefsSnap.data() : {}) };
         const favoriteIds = prefs.favoriteSites || [];
         if (favoriteIds.length === 0) continue;
@@ -120,13 +129,15 @@ exports.checkFavoriteSitesWeather = onSchedule('every 30 minutes', async () => {
                 // Notification uniquement sur la transition non-volable -> volable, jamais à
                 // chaque exécution tant que ça reste volable (sinon spam toutes les 30 min).
                 if (flyable && previousState[siteId] === false && weather) {
-                    await messaging.send({
-                        token: user.fcmToken,
-                        notification: {
-                            title: `${site.nom || site.name || 'Site favori'} est volable !`,
-                            body: `Vent ${weather.windSpeed} km/h (${weather.windCard}), conditions favorables maintenant.`
-                        }
-                    }).catch((err) => console.error(`Échec envoi push (${userDoc.id}/${siteId}):`, err.message));
+                    await messaging
+                        .send({
+                            token: user.fcmToken,
+                            notification: {
+                                title: `${site.nom || site.name || 'Site favori'} est volable !`,
+                                body: `Vent ${weather.windSpeed} km/h (${weather.windCard}), conditions favorables maintenant.`,
+                            },
+                        })
+                        .catch((err) => console.error(`Échec envoi push (${userDoc.id}/${siteId}):`, err.message));
                 }
             } catch (e) {
                 console.error(`Erreur météo pour le site ${siteId} (utilisateur ${userDoc.id}):`, e.message);

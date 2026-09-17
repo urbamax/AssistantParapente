@@ -40,7 +40,7 @@ const Map3DComponent = {
         [-1, [125, 211, 252]],
         [0, [203, 213, 225]],
         [1, [251, 191, 36]],
-        [3, [220, 38, 38]]
+        [3, [220, 38, 38]],
     ],
     PLAYBACK_INTERVAL_MS: 100,
 
@@ -62,7 +62,7 @@ const Map3DComponent = {
             return;
         }
         if (typeof maplibregl.supported === 'function' && !maplibregl.supported()) {
-            container.innerHTML = this._errorHtml("Votre navigateur ne supporte pas le rendu 3D (WebGL).");
+            container.innerHTML = this._errorHtml('Votre navigateur ne supporte pas le rendu 3D (WebGL).');
             return;
         }
 
@@ -87,7 +87,7 @@ const Map3DComponent = {
                 maxZoom: 17,
                 pitch: 60,
                 bearing: 0,
-                interactive: true
+                interactive: true,
             });
         } catch (err) {
             console.error('[Map3D] Échec de création de la carte :', err);
@@ -98,7 +98,9 @@ const Map3DComponent = {
         map3D.dragRotate.enable();
         map3D.touchZoomRotate.enable();
         map3D.addControl(new maplibregl.NavigationControl({ visualizePitch: true, showZoom: true, showCompass: true }));
-        map3D.addControl(new maplibregl.FullscreenControl({ container: document.getElementById(`player-3d-wrapper-${sessionId}`) }));
+        map3D.addControl(
+            new maplibregl.FullscreenControl({ container: document.getElementById(`player-3d-wrapper-${sessionId}`) }),
+        );
         map3D.on('error', (e) => console.error('[Map3D] Erreur MapLibre :', e && e.error));
 
         let deckOverlay = null;
@@ -116,7 +118,8 @@ const Map3DComponent = {
                 map3D.easeTo({ center: [pt.lon, pt.lat], duration: this.PLAYBACK_INTERVAL_MS, easing: (t) => t });
             }
 
-            info.innerHTML = `Heure : <strong style="color:var(--text-primary);">${pt.time}</strong>` +
+            info.innerHTML =
+                `Heure : <strong style="color:var(--text-primary);">${pt.time}</strong>` +
                 ` &nbsp;·&nbsp; Alt : <strong style="color:var(--text-primary);">${Math.round(pt.alt)} m</strong>` +
                 ` &nbsp;·&nbsp; Vario : <strong style="color:${this._varioTextColor(vario)};">${vario >= 0 ? '+' : ''}${vario.toFixed(1)} m/s</strong>`;
         };
@@ -159,13 +162,16 @@ const Map3DComponent = {
         map3D.on('load', () => {
             deckOverlay = new deck.MapboxOverlay({
                 interleaved: true,
-                layers: this._buildDeckLayers(traceGps, pathSegments, varioSeries, parseInt(slider.value, 10))
+                layers: this._buildDeckLayers(traceGps, pathSegments, varioSeries, parseInt(slider.value, 10)),
             });
             map3D.addControl(deckOverlay);
 
             updatePosition();
 
-            const bounds = new maplibregl.LngLatBounds([traceGps[0].lon, traceGps[0].lat], [traceGps[0].lon, traceGps[0].lat]);
+            const bounds = new maplibregl.LngLatBounds(
+                [traceGps[0].lon, traceGps[0].lat],
+                [traceGps[0].lon, traceGps[0].lat],
+            );
             for (const pt of traceGps) bounds.extend([pt.lon, pt.lat]);
             map3D.fitBounds(bounds, { padding: 50, pitch: 60, bearing: 0 });
         });
@@ -194,11 +200,13 @@ const Map3DComponent = {
         maplibregl.addProtocol(protocol, async (params, abortController) => {
             const realUrl = params.url.replace(`${protocol}://`, '');
             const response = await fetch(realUrl, { signal: abortController && abortController.signal });
-            if (!response.ok) throw new Error(`[Map3D] Échec de récupération de la tuile de relief : ${response.status}`);
+            if (!response.ok)
+                throw new Error(`[Map3D] Échec de récupération de la tuile de relief : ${response.status}`);
             const blob = await response.blob();
             const bitmap = await createImageBitmap(blob);
 
-            const w = bitmap.width, h = bitmap.height;
+            const w = bitmap.width,
+                h = bitmap.height;
             const canvas = document.createElement('canvas');
             canvas.width = w;
             canvas.height = h;
@@ -243,10 +251,14 @@ const Map3DComponent = {
             for (let y = 0; y < h; y++) {
                 const rowOffset = y * w;
                 for (let x = 0; x < w; x++) {
-                    let sum = 0, count = 0;
+                    let sum = 0,
+                        count = 0;
                     for (let k = -radius; k <= radius; k++) {
                         const xx = x + k;
-                        if (xx >= 0 && xx < w) { sum += src[rowOffset + xx]; count++; }
+                        if (xx >= 0 && xx < w) {
+                            sum += src[rowOffset + xx];
+                            count++;
+                        }
                     }
                     out[rowOffset + x] = sum / count;
                 }
@@ -254,10 +266,14 @@ const Map3DComponent = {
         } else {
             for (let x = 0; x < w; x++) {
                 for (let y = 0; y < h; y++) {
-                    let sum = 0, count = 0;
+                    let sum = 0,
+                        count = 0;
                     for (let k = -radius; k <= radius; k++) {
                         const yy = y + k;
-                        if (yy >= 0 && yy < h) { sum += src[yy * w + x]; count++; }
+                        if (yy >= 0 && yy < h) {
+                            sum += src[yy * w + x];
+                            count++;
+                        }
                     }
                     out[y * w + x] = sum / count;
                 }
@@ -276,15 +292,15 @@ const Map3DComponent = {
                     type: 'raster',
                     tiles: this.SATELLITE_TILES,
                     tileSize: 256,
-                    attribution: '© Google'
+                    attribution: '© Google',
                 },
                 terrainSource: {
                     type: 'raster-dem',
                     tiles: [`${this.TERRAIN_SMOOTH_PROTOCOL}://${this.TERRAIN_TILES_RAW}`],
                     encoding: 'terrarium',
                     tileSize: 256,
-                    maxzoom: 15
-                }
+                    maxzoom: 15,
+                },
             },
             layers: [
                 { id: 'satellite', type: 'raster', source: 'satellite' },
@@ -299,11 +315,11 @@ const Map3DComponent = {
                         'hillshade-exaggeration': 0.6,
                         'hillshade-shadow-color': '#1a1a1a',
                         'hillshade-highlight-color': '#ffffff',
-                        'hillshade-accent-color': '#000000'
-                    }
-                }
+                        'hillshade-accent-color': '#000000',
+                    },
+                },
             ],
-            terrain: { source: 'terrainSource', exaggeration: 1.0 }
+            terrain: { source: 'terrainSource', exaggeration: 1.0 },
         };
     },
 
@@ -325,10 +341,14 @@ const Map3DComponent = {
         });
         const half = 1;
         return raw.map((_, i) => {
-            let sum = 0, count = 0;
+            let sum = 0,
+                count = 0;
             for (let k = -half; k <= half; k++) {
                 const idx = i + k;
-                if (idx >= 0 && idx < raw.length) { sum += raw[idx]; count++; }
+                if (idx >= 0 && idx < raw.length) {
+                    sum += raw[idx];
+                    count++;
+                }
             }
             return sum / count;
         });
@@ -346,7 +366,7 @@ const Map3DComponent = {
                 return [
                     Math.round(c1[0] + (c2[0] - c1[0]) * t),
                     Math.round(c1[1] + (c2[1] - c1[1]) * t),
-                    Math.round(c1[2] + (c2[2] - c1[2]) * t)
+                    Math.round(c1[2] + (c2[2] - c1[2]) * t),
                 ];
             }
         }
@@ -371,8 +391,11 @@ const Map3DComponent = {
             const p2 = traceGps[i + 1];
             const vario = (varioSeries[i] + varioSeries[i + 1]) / 2;
             segments.push({
-                path: [[p1.lon, p1.lat, p1.alt], [p2.lon, p2.lat, p2.alt]],
-                color: this._varioColor(vario)
+                path: [
+                    [p1.lon, p1.lat, p1.alt],
+                    [p2.lon, p2.lat, p2.alt],
+                ],
+                color: this._varioColor(vario),
             });
         }
         return segments;
@@ -393,7 +416,7 @@ const Map3DComponent = {
             capRounded: true,
             jointRounded: true,
             positionFormat: 'XYZ',
-            pickable: false
+            pickable: false,
         });
 
         // Position actuelle : un point + une étiquette, tous deux à la vraie altitude du
@@ -409,7 +432,7 @@ const Map3DComponent = {
             filled: true,
             getRadius: this.PILOT_MARKER_RADIUS_PIXELS,
             radiusUnits: 'pixels',
-            positionFormat: 'XYZ'
+            positionFormat: 'XYZ',
         });
 
         const pilotLabelLayer = new deck.TextLayer({
@@ -424,7 +447,7 @@ const Map3DComponent = {
             getBackgroundColor: [...this._varioColor(vario), 220],
             backgroundPadding: [6, 3],
             fontFamily: '"Segoe UI", Arial, sans-serif',
-            positionFormat: 'XYZ'
+            positionFormat: 'XYZ',
         });
 
         return [pathLayer, pilotMarkerLayer, pilotLabelLayer];
@@ -458,11 +481,14 @@ const Map3DComponent = {
 
     _varioLegendGradient: function () {
         const stops = this.VARIO_COLOR_STOPS;
-        const min = stops[0][0], max = stops[stops.length - 1][0];
-        return stops.map(([v, c]) => {
-            const pct = ((v - min) / (max - min)) * 100;
-            return `rgb(${c[0]},${c[1]},${c[2]}) ${pct}%`;
-        }).join(', ');
+        const min = stops[0][0],
+            max = stops[stops.length - 1][0];
+        return stops
+            .map(([v, c]) => {
+                const pct = ((v - min) / (max - min)) * 100;
+                return `rgb(${c[0]},${c[1]},${c[2]}) ${pct}%`;
+            })
+            .join(', ');
     },
 
     _errorHtml: function (message) {
@@ -474,7 +500,7 @@ const Map3DComponent = {
             clearInterval(this.activeInterval);
             this.activeInterval = null;
         }
-    }
+    },
 };
 
 window.Map3DComponent = Map3DComponent;

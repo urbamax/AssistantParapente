@@ -12,7 +12,7 @@ function addImportIfMissing(content, importStatement) {
                 lastImportIdx = i;
             }
         }
-        
+
         if (lastImportIdx !== -1) {
             lines.splice(lastImportIdx + 1, 0, importStatement);
             return lines.join('\n');
@@ -48,7 +48,7 @@ function fixSites() {
     let content = fs.readFileSync(file, 'utf8');
 
     content = addImportIfMissing(content, "import { escapeHTML } from '../core/security.js';");
-    
+
     content = content.replace(/\$\{site\.nom\}/g, '${escapeHTML(site.nom)}');
     content = content.replace(/\$\{site\.nomMin\}/g, '${escapeHTML(site.nomMin)}');
     content = content.replace(/\$\{site\.description\}/g, '${escapeHTML(site.description)}');
@@ -67,7 +67,7 @@ function fixQuiz() {
     let content = fs.readFileSync(file, 'utf8');
 
     content = addImportIfMissing(content, "import { escapeHTML } from '../core/security.js';");
-    
+
     content = content.replace(/\$\{question\.titre\}/g, '${escapeHTML(question.titre)}');
     content = content.replace(/\$\{question\.texte\}/g, '${escapeHTML(question.texte)}');
     content = content.replace(/\$\{choice\}/g, '${escapeHTML(choice)}');
@@ -82,7 +82,7 @@ function fixLibrary() {
     let content = fs.readFileSync(file, 'utf8');
 
     content = addImportIfMissing(content, "import { escapeHTML } from '../core/security.js';");
-    
+
     content = content.replace(/\$\{course\.title\}/g, '${escapeHTML(course.title)}');
     content = content.replace(/\$\{course\.description\}/g, '${escapeHTML(course.description)}');
     content = content.replace(/\$\{course\.author\}/g, '${escapeHTML(course.author)}');
@@ -95,4 +95,4 @@ fixLogbook();
 fixSites();
 fixQuiz();
 fixLibrary();
-console.log("Done escaping HTML in views.");
+console.log('Done escaping HTML in views.');
