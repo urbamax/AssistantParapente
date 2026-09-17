@@ -48,10 +48,10 @@
     -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
-        script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://www.gstatic.com;
+        script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://www.gstatic.com https://apis.google.com;
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com;
         font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net data:;
-        img-src 'self' data: blob: https://server.arcgisonline.com https://www.spotair.mobi https://federation.ffvl.fr https://parapente62lefildariane.wordpress.com;
+        img-src 'self' data: blob: https://server.arcgisonline.com https://www.spotair.mobi https://federation.ffvl.fr https://parapente62lefildariane.wordpress.com https://balisemeteo.com;
         connect-src 'self' https://api.open-meteo.com https://nominatim.openstreetmap.org https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://mt1.google.com https://s3.amazonaws.com https://demotiles.maplibre.org;
         frame-src 'self' https://www.spotair.mobi https://embed.windy.com https://meteo-parapente.com https://www.paraglidingearth.com https://paraglidable.com;
         worker-src 'self' blob:;
@@ -80,17 +80,17 @@
     <link href="https://unpkg.com/maplibre-gl@4.x/dist/maplibre-gl.css" rel="stylesheet" />
     <!-- Rendu 3D réel (altitude vraie, pas de plaquage au sol) de la trace de vol dans le Carnet de vol -->
     <script src="https://unpkg.com/deck.gl@9.4.0/dist.min.js" defer></script>
-    <link rel="stylesheet" href="css/base.css?v=2026.09.13_v32">
-    <link rel="stylesheet" href="css/components.css?v=2026.09.13_v32">
-    <link rel="stylesheet" href="css/header.css?v=2026.09.13_v32">
-    <link rel="stylesheet" href="css/footer.css?v=2026.09.13_v32">
+    <link rel="stylesheet" href="css/base.css?v=2026.09.17_v3">
+    <link rel="stylesheet" href="css/components.css?v=2026.09.17_v3">
+    <link rel="stylesheet" href="css/header.css?v=2026.09.17_v3">
+    <link rel="stylesheet" href="css/footer.css?v=2026.09.17_v3">
     
-        <link rel="stylesheet" href="css/quiz.css?v=2026.09.13_v32">
-    <link rel="stylesheet" href="css/library.css?v=2026.09.13_v32">
-    <link rel="stylesheet" href="css/sites.css?v=2026.09.13_v32">
-    <link rel="stylesheet" href="css/auth.css?v=2026.09.13_v32">
-    <link rel="stylesheet" href="css/gdpr.css?v=2026.09.13_v32">
-    <link rel="stylesheet" href="css/logbook.css?v=2026.09.13_v32">
+        <link rel="stylesheet" href="css/quiz.css?v=2026.09.17_v3">
+    <link rel="stylesheet" href="css/library.css?v=2026.09.17_v3">
+    <link rel="stylesheet" href="css/sites.css?v=2026.09.17_v3">
+    <link rel="stylesheet" href="css/auth.css?v=2026.09.17_v3">
+    <link rel="stylesheet" href="css/gdpr.css?v=2026.09.17_v3">
+    <link rel="stylesheet" href="css/logbook.css?v=2026.09.17_v3">
 </head>
 
 <body>
@@ -757,7 +757,7 @@
                         <button id="btn-type-vol" class="type-btn active" data-action="LogbooksetFormType" data-args="&#39;vol&#39;">Vol</button>
                         <button id="btn-type-gonflage" class="type-btn" data-action="LogbooksetFormType" data-args="&#39;gonflage&#39;">Gonflage</button>
                     </div>
-                    <form id="logbook-add-form" data-action="event_preventDefault">
+                    <form id="logbook-add-form">
                         <input type="hidden" id="lb-id-edit">
                         <div id="form-fields-container">
                             <!-- Injected by JS based on type -->
@@ -895,16 +895,16 @@
 
     <!-- SCRIPTS -->
 
-    <script src="js/data/courses_data.js?v=2026.09.13_v32"></script>
-    <script src="js/services/igc_parser.js?v=2026.09.13_v32"></script>
-    <script src="js/components/map_3d.js?v=2026.09.13_v32"></script>
-            <script src="js/weatherScoring.js?v=2026.09.13_v32"></script>
+    <script src="js/data/courses_data.js?v=2026.09.17_v3"></script>
+    <script src="js/services/igc_parser.js?v=2026.09.17_v3"></script>
+    <script src="js/components/map_3d.js?v=2026.09.17_v3"></script>
+            <script src="js/weatherScoring.js?v=2026.09.17_v3"></script>
             
     <!-- Services -->
     
     <!-- Firebase Sync Config & Engine -->
-    <script src="js/firebase_config.js?v=2026.09.13_v32"></script>
-    <script src="js/gdpr_engine.js?v=2026.09.13_v32"></script>
+    <script src="js/firebase_config.js?v=2026.09.17_v3"></script>
+    <script src="js/gdpr_engine.js?v=2026.09.17_v3"></script>
     <!-- Quiz Engine Version 4.8 (Theme Fix & Button Alignment) -->
             <!-- Logbook Engine -->
         <!-- Engine v4.70 (Level Persistence Fix) -->
@@ -1902,7 +1902,7 @@
         </div>
     </div>
 
-    <script type="module" src="js/core/main.js?v=2026.09.13_v32"></script>
+    <script type="module" src="js/core/main.js?v=2026.09.17_v3"></script>
     <!-- Floating Main Navigation -->
     <nav class="desktop-main-nav" id="desktop-main-nav">
         <button class="nav-menu-btn" data-target="SITES" data-action="navigate" data-args="SITES">
