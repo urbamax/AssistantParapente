@@ -39,18 +39,22 @@ class QuizService {
 
         try {
             const cacheBuster = `v=${Date.now()}`;
-            const [questionsRes, explicationsRes] = await Promise.all([
+            const [questionsRes, explicationsRes, courseMappingRes] = await Promise.all([
                 fetch(`${this.basePath}/js/data/qcm_ffvl.csv?${cacheBuster}`),
                 fetch(`${this.basePath}/js/data/qcm_ffvl_explanations.csv?${cacheBuster}`),
+                fetch(`${this.basePath}/js/data/question_course_mapping.json?${cacheBuster}`),
             ]);
 
             if (!questionsRes.ok || !explicationsRes.ok) throw new Error('Failed to load QCM CSV data');
 
             const questionsCSV = await questionsRes.text();
             const explicationsCSV = await explicationsRes.text();
+            // Le mapping question -> cours est un pré-requis mou (best-effort) : son absence ne
+            // doit jamais empêcher le chargement des questions elles-mêmes.
+            const courseMapping = courseMappingRes.ok ? await courseMappingRes.json() : {};
 
             const explications = this.parseExplicationsCSV(explicationsCSV);
-            const questions = this.parseQuestionsCSV(questionsCSV, explications);
+            const questions = this.parseQuestionsCSV(questionsCSV, explications, courseMapping);
 
             if (typeof window !== 'undefined') {
                 window.QCM_OFFICIAL = { questions };
@@ -105,7 +109,7 @@ class QuizService {
         return data;
     }
 
-    parseQuestionsCSV(csvText, explications) {
+    parseQuestionsCSV(csvText, explications, courseMapping = {}) {
         try {
             const parseLine = (line) => {
                 const result = [];
@@ -151,6 +155,14 @@ class QuizService {
                 const categoryPrefix = code.charAt(0);
                 const pFlag = ['A', 'E', 'F', 'G', 'L', 'N', 'P', 'S', 'U', 'W'].includes(categoryPrefix);
 
+                // On ne retient le lien "COURS" que pour les questions dont la page a été
+                // vérifiée manuellement (texte du document relu et confronté aux réponses) :
+                // le mapping brut question_course_mapping.json est un rapprochement par
+                // similarité sémantique automatique, avec des scores de confiance faibles, et
+                // ne doit jamais être présenté tel quel comme une source fiable.
+                const mapping = courseMapping[code];
+                const coursePage = mapping && mapping.verifiedPage ? mapping : null;
+
                 questions.push({
                     code,
                     question: questionText,
@@ -159,6 +171,8 @@ class QuizService {
                     parapente: pFlag,
                     theme: this.getThemeForCode(code),
                     explication: explications[code] || '',
+                    courseId: coursePage ? coursePage.course_id : null,
+                    coursePage: coursePage ? coursePage.verifiedPage : null,
                 });
             }
             return questions;

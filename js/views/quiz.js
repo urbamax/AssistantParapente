@@ -1519,11 +1519,14 @@ class QuizViewClass extends BaseView {
             <button class="next-btn" data-action="next-question" style="flex:1;">QUESTION SUIVANTE <i class="ri-arrow-right-line"></i></button>
         `;
 
+        const courseUrl = this.getCourseUrl(result.question.code);
+
         const feedbackDiv = document.getElementById('qcm-feedback');
         feedbackDiv.style.display = 'block';
         feedbackDiv.innerHTML = `
             <div class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}">
                 <div>${result.question.explication}</div>
+                ${courseUrl ? `<button onclick="window.open('${courseUrl}', '_blank')" style="margin-top:10px; background:var(--accent-blue); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR DANS LE COURS</button>` : ''}
             </div>
         `;
     }
@@ -1921,8 +1924,16 @@ class QuizViewClass extends BaseView {
         }
     }
 
-    getCourseUrl(questionCode, questionText) {
-        return null;
+    getCourseUrl(questionCode) {
+        const q = this.getQuestionByCode(questionCode);
+        if (!q || !q.courseId || !q.coursePage) return null;
+        if (typeof COURSES_DATA === 'undefined') return null;
+        const course = COURSES_DATA[q.courseId];
+        if (!course || !course.pdf) return null;
+        // Convention déjà utilisée pour ouvrir un PDF (manual.js openCourse) : chemin relatif
+        // ouvert par le navigateur, qui supporte nativement l'ancre #page=N pour sauter à la
+        // bonne page sans avoir à construire un lecteur PDF dédié.
+        return `${course.pdf}#page=${q.coursePage}`;
     }
 } // End Class
 
