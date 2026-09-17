@@ -242,6 +242,10 @@ class QuizViewClass extends BaseView {
                 QuizService.setCount(value === 'ALL' ? 'ALL' : parseInt(value));
                 this.updateCountUI(value, target);
                 break;
+            case 'setMasteryTarget':
+                QuizService.setMasteryTarget(parseInt(value));
+                this.updateMasteryTargetUI(value, target);
+                break;
             case 'back-to-setup':
             case 'goBack':
                 this.showSetupScreen();
@@ -405,6 +409,9 @@ class QuizViewClass extends BaseView {
             } else if (mode === 'REVISION') {
                 descEl.innerText =
                     'Mode Révision : Retravaillez vos points faibles et découvrez les questions jamais tentées.';
+            } else if (mode === 'MASTERY') {
+                descEl.innerText =
+                    'Mode Perfectionnement : Choisissez un niveau ou un thème et un palier cible. La série pioche vos questions non maîtrisées et se rallonge automatiquement si besoin, jusqu\'à atteindre l\'objectif.';
             } else {
                 descEl.innerText =
                     'Mode Entraînement : Choisissez votre thème et volume. Correction immédiate après chaque question.';
@@ -420,6 +427,29 @@ class QuizViewClass extends BaseView {
                 trainingOptions.style.opacity = '1';
                 trainingOptions.style.pointerEvents = 'auto';
             }
+        }
+
+        const countGroup = document.getElementById('qcm-count-group');
+        if (countGroup) countGroup.style.display = mode === 'MASTERY' ? 'none' : '';
+
+        const themeLabel = document.getElementById('qcm-theme-label');
+        if (themeLabel) {
+            themeLabel.innerText = mode === 'MASTERY' ? 'NIVEAU (TOUT) OU THÈME CIBLÉ' : 'THÈME SPÉCIFIQUE (OPTIONNEL)';
+        }
+
+        const masteryOptions = document.getElementById('mastery-options');
+        if (masteryOptions) masteryOptions.style.display = mode === 'MASTERY' ? '' : 'none';
+    }
+
+    updateMasteryTargetUI(target, targetBtn) {
+        const container = document.getElementById('mastery-options');
+        if (!container) return;
+        container.querySelectorAll('.count-btn').forEach((btn) => btn.classList.remove('active'));
+        if (targetBtn) {
+            targetBtn.classList.add('active');
+        } else {
+            const btn = container.querySelector(`[data-args="${target}"]`);
+            if (btn) btn.classList.add('active');
         }
     }
 
@@ -1387,6 +1417,30 @@ class QuizViewClass extends BaseView {
         const qIdx = QuizService.state.qcmIndex + 1;
         const total = QuizService.state.qcmSessionData.length;
 
+        const modeLabelEl = document.getElementById('qcm-mode-label');
+        if (modeLabelEl) {
+            const modeLabels = {
+                EXAM: 'MODE EXAMEN',
+                REVISION: 'MODE RÉVISION',
+                MASTERY: 'MODE PERFECTIONNEMENT',
+                TRAINING: 'MODE ENTRAÎNEMENT',
+            };
+            modeLabelEl.innerText = modeLabels[QuizService.state.qcmConfig.mode] || 'MODE ENTRAÎNEMENT';
+        }
+
+        const masteryProgressEl = document.getElementById('qcm-mastery-progress');
+        if (masteryProgressEl) {
+            if (QuizService.state.qcmConfig.mode === 'MASTERY') {
+                const progress = QuizService.getMasteryProgress();
+                masteryProgressEl.style.display = progress ? 'block' : 'none';
+                if (progress) {
+                    masteryProgressEl.innerText = `Objectif : ${progress.target}% — Progression actuelle : ${progress.current}%`;
+                }
+            } else {
+                masteryProgressEl.style.display = 'none';
+            }
+        }
+
         let badgeHtml = '';
         if (QuizService.state.qcmConfig.mode === 'REVISION') {
             const stats = QuizService.getPersistentStats();
@@ -1537,7 +1591,9 @@ class QuizViewClass extends BaseView {
             ? 'MODE EXAMEN'
             : QuizService.state.qcmConfig.mode === 'REVISION'
               ? 'MODE RÉVISION'
-              : 'MODE ENTRAÎNEMENT';
+              : QuizService.state.qcmConfig.mode === 'MASTERY'
+                ? 'MODE PERFECTIONNEMENT'
+                : 'MODE ENTRAÎNEMENT';
 
         if (isExam) {
             const level = typeof GlobalState !== 'undefined' ? GlobalState.get('level') : 'BI';
@@ -1548,6 +1604,8 @@ class QuizViewClass extends BaseView {
         const choicesDiv = document.getElementById('qcm-choices');
         const actionsDiv = document.getElementById('qcm-actions-container');
         document.getElementById('qcm-feedback').style.display = 'none';
+        const masteryProgressEl = document.getElementById('qcm-mastery-progress');
+        if (masteryProgressEl) masteryProgressEl.style.display = 'none';
 
         // Update the mode label dynamically based on mode
         const modeLabel = document.getElementById('qcm-mode-label');
@@ -1661,15 +1719,15 @@ class QuizViewClass extends BaseView {
         if (!list) return;
 
         // Toggle direction if clicking same sort
-        if (QuizView.state.sortState.field === sortBy) {
-            QuizView.state.sortState.dir = QuizView.state.sortState.dir === 'asc' ? 'desc' : 'asc';
+        if (QuizView.state.questionSort === sortBy) {
+            QuizView.state.questionSortDir = QuizView.state.questionSortDir === 'asc' ? 'desc' : 'asc';
         } else {
-            QuizView.state.sortState.field = sortBy;
+            QuizView.state.questionSort = sortBy;
             // Default directions: Rate -> ASC (worst first), Attempts -> DESC (most first)
-            QuizView.state.sortState.dir = sortBy === 'rate' ? 'asc' : 'desc';
+            QuizView.state.questionSortDir = sortBy === 'rate' ? 'asc' : 'desc';
         }
 
-        const dir = QuizView.state.sortState.dir;
+        const dir = QuizView.state.questionSortDir;
         const items = Array.from(list.querySelectorAll('.question-stat-item'));
 
         // Update button states & Icons

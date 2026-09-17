@@ -5,9 +5,10 @@ class QuizService {
         this.state = {
             qcmIndex: 0,
             qcmConfig: {
-                mode: 'TRAINING', // TRAINING, EXAM, REVISION
+                mode: 'TRAINING', // TRAINING, EXAM, REVISION, MASTERY
                 count: 10,
                 theme: 'ALL',
+                masteryTarget: 75,
             },
             qcmSessionData: [],
             currentQcmSelection: new Set(),
@@ -211,6 +212,13 @@ class QuizService {
         return newArray;
     }
 
+    // Retourne une copie de la question avec ses choix mélangés (nouveau tableau, mêmes objets
+    // choix) : ne mute jamais window.QCM_OFFICIAL.questions[].choices, dont l'ordre canonique
+    // reste stable pour la Banque de Questions.
+    shuffleQuestionChoices(q) {
+        return { ...q, choices: this.shuffle(q.choices) };
+    }
+
     getThemes() {
         const themes = new Set();
         if (typeof window !== 'undefined' && window.QCM_OFFICIAL && window.QCM_OFFICIAL.questions) {
@@ -230,6 +238,121 @@ class QuizService {
     }
     setTheme(theme) {
         this.state.qcmConfig.theme = theme;
+    }
+    setMasteryTarget(target) {
+        this.state.qcmConfig.masteryTarget = target;
+    }
+
+    // Ratio de maîtrise d'une question (0 à 1) : correct/total, ou 0 si jamais tentée.
+    // C'est la même formule que celle utilisée par l'écran Statistiques pour la "Réussite globale",
+    // ce qui garantit que le mode Perfectionnement vise le même chiffre que celui affiché au pilote.
+    getMasteryRatio(question, stats) {
+        const s = stats.questions[question.code];
+        return s && s.total > 0 ? s.correct / s.total : 0;
+    }
+
+    // Sélectionne, parmi `pool`, les questions les moins maîtrisées en priorité, jusqu'à ce que
+    // le gain projeté (au mieux : bonne réponse à chacune, donc ratio -> 1) suffise à amener la
+    // moyenne du périmètre au palier cible. C'est une projection optimiste : on mémorise le gain
+    // supposé de chaque question choisie (_masteryAssumedGains) pour pouvoir, question par
+    // question, corriger cette hypothèse par le résultat réel dans advanceMasteryProgress() —
+    // sans quoi on recompterait comme "manquantes" des questions déjà en file mais pas encore
+    // répondues, et la série s'allongerait après quasiment chaque réponse.
+    buildMasterySelection(pool, stats, targetPct) {
+        const poolSize = pool.length;
+        const currentSum = pool.reduce((sum, q) => sum + this.getMasteryRatio(q, stats), 0);
+        const targetSum = (targetPct / 100) * poolSize;
+        const deficit = targetSum - currentSum;
+
+        const sorted = this.shuffle(pool).sort(
+            (a, b) => this.getMasteryRatio(a, stats) - this.getMasteryRatio(b, stats),
+        );
+
+        const assumedGains = new Map();
+        const selected = [];
+        let projectedGain = 0;
+        for (const q of sorted) {
+            if (projectedGain >= deficit) break;
+            const gain = 1 - this.getMasteryRatio(q, stats);
+            selected.push(q);
+            assumedGains.set(q.code, gain);
+            projectedGain += gain;
+        }
+        // Objectif déjà atteint : on propose quand même une petite série de consolidation
+        // sur les questions les plus fragiles, plutôt qu'une session vide.
+        if (selected.length === 0) {
+            sorted.slice(0, Math.min(5, sorted.length)).forEach((q) => {
+                selected.push(q);
+                assumedGains.set(q.code, 1 - this.getMasteryRatio(q, stats));
+            });
+        }
+
+        this._masteryPool = pool;
+        this._masteryTargetPct = targetPct;
+        this._masteryTargetSum = targetSum;
+        this._masteryProjectedSum = currentSum + projectedGain;
+        this._masteryAssumedGains = assumedGains;
+        return selected;
+    }
+
+    // Recalcul dynamique en temps réel : appelé après chaque réponse avec le ratio de maîtrise
+    // de la question AVANT cette réponse. On retire l'hypothèse optimiste posée à la sélection
+    // (assumedGain) et on la remplace par le gain réellement observé ; si la somme projetée
+    // repasse sous l'objectif (typiquement après une mauvaise réponse), on rallonge la série avec
+    // de nouvelles questions faibles (en évitant les doublons tant que le périmètre n'est pas
+    // épuisé, puis en autorisant la répétition) pour garantir qu'à la fin, le palier choisi soit
+    // atteint.
+    advanceMasteryProgress(question, ratioBefore) {
+        if (this._masteryProjectedSum === undefined || !this._masteryPool) return;
+
+        const statsNow = this.getPersistentStats();
+        const ratioAfter = this.getMasteryRatio(question, statsNow);
+        const assumedGain = this._masteryAssumedGains.get(question.code) || 0;
+        const actualGain = ratioAfter - ratioBefore;
+
+        this._masteryProjectedSum += actualGain - assumedGain;
+        this._masteryAssumedGains.delete(question.code);
+
+        const deficit = this._masteryTargetSum - this._masteryProjectedSum;
+        if (deficit <= 0.0001) return;
+
+        const alreadyScheduled = new Set(this.state.qcmSessionData.map((q) => q.code));
+        let candidates = this._masteryPool.filter((q) => !alreadyScheduled.has(q.code));
+        if (candidates.length === 0) candidates = this._masteryPool.slice();
+
+        const sorted = this.shuffle(candidates).sort(
+            (a, b) => this.getMasteryRatio(a, statsNow) - this.getMasteryRatio(b, statsNow),
+        );
+
+        const toAdd = [];
+        let gained = 0;
+        for (const q of sorted) {
+            if (gained >= deficit) break;
+            const gain = 1 - this.getMasteryRatio(q, statsNow);
+            toAdd.push(q);
+            this._masteryAssumedGains.set(q.code, gain);
+            gained += gain;
+        }
+        if (toAdd.length === 0 && sorted.length > 0) {
+            const q = sorted[0];
+            toAdd.push(q);
+            this._masteryAssumedGains.set(q.code, 1 - this.getMasteryRatio(q, statsNow));
+        }
+
+        this._masteryProjectedSum += gained;
+        this.state.qcmSessionData.push(...toAdd.map((q) => this.shuffleQuestionChoices(q)));
+    }
+
+    // Progression actuelle vers l'objectif du mode Perfectionnement, pour affichage en direct.
+    getMasteryProgress() {
+        const pool = this._masteryPool;
+        if (!pool || pool.length === 0) return null;
+        const stats = this.getPersistentStats();
+        const currentSum = pool.reduce((sum, q) => sum + this.getMasteryRatio(q, stats), 0);
+        return {
+            current: Math.round((currentSum / pool.length) * 100),
+            target: this._masteryTargetPct || 75,
+        };
     }
 
     startSession(level = 'BI') {
@@ -298,6 +421,11 @@ class QuizService {
             const filteredData = pool.sort((a, b) => b.dueScore - a.dueScore).map((x) => x.q);
 
             questions = filteredData.slice(0, count);
+        } else if (this.state.qcmConfig.mode === 'MASTERY') {
+            if (selectedTheme !== 'ALL') sourceData = sourceData.filter((q) => q.theme === selectedTheme);
+            const stats = this.getPersistentStats();
+            const target = this.state.qcmConfig.masteryTarget || 75;
+            questions = this.buildMasterySelection(sourceData, stats, target);
         } else {
             if (selectedTheme !== 'ALL') sourceData = sourceData.filter((q) => q.theme === selectedTheme);
             if (this.state.qcmConfig.mode === 'EXAM') {
@@ -307,6 +435,13 @@ class QuizService {
         }
 
         if (questions.length === 0) throw new Error('Aucune question trouvée');
+
+        // Mélange l'ordre des choix de chaque question (sur une copie : les objets choix eux-mêmes
+        // et le tableau canonique QCM_OFFICIAL.questions[].choices ne sont pas mutés, pour que la
+        // Banque de Questions garde un ordre de référence stable). Sans cela, la bonne réponse
+        // apparaît toujours à la même position d'une session à l'autre et l'élève finit par
+        // mémoriser un emplacement plutôt que la théorie.
+        questions = questions.map((q) => this.shuffleQuestionChoices(q));
 
         this.state.qcmSessionData = questions;
         this.state.qcmIndex = 0;
@@ -360,7 +495,10 @@ class QuizService {
         this.state.examResults[this.state.qcmIndex] = resultData;
 
         if (this.state.qcmConfig.mode !== 'EXAM') {
+            const isMastery = this.state.qcmConfig.mode === 'MASTERY';
+            const ratioBefore = isMastery ? this.getMasteryRatio(question, this.getPersistentStats()) : null;
             this.updateStats(question, isCorrect);
+            if (isMastery) this.advanceMasteryProgress(question, ratioBefore);
         }
 
         return resultData;

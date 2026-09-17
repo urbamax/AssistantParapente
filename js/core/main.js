@@ -90,6 +90,10 @@ async function bootApplication() {
         QuizService.setCount(count === 'ALL' ? 'ALL' : parseInt(count));
         if (QuizView.updateCountUI) QuizView.updateCountUI(count, target);
     });
+    AppEvents.register('setMasteryTarget', (target, e, btn) => {
+        QuizService.setMasteryTarget(parseInt(target));
+        if (QuizView.updateMasteryTargetUI) QuizView.updateMasteryTargetUI(target, btn);
+    });
     AppEvents.register('startQcmSession', () => QuizView.startSession());
     AppEvents.register('QuizreviewExam', (args) => QuizView.reviewExam(args));
     AppEvents.register('QuizshowStatsScreen', () => QuizView.showStatsScreen());

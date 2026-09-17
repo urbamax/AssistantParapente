@@ -135,6 +135,9 @@
                         <button id="mode-revision" class="mode-toggle-btn" data-action="setQcmMode" data-args="&#39;REVISION&#39;">
                             <i class="ri-refresh-line"></i> Révision
                         </button>
+                        <button id="mode-mastery" class="mode-toggle-btn" data-action="setQcmMode" data-args="&#39;MASTERY&#39;">
+                            <i class="ri-focus-3-line"></i> Perfectionnement
+                        </button>
                     </div>
                 </div>
                 <!-- Mode Description (New) -->
@@ -145,7 +148,7 @@
 
                 <!-- TRAINING OPTIONS (Hidden in Exam Mode) -->
                 <div id="training-options">
-                    <div class="setup-group">
+                    <div class="setup-group" id="qcm-count-group">
                         <label class="setup-label">NOMBRE DE QUESTIONS</label>
                         <div class="count-selector">
                             <button class="count-btn active" data-action="setQcmCount" data-args="10">10</button>
@@ -156,12 +159,22 @@
                         </div>
                     </div>
 
-                    <div class="setup-group setup-group-margin">
-                        <label class="setup-label">THÈME SPÉCIFIQUE (OPTIONNEL)</label>
+                    <div class="setup-group setup-group-margin" id="qcm-theme-group">
+                        <label class="setup-label" id="qcm-theme-label">THÈME SPÉCIFIQUE (OPTIONNEL)</label>
                         <select id="qcm-theme-select">
                             <option value="ALL">Tous les thèmes</option>
                             <!-- Injected by JS -->
                         </select>
+                    </div>
+                </div>
+
+                <!-- MASTERY (PERFECTIONNEMENT) OPTIONS (Only shown in Mastery Mode) -->
+                <div id="mastery-options" class="setup-group setup-group-margin" style="display:none;">
+                    <label class="setup-label">PALIER OBJECTIF</label>
+                    <div class="count-selector">
+                        <button class="count-btn" data-action="setMasteryTarget" data-args="50">50%</button>
+                        <button class="count-btn active" data-action="setMasteryTarget" data-args="75">75%</button>
+                        <button class="count-btn" data-action="setMasteryTarget" data-args="100">100%</button>
                     </div>
                 </div>
 
@@ -184,6 +197,7 @@
     <div id="qcm-screen" class="mode-screen">
         <div class="main-stage">
             <div id="qcm-mode-label" class="level-tag level-tag-faded">MODE EXAMEN</div>
+            <div id="qcm-mastery-progress" style="display:none; font-size:0.8rem; color:var(--text-secondary); margin-top:6px;"></div>
 
             <div id="qcm-question-text" class="qcm-question">
                 Chargement...
@@ -1810,7 +1824,7 @@
                             la base de données officielle des questions de la Fédération Française de Vol Libre (FFVL)
                             pour préparer vos brevets théoriques.</p>
 
-                        <h5 style="margin-top: 16px; margin-bottom: 8px;">1. Les Trois Modes d'Apprentissage</h5>
+                        <h5 style="margin-top: 16px; margin-bottom: 8px;">1. Les Quatre Modes d'Apprentissage</h5>
                         <ul
                             style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; padding-left: 20px;">
                             <li style="margin-bottom: 8px;"><strong>Mode Entraînement :</strong> C'est le mode par
@@ -1824,14 +1838,22 @@
                             <li style="margin-bottom: 8px;"><strong>Mode Révision :</strong> L'algorithme se concentre
                                 exclusivement sur les questions auxquelles vous avez répondu de manière incorrecte par
                                 le passé. Très utile pour corriger ses faiblesses avant le jour J.</li>
+                            <li style="margin-bottom: 8px;"><strong>Mode Perfectionnement :</strong> Choisissez un
+                                niveau global ou un thème précis, puis un palier cible (50%, 75% ou 100% de réussite).
+                                L'application pioche en priorité vos questions non maîtrisées ou en échec, et calcule
+                                le nombre de bonnes réponses nécessaires pour atteindre ce palier. Si vous vous trompez
+                                en cours de série, l'objectif recule automatiquement et de nouvelles questions sont
+                                ajoutées en temps réel, pour garantir qu'à la fin de la série, votre palier soit bien
+                                atteint.</li>
                         </ul>
 
                         <h5 style="margin-top: 16px; margin-bottom: 8px;">2. Paramétrage Avancé</h5>
                         <p
                             style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem; margin-bottom: 8px;">
-                            Avant de lancer une session, vous pouvez choisir le nombre de questions (10, 20, 30, 40 ou
-                            TOUTES) et forcer le QCM sur un thème précis (ex: uniquement la Météo, ou uniquement la
-                            Réglementation).</p>
+                            En mode Entraînement ou Révision, vous pouvez choisir le nombre de questions (10, 20, 30, 40
+                            ou TOUTES) et forcer le QCM sur un thème précis (ex: uniquement la Météo, ou uniquement la
+                            Réglementation). En mode Perfectionnement, ce nombre est calculé automatiquement : vous
+                            choisissez uniquement le périmètre (niveau ou thème) et le palier objectif.</p>
 
                         <h5 style="margin-top: 16px; margin-bottom: 8px;">3. La Banque de Questions</h5>
                         <p
