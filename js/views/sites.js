@@ -838,7 +838,7 @@ buildWeatherPopupHtml(weather, color, site) {
 
     spotSite(lat, lon, siteName, extraId) {
     // 1. Scroll to the top map view
-    var mapView = document.getElementById('sites-map-view');
+    const mapView = document.getElementById('sites-map-view');
     if (mapView) {
         mapView.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -864,7 +864,7 @@ buildWeatherPopupHtml(weather, color, site) {
 }
 
     showSpotItToast(siteName) {
-    var toast = document.getElementById('spot-it-toast');
+    let toast = document.getElementById('spot-it-toast');
     if (!toast) {
         toast = document.createElement('div');
         toast.id = 'spot-it-toast';
@@ -880,14 +880,14 @@ buildWeatherPopupHtml(weather, color, site) {
 }
 
     openMoreMapsDropdown() {
-    var sheet = document.getElementById('more-maps-bottom-sheet');
+    const sheet = document.getElementById('more-maps-bottom-sheet');
     if (!sheet) return;
 
-    var spotted = this.state._spottedSite || null;
-    var lat = null;
-    var lon = null;
-    var siteName = null;
-    var extraId = null;
+    const spotted = this.state._spottedSite || null;
+    let lat = null;
+    let lon = null;
+    let siteName = null;
+    let extraId = null;
 
     if (spotted) {
         lat = spotted.lat || spotted.latitude;
@@ -895,21 +895,21 @@ buildWeatherPopupHtml(weather, color, site) {
         siteName = spotted.siteName || spotted.nom;
         extraId = spotted.extraId || spotted.id;
     } else if (this.state.map) {
-        var center = this.state.map.getCenter();
+        const center = this.state.map.getCenter();
         lat = center.lat;
         lon = center.lng;
     }
 
-    var mbUrl = 'https://www.meteoblue.com/';
+    let mbUrl = 'https://www.meteoblue.com/';
     if (lat && lon) {
-        var latVal = Math.abs(lat);
-        var lonVal = Math.abs(lon);
-        var latDir = lat >= 0 ? 'N' : 'S';
-        var lonDir = lon >= 0 ? 'E' : 'W';
+        const latVal = Math.abs(lat);
+        const lonVal = Math.abs(lon);
+        const latDir = lat >= 0 ? 'N' : 'S';
+        const lonDir = lon >= 0 ? 'E' : 'W';
         mbUrl = 'https://www.meteoblue.com/fr/meteo/semaine/' + latVal + latDir + lonVal + lonDir;
     }
 
-    var links = [
+    const links = [
         {
             label: 'Meteoblue',
             icon: 'ri-temp-hot-line',
@@ -959,7 +959,7 @@ buildWeatherPopupHtml(weather, color, site) {
         }
     });
 
-    var grid = document.getElementById('more-maps-grid');
+    const grid = document.getElementById('more-maps-grid');
     if (grid) {
         grid.innerHTML = links.map(function (link) {
             if (link.onclick) {
@@ -971,12 +971,12 @@ buildWeatherPopupHtml(weather, color, site) {
         }).join('');
     }
 
-    var title = document.getElementById('more-maps-title');
+    const title = document.getElementById('more-maps-title');
     if (title) {
         title.textContent = siteName ? siteName.toUpperCase() : 'CARTES EXTERNES';
     }
 
-    var subtitle = document.getElementById('more-maps-subtitle');
+    const subtitle = document.getElementById('more-maps-subtitle');
     if (subtitle) {
         subtitle.textContent = siteName
             ? 'Ouvrir dans un nouvel onglet sur ce spot'
@@ -987,7 +987,7 @@ buildWeatherPopupHtml(weather, color, site) {
 }
 
     closeMoreMapsDropdown() {
-    var sheet = document.getElementById('more-maps-bottom-sheet');
+    const sheet = document.getElementById('more-maps-bottom-sheet');
     if (sheet) sheet.classList.remove('active');
 }
 
