@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import QuizService from '../js/services/quiz_service.js';
-import StorageService from '../js/services/storage.js';
+import QuizService from '../../js/services/quiz_service.js';
+import StorageService from '../../js/services/storage.js';
 
 describe('QuizService - Mode REVISION', () => {
     

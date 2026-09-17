@@ -90,7 +90,6 @@ const CRITICAL_ASSETS = [
     './js/data/qcm_ffvl.csv',
     './js/data/qcm_ffvl_explanations.csv',
     './js/weatherScoring.js',
-    './js/engine_v4_6.js',
     './js/gdpr_engine.js',
     './js/firebase_config.js',
     './img/logo.png',

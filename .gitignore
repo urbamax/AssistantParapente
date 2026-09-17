@@ -2,3 +2,7 @@
 node_modules/
 .*smbdelete*
 .claude/settings.local.json
+.claude/worktrees/
+.venv/
+playwright-report/
+test-results/
