@@ -53,6 +53,27 @@ class QuizViewClass extends BaseView {
         this.renderExamResults();
     }
 
+    // Index QCM_OFFICIAL.questions par code/id une seule fois : évite un .find() linéaire
+    // (O(n) par question affichée) répété sur ~850 questions à chaque rendu des stats.
+    _getQuestionMap() {
+        const list = (typeof QCM_OFFICIAL !== 'undefined' && window.QCM_OFFICIAL.questions) ? window.QCM_OFFICIAL.questions : null;
+        if (!list) return null;
+        if (this._questionMapSource !== list) {
+            this._questionMap = new Map();
+            list.forEach(q => {
+                this._questionMap.set(q.code, q);
+                if (q.id !== undefined && q.id !== q.code) this._questionMap.set(q.id, q);
+            });
+            this._questionMapSource = list;
+        }
+        return this._questionMap;
+    }
+
+    getQuestionByCode(code) {
+        const map = this._getQuestionMap();
+        return map ? (map.get(code) || null) : null;
+    }
+
     async mount(container) {
         await super.mount(container);
         console.log("QuizView: mount started");
@@ -106,7 +127,7 @@ class QuizViewClass extends BaseView {
                     this.showBankScreen();
                 }
                 
-                const statsScreen = document.getElementById('qcm-stats-screen');
+                const statsScreen = document.getElementById('stats-screen');
                 if (statsScreen && statsScreen.classList.contains('active')) {
                     this.renderStats();
                 }
@@ -137,7 +158,7 @@ class QuizViewClass extends BaseView {
         if (bankSearch && this._handleChange) bankSearch.removeEventListener('input', this._handleChange);
         
         // Cache les écrans
-        const screens = ['qcm-setup-screen', 'qcm-screen', 'qcm-stats-screen', 'qcm-bank-screen'];
+        const screens = ['qcm-setup-screen', 'qcm-screen', 'stats-screen', 'qcm-bank-screen'];
         screens.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.classList.remove('active');
@@ -824,10 +845,7 @@ class QuizViewClass extends BaseView {
                     displayLabel += ` • Thème: ${QuizView.state.themeFilter}`;
                     // Filter sortedQuestions again by theme
                     visibleQuestions = visibleQuestions.filter(([code, data]) => {
-                        let qObj = null;
-                        if (typeof QCM_OFFICIAL !== 'undefined' && window.QCM_OFFICIAL.questions) {
-                            qObj = window.QCM_OFFICIAL.questions.find(q => q.code === code || q.id === code);
-                        }
+                        const qObj = QuizView.getQuestionByCode(code);
 
                         let qTheme = (qObj && qObj.theme) ? qObj.theme : null;
 
@@ -875,12 +893,8 @@ class QuizViewClass extends BaseView {
             `;
 
                 visibleQuestions.forEach(([code, data]) => {
-                    let qObj = null;
+                    const qObj = QuizView.getQuestionByCode(code);
 
-                    if (typeof QCM_OFFICIAL !== 'undefined' && window.QCM_OFFICIAL.questions) {
-                        qObj = window.QCM_OFFICIAL.questions.find(q => q.code === code || q.id === code);
-                    }
-                    
                     let theme = qObj ? qObj.theme : "Autre";
 
                     // Derive theme if missing
@@ -1098,9 +1112,7 @@ class QuizViewClass extends BaseView {
                 
                 // Fallback: If question was saved as a string code (bug from early ES6 engine)
                 if (typeof q === 'string') {
-                    if (typeof QCM_OFFICIAL !== 'undefined' && window.QCM_OFFICIAL.questions) {
-                        q = window.QCM_OFFICIAL.questions.find(curr => curr.code === r.question);
-                    }
+                    q = QuizView.getQuestionByCode(r.question);
                 }
                 
                 if (!q) return; // Skip if question couldn't be resolved
@@ -1146,8 +1158,8 @@ class QuizViewClass extends BaseView {
                         ${(function () {
                         // Try to get explanation from saved question, or lookup in current QCM_OFFICIAL
                         let expl = q.explanation || q.explication;
-                        if (!expl && typeof QCM_OFFICIAL !== 'undefined' && window.QCM_OFFICIAL.questions) {
-                            const currentQ = window.QCM_OFFICIAL.questions.find(curr => curr.code === q.code);
+                        if (!expl) {
+                            const currentQ = QuizView.getQuestionByCode(q.code);
                             if (currentQ) expl = currentQ.explication || currentQ.explanation;
                         }
 
