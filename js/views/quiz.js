@@ -1457,6 +1457,15 @@ class QuizViewClass extends BaseView {
             ${qIdx > 1 ? '<button class="next-btn" data-action="prev-question" style="flex:0 0 60px;"><i class="ri-arrow-left-line"></i></button>' : ''}
             <button class="next-btn" id="qcm-validate-btn" data-action="validate-question" style="flex:1;">VALIDER</button>
         `;
+
+        // Si on revient sur une question déjà validée (bouton "retour"), on réaffiche son état
+        // corrigé (réponses figées + explication) au lieu d'une question vierge : sinon il suffit
+        // de cliquer sur la bonne réponse qu'on vient de voir surlignée, sans aucun effort.
+        const isExam = QuizService.state.qcmConfig.mode === 'EXAM';
+        const existingResult = QuizService.state.examResults[QuizService.state.qcmIndex];
+        if (existingResult && !isExam) {
+            this.showAnswerFeedback(existingResult, qIdx > 1);
+        }
     }
 
     toggleOptionSelection(btnElement) {
@@ -1474,45 +1483,54 @@ class QuizViewClass extends BaseView {
     validateQuestion() {
         const result = QuizService.validate();
         if(!result) return;
-        
+
         const isExam = QuizService.state.qcmConfig.mode === 'EXAM';
-        
+
         if (isExam) {
             this.renderQuestion(QuizService.nextQuestion());
         } else {
-            // Training mode: Visual feedback
-            document.getElementById('qcm-validate-btn').remove();
-            const btns = document.querySelectorAll('.qcm-option');
-            
-            btns.forEach(btn => {
-                btn.disabled = true;
-                const idx = parseInt(btn.getAttribute('data-idx'));
-                const opt = this._currentChoices[idx];
-                const isSelected = result.selected.includes(opt);
-                
-                if (opt.pts > 0) {
-                    if (isSelected) {
-                        btn.classList.add('correct');
-                        btn.innerHTML += ' <i class="ri-check-double-line"></i>';
-                    } else {
-                        btn.classList.add('missed');
-                    }
-                } else if (opt.pts < 0 && isSelected) {
-                    btn.classList.add('incorrect');
-                }
-            });
-            
-            const actionsDiv = document.getElementById('qcm-actions-container');
-            actionsDiv.innerHTML += `<button class="next-btn" data-action="next-question" style="flex:1;">QUESTION SUIVANTE <i class="ri-arrow-right-line"></i></button>`;
-            
-            const feedbackDiv = document.getElementById('qcm-feedback');
-            feedbackDiv.style.display = 'block';
-            feedbackDiv.innerHTML = `
-                <div class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}">
-                    <div>${result.question.explication}</div>
-                </div>
-            `;
+            this.showAnswerFeedback(result, QuizService.state.qcmIndex > 0);
         }
+    }
+
+    // Affiche les réponses figées (corrigées) + l'explication, que ce soit juste après avoir
+    // validé ou en revenant sur une question déjà répondue via le bouton "retour".
+    showAnswerFeedback(result, showBackButton) {
+        const btns = document.querySelectorAll('.qcm-option');
+
+        btns.forEach(btn => {
+            btn.disabled = true;
+            const idx = parseInt(btn.getAttribute('data-idx'));
+            const opt = this._currentChoices[idx];
+            const isSelected = result.selected.includes(opt);
+
+            if (opt.pts > 0) {
+                if (isSelected) {
+                    btn.classList.add('correct');
+                    if (!btn.innerHTML.includes('ri-check-double-line')) {
+                        btn.innerHTML += ' <i class="ri-check-double-line"></i>';
+                    }
+                } else {
+                    btn.classList.add('missed');
+                }
+            } else if (opt.pts < 0 && isSelected) {
+                btn.classList.add('incorrect');
+            }
+        });
+
+        const actionsDiv = document.getElementById('qcm-actions-container');
+        actionsDiv.innerHTML = `
+            ${showBackButton ? '<button class="next-btn" data-action="prev-question" style="flex:0 0 60px;"><i class="ri-arrow-left-line"></i></button>' : ''}
+            <button class="next-btn" data-action="next-question" style="flex:1;">QUESTION SUIVANTE <i class="ri-arrow-right-line"></i></button>
+        `;
+
+        const feedbackDiv = document.getElementById('qcm-feedback');
+        feedbackDiv.style.display = 'block';
+        feedbackDiv.innerHTML = `
+            <div class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}">
+                <div>${result.question.explication}</div>
+            </div>
+        `;
     }
 
     renderExamResults() {
