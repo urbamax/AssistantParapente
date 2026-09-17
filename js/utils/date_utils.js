@@ -43,8 +43,25 @@ export function formatDateTime(dateStr) {
 }
 
 /**
+ * Add a duration to a `datetime-local` input value (e.g. "2026-09-17T14:30")
+ * and return the result in the same format, for use as a landing time computed
+ * from a flight's takeoff time + duration.
+ * @param {string} datetimeStr - "YYYY-MM-DDTHH:mm"
+ * @param {number} minutes
+ * @returns {string|null}
+ */
+export function addMinutesToDatetimeLocal(datetimeStr, minutes) {
+    if (!datetimeStr || !minutes) return datetimeStr || null;
+    const d = new Date(datetimeStr);
+    if (isNaN(d.getTime())) return null;
+    d.setMinutes(d.getMinutes() + minutes);
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+/**
  * Generate a timestamp string suitable for filenames (e.g. 2026-07-18_14-30).
- * @param {Date} date 
+ * @param {Date} date
  * @returns {string}
  */
 export function getFileTimestamp(date = new Date()) {

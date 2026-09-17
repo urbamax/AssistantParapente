@@ -14,8 +14,9 @@ import {
     DEFAULT_EQUIPMENT_COLORS
 } from '../data/equipment_config.js';
 import { escapeHTML } from '../core/security.js';
-import { formatDuration, formatDateOnly, formatDateTime } from '../utils/date_utils.js';
+import { formatDuration, formatDateOnly, formatDateTime, addMinutesToDatetimeLocal } from '../utils/date_utils.js';
 import { capitalizeFirstLetter } from '../utils/text_utils.js';
+import { getSpotairWidgetId } from '../data/spotair_widgets.js';
 
 import BaseView from '../core/base_view.js';
 
@@ -1129,20 +1130,19 @@ class LogbookViewClass extends BaseView {
 
             let meteoHtml;
             if (session.meteo) {
-                const m = session.meteo;
-                const weatherIcon = m.weatherCode !== null && m.weatherCode !== undefined ? this.getWeatherEmoji(m.weatherCode) : '🌤️';
-                const dirStr = m.ventDirection !== null && m.ventDirection !== undefined ? this.getWindDirectionString(m.ventDirection) : '';
+                const decollageRow = this.renderWeatherPointRow(session.meteo, 'Décollage');
+                const atterroRow = session.meteoAtterro ? this.renderWeatherPointRow(session.meteoAtterro, 'Atterrissage') : '';
+                const baliseHtml = this.renderBaliseHistoBlock(session);
 
                 meteoHtml = `
-                <div class="logbook-card-weather" style="margin-top: 10px; padding: 10px; background: rgba(14,165,233,0.06); border-radius: var(--radius-sm); border: 1px solid rgba(14,165,233,0.15); display: flex; align-items: center; gap: 12px; font-size: 0.85rem; color: var(--text-secondary); flex-wrap: wrap;">
-                    <span title="Température"><strong>${weatherIcon} ${m.temperature}°C</strong></span>
-                    <span style="color: rgba(0,0,0,0.2);">|</span>
-                    <span title="Vent"><i class="ri-windy-line" style="color: var(--accent-blue);"></i> <strong>Vent :</strong> ${m.ventVitesse} km/h ${m.ventRafales ? `(Rafales : ${m.ventRafales} km/h)` : ''}</span>
-                    ${m.ventDirection !== null && m.ventDirection !== undefined ? `
-                    <span style="color: rgba(0,0,0,0.2);">|</span>
-                    <span title="Direction"><i class="ri-navigation-line" style="color: #10b981; display:inline-block; transform: rotate(${m.ventDirection}deg);"></i> <strong>Dir :</strong> ${dirStr} (${m.ventDirection}°)</span>
-                    ` : ''}
-                </div>`;
+                <div class="logbook-card-weather" style="margin-top: 10px; padding: 10px; background: rgba(14,165,233,0.06); border-radius: var(--radius-sm); border: 1px solid rgba(14,165,233,0.15); font-size: 0.85rem; color: var(--text-secondary);">
+                    ${decollageRow}
+                    ${atterroRow}
+                    <button data-action="forceWeatherRefresh" data-args="${session.id}" title="Rafraîchir la météo" style="margin-top: 6px; color: var(--text-muted); cursor: pointer; border: none; background: none; padding: 2px 4px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px;">
+                        <i class="ri-refresh-line"></i> Actualiser
+                    </button>
+                </div>
+                ${baliseHtml}`;
             } else {
                 meteoHtml = `
                 <div id="weather-container-${session.id}" class="logbook-card-weather-empty" style="margin-top: 10px; font-size: 0.85rem;">
@@ -1681,6 +1681,53 @@ class LogbookViewClass extends BaseView {
         return dirs[(val % 16)];
     }
 
+    // Une ligne "Décollage" ou "Atterrissage" du bloc météo (modèle Open-Meteo/AROME,
+    // valeur estimée au point GPS du site à l'heure donnée).
+    renderWeatherPointRow(m, label) {
+        if (!m) return '';
+        const weatherIcon = m.weatherCode !== null && m.weatherCode !== undefined ? this.getWeatherEmoji(m.weatherCode) : '🌤️';
+        const dirStr = m.ventDirection !== null && m.ventDirection !== undefined ? this.getWindDirectionString(m.ventDirection) : '';
+
+        return `
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 4px 0;">
+            <span style="font-weight: 600; min-width: 90px;">${escapeHTML(label)} :</span>
+            <span title="Température"><strong>${weatherIcon} ${m.temperature}°C</strong></span>
+            <span style="color: rgba(0,0,0,0.2);">|</span>
+            <span title="Vent"><i class="ri-windy-line" style="color: var(--accent-blue);"></i> <strong>Vent :</strong> ${m.ventVitesse} km/h ${m.ventRafales ? `(Rafales : ${m.ventRafales} km/h)` : ''}</span>
+            ${m.ventDirection !== null && m.ventDirection !== undefined ? `
+            <span style="color: rgba(0,0,0,0.2);">|</span>
+            <span title="Direction"><i class="ri-navigation-line" style="color: #10b981; display:inline-block; transform: rotate(${m.ventDirection}deg);"></i> <strong>Dir :</strong> ${dirStr} (${m.ventDirection}°)</span>
+            ` : ''}
+        </div>`;
+    }
+
+    // Graphe réel de la balise météo FFVL associée au site, pour le jour du vol.
+    // Contrairement au bloc ci-dessus (modèle AROME estimé au point GPS), c'est la
+    // mesure effective de la balise la plus proche -- balisemeteo.com n'expose pas
+    // de valeur numérique historique en API, seulement ce graphe image par jour, donc
+    // on l'affiche tel quel avec un lien pour lire la valeur précise à l'heure du vol.
+    renderBaliseHistoBlock(session) {
+        if (!session.baliseId) return '';
+        const dateStr = (session.datetime || '').split('T')[0];
+        if (!dateStr) return '';
+
+        const histoPageUrl = `https://balisemeteo.com/balise_histo.php?idBalise=${encodeURIComponent(session.baliseId)}&date=${encodeURIComponent(dateStr)}`;
+        const graphUrl = `https://balisemeteo.com/graphs/histo_vent.php?idBalise=${encodeURIComponent(session.baliseId)}&interval=1&marks=false&date=${encodeURIComponent(dateStr)}`;
+
+        return `
+        <div class="logbook-card-balise" style="margin-top: 8px; padding: 10px; background: var(--bg-card-hover, rgba(0,0,0,0.03)); border-radius: var(--radius-sm); border: 1px solid var(--border-light, rgba(0,0,0,0.06)); font-size: 0.82rem; color: var(--text-secondary);">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;">
+                <span><i class="ri-broadcast-line" style="color: var(--accent-blue);"></i> <strong>Vent réel (balise FFVL, ${escapeHTML(dateStr.split('-').reverse().join('/'))})</strong></span>
+                <a href="${histoPageUrl}" target="_blank" rel="noopener noreferrer" style="color: var(--accent-blue); text-decoration: none; font-size: 0.78rem;">
+                    Voir l'historique complet <i class="ri-external-link-line"></i>
+                </a>
+            </div>
+            <a href="${histoPageUrl}" target="_blank" rel="noopener noreferrer">
+                <img src="${graphUrl}" alt="Historique du vent - balise FFVL" style="width: 100%; max-width: 500px; height: auto; border-radius: 4px; display: block;">
+            </a>
+        </div>`;
+    }
+
     forceWeatherRefresh(sessionId) {
         const session = LogbookService.getFlights().find(s => s.id === sessionId);
         if (!session) return;
@@ -1692,6 +1739,7 @@ class LogbookViewClass extends BaseView {
         }
 
         let lat = null, lon = null;
+        let baliseId = null;
         const siteName = session.site || session.lieu || "";
 
         if (session.lat && session.lon) {
@@ -1712,6 +1760,7 @@ class LogbookViewClass extends BaseView {
                     } else {
                         console.warn("[Météo Logbook] Le site n'a pas de coordonnées valides :", foundSite);
                     }
+                    baliseId = getSpotairWidgetId(foundSite);
                 } else {
                     console.error("[Météo Logbook] Aucun match pour :", siteName);
                 }
@@ -1719,7 +1768,7 @@ class LogbookViewClass extends BaseView {
         }
 
         if (lat && lon) {
-            this.fetchWeatherForSession(lat, lon, session.datetime, session.id);
+            this.fetchWeatherForSession(lat, lon, session.datetime, session.id, session.duree, baliseId);
         } else {
             if (container) {
                 const searchedString = this.normalizeString(siteName || "VIDE");
@@ -1729,15 +1778,25 @@ class LogbookViewClass extends BaseView {
         }
     }
 
-    // --- WEATHER MODULE (Open-Meteo) ---
-    async fetchWeatherForSession(lat, lon, datetimeStr, sessionId) {
+    // --- WEATHER MODULE (Open-Meteo pour les chiffres + balise FFVL réelle pour la vérif visuelle) ---
+    async fetchWeatherForSession(lat, lon, datetimeStr, sessionId, dureeMin, baliseId) {
         console.log(`Fetching weather for session ${sessionId}...`);
-        const result = await LogbookService.fetchSessionWeather(lat, lon, datetimeStr);
+        const landingDatetimeStr = addMinutesToDatetimeLocal(datetimeStr, dureeMin);
 
-        if (result.success) {
+        const [decollageResult, atterroResult] = await Promise.all([
+            LogbookService.fetchSessionWeather(lat, lon, datetimeStr),
+            landingDatetimeStr && landingDatetimeStr !== datetimeStr
+                ? LogbookService.fetchSessionWeather(lat, lon, landingDatetimeStr)
+                : Promise.resolve({ success: false, data: null, error: null })
+        ]);
+
+        if (decollageResult.success) {
             const sessionIndex = LogbookService.getFlights().findIndex(s => s.id === sessionId);
             if (sessionIndex !== -1) {
-                LogbookService.getFlights()[sessionIndex].meteo = result.data;
+                const target = LogbookService.getFlights()[sessionIndex];
+                target.meteo = decollageResult.data;
+                target.meteoAtterro = atterroResult.success ? atterroResult.data : null;
+                target.baliseId = baliseId || null;
                 LogbookService.saveFlights(); // Persiste en localStorage et déclenche la synchro Firestore
 
                 // IMPORTANT: Force complete UI rerender to visually inject the block
@@ -1745,10 +1804,10 @@ class LogbookViewClass extends BaseView {
                 console.log(`Weather data fetched successfully for session ${sessionId}.`);
             }
         } else {
-            console.error("Error fetching weather for session:", result.error);
+            console.error("Error fetching weather for session:", decollageResult.error);
             const container = document.getElementById('weather-container-' + sessionId);
             if (container) {
-                container.innerHTML = `<div style="color: #f59e0b; font-size: 0.85rem; padding: 8px 12px; background: rgba(245,158,11,0.08); border-radius: var(--radius-sm);"><i class="ri-alert-line"></i> Météo indisponible : ${escapeHTML(result.error)}</div>`;
+                container.innerHTML = `<div style="color: #f59e0b; font-size: 0.85rem; padding: 8px 12px; background: rgba(245,158,11,0.08); border-radius: var(--radius-sm);"><i class="ri-alert-line"></i> Météo indisponible : ${escapeHTML(decollageResult.error)}</div>`;
             }
         }
     } // Ends fetchWeather method

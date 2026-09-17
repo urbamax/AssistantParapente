@@ -619,9 +619,11 @@ export const FirebaseAuthEngine = {
             SitesService.loadUserPreferences();
             SitesService.renderList();
 
-            // Refresh logbook (flights + equipment) and re-render whichever tab is open
+            // Refresh logbook (flights + equipment) and re-render whichever tab is open.
+            // On ne touche pas à l'onglet "add" : c'est un formulaire (vol ou gonflage), pas
+            // une vue de données, et le re-render effacerait une saisie/modification en cours.
             LogbookService.loadData();
-            if (window.LogbookView) {
+            if (window.LogbookView && window.LogbookView.currentTab !== 'add') {
                 window.LogbookView.switchTab(window.LogbookView.currentTab);
             }
 
