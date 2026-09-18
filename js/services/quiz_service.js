@@ -216,6 +216,7 @@ class QuizService {
     // choix) : ne mute jamais window.QCM_OFFICIAL.questions[].choices, dont l'ordre canonique
     // reste stable pour la Banque de Questions.
     shuffleQuestionChoices(q) {
+        if (!q || !Array.isArray(q.choices)) return { ...q };
         return { ...q, choices: this.shuffle(q.choices) };
     }
 

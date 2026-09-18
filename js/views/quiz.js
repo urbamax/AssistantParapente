@@ -411,7 +411,7 @@ class QuizViewClass extends BaseView {
                     'Mode Révision : Retravaillez vos points faibles et découvrez les questions jamais tentées.';
             } else if (mode === 'MASTERY') {
                 descEl.innerText =
-                    'Mode Perfectionnement : Choisissez un niveau ou un thème et un palier cible. La série pioche vos questions non maîtrisées et se rallonge automatiquement si besoin, jusqu\'à atteindre l\'objectif.';
+                    "Mode Perfectionnement : Choisissez un niveau ou un thème et un palier cible. La série pioche vos questions non maîtrisées et se rallonge automatiquement si besoin, jusqu'à atteindre l'objectif.";
             } else {
                 descEl.innerText =
                     'Mode Entraînement : Choisissez votre thème et volume. Correction immédiate après chaque question.';
