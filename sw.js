@@ -9,7 +9,7 @@
 //   2. CACHE_NAME est versionné (synchronisé par bump.py avec le ?v= du reste du site) et
 //      activate() supprime systématiquement tout cache dont le nom ne correspond pas à la
 //      version courante.
-const CACHE_NAME = 'parapente-app-v2026.09.17_v4';
+const CACHE_NAME = 'parapente-app-v2026.09.19_v1';
 
 // La météo ne doit jamais être servie depuis le cache : une donnée de vent vieille de
 // plusieurs heures mais présentée comme "en direct" est un vrai risque sécurité pour un
@@ -179,6 +179,10 @@ self.addEventListener('fetch', (event) => {
     }
 
     // Assets statiques same-origin : cache-first avec revalidation réseau en arrière-plan.
+    // Si rien n'est en cache ET que le réseau échoue, on ne doit jamais résoudre respondWith()
+    // avec `undefined` (le navigateur remonte alors un opaque net::ERR_FAILED, y compris pour
+    // du CSS/JS critique — c'est ce qui a cassé la mise en page en local) : on retombe sur un
+    // second essai réseau direct pour laisser passer la vraie erreur si celle-ci persiste.
     event.respondWith(
         caches.match(request).then((cached) => {
             const networkFetch = fetch(request)
@@ -189,7 +193,7 @@ self.addEventListener('fetch', (event) => {
                     }
                     return response;
                 })
-                .catch(() => cached);
+                .catch(() => cached || fetch(request));
             return cached || networkFetch;
         }),
     );

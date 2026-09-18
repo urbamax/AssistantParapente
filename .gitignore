@@ -1,8 +1,9 @@
 .DS_Store
 node_modules/
 .*smbdelete*
-.claude/settings.local.json
-.claude/worktrees/
+.claude/
 .venv/
 playwright-report/
 test-results/
+
+TODO_claude.md
