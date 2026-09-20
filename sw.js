@@ -9,7 +9,7 @@
 //   2. CACHE_NAME est versionné (synchronisé par bump.py avec le ?v= du reste du site) et
 //      activate() supprime systématiquement tout cache dont le nom ne correspond pas à la
 //      version courante.
-const CACHE_NAME = 'parapente-app-v2026.09.19_v1';
+const CACHE_NAME = 'parapente-app-v2026.09.20_v1';
 
 // La météo ne doit jamais être servie depuis le cache : une donnée de vent vieille de
 // plusieurs heures mais présentée comme "en direct" est un vrai risque sécurité pour un
@@ -143,9 +143,19 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Les PDF de cours (plusieurs Mo, lus par Range par les lecteurs PDF) ne doivent jamais passer
+    // par le SW : le navigateur les gère mieux seul, et un échec ici retombait sur index.html servi
+    // à l'URL du PDF (app affichée sans CSS, les chemins relatifs ne se résolvant plus).
+    if (url.origin === location.origin && (/\.pdf$/i.test(url.pathname) || request.headers.has('range'))) return;
+
     // Navigation (chargement de page) : network-first, pour qu'un déploiement soit visible
     // dès le prochain chargement avec réseau, avec repli sur le HTML en cache si hors-ligne.
+    // Uniquement pour le shell de l'app ("/" et "/index.html", les routes passent par ?mode=) :
+    // toute autre navigation est laissée au navigateur, sans repli trompeur sur index.html.
     if (request.mode === 'navigate') {
+        const isAppShell =
+            url.origin === location.origin && (url.pathname === '/' || url.pathname.endsWith('/index.html'));
+        if (!isAppShell) return;
         event.respondWith(
             fetch(request)
                 .then((response) => {

@@ -5,17 +5,17 @@
 
 import GlobalState from './app_state.js';
 import AppRouter from './router.js';
-import AppEvents from './events.js?v=2026.09.19_v1';
+import AppEvents from './events.js?v=2026.09.20_v1';
 import UIManager from './ui_manager.js';
 import { escapeHTML } from './security.js';
 
 // Import Views
-import QuizView from '../views/quiz.js?v=2026.09.19_v1';
-import LogbookView from '../views/logbook.js?v=2026.09.19_v1';
-import SitesView from '../views/sites.js?v=2026.09.19_v1';
-import LibraryView from '../views/manual.js?v=2026.09.19_v1';
-import QuizService from '../services/quiz_service.js?v=2026.09.19_v1';
-import SitesService from '../services/sites_service.js?v=2026.09.19_v1';
+import QuizView from '../views/quiz.js?v=2026.09.20_v1';
+import LogbookView from '../views/logbook.js?v=2026.09.20_v1';
+import SitesView from '../views/sites.js?v=2026.09.20_v1';
+import LibraryView from '../views/manual.js?v=2026.09.20_v1';
+import QuizService from '../services/quiz_service.js?v=2026.09.20_v1';
+import SitesService from '../services/sites_service.js?v=2026.09.20_v1';
 import LogbookService from '../services/logbook_service.js';
 
 async function bootApplication() {
@@ -186,7 +186,7 @@ async function bootApplication() {
     };
 
     // Polyfill FirebaseAuthEngine
-    import('../services/firebase_service.js?v=2026.09.19_v1')
+    import('../services/firebase_service.js?v=2026.09.20_v1')
         .then((module) => {
             window.FirebaseAuthEngine = module.FirebaseAuthEngine;
             if (window.FirebaseAuthEngine.init) {
