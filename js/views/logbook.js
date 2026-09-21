@@ -21,7 +21,6 @@ import BaseView from '../core/base_view.js';
 class LogbookViewClass extends BaseView {
     constructor() {
         super();
-        this.engine = null;
         this.currentTab = 'history';
         this.currentFormType = 'vol';
     } // Ends constructor
@@ -68,8 +67,7 @@ class LogbookViewClass extends BaseView {
         }
     }
 
-    init(mainEngine) {
-        this.engine = mainEngine;
+    init() {
         this.initEquipment();
         this.setupEventListeners();
         this.updateEquipmentAlertBadge();
@@ -1911,7 +1909,7 @@ class LogbookViewClass extends BaseView {
         console.log('Mounting LogbookView with params', params);
         try {
             if (this.init) {
-                this.init(typeof Engine !== 'undefined' ? Engine : window.Engine);
+                this.init();
             }
             if (this.show) {
                 this.show();
@@ -1932,5 +1930,4 @@ class LogbookViewClass extends BaseView {
 }
 
 const LogbookView = new LogbookViewClass();
-window.LogbookView = LogbookView;
 export default LogbookView;

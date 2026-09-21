@@ -7,6 +7,7 @@ import GlobalState from './app_state.js';
 import AppRouter from './router.js';
 import AppEvents from './events.js?v=2026.09.19_v1';
 import UIManager from './ui_manager.js';
+import StorageService from '../services/storage.js';
 import GdprEngine from '../gdpr_engine.js';
 
 // Import Views
@@ -97,7 +98,7 @@ async function bootApplication() {
     AppEvents.register('QuizshowStatsScreen', () => QuizView.showStatsScreen());
 
     // Library Events
-    AppEvents.register('setLibrarySort', (sort) => window.LibraryEngine && window.LibraryEngine.setSort(sort));
+    AppEvents.register('setLibrarySort', (sort) => LibraryView.setSort(sort));
 
     // Logbook Events mappings from extracted data
     [
@@ -174,16 +175,7 @@ async function bootApplication() {
         );
     });
 
-    // --- LEGACY POLYFILLS ---
-    // Ensure existing engines don't break when calling window.Engine.showDashboard()
-    window.Engine = {
-        state: GlobalState.state,
-        showDashboard: () => AppRouter.navigate('MENU'),
-        startMode: (mode) => AppRouter.navigate(mode),
-        hideManual: () => UIManager.hideManual(),
-    };
-
-    // Polyfill FirebaseAuthEngine
+    // --- FirebaseAuthEngine : chargé à la demande (SDK Firebase), exposé sur window pour les handlers ---
     import('../services/firebase_service.js?v=2026.09.19_v1')
         .then((module) => {
             window.FirebaseAuthEngine = module.FirebaseAuthEngine;

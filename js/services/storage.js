@@ -104,9 +104,4 @@ const StorageService = {
     },
 };
 
-// Exposition du service sur l'objet global (window) pour une utilisation partout dans l'application Vanilla JS
-if (typeof window !== 'undefined') {
-    window.StorageService = StorageService;
-}
-
 export default StorageService;
