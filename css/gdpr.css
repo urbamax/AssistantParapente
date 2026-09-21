@@ -12,7 +12,9 @@
     transform: translateX(-50%) translateY(calc(100% + 40px));
     width: 92%;
     max-width: 850px;
-    background: var(--bg-card);
+    /* Fond opaque : la bannière recouvre du contenu (cartes, listes) et un fond translucide
+       laissait le texte de derrière passer sous ses boutons, surtout en thème sombre. */
+    background-color: var(--bg-surface);
     border: var(--border-glass);
     border-radius: var(--radius-card);
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
