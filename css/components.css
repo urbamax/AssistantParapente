@@ -149,7 +149,7 @@ select {
     position: fixed;
     left: 50%;
     /* Au-dessus de la barre de navigation flottante (fixe, en bas) qu'elle recouvrirait sinon */
-    bottom: calc(96px + env(safe-area-inset-bottom));
+    bottom: calc(108px + env(safe-area-inset-bottom));
     transform: translateX(-50%);
     z-index: 10000;
     display: flex;
