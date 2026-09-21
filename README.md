@@ -14,7 +14,7 @@
 
 ## 🚀 Démarrage Rapide
 
-L'application fonctionne en **JavaScript ES6 natif** sans aucune étape de compilation (Zero Build Step).
+L'application fonctionne en **JavaScript ES6 natif** sans aucune étape de compilation pour le développement. Un build optionnel (Vite) produit une version optimisée dans `dist/`.
 
 ### Lancer un serveur local :
 
@@ -27,6 +27,13 @@ npx serve .
 ```
 
 Ouvrez ensuite votre navigateur sur `http://localhost:8000`.
+
+### Build optimisé (optionnel) :
+
+```bash
+npm run build     # génère dist/ (JS/CSS hachés et minifiés, service worker versionné)
+npm run preview   # sert dist/ en local
+```
 
 ---
 
