@@ -1111,11 +1111,6 @@ class SitesService {
 
         // Re-render the dropdown menu
         this.renderDropdowns();
-
-        // Let's rely on switchMapMode
-        if (!this.state.activeMapLayers.includes('leaflet')) {
-            // If leaflet is disabled and we were on it... well, leaflet should probably be mandatory but let's allow anything.
-        }
     }
 
     geocodeAddress(query) {
