@@ -10,6 +10,7 @@ import UIManager from './ui_manager.js';
 import StorageService from '../services/storage.js';
 import GdprEngine from '../gdpr_engine.js';
 import SitesService from '../services/sites_service.js';
+import { initAppUpdateNotifier } from './app_update.js';
 
 // Import Views
 import QuizView from '../views/quiz.js';
@@ -282,7 +283,8 @@ async function bootApplication() {
     // navigateurs qui avaient encore l'ancien kill-switch actif reçoivent cette nouvelle
     // version au prochain contrôle de mise à jour du navigateur, comme n'importe quel SW.
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+        const swRegistration = navigator.serviceWorker.register('./sw.js').catch(() => null);
+        initAppUpdateNotifier(swRegistration);
     }
 }
 

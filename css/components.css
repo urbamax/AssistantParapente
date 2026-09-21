@@ -143,3 +143,43 @@ select {
     color: white !important;
     font-weight: 700;
 }
+
+/* --- Bannière de mise à jour de l'app (js/core/app_update.js) --- */
+#app-update-banner {
+    position: fixed;
+    left: 50%;
+    /* Au-dessus de la barre de navigation flottante (fixe, en bas) qu'elle recouvrirait sinon */
+    bottom: calc(96px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 12px 10px 16px;
+    background: var(--bg-surface);
+    color: var(--text-main);
+    border: var(--border-glass);
+    border-radius: 999px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    font-size: 0.9rem;
+}
+
+#app-update-banner .app-update-reload {
+    background: var(--accent-blue);
+    color: #fff;
+    border: 0;
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#app-update-banner .app-update-dismiss {
+    background: transparent;
+    color: var(--text-muted);
+    border: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+}
