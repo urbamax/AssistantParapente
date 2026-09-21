@@ -73,7 +73,7 @@ class Router {
                             <h2 style="margin-bottom: 1rem;">Crash Critique</h2>
                             <p style="margin-bottom: 2rem; color: var(--text-muted);">Le module <strong>${mode}</strong> a rencontré une erreur fatale et n'a pas pu se charger.</p>
                             <pre style="background: var(--surface-hover, rgba(0,0,0,0.05)); padding: 1rem; border-radius: 8px; text-align: left; max-width: 100%; overflow-x: auto; font-size: 0.8rem; margin-bottom: 2rem; border: 1px solid var(--border-color);">${safeError}</pre>
-                            <button class="btn btn-primary" onclick="window.location.reload()">Recharger l'Application</button>
+                            <button class="btn btn-primary" data-action="reloadApp">Recharger l'Application</button>
                         </div>
                     `;
                 }

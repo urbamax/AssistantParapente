@@ -218,9 +218,6 @@ const GdprEngine = {
     },
 };
 
-// Les gestionnaires inline (onclick="window.GdprEngine...") du HTML en ont encore besoin.
-window.GdprEngine = GdprEngine;
-
 // Même timing qu'avec le script classique : init au DOMContentLoaded, avant le boot de main.js.
 if (document.readyState === 'complete') {
     GdprEngine.init();

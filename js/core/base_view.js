@@ -4,6 +4,8 @@
  * Provides standard lifecycle methods and error handling.
  */
 
+import { escapeHTML } from './security.js';
+
 class BaseView {
     constructor() {
         this._isMounted = false;
@@ -61,15 +63,14 @@ class BaseView {
         errorContainer.style.display = 'block';
 
         // Secure error message
-        const safeError =
-            typeof Security !== 'undefined' && Security.escapeHTML ? Security.escapeHTML(errorMsg) : errorMsg;
+        const safeError = escapeHTML(errorMsg);
 
         errorContainer.innerHTML = `
             <div class="empty-state" style="margin-top: 2rem;">
                 <div class="empty-icon" style="color: var(--danger-color); font-size: 3rem;">⚠️</div>
                 <h3 style="margin-bottom: 1rem;">Erreur de chargement</h3>
                 <p style="margin-bottom: 2rem; color: var(--text-muted);">${safeError}</p>
-                <button class="btn btn-primary" onclick="window.location.reload()">Réessayer</button>
+                <button class="btn btn-primary" data-action="reloadApp">Réessayer</button>
             </div>
         `;
     }

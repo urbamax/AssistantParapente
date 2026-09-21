@@ -210,7 +210,7 @@ class SitesViewClass extends BaseView {
                 if (openSettings) GdprEngine.showModal('gdpr-settings-modal');
             }
             if (statusEl)
-                statusEl.innerHTML = `<i class="ri-shield-user-line" style="color: var(--text-muted);"></i> Géolocalisation désactivée. <a href="#" onclick="window.GdprEngine.showModal('gdpr-settings-modal'); return false;" style="color: var(--accent-blue);">Gérer</a>`;
+                statusEl.innerHTML = `<i class="ri-shield-user-line" style="color: var(--text-muted);"></i> Géolocalisation désactivée. <a href="#" data-action="GdprshowModal" data-args="gdpr-settings-modal" data-prevent-default style="color: var(--accent-blue);">Gérer</a>`;
             return;
         }
 
@@ -1608,7 +1608,7 @@ class SitesViewClass extends BaseView {
                 const windTags = orientations
                     .map(
                         (w) =>
-                            `<span class="wind-tag" onclick="event.stopPropagation(); SitesView.filterByTag('${w}');" title="Filtrer par vent ${w}">${w}</span>`,
+                            `<span class="wind-tag" data-action="SitesfilterByTag" data-args="${escapeHTML(w)}" title="Filtrer par vent ${w}">${w}</span>`,
                     )
                     .join('');
 
@@ -1616,7 +1616,7 @@ class SitesViewClass extends BaseView {
                 const siteTypes = Array.isArray(st) ? st : [st];
                 const typeLabel = siteTypes
                     .map((t) => {
-                        return `<span class="site-coords-badge site-type-badge" onclick="event.stopPropagation(); SitesView.filterByType('${t}');" style="cursor: pointer;" title="Filtrer par type ${t}">${t}</span>`;
+                        return `<span class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="${escapeHTML(t)}" style="cursor: pointer;" title="Filtrer par type ${t}">${t}</span>`;
                     })
                     .join(' ');
 
@@ -1727,7 +1727,7 @@ class SitesViewClass extends BaseView {
                     if (j === SitesService.state.forecastOffset) {
                         dotStyle += ` outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);`;
                     }
-                    timelineBarsHtml += `<div class="timeline-hour-dot" style="${dotStyle}" title="${timeStr} : ${statusLabel}" onclick="event.stopPropagation(); SitesService.setForecastOffset(${j});"></div>`;
+                    timelineBarsHtml += `<div class="timeline-hour-dot" style="${dotStyle}" title="${timeStr} : ${statusLabel}" data-action="SitessetForecastOffset" data-args="${j}"></div>`;
                 }
 
                 const isFav =
@@ -1827,7 +1827,7 @@ class SitesViewClass extends BaseView {
         const spotairBadgeHtml = spotairId
             ? `
         <button class="site-coords-badge site-spotair-badge" data-spotair-id="${spotairId}" data-site-id="${site.id}"
-            onclick="SitesView.openSpotairModal(this.dataset.spotairId, this.dataset.siteId)"
+            data-action="SitesopenSpotairModal"
             title="Voir le vent en direct (SpotAiR)">
             <i class="ri-windy-line"></i> Balise
         </button>
@@ -2136,6 +2136,4 @@ class SitesViewClass extends BaseView {
 }
 
 const SitesView = new SitesViewClass();
-window.SitesView = SitesView;
-window.SitesService = SitesService;
 export default SitesView;

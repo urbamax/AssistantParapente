@@ -630,7 +630,7 @@ class LogbookViewClass extends BaseView {
                 </div>
                 <div class="form-group" style="margin-bottom: 10px;">
                     <label for="lb-tech-decollage" style="display:block; margin-bottom:5px;">Technique de décollage :</label>
-                    <select id="lb-tech-decollage" style="width:100%; padding:8px;" required onchange="document.getElementById('lb-tech-decollage-autre').style.display = (this.value === 'Autre') ? 'block' : 'none';">
+                    <select id="lb-tech-decollage" style="width:100%; padding:8px;" required data-change-action="toggleOtherField" data-toggle-id="lb-tech-decollage-autre">
                         <option value="Face voile">Face voile</option>
                         <option value="Dos voile">Dos voile</option>
                         ${(() => {
