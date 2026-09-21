@@ -115,7 +115,7 @@
                     </h4>
                     <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4;">Vos
                         résultats d'examens sont stockés localement. <a href="#"
-                            onclick="if(window.FirebaseAuthEngine) window.FirebaseAuthEngine.openAuthModal(); return false;"
+                            data-action="FirebaseAuthopenAuthModal" data-prevent-default
                             style="color: var(--accent-blue); text-decoration: underline;">Créez un compte (100%
                             gratuit)</a> pour synchroniser votre progression et ne jamais la perdre.</p>
                 </div>
@@ -234,7 +234,7 @@
                     </h4>
                     <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4;">Vos
                         statistiques de révision sont stockées localement. <a href="#"
-                            onclick="if(window.FirebaseAuthEngine) window.FirebaseAuthEngine.openAuthModal(); return false;"
+                            data-action="FirebaseAuthopenAuthModal" data-prevent-default
                             style="color: var(--accent-blue); text-decoration: underline;">Créez un compte (100%
                             gratuit)</a> pour les synchroniser sur tous vos appareils.</p>
                 </div>
@@ -657,12 +657,12 @@
                         <span style="color: var(--text-main); font-weight: 500;"><i class="ri-radar-line" style="color: var(--accent-blue);"></i> Rayon maximal :</span>
                         <span id="radius-val-label" style="color: var(--accent-blue); font-weight: bold;">Illimité</span>
                     </div>
-                    <input type="range" id="radius-slider" min="10" max="210" value="210" step="10" oninput="SitesService.setRadiusLimit(parseInt(this.value))" style="width: 100%; margin-bottom: 10px;">
+                    <input type="range" id="radius-slider" min="10" max="210" value="210" step="10" data-input-action="SitesServicesetRadiusLimit" style="width: 100%; margin-bottom: 10px;">
                     
                     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                         <div class="search-box address-search-box" style="flex: 1; min-width: 200px; height: 42px; padding: 2px 12px 2px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; box-sizing: border-box;">
                             <i class="ri-map-pin-2-line" style="font-size: 1rem; color: var(--text-muted);"></i>
-                            <input type="text" id="address-input" placeholder="Adresse ou ville (ex: Annecy)..." style="background: transparent; border: none; outline: none; color: var(--text-main); font-size: 0.9rem; flex: 1; min-width: 0;" onkeydown="if(event.key === 'Enter') SitesService.geocodeAddress(this.value)">
+                            <input type="text" id="address-input" placeholder="Adresse ou ville (ex: Annecy)..." style="background: transparent; border: none; outline: none; color: var(--text-main); font-size: 0.9rem; flex: 1; min-width: 0;" data-enter-action="SitesServicegeocodeAddress">
                             <button class="action-btn-primary" data-action="geocodeAddress" data-args="document.getElementById('address-input')" style="padding: 4px 12px; font-size: 0.8rem; height: 28px; border-radius: var(--radius-sm); border: none; cursor: pointer; flex-shrink: 0;">Valider</button>
                             <button id="btn-save-location" data-action="saveCurrentLocation" title="Enregistrer ce lieu" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; display: none;"><i class="ri-star-line" style="font-size: 1.2rem;"></i></button>
                         </div>
@@ -744,15 +744,15 @@
                         <div style="display: flex; gap: 15px; flex-wrap: wrap;">
                             <div style="flex: 1; min-width: 80px; display: flex; flex-direction: column; gap: 5px;">
                                 <span style="font-size: 0.85rem; color: var(--text-muted);">Vent Min</span>
-                                <input type="number" id="limit-wind-min" value="0" min="0" oninput="SitesService.updateWindLimits()" style="background: transparent; border: 1px solid var(--border-color); padding: 8px; border-radius: var(--radius-md); color: var(--text-main); text-align: center;">
+                                <input type="number" id="limit-wind-min" value="0" min="0" data-input-action="SitesServiceupdateWindLimits" style="background: transparent; border: 1px solid var(--border-color); padding: 8px; border-radius: var(--radius-md); color: var(--text-main); text-align: center;">
                             </div>
                             <div style="flex: 1; min-width: 80px; display: flex; flex-direction: column; gap: 5px;">
                                 <span style="font-size: 0.85rem; color: var(--text-muted);">Vent Max</span>
-                                <input type="number" id="limit-wind-max" value="20" min="0" oninput="SitesService.updateWindLimits()" style="background: transparent; border: 1px solid var(--border-color); padding: 8px; border-radius: var(--radius-md); color: var(--text-main); text-align: center;">
+                                <input type="number" id="limit-wind-max" value="20" min="0" data-input-action="SitesServiceupdateWindLimits" style="background: transparent; border: 1px solid var(--border-color); padding: 8px; border-radius: var(--radius-md); color: var(--text-main); text-align: center;">
                             </div>
                             <div style="flex: 1; min-width: 80px; display: flex; flex-direction: column; gap: 5px;">
                                 <span style="font-size: 0.85rem; color: var(--text-muted);">Rafales Max</span>
-                                <input type="number" id="limit-gust-delta" value="10" min="0" oninput="SitesService.updateWindLimits()" style="background: transparent; border: 1px solid var(--border-color); padding: 8px; border-radius: var(--radius-md); color: var(--text-main); text-align: center;">
+                                <input type="number" id="limit-gust-delta" value="10" min="0" data-input-action="SitesServiceupdateWindLimits" style="background: transparent; border: 1px solid var(--border-color); padding: 8px; border-radius: var(--radius-md); color: var(--text-main); text-align: center;">
                             </div>
                         </div>
                     </div>
@@ -786,7 +786,7 @@
             <div class="search-container" style="margin-bottom: 24px; display: flex; gap: 12px; flex-wrap: wrap;">
                 <div class="search-box site-search-box" style="flex: 1; min-width: 250px; display: flex; align-items: center; gap: 12px; padding: 2px 24px; height: 48px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-pill); color: var(--text-main);">
                     <i class="ri-search-line" style="font-size: 1.25rem; color: var(--text-muted); flex-shrink: 0;"></i>
-                    <input type="text" id="site-search" placeholder="Rechercher un site, ville, code postal..." style="background: transparent; border: none; outline: none; color: var(--text-main); width: 100%; font-size: 0.95rem;" oninput="SitesService.updateSearchQuery(this.value)">
+                    <input type="text" id="site-search" placeholder="Rechercher un site, ville, code postal..." style="background: transparent; border: none; outline: none; color: var(--text-main); width: 100%; font-size: 0.95rem;" data-input-action="SitesServiceupdateSearchQuery">
                 </div>
                 <button id="btn-filter-favorites" class="action-btn-secondary" data-action="toggleFilterFavoritesOnly" style="height: 48px; border-radius: var(--radius-pill); padding: 0 20px; white-space: nowrap; font-weight: 600; background: transparent; border: 1px solid var(--border-color); color: var(--text-main); cursor: pointer; display: flex; align-items: center; gap: 6px;">
                     <i class="ri-star-line"></i> Favoris
@@ -879,7 +879,7 @@
                                 <option value="">-- Choisir ou Saisie Libre --</option>
                                 <option value="Autre">Autre...</option>
                             </select>
-                            <input type="text" id="eq-marque-autre" placeholder="Spécifiez la marque..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;" oninput="if(window.LogbookEngine && LogbookEngine.updateEquipmentNomPreview) { LogbookEngine.updateEquipmentNomPreview(); }">
+                            <input type="text" id="eq-marque-autre" placeholder="Spécifiez la marque..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;" data-input-action="LogbookupdateEquipmentNomPreview">
                         </div>
                     </div>
                     <div class="form-row" style="display:flex; gap:15px; margin-bottom:10px; flex-wrap: wrap;">
@@ -889,7 +889,7 @@
                                 <option value="">-- Choisir ou Saisie Libre --</option>
                                 <option value="Autre">Autre...</option>
                             </select>
-                            <input type="text" id="eq-modele-autre" placeholder="Spécifiez le modèle..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;" oninput="if(window.LogbookEngine && LogbookEngine.updateEquipmentNomPreview) { LogbookEngine.updateEquipmentNomPreview(); }">
+                            <input type="text" id="eq-modele-autre" placeholder="Spécifiez le modèle..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;" data-input-action="LogbookupdateEquipmentNomPreview">
                         </div>
                         <div class="form-group" style="flex:1; min-width: 200px;">
                             <label for="eq-taille" style="display:block; margin-bottom:5px;">Taille :</label>
@@ -897,7 +897,7 @@
                                 <option value="">-- Choisir ou Saisie Libre --</option>
                                 <option value="Autre">Autre...</option>
                             </select>
-                            <input type="text" id="eq-taille-autre" placeholder="Spécifiez la taille..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;" oninput="if(window.LogbookEngine && LogbookEngine.updateEquipmentNomPreview) { LogbookEngine.updateEquipmentNomPreview(); }">
+                            <input type="text" id="eq-taille-autre" placeholder="Spécifiez la taille..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;" data-input-action="LogbookupdateEquipmentNomPreview">
                         </div>
                     </div>
                     <div class="form-row" style="display:flex; gap:15px; margin-bottom:10px; flex-wrap: wrap;">
@@ -907,7 +907,7 @@
                                 <option value="">-- Choisir ou Saisie Libre --</option>
                                 <option value="Autre">Autre...</option>
                             </select>
-                            <input type="text" id="eq-couleur-autre" placeholder="Spécifiez la couleur..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;" oninput="if(window.LogbookEngine && LogbookEngine.updateEquipmentNomPreview) { LogbookEngine.updateEquipmentNomPreview(); }">
+                            <input type="text" id="eq-couleur-autre" placeholder="Spécifiez la couleur..." style="display:none; margin-top: 5px; width: 100%; padding:8px; border-radius:4px; border:1px solid #ccc;" data-input-action="LogbookupdateEquipmentNomPreview">
                         </div>
                         <div class="form-group" style="flex:1; min-width: 200px;">
                             <label for="eq-nom" style="display:block; margin-bottom:5px;">Nom du matériel (auto) :</label>
@@ -976,16 +976,11 @@
 
     <!-- SCRIPTS -->
 
-    <script src="js/data/courses_data.js?v=2026.09.19_v1"></script>
-    <script src="js/services/igc_parser.js?v=2026.09.19_v1"></script>
-    <script src="js/components/map_3d.js?v=2026.09.19_v1"></script>
-            <script src="js/weatherScoring.js?v=2026.09.19_v1"></script>
             
     <!-- Services -->
     
     <!-- Firebase Sync Config & Engine -->
     <script src="js/firebase_config.js?v=2026.09.19_v1"></script>
-    <script src="js/gdpr_engine.js?v=2026.09.19_v1"></script>
     <!-- Quiz Engine Version 4.8 (Theme Fix & Button Alignment) -->
             <!-- Logbook Engine -->
         <!-- Engine v4.70 (Level Persistence Fix) -->
@@ -994,7 +989,7 @@
 
     <!-- AUTHENTICATION MODAL -->
     <div id="auth-modal-overlay" class="auth-modal-overlay"
-        onclick="if(event.target === this && window.FirebaseAuthEngine) window.FirebaseAuthEngine.closeAuthModal();">
+        data-backdrop-action="FirebaseAuthcloseAuthModal">
         <div class="auth-modal">
             <button class="auth-close-btn" data-action="FirebaseAuthcloseAuthModal"><i
                     class="ri-close-line"></i></button>
@@ -1034,7 +1029,7 @@
                         informations d'authentification et de vos scores sur nos serveurs sécurisés (Firebase).
                     </p>
                     <button class="btn-btn-primary"
-                        onclick="if(window.GdprEngine) { window.GdprEngine.showModal('gdpr-settings-modal'); if(window.FirebaseAuthEngine) window.FirebaseAuthEngine.closeAuthModal(); }"
+                        data-action="openGdprSettingsFromAuth"
                         style="padding: 10px 20px; font-size: 0.85rem; border: none; background: var(--accent-blue); color: #fff; border-radius: var(--radius-md); cursor: pointer; font-weight: 700;">
                         Gérer mes préférences
                     </button>
@@ -1164,25 +1159,25 @@
                 <!-- Ligne Export / Import -->
                 <div class="auth-action-row" style="margin-top: 8px;">
                     <button class="action-btn secondary"
-                        onclick="if(window.FirebaseAuthEngine) window.FirebaseAuthEngine.exportAllData();"
+                        data-action="FirebaseAuthexportAllData"
                         title="Télécharger un fichier backup de toutes vos données">
                         <i class="ri-download-2-line"></i> Exporter
                     </button>
                     <!-- Le bouton "Importer" ouvre l'input fichier caché -->
                     <button class="action-btn secondary"
-                        onclick="document.getElementById('import-data-input').click();"
+                        data-action="triggerClick" data-args="import-data-input"
                         title="Restaurer toutes vos données depuis un fichier backup">
                         <i class="ri-upload-2-line"></i> Importer
                     </button>
                     <!-- Input fichier caché : déclenche importAllData dès qu'un fichier est choisi -->
                     <input type="file" id="import-data-input" accept=".json" style="display: none;"
-                        onchange="if(window.FirebaseAuthEngine && this.files[0]) { window.FirebaseAuthEngine.importAllData(this.files[0]); this.value=''; }">
+                        data-change-action="importDataFile">
                 </div>
 
                 <!-- Alertes météo push (FCM) sur les sites favoris -->
                 <div class="auth-action-row" style="margin-top: 8px;">
                     <button class="action-btn secondary"
-                        onclick="if(window.FirebaseAuthEngine) window.FirebaseAuthEngine.enablePushNotifications();"
+                        data-action="FirebaseAuthenablePushNotifications"
                         title="Recevoir une notification quand un site favori devient volable, même app fermée">
                         <i class="ri-notification-3-line"></i> Activer les alertes météo
                     </button>
@@ -1194,7 +1189,7 @@
     <!-- BOTTOM SHEET GPS -->
     <!-- MORE MAPS BOTTOM SHEET -->
     <div id="more-maps-bottom-sheet" class="bottom-sheet-overlay"
-        onclick="if(event.target===this && window.SitesView) window.SitesView.closeMoreMapsDropdown();">
+        data-backdrop-action="SitescloseMoreMapsDropdown">
         <div class="bottom-sheet">
             <div class="bs-header" style="margin-bottom: 12px;">
                 <div>
@@ -1210,7 +1205,7 @@
     </div>
 
     <div id="gps-bottom-sheet" class="bottom-sheet-overlay"
-        onclick="if(event.target === this && window.SitesView) window.SitesView.closeGpsMenu();">
+        data-backdrop-action="SitescloseGpsMenu">
         <div class="bottom-sheet">
             <div class="bs-header">
                 <h3>S'y rendre avec...</h3>
@@ -1262,7 +1257,7 @@
 
     <!-- GDPR Settings Modal -->
     <div id="gdpr-settings-modal" class="gdpr-modal-overlay"
-        onclick="if(event.target === this && window.GdprEngine) window.GdprEngine.hideModal('gdpr-settings-modal');">
+        data-backdrop-action="GdprhideModal" data-args="gdpr-settings-modal">
         <div class="gdpr-modal">
             <div class="gdpr-modal-header">
                 <div class="gdpr-modal-title">
@@ -1357,7 +1352,7 @@
 
     <!-- Privacy Policy Modal -->
     <div id="gdpr-privacy-modal" class="gdpr-modal-overlay"
-        onclick="if(event.target === this && window.GdprEngine) window.GdprEngine.hideModal('gdpr-privacy-modal');">
+        data-backdrop-action="GdprhideModal" data-args="gdpr-privacy-modal">
         <div class="gdpr-modal">
             <div class="gdpr-modal-header">
                 <div class="gdpr-modal-title">
@@ -1419,7 +1414,7 @@
 
     <!-- Legal Notice Modal -->
     <div id="gdpr-legal-modal" class="gdpr-modal-overlay"
-        onclick="if(event.target === this && window.GdprEngine) window.GdprEngine.hideModal('gdpr-legal-modal');">
+        data-backdrop-action="GdprhideModal" data-args="gdpr-legal-modal">
         <div class="gdpr-modal">
             <div class="gdpr-modal-header">
                 <div class="gdpr-modal-title">
@@ -1482,7 +1477,7 @@
     </div>
 
     <!-- SPOTAIR DETAIL MODAL -->
-    <div id="spotair-modal" class="gdpr-modal-overlay" onclick="if(event.target === this) SitesView.closeSpotairModal();"
+    <div id="spotair-modal" class="gdpr-modal-overlay" data-backdrop-action="SitescloseSpotairModal"
         style="display: none;">
         <div class="gdpr-modal" style="max-width: 420px; max-height: 85vh; display: flex; flex-direction: column;">
             <div class="gdpr-modal-header">
@@ -1490,7 +1485,7 @@
                     <i class="ri-windy-line"></i>
                     <span id="spotair-modal-title">Vent en direct — SpotAiR</span>
                 </div>
-                <button class="gdpr-modal-close-btn" onclick="SitesView.closeSpotairModal();">
+                <button class="gdpr-modal-close-btn" data-action="SitescloseSpotairModal">
                     <i class="ri-close-line"></i>
                 </button>
             </div>
@@ -1501,7 +1496,7 @@
     </div>
 
     <!-- MANUAL MODAL -->
-    <div id="manual-modal" class="gdpr-modal-overlay" onclick="if(event.target === this && window.Engine) window.Engine.hideManual();"
+    <div id="manual-modal" class="gdpr-modal-overlay" data-backdrop-action="hideManual"
         style="display: none;">
         <div class="gdpr-modal" style="max-width: 800px; max-height: 90vh; display: flex; flex-direction: column;">
             <div class="gdpr-modal-header">
@@ -2000,13 +1995,13 @@
             <span id="logbook-nav-badge" class="nav-badge" title="Matériel à réviser"></span>
         </button>
         <div class="theory-nav-group nav-dropdown" style="position: relative; display: flex; align-items: center;">
-            <button class="nav-menu-btn" data-target="THEORY" onclick="document.getElementById('theory-sub-bar').classList.toggle('active')">
+            <button class="nav-menu-btn" data-target="THEORY" data-action="toggleTheorySubBar">
                 <i class="ri-graduation-cap-line"></i> <span class="nav-text">Théorie</span>
             </button>
             <div id="theory-sub-bar" class="sub-bar nav-dropdown-menu" style="display: none; position: absolute; top: auto; bottom: calc(100% + 15px); left: 50%; transform: translateX(-50%); background: var(--bg-card, #fff); border: 1px solid var(--border-color, #eee); border-radius: 12px; padding: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 1000; flex-direction: column; min-width: 140px;">
-                <button class="nav-menu-btn" data-target="QCM" data-action="navigate" data-args="QCM" onclick="document.getElementById('theory-sub-bar').classList.remove('active');" style="width: 100%; flex-direction: row; justify-content: flex-start; padding: 10px;"><i class="ri-file-list-3-line"></i> <span class="nav-text" style="display:inline;">QCM</span></button>
-                <button class="nav-menu-btn" data-target="LIBRARY" data-action="navigate" data-args="LIBRARY" onclick="document.getElementById('theory-sub-bar').classList.remove('active');" style="width: 100%; flex-direction: row; justify-content: flex-start; padding: 10px;"><i class="ri-book-open-line"></i> <span class="nav-text" style="display:inline;">Biblio</span></button>
-                <button class="nav-menu-btn" data-target="STATS" data-action="navigate" data-args="STATS" onclick="document.getElementById('theory-sub-bar').classList.remove('active');" style="width: 100%; flex-direction: row; justify-content: flex-start; padding: 10px;"><i class="ri-bar-chart-2-line"></i> <span class="nav-text" style="display:inline;">Stats</span></button>
+                <button class="nav-menu-btn" data-target="QCM" data-action="navigate" data-args="QCM" style="width: 100%; flex-direction: row; justify-content: flex-start; padding: 10px;"><i class="ri-file-list-3-line"></i> <span class="nav-text" style="display:inline;">QCM</span></button>
+                <button class="nav-menu-btn" data-target="LIBRARY" data-action="navigate" data-args="LIBRARY" style="width: 100%; flex-direction: row; justify-content: flex-start; padding: 10px;"><i class="ri-book-open-line"></i> <span class="nav-text" style="display:inline;">Biblio</span></button>
+                <button class="nav-menu-btn" data-target="STATS" data-action="navigate" data-args="STATS" style="width: 100%; flex-direction: row; justify-content: flex-start; padding: 10px;"><i class="ri-bar-chart-2-line"></i> <span class="nav-text" style="display:inline;">Stats</span></button>
             </div>
         </div>
         <button class="nav-menu-btn" data-target="MANUAL" data-action="showManual" data-args="'contextual'">

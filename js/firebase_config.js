@@ -1,3 +1,4 @@
+/* exported FIREBASE_CONFIG, IS_FIREBASE_ENABLED, FCM_VAPID_KEY -- lus comme globals par firebase_service.js et sw.js */
 // Configuration Firebase pour l'application Assistant Parapente.
 // Remplacez ces valeurs par celles de votre propre projet Firebase (obtenues dans les paramètres de votre projet sur la console Firebase).
 const FIREBASE_CONFIG = {

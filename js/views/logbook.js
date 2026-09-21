@@ -2,10 +2,8 @@
  * VIEW/CONTROLLER - LogbookView
  * Wrapped from logbook_engine.js
  */
-import GlobalState from '../core/app_state.js';
-import AppEvents from '../core/events.js';
-import AppRouter from '../core/router.js';
 import LogbookService from '../services/logbook_service.js';
+import Map3DComponent from '../components/map_3d.js';
 import StorageService from '../services/storage.js'; // Retained just for custom select lists
 import { EXTENDED_WIND_DIRECTIONS } from '../data/weather_config.js';
 import {
@@ -23,7 +21,6 @@ import BaseView from '../core/base_view.js';
 class LogbookViewClass extends BaseView {
     constructor() {
         super();
-        this.engine = null;
         this.currentTab = 'history';
         this.currentFormType = 'vol';
     } // Ends constructor
@@ -70,8 +67,7 @@ class LogbookViewClass extends BaseView {
         }
     }
 
-    init(mainEngine) {
-        this.engine = mainEngine;
+    init() {
         this.initEquipment();
         this.setupEventListeners();
         this.updateEquipmentAlertBadge();
@@ -634,7 +630,7 @@ class LogbookViewClass extends BaseView {
                 </div>
                 <div class="form-group" style="margin-bottom: 10px;">
                     <label for="lb-tech-decollage" style="display:block; margin-bottom:5px;">Technique de décollage :</label>
-                    <select id="lb-tech-decollage" style="width:100%; padding:8px;" required onchange="document.getElementById('lb-tech-decollage-autre').style.display = (this.value === 'Autre') ? 'block' : 'none';">
+                    <select id="lb-tech-decollage" style="width:100%; padding:8px;" required data-change-action="toggleOtherField" data-toggle-id="lb-tech-decollage-autre">
                         <option value="Face voile">Face voile</option>
                         <option value="Dos voile">Dos voile</option>
                         ${(() => {
@@ -1281,9 +1277,7 @@ class LogbookViewClass extends BaseView {
 
         if (container.style.display === 'block') {
             container.style.display = 'none';
-            if (typeof Map3DComponent !== 'undefined') {
-                Map3DComponent.clearPlayback();
-            }
+            Map3DComponent.clearPlayback();
             return;
         }
 
@@ -1303,16 +1297,11 @@ class LogbookViewClass extends BaseView {
 
         container.style.display = 'block';
 
-        if (typeof Map3DComponent !== 'undefined') {
-            try {
-                Map3DComponent.showTrace(sessionId, points, container);
-            } catch (error) {
-                console.error('Map3DComponent Error: Erreur lors du dessin de la trace.', error);
-                container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-secondary);">Impossible d'afficher la carte 3D. (${error.message})</div>`;
-            }
-        } else {
-            console.error("Map3DComponent n'est pas chargé.");
-            container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-secondary);">Le module de carte 3D est en cours de chargement ou indisponible.</div>`;
+        try {
+            Map3DComponent.showTrace(sessionId, points, container);
+        } catch (error) {
+            console.error('Map3DComponent Error: Erreur lors du dessin de la trace.', error);
+            container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-secondary);">Impossible d'afficher la carte 3D. (${error.message})</div>`;
         }
     }
 
@@ -1601,15 +1590,6 @@ class LogbookViewClass extends BaseView {
                     secours: 'background: rgba(239, 68, 68, 0.1); color: #ef4444;',
                     accessoire: 'background: rgba(156, 163, 175, 0.1); color: #9ca3af;',
                 };
-
-                const equipIcon =
-                    equip.type === 'voile'
-                        ? 'ri-parachute-line'
-                        : equip.type === 'sellette'
-                          ? 'ri-shield-line'
-                          : equip.type === 'secours'
-                            ? 'ri-lifebuoy-line'
-                            : 'ri-settings-4-line';
 
                 const isArchive = equip.statut === 'archive';
                 const cardStyle = isArchive ? 'opacity: 0.6; filter: grayscale(0.8);' : '';
@@ -1929,7 +1909,7 @@ class LogbookViewClass extends BaseView {
         console.log('Mounting LogbookView with params', params);
         try {
             if (this.init) {
-                this.init(typeof Engine !== 'undefined' ? Engine : window.Engine);
+                this.init();
             }
             if (this.show) {
                 this.show();
@@ -1950,5 +1930,4 @@ class LogbookViewClass extends BaseView {
 }
 
 const LogbookView = new LogbookViewClass();
-window.LogbookView = LogbookView;
 export default LogbookView;

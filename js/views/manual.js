@@ -3,10 +3,8 @@
  * Wrapped from library_engine.js
  */
 import GlobalState from '../core/app_state.js';
-import AppEvents from '../core/events.js';
-import AppRouter from '../core/router.js';
-import StorageService from '../services/storage.js';
 import { escapeHTML } from '../core/security.js';
+import { COURSES_DATA } from '../data/courses_data.js';
 
 /**
  * LIBRARY ENGINE
@@ -21,16 +19,12 @@ class LibraryViewClass extends BaseView {
         this.state = {
             search: '',
             sort: 'CATEGORY', // TITLE, LEVEL, CATEGORY
-            mainEngine: null,
             courses: {},
         };
     }
-    init(mainEngine) {
-        this.state.mainEngine = mainEngine;
+    init() {
         // Load courses from global data
-        if (typeof COURSES_DATA !== 'undefined') {
-            this.state.courses = COURSES_DATA;
-        }
+        this.state.courses = COURSES_DATA;
         console.log('LibraryEngine Initialized');
     }
 
@@ -254,7 +248,7 @@ class LibraryViewClass extends BaseView {
         console.log('Mounting LibraryView with params', params);
         try {
             if (this.init) {
-                this.init(window.Engine); // Pass a dummy or the global engine if needed
+                this.init();
             }
 
             // Auto-update library when level changes

@@ -192,7 +192,7 @@ const IGCParser = {
             }
 
             return decimal;
-        } catch (e) {
+        } catch {
             return null;
         }
     },
@@ -216,4 +216,4 @@ const IGCParser = {
     },
 };
 
-window.IGCParser = IGCParser;
+export default IGCParser;

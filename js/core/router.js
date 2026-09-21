@@ -5,6 +5,7 @@
 
 import GlobalState from './app_state.js';
 import StorageService from '../services/storage.js';
+import { escapeHTML } from './security.js';
 
 class Router {
     constructor() {
@@ -14,6 +15,10 @@ class Router {
 
     register(mode, viewModule) {
         this.routes.set(mode, viewModule);
+    }
+
+    getView(mode) {
+        return this.routes.get(mode);
     }
 
     async navigate(mode, params = {}) {
@@ -61,17 +66,14 @@ class Router {
             } catch (e) {
                 console.error(`Error mounting ${mode}:`, e);
                 if (screenEl) {
-                    const safeError =
-                        typeof Security !== 'undefined' && Security.escapeHTML
-                            ? Security.escapeHTML(e.message || String(e))
-                            : e.message || String(e);
+                    const safeError = escapeHTML(e.message || String(e));
                     screenEl.innerHTML = `
                         <div class="container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; text-align: center; margin-top: 2rem;">
                             <div class="empty-icon" style="color: var(--danger-color); font-size: 4rem; margin-bottom: 1rem;">🔥</div>
                             <h2 style="margin-bottom: 1rem;">Crash Critique</h2>
                             <p style="margin-bottom: 2rem; color: var(--text-muted);">Le module <strong>${mode}</strong> a rencontré une erreur fatale et n'a pas pu se charger.</p>
                             <pre style="background: var(--surface-hover, rgba(0,0,0,0.05)); padding: 1rem; border-radius: 8px; text-align: left; max-width: 100%; overflow-x: auto; font-size: 0.8rem; margin-bottom: 2rem; border: 1px solid var(--border-color);">${safeError}</pre>
-                            <button class="btn btn-primary" onclick="window.location.reload()">Recharger l'Application</button>
+                            <button class="btn btn-primary" data-action="reloadApp">Recharger l'Application</button>
                         </div>
                     `;
                 }

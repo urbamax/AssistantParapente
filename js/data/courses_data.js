@@ -1,4 +1,4 @@
-const COURSES_DATA = {
+export const COURSES_DATA = {
     'general/20240409-ffvl-formation-espacesaeriens': {
         title: 'Espaces Aériens - Les Fondamentaux',
         category: 'Règlementation',

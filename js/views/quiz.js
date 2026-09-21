@@ -1,10 +1,12 @@
 import GlobalState from '../core/app_state.js';
-import AppEvents from '../core/events.js';
 import AppRouter from '../core/router.js';
 import QuizService from '../services/quiz_service.js';
+import StorageService from '../services/storage.js';
 import { escapeHTML } from '../core/security.js';
 import { formatDateTime } from '../utils/date_utils.js';
 import { truncate } from '../utils/text_utils.js';
+import { COURSES_DATA } from '../data/courses_data.js';
+import GdprEngine from '../gdpr_engine.js';
 
 /**
  * PURE VIEW - QuizView
@@ -193,7 +195,7 @@ class QuizViewClass extends BaseView {
                     const value = rawValue.replace(/^'|'$/g, '');
                     args = [value];
                 }
-            } catch (err) {
+            } catch {
                 const value = rawValue.replace(/^'|'$/g, '');
                 args = [value];
             }
@@ -495,7 +497,7 @@ class QuizViewClass extends BaseView {
         const container = document.getElementById('stats-content');
         if (!container) return;
 
-        if (window.GdprEngine && !window.GdprEngine.isConsentGranted('stats')) {
+        if (!GdprEngine.isConsentGranted('stats')) {
             container.innerHTML = `
                 <div style="padding:40px; text-align:center; color:var(--text-main); max-width: 500px; margin: 0 auto; display:flex; flex-direction:column; align-items:center; justify-content:center;">
                     <i class="ri-shield-user-line" style="font-size:3.5rem; color:var(--accent-blue); display:block; margin-bottom:20px;"></i>
@@ -503,7 +505,7 @@ class QuizViewClass extends BaseView {
                     <p style="opacity:0.7; font-size:0.9rem; line-height: 1.6; margin-bottom: 24px;">
                         Vous avez désactivé le stockage de vos statistiques d'entraînement dans vos préférences de confidentialité. Pour suivre votre progression et voir votre historique, veuillez activer cette option.
                     </p>
-                    <button onclick="if(window.GdprEngine) window.GdprEngine.showModal('gdpr-settings-modal');" style="background:var(--accent-blue); color:white; border:none; padding:12px 24px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; font-size:0.9rem;">
+                    <button data-action="GdprshowModal" data-args="gdpr-settings-modal" style="background:var(--accent-blue); color:white; border:none; padding:12px 24px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; font-size:0.9rem;">
                         Activer le suivi de progression
                     </button>
                 </div>
@@ -621,7 +623,7 @@ class QuizViewClass extends BaseView {
             }
 
             // Debug filtering
-            const levelQuestionEntries = allQuestionEntries.filter(([code, data]) => levelQuestionCodes.has(code));
+            const levelQuestionEntries = allQuestionEntries.filter(([code]) => levelQuestionCodes.has(code));
 
             // FALLBACK: If filtering returns 0 results but we have stats, it might be due to code mismatches.
             // In that case, we display everything to ensure the user sees their data.
@@ -645,7 +647,7 @@ class QuizViewClass extends BaseView {
             );
             if (notAttempted < 0) notAttempted = 0;
 
-            levelQuestionEntries.forEach(([code, data]) => {
+            levelQuestionEntries.forEach(([, data]) => {
                 if (data.total === 0) return;
                 const pct = Math.round((data.correct / data.total) * 100);
 
@@ -919,7 +921,7 @@ class QuizViewClass extends BaseView {
                         }
                     });
                 } else {
-                    visibleQuestions = sortedQuestions.filter(([code, data]) => {
+                    visibleQuestions = sortedQuestions.filter(([, data]) => {
                         const pct = Math.round((data.correct / data.total) * 100);
                         if (QuizView.state.masteryFilter === 'PERFECT') return pct === 100;
                         if (QuizView.state.masteryFilter === 'EXCELLENT') return pct >= 90 && pct < 100;
@@ -947,7 +949,7 @@ class QuizViewClass extends BaseView {
                 if (QuizView.state.themeFilter) {
                     displayLabel += ` • Thème: ${QuizView.state.themeFilter}`;
                     // Filter sortedQuestions again by theme
-                    visibleQuestions = visibleQuestions.filter(([code, data]) => {
+                    visibleQuestions = visibleQuestions.filter(([code]) => {
                         const qObj = QuizView.getQuestionByCode(code);
 
                         let qTheme = qObj && qObj.theme ? qObj.theme : null;
@@ -1035,7 +1037,7 @@ class QuizViewClass extends BaseView {
                     if (qObj && qObj.choices) {
                         answersHtml =
                             '<div class="question-answers" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">';
-                        qObj.choices.forEach((ans, idx) => {
+                        qObj.choices.forEach((ans) => {
                             const isCorrect = parseInt(ans.pts) > 0;
                             const answerStyle = isCorrect
                                 ? 'background:rgba(74, 222, 128, 0.1); border-left:3px solid #4ade80;'
@@ -1073,7 +1075,7 @@ class QuizViewClass extends BaseView {
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#${code}</span>
-                                    ${QuizView.getCourseUrl(code, qText) ? `<button onclick="event.stopPropagation(); window.open('${QuizView.getCourseUrl(code, qText)}', '_blank')" style="background:var(--accent-blue); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>` : ''}
+                                    ${QuizView.getCourseUrl(code, qText) ? `<button data-action="openUrl" data-url="${escapeHTML(QuizView.getCourseUrl(code, qText))}" style="background:var(--accent-blue); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>` : ''}
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">${theme}</span>
                                     ${streak >= 3 ? `<span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 ${streak}</span>` : ''}
                                     ${hasAnswers ? '<i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-' + code + '"></i>' : ''}
@@ -1101,7 +1103,6 @@ class QuizViewClass extends BaseView {
             // Premium Circular Gauge Calculation
             const strokeDash = 2 * Math.PI * 55; // r=55
             const offset = strokeDash - (globalPct / 100) * strokeDash;
-            const colorGlow = color + '44'; // Add transparency for glow
 
             const successGaugeHtml = `
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
@@ -1139,8 +1140,6 @@ class QuizViewClass extends BaseView {
                 </div>
             </div>
         `;
-
-            const statsGridStyle = `display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:32px;`;
 
             container.innerHTML = `
             ${successGaugeHtml}
@@ -1368,7 +1367,7 @@ class QuizViewClass extends BaseView {
                             </div>
                             <div style="font-size: 0.9em; background: var(--bg-secondary, #f9f9f9); padding: 10px; border-radius: 6px;">
                                 ${q.reponses
-                                    .map((r, i) => {
+                                    .map((r) => {
                                         const isGood = r.points > 0;
                                         return `<div style="color: ${isGood ? '#22c55e' : 'var(--text-main, #666)'}; ${isGood ? 'font-weight: bold;' : 'margin-bottom: 4px;'}">${escapeHTML(r.texte)} ${isGood ? '✓' : ''}</div>`;
                                     })
@@ -1580,7 +1579,7 @@ class QuizViewClass extends BaseView {
         feedbackDiv.innerHTML = `
             <div class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}">
                 <div>${result.question.explication}</div>
-                ${courseUrl ? `<button onclick="window.open('${courseUrl}', '_blank')" style="margin-top:10px; background:var(--accent-blue); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR DANS LE COURS</button>` : ''}
+                ${courseUrl ? `<button data-action="openUrl" data-url="${escapeHTML(courseUrl)}" style="margin-top:10px; background:var(--accent-blue); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR DANS LE COURS</button>` : ''}
             </div>
         `;
     }
@@ -1653,7 +1652,7 @@ class QuizViewClass extends BaseView {
                         : results
                               .filter((r) => !r.isCorrect)
                               .map(
-                                  (r, i) => `
+                                  (r) => `
                     <div class="bank-item" style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; background: var(--bg-card); box-shadow:0 2px 4px rgba(0,0,0,0.02);">
                         <div class="bank-item-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items:center;">
                             <span class="bank-item-code" style="font-family:monospace; font-size:0.85rem; color:var(--text-secondary); background:rgba(0,0,0,0.05); padding:4px 8px; border-radius:4px;">#${r.question.code}</span>
@@ -1845,7 +1844,7 @@ class QuizViewClass extends BaseView {
     }
 
     saveExamHistory(level, score, total, results) {
-        if (window.GdprEngine && !window.GdprEngine.isConsentGranted('stats')) {
+        if (!GdprEngine.isConsentGranted('stats')) {
             console.log('Stats consent missing, skipping exam history save.');
             return;
         }
@@ -1985,7 +1984,6 @@ class QuizViewClass extends BaseView {
     getCourseUrl(questionCode) {
         const q = this.getQuestionByCode(questionCode);
         if (!q || !q.courseId || !q.coursePage) return null;
-        if (typeof COURSES_DATA === 'undefined') return null;
         const course = COURSES_DATA[q.courseId];
         if (!course || !course.pdf) return null;
         // Convention déjà utilisée pour ouvrir un PDF (manual.js openCourse) : chemin relatif
