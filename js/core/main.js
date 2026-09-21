@@ -8,6 +8,7 @@ import AppRouter from './router.js';
 import AppEvents from './events.js?v=2026.09.19_v1';
 import UIManager from './ui_manager.js';
 import { escapeHTML } from './security.js';
+import GdprEngine from '../gdpr_engine.js';
 
 // Import Views
 import QuizView from '../views/quiz.js?v=2026.09.19_v1';
@@ -172,7 +173,7 @@ async function bootApplication() {
     // GDPR Events
     ['showModal', 'hideModal', 'acceptAll', 'refuseAll', 'saveCustomSettings'].forEach((action) => {
         AppEvents.register('Gdpr' + action, (args, e, t) =>
-            window.GdprEngine && window.GdprEngine[action] ? window.GdprEngine[action](args, e, t) : null,
+            GdprEngine[action] ? GdprEngine[action](args, e, t) : null,
         );
     });
 

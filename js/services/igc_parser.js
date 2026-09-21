@@ -216,4 +216,4 @@ const IGCParser = {
     },
 };
 
-window.IGCParser = IGCParser;
+export default IGCParser;

@@ -1,4 +1,5 @@
 import StorageService from './storage.js';
+import IGCParser from './igc_parser.js';
 
 class LogbookService {
     constructor() {
@@ -237,12 +238,8 @@ class LogbookService {
     }
 
     parseIGC(rawText) {
-        if (typeof window.IGCParser === 'undefined') {
-            return { success: false, data: null, error: 'IGCParser library is not loaded.' };
-        }
-
         try {
-            const parsed = window.IGCParser.parse(rawText);
+            const parsed = IGCParser.parse(rawText);
             if (parsed && parsed.points && parsed.points.length > 0) {
                 return {
                     success: true,

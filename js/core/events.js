@@ -5,6 +5,7 @@
 
 import AppRouter from './router.js';
 import GlobalState from './app_state.js';
+import GdprEngine from '../gdpr_engine.js';
 
 class EventDelegator {
     constructor() {
@@ -70,7 +71,7 @@ class EventDelegator {
                 window.QuizEngine,
                 window.LibraryEngine,
                 window.FirebaseAuthEngine,
-                window.GdprEngine,
+                GdprEngine,
             ];
 
             for (const engine of engines) {

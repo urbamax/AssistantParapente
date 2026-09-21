@@ -7,6 +7,7 @@ import AppEvents from '../core/events.js';
 import AppRouter from '../core/router.js';
 import StorageService from '../services/storage.js';
 import { escapeHTML } from '../core/security.js';
+import { COURSES_DATA } from '../data/courses_data.js';
 
 /**
  * LIBRARY ENGINE
@@ -28,9 +29,7 @@ class LibraryViewClass extends BaseView {
     init(mainEngine) {
         this.state.mainEngine = mainEngine;
         // Load courses from global data
-        if (typeof COURSES_DATA !== 'undefined') {
-            this.state.courses = COURSES_DATA;
-        }
+        this.state.courses = COURSES_DATA;
         console.log('LibraryEngine Initialized');
     }
 

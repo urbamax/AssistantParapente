@@ -6,6 +6,7 @@ import GlobalState from '../core/app_state.js';
 import AppEvents from '../core/events.js';
 import AppRouter from '../core/router.js';
 import LogbookService from '../services/logbook_service.js';
+import Map3DComponent from '../components/map_3d.js';
 import StorageService from '../services/storage.js'; // Retained just for custom select lists
 import { EXTENDED_WIND_DIRECTIONS } from '../data/weather_config.js';
 import {
@@ -1281,9 +1282,7 @@ class LogbookViewClass extends BaseView {
 
         if (container.style.display === 'block') {
             container.style.display = 'none';
-            if (typeof Map3DComponent !== 'undefined') {
-                Map3DComponent.clearPlayback();
-            }
+            Map3DComponent.clearPlayback();
             return;
         }
 
@@ -1303,16 +1302,11 @@ class LogbookViewClass extends BaseView {
 
         container.style.display = 'block';
 
-        if (typeof Map3DComponent !== 'undefined') {
-            try {
-                Map3DComponent.showTrace(sessionId, points, container);
-            } catch (error) {
-                console.error('Map3DComponent Error: Erreur lors du dessin de la trace.', error);
-                container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-secondary);">Impossible d'afficher la carte 3D. (${error.message})</div>`;
-            }
-        } else {
-            console.error("Map3DComponent n'est pas chargé.");
-            container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-secondary);">Le module de carte 3D est en cours de chargement ou indisponible.</div>`;
+        try {
+            Map3DComponent.showTrace(sessionId, points, container);
+        } catch (error) {
+            console.error('Map3DComponent Error: Erreur lors du dessin de la trace.', error);
+            container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-secondary);">Impossible d'afficher la carte 3D. (${error.message})</div>`;
         }
     }
 
