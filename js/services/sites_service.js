@@ -2,9 +2,8 @@
  * SERVICE - SitesService
  * Business logic, GPS calculations, Weather API fetching, and Data Filtering
  */
-import GlobalState from '../core/app_state.js';
 import StorageService from '../services/storage.js';
-import { WIND_DIRECTIONS, WIND_THRESHOLDS, WEATHER_MODELS } from '../data/weather_config.js';
+import { WIND_THRESHOLDS, WEATHER_MODELS } from '../data/weather_config.js';
 import { calculateDistance, getAngularDifference, degreesToCardinal } from '../utils/geo_utils.js';
 import { removeAccents } from '../utils/text_utils.js';
 import { escapeHTML } from '../core/security.js';
@@ -1111,13 +1110,6 @@ class SitesService {
         // Re-render the dropdown menu
         this.renderDropdowns();
 
-        // If the currently active map was hidden, switch back to leaflet (or the first available)
-        const currentMode =
-            Object.keys(this.expandedSites).length > 0
-                ? 'leaflet'
-                : document.getElementById(`sites-${this.state.weatherModel}-canvas`)
-                  ? this.state.weatherModel
-                  : 'leaflet'; // Need to actually check the active tab, but since we don't store the current map tab explicitly in state outside of UI classes, we just force to leaflet.
         // Let's rely on switchMapMode
         if (!this.state.activeMapLayers.includes('leaflet')) {
             // If leaflet is disabled and we were on it... well, leaflet should probably be mandatory but let's allow anything.
@@ -1131,7 +1123,6 @@ class SitesService {
         }
 
         const statusEl = document.getElementById('address-status-message');
-        const inputEl = document.getElementById('address-input');
         const gpsBtn = document.getElementById('btn-use-gps');
         const btnSave = document.getElementById('btn-save-location');
 

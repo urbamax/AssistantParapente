@@ -4,7 +4,6 @@
  */
 
 import AppRouter from './router.js';
-import GlobalState from './app_state.js';
 import GdprEngine from '../gdpr_engine.js';
 
 class EventDelegator {
@@ -28,7 +27,7 @@ class EventDelegator {
                     // downstream `===` comparisons against stored string ids still match.
                     args = typeof parsed === 'number' || typeof parsed === 'boolean' ? args.replace(/'/g, '') : parsed;
                 }
-            } catch (err) {
+            } catch {
                 // If it's a simple string or single quote string
                 if (args) args = args.replace(/'/g, '');
             }

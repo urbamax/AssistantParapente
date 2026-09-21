@@ -35,24 +35,6 @@ class SitesViewClass extends BaseView {
         SitesService.init();
         console.timeEnd('SITES_SERVICE_INIT');
 
-        // Rebuild structure if missing
-        const requiredIds = [
-            'address-status-message',
-            'address-input',
-            'btn-use-gps',
-            'limit-wind-min',
-            'limit-wind-max',
-            'limit-gust-delta',
-            'hide-unflyable-checkbox',
-            'weather-model-select',
-            'select-sort-mode',
-            'radius-slider',
-            'radius-val-label',
-            'forecast-slider',
-            'filter-mode-select',
-        ];
-        // The container already has the HTML injected via engine_v4_6 / index.html
-
         this.setupEventListeners();
         this.renderSavedLocations();
         console.time('SITES_SHOW_METHOD');
@@ -61,7 +43,7 @@ class SitesViewClass extends BaseView {
         console.timeEnd('SITES_MOUNT_TOTAL');
     }
 
-    toggleAdvancedSettings(btn) {
+    toggleAdvancedSettings() {
         const container = document.querySelector('.advanced-filters-container');
         const icon = document.getElementById('advanced-settings-toggle-icon');
         if (container) {
@@ -268,7 +250,7 @@ class SitesViewClass extends BaseView {
                 SitesService.scheduleWeatherRescopeIfNeeded();
                 if (this.state.map) this.updateMapMarkers();
             },
-            (error) => {
+            () => {
                 if (!isInitialLoad) alert("Impossible d'obtenir votre position GPS.");
                 if (statusEl) {
                     statusEl.innerHTML = `<i class="ri-error-warning-line" style="color: var(--accent-red);"></i> Position GPS indisponible.`;
@@ -417,7 +399,7 @@ class SitesViewClass extends BaseView {
             this._progZoomTimeout = setTimeout(() => {
                 this.state.isProgrammaticZoom = false;
             }, 1000);
-        } catch (e) {
+        } catch {
             this.state.map.setView([50.5, 2.5], 9);
         }
 
@@ -1804,7 +1786,7 @@ class SitesViewClass extends BaseView {
             } else if (Object.keys(wear).length > 0) {
                 equipmentHtml = '<span style="color: var(--accent-green); font-weight: 600;">Matériel à jour</span>';
             }
-        } catch (e) {
+        } catch {
             // Carnet non disponible : on garde le message par défaut plutôt que de faire planter la carte.
         }
 

@@ -192,7 +192,7 @@ const IGCParser = {
             }
 
             return decimal;
-        } catch (e) {
+        } catch {
             return null;
         }
     },

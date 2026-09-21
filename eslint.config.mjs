@@ -46,7 +46,7 @@ const baseRules = {
     // pattern in this codebase (best-effort cloud sync, optional parsing) —
     // not a smell worth flagging here.
     'no-empty': ['error', { allowEmptyCatch: true }],
-    'no-unused-vars': ['warn', { argsIgnorePattern: '^_|^e$|^target$' }],
+    'no-unused-vars': ['error', { argsIgnorePattern: '^_|^e$|^target$' }],
 };
 
 export default [

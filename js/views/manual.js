@@ -3,9 +3,6 @@
  * Wrapped from library_engine.js
  */
 import GlobalState from '../core/app_state.js';
-import AppEvents from '../core/events.js';
-import AppRouter from '../core/router.js';
-import StorageService from '../services/storage.js';
 import { escapeHTML } from '../core/security.js';
 import { COURSES_DATA } from '../data/courses_data.js';
 

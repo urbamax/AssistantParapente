@@ -38,7 +38,7 @@ const StorageService = {
             try {
                 // Tente de parser en JSON (valable pour les objets, tableaux, booléens, etc.)
                 return JSON.parse(item);
-            } catch (parseError) {
+            } catch {
                 // Si le parse échoue, c'est qu'il s'agit d'une chaîne brute (ex: 'dark', 'ALL', 'BI')
                 // On la retourne donc telle quelle pour respecter l'ancien format.
                 return item;
