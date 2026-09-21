@@ -1148,6 +1148,44 @@ class LogbookViewClass extends BaseView {
         }
     }
 
+    // Bloc météo d'une carte de l'historique (données AROME + graphe de balise).
+    renderSessionWeatherHtml(session) {
+        if (session.meteo) {
+            const decollageRow = this.renderWeatherPointRow(session.meteo, 'Décollage');
+            const atterroRow = session.meteoAtterro
+                ? this.renderWeatherPointRow(session.meteoAtterro, 'Atterrissage')
+                : '';
+            const baliseHtml = this.renderBaliseHistoBlock(session);
+
+            return `
+            <div class="logbook-card-weather" style="margin-top: 10px; padding: 10px; background: rgba(14,165,233,0.06); border-radius: var(--radius-sm); border: 1px solid rgba(14,165,233,0.15); font-size: 0.85rem; color: var(--text-secondary);">
+                ${decollageRow}
+                ${atterroRow}
+                <button data-action="forceWeatherRefresh" data-args="${session.id}" title="Rafraîchir la météo" style="margin-top: 6px; color: var(--text-muted); cursor: pointer; border: none; background: none; padding: 2px 4px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px;">
+                    <i class="ri-refresh-line"></i> Actualiser
+                </button>
+            </div>
+            ${baliseHtml}`;
+        } else {
+            return `
+            <div id="weather-container-${session.id}" class="logbook-card-weather-empty" style="margin-top: 10px; font-size: 0.85rem;">
+                <button id="refresh-weather-btn-${session.id}" class="action-btn-text" data-action="forceWeatherRefresh" data-args="${session.id}" style="color: var(--text-muted); cursor: pointer; border: none; background: rgba(0,0,0,0.03); border-radius: var(--radius-sm); padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                    <i class="ri-refresh-line"></i> Récupérer la météo
+                </button>
+            </div>`;
+        }
+    }
+
+    // Met à jour le seul bloc météo d'une carte, sans reconstruire la liste : reconstruire
+    // l'historique ferme la trace GPS ouverte et détruit sa carte 3D (position, lecture).
+    refreshSessionWeather(sessionId) {
+        const session = LogbookService.getFlightById(sessionId);
+        const slot = [...document.querySelectorAll('[data-session-weather]')].find(
+            (el) => el.dataset.sessionWeather === String(sessionId),
+        );
+        if (session && slot) slot.innerHTML = this.renderSessionWeatherHtml(session);
+    }
+
     renderHistory() {
         const container = document.getElementById('logbook-history-list');
         if (!container) return;
@@ -1211,31 +1249,7 @@ class LogbookViewClass extends BaseView {
                 }
             }
 
-            let meteoHtml;
-            if (session.meteo) {
-                const decollageRow = this.renderWeatherPointRow(session.meteo, 'Décollage');
-                const atterroRow = session.meteoAtterro
-                    ? this.renderWeatherPointRow(session.meteoAtterro, 'Atterrissage')
-                    : '';
-                const baliseHtml = this.renderBaliseHistoBlock(session);
-
-                meteoHtml = `
-                <div class="logbook-card-weather" style="margin-top: 10px; padding: 10px; background: rgba(14,165,233,0.06); border-radius: var(--radius-sm); border: 1px solid rgba(14,165,233,0.15); font-size: 0.85rem; color: var(--text-secondary);">
-                    ${decollageRow}
-                    ${atterroRow}
-                    <button data-action="forceWeatherRefresh" data-args="${session.id}" title="Rafraîchir la météo" style="margin-top: 6px; color: var(--text-muted); cursor: pointer; border: none; background: none; padding: 2px 4px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px;">
-                        <i class="ri-refresh-line"></i> Actualiser
-                    </button>
-                </div>
-                ${baliseHtml}`;
-            } else {
-                meteoHtml = `
-                <div id="weather-container-${session.id}" class="logbook-card-weather-empty" style="margin-top: 10px; font-size: 0.85rem;">
-                    <button id="refresh-weather-btn-${session.id}" class="action-btn-text" data-action="forceWeatherRefresh" data-args="${session.id}" style="color: var(--text-muted); cursor: pointer; border: none; background: rgba(0,0,0,0.03); border-radius: var(--radius-sm); padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
-                        <i class="ri-refresh-line"></i> Récupérer la météo
-                    </button>
-                </div>`;
-            }
+            const meteoHtml = this.renderSessionWeatherHtml(session);
 
             html += `
                 <div class="logbook-card">
@@ -1266,7 +1280,7 @@ class LogbookViewClass extends BaseView {
                         </div>
                         ${session.commentaire ? `<div class="session-comment">"${escapeHTML(session.commentaire)}"</div>` : ''}
                         ${session.rawIgc || (session.traceGps && session.traceGps.length > 0) ? `<button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="${session.id}"><i class="ri-route-line"></i> Voir la trace 🗺️</button><div id="trace-container-${session.id}" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>` : ''}
-                        ${meteoHtml}
+                        <div data-session-weather="${session.id}">${meteoHtml}</div>
                     </div>
                 </div>
             `;
@@ -1911,8 +1925,7 @@ class LogbookViewClass extends BaseView {
                 target.baliseId = baliseId || null;
                 LogbookService.saveFlights(); // Persiste en localStorage et déclenche la synchro Firestore
 
-                // IMPORTANT: Force complete UI rerender to visually inject the block
-                this.renderHistory();
+                this.refreshSessionWeather(sessionId);
                 console.log(`Weather data fetched successfully for session ${sessionId}.`);
             }
         } else {
