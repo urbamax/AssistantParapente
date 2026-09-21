@@ -926,9 +926,10 @@ class LogbookViewClass extends BaseView {
 
         box.style.display = 'block';
         box.style.borderColor = suspicious ? 'var(--accent-orange, #e67e22)' : 'var(--border-light, #ccc)';
+        const altitudes = `Altitudes de la trace : décollage <strong>${takeoff} m</strong>, atterrissage <strong>${landing} m</strong>.`;
         info.innerHTML = suspicious
-            ? `⚠️ <strong>Attention, c'est bizarre :</strong> la trace indique une altitude d'atterrissage de <strong>${landing} m</strong> (vario probablement mal calé au décollage). Tu veux corriger ?`
-            : `Altitudes de la trace : décollage <strong>${takeoff} m</strong>, atterrissage <strong>${landing} m</strong>. Tu peux les corriger si ton vario était mal calé.`;
+            ? `⚠️ <strong>Attention, c'est bizarre :</strong> altitude d'atterrissage négative (vario probablement mal calé au décollage). ${altitudes} Tu veux corriger ?`
+            : `${altitudes} Tu peux les corriger si ton vario était mal calé.`;
         input.value = existingOffset ? landing + existingOffset : '';
 
         input.oninput = () => {
