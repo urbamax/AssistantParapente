@@ -28,6 +28,20 @@ describe('UIManager', () => {
         expect(document.body.classList.contains('dark-mode')).toBe(false);
     });
 
+    it('keeps <html> and <body> in agreement when the theme changes after load', () => {
+        // The <head> script marks <html> as light before the app boots, e.g. for a light-OS visitor.
+        document.documentElement.classList.add('light-mode');
+
+        UIManagerModule.applyThemeMode('dark');
+        expect(document.documentElement.classList.contains('light-mode')).toBe(false);
+        expect(document.body.classList.contains('dark-theme')).toBe(true);
+
+        UIManagerModule.applyThemeMode('light');
+        expect(document.documentElement.classList.contains('light-mode')).toBe(true);
+        expect(document.body.classList.contains('light-mode')).toBe(true);
+        expect(document.body.classList.contains('dark-theme')).toBe(false);
+    });
+
     it('updateAppTheme updates css variables based on level', () => {
         UIManagerModule.updateAppTheme('BI');
         expect(document.documentElement.style.getPropertyValue('--accent-blue')).toBe('#22c55e');

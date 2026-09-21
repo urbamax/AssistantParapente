@@ -523,3 +523,24 @@ body.light-mode .bank-item-explication {
         margin-bottom: 12px;
     }
 }
+
+/* --- Thème clair : teintes plus sombres pour les textes posés sur des fonds clairs --- */
+/* Les codes de la banque de questions (js/views/quiz.js) utilisent des teintes claires pensées
+   pour le sombre : ~1,5:1 de contraste sur fond clair. */
+body.light-mode {
+    --level-text-V: #15803d;
+    --level-text-B: #1d4ed8;
+    --level-text-M: #7c2d12;
+    --level-text-T: #7e22ce;
+}
+
+/* Bonne réponse non cochée : #fdba74 (orange clair) était quasi invisible sur fond clair (1,4:1). */
+body.light-mode .missed,
+body.light-mode .qcm-option.missed {
+    color: #9a3412 !important;
+}
+
+/* Bonne réponse de la banque de questions : le vert d'accent (#22c55e) ne fait que 2,2:1 sur fond clair. */
+body.light-mode .bank-choice.correct {
+    color: #15803d !important;
+}

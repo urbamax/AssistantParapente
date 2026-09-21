@@ -106,6 +106,12 @@ class UIManager {
         const iconMoon = document.querySelector('.ri-moon-line');
         const btn = document.getElementById('theme-toggle');
 
+        // Le <head> pose `light-mode` sur <html> au chargement (anti-flash) et personne ne le retirait :
+        // après un passage en sombre à l'exécution (bouton ou OS), les jetons clairs de html.light-mode
+        // restaient actifs pendant que body.dark-theme appliquait les règles sombres (header, nav).
+        // <html> et <body> doivent toujours dire la même chose.
+        const root = document.documentElement;
+        root.classList.remove('light-mode');
         body.classList.remove('light-mode', 'dark-mode', 'dark-theme');
         if (iconSun) iconSun.style.opacity = '0.5';
         if (iconMoon) iconMoon.style.opacity = '0.5';
@@ -133,6 +139,7 @@ class UIManager {
             body.classList.add('dark-theme');
         } else {
             body.classList.add('light-mode');
+            root.classList.add('light-mode');
         }
     }
 
