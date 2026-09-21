@@ -1,11 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import * as fs from 'fs';
-import * as path from 'path';
-
-// Load weatherScoring.js into global scope
-const code = fs.readFileSync(path.join(__dirname, '../js/weatherScoring.js'), 'utf8');
-// We use eval to execute it in the current scope so we can access evaluateSpotForecast
-eval(code + '\n;globalThis.evaluateSpotForecast = evaluateSpotForecast;');
+import { evaluateSpotForecast } from '../js/weatherScoring.js';
 
 describe('weatherScoring.js', () => {
     const basePrefs = {

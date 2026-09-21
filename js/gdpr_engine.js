@@ -4,6 +4,10 @@
  * and legal document overlays (Mentions Légales & Politique de Confidentialité).
  */
 
+import GlobalState from './core/app_state.js';
+import AppRouter from './core/router.js';
+import SitesService from './services/sites_service.js';
+
 const GdprEngine = {
     consentKey: 'parapente_gdpr_consent',
     consentVersion: 2026,
@@ -173,15 +177,11 @@ const GdprEngine = {
         }
 
         // 2. GPS Guard
-        // window.SitesEngine n'existe plus (ancien nom, remplacé par SitesService/SitesView
-        // lors du refactor) : SitesService n'étant exporté qu'en module ES, on y accède ici
-        // via import() dynamique (valide même dans ce script classique).
-        const { default: SitesService } = await import('./services/sites_service.js');
         const gpsStatusEl = document.getElementById('address-status-message');
         const gpsBtn = document.getElementById('btn-use-gps');
         if (!this.isConsentGranted('gps')) {
             // Nullify user position in sites engine to clean UI
-            if (SitesService && SitesService.state) {
+            if (SitesService.state) {
                 SitesService.state.userLocation = null;
             }
             if (gpsStatusEl) {
@@ -194,9 +194,9 @@ const GdprEngine = {
             }
         } else {
             // If GPS is approved and we are in SITES mode, attempt to fetch position if not set
-            if (SitesService && SitesService.state && window.Engine && window.Engine.state.mode === 'SITES') {
-                if (!SitesService.state.userLocation && window.SitesView) {
-                    window.SitesView.requestGpsLocation(true);
+            if (SitesService.state && GlobalState.state.mode === 'SITES') {
+                if (!SitesService.state.userLocation) {
+                    AppRouter.getView('SITES')?.requestGpsLocation(true);
                 }
             }
         }
@@ -211,24 +211,18 @@ const GdprEngine = {
             localStorage.removeItem('parapente_exam_history');
 
             // Refresh QCM UI if stats screen is active
-            if (
-                window.QuizEngine &&
-                typeof window.QuizEngine.renderStats === 'function' &&
-                window.Engine &&
-                window.Engine.state.mode === 'STATS'
-            ) {
-                window.QuizEngine.renderStats();
+            if (GlobalState.state.mode === 'STATS') {
+                AppRouter.getView('STATS')?.renderStats?.();
             }
         }
     },
 };
 
-// Bind to window immediately
-window.GdprEngine = GdprEngine;
-
-// Initialize on DOM load
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => GdprEngine.init());
-} else {
+// Même timing qu'avec le script classique : init au DOMContentLoaded, avant le boot de main.js.
+if (document.readyState === 'complete') {
     GdprEngine.init();
+} else {
+    document.addEventListener('DOMContentLoaded', () => GdprEngine.init());
 }
+
+export default GdprEngine;

@@ -6,22 +6,13 @@
  * continu de 0 à 100 pour classer les meilleurs spots.
  */
 
+import { getAngularDifference } from './utils/geo_utils.js';
+
 // Configuration des pondérations pour le score final (ajustable)
 const SCORING_WEIGHTS = {
     WIND_SPEED: 0.5, // 50% du score basé sur la vitesse du vent
     WIND_DIRECTION: 0.5, // 50% du score basé sur l'orientation
 };
-
-/**
- * Calcule la différence angulaire absolue la plus courte entre deux caps (en degrés).
- * @param {number} angle1 - Premier angle (0-360)
- * @param {number} angle2 - Deuxième angle (0-360)
- * @returns {number} La différence angulaire entre 0 et 180 degrés.
- */
-function getAngularDifference(angle1, angle2) {
-    const diff = Math.abs(angle1 - angle2) % 360;
-    return diff > 180 ? 360 - diff : diff;
-}
 
 /**
  * Convertit un cap en degrés (0-360) en direction cardinale.
@@ -62,7 +53,7 @@ function degreesToCardinal(deg) {
  *
  * @returns {Object} Résultat complet du diagnostic pour l'affichage et le tri.
  */
-function evaluateSpotForecast(site, weather, userPreferences) {
+export function evaluateSpotForecast(site, weather, userPreferences) {
     // ---------------------------------------------------------
     // 1. CAS DE CHARGEMENT OU DONNÉES INCOMPLÈTES
     // ---------------------------------------------------------

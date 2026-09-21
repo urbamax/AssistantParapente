@@ -5,19 +5,19 @@
 
 import GlobalState from './app_state.js';
 import AppRouter from './router.js';
-import AppEvents from './events.js?v=2026.09.19_v1';
+import AppEvents from './events.js';
 import UIManager from './ui_manager.js';
-import { escapeHTML } from './security.js';
-import { initAppUpdateNotifier } from './app_update.js?v=2026.09.19_v1';
+import StorageService from '../services/storage.js';
+import GdprEngine from '../gdpr_engine.js';
+import SitesService from '../services/sites_service.js';
+import { initAppUpdateNotifier } from './app_update.js';
 
 // Import Views
-import QuizView from '../views/quiz.js?v=2026.09.19_v1';
-import LogbookView from '../views/logbook.js?v=2026.09.19_v1';
-import SitesView from '../views/sites.js?v=2026.09.19_v1';
-import LibraryView from '../views/manual.js?v=2026.09.19_v1';
-import QuizService from '../services/quiz_service.js?v=2026.09.19_v1';
-import SitesService from '../services/sites_service.js?v=2026.09.19_v1';
-import LogbookService from '../services/logbook_service.js';
+import QuizView from '../views/quiz.js';
+import LogbookView from '../views/logbook.js';
+import SitesView from '../views/sites.js';
+import LibraryView from '../views/manual.js';
+import QuizService from '../services/quiz_service.js';
 
 async function bootApplication() {
     console.time('BOOT_TOTAL');
@@ -100,7 +100,7 @@ async function bootApplication() {
     AppEvents.register('QuizshowStatsScreen', () => QuizView.showStatsScreen());
 
     // Library Events
-    AppEvents.register('setLibrarySort', (sort) => window.LibraryEngine && window.LibraryEngine.setSort(sort));
+    AppEvents.register('setLibrarySort', (sort) => LibraryView.setSort(sort));
 
     // Logbook Events mappings from extracted data
     [
@@ -143,11 +143,51 @@ async function bootApplication() {
         'toggleFilterFavoritesOnly',
         'scrollToTop',
         'filterByTag',
+        'filterByType',
         'renderList',
+        'openSpotairModal',
+        'closeSpotairModal',
+        'closeMoreMapsDropdown',
+        'closeGpsMenu',
     ].forEach((action) => {
         AppEvents.register('Sites' + action, (args, e, t) =>
             SitesView[action] ? SitesView[action](args, e, t) : null,
         );
+    });
+
+    // Sites service actions triggered by typing / Enter (see data-input-action, data-enter-action)
+    ['updateWindLimits', 'updateSearchQuery', 'geocodeAddress'].forEach((action) => {
+        AppEvents.register('SitesService' + action, (value) => SitesService[action](value));
+    });
+    AppEvents.register('SitesServicesetRadiusLimit', (value) => SitesService.setRadiusLimit(parseInt(value)));
+    AppEvents.register('SitessetForecastOffset', (offset) => SitesService.setForecastOffset(parseInt(offset)));
+    AppEvents.register('SitesopenSpotairModal', (_args, _e, target) =>
+        SitesView.openSpotairModal(target.dataset.spotairId, target.dataset.siteId),
+    );
+
+    // Generic UI helpers
+    AppEvents.register('reloadApp', () => window.location.reload());
+    AppEvents.register('openUrl', (_args, _e, target) => window.open(target.dataset.url, '_blank', 'noopener'));
+    AppEvents.register('triggerClick', (id) => document.getElementById(id)?.click());
+    AppEvents.register('toggleOtherField', (value, _e, target) => {
+        const other = document.getElementById(target.dataset.toggleId);
+        if (other) other.style.display = value === 'Autre' ? 'block' : 'none';
+    });
+    AppEvents.register('toggleTheorySubBar', () =>
+        document.getElementById('theory-sub-bar')?.classList.toggle('active'),
+    );
+    document
+        .getElementById('theory-sub-bar')
+        ?.addEventListener('click', (e) => e.currentTarget.classList.remove('active'));
+    AppEvents.register('importDataFile', (_value, _e, target) => {
+        const file = target.files[0];
+        if (!file || !window.FirebaseAuthEngine) return;
+        window.FirebaseAuthEngine.importAllData(file);
+        target.value = '';
+    });
+    AppEvents.register('openGdprSettingsFromAuth', () => {
+        GdprEngine.showModal('gdpr-settings-modal');
+        window.FirebaseAuthEngine?.closeAuthModal();
     });
 
     // FirebaseAuth Events
@@ -162,6 +202,7 @@ async function bootApplication() {
         'openAuthModal',
         'exportAllData',
         'importAllData',
+        'enablePushNotifications',
     ].forEach((action) => {
         AppEvents.register('FirebaseAuth' + action, (args, e, t) =>
             window.FirebaseAuthEngine && window.FirebaseAuthEngine[action]
@@ -173,21 +214,12 @@ async function bootApplication() {
     // GDPR Events
     ['showModal', 'hideModal', 'acceptAll', 'refuseAll', 'saveCustomSettings'].forEach((action) => {
         AppEvents.register('Gdpr' + action, (args, e, t) =>
-            window.GdprEngine && window.GdprEngine[action] ? window.GdprEngine[action](args, e, t) : null,
+            GdprEngine[action] ? GdprEngine[action](args, e, t) : null,
         );
     });
 
-    // --- LEGACY POLYFILLS ---
-    // Ensure existing engines don't break when calling window.Engine.showDashboard()
-    window.Engine = {
-        state: GlobalState.state,
-        showDashboard: () => AppRouter.navigate('MENU'),
-        startMode: (mode) => AppRouter.navigate(mode),
-        hideManual: () => UIManager.hideManual(),
-    };
-
-    // Polyfill FirebaseAuthEngine
-    import('../services/firebase_service.js?v=2026.09.19_v1')
+    // --- FirebaseAuthEngine : chargé à la demande (SDK Firebase), exposé sur window pour les handlers ---
+    import('../services/firebase_service.js')
         .then((module) => {
             window.FirebaseAuthEngine = module.FirebaseAuthEngine;
             if (window.FirebaseAuthEngine.init) {

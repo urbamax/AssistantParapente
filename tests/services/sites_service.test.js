@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import SitesService from '../../js/services/sites_service.js';
-import StorageService from '../../js/services/storage.js';
 
 describe('SitesService', () => {
     beforeEach(() => {
