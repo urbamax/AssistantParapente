@@ -8,6 +8,7 @@ import AppRouter from './router.js';
 import AppEvents from './events.js?v=2026.09.19_v1';
 import UIManager from './ui_manager.js';
 import { escapeHTML } from './security.js';
+import { initAppUpdateNotifier } from './app_update.js?v=2026.09.19_v1';
 
 // Import Views
 import QuizView from '../views/quiz.js?v=2026.09.19_v1';
@@ -251,7 +252,8 @@ async function bootApplication() {
     // navigateurs qui avaient encore l'ancien kill-switch actif reçoivent cette nouvelle
     // version au prochain contrôle de mise à jour du navigateur, comme n'importe quel SW.
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+        const swRegistration = navigator.serviceWorker.register('./sw.js').catch(() => null);
+        initAppUpdateNotifier(swRegistration);
     }
 }
 

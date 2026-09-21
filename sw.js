@@ -66,6 +66,7 @@ const CRITICAL_ASSETS = [
     './css/gdpr.css',
     './css/logbook.css',
     './js/core/app_state.js',
+    './js/core/app_update.js',
     './js/core/base_view.js',
     './js/core/events.js',
     './js/core/main.js',
