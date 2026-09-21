@@ -505,7 +505,7 @@ class QuizViewClass extends BaseView {
                     <p style="opacity:0.7; font-size:0.9rem; line-height: 1.6; margin-bottom: 24px;">
                         Vous avez désactivé le stockage de vos statistiques d'entraînement dans vos préférences de confidentialité. Pour suivre votre progression et voir votre historique, veuillez activer cette option.
                     </p>
-                    <button onclick="if(window.GdprEngine) window.GdprEngine.showModal('gdpr-settings-modal');" style="background:var(--accent-blue); color:white; border:none; padding:12px 24px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; font-size:0.9rem;">
+                    <button data-action="GdprshowModal" data-args="gdpr-settings-modal" style="background:var(--accent-blue); color:white; border:none; padding:12px 24px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; font-size:0.9rem;">
                         Activer le suivi de progression
                     </button>
                 </div>
@@ -1075,7 +1075,7 @@ class QuizViewClass extends BaseView {
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#${code}</span>
-                                    ${QuizView.getCourseUrl(code, qText) ? `<button onclick="event.stopPropagation(); window.open('${QuizView.getCourseUrl(code, qText)}', '_blank')" style="background:var(--accent-blue); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>` : ''}
+                                    ${QuizView.getCourseUrl(code, qText) ? `<button data-action="openUrl" data-url="${escapeHTML(QuizView.getCourseUrl(code, qText))}" style="background:var(--accent-blue); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>` : ''}
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">${theme}</span>
                                     ${streak >= 3 ? `<span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 ${streak}</span>` : ''}
                                     ${hasAnswers ? '<i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-' + code + '"></i>' : ''}
@@ -1579,7 +1579,7 @@ class QuizViewClass extends BaseView {
         feedbackDiv.innerHTML = `
             <div class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}">
                 <div>${result.question.explication}</div>
-                ${courseUrl ? `<button onclick="window.open('${courseUrl}', '_blank')" style="margin-top:10px; background:var(--accent-blue); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR DANS LE COURS</button>` : ''}
+                ${courseUrl ? `<button data-action="openUrl" data-url="${escapeHTML(courseUrl)}" style="margin-top:10px; background:var(--accent-blue); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR DANS LE COURS</button>` : ''}
             </div>
         `;
     }

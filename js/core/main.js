@@ -9,6 +9,7 @@ import AppEvents from './events.js?v=2026.09.19_v1';
 import UIManager from './ui_manager.js';
 import StorageService from '../services/storage.js';
 import GdprEngine from '../gdpr_engine.js';
+import SitesService from '../services/sites_service.js';
 
 // Import Views
 import QuizView from '../views/quiz.js?v=2026.09.19_v1';
@@ -141,11 +142,51 @@ async function bootApplication() {
         'toggleFilterFavoritesOnly',
         'scrollToTop',
         'filterByTag',
+        'filterByType',
         'renderList',
+        'openSpotairModal',
+        'closeSpotairModal',
+        'closeMoreMapsDropdown',
+        'closeGpsMenu',
     ].forEach((action) => {
         AppEvents.register('Sites' + action, (args, e, t) =>
             SitesView[action] ? SitesView[action](args, e, t) : null,
         );
+    });
+
+    // Sites service actions triggered by typing / Enter (see data-input-action, data-enter-action)
+    ['updateWindLimits', 'updateSearchQuery', 'geocodeAddress'].forEach((action) => {
+        AppEvents.register('SitesService' + action, (value) => SitesService[action](value));
+    });
+    AppEvents.register('SitesServicesetRadiusLimit', (value) => SitesService.setRadiusLimit(parseInt(value)));
+    AppEvents.register('SitessetForecastOffset', (offset) => SitesService.setForecastOffset(parseInt(offset)));
+    AppEvents.register('SitesopenSpotairModal', (_args, _e, target) =>
+        SitesView.openSpotairModal(target.dataset.spotairId, target.dataset.siteId),
+    );
+
+    // Generic UI helpers
+    AppEvents.register('reloadApp', () => window.location.reload());
+    AppEvents.register('openUrl', (_args, _e, target) => window.open(target.dataset.url, '_blank', 'noopener'));
+    AppEvents.register('triggerClick', (id) => document.getElementById(id)?.click());
+    AppEvents.register('toggleOtherField', (value, _e, target) => {
+        const other = document.getElementById(target.dataset.toggleId);
+        if (other) other.style.display = value === 'Autre' ? 'block' : 'none';
+    });
+    AppEvents.register('toggleTheorySubBar', () =>
+        document.getElementById('theory-sub-bar')?.classList.toggle('active'),
+    );
+    document
+        .getElementById('theory-sub-bar')
+        ?.addEventListener('click', (e) => e.currentTarget.classList.remove('active'));
+    AppEvents.register('importDataFile', (_value, _e, target) => {
+        const file = target.files[0];
+        if (!file || !window.FirebaseAuthEngine) return;
+        window.FirebaseAuthEngine.importAllData(file);
+        target.value = '';
+    });
+    AppEvents.register('openGdprSettingsFromAuth', () => {
+        GdprEngine.showModal('gdpr-settings-modal');
+        window.FirebaseAuthEngine?.closeAuthModal();
     });
 
     // FirebaseAuth Events
@@ -160,6 +201,7 @@ async function bootApplication() {
         'openAuthModal',
         'exportAllData',
         'importAllData',
+        'enablePushNotifications',
     ].forEach((action) => {
         AppEvents.register('FirebaseAuth' + action, (args, e, t) =>
             window.FirebaseAuthEngine && window.FirebaseAuthEngine[action]
