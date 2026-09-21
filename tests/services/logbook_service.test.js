@@ -86,3 +86,48 @@ describe('LogbookService - Core Functions', () => {
         expect(res.error).toBe('No valid GPS data found in file.');
     });
 });
+
+describe('LogbookService - fetchSessionWeather rate limiting', () => {
+    const hourly = {
+        temperature_2m: Array(24).fill(15),
+        wind_speed_10m: Array(24).fill(10),
+        wind_gusts_10m: Array(24).fill(15),
+        wind_direction_10m: Array(24).fill(180),
+        weather_code: Array(24).fill(1),
+    };
+
+    afterEach(() => {
+        vi.useRealTimers();
+        vi.restoreAllMocks();
+    });
+
+    it('retries once after a 429 and returns the data when the retry succeeds', async () => {
+        vi.useFakeTimers();
+        global.fetch = vi
+            .fn()
+            .mockResolvedValueOnce({ ok: false, status: 429 })
+            .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ hourly }) });
+
+        const pending = LogbookService.fetchSessionWeather(45.9, 6.1, '2026-09-20T15:38');
+        await vi.advanceTimersByTimeAsync(2000);
+        const res = await pending;
+
+        expect(global.fetch).toHaveBeenCalledTimes(2);
+        expect(res.success).toBe(true);
+        expect(res.data.ventVitesse).toBe(10);
+    });
+
+    it('gives a readable message when the limit persists after the retry', async () => {
+        vi.useFakeTimers();
+        global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 429 });
+
+        const pending = LogbookService.fetchSessionWeather(45.9, 6.1, '2026-09-20T15:38');
+        await vi.advanceTimersByTimeAsync(2000);
+        const res = await pending;
+
+        expect(global.fetch).toHaveBeenCalledTimes(2);
+        expect(res.success).toBe(false);
+        expect(res.error).toContain('saturé');
+        expect(res.error).not.toContain('429');
+    });
+});

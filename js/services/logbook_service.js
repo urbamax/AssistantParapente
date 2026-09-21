@@ -273,6 +273,18 @@ class LogbookService {
         }
     }
 
+    // Open-Meteo (gratuit) limite le nombre d'appels par IP et par heure, et la vue Sites en
+    // consomme beaucoup : un 429 est fréquent et passager. Un seul nouvel essai après une pause,
+    // comme le fait déjà sites_service, avant de renoncer.
+    async _fetchWeather(url) {
+        let response = await fetch(url);
+        if (response.status === 429) {
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            response = await fetch(url);
+        }
+        return response;
+    }
+
     async fetchSessionWeather(lat, lon, datetimeStr) {
         try {
             const dateObj = new Date(datetimeStr);
@@ -284,16 +296,20 @@ class LogbookService {
             // L'API Open-Meteo "forecast" avec start_date et end_date permet de récupérer
             // les données passées récentes. models=meteofrance_seamless encapsule AROME/ARPEGE.
             let url = `https://api.open-meteo.com/v1/forecast?latitude=${parsedLat}&longitude=${parsedLon}&hourly=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code&wind_speed_unit=kmh&timezone=auto&start_date=${dateStrQuery}&end_date=${dateStrQuery}&models=meteofrance_seamless`;
-            let response = await fetch(url);
+            let response = await this._fetchWeather(url);
 
             // Fallback for dates older than the forecast model limit
             if (response.status === 400) {
                 url = `https://archive-api.open-meteo.com/v1/archive?latitude=${parsedLat}&longitude=${parsedLon}&hourly=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code&wind_speed_unit=kmh&timezone=auto&start_date=${dateStrQuery}&end_date=${dateStrQuery}`;
-                response = await fetch(url);
+                response = await this._fetchWeather(url);
             }
 
             if (!response.ok) {
-                return { success: false, data: null, error: `Open-Meteo API error: ${response.status}` };
+                const error =
+                    response.status === 429
+                        ? 'Service météo momentanément saturé, réessayez dans quelques minutes'
+                        : `Open-Meteo API error: ${response.status}`;
+                return { success: false, data: null, error };
             }
 
             const result = await response.json();
