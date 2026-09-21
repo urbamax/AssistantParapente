@@ -22,7 +22,7 @@ const WEATHER_API_HOSTNAME = 'api.open-meteo.com';
 // FCM_VAPID_KEY absent côté client, etc.) ne doit jamais empêcher le reste du SW — cache
 // offline et navigation — de fonctionner.
 try {
-    importScripts('./firebase_config.js');
+    importScripts('./js/firebase_config.js');
     importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
     importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
 
