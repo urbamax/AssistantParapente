@@ -351,7 +351,12 @@ class QuizViewClass extends BaseView {
                 M: 'rgba(139, 69, 19, 0.2)', // Marron
                 T: 'rgba(168, 85, 247, 0.2)', // Violet
             };
-            const textColors = { V: '#4ade80', B: '#60a5fa', M: '#c0773d', T: '#c084fc' };
+            const textColors = {
+                V: 'var(--level-text-V, #4ade80)',
+                B: 'var(--level-text-B, #60a5fa)',
+                M: 'var(--level-text-M, #c0773d)',
+                T: 'var(--level-text-T, #c084fc)',
+            };
 
             const validLetters = letters.split('').filter((l) => colorMap[l]);
             if (validLetters.length === 1) {
@@ -1459,7 +1464,12 @@ class QuizViewClass extends BaseView {
             M: 'rgba(139, 69, 19, 0.2)', // Marron
             T: 'rgba(168, 85, 247, 0.2)', // Violet
         };
-        const textColors = { V: '#4ade80', B: '#60a5fa', M: '#c0773d', T: '#c084fc' };
+        const textColors = {
+            V: 'var(--level-text-V, #4ade80)',
+            B: 'var(--level-text-B, #60a5fa)',
+            M: 'var(--level-text-M, #c0773d)',
+            T: 'var(--level-text-T, #c084fc)',
+        };
 
         const validLetters = letters.split('').filter((l) => colorMap[l]);
         if (validLetters.length === 1) {
