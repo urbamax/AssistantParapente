@@ -4,6 +4,7 @@
  */
 import StorageService from './storage.js';
 import GdprEngine from '../gdpr_engine.js';
+import AppRouter from '../core/router.js';
 import GlobalState from '../core/app_state.js';
 import SitesService from './sites_service.js';
 import LogbookService from './logbook_service.js';
@@ -601,20 +602,11 @@ export const FirebaseAuthEngine = {
                 if (GlobalState) {
                     GlobalState.set('level', finalPrefs.pilotLevel);
                 }
-                if (window.Engine && typeof window.Engine.changeLevel === 'function') {
-                    window.Engine.changeLevel(finalPrefs.pilotLevel);
-                }
             }
             if (finalPrefs.themeMode && finalPrefs.themeMode !== StorageService.get(StorageService.KEYS.THEME_MODE)) {
                 StorageService.set(StorageService.KEYS.THEME_MODE, finalPrefs.themeMode);
                 if (GlobalState) {
                     GlobalState.set('themeMode', finalPrefs.themeMode);
-                }
-                if (window.Engine) {
-                    window.Engine.state.themeMode = finalPrefs.themeMode;
-                    if (typeof window.Engine.applyThemeMode === 'function') {
-                        window.Engine.applyThemeMode();
-                    }
                 }
             }
             this.syncingData = false;
@@ -637,8 +629,9 @@ export const FirebaseAuthEngine = {
             // On ne touche pas à l'onglet "add" : c'est un formulaire (vol ou gonflage), pas
             // une vue de données, et le re-render effacerait une saisie/modification en cours.
             LogbookService.loadData();
-            if (window.LogbookView && window.LogbookView.currentTab !== 'add') {
-                window.LogbookView.switchTab(window.LogbookView.currentTab);
+            const logbookView = AppRouter.getView('LOGBOOK');
+            if (logbookView && logbookView.currentTab !== 'add') {
+                logbookView.switchTab(logbookView.currentTab);
             }
 
             console.log('Sync complete!');
@@ -1087,12 +1080,13 @@ export const FirebaseAuthEngine = {
                 }
 
                 // Recharge l'UI pour refléter les nouvelles données
-                if (typeof QuizEngine !== 'undefined' && typeof QuizEngine.renderStats === 'function') {
-                    QuizEngine.renderStats();
-                }
-                if (typeof LogbookEngine !== 'undefined' && typeof LogbookEngine.loadData === 'function') {
-                    LogbookEngine.loadData();
-                    LogbookEngine.switchTab(LogbookEngine.currentTab);
+                const mode = GlobalState.state.mode;
+                if (mode === 'STATS') {
+                    AppRouter.getView('STATS')?.renderStats?.();
+                } else if (mode === 'LOGBOOK') {
+                    LogbookService.loadData();
+                    const logbookView = AppRouter.getView('LOGBOOK');
+                    logbookView?.switchTab(logbookView.currentTab);
                 }
             } catch (parseError) {
                 console.error("[Firebase] Erreur lors de l'import :", parseError);

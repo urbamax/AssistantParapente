@@ -5,6 +5,7 @@
 
 import GlobalState from './app_state.js';
 import StorageService from '../services/storage.js';
+import { escapeHTML } from './security.js';
 
 class Router {
     constructor() {
@@ -14,6 +15,10 @@ class Router {
 
     register(mode, viewModule) {
         this.routes.set(mode, viewModule);
+    }
+
+    getView(mode) {
+        return this.routes.get(mode);
     }
 
     async navigate(mode, params = {}) {
@@ -61,10 +66,7 @@ class Router {
             } catch (e) {
                 console.error(`Error mounting ${mode}:`, e);
                 if (screenEl) {
-                    const safeError =
-                        typeof Security !== 'undefined' && Security.escapeHTML
-                            ? Security.escapeHTML(e.message || String(e))
-                            : e.message || String(e);
+                    const safeError = escapeHTML(e.message || String(e));
                     screenEl.innerHTML = `
                         <div class="container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; text-align: center; margin-top: 2rem;">
                             <div class="empty-icon" style="color: var(--danger-color); font-size: 4rem; margin-bottom: 1rem;">🔥</div>

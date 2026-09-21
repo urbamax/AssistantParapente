@@ -7,7 +7,10 @@ import { WIND_THRESHOLDS, WEATHER_MODELS } from '../data/weather_config.js';
 import { calculateDistance, getAngularDifference, degreesToCardinal } from '../utils/geo_utils.js';
 import { removeAccents } from '../utils/text_utils.js';
 import { escapeHTML } from '../core/security.js';
+import AppRouter from '../core/router.js';
 import { evaluateSpotForecast } from '../weatherScoring.js';
+
+const sitesView = () => AppRouter.getView('SITES');
 
 class SitesService {
     constructor() {
@@ -547,9 +550,7 @@ class SitesService {
             if (!missing) return;
 
             this.fetchWeatherForSites().then(() => {
-                if (window.SitesView && typeof SitesView.renderList === 'function') {
-                    SitesView.renderList();
-                }
+                sitesView()?.renderList?.();
             });
         }, 400);
     }
@@ -856,14 +857,14 @@ class SitesService {
 
         this.savePreferences();
         this.renderList();
-        if (window.SitesView && SitesView.state && SitesView.state.mapExpanded) this.updateMapMarkers();
+        if (sitesView()?.state?.mapExpanded) this.updateMapMarkers();
     }
 
     toggleHideUnflyable(checked) {
         this.state.hideUnflyable = checked;
         this.savePreferences();
         this.renderList();
-        if (window.SitesView && SitesView.state && SitesView.state.mapExpanded) this.updateMapMarkers();
+        if (sitesView()?.state?.mapExpanded) this.updateMapMarkers();
     }
 
     setRadiusLimit(value) {
@@ -884,7 +885,7 @@ class SitesService {
         this.savePreferences();
         this.renderList();
         this.scheduleWeatherRescopeIfNeeded();
-        if (window.SitesView && SitesView.state && SitesView.state.mapExpanded) {
+        if (sitesView()?.state?.mapExpanded) {
             this.updateMapMarkers();
         }
     }
@@ -902,7 +903,7 @@ class SitesService {
         if (mode === 'DISTANCE') {
             if (this.state.userLocation) {
                 this.renderList();
-                if (window.SitesView && SitesView.state && SitesView.state.map) {
+                if (sitesView()?.state?.map) {
                     this.updateMapMarkers();
                 }
             } else {
@@ -910,7 +911,7 @@ class SitesService {
             }
         } else {
             this.renderList();
-            if (window.SitesView && SitesView.state && SitesView.state.map) {
+            if (sitesView()?.state?.map) {
                 this.updateMapMarkers();
             }
         }
@@ -939,7 +940,7 @@ class SitesService {
 
         this.savePreferences();
         this.renderList();
-        if (window.SitesView && SitesView.state && SitesView.state.mapExpanded) {
+        if (sitesView()?.state?.mapExpanded) {
             this.updateMapMarkers();
         }
     }
@@ -984,7 +985,7 @@ class SitesService {
         this.savePreferences();
         this.renderList();
         this.scheduleWeatherRescopeIfNeeded();
-        if (window.SitesView && SitesView.state && SitesView.state.mapExpanded) this.updateMapMarkers();
+        if (sitesView()?.state?.mapExpanded) this.updateMapMarkers();
     }
 
     toggleFavorite(siteId) {
@@ -999,7 +1000,7 @@ class SitesService {
 
         this.savePreferences();
         this.renderList();
-        if (window.SitesView && SitesView.state && SitesView.state.mapExpanded) this.updateMapMarkers();
+        if (sitesView()?.state?.mapExpanded) this.updateMapMarkers();
     }
 
     toggleMinimize(siteId) {
@@ -1021,7 +1022,7 @@ class SitesService {
         this.state.searchQuery = val || '';
         this.renderList();
         this.scheduleWeatherRescopeIfNeeded();
-        if (window.SitesView && SitesView.state && SitesView.state.map) {
+        if (sitesView()?.state?.map) {
             this.updateMapMarkers();
         }
     }
@@ -1040,11 +1041,12 @@ class SitesService {
             slider.style.background = `linear-gradient(to right, var(--accent-blue) 0%, var(--accent-blue) ${percentage}%, rgba(255,255,255,0.1) ${percentage}%, rgba(255,255,255,0.1) 100%)`;
         }
 
-        if (window.SitesView) {
-            SitesView.updateForecastLabel();
-            SitesView.renderList();
-            if (SitesView.state && SitesView.state.map) {
-                SitesView.updateMapMarkers();
+        const view = sitesView();
+        if (view) {
+            view.updateForecastLabel();
+            view.renderList();
+            if (view.state && view.state.map) {
+                view.updateMapMarkers();
             }
         }
     }
@@ -1083,7 +1085,7 @@ class SitesService {
         this.savePreferences();
         this.renderList();
         this.scheduleWeatherRescopeIfNeeded();
-        if (window.SitesView && SitesView.state && SitesView.state.map) {
+        if (sitesView()?.state?.map) {
             this.updateMapMarkers();
         }
     }
@@ -1226,9 +1228,10 @@ class SitesService {
 
                     this.renderList();
                     this.scheduleWeatherRescopeIfNeeded();
-                    if (window.SitesView && SitesView.state && SitesView.state.map) {
+                    const map = sitesView()?.state?.map;
+                    if (map) {
                         this.updateMapMarkers();
-                        (window.SitesView && SitesView.state && SitesView.state.map).setView([lat, lng], 10);
+                        map.setView([lat, lng], 10);
                     }
                 } else {
                     if (statusEl) {
@@ -1285,7 +1288,7 @@ class SitesService {
 
             this.renderList();
             this.scheduleWeatherRescopeIfNeeded();
-            if (window.SitesView && SitesView.state && SitesView.state.mapExpanded) this.updateMapMarkers();
+            if (sitesView()?.state?.mapExpanded) this.updateMapMarkers();
         }
     }
 
@@ -1296,22 +1299,22 @@ class SitesService {
 
     // Forward UI updates to SitesView if it exists (legacy code adaptation)
     renderList() {
-        if (window.SitesView) SitesView.renderList();
+        sitesView()?.renderList();
     }
     updateMapMarkers() {
-        if (window.SitesView) SitesView.updateMapMarkers();
+        sitesView()?.updateMapMarkers();
     }
     updateMapTogglesVisibility() {
-        if (window.SitesView) SitesView.updateMapTogglesVisibility();
+        sitesView()?.updateMapTogglesVisibility();
     }
     updateForecastLabel() {
-        if (window.SitesView) SitesView.updateForecastLabel();
+        sitesView()?.updateForecastLabel();
     }
     updateBadges() {
-        if (window.SitesView) SitesView.updateBadges();
+        sitesView()?.updateBadges();
     }
     renderDropdowns() {
-        if (window.SitesView) SitesView.renderDropdowns();
+        sitesView()?.renderDropdowns();
     }
 }
 export default new SitesService();

@@ -19,12 +19,10 @@ class LibraryViewClass extends BaseView {
         this.state = {
             search: '',
             sort: 'CATEGORY', // TITLE, LEVEL, CATEGORY
-            mainEngine: null,
             courses: {},
         };
     }
-    init(mainEngine) {
-        this.state.mainEngine = mainEngine;
+    init() {
         // Load courses from global data
         this.state.courses = COURSES_DATA;
         console.log('LibraryEngine Initialized');
@@ -250,7 +248,7 @@ class LibraryViewClass extends BaseView {
         console.log('Mounting LibraryView with params', params);
         try {
             if (this.init) {
-                this.init(window.Engine); // Pass a dummy or the global engine if needed
+                this.init();
             }
 
             // Auto-update library when level changes

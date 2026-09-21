@@ -1,6 +1,7 @@
 import GlobalState from '../core/app_state.js';
 import AppRouter from '../core/router.js';
 import QuizService from '../services/quiz_service.js';
+import StorageService from '../services/storage.js';
 import { escapeHTML } from '../core/security.js';
 import { formatDateTime } from '../utils/date_utils.js';
 import { truncate } from '../utils/text_utils.js';

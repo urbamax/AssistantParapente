@@ -9,20 +9,13 @@ import globals from 'globals';
 const projectGlobals = {
     // Globals restants : firebase_config.js (classic script, requis par sw.js) et
     // quelques références historiques lues via `window`.
-    Engine: 'readonly',
     FirebaseAuthEngine: 'readonly',
-    LibraryEngine: 'readonly',
-    LogbookEngine: 'readonly',
-    LogbookView: 'readonly',
     QCM_OFFICIAL: 'readonly',
-    QuizEngine: 'readonly',
     QuizService: 'readonly',
     Security: 'readonly',
     SITES_DATA: 'readonly',
-    SitesEngine: 'readonly',
     SitesService: 'readonly',
     SitesView: 'readonly',
-    StorageService: 'readonly',
     AdventureEngine: 'readonly',
     COMPONENTS: 'readonly',
     GENERATED_CONTENT: 'readonly',
