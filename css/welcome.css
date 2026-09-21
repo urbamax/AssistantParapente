@@ -1,0 +1,163 @@
+/* --- MODULE: WELCOME (écran de première visite) --- */
+
+/* Marge basse généreuse : la bannière RGPD, affichée elle aussi à la première visite,
+   recouvre le bas de l'écran ; les cartes doivent pouvoir défiler au-dessus. */
+#welcome-screen.mode-screen {
+    padding-bottom: 260px;
+}
+
+.welcome-container {
+    max-width: 880px;
+    margin: calc(var(--header-height, 140px) + 20px) auto 0;
+    padding: 40px;
+    background: var(--bg-card);
+    border: var(--border-glass);
+    border-radius: 32px;
+    box-shadow: var(--shadow-card);
+}
+
+.welcome-lead {
+    max-width: 56ch;
+    margin: 0 auto 32px;
+    text-align: center;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.welcome-step + .welcome-step {
+    margin-top: 32px;
+}
+
+.welcome-step h3 {
+    margin: 0 0 6px;
+    font-size: 1.1rem;
+    color: var(--text-main);
+}
+
+.welcome-hint {
+    margin: 0 0 16px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.welcome-levels {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 12px;
+}
+
+.welcome-level {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 14px 16px;
+    text-align: left;
+    color: var(--text-main);
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-left: 6px solid var(--level-color);
+    border-radius: 16px;
+    cursor: pointer;
+    transition:
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.welcome-level-name {
+    font-weight: 700;
+}
+
+.welcome-level-sub {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.welcome-level[aria-pressed='true'] {
+    box-shadow: 0 0 0 2px var(--level-color);
+}
+
+.welcome-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.welcome-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 18px;
+    text-align: left;
+    color: var(--text-main);
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.welcome-card i {
+    font-size: 1.6rem;
+    color: var(--accent-blue);
+}
+
+.welcome-card-title {
+    font-weight: 800;
+}
+
+.welcome-card-text {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+}
+
+.welcome-level:hover,
+.welcome-card:hover {
+    transform: translateY(-2px);
+}
+
+.welcome-card:hover {
+    border-color: var(--accent-blue);
+}
+
+.welcome-level:focus-visible,
+.welcome-card:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+}
+
+.welcome-privacy {
+    margin: 28px 0 0;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    #welcome-screen.mode-screen {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .welcome-container {
+        margin-top: calc(var(--header-height, 140px) + 12px);
+        padding: 20px 16px;
+        border-radius: 20px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .welcome-level,
+    .welcome-card {
+        transition: none;
+    }
+
+    .welcome-level:hover,
+    .welcome-card:hover {
+        transform: none;
+    }
+}

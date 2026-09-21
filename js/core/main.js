@@ -14,6 +14,8 @@ import QuizView from '../views/quiz.js?v=2026.09.19_v1';
 import LogbookView from '../views/logbook.js?v=2026.09.19_v1';
 import SitesView from '../views/sites.js?v=2026.09.19_v1';
 import LibraryView from '../views/manual.js?v=2026.09.19_v1';
+import WelcomeView from '../views/welcome.js?v=2026.09.19_v1';
+import { resolveStartMode } from './start_mode.js?v=2026.09.19_v1';
 import QuizService from '../services/quiz_service.js?v=2026.09.19_v1';
 import SitesService from '../services/sites_service.js?v=2026.09.19_v1';
 import LogbookService from '../services/logbook_service.js';
@@ -221,18 +223,15 @@ async function bootApplication() {
     AppRouter.register('LOGBOOK', LogbookView);
     AppRouter.register('SITES', SitesView);
     AppRouter.register('LIBRARY', LibraryView);
+    AppRouter.register('WELCOME', WelcomeView);
 
     // 4. Initialize History API
     AppRouter.initHistory();
 
     // 5. Restore State or Default
     const params = new URLSearchParams(window.location.search);
-    let startMode = params.get('mode');
-
-    if (!startMode) {
-        // Automatically load last active page, fallback to LIBRARY (Manuel) on first visit
-        startMode = StorageService.get('LAST_ACTIVE_ROUTE') || 'LIBRARY';
-    }
+    // Lien direct > dernière page ouverte > écran d'accueil (toute première visite uniquement)
+    const startMode = resolveStartMode(params.get('mode'), StorageService.get('LAST_ACTIVE_ROUTE'));
 
     AppRouter.navigate(startMode);
 

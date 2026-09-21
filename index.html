@@ -91,6 +91,7 @@
     <link rel="stylesheet" href="css/auth.css?v=2026.09.19_v1">
     <link rel="stylesheet" href="css/gdpr.css?v=2026.09.19_v1">
     <link rel="stylesheet" href="css/logbook.css?v=2026.09.19_v1">
+    <link rel="stylesheet" href="css/welcome.css?v=2026.09.19_v1">
 </head>
 
 <body>
@@ -277,6 +278,74 @@
             <!-- Results injected by JS -->
         </div>
         <div class="app-footer-placeholder"></div>
+    </div>
+
+    <!-- WELCOME SCREEN (toute première visite uniquement) -->
+    <div id="welcome-screen" class="mode-screen">
+        <div class="welcome-container">
+            <h2 class="page-title">Bienvenue</h2>
+            <p class="welcome-lead">
+                Assistant Parapente vous aide à choisir où voler, à tenir votre carnet de vol et à préparer la théorie
+                du brevet.
+            </p>
+
+            <section class="welcome-step" aria-labelledby="welcome-level-title">
+                <h3 id="welcome-level-title">Quel est votre niveau ?</h3>
+                <p class="welcome-hint">
+                    Il adapte les questions, les cours et la couleur de l'application. Vous pourrez le changer à tout
+                    moment en haut de l'écran.
+                </p>
+                <div class="welcome-levels" role="group" aria-label="Niveau de pilote">
+                    <button type="button" class="welcome-level" style="--level-color: #22c55e" data-level="BI" aria-pressed="false" data-action="changeLevel" data-args="BI">
+                        <span class="welcome-level-name">Brevet Initial</span>
+                        <span class="welcome-level-sub">Niveau vert · j'apprends</span>
+                    </button>
+                    <button type="button" class="welcome-level" style="--level-color: #0ea5e9" data-level="BP" aria-pressed="false" data-action="changeLevel" data-args="BP">
+                        <span class="welcome-level-name">Brevet de Pilote</span>
+                        <span class="welcome-level-sub">Niveau bleu · pilote autonome</span>
+                    </button>
+                    <button type="button" class="welcome-level" style="--level-color: #8b4513" data-level="BPC" aria-pressed="false" data-action="changeLevel" data-args="BPC">
+                        <span class="welcome-level-name">Pilote Confirmé</span>
+                        <span class="welcome-level-sub">Niveau marron · vols avancés</span>
+                    </button>
+                    <button type="button" class="welcome-level" style="--level-color: #64748b" data-level="ALL" aria-pressed="true" data-action="changeLevel" data-args="ALL">
+                        <span class="welcome-level-name">Pas encore décidé</span>
+                        <span class="welcome-level-sub">Tous les niveaux</span>
+                    </button>
+                </div>
+            </section>
+
+            <section class="welcome-step" aria-labelledby="welcome-start-title">
+                <h3 id="welcome-start-title">Par où commencer ?</h3>
+                <div class="welcome-cards">
+                    <button type="button" class="welcome-card" data-action="navigate" data-args="SITES">
+                        <i class="ri-map-pin-line" aria-hidden="true"></i>
+                        <span class="welcome-card-title">Sites de vol</span>
+                        <span class="welcome-card-text">Météo et volabilité des décollages autour de vous.</span>
+                    </button>
+                    <button type="button" class="welcome-card" data-action="navigate" data-args="LOGBOOK">
+                        <i class="ri-book-2-line" aria-hidden="true"></i>
+                        <span class="welcome-card-title">Carnet de vol</span>
+                        <span class="welcome-card-text">Vos vols, l'import de traces .igc et le suivi du matériel.</span>
+                    </button>
+                    <button type="button" class="welcome-card" data-action="navigate" data-args="QCM">
+                        <i class="ri-graduation-cap-line" aria-hidden="true"></i>
+                        <span class="welcome-card-title">Théorie</span>
+                        <span class="welcome-card-text">QCM officiels FFVL, examens blancs et révisions.</span>
+                    </button>
+                    <button type="button" class="welcome-card" data-action="navigate" data-args="LIBRARY">
+                        <i class="ri-archive-line" aria-hidden="true"></i>
+                        <span class="welcome-card-title">Bibliothèque</span>
+                        <span class="welcome-card-text">Les cours et livrets PDF officiels.</span>
+                    </button>
+                </div>
+            </section>
+
+            <p class="welcome-privacy">
+                Aucun compte requis : vos données restent sur cet appareil, sauf si vous vous connectez pour les
+                synchroniser.
+            </p>
+        </div>
     </div>
 
     <!-- LIBRARY SCREEN -->
