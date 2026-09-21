@@ -589,8 +589,12 @@ class LogbookViewClass extends BaseView {
                 </div>
                 <div class="form-group" id="igc-alt-check" style="display:none; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-light, #ccc); margin-bottom: 15px;">
                     <div id="igc-alt-info" style="font-size: 0.85rem; margin-bottom: 8px;"></div>
-                    <label for="lb-landing-alt">Altitude réelle de l'atterrissage (m) <small>(optionnel)</small></label>
-                    <input type="number" id="lb-landing-alt" style="width: 100%;" placeholder="Laisser vide pour garder l'altitude du vario">
+                    <div style="display:flex; gap: 16px; margin-bottom: 6px; font-size: 0.9rem;">
+                        <label style="display:flex; align-items:center; gap:4px;"><input type="radio" name="lb-alt-ref" value="landing" checked> Je connais l'altitude de l'atterrissage</label>
+                        <label style="display:flex; align-items:center; gap:4px;"><input type="radio" name="lb-alt-ref" value="takeoff"> du décollage</label>
+                    </div>
+                    <label for="lb-real-alt">Altitude réelle (m) <small>(optionnel)</small></label>
+                    <input type="number" id="lb-real-alt" style="width: 100%;" placeholder="Laisser vide pour garder l'altitude du vario">
                 </div>
                 <div class="form-group">
                     <label>Date & Heure <span class="required">*</span></label>
@@ -917,7 +921,7 @@ class LogbookViewClass extends BaseView {
         this.currentIgcAltOffset = existingOffset;
         const box = document.getElementById('igc-alt-check');
         const info = document.getElementById('igc-alt-info');
-        const input = document.getElementById('lb-landing-alt');
+        const input = document.getElementById('lb-real-alt');
         if (!box || !info || !input) return;
 
         const landing = Math.round(parsed.landingAlt);
@@ -930,16 +934,28 @@ class LogbookViewClass extends BaseView {
         info.innerHTML = suspicious
             ? `⚠️ <strong>Attention, c'est bizarre :</strong> altitude d'atterrissage négative (vario probablement mal calé au décollage). ${altitudes} Tu veux corriger ?`
             : `${altitudes} Tu peux les corriger si ton vario était mal calé.`;
+        // Le point de référence (atterro ou décollage) dont l'utilisateur connaît l'altitude réelle
+        const radios = box.querySelectorAll('input[name="lb-alt-ref"]');
+        const refAlt = () =>
+            box.querySelector('input[name="lb-alt-ref"]:checked').value === 'takeoff' ? takeoff : landing;
+        radios.forEach((r) => (r.checked = r.value === 'landing'));
         input.value = existingOffset ? landing + existingOffset : '';
 
         input.oninput = () => {
             const real = parseInt(input.value, 10);
-            this.currentIgcAltOffset = Number.isNaN(real) ? 0 : real - landing;
+            this.currentIgcAltOffset = Number.isNaN(real) ? 0 : real - refAlt();
             const altMaxInput = document.getElementById('lb-altMax');
             if (altMaxInput && parsed.maxAltitude !== null) {
                 altMaxInput.value = parsed.maxAltitude + this.currentIgcAltOffset;
             }
         };
+        // Changer de référence garde la correction en cours : on réaffiche juste l'altitude
+        // corrigée du nouveau point.
+        radios.forEach((r) => {
+            r.onchange = () => {
+                input.value = this.currentIgcAltOffset ? refAlt() + this.currentIgcAltOffset : '';
+            };
+        });
     }
 
     submitForm() {
