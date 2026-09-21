@@ -249,7 +249,7 @@ export const FirebaseAuthEngine = {
     },
 
     // Auth actions
-    signUp: async function (args, event, target) {
+    signUp: async function (_args, _event, target) {
         if (!isInitialized) return;
         this.clearAlerts();
 
@@ -301,7 +301,7 @@ export const FirebaseAuthEngine = {
         }
     },
 
-    signIn: async function (args, event, target) {
+    signIn: async function (_args, _event, target) {
         if (!isInitialized) return;
         this.clearAlerts();
 
@@ -400,7 +400,7 @@ export const FirebaseAuthEngine = {
             let deletedFlights = [];
             try {
                 deletedFlights = JSON.parse(localStorage.getItem('deleted_flights') || '[]');
-            } catch (e) {}
+            } catch {}
 
             if (deletedFlights.length > 0) {
                 for (const delId of deletedFlights) {

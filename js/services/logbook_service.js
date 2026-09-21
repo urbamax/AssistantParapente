@@ -74,7 +74,7 @@ class LogbookService {
         let deleted = [];
         try {
             deleted = JSON.parse(localStorage.getItem('deleted_flights') || '[]');
-        } catch (e) {}
+        } catch {}
         if (!deleted.includes(id)) {
             deleted.push(id);
             localStorage.setItem('deleted_flights', JSON.stringify(deleted));

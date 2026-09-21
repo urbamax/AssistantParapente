@@ -7,7 +7,6 @@ import GlobalState from './app_state.js';
 import AppRouter from './router.js';
 import AppEvents from './events.js?v=2026.09.19_v1';
 import UIManager from './ui_manager.js';
-import { escapeHTML } from './security.js';
 import GdprEngine from '../gdpr_engine.js';
 
 // Import Views
@@ -16,8 +15,6 @@ import LogbookView from '../views/logbook.js?v=2026.09.19_v1';
 import SitesView from '../views/sites.js?v=2026.09.19_v1';
 import LibraryView from '../views/manual.js?v=2026.09.19_v1';
 import QuizService from '../services/quiz_service.js?v=2026.09.19_v1';
-import SitesService from '../services/sites_service.js?v=2026.09.19_v1';
-import LogbookService from '../services/logbook_service.js';
 
 async function bootApplication() {
     console.time('BOOT_TOTAL');

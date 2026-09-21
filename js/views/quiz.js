@@ -1,5 +1,4 @@
 import GlobalState from '../core/app_state.js';
-import AppEvents from '../core/events.js';
 import AppRouter from '../core/router.js';
 import QuizService from '../services/quiz_service.js';
 import { escapeHTML } from '../core/security.js';
@@ -195,7 +194,7 @@ class QuizViewClass extends BaseView {
                     const value = rawValue.replace(/^'|'$/g, '');
                     args = [value];
                 }
-            } catch (err) {
+            } catch {
                 const value = rawValue.replace(/^'|'$/g, '');
                 args = [value];
             }
@@ -623,7 +622,7 @@ class QuizViewClass extends BaseView {
             }
 
             // Debug filtering
-            const levelQuestionEntries = allQuestionEntries.filter(([code, data]) => levelQuestionCodes.has(code));
+            const levelQuestionEntries = allQuestionEntries.filter(([code]) => levelQuestionCodes.has(code));
 
             // FALLBACK: If filtering returns 0 results but we have stats, it might be due to code mismatches.
             // In that case, we display everything to ensure the user sees their data.
@@ -647,7 +646,7 @@ class QuizViewClass extends BaseView {
             );
             if (notAttempted < 0) notAttempted = 0;
 
-            levelQuestionEntries.forEach(([code, data]) => {
+            levelQuestionEntries.forEach(([, data]) => {
                 if (data.total === 0) return;
                 const pct = Math.round((data.correct / data.total) * 100);
 
@@ -921,7 +920,7 @@ class QuizViewClass extends BaseView {
                         }
                     });
                 } else {
-                    visibleQuestions = sortedQuestions.filter(([code, data]) => {
+                    visibleQuestions = sortedQuestions.filter(([, data]) => {
                         const pct = Math.round((data.correct / data.total) * 100);
                         if (QuizView.state.masteryFilter === 'PERFECT') return pct === 100;
                         if (QuizView.state.masteryFilter === 'EXCELLENT') return pct >= 90 && pct < 100;
@@ -949,7 +948,7 @@ class QuizViewClass extends BaseView {
                 if (QuizView.state.themeFilter) {
                     displayLabel += ` • Thème: ${QuizView.state.themeFilter}`;
                     // Filter sortedQuestions again by theme
-                    visibleQuestions = visibleQuestions.filter(([code, data]) => {
+                    visibleQuestions = visibleQuestions.filter(([code]) => {
                         const qObj = QuizView.getQuestionByCode(code);
 
                         let qTheme = qObj && qObj.theme ? qObj.theme : null;
@@ -1037,7 +1036,7 @@ class QuizViewClass extends BaseView {
                     if (qObj && qObj.choices) {
                         answersHtml =
                             '<div class="question-answers" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">';
-                        qObj.choices.forEach((ans, idx) => {
+                        qObj.choices.forEach((ans) => {
                             const isCorrect = parseInt(ans.pts) > 0;
                             const answerStyle = isCorrect
                                 ? 'background:rgba(74, 222, 128, 0.1); border-left:3px solid #4ade80;'
@@ -1103,7 +1102,6 @@ class QuizViewClass extends BaseView {
             // Premium Circular Gauge Calculation
             const strokeDash = 2 * Math.PI * 55; // r=55
             const offset = strokeDash - (globalPct / 100) * strokeDash;
-            const colorGlow = color + '44'; // Add transparency for glow
 
             const successGaugeHtml = `
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
@@ -1141,8 +1139,6 @@ class QuizViewClass extends BaseView {
                 </div>
             </div>
         `;
-
-            const statsGridStyle = `display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:32px;`;
 
             container.innerHTML = `
             ${successGaugeHtml}
@@ -1370,7 +1366,7 @@ class QuizViewClass extends BaseView {
                             </div>
                             <div style="font-size: 0.9em; background: var(--bg-secondary, #f9f9f9); padding: 10px; border-radius: 6px;">
                                 ${q.reponses
-                                    .map((r, i) => {
+                                    .map((r) => {
                                         const isGood = r.points > 0;
                                         return `<div style="color: ${isGood ? '#22c55e' : 'var(--text-main, #666)'}; ${isGood ? 'font-weight: bold;' : 'margin-bottom: 4px;'}">${escapeHTML(r.texte)} ${isGood ? '✓' : ''}</div>`;
                                     })
@@ -1655,7 +1651,7 @@ class QuizViewClass extends BaseView {
                         : results
                               .filter((r) => !r.isCorrect)
                               .map(
-                                  (r, i) => `
+                                  (r) => `
                     <div class="bank-item" style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; background: var(--bg-card); box-shadow:0 2px 4px rgba(0,0,0,0.02);">
                         <div class="bank-item-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items:center;">
                             <span class="bank-item-code" style="font-family:monospace; font-size:0.85rem; color:var(--text-secondary); background:rgba(0,0,0,0.05); padding:4px 8px; border-radius:4px;">#${r.question.code}</span>

@@ -2,9 +2,6 @@
  * VIEW/CONTROLLER - LogbookView
  * Wrapped from logbook_engine.js
  */
-import GlobalState from '../core/app_state.js';
-import AppEvents from '../core/events.js';
-import AppRouter from '../core/router.js';
 import LogbookService from '../services/logbook_service.js';
 import Map3DComponent from '../components/map_3d.js';
 import StorageService from '../services/storage.js'; // Retained just for custom select lists
@@ -1595,15 +1592,6 @@ class LogbookViewClass extends BaseView {
                     secours: 'background: rgba(239, 68, 68, 0.1); color: #ef4444;',
                     accessoire: 'background: rgba(156, 163, 175, 0.1); color: #9ca3af;',
                 };
-
-                const equipIcon =
-                    equip.type === 'voile'
-                        ? 'ri-parachute-line'
-                        : equip.type === 'sellette'
-                          ? 'ri-shield-line'
-                          : equip.type === 'secours'
-                            ? 'ri-lifebuoy-line'
-                            : 'ri-settings-4-line';
 
                 const isArchive = equip.statut === 'archive';
                 const cardStyle = isArchive ? 'opacity: 0.6; filter: grayscale(0.8);' : '';
