@@ -5,6 +5,8 @@ import QuizService from '../services/quiz_service.js';
 import { escapeHTML } from '../core/security.js';
 import { formatDateTime } from '../utils/date_utils.js';
 import { truncate } from '../utils/text_utils.js';
+import { COURSES_DATA } from '../data/courses_data.js';
+import GdprEngine from '../gdpr_engine.js';
 
 /**
  * PURE VIEW - QuizView
@@ -495,7 +497,7 @@ class QuizViewClass extends BaseView {
         const container = document.getElementById('stats-content');
         if (!container) return;
 
-        if (window.GdprEngine && !window.GdprEngine.isConsentGranted('stats')) {
+        if (!GdprEngine.isConsentGranted('stats')) {
             container.innerHTML = `
                 <div style="padding:40px; text-align:center; color:var(--text-main); max-width: 500px; margin: 0 auto; display:flex; flex-direction:column; align-items:center; justify-content:center;">
                     <i class="ri-shield-user-line" style="font-size:3.5rem; color:var(--accent-blue); display:block; margin-bottom:20px;"></i>
@@ -1845,7 +1847,7 @@ class QuizViewClass extends BaseView {
     }
 
     saveExamHistory(level, score, total, results) {
-        if (window.GdprEngine && !window.GdprEngine.isConsentGranted('stats')) {
+        if (!GdprEngine.isConsentGranted('stats')) {
             console.log('Stats consent missing, skipping exam history save.');
             return;
         }
@@ -1985,7 +1987,6 @@ class QuizViewClass extends BaseView {
     getCourseUrl(questionCode) {
         const q = this.getQuestionByCode(questionCode);
         if (!q || !q.courseId || !q.coursePage) return null;
-        if (typeof COURSES_DATA === 'undefined') return null;
         const course = COURSES_DATA[q.courseId];
         if (!course || !course.pdf) return null;
         // Convention déjà utilisée pour ouvrir un PDF (manual.js openCourse) : chemin relatif

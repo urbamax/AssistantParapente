@@ -3,6 +3,7 @@
  * Wraps the legacy firebase_engine to preserve sync logic exactly as requested.
  */
 import StorageService from './storage.js';
+import GdprEngine from '../gdpr_engine.js';
 import GlobalState from '../core/app_state.js';
 import SitesService from './sites_service.js';
 import LogbookService from './logbook_service.js';
@@ -52,7 +53,7 @@ export const FirebaseAuthEngine = {
         }
 
         // GDPR (RGPD) consent guard
-        if (window.GdprEngine && !window.GdprEngine.isConsentGranted('firebase')) {
+        if (!GdprEngine.isConsentGranted('firebase')) {
             console.log('Firebase initialization bypassed: waiting for user GDPR consent.');
             this.enabled = false;
             this.updateHeaderUI();
@@ -209,7 +210,7 @@ export const FirebaseAuthEngine = {
         anonymousView.style.display = 'none';
         loggedInView.style.display = 'none';
 
-        const hasConsent = window.GdprEngine ? window.GdprEngine.isConsentGranted('firebase') : false;
+        const hasConsent = GdprEngine.isConsentGranted('firebase');
         const isFirebaseEnabledGlobally = typeof IS_FIREBASE_ENABLED !== 'undefined' && IS_FIREBASE_ENABLED;
 
         if (!isFirebaseEnabledGlobally) {

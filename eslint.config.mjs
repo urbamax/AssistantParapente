@@ -7,19 +7,13 @@ import globals from 'globals';
 // with a logic change. Reassess strictness (no-unused-vars as error, curly,
 // etc.) once this baseline has been live for a bit.
 const projectGlobals = {
-    // Legacy classic-script globals: this app is a zero-build-step SPA where
-    // most business logic is ES modules, but a handful of files (weatherScoring.js,
-    // gdpr_engine.js, igc_parser.js, map_3d.js, courses_data.js, firebase_config.js)
-    // are loaded as plain <script> tags and share one global scope with each other
-    // and with the module code that reads them off `window`.
+    // Globals restants : firebase_config.js (classic script, requis par sw.js) et
+    // quelques références historiques lues via `window`.
     Engine: 'readonly',
     FirebaseAuthEngine: 'readonly',
-    GdprEngine: 'readonly',
-    IGCParser: 'readonly',
     LibraryEngine: 'readonly',
     LogbookEngine: 'readonly',
     LogbookView: 'readonly',
-    Map3DComponent: 'readonly',
     QCM_OFFICIAL: 'readonly',
     QuizEngine: 'readonly',
     QuizService: 'readonly',
@@ -31,11 +25,9 @@ const projectGlobals = {
     StorageService: 'readonly',
     AdventureEngine: 'readonly',
     COMPONENTS: 'readonly',
-    COURSES_DATA: 'readonly',
     GENERATED_CONTENT: 'readonly',
     GlobalState: 'readonly',
     TEMPORARY_IGC_RAW: 'readonly',
-    evaluateSpotForecast: 'readonly',
     IS_FIREBASE_ENABLED: 'readonly',
     FIREBASE_CONFIG: 'readonly',
     FCM_VAPID_KEY: 'readonly',
@@ -84,25 +76,13 @@ export default [
         rules: baseRules,
     },
     {
-        // Classic (non-module) scripts: no import/export, share the page's
-        // global script scope instead.
-        files: [
-            'js/weatherScoring.js',
-            'js/gdpr_engine.js',
-            'js/firebase_config.js',
-            'js/components/map_3d.js',
-            'js/data/courses_data.js',
-            'js/services/igc_parser.js',
-        ],
+        // Seul script classique restant : sw.js le charge via importScripts(), ce qui
+        // exclut un module ES. Il déclare les globals que firebase_service.js lit.
+        files: ['js/firebase_config.js'],
         languageOptions: {
             sourceType: 'script',
         },
         rules: {
-            // These files intentionally declare the exact global (Map3DComponent,
-            // COURSES_DATA, FIREBASE_CONFIG, GdprEngine, IGCParser...) that
-            // `projectGlobals` above also lists — that entry exists so *other*
-            // files reading it get no-undef coverage, not to flag its own
-            // definition site.
             'no-redeclare': 'off',
         },
     },

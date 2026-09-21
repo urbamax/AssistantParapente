@@ -8,6 +8,7 @@ import LogbookService from '../services/logbook_service.js';
 import { WIND_DIRECTIONS } from '../data/weather_config.js';
 import { getSpotairWidgetId } from '../data/spotair_widgets.js';
 import { escapeHTML } from '../core/security.js';
+import GdprEngine from '../gdpr_engine.js';
 
 import BaseView from '../core/base_view.js';
 
@@ -219,12 +220,12 @@ class SitesViewClass extends BaseView {
         const inputEl = document.getElementById('address-input');
         const gpsBtn = document.getElementById('btn-use-gps');
 
-        if (window.GdprEngine && !window.GdprEngine.isConsentGranted('gps')) {
+        if (!GdprEngine.isConsentGranted('gps')) {
             if (!isInitialLoad) {
                 const openSettings = confirm(
                     'Vous devez autoriser la géolocalisation dans vos options de confidentialité.',
                 );
-                if (openSettings) window.GdprEngine.showModal('gdpr-settings-modal');
+                if (openSettings) GdprEngine.showModal('gdpr-settings-modal');
             }
             if (statusEl)
                 statusEl.innerHTML = `<i class="ri-shield-user-line" style="color: var(--text-muted);"></i> Géolocalisation désactivée. <a href="#" onclick="window.GdprEngine.showModal('gdpr-settings-modal'); return false;" style="color: var(--accent-blue);">Gérer</a>`;

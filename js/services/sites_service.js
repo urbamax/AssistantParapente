@@ -8,6 +8,7 @@ import { WIND_DIRECTIONS, WIND_THRESHOLDS, WEATHER_MODELS } from '../data/weathe
 import { calculateDistance, getAngularDifference, degreesToCardinal } from '../utils/geo_utils.js';
 import { removeAccents } from '../utils/text_utils.js';
 import { escapeHTML } from '../core/security.js';
+import { evaluateSpotForecast } from '../weatherScoring.js';
 
 class SitesService {
     constructor() {
