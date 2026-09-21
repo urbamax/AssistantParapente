@@ -587,6 +587,11 @@ class LogbookViewClass extends BaseView {
                     <div style="font-weight: bold; margin-top: 10px;">Importer une trace GPS (.igc)</div>
                     <div style="font-size: 0.85rem; color: var(--text-secondary, #666); margin-top: 5px;" id="igc-upload-filename">Cliquez ou glissez-déposez le fichier</div>
                 </div>
+                <div class="form-group" id="igc-alt-check" style="display:none; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-light, #ccc); margin-bottom: 15px;">
+                    <div id="igc-alt-info" style="font-size: 0.85rem; margin-bottom: 8px;"></div>
+                    <label for="lb-landing-alt">Altitude réelle de l'atterrissage (m) <small>(optionnel)</small></label>
+                    <input type="number" id="lb-landing-alt" style="width: 100%;" placeholder="Laisser vide pour garder l'altitude du vario">
+                </div>
                 <div class="form-group">
                     <label>Date & Heure <span class="required">*</span></label>
                     <input type="datetime-local" id="lb-datetime" required value="${defaultDateTime}">
@@ -816,6 +821,8 @@ class LogbookViewClass extends BaseView {
     currentTraceData = null;
     currentRawIgc = null;
     currentIgcStats = null;
+    // null = correction d'altitude non touchée dans ce formulaire (on ne réécrit pas altOffset)
+    currentIgcAltOffset = null;
 
     handleIgcUpload(event) {
         const file = event.target.files[0];
@@ -890,6 +897,7 @@ class LogbookViewClass extends BaseView {
                         });
                     }
                 }
+                this._setupAltitudeCheck(parsed);
                 console.log('[IGC] Trace parsée :', parsed.points.length, 'points, durée :', parsed.duration, 'min');
             } else {
                 alert('Erreur lors du parsing IGC : ' + flightStats.error);
@@ -899,6 +907,38 @@ class LogbookViewClass extends BaseView {
             }
         };
         reader.readAsText(file);
+    }
+
+    // La correction d'altitude est toujours proposée (optionnelle). Une altitude d'atterrissage
+    // négative trahit un vario mal calé : on le signale alors explicitement. Champ vide = on
+    // garde les altitudes du vario. `parsed` = trace brute (sans offset) ; existingOffset = la
+    // correction déjà enregistrée sur un vol qu'on rouvre en édition.
+    _setupAltitudeCheck(parsed, existingOffset = 0) {
+        this.currentIgcAltOffset = existingOffset;
+        const box = document.getElementById('igc-alt-check');
+        const info = document.getElementById('igc-alt-info');
+        const input = document.getElementById('lb-landing-alt');
+        if (!box || !info || !input) return;
+
+        const landing = Math.round(parsed.landingAlt);
+        const takeoff = Math.round(parsed.takeoffAlt);
+        const suspicious = landing < 0;
+
+        box.style.display = 'block';
+        box.style.borderColor = suspicious ? 'var(--accent-orange, #e67e22)' : 'var(--border-light, #ccc)';
+        info.innerHTML = suspicious
+            ? `⚠️ <strong>Attention, c'est bizarre :</strong> la trace indique une altitude d'atterrissage de <strong>${landing} m</strong> (vario probablement mal calé au décollage). Tu veux corriger ?`
+            : `Altitudes de la trace : décollage <strong>${takeoff} m</strong>, atterrissage <strong>${landing} m</strong>. Tu peux les corriger si ton vario était mal calé.`;
+        input.value = existingOffset ? landing + existingOffset : '';
+
+        input.oninput = () => {
+            const real = parseInt(input.value, 10);
+            this.currentIgcAltOffset = Number.isNaN(real) ? 0 : real - landing;
+            const altMaxInput = document.getElementById('lb-altMax');
+            if (altMaxInput && parsed.maxAltitude !== null) {
+                altMaxInput.value = parsed.maxAltitude + this.currentIgcAltOffset;
+            }
+        };
     }
 
     submitForm() {
@@ -985,6 +1025,11 @@ class LogbookViewClass extends BaseView {
                 session.rawIgc = this.currentRawIgc;
                 this.currentRawIgc = null; // reset
             }
+            // Le brut IGC reste inchangé : la correction est ré-appliquée à chaque lecture de la trace
+            if (this.currentIgcAltOffset !== null) {
+                session.altOffset = this.currentIgcAltOffset;
+                this.currentIgcAltOffset = null;
+            }
         } else {
             session.lieu = document.getElementById('lb-lieu').value.trim();
             const checkboxes = document.querySelectorAll('input[name="lb-typeExercice"]:checked');
@@ -1058,6 +1103,7 @@ class LogbookViewClass extends BaseView {
         if (cancelBtn) cancelBtn.style.display = 'none';
         this.currentTraceData = null;
         this.currentIgcStats = null;
+        this.currentIgcAltOffset = null;
         const filenameLabel = document.getElementById('igc-upload-filename');
         if (filenameLabel) filenameLabel.textContent = 'Cliquez ou glissez-déposez le fichier';
         this.renderForm();
@@ -1111,6 +1157,12 @@ class LogbookViewClass extends BaseView {
 
             if (session.altitudeMax) document.getElementById('lb-altMax').value = session.altitudeMax;
             if (session.gain) document.getElementById('lb-gain').value = session.gain;
+
+            // Vol déjà enregistré : on peut corriger (ou annuler) l'altitude d'une trace ajoutée avant
+            if (session.rawIgc) {
+                const raw = LogbookService.parseIGC(session.rawIgc);
+                if (raw.success) this._setupAltitudeCheck(raw.data, session.altOffset || 0);
+            }
 
             if (session.traceGps && session.traceGps.length > 0) {
                 const filenameLabel = document.getElementById('igc-upload-filename');
@@ -1300,7 +1352,7 @@ class LogbookViewClass extends BaseView {
 
         let points = session.traceGps;
         if (session.rawIgc) {
-            const result = LogbookService.parseIGC(session.rawIgc);
+            const result = LogbookService.parseIGC(session.rawIgc, session.altOffset || 0);
             if (result.success && result.data.points) {
                 points = result.data.points;
             } else {

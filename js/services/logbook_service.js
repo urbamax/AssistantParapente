@@ -237,18 +237,26 @@ class LogbookService {
         return nextRevDate;
     }
 
-    parseIGC(rawText) {
+    // altOffset (m) : correction constante ajoutée à toutes les altitudes de la trace, pour les
+    // vario mal calés au décollage (ex. atterro à -7 m alors qu'il est à 2 m). Un décalage
+    // constant ne change pas le gain, seulement les altitudes absolues.
+    parseIGC(rawText, altOffset = 0) {
         try {
             const parsed = IGCParser.parse(rawText);
             if (parsed && parsed.points && parsed.points.length > 0) {
+                const offset = Number.isFinite(altOffset) ? altOffset : 0;
+                const points = offset ? parsed.points.map((p) => ({ ...p, alt: p.alt + offset })) : parsed.points;
+                const hasMax = parsed.maxAltitude > -1000;
                 return {
                     success: true,
                     data: {
                         duration: parsed.duration || 0,
                         dateStr: parsed.dateStr || null,
-                        maxAltitude: parsed.maxAltitude > -1000 ? parsed.maxAltitude : null,
+                        maxAltitude: hasMax ? parsed.maxAltitude + Math.round(offset) : null,
                         gain: typeof parsed.gain === 'number' && !isNaN(parsed.gain) ? parsed.gain : null,
-                        points: parsed.points,
+                        points,
+                        takeoffAlt: points[0].alt,
+                        landingAlt: points[points.length - 1].alt,
                     },
                     error: null,
                 };

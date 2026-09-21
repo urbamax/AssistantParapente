@@ -80,6 +80,32 @@ describe('LogbookService - Core Functions', () => {
         parse.mockRestore();
     });
 
+    it('parseIGC applies altOffset to copies of the points and leaves the parsed data untouched', () => {
+        const parsedPoints = [
+            { lat: 45, lon: 6, alt: 1000 },
+            { lat: 45, lon: 6, alt: 1500 },
+            { lat: 45, lon: 6, alt: -7 },
+        ];
+        const parse = vi
+            .spyOn(IGCParser, 'parse')
+            .mockReturnValue({ points: parsedPoints, duration: 60, maxAltitude: 1500, gain: 500 });
+
+        const res = LogbookService.parseIGC('fake-raw-text', 9);
+        expect(res.data.points.map((p) => p.alt)).toEqual([1009, 1509, 2]);
+        expect(res.data.maxAltitude).toBe(1509);
+        expect(res.data.takeoffAlt).toBe(1009);
+        expect(res.data.landingAlt).toBe(2);
+        expect(res.data.gain).toBe(500);
+        // Les points d'origine ne sont pas mutés : la donnée brute reste brute
+        expect(parsedPoints.map((p) => p.alt)).toEqual([1000, 1500, -7]);
+
+        const raw = LogbookService.parseIGC('fake-raw-text');
+        expect(raw.data.points.map((p) => p.alt)).toEqual([1000, 1500, -7]);
+        expect(raw.data.landingAlt).toBe(-7);
+
+        parse.mockRestore();
+    });
+
     it('parseIGC reports failure when the file has no GPS points', () => {
         const res = LogbookService.parseIGC('fake-raw-text');
         expect(res.success).toBe(false);
