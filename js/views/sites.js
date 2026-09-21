@@ -8,6 +8,7 @@ import LogbookService from '../services/logbook_service.js';
 import { WIND_DIRECTIONS } from '../data/weather_config.js';
 import { getSpotairWidgetId } from '../data/spotair_widgets.js';
 import { escapeHTML } from '../core/security.js';
+import GdprEngine from '../gdpr_engine.js';
 
 import BaseView from '../core/base_view.js';
 
@@ -34,24 +35,6 @@ class SitesViewClass extends BaseView {
         SitesService.init();
         console.timeEnd('SITES_SERVICE_INIT');
 
-        // Rebuild structure if missing
-        const requiredIds = [
-            'address-status-message',
-            'address-input',
-            'btn-use-gps',
-            'limit-wind-min',
-            'limit-wind-max',
-            'limit-gust-delta',
-            'hide-unflyable-checkbox',
-            'weather-model-select',
-            'select-sort-mode',
-            'radius-slider',
-            'radius-val-label',
-            'forecast-slider',
-            'filter-mode-select',
-        ];
-        // The container already has the HTML injected via engine_v4_6 / index.html
-
         this.setupEventListeners();
         this.renderSavedLocations();
         console.time('SITES_SHOW_METHOD');
@@ -60,7 +43,7 @@ class SitesViewClass extends BaseView {
         console.timeEnd('SITES_MOUNT_TOTAL');
     }
 
-    toggleAdvancedSettings(btn) {
+    toggleAdvancedSettings() {
         const container = document.querySelector('.advanced-filters-container');
         const icon = document.getElementById('advanced-settings-toggle-icon');
         if (container) {
@@ -219,15 +202,15 @@ class SitesViewClass extends BaseView {
         const inputEl = document.getElementById('address-input');
         const gpsBtn = document.getElementById('btn-use-gps');
 
-        if (window.GdprEngine && !window.GdprEngine.isConsentGranted('gps')) {
+        if (!GdprEngine.isConsentGranted('gps')) {
             if (!isInitialLoad) {
                 const openSettings = confirm(
                     'Vous devez autoriser la géolocalisation dans vos options de confidentialité.',
                 );
-                if (openSettings) window.GdprEngine.showModal('gdpr-settings-modal');
+                if (openSettings) GdprEngine.showModal('gdpr-settings-modal');
             }
             if (statusEl)
-                statusEl.innerHTML = `<i class="ri-shield-user-line" style="color: var(--text-muted);"></i> Géolocalisation désactivée. <a href="#" onclick="window.GdprEngine.showModal('gdpr-settings-modal'); return false;" style="color: var(--accent-blue);">Gérer</a>`;
+                statusEl.innerHTML = `<i class="ri-shield-user-line" style="color: var(--text-muted);"></i> Géolocalisation désactivée. <a href="#" data-action="GdprshowModal" data-args="gdpr-settings-modal" data-prevent-default style="color: var(--accent-blue);">Gérer</a>`;
             return;
         }
 
@@ -267,7 +250,7 @@ class SitesViewClass extends BaseView {
                 SitesService.scheduleWeatherRescopeIfNeeded();
                 if (this.state.map) this.updateMapMarkers();
             },
-            (error) => {
+            () => {
                 if (!isInitialLoad) alert("Impossible d'obtenir votre position GPS.");
                 if (statusEl) {
                     statusEl.innerHTML = `<i class="ri-error-warning-line" style="color: var(--accent-red);"></i> Position GPS indisponible.`;
@@ -416,7 +399,7 @@ class SitesViewClass extends BaseView {
             this._progZoomTimeout = setTimeout(() => {
                 this.state.isProgrammaticZoom = false;
             }, 1000);
-        } catch (e) {
+        } catch {
             this.state.map.setView([50.5, 2.5], 9);
         }
 
@@ -1625,7 +1608,7 @@ class SitesViewClass extends BaseView {
                 const windTags = orientations
                     .map(
                         (w) =>
-                            `<span class="wind-tag" onclick="event.stopPropagation(); SitesView.filterByTag('${w}');" title="Filtrer par vent ${w}">${w}</span>`,
+                            `<span class="wind-tag" data-action="SitesfilterByTag" data-args="${escapeHTML(w)}" title="Filtrer par vent ${w}">${w}</span>`,
                     )
                     .join('');
 
@@ -1633,7 +1616,7 @@ class SitesViewClass extends BaseView {
                 const siteTypes = Array.isArray(st) ? st : [st];
                 const typeLabel = siteTypes
                     .map((t) => {
-                        return `<span class="site-coords-badge site-type-badge" onclick="event.stopPropagation(); SitesView.filterByType('${t}');" style="cursor: pointer;" title="Filtrer par type ${t}">${t}</span>`;
+                        return `<span class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="${escapeHTML(t)}" style="cursor: pointer;" title="Filtrer par type ${t}">${t}</span>`;
                     })
                     .join(' ');
 
@@ -1744,7 +1727,7 @@ class SitesViewClass extends BaseView {
                     if (j === SitesService.state.forecastOffset) {
                         dotStyle += ` outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);`;
                     }
-                    timelineBarsHtml += `<div class="timeline-hour-dot" style="${dotStyle}" title="${timeStr} : ${statusLabel}" onclick="event.stopPropagation(); SitesService.setForecastOffset(${j});"></div>`;
+                    timelineBarsHtml += `<div class="timeline-hour-dot" style="${dotStyle}" title="${timeStr} : ${statusLabel}" data-action="SitessetForecastOffset" data-args="${j}"></div>`;
                 }
 
                 const isFav =
@@ -1803,7 +1786,7 @@ class SitesViewClass extends BaseView {
             } else if (Object.keys(wear).length > 0) {
                 equipmentHtml = '<span style="color: var(--accent-green); font-weight: 600;">Matériel à jour</span>';
             }
-        } catch (e) {
+        } catch {
             // Carnet non disponible : on garde le message par défaut plutôt que de faire planter la carte.
         }
 
@@ -1844,7 +1827,7 @@ class SitesViewClass extends BaseView {
         const spotairBadgeHtml = spotairId
             ? `
         <button class="site-coords-badge site-spotair-badge" data-spotair-id="${spotairId}" data-site-id="${site.id}"
-            onclick="SitesView.openSpotairModal(this.dataset.spotairId, this.dataset.siteId)"
+            data-action="SitesopenSpotairModal"
             title="Voir le vent en direct (SpotAiR)">
             <i class="ri-windy-line"></i> Balise
         </button>
@@ -2153,6 +2136,4 @@ class SitesViewClass extends BaseView {
 }
 
 const SitesView = new SitesViewClass();
-window.SitesView = SitesView;
-window.SitesService = SitesService;
 export default SitesView;

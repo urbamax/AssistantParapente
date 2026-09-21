@@ -503,4 +503,4 @@ const Map3DComponent = {
     },
 };
 
-window.Map3DComponent = Map3DComponent;
+export default Map3DComponent;

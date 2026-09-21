@@ -1,4 +1,5 @@
 import StorageService from './storage.js';
+import IGCParser from './igc_parser.js';
 
 class LogbookService {
     constructor() {
@@ -73,7 +74,7 @@ class LogbookService {
         let deleted = [];
         try {
             deleted = JSON.parse(localStorage.getItem('deleted_flights') || '[]');
-        } catch (e) {}
+        } catch {}
         if (!deleted.includes(id)) {
             deleted.push(id);
             localStorage.setItem('deleted_flights', JSON.stringify(deleted));
@@ -237,12 +238,8 @@ class LogbookService {
     }
 
     parseIGC(rawText) {
-        if (typeof window.IGCParser === 'undefined') {
-            return { success: false, data: null, error: 'IGCParser library is not loaded.' };
-        }
-
         try {
-            const parsed = window.IGCParser.parse(rawText);
+            const parsed = IGCParser.parse(rawText);
             if (parsed && parsed.points && parsed.points.length > 0) {
                 return {
                     success: true,

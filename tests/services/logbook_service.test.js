@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import LogbookService from '../../js/services/logbook_service.js';
 import StorageService from '../../js/services/storage.js';
+import IGCParser from '../../js/services/igc_parser.js';
 
 describe('LogbookService - Core Functions', () => {
     beforeEach(() => {
@@ -61,29 +62,27 @@ describe('LogbookService - Core Functions', () => {
         expect(window.FirebaseAuthEngine.deleteLogbookEntry).toHaveBeenCalledWith(f1.id);
     });
 
-    it('parseIGC correctly delegates to window.IGCParser', () => {
-        window.IGCParser = {
-            parse: vi.fn().mockReturnValue({
-                points: [{ lat: 45, lon: 6 }],
-                duration: 60,
-                dateStr: '2026-08-21',
-                maxAltitude: 1000,
-                gain: 500,
-            }),
-        };
+    it('parseIGC correctly delegates to IGCParser', () => {
+        const parse = vi.spyOn(IGCParser, 'parse').mockReturnValue({
+            points: [{ lat: 45, lon: 6 }],
+            duration: 60,
+            dateStr: '2026-08-21',
+            maxAltitude: 1000,
+            gain: 500,
+        });
 
         const res = LogbookService.parseIGC('fake-raw-text');
         expect(res.success).toBe(true);
         expect(res.data.duration).toBe(60);
         expect(res.data.gain).toBe(500);
-        expect(window.IGCParser.parse).toHaveBeenCalledWith('fake-raw-text');
+        expect(parse).toHaveBeenCalledWith('fake-raw-text');
 
-        window.IGCParser = undefined;
+        parse.mockRestore();
     });
 
-    it('parseIGC handles missing parser gracefully', () => {
+    it('parseIGC reports failure when the file has no GPS points', () => {
         const res = LogbookService.parseIGC('fake-raw-text');
         expect(res.success).toBe(false);
-        expect(res.error).toBe('IGCParser library is not loaded.');
+        expect(res.error).toBe('No valid GPS data found in file.');
     });
 });

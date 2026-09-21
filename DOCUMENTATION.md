@@ -281,7 +281,8 @@ Supports three theme modes:
 When modifying or expanding the codebase, follow these rules strictly:
 
 ### 1. Preserving Architecture Rules
-- **Do NOT introduce bundlers** (Webpack, Vite, Rollup) unless explicitly requested. The site must remain instantly runnable via standard web servers (`python3 -m http.server` or `npx serve`).
+- **The source must stay runnable without a build**: the app is native ES modules served as-is by any static server (`python3 -m http.server` or `npx serve`). Vite (`npm run build`) is only used to produce an optimized `dist/`; never make the source depend on Vite-only features (no `import.meta.env`, no bare-module imports, no Vite plugins that change semantics).
+- **Runtime-fetched files** (`components/`, `courses/`, `img/`, `manifest.json`, `js/firebase_config.js`, the `js/data` JSON/CSV) are not in the import graph: if you add a new one, list it in `STATIC_PATHS` in `vite.config.mjs` so it is copied into `dist/`.
 - **Maintain ES6 Imports**: Always specify file extensions in import statements (e.g., `import GlobalState from './app_state.js';`).
 - **Use Event Delegation**: Never write inline event handlers in rendered HTML strings (e.g. avoid `onclick="doSomething()"`). Use `data-action="doSomething"` and `data-args="..."`.
 
@@ -312,6 +313,13 @@ To run a local server for testing:
 python3 -m http.server 8000
 # Open http://localhost:8000 in browser
 ```
+
+To produce an optimized build (hashed and minified JS/CSS, versioned service worker):
+```bash
+npm run build      # outputs dist/
+npm run preview    # serves dist/ locally
+```
+The build rewrites `sw.js` into `dist/sw.js`: the precache list is generated from the emitted files and `CACHE_NAME` is derived from their names, so no manual `bump.py` is needed for a `dist/` deployment.
 
 ---
 
