@@ -1176,41 +1176,6 @@ class SitesViewClass extends BaseView {
         if (menu) menu.classList.toggle('show');
     }
 
-    toggleFilter(category, value, isChecked) {
-        // Legacy toggleFilter wrapper for external callers
-        if (isChecked) {
-            if (category === 'wind') {
-                SitesService.state.filterWindExclude = SitesService.state.filterWindExclude.filter((w) => w !== value);
-                if (!SitesService.state.filterWindInclude.includes(value))
-                    SitesService.state.filterWindInclude.push(value);
-                SitesService.state.filterWind = SitesService.state.filterWindInclude;
-            } else {
-                SitesService.state.filterTypeExclude = SitesService.state.filterTypeExclude.filter((t) => t !== value);
-                if (!SitesService.state.filterTypeInclude.includes(value))
-                    SitesService.state.filterTypeInclude.push(value);
-                SitesService.state.filterType = SitesService.state.filterTypeInclude;
-            }
-        } else {
-            if (category === 'wind') {
-                SitesService.state.filterWindInclude = SitesService.state.filterWindInclude.filter((w) => w !== value);
-                SitesService.state.filterWindExclude = SitesService.state.filterWindExclude.filter((w) => w !== value);
-                SitesService.state.filterWind = SitesService.state.filterWindInclude;
-            } else {
-                SitesService.state.filterTypeInclude = SitesService.state.filterTypeInclude.filter((t) => t !== value);
-                SitesService.state.filterTypeExclude = SitesService.state.filterTypeExclude.filter((t) => t !== value);
-                SitesService.state.filterType = SitesService.state.filterTypeInclude;
-            }
-        }
-        this.updateBadges();
-        this.renderDropdowns();
-        this.savePreferences();
-        this.renderList();
-        SitesService.scheduleWeatherRescopeIfNeeded();
-        if (this.state.map) {
-            this.updateMapMarkers();
-        }
-    }
-
     updateBadges() {
         const badgeWind = document.getElementById('badge-wind');
         const badgeType = document.getElementById('badge-type');

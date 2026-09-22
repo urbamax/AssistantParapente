@@ -907,7 +907,7 @@ class SitesService {
                     this.updateMapMarkers();
                 }
             } else {
-                this.requestGpsLocation();
+                sitesView()?.requestGpsLocation();
             }
         } else {
             this.renderList();

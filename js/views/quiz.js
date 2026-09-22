@@ -1080,7 +1080,7 @@ class QuizViewClass extends BaseView {
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#${code}</span>
-                                    ${QuizView.getCourseUrl(code, qText) ? `<button data-action="openUrl" data-url="${escapeHTML(QuizView.getCourseUrl(code, qText))}" style="background:var(--accent-blue); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>` : ''}
+                                    ${QuizView.getCourseUrl(code) ? `<button data-action="openUrl" data-url="${escapeHTML(QuizView.getCourseUrl(code))}" style="background:var(--accent-blue); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>` : ''}
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">${theme}</span>
                                     ${streak >= 3 ? `<span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 ${streak}</span>` : ''}
                                     ${hasAnswers ? '<i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-' + code + '"></i>' : ''}
@@ -1362,19 +1362,21 @@ class QuizViewClass extends BaseView {
             html += `<div style="display: flex; flex-direction: column; gap: 15px;">`;
 
             errors.forEach((err) => {
-                const q = QuizService.allQuestions.find((qq) => qq.code === err.code);
+                // Exam history stores the full question object already (see QuizService.saveExamToHistory),
+                // no lookup by code needed or possible: results never carried a `code` field.
+                const q = err.question;
                 if (q) {
                     html += `
                         <div class="card error-card" style="border-left: 3px solid #ef4444; padding: 15px; border-radius: 8px; background: var(--bg-card, #fff); box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                             <div style="margin-bottom: 10px;">
-                                <strong style="color: var(--text-main, #333);">${escapeHTML(q.code)} - ${escapeHTML(q.theme)}</strong><br>
-                                <p style="margin: 8px 0; color: var(--text-main, #333);">${escapeHTML(q.texte)}</p>
+                                <strong style="color: var(--text-main, #333);">${escapeHTML(q.code)} - ${escapeHTML(err.theme || q.theme)}</strong><br>
+                                <p style="margin: 8px 0; color: var(--text-main, #333);">${escapeHTML(q.question)}</p>
                             </div>
                             <div style="font-size: 0.9em; background: var(--bg-secondary, #f9f9f9); padding: 10px; border-radius: 6px;">
-                                ${q.reponses
-                                    .map((r) => {
-                                        const isGood = r.points > 0;
-                                        return `<div style="color: ${isGood ? '#22c55e' : 'var(--text-main, #666)'}; ${isGood ? 'font-weight: bold;' : 'margin-bottom: 4px;'}">${escapeHTML(r.texte)} ${isGood ? '✓' : ''}</div>`;
+                                ${q.choices
+                                    .map((c) => {
+                                        const isGood = c.pts > 0;
+                                        return `<div style="color: ${isGood ? '#22c55e' : 'var(--text-main, #666)'}; ${isGood ? 'font-weight: bold;' : 'margin-bottom: 4px;'}">${escapeHTML(c.text)} ${isGood ? '✓' : ''}</div>`;
                                     })
                                     .join('')}
                             </div>

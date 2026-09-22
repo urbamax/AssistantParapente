@@ -286,6 +286,9 @@ When modifying or expanding the codebase, follow these rules strictly:
 - **Maintain ES6 Imports**: Always specify file extensions in import statements (e.g., `import GlobalState from './app_state.js';`).
 - **Use Event Delegation**: Never write inline event handlers in rendered HTML strings (e.g. avoid `onclick="doSomething()"`). Use `data-action="doSomething"` and `data-args="..."`.
 
+### JS type checking (optional, best-effort)
+`npm run typecheck` runs plain TypeScript's `checkJs` over `js/**/*.js` (config: `jsconfig.json`, ambient types for CDN globals in `types/`). It's not wired into CI and won't reach 0 errors: most of what it reports is `document.getElementById()` returning a bare `HTMLElement` (no `.value`, `.checked`, etc. without a cast), which is expected for a codebase with no `/** @type {...} */` casts at every DOM read — not a bug list. Run it after a change to a service/view file to catch the kind of error it's actually good at: a wrong property name, a function called with the wrong arguments, a reference to something that was renamed or removed elsewhere. `sw.js` is excluded (service worker globals need a different `lib` set than the rest of the app, which targets the browser DOM).
+
 ### 2. Event Handler Registration Rule
 When creating new interactive actions in views, register them in `main.js`:
 ```javascript
