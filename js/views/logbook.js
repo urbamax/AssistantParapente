@@ -394,7 +394,7 @@ class LogbookViewClass extends BaseView {
 
             let html = '<option value="">-- Choisir ou Saisie Libre --</option>';
             sortedVals.forEach((val) => {
-                html += `<option value="${val}">${val}</option>`;
+                html += `<option value="${escapeHTML(val)}">${escapeHTML(val)}</option>`;
             });
             html += '<option value="Autre">Autre...</option>';
             selectEl.innerHTML = html;
@@ -645,7 +645,9 @@ class LogbookViewClass extends BaseView {
                         ${(() => {
                             const parsed = StorageService.get('customDecollageTechniques');
                             if (Array.isArray(parsed))
-                                return parsed.map((t) => `<option value="${t}">${t}</option>`).join('');
+                                return parsed
+                                    .map((t) => `<option value="${escapeHTML(t)}">${escapeHTML(t)}</option>`)
+                                    .join('');
                             return '';
                         })()}
                         <option value="Autre">Autre...</option>
@@ -795,9 +797,9 @@ class LogbookViewClass extends BaseView {
             .filter((e) => e.statut !== 'archive')
             .forEach((equip) => {
                 if (equip.type === 'voile') {
-                    voilesHtml += `<option value="${equip.nom}">${equip.nom}</option>`;
+                    voilesHtml += `<option value="${escapeHTML(equip.nom)}">${escapeHTML(equip.nom)}</option>`;
                 } else if (equip.type === 'sellette') {
-                    sellettesHtml += `<option value="${equip.nom}">${equip.nom}</option>`;
+                    sellettesHtml += `<option value="${escapeHTML(equip.nom)}">${escapeHTML(equip.nom)}</option>`;
                 }
             });
 
@@ -1683,7 +1685,7 @@ class LogbookViewClass extends BaseView {
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
                                 <div class="equip-name" style="font-size:1.1rem; font-weight:600;">
-                                    ${equip.nom}
+                                    ${escapeHTML(equip.nom)}
                                     <span class="session-badge" style="margin-left: 8px; font-size:0.75rem; padding:2px 6px; border-radius:4px; ${typeBadgeColors[equip.type] || ''}">${equip.type.toUpperCase()}</span>
                                     ${isArchive ? '<span class="session-badge" style="margin-left: 4px; background: #333; color: white; font-size:0.75rem; padding:2px 6px; border-radius:4px;">ARCHIVÉ</span>' : ''}
                                 </div>
