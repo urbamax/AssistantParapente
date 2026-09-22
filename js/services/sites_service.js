@@ -325,8 +325,45 @@ class SitesService {
         return primaryFlyable === secondaryFlyable;
     }
 
+    // Après un lot rejeté par Open-Meteo malgré les 3 tentatives ci-dessous, on arrête
+    // d'appeler l'API pendant ce délai : réessayer plus vite ne fait que reproduire le même
+    // 429 (le quota par IP est horaire, pas minute), et ça vide le quota un peu plus à chaque
+    // tentative ratée. sites.js désactive "Réessayer" et affiche un compte à rebours pendant
+    // ce temps ; getWeatherCooldownRemainingMs() lui permet de le calculer.
+    static WEATHER_COOLDOWN_MS = 3 * 60 * 1000;
+
+    getWeatherCooldownRemainingMs() {
+        return Math.max(0, (this._weatherCooldownUntil || 0) - Date.now());
+    }
+
+    // Un seul essai supplémentaire à +2s ne laisse pas le temps au quota par minute de
+    // se reconstituer : Open-Meteo a déjà re-rejeté ce deuxième essai en pratique (cf. #22
+    // pour le même correctif côté carnet de vol). 3 tentatives avec un backoff croissant
+    // (immédiat, +3s, +12s) restent sous un délai total raisonnable pour un lot, tout en
+    // laissant une vraie chance au quota de se libérer.
+    async _fetchWithBackoff(url, signal) {
+        const delaysMs = [0, 3000, 12000];
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        let response;
+        for (let attempt = 0; attempt < delaysMs.length; attempt++) {
+            if (delaysMs[attempt]) await sleep(delaysMs[attempt]);
+            response = await fetch(url, { signal });
+            if (response.status !== 429) return response;
+        }
+        return response;
+    }
+
     async fetchWeatherForSites() {
         if (typeof SITES_DATA === 'undefined' || SITES_DATA.length === 0) return;
+
+        const cooldownRemaining = this.getWeatherCooldownRemainingMs();
+        if (cooldownRemaining > 0) {
+            return {
+                success: false,
+                error: { message: 'Service météo momentanément saturé' },
+                cooldownRemainingMs: cooldownRemaining,
+            };
+        }
 
         // On ne récupère la météo QUE pour les sites que les filtres actuels
         // (recherche, rayon, favoris, orientation, type) laissent réellement
@@ -366,7 +403,7 @@ class SitesService {
             // Séquentiel (pas Promise.all) : 5 lots tirés en même temps se sont déjà
             // fait rejeter en bloc par Open-Meteo avec un 429 "Hourly API request
             // limit exceeded" — un seul lot à la fois, avec une pause entre chaque
-            // et une reprise après backoff sur 429, reste sous ce seuil.
+            // et un backoff sur 429 (voir _fetchWithBackoff), reste sous ce seuil.
             const chunkResults = [];
             for (const chunkSites of chunks) {
                 const chunkLats = chunkSites.map((s) => parseFloat(s.latitude || s.lat)).join(',');
@@ -381,10 +418,9 @@ class SitesService {
                     continue;
                 }
 
-                let response = await fetch(url, { signal: this.abortController.signal });
+                const response = await this._fetchWithBackoff(url, this.abortController.signal);
                 if (response.status === 429) {
-                    await sleep(2000);
-                    response = await fetch(url, { signal: this.abortController.signal });
+                    this._weatherCooldownUntil = Date.now() + SitesService.WEATHER_COOLDOWN_MS;
                 }
                 if (!response.ok) {
                     throw new Error(`Open-Meteo HTTP ${response.status} pour un lot de ${chunkSites.length} sites`);
@@ -399,7 +435,7 @@ class SitesService {
             results = chunkResults.flat();
         } catch (e) {
             console.error('Erreur lors de la récupération météo:', e);
-            return { success: false, error: e };
+            return { success: false, error: e, cooldownRemainingMs: this.getWeatherCooldownRemainingMs() };
         }
 
         try {
