@@ -8,6 +8,7 @@ describe('SitesService', () => {
         SitesService.state.filterWindInclude = [];
         SitesService.state.filterWindExclude = [];
         SitesService._weatherCache = new Map(); // avoid cross-test hits on the 10-min weather cache
+        SitesService._weatherCooldownUntil = 0; // avoid cross-test hits on the post-429 cooldown
         global.SITES_DATA = [
             {
                 id: 1,
@@ -128,6 +129,47 @@ describe('SitesService', () => {
 
         // The service should catch the error and not crash
         expect(Object.keys(SitesService.state.weatherForecasts)).toHaveLength(0);
+    });
+
+    it('fetchWeatherForSites retries a 429 with backoff and succeeds once the quota frees up', async () => {
+        vi.useFakeTimers();
+        const mockApiResponse = [{ latitude: 45.9, longitude: 6.1, hourly: { time: [], wind_speed_10m: [] } }];
+        global.fetch
+            .mockResolvedValueOnce({ ok: false, status: 429 })
+            .mockResolvedValueOnce({ ok: true, status: 200, json: vi.fn().mockResolvedValue(mockApiResponse) });
+
+        const pending = SitesService.fetchWeatherForSites();
+        await vi.advanceTimersByTimeAsync(3000);
+        await pending;
+
+        expect(global.fetch).toHaveBeenCalledTimes(2);
+        expect(SitesService.state.weatherForecasts[1]).toBeDefined();
+        expect(SitesService.getWeatherCooldownRemainingMs()).toBe(0);
+        vi.useRealTimers();
+    });
+
+    it('fetchWeatherForSites gives up after 3 attempts and starts a cooldown', async () => {
+        vi.useFakeTimers();
+        global.fetch.mockResolvedValue({ ok: false, status: 429 });
+
+        const pending = SitesService.fetchWeatherForSites();
+        await vi.advanceTimersByTimeAsync(20000);
+        const result = await pending;
+
+        expect(global.fetch).toHaveBeenCalledTimes(3);
+        expect(result.success).toBe(false);
+        expect(result.cooldownRemainingMs).toBeGreaterThan(0);
+        vi.useRealTimers();
+    });
+
+    it('fetchWeatherForSites skips the network entirely while the cooldown is active', async () => {
+        SitesService._weatherCooldownUntil = Date.now() + 60000;
+
+        const result = await SitesService.fetchWeatherForSites();
+
+        expect(global.fetch).not.toHaveBeenCalled();
+        expect(result.success).toBe(false);
+        expect(result.cooldownRemainingMs).toBeGreaterThan(0);
     });
 
     it('filter functions update state correctly', () => {

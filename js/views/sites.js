@@ -60,8 +60,41 @@ class SitesViewClass extends BaseView {
         }
     }
 
+    // Désactive le bouton "Réessayer" de la bannière météo pendant le cooldown (voir
+    // SitesService.WEATHER_COOLDOWN_MS) plutôt que de laisser l'utilisateur le re-déclencher
+    // aussitôt et re-provoquer le même 429 : Open-Meteo limite par heure, pas par clic.
+    _startWeatherRetryCountdown(remainingMs) {
+        clearInterval(this._weatherRetryInterval);
+        const btn = document.getElementById('weather-retry-btn');
+        if (!btn || remainingMs <= 0) return;
+
+        const label = () => {
+            const remaining = Math.max(0, remainingMs);
+            const mins = Math.ceil(remaining / 60000);
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+            btn.textContent = `Réessayer dans ${mins} min`;
+        };
+        label();
+
+        this._weatherRetryInterval = setInterval(() => {
+            remainingMs -= 1000;
+            if (remainingMs <= 0) {
+                clearInterval(this._weatherRetryInterval);
+                btn.disabled = false;
+                btn.style.opacity = '';
+                btn.style.cursor = '';
+                btn.textContent = 'Réessayer';
+                return;
+            }
+            label();
+        }, 1000);
+    }
+
     async unmount() {
         await super.unmount();
+        clearInterval(this._weatherRetryInterval);
         if (SitesService.activeFetchController) {
             SitesService.activeFetchController.abort();
             SitesService.activeFetchController = null;
@@ -339,10 +372,11 @@ class SitesViewClass extends BaseView {
                         <div style="color:var(--accent-red, #ef4444); font-size: 0.95rem; text-align: center; padding: 16px; margin-bottom: 16px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: var(--radius-lg); width: 100%;">
                             <i class="ri-error-warning-line" style="font-size: 1.2rem; vertical-align: middle; margin-right: 8px;"></i>
                             <strong>Météo indisponible :</strong> ${result.error?.message || 'Erreur réseau'}
-                            <button data-action="fetchWeatherForSites" class="action-btn-primary" style="margin-left: 12px; padding: 4px 12px; font-size: 0.8rem; border-radius: var(--radius-pill);">Réessayer</button>
+                            <button id="weather-retry-btn" data-action="fetchWeatherForSites" class="action-btn-primary" style="margin-left: 12px; padding: 4px 12px; font-size: 0.8rem; border-radius: var(--radius-pill);">Réessayer</button>
                         </div>
                     `;
                         container.insertAdjacentHTML('afterbegin', errorHtml);
+                        this._startWeatherRetryCountdown(result.cooldownRemainingMs || 0);
                     }
                 } else {
                     this.updateForecastLabel();
