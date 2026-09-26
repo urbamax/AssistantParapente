@@ -44,9 +44,40 @@ let isInitialized = false;
 const LAST_SYNC_STORAGE_KEY = 'firebase_last_sync';
 
 // We will expose this engine to the window object so it can be called from non-module scripts
+const SYNC_DOT_TITLES = {
+    syncing: 'Synchronisation cloud en cours…',
+    pending: 'Modifications pas encore envoyées au cloud (hors ligne ou échec) : nouvel essai automatique.',
+    idle: '',
+};
+
 export const FirebaseAuthEngine = {
     enabled: false,
     currentUser: null,
+
+    // --- État du voyant de synchronisation (point dans le header) ---
+    // _changeSeq augmente à chaque modification locale à envoyer ; _syncedSeq retient la
+    // dernière modification confirmée par une synchro complète réussie. Tant que
+    // _changeSeq > _syncedSeq, des données locales ne sont pas dans le cloud (hors ligne,
+    // échec) : le voyant reste orange au lieu de s'éteindre comme si tout était envoyé.
+    _changeSeq: 0,
+    _syncedSeq: 0,
+    _syncsInFlight: 0,
+
+    markUnsyncedChange: function () {
+        this._changeSeq++;
+        this._updateSyncStatus();
+    },
+
+    getSyncStatus: function () {
+        if (!this.currentUser) return 'idle';
+        if (this._syncsInFlight > 0 || this._debounceSyncTimer) return 'syncing';
+        if (this._changeSeq > this._syncedSeq) return 'pending';
+        return 'idle';
+    },
+
+    _updateSyncStatus: function () {
+        GlobalState.set('syncStatus', this.getSyncStatus());
+    },
 
     // --- Getter / Setter pour lastSyncTime ---
     // Persisté dans le localStorage pour survivre aux rechargements de page.
@@ -63,12 +94,15 @@ export const FirebaseAuthEngine = {
 
     // Initialize Firebase
     init: async function () {
-        // Petit point de statut dans le header (à côté du bouton profil), indépendant de
-        // l'activation Firebase : reflète GlobalState.isSyncing pendant qu'une synchro cloud
-        // est en attente ou en cours.
-        GlobalState.subscribe('isSyncing', (isSyncing) => {
+        // Petit point de statut dans le header (à côté du bouton profil) : bleu clignotant
+        // pendant une synchro, orange fixe s'il reste des modifications non envoyées, caché
+        // quand tout est dans le cloud (voir getSyncStatus).
+        GlobalState.subscribe('syncStatus', (status) => {
             const dot = document.getElementById('sync-active-dot');
-            if (dot) dot.classList.toggle('active', !!isSyncing);
+            if (!dot) return;
+            dot.classList.toggle('active', status === 'syncing' || status === 'pending');
+            dot.classList.toggle('pending', status === 'pending');
+            dot.title = SYNC_DOT_TITLES[status] || '';
         });
 
         if (typeof IS_FIREBASE_ENABLED === 'undefined' || !IS_FIREBASE_ENABLED) {
@@ -134,6 +168,7 @@ export const FirebaseAuthEngine = {
                 } else {
                     console.log('User logged out');
                     this.currentUser = null;
+                    this._updateSyncStatus(); // déconnecté : plus de voyant
                     // On réinitialise lastSyncTime à la déconnexion pour ne pas afficher
                     // une heure de synchro qui appartient à une autre session.
                     this.lastSyncTime = null;
@@ -427,7 +462,11 @@ export const FirebaseAuthEngine = {
     syncDataWithCloud: async function (silent = false) {
         if (!this.currentUser) return { success: false, data: null, error: 'Not logged in' };
 
-        GlobalState.set('isSyncing', true);
+        // Toutes les modifications faites jusqu'ici partent avec cette synchro ; une modification
+        // faite pendant qu'elle tourne (seq plus grand) restera à envoyer.
+        const seqAtStart = this._changeSeq;
+        this._syncsInFlight++;
+        this._updateSyncStatus();
         if (!silent) {
             this.showStatus('Synchronisation en cours...', 'info');
         }
@@ -690,7 +729,9 @@ export const FirebaseAuthEngine = {
             if (!silent) {
                 this.showStatus('Synchronisé avec le cloud !', 'success');
             }
-            GlobalState.set('isSyncing', false);
+            this._syncsInFlight--;
+            this._syncedSeq = Math.max(this._syncedSeq, seqAtStart);
+            this._updateSyncStatus();
             return { success: true, data: null, error: null };
         } catch (error) {
             console.error('Synchronization failed:', error);
@@ -701,7 +742,8 @@ export const FirebaseAuthEngine = {
                     'error',
                 );
             }
-            GlobalState.set('isSyncing', false);
+            this._syncsInFlight--;
+            this._updateSyncStatus(); // les modifications restent « en attente » (orange)
             return { success: false, data: null, error: error.message };
         }
     },
@@ -723,29 +765,32 @@ export const FirebaseAuthEngine = {
             clearTimeout(this._debounceSyncTimer);
         }
 
-        // Dès qu'une synchro est mise en file (même avant le déclenchement réel après le
-        // délai), on affiche l'état "en attente" — GlobalState.isSyncing repasse à false
-        // seulement à la fin de syncDataWithCloud, une fois la synchro effective terminée.
-        GlobalState.set('isSyncing', true);
-
-        // Repousse de 2 secondes pour regrouper les changements rapides
+        // Repousse de 2 secondes pour regrouper les changements rapides. Pendant ce délai le
+        // voyant est bleu (getSyncStatus voit le timer), puis suit la vraie synchro.
         this._debounceSyncTimer = setTimeout(() => {
             this._debounceSyncTimer = null;
             if (this.currentUser && navigator.onLine) {
                 console.log('[Firebase] Synchro debounced déclenchée après modification utilisateur.');
                 this.syncDataWithCloud(true); // silent = true (pas d'alerte UI intrusive)
             } else {
-                // Hors ligne ou déconnecté : rien à synchroniser pour l'instant, on ne laisse
-                // pas l'indicateur bloqué sur "en cours" indéfiniment.
-                GlobalState.set('isSyncing', false);
+                // Hors ligne : la modification reste à envoyer (voyant orange). La synchro de
+                // rattrapage au retour du réseau (événement 'online') l'enverra.
+                this._updateSyncStatus();
             }
         }, 2000);
+        this.markUnsyncedChange();
     },
 
     // Write-through updates to Cloud when user makes progress
     saveStatsToCloud: async function () {
         if (!this.currentUser || !this.enabled)
             return { success: false, data: null, error: 'Not enabled or logged in' };
+        // Hors ligne, l'écriture Firestore ne répond qu'au retour du réseau : on le signale
+        // tout de suite (voyant orange) et la synchro de rattrapage 'online' s'en chargera.
+        if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+            this.markUnsyncedChange();
+            return { success: false, data: null, error: 'Offline' };
+        }
 
         try {
             const { doc, setDoc } = await loadFirestoreModule();
@@ -761,6 +806,7 @@ export const FirebaseAuthEngine = {
             return { success: true, data: null, error: null };
         } catch (error) {
             console.error('Incremental QCM stats sync failed:', error);
+            this.markUnsyncedChange(); // renvoyé par la prochaine synchro complète
             return { success: false, data: null, error: error.message };
         }
     },
@@ -768,6 +814,12 @@ export const FirebaseAuthEngine = {
     saveHistoryToCloud: async function () {
         if (!this.currentUser || !this.enabled)
             return { success: false, data: null, error: 'Not enabled or logged in' };
+        // Hors ligne, l'écriture Firestore ne répond qu'au retour du réseau : on le signale
+        // tout de suite (voyant orange) et la synchro de rattrapage 'online' s'en chargera.
+        if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+            this.markUnsyncedChange();
+            return { success: false, data: null, error: 'Offline' };
+        }
 
         try {
             const { doc, setDoc } = await loadFirestoreModule();
@@ -783,6 +835,7 @@ export const FirebaseAuthEngine = {
             return { success: true, data: null, error: null };
         } catch (error) {
             console.error('Incremental exam history sync failed:', error);
+            this.markUnsyncedChange(); // renvoyé par la prochaine synchro complète
             return { success: false, data: null, error: error.message };
         }
     },
