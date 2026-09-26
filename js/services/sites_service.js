@@ -437,11 +437,23 @@ class SitesService {
     }
 
     async fetchWeatherForSites() {
+        // Plusieurs déclencheurs (show(), changeWeatherModel(), scheduleWeatherRescopeIfNeeded())
+        // peuvent chacun poser cet indicateur puis retourner tôt (cooldown, aucun site) ou
+        // s'annuler mutuellement : sans ce nettoyage à chaque sortie, il reste bloqué à l'écran
+        // dès que ce n'est pas l'appel qui l'avait créé qui termine en dernier.
+        const clearLoadingIndicator = () => {
+            document.getElementById('weather-loading-indicator')?.remove();
+        };
+
         const allSites = this.getSites();
-        if (allSites.length === 0) return;
+        if (allSites.length === 0) {
+            clearLoadingIndicator();
+            return;
+        }
 
         const cooldownRemaining = this.getWeatherCooldownRemainingMs();
         if (cooldownRemaining > 0) {
+            clearLoadingIndicator();
             return {
                 success: false,
                 error: { message: 'Service météo momentanément saturé' },
@@ -456,7 +468,10 @@ class SitesService {
         // à quelques dizaines de sites, ce qui évite de saturer le quota Open-Meteo
         // et rend le chargement bien plus rapide.
         const activeSites = this.getGeoFilteredSites(allSites);
-        if (activeSites.length === 0) return;
+        if (activeSites.length === 0) {
+            clearLoadingIndicator();
+            return;
+        }
 
         // Open-Meteo (derrière nginx) répond 414 "Request-URI Too Large" au-delà
         // d'environ 8-9 Ko d'URL (~500-600 sites en une seule requête). On découpe
@@ -478,7 +493,8 @@ class SitesService {
         if (this.abortController) {
             this.abortController.abort();
         }
-        this.abortController = new AbortController();
+        const controller = new AbortController();
+        this.abortController = controller;
 
         const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -502,7 +518,7 @@ class SitesService {
                     continue;
                 }
 
-                const response = await this._fetchWithBackoff(url, this.abortController.signal);
+                const response = await this._fetchWithBackoff(url, controller.signal);
                 if (response.status === 429) {
                     this._weatherCooldownUntil = Date.now() + SitesService.WEATHER_COOLDOWN_MS;
                 }
@@ -518,6 +534,14 @@ class SitesService {
             }
             results = chunkResults.flat();
         } catch (e) {
+            // Un appel plus récent à fetchWeatherForSites() (filtre changé, GPS mis à jour,
+            // modèle météo changé...) a annulé celui-ci pour prendre le relais : ce n'est pas
+            // un vrai échec réseau. Le laisser afficher "Météo indisponible" ici écraserait
+            // (ou courrait après) le résultat de l'appel plus récent, qui gère déjà l'UI.
+            if (e.name === 'AbortError' && this.abortController !== controller) {
+                return { success: null };
+            }
+            clearLoadingIndicator();
             console.error('Erreur lors de la récupération météo:', e);
             return { success: false, error: e, cooldownRemainingMs: this.getWeatherCooldownRemainingMs() };
         }
@@ -648,8 +672,10 @@ class SitesService {
                 const percentage = slider.max > 0 ? (this.state.forecastOffset / slider.max) * 100 : 0;
                 slider.style.background = `linear-gradient(to right, var(--accent-blue) 0%, var(--accent-blue) ${percentage}%, rgba(255,255,255,0.1) ${percentage}%, rgba(255,255,255,0.1) 100%)`;
             }
+            clearLoadingIndicator();
             return { success: true };
         } catch (e) {
+            clearLoadingIndicator();
             console.error('Erreur lors de la récupération météo:', e);
             return { success: false, error: e };
         }

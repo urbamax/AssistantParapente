@@ -359,6 +359,11 @@ class SitesViewClass extends BaseView {
             }
 
             SitesService.fetchWeatherForSites().then((result) => {
+                // success === null : cet appel a été annulé par un appel plus récent (filtre,
+                // GPS ou modèle météo changé entre-temps) — pas un échec, on laisse cet appel
+                // plus récent gérer seul le spinner et la bannière d'erreur éventuelle.
+                if (result && result.success === null) return;
+
                 console.timeEnd('SITES_FETCH_WEATHER');
 
                 const indicator = document.getElementById('weather-loading-indicator');
