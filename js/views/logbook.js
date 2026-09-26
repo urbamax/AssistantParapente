@@ -153,12 +153,23 @@ class LogbookViewClass extends BaseView {
 
     // Site officiel le plus proche d'un point GPS (ex: décollage détecté depuis une trace
     // IGC), dans un rayon raisonnable. Retourne null si aucun site officiel n'est assez proche.
+    // Types de sites d'où l'on décolle. Un site uniquement ATTERRO, KITE, GONFLAGE, INTERDIT…
+    // ne doit jamais être proposé comme lieu d'un vol importé.
+    static TAKEOFF_SITE_TYPES = ['NATUREL', 'TREUIL', 'SOARING', 'THERMIQUE', 'DUNE', 'PENTE-ÉCOLE', 'MARCHE ET VOL'];
+
+    isTakeoffSite(site) {
+        if (!site || site.affiche === false) return false;
+        const types = Array.isArray(site.type) ? site.type : [site.type];
+        return types.some((t) => LogbookViewClass.TAKEOFF_SITE_TYPES.includes(t));
+    }
+
     findNearestSite(lat, lon, maxDistanceKm = 2) {
         if (lat === null || lon === null) return null;
 
         let nearest = null;
         let nearestDist = Infinity;
         SitesService.getSites().forEach((site) => {
+            if (!this.isTakeoffSite(site)) return;
             const coords = this.getSiteCoords(site);
             if (coords.lat === null || coords.lon === null) return;
             const dist = this.haversineDistanceKm(lat, lon, coords.lat, coords.lon);
@@ -851,7 +862,7 @@ class LogbookViewClass extends BaseView {
         if (filenameLabel) filenameLabel.textContent = `Fichier chargé : ${file.name}`;
 
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
             const text = e.target.result;
             this.currentRawIgc = text;
 
@@ -885,16 +896,25 @@ class LogbookViewClass extends BaseView {
                 }
 
                 const siteInput = document.getElementById('lb-site');
+                // Le vrai décollage (pas forcément le 1er point : vario allumé au parking,
+                // montée à pied…), voir IGCParser.detectTakeoffIndex.
+                const takeoff = parsed.points[parsed.takeoffIndex] || parsed.points[0];
+                if (siteInput && !siteInput.value.trim()) {
+                    // La liste des sites se charge en arrière-plan au démarrage : un import
+                    // fait juste après l'ouverture de l'app ne doit pas la trouver vide.
+                    await SitesService.ensureSitesLoaded().catch(() => null);
+                }
+                // Re-vérifié après l'attente : le pilote a pu saisir le lieu entre-temps.
                 if (siteInput && !siteInput.value.trim()) {
                     // 1. Un site officiel connu tout près du décollage détecté : on l'utilise
                     // directement, c'est plus fiable et plus utile qu'un nom de ville/lieu-dit.
-                    const nearestSite = this.findNearestSite(parsed.points[0].lat, parsed.points[0].lon);
+                    const nearestSite = this.findNearestSite(takeoff.lat, takeoff.lon);
                     if (nearestSite) {
                         siteInput.value = nearestSite.nom || nearestSite.name;
                     } else {
                         // 2. Sinon, reverse-geocoding vers la ville/lieu-dit le plus proche.
                         siteInput.value = 'Recherche du lieu...';
-                        LogbookService.reverseGeocode(parsed.points[0].lat, parsed.points[0].lon).then((res) => {
+                        LogbookService.reverseGeocode(takeoff.lat, takeoff.lon).then((res) => {
                             if (res.success && res.data.city) {
                                 siteInput.value = `${res.data.city} (Import GPS)`;
                             } else {
