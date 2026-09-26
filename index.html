@@ -92,6 +92,7 @@
     <link rel="stylesheet" href="css/gdpr.css?v=2026.09.20_v1">
     <link rel="stylesheet" href="css/logbook.css?v=2026.09.20_v1">
     <link rel="stylesheet" href="css/welcome.css?v=2026.09.20_v1">
+    <link rel="stylesheet" href="css/safety.css?v=2026.09.20_v1">
 </head>
 
 <body>
@@ -344,6 +345,12 @@
                 synchroniser.
             </p>
         </div>
+    </div>
+
+    <!-- SAFETY SCREEN (urgence, check-lists, SIGR : rendu par js/views/safety.js) -->
+    <div id="safety-screen" class="mode-screen">
+        <div id="safety-root" class="safety-container"></div>
+        <div class="app-footer-placeholder"></div>
     </div>
 
     <!-- LIBRARY SCREEN -->
@@ -1987,6 +1994,16 @@
     <script type="module" src="js/core/main.js?v=2026.09.20_v1"></script>
     <!-- Floating Main Navigation -->
     <nav class="desktop-main-nav" id="desktop-main-nav">
+        <div class="theory-nav-group nav-dropdown" style="position: relative; display: flex; align-items: center;">
+            <button class="nav-menu-btn" data-target="THEORY" data-action="toggleTheorySubBar">
+                <i class="ri-graduation-cap-line"></i> <span class="nav-text">Théorie</span>
+            </button>
+            <div id="theory-sub-bar" class="sub-bar nav-dropdown-menu" style="display: none; position: absolute; top: auto; bottom: calc(100% + 15px); left: 0; background: var(--bg-card, #fff); border: 1px solid var(--border-color, #eee); border-radius: 12px; padding: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 1000; flex-direction: column; min-width: 140px;">
+                <button class="nav-menu-btn" data-target="QCM" data-action="navigate" data-args="QCM" style="width: 100%; flex-direction: row; justify-content: flex-start; padding: 10px;"><i class="ri-file-list-3-line"></i> <span class="nav-text" style="display:inline;">QCM</span></button>
+                <button class="nav-menu-btn" data-target="LIBRARY" data-action="navigate" data-args="LIBRARY" style="width: 100%; flex-direction: row; justify-content: flex-start; padding: 10px;"><i class="ri-book-open-line"></i> <span class="nav-text" style="display:inline;">Biblio</span></button>
+                <button class="nav-menu-btn" data-target="STATS" data-action="navigate" data-args="STATS" style="width: 100%; flex-direction: row; justify-content: flex-start; padding: 10px;"><i class="ri-bar-chart-2-line"></i> <span class="nav-text" style="display:inline;">Stats</span></button>
+            </div>
+        </div>
         <button class="nav-menu-btn" data-target="SITES" data-action="navigate" data-args="SITES">
             <i class="ri-map-pin-line"></i> <span class="nav-text">Sites</span>
         </button>
@@ -1994,16 +2011,9 @@
             <i class="ri-booklet-line"></i> <span class="nav-text">Carnet</span>
             <span id="logbook-nav-badge" class="nav-badge" title="Matériel à réviser"></span>
         </button>
-        <div class="theory-nav-group nav-dropdown" style="position: relative; display: flex; align-items: center;">
-            <button class="nav-menu-btn" data-target="THEORY" data-action="toggleTheorySubBar">
-                <i class="ri-graduation-cap-line"></i> <span class="nav-text">Théorie</span>
-            </button>
-            <div id="theory-sub-bar" class="sub-bar nav-dropdown-menu" style="display: none; position: absolute; top: auto; bottom: calc(100% + 15px); left: 50%; transform: translateX(-50%); background: var(--bg-card, #fff); border: 1px solid var(--border-color, #eee); border-radius: 12px; padding: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 1000; flex-direction: column; min-width: 140px;">
-                <button class="nav-menu-btn" data-target="QCM" data-action="navigate" data-args="QCM" style="width: 100%; flex-direction: row; justify-content: flex-start; padding: 10px;"><i class="ri-file-list-3-line"></i> <span class="nav-text" style="display:inline;">QCM</span></button>
-                <button class="nav-menu-btn" data-target="LIBRARY" data-action="navigate" data-args="LIBRARY" style="width: 100%; flex-direction: row; justify-content: flex-start; padding: 10px;"><i class="ri-book-open-line"></i> <span class="nav-text" style="display:inline;">Biblio</span></button>
-                <button class="nav-menu-btn" data-target="STATS" data-action="navigate" data-args="STATS" style="width: 100%; flex-direction: row; justify-content: flex-start; padding: 10px;"><i class="ri-bar-chart-2-line"></i> <span class="nav-text" style="display:inline;">Stats</span></button>
-            </div>
-        </div>
+        <button class="nav-menu-btn nav-menu-btn-safety" data-target="SAFETY" data-action="navigate" data-args="SAFETY">
+            <i class="ri-alarm-warning-line"></i> <span class="nav-text">Sécurité</span>
+        </button>
         <button class="nav-menu-btn" data-target="MANUAL" data-action="showManual" data-args="'contextual'">
             <i class="ri-information-line"></i> <span class="nav-text">Manuel</span>
         </button>

@@ -19,6 +19,7 @@ import SitesView from '../views/sites.js';
 import LibraryView from '../views/manual.js';
 import QuizService from '../services/quiz_service.js';
 import WelcomeView from '../views/welcome.js';
+import SafetyView from '../views/safety.js';
 import { resolveStartMode } from './start_mode.js';
 
 async function bootApplication() {
@@ -167,6 +168,22 @@ async function bootApplication() {
         SitesView.openSpotairModal(target.dataset.spotairId, target.dataset.siteId),
     );
 
+    // Safety (écran Secours / check-lists / SIGR)
+    [
+        'switchTab',
+        'locate',
+        'copyPosition',
+        'sharePosition',
+        'toggleCheck',
+        'resetChecklist',
+        'readChecklist',
+        'answerReady',
+        'resetReady',
+        'ratePlate',
+    ].forEach((action) => {
+        AppEvents.register('Safety' + action, (args, e, t) => SafetyView[action](args, e, t));
+    });
+
     // Generic UI helpers
     AppEvents.register('reloadApp', () => window.location.reload());
     AppEvents.register('openUrl', (_args, _e, target) => window.open(target.dataset.url, '_blank', 'noopener'));
@@ -257,6 +274,7 @@ async function bootApplication() {
     AppRouter.register('SITES', SitesView);
     AppRouter.register('LIBRARY', LibraryView);
     AppRouter.register('WELCOME', WelcomeView);
+    AppRouter.register('SAFETY', SafetyView);
 
     // 4. Initialize History API
     AppRouter.initHistory();
