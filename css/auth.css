@@ -439,6 +439,12 @@ body.light-mode .auth-sync-status {
     display: block;
 }
 
+/* Modifications locales pas encore envoyées (hors ligne / échec) : orange fixe */
+.sync-active-dot.pending {
+    background: #f59e0b;
+    animation: none;
+}
+
 @keyframes sync-pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.4; transform: scale(0.75); }
