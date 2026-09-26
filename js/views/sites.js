@@ -1677,6 +1677,15 @@ class SitesViewClass extends BaseView {
 
                 let weatherHtml;
                 let weather = null;
+                // Distingue "jamais interrogé" (weatherForecasts[site.id] absent) de "requête
+                // terminée mais Open-Meteo n'a renvoyé aucune heure exploitable pour ce site"
+                // (entrée présente mais vide, ex: coordonnées hors couverture) : sans ça, ce
+                // deuxième cas réaffiche indéfiniment "Chargement météo..." puisque plus rien
+                // ne vient jamais la remplacer.
+                const hasWeatherEntry = Object.prototype.hasOwnProperty.call(
+                    SitesService.state.weatherForecasts,
+                    site.id,
+                );
                 const forecasts = SitesService.state.weatherForecasts[site.id] || [];
                 if (forecasts && forecasts[SitesService.state.forecastOffset]) {
                     weather = forecasts[SitesService.state.forecastOffset];
@@ -1694,6 +1703,13 @@ class SitesViewClass extends BaseView {
                                     <i class="${status.icon}"></i> ${status.reason}
                                 </span>
                             </div>
+                        </div>
+                    `;
+                } else if (hasWeatherEntry) {
+                    weatherHtml = `
+                        <div class="weather-loading">
+                            <i class="ri-error-warning-line"></i>
+                            <span>Météo indisponible pour ce site</span>
                         </div>
                     `;
                 } else {
