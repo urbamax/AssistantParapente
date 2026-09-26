@@ -1,21 +1,59 @@
 {
   "name": "Assistant Parapente",
   "short_name": "Parapente",
-  "description": "Assistant web progressif dédié aux pilotes de parapente.",
+  "id": "./",
+  "lang": "fr",
+  "description": "Assistant web progressif dédié aux pilotes de parapente : sites de vol, météo temps réel, carnet de vol numérique et préparation aux brevets FFVL.",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#2563eb",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#000205",
+  "theme_color": "#ff7a00",
+  "categories": ["sports", "weather", "utilities"],
   "icons": [
     {
       "src": "./img/icons/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "./img/icons/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Sécurité : urgence & check-lists",
+      "short_name": "Sécurité",
+      "description": "Procédure d'urgence, position GPS et check-lists avant le vol",
+      "url": "./index.html?mode=SAFETY",
+      "icons": [{ "src": "./img/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Sites & Météo",
+      "short_name": "Sites",
+      "description": "Consulter les décollages et la météo volable",
+      "url": "./index.html?mode=SITES",
+      "icons": [{ "src": "./img/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Carnet de Vol",
+      "short_name": "Carnet",
+      "description": "Enregistrer un vol ou analyser une trace IGC",
+      "url": "./index.html?mode=LOGBOOK",
+      "icons": [{ "src": "./img/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "QCM Brevets FFVL",
+      "short_name": "QCM",
+      "description": "Réviser les questions d'examen FFVL",
+      "url": "./index.html?mode=QCM",
+      "icons": [{ "src": "./img/icons/icon-192x192.png", "sizes": "192x192" }]
     }
   ]
 }

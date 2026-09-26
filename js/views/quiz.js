@@ -5,6 +5,7 @@ import StorageService from '../services/storage.js';
 import { escapeHTML } from '../core/security.js';
 import { formatDateTime } from '../utils/date_utils.js';
 import { truncate } from '../utils/text_utils.js';
+import { toSorted } from '../utils/array_utils.js';
 import { COURSES_DATA } from '../data/courses_data.js';
 import GdprEngine from '../gdpr_engine.js';
 
@@ -60,26 +61,8 @@ class QuizViewClass extends BaseView {
         this.renderExamResults();
     }
 
-    // Index QCM_OFFICIAL.questions par code/id une seule fois : évite un .find() linéaire
-    // (O(n) par question affichée) répété sur ~850 questions à chaque rendu des stats.
-    _getQuestionMap() {
-        const list =
-            typeof QCM_OFFICIAL !== 'undefined' && window.QCM_OFFICIAL.questions ? window.QCM_OFFICIAL.questions : null;
-        if (!list) return null;
-        if (this._questionMapSource !== list) {
-            this._questionMap = new Map();
-            list.forEach((q) => {
-                this._questionMap.set(q.code, q);
-                if (q.id !== undefined && q.id !== q.code) this._questionMap.set(q.id, q);
-            });
-            this._questionMapSource = list;
-        }
-        return this._questionMap;
-    }
-
     getQuestionByCode(code) {
-        const map = this._getQuestionMap();
-        return map ? map.get(code) || null : null;
+        return QuizService.getQuestionByCode(code);
     }
 
     async mount(container) {
@@ -301,7 +284,7 @@ class QuizViewClass extends BaseView {
         const searchInput = document.getElementById('bank-search');
         const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-        let sourceData = window.QCM_OFFICIAL && window.QCM_OFFICIAL.questions ? window.QCM_OFFICIAL.questions : [];
+        let sourceData = QuizService.getQuestions();
 
         // Filter by selected level
         const level = GlobalState.get('level') || 'BI';
@@ -539,7 +522,8 @@ class QuizViewClass extends BaseView {
             return;
         }
 
-        if (typeof QCM_OFFICIAL === 'undefined' || !window.QCM_OFFICIAL.questions) {
+        const questions = QuizService.getQuestions();
+        if (!questions || !questions.length) {
             container.innerHTML = `
                 <div style="padding:40px; text-align:center; color:white;">
                     <i class="ri-error-warning-line" style="font-size:3rem; color:#b91c1c; display:block; margin-bottom:20px;"></i>
@@ -573,37 +557,27 @@ class QuizViewClass extends BaseView {
 
             if (currentLevel === 'ALL') {
                 // For global view, use all PARAPENTE questions
-                levelQs = window.QCM_OFFICIAL.questions.filter((q) => q.parapente === true);
+                levelQs = questions.filter((q) => q.parapente === true);
                 console.log('DEBUG ALL FILTER: Total parapente questions:', levelQs.length);
             } else if (currentLevel === 'BI') {
                 // BI = Contains suffix V AND parapente
-                levelQs = window.QCM_OFFICIAL.questions.filter(
-                    (q) => q.parapente === true && q.code && q.code.includes('V'),
-                );
+                levelQs = questions.filter((q) => q.parapente === true && q.code && q.code.includes('V'));
                 console.log(`DEBUG BI FILTER: Found ${levelQs.length} questions (Suffix contains V).`);
             } else if (currentLevel === 'BP') {
                 // BP = Contains suffix B AND parapente
-                levelQs = window.QCM_OFFICIAL.questions.filter(
-                    (q) => q.parapente === true && q.code && q.code.includes('B'),
-                );
+                levelQs = questions.filter((q) => q.parapente === true && q.code && q.code.includes('B'));
                 console.log(`DEBUG BP FILTER: Found ${levelQs.length} questions (Suffix contains B).`);
             } else if (currentLevel === 'BPC') {
                 // BPC = Contains suffix M AND parapente
-                levelQs = window.QCM_OFFICIAL.questions.filter(
-                    (q) => q.parapente === true && q.code && q.code.includes('M'),
-                );
+                levelQs = questions.filter((q) => q.parapente === true && q.code && q.code.includes('M'));
                 console.log(`DEBUG BPC FILTER: Found ${levelQs.length} questions (Suffix contains M).`);
             } else if (currentLevel === 'TREUIL') {
                 // TREUIL = Contains suffix T AND parapente
-                levelQs = window.QCM_OFFICIAL.questions.filter(
-                    (q) => q.parapente === true && q.code && q.code.includes('T'),
-                );
+                levelQs = questions.filter((q) => q.parapente === true && q.code && q.code.includes('T'));
                 console.log(`DEBUG TREUIL FILTER: Found ${levelQs.length} questions (Suffix contains T).`);
             } else {
                 // Fallback
-                levelQs = window.QCM_OFFICIAL.questions.filter(
-                    (q) => q.parapente === true && q.class && q.class.includes(currentLevel),
-                );
+                levelQs = questions.filter((q) => q.parapente === true && q.class && q.class.includes(currentLevel));
             }
 
             // Deduplicate and Filter levelQs (Fix for erroneous 198 count vs 174)
@@ -613,7 +587,7 @@ class QuizViewClass extends BaseView {
             if (levelQs.length > 0) {
                 totalLevelQuestions = levelQs.length;
                 levelQs.forEach((q) => levelQuestionCodes.add(q.code));
-                console.log(`Found ${totalLevelQuestions} questions for level ${currentLevel} in QCM_OFFICIAL`);
+                console.log(`Found ${totalLevelQuestions} questions for level ${currentLevel} in QCM dataset`);
             }
 
             // Calculate question distribution for CURRENT LEVEL
@@ -672,27 +646,34 @@ class QuizViewClass extends BaseView {
 
             let accumulatedMastery = 0;
 
-            // Calculate Theme Stats dynamically for THIS LEVEL
+            // Calculate Theme Stats dynamically for THIS LEVEL using ES2024 Object.groupBy
             const levelThemes = {};
 
             if (levelQs) {
-                levelQs.forEach((q) => {
-                    const qStat = stats.questions[q.code];
-                    const theme = q.theme || 'Autre';
+                const groupedByTheme = Object.groupBy
+                    ? Object.groupBy(levelQs, (q) => q.theme || 'Autre')
+                    : levelQs.reduce((acc, q) => {
+                          const t = q.theme || 'Autre';
+                          (acc[t] = acc[t] || []).push(q);
+                          return acc;
+                      }, {});
 
-                    if (!levelThemes[theme]) {
-                        levelThemes[theme] = { mastery: 0, totalQuestions: 0, attemptedCount: 0 };
+                for (const [theme, questions] of Object.entries(groupedByTheme)) {
+                    let mastery = 0;
+                    let attemptedCount = 0;
+                    for (const q of questions) {
+                        const qStat = stats.questions[q.code];
+                        if (qStat && qStat.total > 0) {
+                            mastery += qStat.correct / qStat.total;
+                            attemptedCount++;
+                        }
                     }
-
-                    // Always count this question toward the theme total
-                    levelThemes[theme].totalQuestions++;
-
-                    // Per-question mastery score: correct/total ratio (0–1), or 0 if not attempted
-                    if (qStat && qStat.total > 0) {
-                        levelThemes[theme].mastery += qStat.correct / qStat.total;
-                        levelThemes[theme].attemptedCount++;
-                    }
-                });
+                    levelThemes[theme] = {
+                        mastery,
+                        totalQuestions: questions.length,
+                        attemptedCount,
+                    };
+                }
             }
 
             // Iterate over ALL unique questions for this level (attempted or not)
@@ -770,8 +751,8 @@ class QuizViewClass extends BaseView {
 
             let themesHtml = '';
 
-            // Sort Themes
-            const sortedThemes = Object.entries(levelThemes).sort((a, b) => {
+            // Sort Themes immutably
+            const sortedThemes = toSorted(Object.entries(levelThemes), (a, b) => {
                 let valA, valB;
 
                 if (QuizView.state.themeSort === 'rate') {
@@ -901,10 +882,8 @@ class QuizViewClass extends BaseView {
             // Use levelQuestionEntries computed earlier to show only relevant questions
 
             if (levelQuestionEntries.length > 0) {
-                // Sort by success rate (worst first) by default
-                // Create a copy to avoid mutating the original array if used elsewhere?
-                // Although here it's fine as we are at the end.
-                const sortedQuestions = [...levelQuestionEntries].sort((a, b) => {
+                // Sort by success rate (worst first) immutably using ES2023 toSorted
+                const sortedQuestions = toSorted(levelQuestionEntries, (a, b) => {
                     const pctA = a[1].total > 0 ? a[1].correct / a[1].total : 0;
                     const pctB = b[1].total > 0 ? b[1].correct / b[1].total : 0;
                     return pctA - pctB;

@@ -1,5 +1,25 @@
 import StorageService from './storage.js';
+import IDBStorage from './idb_storage.js';
 import IGCParser from './igc_parser.js';
+
+// Garantit que les champs consommés directement par un rendu (ex: subtitle.toLowerCase()
+// dans LogbookView) ne sont jamais undefined/null, quelle que soit la provenance de
+// l'enregistrement (formulaire, fusion Firestore, import JSON, ancien format IndexedDB).
+// Sans ça, un seul enregistrement incomplet peut faire planter toute une vue plutôt que
+// de simplement s'afficher avec un champ vide.
+function normalizeFlight(f) {
+    if (!f || typeof f !== 'object') return f;
+    if (f.typeVol === undefined || f.typeVol === null) f.typeVol = '';
+    if (f.typeExercice === undefined || f.typeExercice === null) f.typeExercice = '';
+    return f;
+}
+
+function normalizeEquipment(e) {
+    if (!e || typeof e !== 'object') return e;
+    if (e.nom === undefined || e.nom === null) e.nom = '';
+    if (e.type === undefined || e.type === null) e.type = '';
+    return e;
+}
 
 class LogbookService {
     constructor() {
@@ -11,14 +31,89 @@ class LogbookService {
     loadData() {
         this.flights = StorageService.get(StorageService.KEYS.LOGBOOK_DATA) || [];
         if (!Array.isArray(this.flights)) this.flights = [];
+        this.flights.forEach(normalizeFlight);
         this.flights.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
 
         this.equipment = StorageService.get(StorageService.KEYS.EQUIPMENT_DATA) || [];
         if (!Array.isArray(this.equipment)) this.equipment = [];
+        this.equipment.forEach(normalizeEquipment);
+
+        // Asynchronously sync/migrate with IndexedDB. Stored so callers that render flight data
+        // (LogbookView.mount) can await it and avoid a render that briefly misses rawIgc-only
+        // traces while this in-memory swap is still in flight (see whenReady()).
+        this._readyPromise = this.initIndexedDB().catch((err) =>
+            console.warn('[LogbookService] Initialisation IndexedDB ignorée :', err),
+        );
+    }
+
+    /**
+     * Résout une fois la synchronisation IndexedDB initiale terminée (ou immédiatement si
+     * IndexedDB est indisponible). À utiliser avant tout rendu qui dépend de `this.flights`
+     * pour éviter de lire un état transitoire.
+     * @returns {Promise<void>}
+     */
+    whenReady() {
+        return this._readyPromise || Promise.resolve();
+    }
+
+    async initIndexedDB() {
+        if (!IDBStorage.isSupported()) return;
+        try {
+            const idbFlights = await IDBStorage.getAllFlights();
+            if (idbFlights.length === 0) {
+                // First time ever using IndexedDB on this device: seed it from whatever
+                // LocalStorage already had (this.flights, just loaded by loadData()).
+                if (this.flights.length > 0) {
+                    await IDBStorage.migrateFromLocalStorage(this.flights);
+                }
+                return;
+            }
+            // IndexedDB already has data, but `this.flights` (just loaded from LocalStorage)
+            // stays the authoritative list of which flights exist: replacing it with the IDB
+            // list here used to silently drop any flight a Firestore merge had just added to
+            // LocalStorage (firebase_service.js writes the merged logbook straight to
+            // LocalStorage, never to IndexedDB, then calls loadData() to refresh the UI —
+            // this used to overwrite that merge with a stale IndexedDB snapshot one line later).
+            // IndexedDB's only unique value is rawIgc (LocalStorage never stores it, see
+            // saveFlights()), so hydrate that onto matching flights instead of replacing the list.
+            const idbById = new Map(idbFlights.map((f) => [f.id, f]));
+            this.flights.forEach((f) => {
+                if (!f.rawIgc) {
+                    const stored = idbById.get(f.id);
+                    if (stored?.rawIgc) f.rawIgc = stored.rawIgc;
+                }
+            });
+            // Bring IndexedDB's flights store back in sync with the now-current list (adds any
+            // flight the merge introduced, without waiting for the next user-triggered save).
+            IDBStorage.saveFlights(this.flights).catch(() => {});
+        } catch (err) {
+            console.warn('[LogbookService] Erreur init IndexedDB :', err);
+        }
     }
 
     saveFlights() {
-        StorageService.set(StorageService.KEYS.LOGBOOK_DATA, this.flights);
+        // rawIgc (potentiellement plusieurs centaines de Ko par vol) ne part jamais dans
+        // LocalStorage (quota strict de 5 Mo, partagé avec le reste de l'app) : il est
+        // dédoublé dans IndexedDB juste en dessous (store `flights` complet + store `traces`
+        // dédié), dont le quota est largement supérieur. LogbookService.getFlightTrace()
+        // relit ce store dédié quand `rawIgc` n'est pas déjà en mémoire.
+        const flightsForLocalStorage = this.flights.map((f) => {
+            if (!f.rawIgc) return f;
+            const copy = { ...f };
+            delete copy.rawIgc;
+            return copy;
+        });
+        StorageService.set(StorageService.KEYS.LOGBOOK_DATA, flightsForLocalStorage);
+        if (IDBStorage.isSupported()) {
+            IDBStorage.saveFlights(this.flights).catch((err) =>
+                console.warn('[LogbookService] Erreur sauvegarde IDB :', err),
+            );
+            this.flights.forEach((f) => {
+                if (f.rawIgc) {
+                    IDBStorage.saveTrace(f.id, f.rawIgc).catch(() => {});
+                }
+            });
+        }
         this.syncCloud();
     }
 
@@ -49,9 +144,13 @@ class LogbookService {
 
     // --- FLIGHTS CRUD ---
     addFlight(flight) {
-        flight.id = Date.now().toString();
+        flight.id =
+            typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+                ? crypto.randomUUID()
+                : Date.now().toString();
         flight.updatedAt = Date.now();
         flight.syncPending = true;
+        normalizeFlight(flight);
         this.flights.push(flight);
         this.flights.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
         this.saveFlights();
@@ -62,6 +161,7 @@ class LogbookService {
         const index = this.flights.findIndex((f) => f.id === id);
         if (index !== -1) {
             this.flights[index] = { ...this.flights[index], ...updatedData, updatedAt: Date.now(), syncPending: true };
+            normalizeFlight(this.flights[index]);
             this.flights.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
             this.saveFlights();
         }
@@ -70,6 +170,9 @@ class LogbookService {
     deleteFlight(id) {
         this.flights = this.flights.filter((f) => f.id !== id);
         this.saveFlights();
+        if (IDBStorage.isSupported()) {
+            IDBStorage.deleteFlight(id).catch(() => {});
+        }
 
         let deleted = [];
         try {
@@ -97,12 +200,31 @@ class LogbookService {
         return this.flights.find((f) => f.id === id);
     }
 
+    /**
+     * Récupère la trace IGC brute d'un vol depuis la mémoire ou depuis IndexedDB.
+     * @param {string} id
+     * @returns {Promise<string|null>}
+     */
+    async getFlightTrace(id) {
+        const flight = this.getFlightById(id);
+        if (flight?.rawIgc) return flight.rawIgc;
+        if (IDBStorage.isSupported()) {
+            const trace = await IDBStorage.getTrace(id);
+            if (trace) return trace;
+        }
+        return null;
+    }
+
     // --- EQUIPMENT CRUD ---
     addEquipment(equip) {
-        equip.id = Date.now().toString();
+        equip.id =
+            typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+                ? crypto.randomUUID()
+                : Date.now().toString();
         equip.updatedAt = Date.now();
         equip.syncPending = true;
         if (!equip.statut) equip.statut = 'actif';
+        normalizeEquipment(equip);
         this.equipment.push(equip);
         this.saveEquipment();
         return equip;
@@ -121,6 +243,7 @@ class LogbookService {
                 updatedAt: Date.now(),
                 syncPending: true,
             };
+            normalizeEquipment(this.equipment[index]);
             this.saveEquipment();
         }
     }

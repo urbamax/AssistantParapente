@@ -14,24 +14,24 @@
     gap: 8px;
     opacity: 0.6;
     transition: opacity 0.3s ease;
-}
 
-.app-footer:hover {
-    opacity: 1;
-}
+    &:hover {
+        opacity: 1;
+    }
 
-.app-footer p {
-    margin: 4px 0;
-}
+    p {
+        margin: 4px 0;
+    }
 
-.app-footer a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: color 0.2s;
-}
+    a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.2s;
 
-.app-footer a:hover {
-    color: var(--accent-blue);
+        &:hover {
+            color: var(--accent-blue);
+        }
+    }
 }
 
 .footer-logos {
@@ -48,18 +48,16 @@
     transition: all 0.3s ease;
     filter: opacity(0.85);
     background: rgba(255, 255, 255, 0.85);
-    /* Requis pour la lisibilitÃ© sur fond sombre */
+    /* Requis pour la lisibilité sur fond sombre */
     padding: 4px 8px;
     border-radius: 8px;
-}
 
-/* On hover, full opacity and brighter background */
-.ffvl-logo:hover,
-.club-logo:hover {
-    transform: translateY(-2px) scale(1.05);
-    filter: opacity(1);
-    background: rgba(255, 255, 255, 1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    &:hover {
+        transform: translateY(-2px) scale(1.05);
+        filter: opacity(1);
+        background: rgba(255, 255, 255, 1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
 }
 
 /* In light mode, no white background needed on hover */

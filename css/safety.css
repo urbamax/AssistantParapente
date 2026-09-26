@@ -1,15 +1,9 @@
 /* --- MODULE: SAFETY (Secours, check-lists, SIGR) --- */
-
-.safety-container {
-    max-width: 880px;
-    margin: calc(var(--header-height, 140px) + 20px) auto 0;
-    padding: 40px;
-    background: var(--bg-card);
-    border: var(--border-glass);
-    border-radius: 32px;
-    box-shadow: var(--shadow-card);
-    color: var(--text-main);
-}
+/* Le conteneur racine (#safety-root) utilise la classe partagée .library-container
+   (voir css/library.css) : même convention que LOGBOOK/QUIZ/LIBRARY, où le wrapper
+   externe reste transparent (pas de carte) et seules les sections internes (.safety-card
+   ci-dessous) sont mises en carte. Lui donner sa propre carte pleine page produisait un
+   effet « carte dans la carte » incohérent avec le reste de l'app. */
 
 .safety-tabs {
     display: grid;
@@ -517,19 +511,9 @@
     cursor: pointer;
 }
 
-/* Bouton Sécurité de la barre de navigation : rouge pour être repéré d'un coup d'œil. */
-.desktop-main-nav .nav-menu-btn.nav-menu-btn-safety,
-.desktop-main-nav .nav-menu-btn.nav-menu-btn-safety.active {
-    color: var(--accent-red);
-}
-
 @media (max-width: 768px) {
-    .safety-container {
-        margin-top: calc(var(--header-height, 140px) + 12px);
-        padding: 16px 12px;
-        border-radius: 16px;
-    }
-
+    /* Le responsive du wrapper racine est déjà géré par .library-container (voir
+       css/library.css) — inutile de le dupliquer ici. */
     .safety-alert-actions {
         grid-template-columns: 1fr;
     }

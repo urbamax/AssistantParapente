@@ -56,4 +56,24 @@ describe('UIManager', () => {
         expect(global.fetch).toHaveBeenCalled();
         expect(document.getElementById('app-header').innerHTML).toBe('<header>Mocked Header</header>');
     });
+
+    it('restoreLevelUI updates global-level-select immediately and returns', () => {
+        document.body.innerHTML += `
+            <select id="global-level-select">
+                <option value="BI">BI</option>
+                <option value="BP">BP</option>
+                <option value="BPC">BPC</option>
+            </select>
+        `;
+        GlobalState.state.level = 'BP';
+
+        const setTimeoutSpy = vi.spyOn(window, 'setTimeout');
+        UIManagerModule.restoreLevelUI();
+
+        const select = document.getElementById('global-level-select');
+        expect(select.value).toBe('BP');
+        // When found, no trailing timeout should be scheduled
+        expect(setTimeoutSpy).not.toHaveBeenCalled();
+        setTimeoutSpy.mockRestore();
+    });
 });

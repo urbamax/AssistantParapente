@@ -96,4 +96,58 @@ describe('QuizService - Mode REVISION', () => {
         expect(['A01V', 'A04V']).toContain(sessionData[2].code);
         expect(['A01V', 'A04V']).toContain(sessionData[3].code);
     });
+
+    it('Cas 4 : getQuestionsByTheme() groupe correctement par thème via Object.groupBy', () => {
+        window.QCM_OFFICIAL = {
+            questions: [
+                { code: 'A01V', theme: 'Météo' },
+                { code: 'E01V', theme: 'Mécavol' },
+                { code: 'A02V', theme: 'Météo' },
+            ],
+        };
+
+        const grouped = QuizService.getQuestionsByTheme();
+        expect(Object.keys(grouped)).toContain('Météo');
+        expect(Object.keys(grouped)).toContain('Mécavol');
+        expect(grouped['Météo']).toHaveLength(2);
+        expect(grouped['Mécavol']).toHaveLength(1);
+    });
+
+    it('Cas 5 : getThemes() retourne les thèmes uniques et triés avec toSorted()', () => {
+        window.QCM_OFFICIAL = {
+            questions: [
+                { code: 'U01V', theme: 'Pilotage' },
+                { code: 'A01V', theme: 'Météo' },
+                { code: 'E01V', theme: 'Mécavol' },
+                { code: 'A02V', theme: 'Météo' },
+            ],
+        };
+
+        const themes = QuizService.getThemes();
+        expect(themes).toEqual(['Mécavol', 'Météo', 'Pilotage']);
+    });
+
+    it('Cas 6 : getQuestions() et setQuestions() encapsulent les questions sans dépendre directement du global', () => {
+        const customQuestions = [
+            { code: 'Z01', question: 'Q custom 1' },
+            { code: 'Z02', question: 'Q custom 2' },
+        ];
+        QuizService.setQuestions(customQuestions);
+
+        expect(QuizService.getQuestions()).toEqual(customQuestions);
+        // Compatibilité ascendante : window.QCM_OFFICIAL est synchronisé
+        expect(window.QCM_OFFICIAL.questions).toEqual(customQuestions);
+    });
+
+    it('Cas 7 : getQuestionByCode() indexe et retourne la question par code ou id en O(1)', () => {
+        QuizService.setQuestions([
+            { code: 'A10', id: '10', question: 'Question A10' },
+            { code: 'B20', id: '20', question: 'Question B20' },
+        ]);
+
+        expect(QuizService.getQuestionByCode('A10')?.question).toBe('Question A10');
+        expect(QuizService.getQuestionByCode('20')?.question).toBe('Question B20');
+        expect(QuizService.getQuestionByCode('INCONNU')).toBeNull();
+        expect(QuizService.getQuestionByCode(null)).toBeNull();
+    });
 });

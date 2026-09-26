@@ -31,6 +31,7 @@ class SitesViewClass extends BaseView {
     async mount(container) {
         console.time('SITES_MOUNT_TOTAL');
         await super.mount(container);
+        await SitesService.ensureSitesLoaded();
         console.time('SITES_SERVICE_INIT');
         SitesService.init();
         console.timeEnd('SITES_SERVICE_INIT');
@@ -95,6 +96,8 @@ class SitesViewClass extends BaseView {
     async unmount() {
         await super.unmount();
         clearInterval(this._weatherRetryInterval);
+        clearTimeout(this._radiusTimeout);
+        clearTimeout(this._progZoomTimeout);
         if (SitesService.activeFetchController) {
             SitesService.activeFetchController.abort();
             SitesService.activeFetchController = null;
@@ -136,7 +139,15 @@ class SitesViewClass extends BaseView {
                         result = SitesService[action](...args.split(',').map((a) => a.trim().replace(/'/g, '')));
                     else result = SitesService[action]();
 
-                    const updateUI = () => {
+                    const updateUI = (resolved) => {
+                        // Le bouton "Réessayer" de la bannière d'erreur météo repasse par ce
+                        // dispatcheur générique : sans ce cas particulier, un nouvel échec (ex.
+                        // toujours saturé) se contentait de re-render sans rien expliquer,
+                        // laissant les cartes sur "Chargement météo..." indéfiniment.
+                        if (action === 'fetchWeatherForSites') {
+                            this.handleWeatherFetchResult(resolved);
+                            return;
+                        }
                         this.renderList();
                         this.updateMapMarkers();
                         if (action === 'cycleFilterState') {
@@ -167,7 +178,14 @@ class SitesViewClass extends BaseView {
                 if (el.type === 'checkbox') result = SitesService[action](el.checked);
                 else result = SitesService[action](el.value);
 
-                const updateUI = () => {
+                const updateUI = (resolved) => {
+                    // Même raison que pour _clickHandler : changer de modèle météo relance un
+                    // fetch qui peut échouer (429...), et sans ce cas particulier ça se
+                    // contentait de re-render sans jamais l'expliquer.
+                    if (action === 'changeWeatherModel') {
+                        this.handleWeatherFetchResult(resolved);
+                        return;
+                    }
                     this.renderList();
                     this.updateMapMarkers();
                 };
@@ -256,11 +274,9 @@ class SitesViewClass extends BaseView {
 
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                if (typeof SITES_DATA !== 'undefined' && Array.isArray(SITES_DATA)) {
-                    SITES_DATA.forEach((s) => {
-                        delete s.distance;
-                    }); // reset cache
-                }
+                SitesService.getSites().forEach((s) => {
+                    delete s.distance;
+                }); // reset cache
 
                 SitesService.state.userLocation = {
                     lat: position.coords.latitude,
@@ -359,30 +375,7 @@ class SitesViewClass extends BaseView {
 
             SitesService.fetchWeatherForSites().then((result) => {
                 console.timeEnd('SITES_FETCH_WEATHER');
-
-                const indicator = document.getElementById('weather-loading-indicator');
-                if (indicator) indicator.remove();
-
-                if (result && result.success === false) {
-                    // Render list with error banner
-                    this.renderList();
-                    const container = document.getElementById('sites-list-container');
-                    if (container) {
-                        const errorHtml = `
-                        <div style="color:var(--accent-red, #ef4444); font-size: 0.95rem; text-align: center; padding: 16px; margin-bottom: 16px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: var(--radius-lg); width: 100%;">
-                            <i class="ri-error-warning-line" style="font-size: 1.2rem; vertical-align: middle; margin-right: 8px;"></i>
-                            <strong>Météo indisponible :</strong> ${result.error?.message || 'Erreur réseau'}
-                            <button id="weather-retry-btn" data-action="fetchWeatherForSites" class="action-btn-primary" style="margin-left: 12px; padding: 4px 12px; font-size: 0.8rem; border-radius: var(--radius-pill);">Réessayer</button>
-                        </div>
-                    `;
-                        container.insertAdjacentHTML('afterbegin', errorHtml);
-                        this._startWeatherRetryCountdown(result.cooldownRemainingMs || 0);
-                    }
-                } else {
-                    this.updateForecastLabel();
-                    this.renderList();
-                    this.updateMapMarkers();
-                }
+                this.handleWeatherFetchResult(result);
             });
             this.initialized = true;
         }
@@ -404,6 +397,44 @@ class SitesViewClass extends BaseView {
 
         this.updateMapTogglesVisibility();
         this.switchMapMode('leaflet');
+    }
+
+    /**
+     * Point d'entrée unique pour réagir à la fin d'un fetchWeatherForSites(), quel que soit
+     * le déclencheur (chargement initial, changement de modèle météo, re-scope après un
+     * changement de filtre/rayon/GPS). Sans ce point commun, seul show() affichait la
+     * bannière d'erreur sur un vrai échec (429, réseau...) — les deux autres déclencheurs se
+     * contentaient de re-render, laissant les cartes tourner sur "Chargement météo..." sans
+     * jamais expliquer pourquoi en cas d'échec réel.
+     */
+    handleWeatherFetchResult(result) {
+        // success === null : cet appel a été annulé par un appel plus récent (filtre, GPS ou
+        // modèle météo changé entre-temps) — pas un échec, on laisse cet appel plus récent
+        // gérer seul le spinner et la bannière d'erreur éventuelle.
+        if (result && result.success === null) return;
+
+        const indicator = document.getElementById('weather-loading-indicator');
+        if (indicator) indicator.remove();
+
+        if (result && result.success === false) {
+            this.renderList();
+            const container = document.getElementById('sites-list-container');
+            if (container) {
+                const errorHtml = `
+                <div style="color:var(--accent-red, #ef4444); font-size: 0.95rem; text-align: center; padding: 16px; margin-bottom: 16px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: var(--radius-lg); width: 100%;">
+                    <i class="ri-error-warning-line" style="font-size: 1.2rem; vertical-align: middle; margin-right: 8px;"></i>
+                    <strong>Météo indisponible :</strong> ${result.error?.message || 'Erreur réseau'}
+                    <button id="weather-retry-btn" data-action="fetchWeatherForSites" class="action-btn-primary" style="margin-left: 12px; padding: 4px 12px; font-size: 0.8rem; border-radius: var(--radius-pill);">Réessayer</button>
+                </div>
+            `;
+                container.insertAdjacentHTML('afterbegin', errorHtml);
+                this._startWeatherRetryCountdown(result.cooldownRemainingMs || 0);
+            }
+        } else {
+            this.updateForecastLabel();
+            this.renderList();
+            this.updateMapMarkers();
+        }
     }
 
     initMap() {
@@ -533,7 +564,7 @@ class SitesViewClass extends BaseView {
         if (!this.state.map || !this.state.markersGroup) return;
         this.state.markersGroup.clearLayers();
 
-        const activeSites = SitesService.getFilteredAndSortedSites(typeof SITES_DATA !== 'undefined' ? SITES_DATA : []);
+        const activeSites = SitesService.getFilteredAndSortedSites(SitesService.getSites());
 
         activeSites.forEach((site) => {
             let color = '#94a3b8';
@@ -605,7 +636,7 @@ class SitesViewClass extends BaseView {
                 ${
                     site.url
                         ? `
-                <a class="action-btn-secondary ffvl-btn" href="${site.url}" target="_blank" style="padding: 6px 8px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;" title="Fiche FFVL">
+                <a class="action-btn-secondary ffvl-btn" href="${site.url}" target="_blank" rel="noopener noreferrer" style="padding: 6px 8px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;" title="Fiche FFVL">
                     <img src="https://federation.ffvl.fr/sites/all/themes/ffvl/favicon.ico" alt="FFVL" style="width: 14px; height: 14px; border-radius: 2px;">
                 </a>
                 `
@@ -642,10 +673,20 @@ class SitesViewClass extends BaseView {
         const titleEl = document.getElementById('spotair-modal-title');
         if (!modal || !iframe) return;
 
-        const site = (typeof SITES_DATA !== 'undefined' ? SITES_DATA : []).find((s) => s.id === siteId);
+        const site = SitesService.getSiteById(siteId);
         if (titleEl) titleEl.textContent = site ? `Vent en direct — ${site.nom}` : 'Vent en direct — SpotAiR';
         iframe.src = `https://www.spotair.mobi/page/wind/ffvl/${spotairId}`;
 
+        if (typeof modal.showModal === 'function' && !modal.open) {
+            modal.showModal();
+            if (!modal._cancelBound) {
+                modal._cancelBound = true;
+                modal.addEventListener('cancel', (e) => {
+                    e.preventDefault();
+                    this.closeSpotairModal();
+                });
+            }
+        }
         modal.style.display = 'flex';
         void modal.offsetWidth;
         modal.classList.add('active');
@@ -658,10 +699,13 @@ class SitesViewClass extends BaseView {
         modal.classList.remove('active');
         setTimeout(() => {
             if (!modal.classList.contains('active')) {
+                if (typeof modal.close === 'function' && modal.open) {
+                    modal.close();
+                }
                 modal.style.display = 'none';
                 if (iframe) iframe.src = '';
             }
-        }, 400);
+        }, 300);
     }
 
     launchGps(app) {
@@ -676,7 +720,7 @@ class SitesViewClass extends BaseView {
         } else if (app === 'apple') {
             url = `http://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`;
         }
-        if (url) window.open(url, '_blank');
+        if (url) window.open(url, '_blank', 'noopener,noreferrer');
         this.closeGpsMenu();
     }
 
@@ -838,7 +882,7 @@ class SitesViewClass extends BaseView {
                 url = `https://www.paraglidingmap.com/app/?lat=${lat}&lng=${lon}&zoom=11`;
             }
             if (url) {
-                window.open(url, '_blank');
+                window.open(url, '_blank', 'noopener,noreferrer');
             }
             return;
         }
@@ -1086,7 +1130,7 @@ class SitesViewClass extends BaseView {
                     return (
                         '<a href="' +
                         link.url +
-                        '" target="_blank" class="external-link-btn ' +
+                        '" target="_blank" rel="noopener noreferrer" class="external-link-btn ' +
                         link.cls +
                         ' more-map-link" data-action="closeMoreMapsDropdown">' +
                         '<i class="' +
@@ -1307,7 +1351,7 @@ class SitesViewClass extends BaseView {
         }
 
         // Find forecast time from first active site
-        const firstActiveSite = SITES_DATA.find((s) => s.affiche !== false);
+        const firstActiveSite = SitesService.getSites().find((s) => s.affiche !== false);
         const firstSiteId = firstActiveSite?.id;
         const forecasts = firstSiteId ? SitesService.state.weatherForecasts[firstSiteId] : null;
         if (forecasts && forecasts[offset]) {
@@ -1336,17 +1380,39 @@ class SitesViewClass extends BaseView {
 
             const label = document.createElement('span');
             label.textContent = loc.name;
-            label.onclick = () => SitesService.loadSavedLocation(index);
+            label.setAttribute('role', 'button');
+            label.setAttribute('tabindex', '0');
+            label.setAttribute('aria-label', `Charger le lieu : ${loc.name}`);
+
+            const handleLoad = () => SitesService.loadSavedLocation(index);
+            label.addEventListener('click', handleLoad);
+            label.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleLoad();
+                }
+            });
 
             const btnRemove = document.createElement('i');
             btnRemove.className = 'ri-close-line';
             btnRemove.style.cursor = 'pointer';
             btnRemove.style.fontSize = '1rem';
-            btnRemove.onclick = (e) => {
+            btnRemove.setAttribute('role', 'button');
+            btnRemove.setAttribute('tabindex', '0');
+            btnRemove.setAttribute('aria-label', `Supprimer le lieu : ${loc.name}`);
+
+            const handleRemove = (e) => {
                 e.stopPropagation();
                 SitesService.removeSavedLocation(index);
                 this.renderSavedLocations();
             };
+            btnRemove.addEventListener('click', handleRemove);
+            btnRemove.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleRemove(e);
+                }
+            });
 
             pill.appendChild(label);
             pill.appendChild(btnRemove);
@@ -1580,7 +1646,7 @@ class SitesViewClass extends BaseView {
         const listDiv = document.getElementById('sites-list-container');
         if (!listDiv) return;
 
-        const activeSites = SitesService.getFilteredAndSortedSites(typeof SITES_DATA !== 'undefined' ? SITES_DATA : []);
+        const activeSites = SitesService.getFilteredAndSortedSites(SitesService.getSites());
 
         if (this.state.showComparator) {
             this.renderComparator(activeSites);
@@ -1636,6 +1702,15 @@ class SitesViewClass extends BaseView {
 
                 let weatherHtml;
                 let weather = null;
+                // Distingue "jamais interrogé" (weatherForecasts[site.id] absent) de "requête
+                // terminée mais Open-Meteo n'a renvoyé aucune heure exploitable pour ce site"
+                // (entrée présente mais vide, ex: coordonnées hors couverture) : sans ça, ce
+                // deuxième cas réaffiche indéfiniment "Chargement météo..." puisque plus rien
+                // ne vient jamais la remplacer.
+                const hasWeatherEntry = Object.prototype.hasOwnProperty.call(
+                    SitesService.state.weatherForecasts,
+                    site.id,
+                );
                 const forecasts = SitesService.state.weatherForecasts[site.id] || [];
                 if (forecasts && forecasts[SitesService.state.forecastOffset]) {
                     weather = forecasts[SitesService.state.forecastOffset];
@@ -1653,6 +1728,13 @@ class SitesViewClass extends BaseView {
                                     <i class="${status.icon}"></i> ${status.reason}
                                 </span>
                             </div>
+                        </div>
+                    `;
+                } else if (hasWeatherEntry) {
+                    weatherHtml = `
+                        <div class="weather-loading">
+                            <i class="ri-error-warning-line"></i>
+                            <span>Météo indisponible pour ce site</span>
                         </div>
                     `;
                 } else {
@@ -1869,7 +1951,7 @@ class SitesViewClass extends BaseView {
                     ${
                         site.url
                             ? `
-                    <a class="action-btn-secondary ffvl-btn" href="${site.url}" target="_blank" title="Fiche officielle FFVL">
+                    <a class="action-btn-secondary ffvl-btn" href="${site.url}" target="_blank" rel="noopener noreferrer" title="Fiche officielle FFVL">
                         <img src="https://federation.ffvl.fr/sites/all/themes/ffvl/favicon.ico" alt="FFVL"> FFVL
                     </a>
                     `

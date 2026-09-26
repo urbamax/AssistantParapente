@@ -182,4 +182,17 @@ describe('SitesService', () => {
         const prefs = JSON.parse(localStorage.getItem('parapente_user_prefs') || '{}');
         expect(prefs.favoriteSites).toContain(1);
     });
+
+    it('getSiteById retrieves a site by id in O(1) via internal Map', () => {
+        const site1 = SitesService.getSiteById(1);
+        expect(site1).toBeDefined();
+        expect(site1.nom).toBe('Annecy');
+
+        const site2 = SitesService.getSiteById('2');
+        expect(site2).toBeDefined();
+        expect(site2.nom).toBe('Chamonix');
+
+        expect(SitesService.getSiteById(999)).toBeNull();
+        expect(SitesService.getSiteById(null)).toBeNull();
+    });
 });

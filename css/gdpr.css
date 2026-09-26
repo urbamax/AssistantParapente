@@ -151,6 +151,7 @@ body.light-mode .gdpr-btn-settings:hover {
     left: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     background: var(--bg-overlay);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -166,6 +167,33 @@ body.light-mode .gdpr-btn-settings:hover {
 .gdpr-modal-overlay.active {
     opacity: 1;
     pointer-events: auto;
+}
+
+/* Support moderne des éléments <dialog> natifs */
+dialog.gdpr-modal-overlay {
+    border: none;
+    padding: 0;
+    margin: 0;
+    max-width: 100vw;
+    max-height: 100dvh;
+    width: 100vw;
+    height: 100dvh;
+    color: inherit;
+    background: transparent;
+}
+
+dialog.gdpr-modal-overlay:not([open]) {
+    display: none;
+}
+
+dialog.gdpr-modal-overlay[open] {
+    display: flex;
+}
+
+dialog.gdpr-modal-overlay::backdrop {
+    background: var(--bg-overlay);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .gdpr-modal {

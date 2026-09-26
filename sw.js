@@ -9,7 +9,7 @@
 //   2. CACHE_NAME est versionné (synchronisé par bump.py avec le ?v= du reste du site) et
 //      activate() supprime systématiquement tout cache dont le nom ne correspond pas à la
 //      version courante.
-const CACHE_NAME = 'parapente-app-v2026.09.20_v1';
+const CACHE_NAME = 'parapente-app-v2026.09.26_v1';
 
 // La météo ne doit jamais être servie depuis le cache : une donnée de vent vieille de
 // plusieurs heures mais présentée comme "en direct" est un vrai risque sécurité pour un
@@ -82,6 +82,8 @@ const CRITICAL_ASSETS = [
     './js/services/quiz_service.js',
     './js/services/sites_service.js',
     './js/services/storage.js',
+    './js/services/idb_storage.js',
+    './js/utils/array_utils.js',
     './js/utils/date_utils.js',
     './js/utils/geo_utils.js',
     './js/utils/math_utils.js',
@@ -100,6 +102,7 @@ const CRITICAL_ASSETS = [
     './js/data/weather_config.js',
     './js/data/qcm_ffvl.csv',
     './js/data/qcm_ffvl_explanations.csv',
+    './js/data/question_course_mapping.json',
     './js/weatherScoring.js',
     './js/gdpr_engine.js',
     './js/firebase_config.js',
@@ -129,12 +132,19 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches
-            .keys()
-            .then((cacheNames) =>
-                Promise.all(cacheNames.map((name) => (name !== CACHE_NAME ? caches.delete(name) : null))),
-            )
-            .then(() => self.clients.claim()),
+        (async () => {
+            // Navigation Preload : amorce la requête réseau en parallèle du démarrage du SW
+            if (self.registration.navigationPreload) {
+                try {
+                    await self.registration.navigationPreload.enable();
+                } catch (e) {
+                    console.warn('[SW] Navigation Preload indisponible :', e.message);
+                }
+            }
+            const cacheNames = await caches.keys();
+            await Promise.all(cacheNames.map((name) => (name !== CACHE_NAME ? caches.delete(name) : null)));
+            await self.clients.claim();
+        })(),
     );
 });
 
@@ -163,13 +173,24 @@ self.addEventListener('fetch', (event) => {
             url.origin === location.origin && (url.pathname === '/' || url.pathname.endsWith('/index.html'));
         if (!isAppShell) return;
         event.respondWith(
-            fetch(request)
-                .then((response) => {
+            (async () => {
+                try {
+                    // Utilise la réponse préchargée en parallèle si disponible
+                    const preloadResponse = await event.preloadResponse;
+                    if (preloadResponse) {
+                        const copy = preloadResponse.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                        return preloadResponse;
+                    }
+                    const response = await fetch(request);
                     const copy = response.clone();
                     caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
                     return response;
-                })
-                .catch(() => caches.match(request).then((cached) => cached || caches.match('./index.html'))),
+                } catch {
+                    const cached = await caches.match(request);
+                    return cached || (await caches.match('./index.html'));
+                }
+            })(),
         );
         return;
     }
@@ -194,7 +215,25 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Assets statiques same-origin : cache-first avec revalidation réseau en arrière-plan.
+    // Sur localhost / 127.0.0.1 (développement local) : toujours network-first pour éviter tout
+    // déphasage de cache entre modules ES lors des modifications locales.
+    const isDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if (isDev) {
+        event.respondWith(
+            fetch(request)
+                .then((response) => {
+                    if (response.ok) {
+                        const copy = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                    }
+                    return response;
+                })
+                .catch(() => caches.match(request)),
+        );
+        return;
+    }
+
+    // Assets statiques same-origin (production) : cache-first avec revalidation réseau en arrière-plan.
     // Si rien n'est en cache ET que le réseau échoue, on ne doit jamais résoudre respondWith()
     // avec `undefined` (le navigateur remonte alors un opaque net::ERR_FAILED, y compris pour
     // du CSS/JS critique — c'est ce qui a cassé la mise en page en local) : on retombe sur un

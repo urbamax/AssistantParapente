@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { formatDuration, formatDateOnly, formatDateTime, getFileTimestamp } from '../../js/utils/date_utils.js';
+import {
+    formatDuration,
+    formatDateOnly,
+    formatDateTime,
+    formatRelativeTime,
+    getFileTimestamp,
+} from '../../js/utils/date_utils.js';
 
 describe('Date Utils', () => {
     it('formatDuration handles minutes and hours', () => {
@@ -22,6 +28,33 @@ describe('Date Utils', () => {
         const d = new Date('2026-08-21T10:30:00Z');
         expect(formatDateTime(d)).toContain('21/08/2026');
         expect(formatDateTime('invalid')).toBe('');
+        expect(formatDateTime(null)).toBe('');
+    });
+
+    it('formatRelativeTime formats relative differences correctly', () => {
+        const base = new Date('2026-08-21T12:00:00Z');
+
+        // Instant
+        expect(formatRelativeTime(new Date('2026-08-21T12:00:20Z'), base)).toBe("à l'instant");
+
+        // Minutes
+        const tenMinutesAgo = new Date('2026-08-21T11:50:00Z');
+        expect(formatRelativeTime(tenMinutesAgo, base)).toMatch(/il y a 10 minutes/i);
+
+        // Hours
+        const threeHoursAgo = new Date('2026-08-21T09:00:00Z');
+        expect(formatRelativeTime(threeHoursAgo, base)).toMatch(/il y a 3 heures/i);
+
+        // Days
+        const twoDaysAgo = new Date('2026-08-19T12:00:00Z');
+        expect(formatRelativeTime(twoDaysAgo, base)).toBe('avant-hier');
+
+        const fiveDaysAgo = new Date('2026-08-16T12:00:00Z');
+        expect(formatRelativeTime(fiveDaysAgo, base)).toMatch(/il y a 5 jours/i);
+
+        // Invalid / null
+        expect(formatRelativeTime('invalid', base)).toBe('');
+        expect(formatRelativeTime(null, base)).toBe('');
     });
 
     it('getFileTimestamp returns correct format', () => {
