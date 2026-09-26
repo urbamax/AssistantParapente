@@ -327,7 +327,7 @@ class SafetyViewClass extends BaseView {
             </div>
 
             <div class="safety-card">
-                <h3><i class="ri-tree-line" aria-hidden="true"></i> Vous êtes « branché » ou en falaise</h3>
+                <h3><i class="ri-tree-line" aria-hidden="true"></i> Posé dans un arbre ou bloqué en falaise</h3>
                 <p class="safety-warning">Attention aux sur-accidents : ne prenez pas de risques en cherchant à descendre par vos propres moyens.</p>
                 <h4>Vous avez besoin d'aide</h4>
                 <ul>
