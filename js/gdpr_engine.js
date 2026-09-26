@@ -62,6 +62,18 @@ const GdprEngine = {
     showModal: function (modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
+            if (typeof modal.showModal === 'function' && !modal.open) {
+                modal.showModal();
+                if (!modal._cancelBound) {
+                    modal._cancelBound = true;
+                    modal.addEventListener('cancel', (e) => {
+                        e.preventDefault();
+                        this.hideModal(modalId);
+                    });
+                }
+            }
+            modal.style.display = 'flex';
+            void modal.offsetWidth;
             modal.classList.add('active');
 
             // If it's the settings modal, synchronize toggles
@@ -75,6 +87,14 @@ const GdprEngine = {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.classList.remove('active');
+            setTimeout(() => {
+                if (!modal.classList.contains('active')) {
+                    if (typeof modal.close === 'function' && modal.open) {
+                        modal.close();
+                    }
+                    modal.style.display = 'none';
+                }
+            }, 300);
         }
     },
 

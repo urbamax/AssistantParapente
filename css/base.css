@@ -26,6 +26,9 @@
     --accent-green: #22c55e;
     --accent-red: #e2001a;
     --accent-gold: #eab308;
+    /* Referenced by .nav-menu-btn.active (css/header.css) for the active nav item's text
+       color; was never defined, so that color silently fell back to plain text. */
+    --primary-color: var(--accent-blue);
 
     /* --- THEME VARIABLES (Default: Dark) --- */
     --bg-app: var(--p-dark-deep);
@@ -66,6 +69,16 @@
     --radius-md: 8px;
     --radius-sm: 4px;
 
+    /* Progressive enhancement: native light-dark() (Baseline 2024) */
+    @supports (color: light-dark(#fff, #000)) {
+        --bg-app: light-dark(var(--p-light-deep), var(--p-dark-deep));
+        --bg-surface: light-dark(var(--p-light-surface), var(--p-dark-surface));
+        --text-main: light-dark(#0f172a, #ffffff);
+        --text-muted: light-dark(#475569, #94a3b8);
+        --text-secondary: light-dark(#64748b, #cbd5e1);
+        --border-color: light-dark(var(--p-light-border), var(--p-dark-border));
+        --glass-bg: light-dark(var(--p-light-glass), var(--p-dark-glass));
+    }
 }
 
 /* --- LIGHT MODE THEME REDEFINITION --- */
@@ -73,6 +86,7 @@
    body.light-mode is set later by UIManager once the app boots. */
 html.light-mode,
 body.light-mode {
+    color-scheme: light;
     --bg-app: var(--p-light-deep);
     --bg-surface: var(--p-light-surface);
     --bg-overlay: rgba(255, 255, 255, 0.8);
@@ -96,6 +110,13 @@ body.light-mode {
         radial-gradient(circle at 100% 100%, rgba(226, 0, 26, 0.08), transparent 40%);
 }
 
+html.dark-theme,
+html.dark-mode,
+body.dark-theme,
+body.dark-mode {
+    color-scheme: dark;
+}
+
 /* --- BASE --- */
 body {
     background-color: var(--bg-app);
@@ -106,6 +127,7 @@ body {
     font-family: var(--font-main);
     margin: 0;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -169,5 +191,14 @@ button {
 
     body:has(.gdpr-banner.active) .mode-screen {
         padding-bottom: 220px !important;
+    }
+}
+
+/* --- VIEW TRANSITIONS (SMOOTH SPA NAVIGATION) --- */
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation: none !important;
     }
 }

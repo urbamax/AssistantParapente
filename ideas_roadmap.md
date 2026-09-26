@@ -120,3 +120,71 @@ Un tableau côte-à-côte du score d'exploitabilité de plusieurs sites favoris 
 
 > **À vérifier avant tout :** la section 2 (ruban 3D suspendu) semble déjà en grande partie implémentée dans `js/components/map_3d.js` (`_buildDeckLayers`, `_computeVarioSeries`, `_varioColor`, coloration par vario) — à requalifier "fait" plutôt que "R&D" si confirmé.
 
+
+## 🚀 9. Phase 3 & Idées Validées (2026-09-26)
+### 1. Auto-tagging intelligent du Site depuis IGC
+Extraire le point de décollage depuis l'IGC et trouver le site le plus proche dans `SITES_DATA` (rayon de 2-3km) pour pré-remplir le lieu de vol.
+
+### 2. Exploitation avancée des statistiques IGC
+Dashboard avec records (Vitesse max, Thermique max, Distance). Profil altimétrique 2D coloré par le Vario dans la vue de détail du vol.
+
+### 3. Auto-Nettoyage IGC (Détection Atterrissage Réel)
+Tronquer automatiquement la fin de la trace IGC (la marche vers la voiture) en détectant une vitesse < 5 km/h et une altitude constante, pour des stats de vol exactes.
+
+### 4. Auto-Classification du Vol (Analyse IGC)
+L'app tague le vol (Plouf, Thermique, Soaring, Cross) en analysant la géométrie de la trace (virages 360, inversions de cap, distance max). Affichage d'un graphique de répartition.
+
+### 5. Apprentissage Espacé "Spaced Repetition" (QCM)
+Algorithme SM-2. Bonne réponse = intervalle grandi (1j, 3j, 7j). Mauvaise réponse = reset. Tirage prioritaire des questions échues.
+
+### 6. Indicateur de Synchronisation Cloud discret
+Petite pastille de couleur (orange=en attente, vert/invisible=sync) branchée sur l'état de `FirebaseService`.
+
+### 7. Espaces Aériens 3D (TMA / CTR)
+Intégration d'OpenAIP dans Deck.GL avec une option "Afficher les espaces aériens" désactivable par défaut.
+
+### 8. Prédiction de Plafond (Météo Avancée)
+Affichage de l'isotherme 0°C ou couverture nuageuse base (`cloudbase`) via Open-Meteo.
+
+### 9. Export de la Trace IGC (Déclaration CFD / XContest)
+Bouton pour recréer le fichier `.igc` depuis `rawIgc` et le télécharger sur le téléphone/PC.
+
+### 10. Export PDF du Carnet de Vol (Bilan FFVL)
+Bouton pour générer un PDF A4 tabulaire du carnet (Date, Site, Voile, Durée, Commentaires).
+
+### 11. Partage Météo aux Copains (Visuel WhatsApp)
+Générer une image / canvas propre du bloc Météo pour la partager facilement.
+
+### 12. Module "Procédure d'Urgence" (Hors-ligne) — ✅ FAIT (2026-09-26)
+*Écran `SAFETY` (`js/views/safety.js`), onglet Urgence. Contenu repris de l'affiche FFVL « Secours vol libre » 2022. Fréquence exacte : 143,9875 MHz. Pas de trame « MAYDAY » : l'affiche FFVL ne la mentionne pas.*
+
+Bouton "⚠️ Secours" dans le menu. Modale offline avec : GPS décimal/degrés, fréquence FFVL (143.987 MHz), numéros d'urgence, trame MAYDAY.
+
+### 13. Calendrier de Vol façon "GitHub" (Heatmap Annuelle)
+Grille annuelle où les jours avec vols sont colorés selon l'intensité (durée/nombre).
+
+### 14. Calculateur de "Polaire de Vitesses" Réelle
+Analyse des lignes droites (transitions) de l'IGC pour tracer le Taux de Chute vs Vitesse Sol de l'aile du pilote.
+
+### 15. Cartographie Topographique 100% Hors-Ligne (Mise en cache)
+Bouton pour aspirer et cacher (IndexedDB) les tuiles MapLibre vectorielles de la zone affichée pour un usage sans réseau.
+
+### 16. Générateur "QR Code Secours" (ICE) pour Casque
+Dans le module d'urgence ou le profil, générer une petite étiquette imprimable avec un QR Code. L'étiquette mentionne clairement "INFO SECOURS / ICE". Au scan, le QR Code affiche le groupe sanguin, allergies, et contacts d'urgence du pilote.
+
+### 17. Score d'Efficacité en Thermique
+L'analyse IGC calcule le ratio entre le temps passé à chercher le thermique (virages en S, zérotage) et le temps passé à l'enrouler efficacement (spirale). Donne un pourcentage d'efficacité affiché dans le carnet.
+
+### 18. Module "Checklist Pré-vol" — ✅ FAIT (2026-09-26)
+*⚠️ Correction : dans le vocabulaire FFVL, SIGR veut dire « Stratégie Individuelle de Gestion des Risques » (affiche FFVL 2019, modèle de Reason). Ce n'est pas une check-list « Sangles / Instruments / Goupille / Radio ». Ce qui a été fait : la prévol officielle en 7 points (livret Initiation 2025), la check-list « Prêt pour le déco ? » (livret 9BD) et une auto-évaluation SIGR, dans l'écran `SAFETY`.*
+
+Une section d'assistance au décollage affichant la checklist vitale de pré-vol (SIGR : Sangles, Instruments, Goupille de secours, Radio, etc.). L'idée est de fournir une interface claire, peut-être avec une option pour se la faire lire à voix haute par le téléphone pour avoir les mains libres, afin de garantir une sécurité maximale avant de décoller.
+
+### 19. Le "Sniper" Météo (Alertes Push Sur-Mesure)
+Plutôt qu'une alerte météo générique, permettre au pilote de configurer ses "Conditions Idéales" par site (ex: Plafond > 2000m, Vent < 15km/h, Orientation N/NE, uniquement le week-end). Une Cloud Function surveille ces critères et envoie une notification push uniquement quand la fenêtre parfaite s'ouvre.
+
+### 20. Tableau de Bord "Navettes & Covoiturage"
+Un module temps réel sur la fiche du site pour mettre en relation les pilotes à l'atterrissage cherchant à monter, et les conducteurs offrant des places dans leur voiture vers le décollage. Évite la saturation des groupes WhatsApp.
+
+### 21. Optimiseur de Triangle FAI (Planificateur Cross)
+Lié à l'outil de planification de route : une fois 2 balises posées sur la carte, l'application dessine la zone d'intersection mathématique obligatoire où le pilote doit placer son 3ème point pour que le triangle respecte la règle FAI des 28%.

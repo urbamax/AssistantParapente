@@ -8,7 +8,6 @@ declare global {
         LibraryEngine: any;
         QCM_OFFICIAL: any;
         SITES_DATA: any[];
-        TEMPORARY_IGC_RAW: any;
     }
 
     const SITES_DATA: any[];

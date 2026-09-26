@@ -13,6 +13,30 @@ import QuizView from '../views/quiz.js';
 // We inject the original code but export the Engine
 // --- FIREBASE AUTHENTICATION & SYNC ENGINE ---
 
+const FIREBASE_VERSION = '10.12.0';
+const FIREBASE_BASE_URL = `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}`;
+
+// Memoizes a dynamic import by specifier, but only the *resolved* promise: caching a rejected
+// one (e.g. a transient CDN blip) would permanently break sign-in/sync for the rest of the page
+// session, since every later call would just replay the same rejection instead of retrying.
+function createModuleLoader(specifier) {
+    let cached = null;
+    return () => {
+        if (!cached) {
+            cached = import(specifier).catch((err) => {
+                cached = null;
+                throw err;
+            });
+        }
+        return cached;
+    };
+}
+
+const loadAppModule = createModuleLoader(`${FIREBASE_BASE_URL}/firebase-app.js`);
+const loadAuthModule = createModuleLoader(`${FIREBASE_BASE_URL}/firebase-auth.js`);
+const loadFirestoreModule = createModuleLoader(`${FIREBASE_BASE_URL}/firebase-firestore.js`);
+const loadMessagingModule = createModuleLoader(`${FIREBASE_BASE_URL}/firebase-messaging.js`);
+
 let app, auth, db;
 let isInitialized = false;
 
@@ -63,11 +87,9 @@ export const FirebaseAuthEngine = {
 
         try {
             // Import Firebase SDKs dynamically from CDN
-            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-            const { getAuth, onAuthStateChanged } =
-                await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-            const { initializeFirestore } =
-                await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            const { initializeApp } = await loadAppModule();
+            const { getAuth, onAuthStateChanged } = await loadAuthModule();
+            const { initializeFirestore } = await loadFirestoreModule();
 
             app = initializeApp(FIREBASE_CONFIG);
             auth = getAuth(app);
@@ -135,6 +157,18 @@ export const FirebaseAuthEngine = {
     openAuthModal: function () {
         const overlay = document.getElementById('auth-modal-overlay');
         if (overlay) {
+            if (typeof overlay.showModal === 'function' && !overlay.open) {
+                overlay.showModal();
+                if (!overlay._cancelBound) {
+                    overlay._cancelBound = true;
+                    overlay.addEventListener('cancel', (e) => {
+                        e.preventDefault();
+                        this.closeAuthModal();
+                    });
+                }
+            }
+            overlay.style.display = 'flex';
+            void overlay.offsetWidth;
             overlay.classList.add('active');
             this.clearAlerts();
             this.updateModalUI();
@@ -145,6 +179,14 @@ export const FirebaseAuthEngine = {
         const overlay = document.getElementById('auth-modal-overlay');
         if (overlay) {
             overlay.classList.remove('active');
+            setTimeout(() => {
+                if (!overlay.classList.contains('active')) {
+                    if (typeof overlay.close === 'function' && overlay.open) {
+                        overlay.close();
+                    }
+                    overlay.style.display = 'none';
+                }
+            }, 300);
         }
     },
 
@@ -278,7 +320,7 @@ export const FirebaseAuthEngine = {
                 setPersistence,
                 indexedDBLocalPersistence,
                 browserSessionPersistence,
-            } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+            } = await loadAuthModule();
             this.showStatus('Création du compte...', 'info');
 
             // Set persistence dynamically
@@ -319,7 +361,7 @@ export const FirebaseAuthEngine = {
 
         try {
             const { signInWithEmailAndPassword, setPersistence, indexedDBLocalPersistence, browserSessionPersistence } =
-                await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+                await loadAuthModule();
             this.showStatus('Connexion...', 'info');
 
             // Set persistence dynamically
@@ -353,7 +395,7 @@ export const FirebaseAuthEngine = {
     signOut: async function () {
         if (!isInitialized) return;
         try {
-            const { signOut } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+            const { signOut } = await loadAuthModule();
             await signOut(auth);
             this.closeAuthModal();
             alert('Vous avez été déconnecté.');
@@ -370,8 +412,7 @@ export const FirebaseAuthEngine = {
         this.clearAlerts();
 
         try {
-            const { sendPasswordResetEmail } =
-                await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+            const { sendPasswordResetEmail } = await loadAuthModule();
             await sendPasswordResetEmail(auth, email);
             this.showAlert('Email de réinitialisation envoyé !', 'success');
         } catch (error) {
@@ -392,8 +433,7 @@ export const FirebaseAuthEngine = {
         }
 
         try {
-            const { doc, getDoc, setDoc, collection, getDocs, deleteDoc } =
-                await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            const { doc, getDoc, setDoc, collection, getDocs, deleteDoc } = await loadFirestoreModule();
             const uid = this.currentUser.uid;
 
             // --- Sync Logbook ---
@@ -628,7 +668,11 @@ export const FirebaseAuthEngine = {
             // Refresh logbook (flights + equipment) and re-render whichever tab is open.
             // On ne touche pas à l'onglet "add" : c'est un formulaire (vol ou gonflage), pas
             // une vue de données, et le re-render effacerait une saisie/modification en cours.
+            // On attend whenReady() avant de rendre : sinon le rendu peut avoir lieu avant la
+            // réhydratation de rawIgc depuis IndexedDB, cachant à tort le bouton "Voir la trace"
+            // d'un vol dont la trace n'est stockée que là (cf. LogbookService.getFlightTrace()).
             LogbookService.loadData();
+            await LogbookService.whenReady();
             const logbookView = AppRouter.getView('LOGBOOK');
             if (logbookView && logbookView.currentTab !== 'add') {
                 logbookView.switchTab(logbookView.currentTab);
@@ -704,7 +748,7 @@ export const FirebaseAuthEngine = {
             return { success: false, data: null, error: 'Not enabled or logged in' };
 
         try {
-            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            const { doc, setDoc } = await loadFirestoreModule();
             const uid = this.currentUser.uid;
 
             const qcmStats = this.getLocalQcmStats();
@@ -726,7 +770,7 @@ export const FirebaseAuthEngine = {
             return { success: false, data: null, error: 'Not enabled or logged in' };
 
         try {
-            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            const { doc, setDoc } = await loadFirestoreModule();
             const uid = this.currentUser.uid;
 
             const examHistory = this.getLocalExamHistory();
@@ -748,7 +792,7 @@ export const FirebaseAuthEngine = {
             return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
-            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            const { doc, setDoc } = await loadFirestoreModule();
             const uid = this.currentUser.uid;
 
             const prefs = this.getLocalPreferences();
@@ -770,7 +814,7 @@ export const FirebaseAuthEngine = {
             return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
-            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            const { doc, setDoc } = await loadFirestoreModule();
             const uid = this.currentUser.uid;
 
             // Save all locally present to cloud
@@ -794,7 +838,7 @@ export const FirebaseAuthEngine = {
             return { success: false, data: null, error: 'Not enabled or logged in' };
 
         try {
-            const { doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            const { doc, deleteDoc } = await loadFirestoreModule();
             const uid = this.currentUser.uid;
 
             const docRef = doc(db, 'users', uid, 'logbook', id);
@@ -812,7 +856,7 @@ export const FirebaseAuthEngine = {
             return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
-            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            const { doc, setDoc } = await loadFirestoreModule();
             const uid = this.currentUser.uid;
 
             // Save all locally present to cloud
@@ -836,7 +880,7 @@ export const FirebaseAuthEngine = {
             return { success: false, data: null, error: 'Not enabled or logged in' };
 
         try {
-            const { doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            const { doc, deleteDoc } = await loadFirestoreModule();
             const uid = this.currentUser.uid;
 
             const docRef = doc(db, 'users', uid, 'equipment', id);
@@ -854,7 +898,7 @@ export const FirebaseAuthEngine = {
             return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
-            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            const { doc, setDoc } = await loadFirestoreModule();
             const uid = this.currentUser.uid;
 
             const docRef = doc(db, 'users', uid, 'equipment', item.id);
@@ -875,7 +919,7 @@ export const FirebaseAuthEngine = {
             return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
-            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            const { doc, setDoc } = await loadFirestoreModule();
             const uid = this.currentUser.uid;
 
             const docRef = doc(db, 'users', uid, 'logbook', session.id);
@@ -923,8 +967,7 @@ export const FirebaseAuthEngine = {
             }
 
             const swRegistration = await navigator.serviceWorker.ready;
-            const { getMessaging, getToken } =
-                await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js');
+            const { getMessaging, getToken } = await loadMessagingModule();
             const messaging = getMessaging(app);
             const token = await getToken(messaging, {
                 vapidKey: FCM_VAPID_KEY,
@@ -936,7 +979,7 @@ export const FirebaseAuthEngine = {
                 return { success: false, error: 'No token' };
             }
 
-            const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            const { doc, setDoc } = await loadFirestoreModule();
             await setDoc(doc(db, 'users', this.currentUser.uid), { fcmToken: token }, { merge: true });
 
             this.showStatus('Alertes météo activées sur cet appareil !', 'success');
@@ -1085,6 +1128,7 @@ export const FirebaseAuthEngine = {
                     AppRouter.getView('STATS')?.renderStats?.();
                 } else if (mode === 'LOGBOOK') {
                     LogbookService.loadData();
+                    await LogbookService.whenReady();
                     const logbookView = AppRouter.getView('LOGBOOK');
                     logbookView?.switchTab(logbookView.currentTab);
                 }

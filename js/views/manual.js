@@ -5,6 +5,7 @@
 import GlobalState from '../core/app_state.js';
 import { escapeHTML } from '../core/security.js';
 import { COURSES_DATA } from '../data/courses_data.js';
+import { toSorted } from '../utils/array_utils.js';
 
 /**
  * LIBRARY ENGINE
@@ -136,17 +137,17 @@ class LibraryViewClass extends BaseView {
     }
 
     renderGroupedByCategory(container, courses) {
-        // Group by the 'category' property defined in courses_data.js
-        const categories = {};
+        // Group courses by category using modern ES2024 Object.groupBy
+        const categories = Object.groupBy
+            ? Object.groupBy(courses, (c) => c.category || 'Autre')
+            : courses.reduce((acc, c) => {
+                  const cat = c.category || 'Autre';
+                  (acc[cat] = acc[cat] || []).push(c);
+                  return acc;
+              }, {});
 
-        courses.forEach((c) => {
-            const cat = c.category || 'Autre';
-            if (!categories[cat]) categories[cat] = [];
-            categories[cat].push(c);
-        });
-
-        // Get all unique categories and sort them
-        const sortedCategories = Object.keys(categories).sort((a, b) => {
+        // Get all unique categories and sort them immutably
+        const sortedCategories = toSorted(Object.keys(categories), (a, b) => {
             // Put 'Général' or 'GENERAL' first, 'Autre' last
             if (a.toLowerCase().includes('général') || a === 'GENERAL') return -1;
             if (b.toLowerCase().includes('général') || b === 'GENERAL') return 1;
@@ -156,7 +157,8 @@ class LibraryViewClass extends BaseView {
         });
 
         sortedCategories.forEach((cat) => {
-            if (categories[cat].length === 0) return;
+            const catCourses = categories[cat] || [];
+            if (catCourses.length === 0) return;
 
             const section = document.createElement('div');
             section.className = 'library-section';
@@ -166,9 +168,9 @@ class LibraryViewClass extends BaseView {
             listContainer.className = 'library-list';
 
             // Sort courses within each category by title
-            categories[cat].sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+            const sortedInCat = toSorted(catCourses, (a, b) => (a.title || '').localeCompare(b.title || ''));
 
-            categories[cat].forEach((c) => listContainer.appendChild(this.createCourseListItem(c)));
+            sortedInCat.forEach((c) => listContainer.appendChild(this.createCourseListItem(c)));
 
             section.appendChild(listContainer);
             container.appendChild(section);
@@ -183,7 +185,18 @@ class LibraryViewClass extends BaseView {
     createCourseListItem(c) {
         const btn = document.createElement('div');
         btn.className = 'library-list-item';
-        btn.onclick = () => this.openCourse(c.id);
+        btn.setAttribute('role', 'button');
+        btn.setAttribute('tabindex', '0');
+        btn.setAttribute('aria-label', `Consulter le cours : ${c.title || ''}`);
+
+        const handleOpen = () => this.openCourse(c.id);
+        btn.addEventListener('click', handleOpen);
+        btn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleOpen();
+            }
+        });
 
         let levelBadges = '';
         const levels = Array.isArray(c.level) ? c.level : [c.level || 'GENERAL'];
@@ -199,7 +212,7 @@ class LibraryViewClass extends BaseView {
             </div>
             <div class="list-item-meta">
                 ${levelBadges}
-                <div class="list-item-action">
+                <div class="list-item-action" aria-hidden="true">
                     <i class="ri-arrow-right-s-line"></i>
                 </div>
             </div>
@@ -224,8 +237,8 @@ class LibraryViewClass extends BaseView {
             targetUrl = targetUrl.normalize('NFC');
         }
 
-        // OPEN IN NEW TAB
-        window.open(targetUrl, '_blank');
+        // OPEN IN NEW TAB with reverse tabnabbing protection
+        window.open(targetUrl, '_blank', 'noopener,noreferrer');
     }
 
     formatTitle(title) {

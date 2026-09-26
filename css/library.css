@@ -182,6 +182,25 @@ body.light-mode .library-section-header {
     background: rgba(255, 255, 255, 0.05);
 }
 
+@media (max-width: 768px) {
+    /* 4 onglets de mode : grille 2x2 au lieu d'une ligne qui déborde de l'écran */
+    .mode-toggle-container {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    .count-selector {
+        gap: 6px;
+    }
+
+    .mode-toggle-btn,
+    .count-btn {
+        min-width: 0;
+        padding: 10px 6px;
+    }
+}
+
 #qcm-theme-select {
     width: 100%;
     padding: 16px;
@@ -258,22 +277,27 @@ body.light-mode .sort-btn.active {
     align-items: center;
     gap: 12px;
     height: 48px;
-}
+    box-sizing: border-box;
 
-.search-box i {
-    font-size: 1.25rem;
-    color: var(--text-muted);
-    flex-shrink: 0;
-}
+    & i {
+        font-size: 1.25rem;
+        color: var(--text-muted);
+        flex-shrink: 0;
+    }
 
-.search-box input {
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text-main);
-    width: 100%;
-    font-size: 0.95rem;
-    font-family: inherit;
+    & input {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--text-main);
+        width: 100%;
+        font-size: 0.95rem;
+        font-family: inherit;
+
+        &::-webkit-search-cancel-button {
+            cursor: pointer;
+        }
+    }
 }
 
 
@@ -303,32 +327,50 @@ body.light-mode .sort-btn.active {
     margin-bottom: 12px;
     backdrop-filter: blur(8px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.06);
+        transform: translateY(-2px) scale(1.005);
+        border-color: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+
+        &::after {
+            opacity: 1;
+        }
+
+        & .list-item-action {
+            opacity: 1;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(2px);
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--accent-blue);
+        outline-offset: 2px;
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
+
+        & .list-item-action {
+            opacity: 1;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--accent-blue);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
 }
-
-.library-list-item:hover {
-    background: rgba(255, 255, 255, 0.06);
-    transform: translateY(-2px) scale(1.005);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-}
-
-.library-list-item::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: var(--accent-blue);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.library-list-item:hover::after {
-    opacity: 1;
-}
-
-
 
 .list-item-content {
     flex: 1;
@@ -373,24 +415,22 @@ body.light-mode .sort-btn.active {
     border-radius: 50%;
 }
 
-.library-list-item:hover .list-item-action {
-    opacity: 1;
-    color: white;
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateX(2px);
-}
-
 /* Light Mode Overrides */
 body.light-mode .library-list-item {
     background: #ffffff;
     border-color: var(--border-color);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
 
-body.light-mode .library-list-item:hover {
-    background: #ffffff;
-    border-color: var(--accent-blue);
-    box-shadow: 0 10px 20px rgba(14, 165, 233, 0.1);
+    &:hover {
+        background: #ffffff;
+        border-color: var(--accent-blue);
+        box-shadow: 0 10px 20px rgba(14, 165, 233, 0.1);
+    }
+
+    &:focus-visible {
+        outline-color: var(--accent-blue);
+        box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
+    }
 }
 
 

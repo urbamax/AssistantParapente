@@ -16,6 +16,10 @@ const Map3DComponent = {
     _smoothProtocolRegistered: false,
 
     // --- Configuration ---------------------------------------------------------
+    // 5.24.0, pas la 6.x (latest) : 6.x casse le rendu interleaved de deck.gl 9.4.0
+    // (voir PR #35 pour l'investigation complète — deck.gl n'a pas encore de version
+    // compatible avec MapLibre v6 au moment où ceci est écrit).
+    MAPLIBRE_VERSION: '5.24.0',
     SATELLITE_TILES: ['https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'],
     // Tuiles de relief brutes (AWS Terrarium / Mapzen). Elles sont servies à MapLibre
     // via un protocole personnalisé (voir _registerSmoothTerrainProtocol) qui les lisse
@@ -43,6 +47,68 @@ const Map3DComponent = {
         [3, [220, 38, 38]],
     ],
     PLAYBACK_INTERVAL_MS: 100,
+    _loadDependenciesPromise: null,
+
+    /**
+     * Charge à la demande les dépendances MapLibre GL et deck.gl (scripts et styles)
+     * pour alléger le chargement initial du site de ~2.4 Mo de code WebGL.
+     * @returns {Promise<void>}
+     */
+    ensureDependenciesLoaded: function () {
+        if (typeof maplibregl !== 'undefined' && typeof deck !== 'undefined') {
+            return Promise.resolve();
+        }
+        if (this._loadDependenciesPromise) {
+            return this._loadDependenciesPromise;
+        }
+
+        this._loadDependenciesPromise = new Promise((resolve, reject) => {
+            const loadScript = (src) => {
+                return new Promise((res, rej) => {
+                    const existing = document.querySelector(`script[src="${src}"]`);
+                    if (existing) {
+                        if (existing.dataset.loaded === 'true') return res();
+                        existing.addEventListener('load', () => res(), { once: true });
+                        existing.addEventListener('error', (err) => rej(err), { once: true });
+                        return;
+                    }
+                    const s = document.createElement('script');
+                    s.src = src;
+                    s.async = true;
+                    s.crossOrigin = 'anonymous';
+                    s.onload = () => {
+                        s.dataset.loaded = 'true';
+                        res();
+                    };
+                    s.onerror = () => rej(new Error(`Impossible de charger le script : ${src}`));
+                    document.head.appendChild(s);
+                });
+            };
+
+            const loadCss = (href) => {
+                if (document.querySelector(`link[href="${href}"]`)) return;
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = href;
+                link.crossOrigin = 'anonymous';
+                document.head.appendChild(link);
+            };
+
+            loadCss(`https://unpkg.com/maplibre-gl@${this.MAPLIBRE_VERSION}/dist/maplibre-gl.css`);
+
+            Promise.all([
+                loadScript(`https://unpkg.com/maplibre-gl@${this.MAPLIBRE_VERSION}/dist/maplibre-gl.js`),
+                loadScript('https://unpkg.com/deck.gl@9.4.0/dist.min.js'),
+            ])
+                .then(() => resolve())
+                .catch((err) => {
+                    this._loadDependenciesPromise = null;
+                    reject(err);
+                });
+        });
+
+        return this._loadDependenciesPromise;
+    },
 
     /**
      * Initialise et affiche la trace 3D dans le conteneur donné.
@@ -50,17 +116,27 @@ const Map3DComponent = {
      * @param {Array} traceGps Le tableau de points GPS {lat, lon, alt, time}
      * @param {HTMLElement} container L'élément DOM conteneur
      */
-    showTrace: function (sessionId, traceGps, container) {
+    showTrace: async function (sessionId, traceGps, container) {
         if (!traceGps || traceGps.length === 0) return;
 
-        if (typeof maplibregl === 'undefined') {
-            container.innerHTML = this._errorHtml("MapLibre GL JS n'est pas chargé.");
-            return;
+        if (typeof maplibregl === 'undefined' || typeof deck === 'undefined') {
+            container.innerHTML = `
+                <div style="padding: 40px; text-align: center; color: var(--text-secondary);">
+                    <i class="ri-loader-4-line ri-spin" style="font-size: 2rem; display: block; margin-bottom: 12px; color: var(--accent-blue);"></i>
+                    <p style="margin: 0; font-size: 0.95rem;">Chargement du moteur 3D (MapLibre &amp; deck.gl)...</p>
+                </div>
+            `;
+            try {
+                await this.ensureDependenciesLoaded();
+            } catch (err) {
+                console.error('[Map3D] Échec de chargement des dépendances 3D :', err);
+                container.innerHTML = this._errorHtml(
+                    'Impossible de charger les librairies 3D (MapLibre / deck.gl). Vérifiez votre connexion.',
+                );
+                return;
+            }
         }
-        if (typeof deck === 'undefined') {
-            container.innerHTML = this._errorHtml("deck.gl n'est pas chargé.");
-            return;
-        }
+
         if (typeof maplibregl.supported === 'function' && !maplibregl.supported()) {
             container.innerHTML = this._errorHtml('Votre navigateur ne supporte pas le rendu 3D (WebGL).');
             return;

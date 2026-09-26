@@ -31,6 +31,7 @@ class SitesViewClass extends BaseView {
     async mount(container) {
         console.time('SITES_MOUNT_TOTAL');
         await super.mount(container);
+        await SitesService.ensureSitesLoaded();
         console.time('SITES_SERVICE_INIT');
         SitesService.init();
         console.timeEnd('SITES_SERVICE_INIT');
@@ -95,6 +96,8 @@ class SitesViewClass extends BaseView {
     async unmount() {
         await super.unmount();
         clearInterval(this._weatherRetryInterval);
+        clearTimeout(this._radiusTimeout);
+        clearTimeout(this._progZoomTimeout);
         if (SitesService.activeFetchController) {
             SitesService.activeFetchController.abort();
             SitesService.activeFetchController = null;
@@ -256,11 +259,9 @@ class SitesViewClass extends BaseView {
 
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                if (typeof SITES_DATA !== 'undefined' && Array.isArray(SITES_DATA)) {
-                    SITES_DATA.forEach((s) => {
-                        delete s.distance;
-                    }); // reset cache
-                }
+                SitesService.getSites().forEach((s) => {
+                    delete s.distance;
+                }); // reset cache
 
                 SitesService.state.userLocation = {
                     lat: position.coords.latitude,
@@ -533,7 +534,7 @@ class SitesViewClass extends BaseView {
         if (!this.state.map || !this.state.markersGroup) return;
         this.state.markersGroup.clearLayers();
 
-        const activeSites = SitesService.getFilteredAndSortedSites(typeof SITES_DATA !== 'undefined' ? SITES_DATA : []);
+        const activeSites = SitesService.getFilteredAndSortedSites(SitesService.getSites());
 
         activeSites.forEach((site) => {
             let color = '#94a3b8';
@@ -605,7 +606,7 @@ class SitesViewClass extends BaseView {
                 ${
                     site.url
                         ? `
-                <a class="action-btn-secondary ffvl-btn" href="${site.url}" target="_blank" style="padding: 6px 8px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;" title="Fiche FFVL">
+                <a class="action-btn-secondary ffvl-btn" href="${site.url}" target="_blank" rel="noopener noreferrer" style="padding: 6px 8px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;" title="Fiche FFVL">
                     <img src="https://federation.ffvl.fr/sites/all/themes/ffvl/favicon.ico" alt="FFVL" style="width: 14px; height: 14px; border-radius: 2px;">
                 </a>
                 `
@@ -642,10 +643,20 @@ class SitesViewClass extends BaseView {
         const titleEl = document.getElementById('spotair-modal-title');
         if (!modal || !iframe) return;
 
-        const site = (typeof SITES_DATA !== 'undefined' ? SITES_DATA : []).find((s) => s.id === siteId);
+        const site = SitesService.getSiteById(siteId);
         if (titleEl) titleEl.textContent = site ? `Vent en direct — ${site.nom}` : 'Vent en direct — SpotAiR';
         iframe.src = `https://www.spotair.mobi/page/wind/ffvl/${spotairId}`;
 
+        if (typeof modal.showModal === 'function' && !modal.open) {
+            modal.showModal();
+            if (!modal._cancelBound) {
+                modal._cancelBound = true;
+                modal.addEventListener('cancel', (e) => {
+                    e.preventDefault();
+                    this.closeSpotairModal();
+                });
+            }
+        }
         modal.style.display = 'flex';
         void modal.offsetWidth;
         modal.classList.add('active');
@@ -658,10 +669,13 @@ class SitesViewClass extends BaseView {
         modal.classList.remove('active');
         setTimeout(() => {
             if (!modal.classList.contains('active')) {
+                if (typeof modal.close === 'function' && modal.open) {
+                    modal.close();
+                }
                 modal.style.display = 'none';
                 if (iframe) iframe.src = '';
             }
-        }, 400);
+        }, 300);
     }
 
     launchGps(app) {
@@ -676,7 +690,7 @@ class SitesViewClass extends BaseView {
         } else if (app === 'apple') {
             url = `http://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`;
         }
-        if (url) window.open(url, '_blank');
+        if (url) window.open(url, '_blank', 'noopener,noreferrer');
         this.closeGpsMenu();
     }
 
@@ -838,7 +852,7 @@ class SitesViewClass extends BaseView {
                 url = `https://www.paraglidingmap.com/app/?lat=${lat}&lng=${lon}&zoom=11`;
             }
             if (url) {
-                window.open(url, '_blank');
+                window.open(url, '_blank', 'noopener,noreferrer');
             }
             return;
         }
@@ -1086,7 +1100,7 @@ class SitesViewClass extends BaseView {
                     return (
                         '<a href="' +
                         link.url +
-                        '" target="_blank" class="external-link-btn ' +
+                        '" target="_blank" rel="noopener noreferrer" class="external-link-btn ' +
                         link.cls +
                         ' more-map-link" data-action="closeMoreMapsDropdown">' +
                         '<i class="' +
@@ -1307,7 +1321,7 @@ class SitesViewClass extends BaseView {
         }
 
         // Find forecast time from first active site
-        const firstActiveSite = SITES_DATA.find((s) => s.affiche !== false);
+        const firstActiveSite = SitesService.getSites().find((s) => s.affiche !== false);
         const firstSiteId = firstActiveSite?.id;
         const forecasts = firstSiteId ? SitesService.state.weatherForecasts[firstSiteId] : null;
         if (forecasts && forecasts[offset]) {
@@ -1336,17 +1350,39 @@ class SitesViewClass extends BaseView {
 
             const label = document.createElement('span');
             label.textContent = loc.name;
-            label.onclick = () => SitesService.loadSavedLocation(index);
+            label.setAttribute('role', 'button');
+            label.setAttribute('tabindex', '0');
+            label.setAttribute('aria-label', `Charger le lieu : ${loc.name}`);
+
+            const handleLoad = () => SitesService.loadSavedLocation(index);
+            label.addEventListener('click', handleLoad);
+            label.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleLoad();
+                }
+            });
 
             const btnRemove = document.createElement('i');
             btnRemove.className = 'ri-close-line';
             btnRemove.style.cursor = 'pointer';
             btnRemove.style.fontSize = '1rem';
-            btnRemove.onclick = (e) => {
+            btnRemove.setAttribute('role', 'button');
+            btnRemove.setAttribute('tabindex', '0');
+            btnRemove.setAttribute('aria-label', `Supprimer le lieu : ${loc.name}`);
+
+            const handleRemove = (e) => {
                 e.stopPropagation();
                 SitesService.removeSavedLocation(index);
                 this.renderSavedLocations();
             };
+            btnRemove.addEventListener('click', handleRemove);
+            btnRemove.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleRemove(e);
+                }
+            });
 
             pill.appendChild(label);
             pill.appendChild(btnRemove);
@@ -1580,7 +1616,7 @@ class SitesViewClass extends BaseView {
         const listDiv = document.getElementById('sites-list-container');
         if (!listDiv) return;
 
-        const activeSites = SitesService.getFilteredAndSortedSites(typeof SITES_DATA !== 'undefined' ? SITES_DATA : []);
+        const activeSites = SitesService.getFilteredAndSortedSites(SitesService.getSites());
 
         if (this.state.showComparator) {
             this.renderComparator(activeSites);
@@ -1869,7 +1905,7 @@ class SitesViewClass extends BaseView {
                     ${
                         site.url
                             ? `
-                    <a class="action-btn-secondary ffvl-btn" href="${site.url}" target="_blank" title="Fiche officielle FFVL">
+                    <a class="action-btn-secondary ffvl-btn" href="${site.url}" target="_blank" rel="noopener noreferrer" title="Fiche officielle FFVL">
                         <img src="https://federation.ffvl.fr/sites/all/themes/ffvl/favicon.ico" alt="FFVL"> FFVL
                     </a>
                     `

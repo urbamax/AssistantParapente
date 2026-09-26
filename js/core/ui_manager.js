@@ -111,7 +111,7 @@ class UIManager {
         // restaient actifs pendant que body.dark-theme appliquait les règles sombres (header, nav).
         // <html> et <body> doivent toujours dire la même chose.
         const root = document.documentElement;
-        root.classList.remove('light-mode');
+        root.classList.remove('light-mode', 'dark-theme', 'dark-mode');
         body.classList.remove('light-mode', 'dark-mode', 'dark-theme');
         if (iconSun) iconSun.style.opacity = '0.5';
         if (iconMoon) iconMoon.style.opacity = '0.5';
@@ -134,9 +134,11 @@ class UIManager {
             }
         }
 
+        root.style.colorScheme = effectiveMode;
+
         if (effectiveMode === 'dark') {
-            body.classList.add('dark-mode');
-            body.classList.add('dark-theme');
+            body.classList.add('dark-mode', 'dark-theme');
+            root.classList.add('dark-theme');
         } else {
             body.classList.add('light-mode');
             root.classList.add('light-mode');
@@ -193,12 +195,12 @@ class UIManager {
             levelSelect.value = currentLevel;
             const targetOption = levelSelect.querySelector(`option[value="${currentLevel}"]`);
             if (targetOption) targetOption.selected = true;
+            return;
+        }
 
-            if (attempts < 25) {
-                setTimeout(() => this.restoreLevelUI(attempts + 1), 100);
-            }
-        } else if (attempts < 50) {
-            setTimeout(() => this.restoreLevelUI(attempts + 1), 100);
+        // If the header component is still loading, retry at most 3 times (150ms max)
+        if (attempts < 3) {
+            setTimeout(() => this.restoreLevelUI(attempts + 1), 50);
         }
     }
 
@@ -220,6 +222,16 @@ class UIManager {
 
         const modal = document.getElementById('manual-modal');
         if (modal) {
+            if (typeof modal.showModal === 'function' && !modal.open) {
+                modal.showModal();
+                if (!modal._cancelBound) {
+                    modal._cancelBound = true;
+                    modal.addEventListener('cancel', (e) => {
+                        e.preventDefault();
+                        this.hideManual();
+                    });
+                }
+            }
             modal.style.display = 'flex';
             void modal.offsetWidth;
             modal.classList.add('active');
@@ -232,8 +244,13 @@ class UIManager {
         if (modal) {
             modal.classList.remove('active');
             setTimeout(() => {
-                if (!modal.classList.contains('active')) modal.style.display = 'none';
-            }, 400);
+                if (!modal.classList.contains('active')) {
+                    if (typeof modal.close === 'function' && modal.open) {
+                        modal.close();
+                    }
+                    modal.style.display = 'none';
+                }
+            }, 300);
         }
     }
 

@@ -19,6 +19,7 @@ import SitesView from '../views/sites.js';
 import LibraryView from '../views/manual.js';
 import QuizService from '../services/quiz_service.js';
 import WelcomeView from '../views/welcome.js';
+import SafetyView from '../views/safety.js';
 import { resolveStartMode } from './start_mode.js';
 
 async function bootApplication() {
@@ -166,10 +167,35 @@ async function bootApplication() {
     AppEvents.register('SitesopenSpotairModal', (_args, _e, target) =>
         SitesView.openSpotairModal(target.dataset.spotairId, target.dataset.siteId),
     );
+    // "Valider" button next to #address-input: reads the field's live value at click time.
+    // data-args can't carry that (it's a static HTML attribute), and it isn't JS to evaluate —
+    // an earlier attempt here passed the literal string "document.getElementById('address-input')"
+    // as the search query, so every click geocoded that text instead of the typed address.
+    AppEvents.register('SitesvalidateAddress', () =>
+        SitesService.geocodeAddress(document.getElementById('address-input')?.value),
+    );
+
+    // Safety (écran Secours / check-lists / SIGR)
+    [
+        'switchTab',
+        'locate',
+        'copyPosition',
+        'sharePosition',
+        'toggleCheck',
+        'resetChecklist',
+        'readChecklist',
+        'answerReady',
+        'resetReady',
+        'ratePlate',
+    ].forEach((action) => {
+        AppEvents.register('Safety' + action, (args, e, t) => SafetyView[action](args, e, t));
+    });
 
     // Generic UI helpers
     AppEvents.register('reloadApp', () => window.location.reload());
-    AppEvents.register('openUrl', (_args, _e, target) => window.open(target.dataset.url, '_blank', 'noopener'));
+    AppEvents.register('openUrl', (_args, _e, target) =>
+        window.open(target.dataset.url, '_blank', 'noopener,noreferrer'),
+    );
     AppEvents.register('triggerClick', (id) => document.getElementById(id)?.click());
     AppEvents.register('toggleOtherField', (value, _e, target) => {
         const other = document.getElementById(target.dataset.toggleId);
@@ -257,6 +283,7 @@ async function bootApplication() {
     AppRouter.register('SITES', SitesView);
     AppRouter.register('LIBRARY', LibraryView);
     AppRouter.register('WELCOME', WelcomeView);
+    AppRouter.register('SAFETY', SafetyView);
 
     // 4. Initialize History API
     AppRouter.initHistory();
@@ -289,15 +316,8 @@ async function bootApplication() {
 }
 
 // Start
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        console.time('FETCH_SITES');
-        const response = await fetch('js/data/sites_data.json');
-        window.SITES_DATA = await response.json();
-        console.timeEnd('FETCH_SITES');
-    } catch (e) {
-        console.error('Erreur de chargement de sites_data.json:', e);
-        window.SITES_DATA = [];
-    }
+document.addEventListener('DOMContentLoaded', () => {
+    // Déclenche le chargement asynchrone des sites en arrière-plan sans bloquer le boot
+    SitesService.ensureSitesLoaded().catch((e) => console.error('Erreur chargement asynchrone sites_data.json:', e));
     bootApplication();
 });

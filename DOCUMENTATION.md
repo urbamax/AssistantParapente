@@ -18,8 +18,8 @@ Assistant Parapente is a modern, responsive single-page web application (SPA) de
 - **Unidirectional Reactive State**: `AppState` (`js/core/app_state.js`) provides a publish/subscribe pattern for global settings (theme, level, active route, network state).
 - **Declarative Event Delegation**: Eliminates inline HTML event attributes (`onclick=...`). Interactivity uses HTML data attributes `data-action="..."` and `data-args="..."` dispatched via `EventDelegator` (`js/core/events.js`).
 - **Service & View Separation**: UI views (`js/views/`) strictly handle DOM rendering and user interactions, delegating state management, data processing, and external APIs to stateless services (`js/services/`).
-- **Offline-First & Hybrid Sync**: Complete functionality available offline with `LocalStorage` (`StorageService`), automatically syncing with Cloud Firestore when user signs in (`FirebaseService`).
-- **Security Policy (XSS Prevention)**: To prevent Cross-Site Scripting, the usage of raw `innerHTML` with unsanitized user or external data is **strictly forbidden**. All dynamic injections must either use `document.createElement()` + `textContent` or wrap variables in `escapeHTML()` (from `js/core/security.js`).
+- **Offline-First & Hybrid Storage**: High-capacity persistent offline storage via native `IndexedDB` (`IDBStorageService`) for heavy datasets (IGC flight traces and telemetry) alongside `LocalStorage` (`StorageService`) for instant synchronous preferences, automatically syncing with Cloud Firestore when user signs in (`FirebaseService`).
+- **Security Policy (XSS & Tabnabbing Prevention)**: To prevent Cross-Site Scripting, the usage of raw `innerHTML` with unsanitized user or external data is **strictly forbidden**. All dynamic injections must either use `document.createElement()` + `textContent` or wrap variables in `escapeHTML()` (from `js/core/security.js`). Furthermore, all external targets (`target="_blank"` and `window.open`) strictly enforce `rel="noopener noreferrer"` to prevent Reverse Tabnabbing.
 
 ---
 
@@ -63,7 +63,8 @@ AssistantParapente/
 │   │   ├── quiz_service.js     # Question randomization, scoring & streak tracking
 │   │   ├── firebase_service.js # Authentication & Cloud Firestore synchronization
 │   │   ├── igc_parser.js       # Native IGC GPS file parser (B-records, vario, stats)
-│   │   └── storage.js          # LocalStorage wrapper & fallback keys
+│   │   ├── storage.js          # LocalStorage wrapper & fallback keys
+│   │   └── idb_storage.js      # Native IndexedDB wrapper for heavy flights & IGC traces
 │   ├── components/
 │   │   └── map_3d.js           # MapLibre GL 3D terrain viewer & line extrusion
 │   ├── data/                   # Static Datasets & Configs
@@ -198,7 +199,11 @@ Sites service fetches open-access meteorological data from **Open-Meteo API**:
 
 ### 3. Interactive Cartography (2D & 3D)
 - **2D Map**: Built on Leaflet.js with custom markers and SpotAir SVG federal vector icons.
-- **3D Map** (`js/components/map_3d.js`): Uses MapLibre GL JS with DEM elevation tiles to render 3D terrain, camera pitch, and 3D flight trace extrusions.
+- **3D Map & Flight Replay** (`js/components/map_3d.js`): Renders 3D terrain and true-altitude flight traces via MapLibre GL JS and deck.gl (`PathLayer`). To optimize performance, the ~2.4 MB 3D engine is **lazily loaded on demand** upon clicking "Afficher la trace 3D", saving bandwidth and boot time for regular users.
+
+### 4. Service Encapsulation & Lookup (`SitesService`)
+- Sites catalog is accessed via `SitesService.getSites()`.
+- `SitesService.getSiteById(id)` provides constant-time $\mathcal{O}(1)$ resolution through an internal cached `Map`.
 
 ---
 
@@ -225,7 +230,12 @@ Every logged flight automatically increments the total airtime (hours & minutes)
 - **Exam Mode**: 60 random questions selected across all subjects according to official FFVL weighting. Includes a strict 60-minute countdown timer.
 - **Revision Mode**: Focuses specifically on questions previously answered incorrectly by the user.
 
-### 2. Scoring & Progression Analytics
+### 2. Service Encapsulation & Indexing (`QuizService`)
+- **Data Encapsulation**: Questions are encapsulated within `QuizService` and accessed via `getQuestions()`, `getThemes()`, and `getQuestionsByTheme()` (using `Object.groupBy` Baseline 2024).
+- **Fast Lookup**: `getQuestionByCode(code)` maintains an internal `Map` for $\mathcal{O}(1)$ resolution by code or id.
+- **Backwards Compatibility**: `window.QCM_OFFICIAL` is mirrored for external tools and debugging console access.
+
+### 3. Scoring & Progression Analytics
 Calculates overall success percentage, subject mastery radar, active day streak, and logs exam history locally and in Cloud Firestore.
 
 ---
@@ -285,6 +295,10 @@ When modifying or expanding the codebase, follow these rules strictly:
 - **Runtime-fetched files** (`components/`, `courses/`, `img/`, `manifest.json`, `js/firebase_config.js`, the `js/data` JSON/CSV) are not in the import graph: if you add a new one, list it in `STATIC_PATHS` in `vite.config.mjs` so it is copied into `dist/`.
 - **Maintain ES6 Imports**: Always specify file extensions in import statements (e.g., `import GlobalState from './app_state.js';`).
 - **Use Event Delegation**: Never write inline event handlers in rendered HTML strings (e.g. avoid `onclick="doSomething()"`). Use `data-action="doSomething"` and `data-args="..."`.
+- **Modern JavaScript Idioms (ES2023 / ES2024 Baseline)**:
+  - Prefer immutable array sorting via `toSorted(array, compareFn)` from `js/utils/array_utils.js` instead of mutative `[...array].sort(...)`. Never call the native `array.toSorted(...)` directly: it throws on Safari < 16 / Chrome < 110 / Firefox < 115, and this helper is the feature-detected fallback for it (same reasoning as the `Object.groupBy` fallback below).
+  - Prefer declarative grouping via `Object.groupBy(items, fn)` (with fallback) over manual accumulator loops.
+  - Wrap search inputs in semantic HTML5 `<search role="search">` containers and use `type="search"`.
 
 ### JS type checking (optional, best-effort)
 `npm run typecheck` runs plain TypeScript's `checkJs` over `js/**/*.js` (config: `jsconfig.json`, ambient types for CDN globals in `types/`). It's not wired into CI and won't reach 0 errors: most of what it reports is `document.getElementById()` returning a bare `HTMLElement` (no `.value`, `.checked`, etc. without a cast), which is expected for a codebase with no `/** @type {...} */` casts at every DOM read — not a bug list. Run it after a change to a service/view file to catch the kind of error it's actually good at: a wrong property name, a function called with the wrong arguments, a reference to something that was renamed or removed elsewhere. `sw.js` is excluded (service worker globals need a different `lib` set than the rest of the app, which targets the browser DOM).

@@ -9,6 +9,7 @@ import { removeAccents } from '../utils/text_utils.js';
 import { escapeHTML } from '../core/security.js';
 import AppRouter from '../core/router.js';
 import { evaluateSpotForecast } from '../weatherScoring.js';
+import { toSorted } from '../utils/array_utils.js';
 
 const sitesView = () => AppRouter.getView('SITES');
 
@@ -80,6 +81,87 @@ class SitesService {
             },
             activeMapLayers: ['leaflet', 'windy', 'meteoparapente', 'paraglidingearth', 'paraglidable', 'isofronts'],
         };
+    }
+
+    /**
+     * Charge sites_data.json de façon asynchrone (lazy loading / non-bloquant).
+     * Partage une même promesse pour éviter tout fetch en double.
+     * @returns {Promise<Array>} Tableau des sites chargés
+     */
+    async ensureSitesLoaded() {
+        const currentData =
+            typeof window !== 'undefined'
+                ? window.SITES_DATA
+                : typeof globalThis !== 'undefined'
+                  ? globalThis.SITES_DATA
+                  : undefined;
+        if (this._sitesLoaded && Array.isArray(currentData) && currentData.length > 0) {
+            return currentData;
+        }
+        if (this._sitesLoadingPromise) {
+            return this._sitesLoadingPromise;
+        }
+        this._sitesLoadingPromise = (async () => {
+            try {
+                const existing =
+                    typeof window !== 'undefined'
+                        ? window.SITES_DATA
+                        : typeof globalThis !== 'undefined'
+                          ? globalThis.SITES_DATA
+                          : undefined;
+                if (Array.isArray(existing) && existing.length > 0) {
+                    this._sitesLoaded = true;
+                    return existing;
+                }
+                const response = await fetch('js/data/sites_data.json');
+                const data = await response.json();
+                if (typeof window !== 'undefined') window.SITES_DATA = data;
+                if (typeof globalThis !== 'undefined') globalThis.SITES_DATA = data;
+                this._sitesLoaded = true;
+                return data;
+            } catch (err) {
+                console.error('[SitesService] Erreur lors du chargement de sites_data.json:', err);
+                const fallback = (typeof window !== 'undefined' && window.SITES_DATA) || [];
+                if (typeof window !== 'undefined') window.SITES_DATA = fallback;
+                return fallback;
+            } finally {
+                this._sitesLoadingPromise = null;
+            }
+        })();
+        return this._sitesLoadingPromise;
+    }
+
+    /**
+     * Retourne le catalogue des sites chargés (encapsulation propre de SITES_DATA).
+     * @returns {Array}
+     */
+    getSites() {
+        const data =
+            typeof window !== 'undefined'
+                ? window.SITES_DATA
+                : typeof globalThis !== 'undefined'
+                  ? globalThis.SITES_DATA
+                  : undefined;
+        return Array.isArray(data) ? data : [];
+    }
+
+    /**
+     * Recherche un site par identifiant en temps constant O(1) via Map interne.
+     * @param {string|number} id L'identifiant du site
+     * @returns {Object|null}
+     */
+    getSiteById(id) {
+        if (!id) return null;
+        const sites = this.getSites();
+        if (!sites.length) return null;
+        if (this._siteMapSource !== sites) {
+            this._siteMap = new Map();
+            sites.forEach((s) => {
+                if (s && s.id !== undefined) this._siteMap.set(String(s.id), s);
+            });
+            this._siteMapSource = sites;
+        }
+        return this._siteMap.get(String(id)) || null;
     }
 
     init() {
@@ -248,10 +330,11 @@ class SitesService {
     // qui couvre tous les sites actifs sur toute la fenêtre de prévision.
     async fetchSecondaryModelForFavorites() {
         this.state.weatherForecastsSecondary = this.state.weatherForecastsSecondary || {};
-        if (typeof SITES_DATA === 'undefined') return { success: false, error: 'SITES_DATA indisponible' };
+        const allSites = this.getSites();
+        if (allSites.length === 0) return { success: false, error: 'SITES_DATA indisponible' };
 
         const favoriteIds = (this.state.userPreferences && this.state.userPreferences.favoriteSites) || [];
-        const favoriteSites = SITES_DATA.filter(
+        const favoriteSites = allSites.filter(
             (s) =>
                 favoriteIds.includes(s.id) &&
                 !isNaN(parseFloat(s.latitude || s.lat)) &&
@@ -354,7 +437,8 @@ class SitesService {
     }
 
     async fetchWeatherForSites() {
-        if (typeof SITES_DATA === 'undefined' || SITES_DATA.length === 0) return;
+        const allSites = this.getSites();
+        if (allSites.length === 0) return;
 
         const cooldownRemaining = this.getWeatherCooldownRemainingMs();
         if (cooldownRemaining > 0) {
@@ -371,7 +455,7 @@ class SitesService {
         // à chaque fois. Un rayon de 50km autour de l'utilisateur peut réduire ça
         // à quelques dizaines de sites, ce qui évite de saturer le quota Open-Meteo
         // et rend le chargement bien plus rapide.
-        const activeSites = this.getGeoFilteredSites(SITES_DATA);
+        const activeSites = this.getGeoFilteredSites(allSites);
         if (activeSites.length === 0) return;
 
         // Open-Meteo (derrière nginx) répond 414 "Request-URI Too Large" au-delà
@@ -580,8 +664,9 @@ class SitesService {
     scheduleWeatherRescopeIfNeeded() {
         clearTimeout(this._weatherRescopeTimer);
         this._weatherRescopeTimer = setTimeout(() => {
-            if (typeof SITES_DATA === 'undefined') return;
-            const candidates = this.getGeoFilteredSites(SITES_DATA);
+            const allSites = this.getSites();
+            if (allSites.length === 0) return;
+            const candidates = this.getGeoFilteredSites(allSites);
             const missing = candidates.some((s) => !this.state.weatherForecasts[s.id]);
             if (!missing) return;
 
@@ -1225,25 +1310,15 @@ class SitesService {
                         return 3;
                     };
 
-                    // Stable sort prioritizing French and bordering countries' locations
-                    const mapped = data.map((item, idx) => ({ item, idx, rank: getCountryRank(item) }));
-                    mapped.sort((a, b) => {
-                        if (a.rank !== b.rank) {
-                            return a.rank - b.rank;
-                        }
-                        return a.idx - b.idx;
-                    });
-
-                    const result = mapped[0].item;
+                    // Stable sort prioritizing French and bordering countries' locations (ES2023 toSorted)
+                    const result = toSorted(data, (a, b) => getCountryRank(a) - getCountryRank(b))[0];
                     const lat = parseFloat(result.lat);
                     const lng = parseFloat(result.lon);
 
                     // Clear cached distances on sites data to force recalculation with new reference coordinates
-                    if (typeof SITES_DATA !== 'undefined' && Array.isArray(SITES_DATA)) {
-                        SITES_DATA.forEach((s) => {
-                            delete s.distance;
-                        });
-                    }
+                    this.getSites().forEach((s) => {
+                        delete s.distance;
+                    });
 
                     this.state.userLocation = { lat, lng };
 
