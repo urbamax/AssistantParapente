@@ -696,7 +696,11 @@ class SitesService {
             const missing = candidates.some((s) => !this.state.weatherForecasts[s.id]);
             if (!missing) return;
 
-            this.fetchWeatherForSites().then(() => {
+            this.fetchWeatherForSites().then((result) => {
+                if (sitesView()?.handleWeatherFetchResult) {
+                    sitesView().handleWeatherFetchResult(result);
+                    return;
+                }
                 sitesView()?.renderList?.();
             });
         }, 400);

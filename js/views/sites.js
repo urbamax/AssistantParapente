@@ -139,7 +139,15 @@ class SitesViewClass extends BaseView {
                         result = SitesService[action](...args.split(',').map((a) => a.trim().replace(/'/g, '')));
                     else result = SitesService[action]();
 
-                    const updateUI = () => {
+                    const updateUI = (resolved) => {
+                        // Le bouton "Réessayer" de la bannière d'erreur météo repasse par ce
+                        // dispatcheur générique : sans ce cas particulier, un nouvel échec (ex.
+                        // toujours saturé) se contentait de re-render sans rien expliquer,
+                        // laissant les cartes sur "Chargement météo..." indéfiniment.
+                        if (action === 'fetchWeatherForSites') {
+                            this.handleWeatherFetchResult(resolved);
+                            return;
+                        }
                         this.renderList();
                         this.updateMapMarkers();
                         if (action === 'cycleFilterState') {
@@ -170,7 +178,14 @@ class SitesViewClass extends BaseView {
                 if (el.type === 'checkbox') result = SitesService[action](el.checked);
                 else result = SitesService[action](el.value);
 
-                const updateUI = () => {
+                const updateUI = (resolved) => {
+                    // Même raison que pour _clickHandler : changer de modèle météo relance un
+                    // fetch qui peut échouer (429...), et sans ce cas particulier ça se
+                    // contentait de re-render sans jamais l'expliquer.
+                    if (action === 'changeWeatherModel') {
+                        this.handleWeatherFetchResult(resolved);
+                        return;
+                    }
                     this.renderList();
                     this.updateMapMarkers();
                 };
@@ -359,36 +374,8 @@ class SitesViewClass extends BaseView {
             }
 
             SitesService.fetchWeatherForSites().then((result) => {
-                // success === null : cet appel a été annulé par un appel plus récent (filtre,
-                // GPS ou modèle météo changé entre-temps) — pas un échec, on laisse cet appel
-                // plus récent gérer seul le spinner et la bannière d'erreur éventuelle.
-                if (result && result.success === null) return;
-
                 console.timeEnd('SITES_FETCH_WEATHER');
-
-                const indicator = document.getElementById('weather-loading-indicator');
-                if (indicator) indicator.remove();
-
-                if (result && result.success === false) {
-                    // Render list with error banner
-                    this.renderList();
-                    const container = document.getElementById('sites-list-container');
-                    if (container) {
-                        const errorHtml = `
-                        <div style="color:var(--accent-red, #ef4444); font-size: 0.95rem; text-align: center; padding: 16px; margin-bottom: 16px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: var(--radius-lg); width: 100%;">
-                            <i class="ri-error-warning-line" style="font-size: 1.2rem; vertical-align: middle; margin-right: 8px;"></i>
-                            <strong>Météo indisponible :</strong> ${result.error?.message || 'Erreur réseau'}
-                            <button id="weather-retry-btn" data-action="fetchWeatherForSites" class="action-btn-primary" style="margin-left: 12px; padding: 4px 12px; font-size: 0.8rem; border-radius: var(--radius-pill);">Réessayer</button>
-                        </div>
-                    `;
-                        container.insertAdjacentHTML('afterbegin', errorHtml);
-                        this._startWeatherRetryCountdown(result.cooldownRemainingMs || 0);
-                    }
-                } else {
-                    this.updateForecastLabel();
-                    this.renderList();
-                    this.updateMapMarkers();
-                }
+                this.handleWeatherFetchResult(result);
             });
             this.initialized = true;
         }
@@ -410,6 +397,44 @@ class SitesViewClass extends BaseView {
 
         this.updateMapTogglesVisibility();
         this.switchMapMode('leaflet');
+    }
+
+    /**
+     * Point d'entrée unique pour réagir à la fin d'un fetchWeatherForSites(), quel que soit
+     * le déclencheur (chargement initial, changement de modèle météo, re-scope après un
+     * changement de filtre/rayon/GPS). Sans ce point commun, seul show() affichait la
+     * bannière d'erreur sur un vrai échec (429, réseau...) — les deux autres déclencheurs se
+     * contentaient de re-render, laissant les cartes tourner sur "Chargement météo..." sans
+     * jamais expliquer pourquoi en cas d'échec réel.
+     */
+    handleWeatherFetchResult(result) {
+        // success === null : cet appel a été annulé par un appel plus récent (filtre, GPS ou
+        // modèle météo changé entre-temps) — pas un échec, on laisse cet appel plus récent
+        // gérer seul le spinner et la bannière d'erreur éventuelle.
+        if (result && result.success === null) return;
+
+        const indicator = document.getElementById('weather-loading-indicator');
+        if (indicator) indicator.remove();
+
+        if (result && result.success === false) {
+            this.renderList();
+            const container = document.getElementById('sites-list-container');
+            if (container) {
+                const errorHtml = `
+                <div style="color:var(--accent-red, #ef4444); font-size: 0.95rem; text-align: center; padding: 16px; margin-bottom: 16px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: var(--radius-lg); width: 100%;">
+                    <i class="ri-error-warning-line" style="font-size: 1.2rem; vertical-align: middle; margin-right: 8px;"></i>
+                    <strong>Météo indisponible :</strong> ${result.error?.message || 'Erreur réseau'}
+                    <button id="weather-retry-btn" data-action="fetchWeatherForSites" class="action-btn-primary" style="margin-left: 12px; padding: 4px 12px; font-size: 0.8rem; border-radius: var(--radius-pill);">Réessayer</button>
+                </div>
+            `;
+                container.insertAdjacentHTML('afterbegin', errorHtml);
+                this._startWeatherRetryCountdown(result.cooldownRemainingMs || 0);
+            }
+        } else {
+            this.updateForecastLabel();
+            this.renderList();
+            this.updateMapMarkers();
+        }
     }
 
     initMap() {
