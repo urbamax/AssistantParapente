@@ -1197,6 +1197,20 @@ export const FirebaseAuthEngine = {
     },
 
     // Merge algorithms
+
+    // État de révision espacée (streak + lastSeen) d'une question : on garde celui de l'appareil
+    // qui a vu la question le plus récemment. Prendre le max des streaks effacerait une erreur
+    // récente (streak remis à 0 sur le téléphone, 4 dans le cloud), et ne pas recopier lastSeen
+    // faisait retomber le mode Révision sur l'ancien critère de ratio après chaque synchro.
+    _latestReviewState: function (a, b) {
+        const aSeen = a.lastSeen || 0;
+        const bSeen = b.lastSeen || 0;
+        if (!aSeen && !bSeen) return { streak: Math.max(a.streak || 0, b.streak || 0) };
+        if (aSeen === bSeen) return { streak: Math.max(a.streak || 0, b.streak || 0), lastSeen: aSeen };
+        const latest = aSeen > bSeen ? a : b;
+        return { streak: latest.streak || 0, lastSeen: latest.lastSeen };
+    },
+
     mergeQcmStats: function (local, cloud) {
         const merged = {
             totalQuestions: 0,
@@ -1215,7 +1229,7 @@ export const FirebaseAuthEngine = {
             merged.questions[qCode] = {
                 total: Math.max(lQ.total, cQ.total),
                 correct: Math.max(lQ.correct, cQ.correct),
-                streak: Math.max(lQ.streak || 0, cQ.streak || 0),
+                ...this._latestReviewState(lQ, cQ),
             };
         });
 
