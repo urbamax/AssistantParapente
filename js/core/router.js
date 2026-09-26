@@ -11,6 +11,7 @@ class Router {
     constructor() {
         this.routes = new Map();
         this.activeRoute = null;
+        this._activeTransition = null;
     }
 
     register(mode, viewModule) {
@@ -40,8 +41,57 @@ class Router {
         console.timeEnd('ROUTER_UNMOUNT_PREVIOUS');
 
         console.time('ROUTER_HIDE_SCREENS');
-        // Hide all screens
-        document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
+        const updateDOM = () => {
+            // Hide all screens
+            document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
+
+            const screenEl = document.getElementById(`${mode.toLowerCase()}-screen`);
+            if (screenEl) {
+                screenEl.classList.add('active');
+            }
+        };
+
+        // Utilise l'API native View Transitions si supportée par le navigateur
+        // et non restreinte par prefers-reduced-motion (Accessibilité / performance)
+        const prefersReducedMotion =
+            typeof window !== 'undefined' &&
+            window.matchMedia &&
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (
+            !prefersReducedMotion &&
+            typeof document !== 'undefined' &&
+            typeof document.startViewTransition === 'function'
+        ) {
+            // Une navigation qui arrive pendant qu'une transition précédente est encore en
+            // cours (double clic, navigation rapide) la ferait sinon avorter implicitement :
+            // le navigateur rejette `ready` (et potentiellement `updateCallbackDone`/`finished`)
+            // avec une AbortError/InvalidStateError, qui remonte comme rejet de promesse non géré
+            // (bannière GLOBAL ERROR) si personne ne l'écoute. On l'arrête nous-mêmes
+            // explicitement puis on avale ces trois rejets attendus (vérifié en direct : seul
+            // `ready` rejetait réellement ici, mais rien ne garantit que ce soit toujours le cas
+            // selon le moteur).
+            if (this._activeTransition) {
+                this._activeTransition.skipTransition();
+            }
+            const transition = document.startViewTransition(() => updateDOM());
+            this._activeTransition = transition;
+            transition.ready.catch(() => {});
+            transition.finished
+                .catch(() => {})
+                .finally(() => {
+                    if (this._activeTransition === transition) {
+                        this._activeTransition = null;
+                    }
+                });
+            // Le callback de transition est asynchrone : on attend qu'il ait basculé les
+            // écrans AVANT de monter la vue, sinon il écraserait l'écran activé par mount()
+            // (ex. QuizView active qcm-setup-screen, puis le callback réactivait qcm-screen
+            // → écran bloqué sur « Chargement… »).
+            await transition.updateCallbackDone.catch(() => {});
+        } else {
+            updateDOM();
+        }
 
         // Update State
         GlobalState.set('lastMode', GlobalState.get('mode'));
@@ -51,11 +101,7 @@ class Router {
         // Mount new view
         const view = this.routes.get(mode);
         this.activeRoute = view;
-
         const screenEl = document.getElementById(`${mode.toLowerCase()}-screen`);
-        if (screenEl) {
-            screenEl.classList.add('active');
-        }
 
         console.timeEnd('ROUTER_HIDE_SCREENS');
 
@@ -80,11 +126,16 @@ class Router {
             }
         }
 
-        // Push state for browser history
+        // Push/replace state for browser history
         if (params.pushState !== false) {
             const url = new URL(window.location);
+            const currentModeInUrl = url.searchParams.get('mode');
             url.searchParams.set('mode', mode);
-            window.history.pushState({ mode, params }, '', url);
+            if (currentModeInUrl === mode) {
+                window.history.replaceState({ mode, params }, '', url);
+            } else {
+                window.history.pushState({ mode, params }, '', url);
+            }
         }
         if (view.mount) {
             console.timeEnd('ROUTER_MOUNT_' + mode);

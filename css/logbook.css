@@ -21,25 +21,27 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-}
 
-.logbook-tab-btn.active {
-    background: var(--bg-surface);
-    color: var(--text-main);
-    box-shadow: var(--shadow-sm);
+    &.active {
+        background: var(--bg-surface);
+        color: var(--text-main);
+        box-shadow: var(--shadow-sm);
+    }
 }
 
 .logbook-tab-content {
     display: none;
     animation: fadeIn 0.3s ease;
-}
 
-.logbook-tab-content.active {
-    display: block;
+    &.active {
+        display: block;
+    }
 }
 
 /* History List */
 .logbook-list {
+    container-type: inline-size;
+    container-name: logbook-list;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -55,10 +57,10 @@
     flex-direction: column;
     gap: 12px;
     transition: transform 0.2s ease;
-}
 
-.logbook-card:hover {
-    transform: translateY(-2px);
+    &:hover {
+        transform: translateY(-2px);
+    }
 }
 
 .logbook-card-header {
@@ -92,10 +94,22 @@
     cursor: pointer;
     transition: color 0.2s;
     font-size: 1.1rem;
+
+    &:hover {
+        color: #ef4444;
+    }
 }
 
-.delete-btn:hover {
-    color: #ef4444;
+@container logbook-list (max-width: 480px) {
+    .logbook-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    .session-details {
+        flex-direction: column;
+        gap: 6px;
+    }
 }
 
 .logbook-card-body {

@@ -37,6 +37,20 @@
     overflow: hidden;
     display: block;
     margin-bottom: 16px;
+
+    &:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--accent-blue);
+        color: var(--text-main);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px -10px rgba(14, 165, 233, 0.3);
+    }
+
+    body.light-mode & {
+        background: #ffffff;
+        border-color: var(--border-color);
+        color: var(--text-main);
+    }
 }
 
 /* Primary Action Button (Blue) */
@@ -57,29 +71,13 @@
     margin-bottom: 16px;
     cursor: pointer;
     transition: all 0.2s;
-}
 
-.next-btn:hover {
-    filter: brightness(1.1);
-    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
-    transform: translateY(-2px);
-    cursor: pointer;
-}
-
-body.light-mode .choice-btn,
-body.light-mode .qcm-option {
-    background: #ffffff;
-    border-color: var(--border-color);
-    color: var(--text-main);
-}
-
-.choice-btn:hover,
-.qcm-option:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--accent-blue);
-    color: var(--text-main);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px -10px rgba(14, 165, 233, 0.3);
+    &:hover {
+        filter: brightness(1.1);
+        box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+        transform: translateY(-2px);
+        cursor: pointer;
+    }
 }
 
 .qcm-option.selected {
@@ -89,12 +87,12 @@ body.light-mode .qcm-option {
     color: #fff;
     transform: scale(1.02);
     font-weight: 600;
-}
 
-body.light-mode .qcm-option.selected {
-    background: #e0f2fe;
-    color: #0f172a;
-    box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+    body.light-mode & {
+        background: #e0f2fe;
+        color: #0f172a;
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+    }
 }
 
 .correct,
@@ -152,6 +150,7 @@ body.course-open #course-pdf-frame {
     border: none;
     width: 100%;
     min-height: 100vh;
+    min-height: 100dvh;
 }
 
 /* --- MODULE: REVIEW OVERLAY --- */
@@ -467,7 +466,9 @@ body.light-mode .bank-item-explication {
 
     /* QCM Setup Grid Fix */
     .setup-grid {
-        grid-template-columns: 1fr !important;
+        /* minmax(0, 1fr) : sinon la colonne prend la largeur min-content du
+           contenu (onglets de mode) et tout le formulaire déborde de l'écran */
+        grid-template-columns: minmax(0, 1fr) !important;
         gap: 16px !important;
     }
 

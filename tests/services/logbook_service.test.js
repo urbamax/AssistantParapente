@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import LogbookService from '../../js/services/logbook_service.js';
 import StorageService from '../../js/services/storage.js';
 import IGCParser from '../../js/services/igc_parser.js';
+import IDBStorage from '../../js/services/idb_storage.js';
 
 describe('LogbookService - Core Functions', () => {
     beforeEach(() => {
@@ -110,6 +111,130 @@ describe('LogbookService - Core Functions', () => {
         const res = LogbookService.parseIGC('fake-raw-text');
         expect(res.success).toBe(false);
         expect(res.error).toBe('No valid GPS data found in file.');
+    });
+
+    it('loadData() normalizes flights/equipment missing typeVol/typeExercice/nom/type, so a legacy or corrupted record can no longer crash a render (regression test for the .toLowerCase()/.toUpperCase() crashes on undefined)', () => {
+        StorageService.set(StorageService.KEYS.LOGBOOK_DATA, [
+            { id: 'corrupt-1', type: 'vol', site: 'Site Test', datetime: '2026-01-01T10:00' },
+        ]);
+        StorageService.set(StorageService.KEYS.EQUIPMENT_DATA, [{ id: 'eq-1' }]);
+
+        LogbookService.loadData();
+
+        expect(LogbookService.flights[0].typeVol).toBe('');
+        expect(LogbookService.flights[0].typeExercice).toBe('');
+        expect(LogbookService.equipment[0].nom).toBe('');
+        expect(LogbookService.equipment[0].type).toBe('');
+    });
+
+    it('addFlight() and addEquipment() normalize missing fields too, not only loadData()', () => {
+        const flight = LogbookService.addFlight({ datetime: '2026-08-21T10:00:00Z', site: 'Test Site' });
+        expect(flight.typeVol).toBe('');
+        expect(flight.typeExercice).toBe('');
+
+        const equip = LogbookService.addEquipment({});
+        expect(equip.nom).toBe('');
+        expect(equip.type).toBe('');
+    });
+});
+
+describe('LogbookService - IndexedDB hydration (initIndexedDB / whenReady)', () => {
+    let fakeDB;
+    let mockIndexedDB;
+
+    beforeEach(() => {
+        localStorage.clear();
+        LogbookService.flights = [];
+        LogbookService.equipment = [];
+
+        const flightsStore = new Map();
+        // traces/keyval aren't used by these tests, but objectStoreNames.contains() must report
+        // them as present too, otherwise onupgradeneeded tries to createObjectStore() on this
+        // fake db (which doesn't implement it) for each one it thinks is missing.
+        const stores = { flights: flightsStore, traces: new Map(), keyval: new Map() };
+
+        fakeDB = {
+            objectStoreNames: { contains: (name) => name in stores },
+            transaction: vi.fn((_storeNames, _mode) => {
+                const tx = {
+                    objectStore: (name) => {
+                        const storeMap = stores[name];
+                        return {
+                            getAll: () => {
+                                const req = { result: Array.from(storeMap.values()) };
+                                setTimeout(() => req.onsuccess && req.onsuccess({ target: req }), 0);
+                                return req;
+                            },
+                            put: (item) => {
+                                storeMap.set(item.id, item);
+                                const req = { result: item.id };
+                                setTimeout(() => req.onsuccess && req.onsuccess({ target: req }), 0);
+                                return req;
+                            },
+                        };
+                    },
+                    oncomplete: null,
+                    onerror: null,
+                };
+                setTimeout(() => tx.oncomplete && tx.oncomplete(), 0);
+                return tx;
+            }),
+        };
+
+        mockIndexedDB = {
+            open: vi.fn(() => {
+                const req = { result: fakeDB, onsuccess: null, onerror: null, onupgradeneeded: null };
+                setTimeout(() => {
+                    if (req.onupgradeneeded) req.onupgradeneeded({ target: { result: fakeDB } });
+                    if (req.onsuccess) req.onsuccess({ target: { result: fakeDB } });
+                }, 0);
+                return req;
+            }),
+        };
+
+        vi.stubGlobal('indexedDB', mockIndexedDB);
+        // Force IDBStorage (a shared singleton) to reopen against this test's fresh mock DB,
+        // instead of reusing a cached connection left over from a previous test.
+        IDBStorage._db = null;
+        IDBStorage._openPromise = null;
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+    });
+
+    it('preserves a flight written by a cloud merge instead of overwriting it with a stale IndexedDB snapshot (regression test for the data-loss bug)', async () => {
+        // Seed IndexedDB with an "old" flight carrying a rawIgc trace.
+        await IDBStorage.saveFlights([
+            { id: 'old-flight', site: 'Ancien Site', datetime: '2020-01-01T10:00', rawIgc: 'RAW_IGC_OLD' },
+        ]);
+
+        // Simulate firebase_service.js's syncDataWithCloud(): it writes the merged logbook
+        // straight to LocalStorage (never to IndexedDB), then calls loadData() to refresh the UI.
+        StorageService.set(StorageService.KEYS.LOGBOOK_DATA, [
+            { id: 'old-flight', site: 'Ancien Site', datetime: '2020-01-01T10:00' },
+            { id: 'new-flight-from-other-device', site: 'Site Distant', datetime: '2026-09-27T10:00' },
+        ]);
+
+        LogbookService.loadData();
+        await LogbookService.whenReady();
+
+        expect(LogbookService.flights.map((f) => f.id).sort()).toEqual(
+            ['new-flight-from-other-device', 'old-flight'].sort(),
+        );
+        // rawIgc only ever lives in IndexedDB (see saveFlights()) : it must be hydrated back
+        // onto the matching flight rather than lost along with the rest of the stale snapshot.
+        expect(LogbookService.getFlightById('old-flight').rawIgc).toBe('RAW_IGC_OLD');
+    });
+
+    it('seeds IndexedDB from LocalStorage the first time it is used on a device', async () => {
+        StorageService.set(StorageService.KEYS.LOGBOOK_DATA, [{ id: 'f1', site: 'A', datetime: '2026-01-01T10:00' }]);
+
+        LogbookService.loadData();
+        await LogbookService.whenReady();
+
+        const idbFlights = await IDBStorage.getAllFlights();
+        expect(idbFlights.map((f) => f.id)).toEqual(['f1']);
     });
 });
 

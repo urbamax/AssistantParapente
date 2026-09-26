@@ -5,6 +5,7 @@
 import LogbookService from '../services/logbook_service.js';
 import Map3DComponent from '../components/map_3d.js';
 import StorageService from '../services/storage.js'; // Retained just for custom select lists
+import SitesService from '../services/sites_service.js';
 import { EXTENDED_WIND_DIRECTIONS } from '../data/weather_config.js';
 import {
     DEFAULT_EQUIPMENT_BRANDS,
@@ -14,6 +15,7 @@ import {
 import { escapeHTML } from '../core/security.js';
 import { formatDuration, formatDateOnly, formatDateTime, addMinutesToDatetimeLocal } from '../utils/date_utils.js';
 import { capitalizeFirstLetter } from '../utils/text_utils.js';
+import { toSorted } from '../utils/array_utils.js';
 import { getSpotairWidgetId } from '../data/spotair_widgets.js';
 
 import BaseView from '../core/base_view.js';
@@ -113,13 +115,13 @@ class LogbookViewClass extends BaseView {
 
     // Recherche le meilleur site par correspondance de mots-clés
     findSiteByName(siteName) {
-        if (!siteName || typeof SITES_DATA === 'undefined') return null;
+        if (!siteName) return null;
         const inputWords = this.normalizeWords(siteName);
         if (inputWords.length === 0) return null;
 
         let bestMatch = null;
         let bestScore = 0;
-        SITES_DATA.forEach((s) => {
+        SitesService.getSites().forEach((s) => {
             const siteWords = this.normalizeWords(s.nom || s.name || '');
             const score = inputWords.filter((w) => siteWords.some((sw) => sw.includes(w) || w.includes(sw))).length;
             if (score > bestScore) {
@@ -152,11 +154,11 @@ class LogbookViewClass extends BaseView {
     // Site officiel le plus proche d'un point GPS (ex: décollage détecté depuis une trace
     // IGC), dans un rayon raisonnable. Retourne null si aucun site officiel n'est assez proche.
     findNearestSite(lat, lon, maxDistanceKm = 2) {
-        if (typeof SITES_DATA === 'undefined' || lat === null || lon === null) return null;
+        if (lat === null || lon === null) return null;
 
         let nearest = null;
         let nearestDist = Infinity;
-        SITES_DATA.forEach((site) => {
+        SitesService.getSites().forEach((site) => {
             const coords = this.getSiteCoords(site);
             if (coords.lat === null || coords.lon === null) return;
             const dist = this.haversineDistanceKm(lat, lon, coords.lat, coords.lon);
@@ -384,9 +386,9 @@ class LogbookViewClass extends BaseView {
             if (!Array.isArray(customVals)) customVals = [];
 
             const allValsSet = new Set([...defaultList, ...customVals, ...uniqueValues]);
-            const sortedVals = Array.from(allValsSet)
-                .filter(Boolean)
-                .sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
+            const sortedVals = toSorted(Array.from(allValsSet).filter(Boolean), (a, b) =>
+                a.localeCompare(b, 'fr', { sensitivity: 'base' }),
+            );
 
             // Save back to storage
             const newCustomVals = sortedVals.filter((v) => !defaultList.includes(v));
@@ -761,13 +763,11 @@ class LogbookViewClass extends BaseView {
         if (datalist) {
             let allSites = [];
 
-            // 1. Sites officiels (SITES_DATA)
-            if (typeof SITES_DATA !== 'undefined') {
-                const officialSites = SITES_DATA.filter(
-                    (site) => site.affiche !== false && (site.nom || site.name),
-                ).map((site) => (site.nom || site.name).trim().toUpperCase());
-                allSites = allSites.concat(officialSites);
-            }
+            // 1. Sites officiels (SitesService)
+            const officialSites = SitesService.getSites()
+                .filter((site) => site.affiche !== false && (site.nom || site.name))
+                .map((site) => (site.nom || site.name).trim().toUpperCase());
+            allSites = allSites.concat(officialSites);
 
             // 2. Sites personnalisés (Historique du carnet)
             const historySites = LogbookService.getFlights()
@@ -776,9 +776,10 @@ class LogbookViewClass extends BaseView {
                 .map((site) => site.trim().toUpperCase());
             allSites = allSites.concat(historySites);
 
-            // 3. Dédoublonnage et tri alphabétique
-            const processedSites = [...new Set(allSites)];
-            processedSites.sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
+            // 3. Dédoublonnage et tri alphabétique immuable (ES2023)
+            const processedSites = toSorted(Array.from(new Set(allSites)), (a, b) =>
+                a.localeCompare(b, 'fr', { sensitivity: 'base' }),
+            );
 
             // 4. Injection dans le DOM
             datalist.innerHTML = processedSites
@@ -981,7 +982,11 @@ class LogbookViewClass extends BaseView {
         const editId = document.getElementById('lb-id-edit') ? document.getElementById('lb-id-edit').value : '';
 
         const session = {
-            id: editId ? editId : Date.now().toString(),
+            id: editId
+                ? editId
+                : typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+                  ? crypto.randomUUID()
+                  : Date.now().toString(),
             type: this.currentFormType,
             datetime: datetime,
             voile: voile,
@@ -1037,10 +1042,7 @@ class LogbookViewClass extends BaseView {
                 Object.assign(session, this.currentIgcStats);
                 this.currentIgcStats = null; // reset
             }
-            if (window.TEMPORARY_IGC_RAW) {
-                session.rawIgc = window.TEMPORARY_IGC_RAW;
-                window.TEMPORARY_IGC_RAW = null; // On vide la mémoire après utilisation
-            } else if (this.currentRawIgc) {
+            if (this.currentRawIgc) {
                 session.rawIgc = this.currentRawIgc;
                 this.currentRawIgc = null; // reset
             }
@@ -1077,7 +1079,7 @@ class LogbookViewClass extends BaseView {
             lon = session.lon;
         } else {
             const siteName = session.site || session.lieu || '';
-            if (siteName && typeof SITES_DATA !== 'undefined') {
+            if (siteName) {
                 const foundSite = this.findSiteByName(siteName);
                 const coords = this.getSiteCoords(foundSite);
                 if (coords.lat && coords.lon) {
@@ -1270,42 +1272,48 @@ class LogbookViewClass extends BaseView {
 
         let html = '';
         LogbookService.getFlights().forEach((session) => {
-            const isVol = session.type === 'vol';
-            const icon = isVol ? 'ri-windy-line' : 'ri-footprint-line';
-            const typeColor = isVol ? 'var(--accent-blue)' : '#f59e0b';
-            const location = isVol ? session.site : session.lieu;
-            const subtitle = isVol
-                ? session.typeVol
-                : Array.isArray(session.typeExercice)
-                  ? session.typeExercice.join(', ')
-                  : session.typeExercice;
+            try {
+                const isVol = session.type === 'vol';
+                const icon = isVol ? 'ri-windy-line' : 'ri-footprint-line';
+                const typeColor = isVol ? 'var(--accent-blue)' : '#f59e0b';
+                const location = isVol ? session.site : session.lieu;
+                // Repli sur '' : un enregistrement corrompu/partiel (import JSON manuel, ancien
+                // format, fusion cloud incomplète) sans typeVol/typeExercice ferait planter tout le
+                // carnet ici (.toLowerCase() sur undefined un peu plus bas), au lieu de sauter
+                // juste cette carte.
+                const subtitle =
+                    (isVol
+                        ? session.typeVol
+                        : Array.isArray(session.typeExercice)
+                          ? session.typeExercice.join(', ')
+                          : session.typeExercice) || '';
 
-            let extraInfo = '';
-            if (isVol) {
-                const badgeStyle =
-                    'background: var(--bg-card-hover, rgba(0,0,0,0.05)); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-light, rgba(0,0,0,0.05)); font-weight: 500; display: inline-flex; align-items: center; gap: 4px;';
-                const decoInfo = session.techDecollage
-                    ? `<span style="${badgeStyle}" title="Décollage"><i class="ri-takeaway-line"></i> Décollage : ${escapeHTML(session.techDecollage)}</span>`
-                    : '';
-                const altInfo = session.altitudeMax
-                    ? `<span style="${badgeStyle}" title="Alt Max">⛰️ Alt Max : ${session.altitudeMax}m</span>`
-                    : '';
-                const gainInfo =
-                    session.gain !== undefined && session.gain !== null && session.gain !== ''
-                        ? `<span style="${badgeStyle}" title="Gain">📈 Gain : ${session.gain}m</span>`
+                let extraInfo = '';
+                if (isVol) {
+                    const badgeStyle =
+                        'background: var(--bg-card-hover, rgba(0,0,0,0.05)); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-light, rgba(0,0,0,0.05)); font-weight: 500; display: inline-flex; align-items: center; gap: 4px;';
+                    const decoInfo = session.techDecollage
+                        ? `<span style="${badgeStyle}" title="Décollage"><i class="ri-takeaway-line"></i> Décollage : ${escapeHTML(session.techDecollage)}</span>`
                         : '';
-                const distanceInfo = session.distanceKm
-                    ? `<span style="${badgeStyle}" title="Distance parcourue">📏 Distance : ${session.distanceKm}km</span>`
-                    : '';
-                const climbInfo = session.maxClimbRate
-                    ? `<span style="${badgeStyle}" title="Vario max">🔼 Vario max : +${session.maxClimbRate}m/s</span>`
-                    : '';
-                const speedInfo = session.maxSpeedKmh
-                    ? `<span style="${badgeStyle}" title="Vitesse max / moyenne">💨 Vitesse : ${session.maxSpeedKmh}km/h max (${session.avgSpeedKmh}km/h moy.)</span>`
-                    : '';
+                    const altInfo = session.altitudeMax
+                        ? `<span style="${badgeStyle}" title="Alt Max">⛰️ Alt Max : ${session.altitudeMax}m</span>`
+                        : '';
+                    const gainInfo =
+                        session.gain !== undefined && session.gain !== null && session.gain !== ''
+                            ? `<span style="${badgeStyle}" title="Gain">📈 Gain : ${session.gain}m</span>`
+                            : '';
+                    const distanceInfo = session.distanceKm
+                        ? `<span style="${badgeStyle}" title="Distance parcourue">📏 Distance : ${session.distanceKm}km</span>`
+                        : '';
+                    const climbInfo = session.maxClimbRate
+                        ? `<span style="${badgeStyle}" title="Vario max">🔼 Vario max : +${session.maxClimbRate}m/s</span>`
+                        : '';
+                    const speedInfo = session.maxSpeedKmh
+                        ? `<span style="${badgeStyle}" title="Vitesse max / moyenne">💨 Vitesse : ${session.maxSpeedKmh}km/h max (${session.avgSpeedKmh}km/h moy.)</span>`
+                        : '';
 
-                if (decoInfo || altInfo || gainInfo || distanceInfo || climbInfo || speedInfo) {
-                    extraInfo = `<div class="session-extra-info" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; font-size: 0.82rem; color: var(--text-secondary);">
+                    if (decoInfo || altInfo || gainInfo || distanceInfo || climbInfo || speedInfo) {
+                        extraInfo = `<div class="session-extra-info" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; font-size: 0.82rem; color: var(--text-secondary);">
                         ${decoInfo}
                         ${altInfo}
                         ${gainInfo}
@@ -1313,12 +1321,12 @@ class LogbookViewClass extends BaseView {
                         ${climbInfo}
                         ${speedInfo}
                     </div>`;
+                    }
                 }
-            }
 
-            const meteoHtml = this.renderSessionWeatherHtml(session);
+                const meteoHtml = this.renderSessionWeatherHtml(session);
 
-            html += `
+                html += `
                 <div class="logbook-card">
                     <div class="logbook-card-header">
                         <div class="session-badge" style="background-color: ${typeColor}22; color: ${typeColor};">
@@ -1351,12 +1359,18 @@ class LogbookViewClass extends BaseView {
                     </div>
                 </div>
             `;
+            } catch (err) {
+                // Un enregistrement corrompu/partiel ne doit plus faire disparaître tout le
+                // carnet (cf. bugs .toLowerCase() sur un champ manquant) : on saute cette carte
+                // et on continue le rendu des autres vols.
+                console.warn('[LogbookView] Vol illisible ignoré lors du rendu :', session?.id, err);
+            }
         });
 
         container.innerHTML = html;
     }
 
-    showTrace(sessionId) {
+    async showTrace(sessionId) {
         const container = document.getElementById(`trace-container-${sessionId}`);
         if (!container) return;
 
@@ -1367,11 +1381,17 @@ class LogbookViewClass extends BaseView {
         }
 
         const session = LogbookService.getFlightById(sessionId);
-        if (!session || (!session.rawIgc && (!session.traceGps || session.traceGps.length === 0))) return;
+        if (!session) return;
+
+        let rawIgc = session.rawIgc;
+        if (!rawIgc && (!session.traceGps || session.traceGps.length === 0)) {
+            rawIgc = await LogbookService.getFlightTrace(sessionId);
+        }
+        if (!rawIgc && (!session.traceGps || session.traceGps.length === 0)) return;
 
         let points = session.traceGps;
-        if (session.rawIgc) {
-            const result = LogbookService.parseIGC(session.rawIgc, session.altOffset || 0);
+        if (rawIgc) {
+            const result = LogbookService.parseIGC(rawIgc, session.altOffset || 0);
             if (result.success && result.data.points) {
                 points = result.data.points;
             } else {
@@ -1383,7 +1403,7 @@ class LogbookViewClass extends BaseView {
         container.style.display = 'block';
 
         try {
-            Map3DComponent.showTrace(sessionId, points, container);
+            await Map3DComponent.showTrace(sessionId, points, container);
         } catch (error) {
             console.error('Map3DComponent Error: Erreur lors du dessin de la trace.', error);
             container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-secondary);">Impossible d'afficher la carte 3D. (${error.message})</div>`;
@@ -1472,10 +1492,8 @@ class LogbookViewClass extends BaseView {
             }
         });
 
-        // Top Sites
-        const topSites = Object.entries(sitesStats)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5);
+        // Top Sites (ES2023 toSorted)
+        const topSites = toSorted(Object.entries(sitesStats), (a, b) => b[1] - a[1]).slice(0, 5);
 
         // Building HTML
         let html = `
@@ -1528,7 +1546,7 @@ class LogbookViewClass extends BaseView {
                         </div>
                         ${(() => {
                             const equipObj = LogbookService.getEquipment().find(
-                                (e) => e.nom.toLowerCase() === voile.toLowerCase(),
+                                (e) => (e.nom || '').toLowerCase() === voile.toLowerCase(),
                             );
                             if (equipObj && equipObj.periodiciteHeures > 0) {
                                 const totalHours = (st.timeVols + st.timeGonflages) / 60;
@@ -1628,8 +1646,8 @@ class LogbookViewClass extends BaseView {
         const container = document.getElementById('logbook-equip-container');
         if (!container) return;
 
-        // Sort: actifs first, then by date added
-        const sortedEquip = [...LogbookService.getEquipment()].sort((a, b) => {
+        // Sort immutably (ES2023): actifs first, then by date added
+        const sortedEquip = toSorted(LogbookService.getEquipment(), (a, b) => {
             if (a.statut === 'actif' && b.statut !== 'actif') return -1;
             if (a.statut !== 'actif' && b.statut === 'actif') return 1;
             return 0; // maintain original insertion order if same status
@@ -1644,49 +1662,51 @@ class LogbookViewClass extends BaseView {
         } else {
             html += `<div class="equip-list">`;
             sortedEquip.forEach((equip) => {
-                const stats = equipStats[(equip.nom || '').toLowerCase()];
+                try {
+                    const stats = equipStats[(equip.nom || '').toLowerCase()];
 
-                let alertHtml = '';
-                let statusClass = 'status-ok';
+                    let alertHtml = '';
+                    let statusClass = 'status-ok';
 
-                // Logique des alertes combinées
-                if (stats && (stats.alerts.dateAlert === 'red' || stats.alerts.hoursAlert === 'red')) {
-                    statusClass = 'status-danger';
-                    const reason = [];
-                    if (stats.alerts.dateAlert === 'red') reason.push(`Date dépassée (${stats.revisionDateStr})`);
-                    if (stats.alerts.hoursAlert === 'red')
-                        reason.push(
-                            `Heures dépassées (${Math.round(stats.totalTime / 60)}h / ${equip.periodiciteHeures}h)`,
-                        );
+                    // Logique des alertes combinées
+                    if (stats && (stats.alerts.dateAlert === 'red' || stats.alerts.hoursAlert === 'red')) {
+                        statusClass = 'status-danger';
+                        const reason = [];
+                        if (stats.alerts.dateAlert === 'red') reason.push(`Date dépassée (${stats.revisionDateStr})`);
+                        if (stats.alerts.hoursAlert === 'red')
+                            reason.push(
+                                `Heures dépassées (${Math.round(stats.totalTime / 60)}h / ${equip.periodiciteHeures}h)`,
+                            );
 
-                    alertHtml = `<div class="equip-alert text-danger" style="color:#ef4444; font-weight:bold; margin-bottom:8px;"><i class="ri-tools-line"></i> ⚠️ ATTENTION : Révision requise - ${reason.join(' ET ')}</div>`;
-                } else if (stats && (stats.alerts.dateAlert === 'orange' || stats.alerts.hoursAlert === 'orange')) {
-                    statusClass = 'status-warning';
-                    const reason = [];
-                    if (stats.alerts.dateAlert === 'orange') reason.push(`Dans ${stats.diffDays} jours`);
-                    if (stats.alerts.hoursAlert === 'orange') reason.push(`Dans ${Math.round(stats.hoursRemaining)}h`);
+                        alertHtml = `<div class="equip-alert text-danger" style="color:#ef4444; font-weight:bold; margin-bottom:8px;"><i class="ri-tools-line"></i> ⚠️ ATTENTION : Révision requise - ${reason.join(' ET ')}</div>`;
+                    } else if (stats && (stats.alerts.dateAlert === 'orange' || stats.alerts.hoursAlert === 'orange')) {
+                        statusClass = 'status-warning';
+                        const reason = [];
+                        if (stats.alerts.dateAlert === 'orange') reason.push(`Dans ${stats.diffDays} jours`);
+                        if (stats.alerts.hoursAlert === 'orange')
+                            reason.push(`Dans ${Math.round(stats.hoursRemaining)}h`);
 
-                    alertHtml = `<div class="equip-alert text-warning" style="color:#f59e0b; font-weight:bold; margin-bottom:8px;"><i class="ri-tools-line"></i> ⚠️ À réviser bientôt : ${reason.join(' OU ')}</div>`;
-                }
+                        alertHtml = `<div class="equip-alert text-warning" style="color:#f59e0b; font-weight:bold; margin-bottom:8px;"><i class="ri-tools-line"></i> ⚠️ À réviser bientôt : ${reason.join(' OU ')}</div>`;
+                    }
 
-                const typeBadgeColors = {
-                    voile: 'background: rgba(14, 165, 233, 0.1); color: var(--accent-blue);',
-                    sellette: 'background: rgba(245, 158, 11, 0.1); color: #f59e0b;',
-                    secours: 'background: rgba(239, 68, 68, 0.1); color: #ef4444;',
-                    accessoire: 'background: rgba(156, 163, 175, 0.1); color: #9ca3af;',
-                };
+                    const typeBadgeColors = {
+                        voile: 'background: rgba(14, 165, 233, 0.1); color: var(--accent-blue);',
+                        sellette: 'background: rgba(245, 158, 11, 0.1); color: #f59e0b;',
+                        secours: 'background: rgba(239, 68, 68, 0.1); color: #ef4444;',
+                        accessoire: 'background: rgba(156, 163, 175, 0.1); color: #9ca3af;',
+                    };
 
-                const isArchive = equip.statut === 'archive';
-                const cardStyle = isArchive ? 'opacity: 0.6; filter: grayscale(0.8);' : '';
+                    const isArchive = equip.statut === 'archive';
+                    const cardStyle = isArchive ? 'opacity: 0.6; filter: grayscale(0.8);' : '';
 
-                html += `
+                    html += `
                     <div class="equip-card ${statusClass}" style="${cardStyle} border:1px solid #eee; padding:15px; border-radius:8px; margin-bottom:15px; background:var(--bg-card); display:flex; flex-direction:column; justify-content:space-between; min-height:160px;">
                         ${alertHtml}
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
                                 <div class="equip-name" style="font-size:1.1rem; font-weight:600;">
                                     ${escapeHTML(equip.nom)}
-                                    <span class="session-badge" style="margin-left: 8px; font-size:0.75rem; padding:2px 6px; border-radius:4px; ${typeBadgeColors[equip.type] || ''}">${equip.type.toUpperCase()}</span>
+                                    <span class="session-badge" style="margin-left: 8px; font-size:0.75rem; padding:2px 6px; border-radius:4px; ${typeBadgeColors[equip.type] || ''}">${(equip.type || '').toUpperCase()}</span>
                                     ${isArchive ? '<span class="session-badge" style="margin-left: 4px; background: #333; color: white; font-size:0.75rem; padding:2px 6px; border-radius:4px;">ARCHIVÉ</span>' : ''}
                                 </div>
                             </div>
@@ -1715,6 +1735,11 @@ class LogbookViewClass extends BaseView {
                         </div>
                     </div>
                 `;
+                } catch (err) {
+                    // Même logique que renderHistory() : un équipement corrompu ne doit pas
+                    // faire disparaître tout l'inventaire.
+                    console.warn('[LogbookView] Équipement illisible ignoré lors du rendu :', equip?.id, err);
+                }
             });
             html += `</div>`;
         }
@@ -1919,7 +1944,7 @@ class LogbookViewClass extends BaseView {
             lon = session.lon;
             console.log('[Météo Logbook] Utilisation des coordonnées IGC en dur (Refresh) :', lat, lon);
         } else {
-            if (siteName && typeof SITES_DATA !== 'undefined') {
+            if (siteName) {
                 console.log('[Météo Logbook] Saisie (Refresh) :', siteName);
 
                 const foundSite = this.findSiteByName(siteName);
@@ -1944,13 +1969,15 @@ class LogbookViewClass extends BaseView {
         } else {
             if (container) {
                 const searchedString = this.normalizeString(siteName || 'VIDE');
+                const sites = SitesService.getSites();
                 const availableNamesSample =
-                    typeof SITES_DATA !== 'undefined'
-                        ? SITES_DATA.slice(0, 3)
+                    sites.length > 0
+                        ? sites
+                              .slice(0, 3)
                               .map((s) => this.normalizeString(s.nom))
                               .join(' | ')
-                        : 'SITES_DATA NOT FOUND';
-                container.innerHTML = `<div style="color: #ef4444; font-size: 0.85rem; padding: 8px 12px; background: rgba(239,68,68,0.08); border-radius: var(--radius-sm); line-height: 1.4;"><i class="ri-error-warning-line"></i> <strong>Erreur Météo :</strong> Saisie [${escapeHTML(searchedString)}] non trouvée dans SITES_DATA.<br><span style="font-size: 0.75rem; opacity: 0.8; word-break: break-all;">Échantillon base : [${availableNamesSample}]</span></div>`;
+                        : 'BASE SITES VIDE';
+                container.innerHTML = `<div style="color: #ef4444; font-size: 0.85rem; padding: 8px 12px; background: rgba(239,68,68,0.08); border-radius: var(--radius-sm); line-height: 1.4;"><i class="ri-error-warning-line"></i> <strong>Erreur Météo :</strong> Saisie [${escapeHTML(searchedString)}] non trouvée dans la base des sites.<br><span style="font-size: 0.75rem; opacity: 0.8; word-break: break-all;">Échantillon base : [${availableNamesSample}]</span></div>`;
             }
         }
     }
@@ -1992,6 +2019,8 @@ class LogbookViewClass extends BaseView {
         await super.mount(params);
         console.log('Mounting LogbookView with params', params);
         try {
+            await SitesService.ensureSitesLoaded();
+            await LogbookService.whenReady();
             if (this.init) {
                 this.init();
             }

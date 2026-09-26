@@ -1,4 +1,5 @@
 import StorageService from './storage.js';
+import { toSorted } from '../utils/array_utils.js';
 
 class QuizService {
     constructor() {
@@ -16,6 +17,9 @@ class QuizService {
             isLoaded: false,
             loadingError: null,
         };
+        this.questions = [];
+        this._questionMap = null;
+        this._questionMapSource = null;
         this.basePath = '.';
     }
 
@@ -33,9 +37,14 @@ class QuizService {
     }
 
     async loadOfficialData() {
-        if (typeof window !== 'undefined' && window.QCM_OFFICIAL && window.QCM_OFFICIAL.questions) {
+        if (this.questions && this.questions.length > 0) {
             this.state.isLoaded = true;
-            return { success: true, data: window.QCM_OFFICIAL.questions, error: null };
+            return { success: true, data: this.questions, error: null };
+        }
+        if (typeof window !== 'undefined' && window.QCM_OFFICIAL && window.QCM_OFFICIAL.questions) {
+            this.questions = window.QCM_OFFICIAL.questions;
+            this.state.isLoaded = true;
+            return { success: true, data: this.questions, error: null };
         }
 
         try {
@@ -57,6 +66,9 @@ class QuizService {
             const explications = this.parseExplicationsCSV(explicationsCSV);
             const questions = this.parseQuestionsCSV(questionsCSV, explications, courseMapping);
 
+            this.questions = questions;
+            this._questionMap = null;
+            this._questionMapSource = null;
             if (typeof window !== 'undefined') {
                 window.QCM_OFFICIAL = { questions };
             }
@@ -67,6 +79,37 @@ class QuizService {
             this.state.isLoaded = true;
             return { success: false, data: null, error: err.message };
         }
+    }
+
+    getQuestions() {
+        if (typeof window !== 'undefined' && window.QCM_OFFICIAL && Array.isArray(window.QCM_OFFICIAL.questions)) {
+            return window.QCM_OFFICIAL.questions;
+        }
+        return this.questions || [];
+    }
+
+    setQuestions(questions) {
+        this.questions = Array.isArray(questions) ? questions : [];
+        this._questionMap = null;
+        this._questionMapSource = null;
+        if (typeof window !== 'undefined') {
+            window.QCM_OFFICIAL = { questions: this.questions };
+        }
+    }
+
+    getQuestionByCode(code) {
+        if (!code) return null;
+        const questions = this.getQuestions();
+        if (!questions.length) return null;
+        if (this._questionMapSource !== questions) {
+            this._questionMap = new Map();
+            questions.forEach((q) => {
+                if (q.code) this._questionMap.set(q.code, q);
+                if (q.id !== undefined && q.id !== q.code) this._questionMap.set(q.id, q);
+            });
+            this._questionMapSource = questions;
+        }
+        return this._questionMap.get(code) || null;
     }
 
     // Parseur CSV respectant les guillemets : les questions/explications contiennent parfois
@@ -222,10 +265,23 @@ class QuizService {
 
     getThemes() {
         const themes = new Set();
-        if (typeof window !== 'undefined' && window.QCM_OFFICIAL && window.QCM_OFFICIAL.questions) {
-            window.QCM_OFFICIAL.questions.forEach((q) => themes.add(q.theme));
-        }
-        return [...themes].sort();
+        const questions = this.getQuestions();
+        questions.forEach((q) => {
+            if (q.theme) themes.add(q.theme);
+        });
+        return toSorted(Array.from(themes));
+    }
+
+    getQuestionsByTheme() {
+        const questions = this.getQuestions();
+        if (!questions.length) return {};
+        return Object.groupBy
+            ? Object.groupBy(questions, (q) => q.theme || 'Autre')
+            : questions.reduce((acc, q) => {
+                  const t = q.theme || 'Autre';
+                  (acc[t] = acc[t] || []).push(q);
+                  return acc;
+              }, {});
     }
 
     setMode(mode) {
@@ -359,7 +415,7 @@ class QuizService {
     startSession(level = 'BI') {
         if (!this.state.isLoaded) throw new Error('Données QCM non chargées');
 
-        let sourceData = window.QCM_OFFICIAL && window.QCM_OFFICIAL.questions ? window.QCM_OFFICIAL.questions : [];
+        let sourceData = this.getQuestions();
         const excludedPrefixes = ['H', 'R', 'X'];
         sourceData = sourceData.filter((q) => !excludedPrefixes.includes(q.code.charAt(0)));
 

@@ -16,17 +16,17 @@
     z-index: 9999 !important; background: transparent !important;
     width: max-content !important; height: auto !important;
     overflow: visible !important; box-shadow: none !important;
-}
 
-.floating-logo:hover {
-    transform: translateY(-2px);
-}
+    &:hover {
+        transform: translateY(-2px);
+    }
 
-.floating-logo img {
-    height: 120px !important; width: auto !important;
-    padding: 0 !important; margin: 0 !important;
-    overflow: visible !important;
-    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.4)) !important;
+    img {
+        height: 120px !important; width: auto !important;
+        padding: 0 !important; margin: 0 !important;
+        overflow: visible !important;
+        filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.4)) !important;
+    }
 }
 
 /* 2. FLOATING USER MENU (Top Right) */
@@ -46,12 +46,12 @@
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     pointer-events: auto;
     border: 1px solid rgba(150, 150, 150, 0.1);
-}
 
-body.dark-theme .floating-user-menu {
-    background: rgba(0, 0, 0, 0.7);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    body.dark-theme & {
+        background: rgba(0, 0, 0, 0.7);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
 }
 
 
@@ -312,12 +312,12 @@ body {
 @keyframes slideDown {
     from {
         opacity: 0;
-        transform: translate(-50%, -10px);
+        transform: translateY(-10px);
     }
 
     to {
         opacity: 1;
-        transform: translate(-50%, 0);
+        transform: translateY(0);
     }
 }
 

@@ -16,6 +16,22 @@ export function formatDuration(minutes) {
     return `${h}h ${m.toString().padStart(2, '0')}min`;
 }
 
+// Memoized Intl formatters for performance and lower memory allocation
+const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+});
+
+const timeFormatter = new Intl.DateTimeFormat('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+});
+
+const relativeTimeFormatter = new Intl.RelativeTimeFormat('fr-FR', {
+    numeric: 'auto',
+});
+
 /**
  * Format a date string into a localized short date (DD/MM/YYYY).
  * @param {string|Date} dateStr
@@ -25,7 +41,7 @@ export function formatDateOnly(dateStr) {
     if (!dateStr) return '';
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return '';
-    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return dateFormatter.format(d);
 }
 
 /**
@@ -37,11 +53,33 @@ export function formatDateTime(dateStr) {
     if (!dateStr) return '';
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return '';
-    return (
-        d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
-        ' à ' +
-        d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-    );
+    return `${dateFormatter.format(d)} à ${timeFormatter.format(d)}`;
+}
+
+/**
+ * Format a date string into a relative time description (e.g. "à l'instant", "il y a 2 jours", "hier").
+ * @param {string|Date} dateStr
+ * @param {Date} [baseDate=new Date()]
+ * @returns {string}
+ */
+export function formatRelativeTime(dateStr, baseDate = new Date()) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+
+    const diffInSeconds = Math.round((d.getTime() - baseDate.getTime()) / 1000);
+    const diffInMinutes = Math.round(diffInSeconds / 60);
+    const diffInHours = Math.round(diffInMinutes / 60);
+    const diffInDays = Math.round(diffInHours / 24);
+
+    if (Math.abs(diffInSeconds) < 45) return "à l'instant";
+    if (Math.abs(diffInMinutes) < 60) return relativeTimeFormatter.format(diffInMinutes, 'minute');
+    if (Math.abs(diffInHours) < 24) return relativeTimeFormatter.format(diffInHours, 'hour');
+    if (Math.abs(diffInDays) < 30) return relativeTimeFormatter.format(diffInDays, 'day');
+    const diffInMonths = Math.round(diffInDays / 30);
+    if (Math.abs(diffInMonths) < 12) return relativeTimeFormatter.format(diffInMonths, 'month');
+    const diffInYears = Math.round(diffInDays / 365);
+    return relativeTimeFormatter.format(diffInYears, 'year');
 }
 
 /**
