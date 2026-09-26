@@ -378,6 +378,7 @@ class LogbookService {
                         maxAltitude: hasMax ? parsed.maxAltitude + Math.round(offset) : null,
                         gain: typeof parsed.gain === 'number' && !isNaN(parsed.gain) ? parsed.gain : null,
                         points,
+                        takeoffIndex: parsed.takeoffIndex || 0,
                         takeoffAlt: points[0].alt,
                         landingAlt: points[points.length - 1].alt,
                     },

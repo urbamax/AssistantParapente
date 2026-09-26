@@ -104,6 +104,7 @@ const IGCParser = {
 
         return {
             points: trace,
+            takeoffIndex: this.detectTakeoffIndex(trace),
             dateStr: dateStr,
             duration: duration,
             maxAltitude: maxAltitude !== -Infinity ? Math.round(maxAltitude) : 0,
@@ -172,6 +173,53 @@ const IGCParser = {
             maxSpeedKmh: Math.round(maxSpeedKmh * 10) / 10,
             avgSpeedKmh: Math.round(avgSpeedKmh * 10) / 10,
         };
+    },
+
+    /**
+     * Repère le vrai décollage dans la trace. Beaucoup de pilotes allument leur vario au
+     * parking ou avant la montée à pied : le premier point de la trace peut alors se trouver à
+     * plusieurs kilomètres du décollage. Un pilote en vol se déplace vite (> 15 km/h, hors de
+     * portée de la marche) ou monte/descend franchement (> 1,5 m/s) ; on retient le premier
+     * point à partir duquel l'une de ces deux conditions tient pendant au moins une minute
+     * (fenêtres de 20 s, pour absorber le bruit GPS et la course d'envol).
+     *
+     * Limite connue : un vario allumé en voiture sera vu « en vol » dès le départ de la
+     * voiture. Le point retourné reste alors au départ de la trace, comme avant.
+     *
+     * @param {Array<{lat:number, lon:number, alt:number, timestamp:number}>} trace
+     * @returns {number} Index du décollage (0 si rien de concluant)
+     */
+    detectTakeoffIndex: function (trace) {
+        const WINDOW_MS = 20000;
+        const SUSTAIN_MS = 60000;
+        const MIN_SPEED_KMH = 15;
+        const MIN_VERTICAL_MS = 1.5;
+        if (!trace || trace.length < 2) return 0;
+
+        // j avance avec i : premier point au moins WINDOW_MS après trace[i]
+        const airborneFrom = [];
+        let j = 0;
+        for (let i = 0; i < trace.length; i++) {
+            if (j <= i) j = i + 1;
+            while (j < trace.length && trace[j].timestamp - trace[i].timestamp < WINDOW_MS) j++;
+            if (j >= trace.length) {
+                airborneFrom.push(false);
+                continue;
+            }
+            const dtSec = (trace[j].timestamp - trace[i].timestamp) / 1000;
+            const speedKmh = this._distanceKm(trace[i].lat, trace[i].lon, trace[j].lat, trace[j].lon) / (dtSec / 3600);
+            const verticalMs = Math.abs(trace[j].alt - trace[i].alt) / dtSec;
+            airborneFrom.push(speedKmh > MIN_SPEED_KMH || verticalMs > MIN_VERTICAL_MS);
+        }
+
+        for (let i = 0; i < trace.length; i++) {
+            if (!airborneFrom[i]) continue;
+            let k = i;
+            while (k < trace.length && airborneFrom[k] && trace[k].timestamp - trace[i].timestamp < SUSTAIN_MS) k++;
+            if (k < trace.length && trace[k].timestamp - trace[i].timestamp >= SUSTAIN_MS) return i;
+            i = k; // la série s'est interrompue avant une minute : on repart après
+        }
+        return 0;
     },
 
     /**
