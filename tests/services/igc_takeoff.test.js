@@ -66,6 +66,65 @@ describe('IGCParser.detectTakeoffIndex', () => {
     });
 });
 
+/** Convertit une trace synthétique en texte IGC (enregistrements B). */
+function toIgc(trace) {
+    const coord = (value, degLen, pos, neg) => {
+        const abs = Math.abs(value);
+        const deg = Math.floor(abs);
+        const min = Math.round((abs - deg) * 60000);
+        return `${String(deg).padStart(degLen, '0')}${String(min).padStart(5, '0')}${value < 0 ? neg : pos}`;
+    };
+    const records = trace.map((p) => {
+        const d = new Date(p.timestamp);
+        const time = [d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds()]
+            .map((n) => String(n).padStart(2, '0'))
+            .join('');
+        const alt = String(p.alt).padStart(5, '0');
+        return `B${time}${coord(p.lat, 2, 'N', 'S')}${coord(p.lon, 3, 'E', 'W')}A${alt}${alt}`;
+    });
+    return ['HFDTE260926', ...records].join('\n');
+}
+
+describe('IGCParser.detectLandingIndex', () => {
+    it('cuts the walk back to the car after landing', () => {
+        const { trace, phaseStarts } = buildTrace([FLIGHT, { seconds: 15 * 60, speedKmh: 4 }]);
+        expectNear(IGCParser.detectLandingIndex(trace), phaseStarts[1], trace);
+    });
+
+    it('keeps the whole track when the vario was switched off on landing', () => {
+        const { trace } = buildTrace([FLIGHT]);
+        expect(IGCParser.detectLandingIndex(trace)).toBe(trace.length - 1);
+    });
+});
+
+describe('IGCParser.parse on the flight only', () => {
+    it('measures duration, takeoff time and gain without the walk up nor the walk back', () => {
+        const { trace, phaseStarts } = buildTrace([WALK, WAIT, FLIGHT, { seconds: 10 * 60, speedKmh: 4 }]);
+        const parsed = IGCParser.parse(toIgc(trace));
+
+        expect(parsed.points).toHaveLength(trace.length); // trace complète conservée
+        expect(parsed.duration).toBeGreaterThanOrEqual(10);
+        expect(parsed.duration).toBeLessThanOrEqual(11);
+
+        const takeoff = new Date(trace[phaseStarts[2]].timestamp);
+        const [, time] = parsed.dateStr.split('T');
+        const expectedHour = String(takeoff.getHours()).padStart(2, '0');
+        expect(time.startsWith(expectedHour)).toBe(true);
+        expect(Math.abs(Number(time.slice(3)) - takeoff.getMinutes())).toBeLessThanOrEqual(1);
+
+        // La montée à pied (+240 m) n'est pas un gain en vol : le vol ne fait que descendre.
+        expect(parsed.gain).toBeLessThanOrEqual(10);
+    });
+
+    it('gives the same stats as before when the track is only the flight', () => {
+        const { trace } = buildTrace([FLIGHT]);
+        const parsed = IGCParser.parse(toIgc(trace));
+        expect(parsed.takeoffIndex).toBe(0);
+        expect(parsed.landingIndex).toBe(trace.length - 1);
+        expect(parsed.duration).toBe(IGCParser.calculateDurationMinutes(parsed.points));
+    });
+});
+
 describe('LogbookView.findNearestSite (import IGC)', () => {
     const deco = { nom: 'PLANPRAZ', latitude: 45.9, longitude: 6.87, type: ['NATUREL'], affiche: true };
     const atterro = { nom: 'ATTERRO DU BOIS', latitude: 45.9001, longitude: 6.87, type: ['ATTERRO'] };

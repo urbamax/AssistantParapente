@@ -379,8 +379,9 @@ class LogbookService {
                         gain: typeof parsed.gain === 'number' && !isNaN(parsed.gain) ? parsed.gain : null,
                         points,
                         takeoffIndex: parsed.takeoffIndex || 0,
-                        takeoffAlt: points[0].alt,
-                        landingAlt: points[points.length - 1].alt,
+                        // Altitudes au vrai décollage / atterrissage (pas au parking)
+                        takeoffAlt: (points[parsed.takeoffIndex] || points[0]).alt,
+                        landingAlt: (points[parsed.landingIndex] || points[points.length - 1]).alt,
                     },
                     error: null,
                 };

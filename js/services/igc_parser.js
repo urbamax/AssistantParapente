@@ -30,9 +30,6 @@ const IGCParser = {
             }
         }
 
-        let firstPointTime = null;
-        let maxAltitude = -Infinity;
-
         // 2. Extraire les enregistrements B
         for (const line of lines) {
             const l = line.trim();
@@ -62,12 +59,6 @@ const IGCParser = {
                     const pointDate = new Date(baseDate.getTime());
                     pointDate.setUTCHours(hours, mins, secs);
 
-                    if (!firstPointTime) {
-                        firstPointTime = pointDate;
-                    }
-
-                    if (alt > maxAltitude) maxAltitude = alt;
-
                     // Heure affichée à l'utilisateur : convertie dans son fuseau local
                     const localTime = `${String(pointDate.getHours()).padStart(2, '0')}:${String(pointDate.getMinutes()).padStart(2, '0')}:${String(pointDate.getSeconds()).padStart(2, '0')}`;
 
@@ -82,29 +73,40 @@ const IGCParser = {
             }
         }
 
+        // Les statistiques portent sur le vol seul, du décollage à l'atterrissage : ni la
+        // montée à pied ou l'attente au déco, ni le retour vers la voiture. La trace complète
+        // reste dans `points` (affichage 3D, export).
+        const takeoffIndex = this.detectTakeoffIndex(trace);
+        let landingIndex = this.detectLandingIndex(trace);
+        if (landingIndex <= takeoffIndex) landingIndex = trace.length - 1;
+        const flight = trace.slice(takeoffIndex, landingIndex + 1);
+
         let dateStr = '';
-        if (firstPointTime) {
+        if (flight.length > 0) {
             // Conversion en heure locale de l'utilisateur (les champs datetime-local attendent une heure locale)
-            const yyyy = firstPointTime.getFullYear();
-            const mm = String(firstPointTime.getMonth() + 1).padStart(2, '0');
-            const dd = String(firstPointTime.getDate()).padStart(2, '0');
-            const hh = String(firstPointTime.getHours()).padStart(2, '0');
-            const mnm = String(firstPointTime.getMinutes()).padStart(2, '0');
+            const takeoffTime = new Date(flight[0].timestamp);
+            const yyyy = takeoffTime.getFullYear();
+            const mm = String(takeoffTime.getMonth() + 1).padStart(2, '0');
+            const dd = String(takeoffTime.getDate()).padStart(2, '0');
+            const hh = String(takeoffTime.getHours()).padStart(2, '0');
+            const mnm = String(takeoffTime.getMinutes()).padStart(2, '0');
             dateStr = `${yyyy}-${mm}-${dd}T${hh}:${mnm}`;
         }
 
-        const duration = this.calculateDurationMinutes(trace);
+        const duration = this.calculateDurationMinutes(flight);
 
-        const startAltitude = trace.length > 0 ? trace[0].alt : 0;
+        const maxAltitude = flight.reduce((max, p) => (p.alt > max ? p.alt : max), -Infinity);
+        const startAltitude = flight.length > 0 ? flight[0].alt : 0;
         const gain = maxAltitude !== -Infinity ? Math.max(0, Math.round(maxAltitude - startAltitude)) : 0;
 
-        const { distanceKm, maxClimbRate, maxSpeedKmh, avgSpeedKmh } = this._computeFlightStats(trace, duration);
+        const { distanceKm, maxClimbRate, maxSpeedKmh, avgSpeedKmh } = this._computeFlightStats(flight, duration);
 
         console.log('Points IGC extraits avec succès :', trace.length);
 
         return {
             points: trace,
-            takeoffIndex: this.detectTakeoffIndex(trace),
+            takeoffIndex: takeoffIndex,
+            landingIndex: trace.length > 0 ? landingIndex : 0,
             dateStr: dateStr,
             duration: duration,
             maxAltitude: maxAltitude !== -Infinity ? Math.round(maxAltitude) : 0,
@@ -220,6 +222,20 @@ const IGCParser = {
             i = k; // la série s'est interrompue avant une minute : on repart après
         }
         return 0;
+    },
+
+    /**
+     * Repère le vrai atterrissage : même critère que le décollage, appliqué en partant de la
+     * fin de la trace. Coupe la marche vers la voiture quand le vario n'a pas été éteint
+     * après le posé. Retourne le dernier index si rien de concluant.
+     * @param {Array<{lat:number, lon:number, alt:number, timestamp:number}>} trace
+     * @returns {number}
+     */
+    detectLandingIndex: function (trace) {
+        if (!trace || trace.length < 2) return Math.max(0, (trace?.length || 0) - 1);
+        // Trace inversée, horodatage retourné pour rester croissant.
+        const reversed = [...trace].reverse().map((p) => ({ ...p, timestamp: -p.timestamp }));
+        return trace.length - 1 - this.detectTakeoffIndex(reversed);
     },
 
     /**
