@@ -49,7 +49,7 @@ export class IDBStorageService {
                 const request = window.indexedDB.open(DB_NAME, DB_VERSION);
 
                 request.onupgradeneeded = (event) => {
-                    const db = event.target.result;
+                    const db = /** @type {IDBOpenDBRequest} */ (event.target).result;
                     if (!db.objectStoreNames.contains(STORE_FLIGHTS)) {
                         db.createObjectStore(STORE_FLIGHTS, { keyPath: 'id' });
                     }
@@ -62,12 +62,15 @@ export class IDBStorageService {
                 };
 
                 request.onsuccess = (event) => {
-                    this._db = event.target.result;
+                    this._db = /** @type {IDBOpenDBRequest} */ (event.target).result;
                     resolve(this._db);
                 };
 
                 request.onerror = (event) => {
-                    console.warn('[IDBStorage] Échec ouverture base :', event.target?.error);
+                    console.warn(
+                        '[IDBStorage] Échec ouverture base :',
+                        /** @type {IDBOpenDBRequest} */ (event.target)?.error,
+                    );
                     this._openPromise = null;
                     resolve(null);
                 };
@@ -323,7 +326,7 @@ export class IDBStorageService {
                     resolve({ migrated, tracesMigrated });
                 };
                 tx.onerror = (e) => {
-                    console.warn('[IDBStorage] Échec migration :', e.target?.error);
+                    console.warn('[IDBStorage] Échec migration :', /** @type {IDBRequest} */ (e.target)?.error);
                     resolve({ migrated: 0, tracesMigrated: 0 });
                 };
             } catch (err) {

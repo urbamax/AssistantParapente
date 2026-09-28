@@ -34,6 +34,7 @@ function degreesToCardinal(deg) {
  *
  * @param {Object} site - Caractéristiques géographiques du spot.
  * @param {string} site.orientation - Orientations acceptées séparées par des virgules (ex: "S,SO").
+ * @param {string|string[]} [site.orientations_vent] - Orientations acceptées (liste, ou chaîne séparée par des virgules).
  * @param {number} [site.orientation_ideale_deg] - Orientation idéale du site en degrés (le cas échéant).
  *
  * @param {Object} weather - Prévisions météo actuelles fournies par l'API.
@@ -50,6 +51,7 @@ function degreesToCardinal(deg) {
  * @param {number} userPreferences.vMin - Vitesse de vent minimale requise.
  * @param {number} userPreferences.vMax - Vitesse de vent maximale autorisée.
  * @param {number} userPreferences.deltaRafaleMax - Écart maximal toléré (rafale - vent moyen).
+ * @param {string} [userPreferences.filterMode] - 'hardware' pour filtrer selon les voiles de l'inventaire.
  *
  * @returns {Object} Résultat complet du diagnostic pour l'affichage et le tri.
  */

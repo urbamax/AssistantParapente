@@ -45,7 +45,7 @@ class SitesViewClass extends BaseView {
     }
 
     toggleAdvancedSettings() {
-        const container = document.querySelector('.advanced-filters-container');
+        const container = /** @type {HTMLElement} */ (document.querySelector('.advanced-filters-container'));
         const icon = document.getElementById('advanced-settings-toggle-icon');
         if (container) {
             const isHidden = container.classList.contains('hidden');
@@ -66,7 +66,7 @@ class SitesViewClass extends BaseView {
     // aussitôt et re-provoquer le même 429 : Open-Meteo limite par heure, pas par clic.
     _startWeatherRetryCountdown(remainingMs) {
         clearInterval(this._weatherRetryInterval);
-        const btn = document.getElementById('weather-retry-btn');
+        const btn = /** @type {HTMLButtonElement} */ (document.getElementById('weather-retry-btn'));
         if (!btn || remainingMs <= 0) return;
 
         const label = () => {
@@ -98,10 +98,6 @@ class SitesViewClass extends BaseView {
         clearInterval(this._weatherRetryInterval);
         clearTimeout(this._radiusTimeout);
         clearTimeout(this._progZoomTimeout);
-        if (SitesService.activeFetchController) {
-            SitesService.activeFetchController.abort();
-            SitesService.activeFetchController = null;
-        }
         if (this.state.mapResizeObserver) {
             this.state.mapResizeObserver.disconnect();
             this.state.mapResizeObserver = null;
@@ -112,11 +108,13 @@ class SitesViewClass extends BaseView {
         }
         this.state.markersGroup = null;
         this.state.tileLayer = null;
-        const container = document.getElementById('sites-screen');
-        if (container) {
-            container.removeEventListener('scroll', this._handleScroll);
-        }
-        document.body.removeEventListener('click', this._handleClick);
+        // Les délégateurs posés sur <body> par setupEventListeners() ne doivent pas survivre à
+        // l'écran Sites (mount() les réinstalle) : sinon ils réagissent aux clics des autres écrans.
+        if (this._clickHandler) document.body.removeEventListener('click', this._clickHandler, true);
+        if (this._changeHandler) document.body.removeEventListener('change', this._changeHandler, true);
+        if (this._inputHandler) document.body.removeEventListener('input', this._inputHandler, true);
+        if (this._toggleHandler) document.body.removeEventListener('toggle', this._toggleHandler, true);
+        this._clickHandler = this._changeHandler = this._inputHandler = this._toggleHandler = null;
     }
 
     setupEventListeners() {
@@ -250,7 +248,7 @@ class SitesViewClass extends BaseView {
 
     requestGpsLocation(isInitialLoad = false) {
         const statusEl = document.getElementById('address-status-message');
-        const inputEl = document.getElementById('address-input');
+        const inputEl = /** @type {HTMLInputElement} */ (document.getElementById('address-input'));
         const gpsBtn = document.getElementById('btn-use-gps');
 
         if (!GdprEngine.isConsentGranted('gps')) {
@@ -313,22 +311,24 @@ class SitesViewClass extends BaseView {
             this.setupDropdowns();
 
             // Prefill limits inputs and select from state
-            const minInput = document.getElementById('limit-wind-min');
-            const maxInput = document.getElementById('limit-wind-max');
-            const deltaInput = document.getElementById('limit-gust-delta');
-            const hideUnflyableCheckbox = document.getElementById('hide-unflyable-checkbox');
-            const modelSelect = document.getElementById('weather-model-select');
-            const sortSelect = document.getElementById('select-sort-mode');
-            const radiusSlider = document.getElementById('radius-slider');
+            const minInput = /** @type {HTMLInputElement} */ (document.getElementById('limit-wind-min'));
+            const maxInput = /** @type {HTMLInputElement} */ (document.getElementById('limit-wind-max'));
+            const deltaInput = /** @type {HTMLInputElement} */ (document.getElementById('limit-gust-delta'));
+            const hideUnflyableCheckbox = /** @type {HTMLInputElement} */ (
+                document.getElementById('hide-unflyable-checkbox')
+            );
+            const modelSelect = /** @type {HTMLSelectElement} */ (document.getElementById('weather-model-select'));
+            const sortSelect = /** @type {HTMLSelectElement} */ (document.getElementById('select-sort-mode'));
+            const radiusSlider = /** @type {HTMLInputElement} */ (document.getElementById('radius-slider'));
             const radiusLabel = document.getElementById('radius-val-label');
 
-            if (minInput) minInput.value = SitesService.state.limitWindMin;
-            if (maxInput) maxInput.value = SitesService.state.limitWindMax;
-            if (deltaInput) deltaInput.value = SitesService.state.limitGustDelta;
+            if (minInput) minInput.value = String(SitesService.state.limitWindMin);
+            if (maxInput) maxInput.value = String(SitesService.state.limitWindMax);
+            if (deltaInput) deltaInput.value = String(SitesService.state.limitGustDelta);
             if (hideUnflyableCheckbox) hideUnflyableCheckbox.checked = SitesService.state.hideUnflyable;
             if (modelSelect) modelSelect.value = SitesService.state.weatherModel;
             if (sortSelect) sortSelect.value = SitesService.state.sortMode;
-            if (radiusSlider) radiusSlider.value = SitesService.state.radiusLimit;
+            if (radiusSlider) radiusSlider.value = String(SitesService.state.radiusLimit);
             if (radiusLabel)
                 radiusLabel.textContent =
                     SitesService.state.radiusLimit === 210 ? 'Illimité' : `${SitesService.state.radiusLimit} km`;
@@ -511,7 +511,7 @@ class SitesViewClass extends BaseView {
 
                 if (SitesService.state.radiusLimit !== radius) {
                     this.state.ignoreNextFitBounds = true;
-                    const slider = document.getElementById('radius-slider');
+                    const slider = /** @type {HTMLInputElement} */ (document.getElementById('radius-slider'));
                     if (slider) {
                         slider.value = radius;
                         slider.dispatchEvent(new Event('input', { bubbles: true }));
@@ -668,8 +668,10 @@ class SitesViewClass extends BaseView {
     }
 
     openSpotairModal(spotairId, siteId) {
-        const modal = document.getElementById('spotair-modal');
-        const iframe = document.getElementById('spotair-modal-iframe');
+        const modal = /** @type {HTMLDialogElement & { _cancelBound?: boolean }} */ (
+            document.getElementById('spotair-modal')
+        );
+        const iframe = /** @type {HTMLIFrameElement} */ (document.getElementById('spotair-modal-iframe'));
         const titleEl = document.getElementById('spotair-modal-title');
         if (!modal || !iframe) return;
 
@@ -693,8 +695,10 @@ class SitesViewClass extends BaseView {
     }
 
     closeSpotairModal() {
-        const modal = document.getElementById('spotair-modal');
-        const iframe = document.getElementById('spotair-modal-iframe');
+        const modal = /** @type {HTMLDialogElement & { _cancelBound?: boolean }} */ (
+            document.getElementById('spotair-modal')
+        );
+        const iframe = /** @type {HTMLIFrameElement} */ (document.getElementById('spotair-modal-iframe'));
         if (!modal) return;
         modal.classList.remove('active');
         setTimeout(() => {
@@ -986,6 +990,7 @@ class SitesViewClass extends BaseView {
     }
 
     showSpotItToast(siteName) {
+        /** @type {HTMLElement & { _hideTimer?: ReturnType<typeof setTimeout> }} */
         let toast = document.getElementById('spot-it-toast');
         if (!toast) {
             toast = document.createElement('div');
@@ -1165,7 +1170,7 @@ class SitesViewClass extends BaseView {
 
     setupDropdowns() {
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.filter-dropdown-container')) {
+            if (!(/** @type {HTMLElement} */ (e.target).closest('.filter-dropdown-container'))) {
                 document.querySelectorAll('.filter-dropdown-menu.show').forEach((m) => m.classList.remove('show'));
             }
         });
@@ -1263,11 +1268,11 @@ class SitesViewClass extends BaseView {
         const activeTypesCount = SitesService.state.filterTypeInclude.length;
 
         if (badgeWind) {
-            badgeWind.textContent = activeWindsCount;
+            badgeWind.textContent = String(activeWindsCount);
             badgeWind.classList.toggle('active', activeWindsCount > 0);
         }
         if (badgeType) {
-            badgeType.textContent = activeTypesCount;
+            badgeType.textContent = String(activeTypesCount);
             badgeType.classList.toggle('active', activeTypesCount > 0);
         }
     }
@@ -1460,7 +1465,9 @@ class SitesViewClass extends BaseView {
                 }
 
                 // JS fallback for broken CSS position: sticky on mobile Safari/Chrome
-                const stickyContainer = document.querySelector('.forecast-sticky-container');
+                const stickyContainer = /** @type {HTMLElement} */ (
+                    document.querySelector('.forecast-sticky-container')
+                );
                 if (stickyContainer) {
                     if (window.innerWidth <= 768) {
                         // Mobile: apply JS fixed positioning

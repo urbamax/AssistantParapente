@@ -46,6 +46,7 @@ const Map3DComponent = {
     PILOT_MARKER_RADIUS_PIXELS: 7,
     // Palette variomètre : bleu (fort taux de chute) -> gris (neutre) -> rouge (forte
     // ascendance), aux repères usuels en vol libre (m/s).
+    /** @type {Array<[number, number[]]>} */
     VARIO_COLOR_STOPS: [
         [-3, [37, 99, 235]],
         [-1, [125, 211, 252]],
@@ -69,58 +70,64 @@ const Map3DComponent = {
             return this._loadDependenciesPromise;
         }
 
-        this._loadDependenciesPromise = new Promise((resolve, reject) => {
-            const loadScript = (src, integrity) => {
-                return new Promise((res, rej) => {
-                    const existing = document.querySelector(`script[src="${src}"]`);
-                    if (existing) {
-                        if (existing.dataset.loaded === 'true') return res();
-                        existing.addEventListener('load', () => res(), { once: true });
-                        existing.addEventListener('error', (err) => rej(err), { once: true });
-                        return;
-                    }
-                    const s = document.createElement('script');
-                    s.src = src;
-                    s.async = true;
-                    s.integrity = integrity;
-                    s.crossOrigin = 'anonymous';
-                    s.onload = () => {
-                        s.dataset.loaded = 'true';
-                        res();
-                    };
-                    s.onerror = () => rej(new Error(`Impossible de charger le script : ${src}`));
-                    document.head.appendChild(s);
-                });
-            };
+        this._loadDependenciesPromise = /** @type {Promise<void>} */ (
+            new Promise((resolve, reject) => {
+                const loadScript = (src, integrity) => {
+                    return /** @type {Promise<void>} */ (
+                        new Promise((res, rej) => {
+                            const existing = /** @type {HTMLScriptElement} */ (
+                                document.querySelector(`script[src="${src}"]`)
+                            );
+                            if (existing) {
+                                if (existing.dataset.loaded === 'true') return res();
+                                existing.addEventListener('load', () => res(), { once: true });
+                                existing.addEventListener('error', (err) => rej(err), { once: true });
+                                return;
+                            }
+                            const s = document.createElement('script');
+                            s.src = src;
+                            s.async = true;
+                            s.integrity = integrity;
+                            s.crossOrigin = 'anonymous';
+                            s.onload = () => {
+                                s.dataset.loaded = 'true';
+                                res();
+                            };
+                            s.onerror = () => rej(new Error(`Impossible de charger le script : ${src}`));
+                            document.head.appendChild(s);
+                        })
+                    );
+                };
 
-            const loadCss = (href, integrity) => {
-                if (document.querySelector(`link[href="${href}"]`)) return;
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = href;
-                link.integrity = integrity;
-                link.crossOrigin = 'anonymous';
-                document.head.appendChild(link);
-            };
+                const loadCss = (href, integrity) => {
+                    if (document.querySelector(`link[href="${href}"]`)) return;
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = href;
+                    link.integrity = integrity;
+                    link.crossOrigin = 'anonymous';
+                    document.head.appendChild(link);
+                };
 
-            loadCss(
-                `https://unpkg.com/maplibre-gl@${this.MAPLIBRE_VERSION}/dist/maplibre-gl.css`,
-                this.CDN_INTEGRITY['maplibre-gl.css'],
-            );
+                loadCss(
+                    `https://unpkg.com/maplibre-gl@${this.MAPLIBRE_VERSION}/dist/maplibre-gl.css`,
+                    this.CDN_INTEGRITY['maplibre-gl.css'],
+                );
 
-            Promise.all([
-                loadScript(
-                    `https://unpkg.com/maplibre-gl@${this.MAPLIBRE_VERSION}/dist/maplibre-gl.js`,
-                    this.CDN_INTEGRITY['maplibre-gl.js'],
-                ),
-                loadScript('https://unpkg.com/deck.gl@9.4.0/dist.min.js', this.CDN_INTEGRITY['deck.gl.js']),
-            ])
-                .then(() => resolve())
-                .catch((err) => {
-                    this._loadDependenciesPromise = null;
-                    reject(err);
-                });
-        });
+                Promise.all([
+                    loadScript(
+                        `https://unpkg.com/maplibre-gl@${this.MAPLIBRE_VERSION}/dist/maplibre-gl.js`,
+                        this.CDN_INTEGRITY['maplibre-gl.js'],
+                    ),
+                    loadScript('https://unpkg.com/deck.gl@9.4.0/dist.min.js', this.CDN_INTEGRITY['deck.gl.js']),
+                ])
+                    .then(() => resolve())
+                    .catch((err) => {
+                        this._loadDependenciesPromise = null;
+                        reject(err);
+                    });
+            })
+        );
 
         return this._loadDependenciesPromise;
     },
@@ -161,7 +168,7 @@ const Map3DComponent = {
         this._registerSmoothTerrainProtocol();
         container.innerHTML = this._playerHtml(sessionId, traceGps.length - 1);
 
-        const slider = document.getElementById(`slider-${sessionId}`);
+        const slider = /** @type {HTMLInputElement} */ (document.getElementById(`slider-${sessionId}`));
         const playBtn = document.getElementById(`play-btn-${sessionId}`);
         const info = document.getElementById(`info-${sessionId}`);
 
@@ -228,7 +235,7 @@ const Map3DComponent = {
                 return;
             }
             playBtn.innerHTML = '<i class="ri-pause-fill"></i>';
-            if (parseInt(slider.value, 10) >= traceGps.length - 1) slider.value = 0;
+            if (parseInt(slider.value, 10) >= traceGps.length - 1) slider.value = String(0);
 
             this.activeInterval = setInterval(() => {
                 const val = parseInt(slider.value, 10);
@@ -237,7 +244,7 @@ const Map3DComponent = {
                 else if (traceGps.length > 1000) step = 2;
 
                 if (val < traceGps.length - 1) {
-                    slider.value = Math.min(val + step, traceGps.length - 1);
+                    slider.value = String(Math.min(val + step, traceGps.length - 1));
                     updatePosition();
                 } else {
                     this.clearPlayback();

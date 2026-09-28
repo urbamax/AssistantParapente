@@ -7,6 +7,7 @@ class QuizService {
             qcmIndex: 0,
             qcmConfig: {
                 mode: 'TRAINING', // TRAINING, EXAM, REVISION, MASTERY
+                /** @type {number | 'ALL'} */
                 count: 10,
                 theme: 'ALL',
                 masteryTarget: 75,

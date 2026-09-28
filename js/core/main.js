@@ -44,13 +44,13 @@ async function bootApplication() {
     const globalInput = document.getElementById('global-igc-input');
     if (globalInput) {
         globalInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
+            const file = /** @type {HTMLInputElement} */ (e.target).files[0];
             if (!file) return;
             // Réutilise le traitement de logbook.js (parsing + remplissage + géolocalisation
             // du site par reverse-geocoding) plutôt qu'une copie qui en divergeait et
             // laissait le site à "Lieu détecté (GPS)" sans jamais le résoudre.
             LogbookView._processIgcFile(file);
-            e.target.value = ''; // Reset indispensable
+            /** @type {HTMLInputElement} */ (e.target).value = ''; // Reset indispensable
         });
     }
 
@@ -68,7 +68,7 @@ async function bootApplication() {
     });
     AppEvents.register('goBack', () => {
         if (GlobalState.get('mode') === 'COURSE') {
-            const frame = document.getElementById('course-pdf-frame');
+            const frame = /** @type {HTMLIFrameElement} */ (document.getElementById('course-pdf-frame'));
             if (frame) frame.src = '';
             document.body.classList.remove('course-open');
             AppRouter.navigate('LIBRARY');
@@ -172,7 +172,7 @@ async function bootApplication() {
     // an earlier attempt here passed the literal string "document.getElementById('address-input')"
     // as the search query, so every click geocoded that text instead of the typed address.
     AppEvents.register('SitesvalidateAddress', () =>
-        SitesService.geocodeAddress(document.getElementById('address-input')?.value),
+        SitesService.geocodeAddress(/** @type {HTMLInputElement} */ (document.getElementById('address-input'))?.value),
     );
 
     // Safety (écran Secours / check-lists / SIGR)
@@ -206,7 +206,7 @@ async function bootApplication() {
     );
     document
         .getElementById('theory-sub-bar')
-        ?.addEventListener('click', (e) => e.currentTarget.classList.remove('active'));
+        ?.addEventListener('click', (e) => /** @type {HTMLElement} */ (e.currentTarget).classList.remove('active'));
     AppEvents.register('importDataFile', (_value, _e, target) => {
         const file = target.files[0];
         if (!file || !window.FirebaseAuthEngine) return;
@@ -264,7 +264,7 @@ async function bootApplication() {
             const startScreen = document.getElementById('start-screen');
             if (startScreen) {
                 startScreen.classList.add('active');
-                const dashContent = document.querySelector('.dashboard-content');
+                const dashContent = /** @type {HTMLElement} */ (document.querySelector('.dashboard-content'));
                 if (dashContent) dashContent.style.display = 'block';
             } else {
                 // Fallback to SITES if no start-screen exists (legacy engine_v4_6.js behavior)
