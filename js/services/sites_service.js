@@ -34,6 +34,9 @@ class SitesService {
             'filterMode',
         ];
 
+        /** @type {Array} Catalogue des sites (sites_data.json), chargé à la demande. */
+        this._sites = [];
+
         this.state = {
             filterWind: [],
             filterType: [],
@@ -89,60 +92,36 @@ class SitesService {
      * @returns {Promise<Array>} Tableau des sites chargés
      */
     async ensureSitesLoaded() {
-        const currentData =
-            typeof window !== 'undefined'
-                ? window.SITES_DATA
-                : typeof globalThis !== 'undefined'
-                  ? globalThis.SITES_DATA
-                  : undefined;
-        if (this._sitesLoaded && Array.isArray(currentData) && currentData.length > 0) {
-            return currentData;
-        }
-        if (this._sitesLoadingPromise) {
-            return this._sitesLoadingPromise;
-        }
+        if (this._sites.length > 0) return this._sites;
+        if (this._sitesLoadingPromise) return this._sitesLoadingPromise;
         this._sitesLoadingPromise = (async () => {
             try {
-                const existing =
-                    typeof window !== 'undefined'
-                        ? window.SITES_DATA
-                        : typeof globalThis !== 'undefined'
-                          ? globalThis.SITES_DATA
-                          : undefined;
-                if (Array.isArray(existing) && existing.length > 0) {
-                    this._sitesLoaded = true;
-                    return existing;
-                }
                 const response = await fetch('js/data/sites_data.json');
-                const data = await response.json();
-                if (typeof window !== 'undefined') window.SITES_DATA = data;
-                if (typeof globalThis !== 'undefined') globalThis.SITES_DATA = data;
-                this._sitesLoaded = true;
-                return data;
+                this.setSites(await response.json());
             } catch (err) {
                 console.error('[SitesService] Erreur lors du chargement de sites_data.json:', err);
-                const fallback = (typeof window !== 'undefined' && window.SITES_DATA) || [];
-                if (typeof window !== 'undefined') window.SITES_DATA = fallback;
-                return fallback;
             } finally {
                 this._sitesLoadingPromise = null;
             }
+            return this._sites;
         })();
         return this._sitesLoadingPromise;
     }
 
     /**
-     * Retourne le catalogue des sites chargés (encapsulation propre de SITES_DATA).
+     * Remplace le catalogue des sites (chargement, tests).
+     * @param {Array} sites
+     */
+    setSites(sites) {
+        this._sites = Array.isArray(sites) ? sites : [];
+    }
+
+    /**
+     * Retourne le catalogue des sites chargés. SitesService en est l'unique source de vérité.
      * @returns {Array}
      */
     getSites() {
-        const data =
-            typeof window !== 'undefined'
-                ? window.SITES_DATA
-                : typeof globalThis !== 'undefined'
-                  ? globalThis.SITES_DATA
-                  : undefined;
-        return Array.isArray(data) ? data : [];
+        return this._sites;
     }
 
     /**
@@ -331,7 +310,7 @@ class SitesService {
     async fetchSecondaryModelForFavorites() {
         this.state.weatherForecastsSecondary = this.state.weatherForecastsSecondary || {};
         const allSites = this.getSites();
-        if (allSites.length === 0) return { success: false, error: 'SITES_DATA indisponible' };
+        if (allSites.length === 0) return { success: false, error: 'Catalogue des sites indisponible' };
 
         const favoriteIds = (this.state.userPreferences && this.state.userPreferences.favoriteSites) || [];
         const favoriteSites = allSites.filter(

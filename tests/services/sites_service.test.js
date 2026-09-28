@@ -9,7 +9,7 @@ describe('SitesService', () => {
         SitesService.state.filterWindExclude = [];
         SitesService._weatherCache = new Map(); // avoid cross-test hits on the 10-min weather cache
         SitesService._weatherCooldownUntil = 0; // avoid cross-test hits on the post-429 cooldown
-        global.SITES_DATA = [
+        SitesService.setSites([
             {
                 id: 1,
                 nom: 'Annecy',
@@ -29,14 +29,14 @@ describe('SitesService', () => {
                 type_pratique: 'Cross',
             },
             { id: 3, nom: 'Hidden', latitude: 0, longitude: 0, affiche: false },
-        ];
+        ]);
 
         global.fetch = vi.fn();
     });
 
     afterEach(() => {
         vi.restoreAllMocks();
-        delete global.SITES_DATA;
+        SitesService.setSites([]);
     });
 
     it('fetchWeatherForSites sets weatherForecasts on success', async () => {

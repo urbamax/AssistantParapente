@@ -12,8 +12,8 @@ describe('QuizService - Mode REVISION', () => {
     ];
 
     beforeEach(() => {
-        // Injection des données dans le window (simule le chargement du CSV)
-        window.QCM_OFFICIAL = { questions: mockQuestions };
+        // Injection des données dans le service (simule le chargement du CSV)
+        QuizService.setQuestions(mockQuestions);
 
         // Initialisation de l'état du service
         QuizService.state.isLoaded = true;
@@ -98,13 +98,11 @@ describe('QuizService - Mode REVISION', () => {
     });
 
     it('Cas 4 : getQuestionsByTheme() groupe correctement par thème via Object.groupBy', () => {
-        window.QCM_OFFICIAL = {
-            questions: [
-                { code: 'A01V', theme: 'Météo' },
-                { code: 'E01V', theme: 'Mécavol' },
-                { code: 'A02V', theme: 'Météo' },
-            ],
-        };
+        QuizService.setQuestions([
+            { code: 'A01V', theme: 'Météo' },
+            { code: 'E01V', theme: 'Mécavol' },
+            { code: 'A02V', theme: 'Météo' },
+        ]);
 
         const grouped = QuizService.getQuestionsByTheme();
         expect(Object.keys(grouped)).toContain('Météo');
@@ -114,14 +112,12 @@ describe('QuizService - Mode REVISION', () => {
     });
 
     it('Cas 5 : getThemes() retourne les thèmes uniques et triés avec toSorted()', () => {
-        window.QCM_OFFICIAL = {
-            questions: [
-                { code: 'U01V', theme: 'Pilotage' },
-                { code: 'A01V', theme: 'Météo' },
-                { code: 'E01V', theme: 'Mécavol' },
-                { code: 'A02V', theme: 'Météo' },
-            ],
-        };
+        QuizService.setQuestions([
+            { code: 'U01V', theme: 'Pilotage' },
+            { code: 'A01V', theme: 'Météo' },
+            { code: 'E01V', theme: 'Mécavol' },
+            { code: 'A02V', theme: 'Météo' },
+        ]);
 
         const themes = QuizService.getThemes();
         expect(themes).toEqual(['Mécavol', 'Météo', 'Pilotage']);
@@ -135,8 +131,7 @@ describe('QuizService - Mode REVISION', () => {
         QuizService.setQuestions(customQuestions);
 
         expect(QuizService.getQuestions()).toEqual(customQuestions);
-        // Compatibilité ascendante : window.QCM_OFFICIAL est synchronisé
-        expect(window.QCM_OFFICIAL.questions).toEqual(customQuestions);
+        expect(window.QCM_OFFICIAL).toBeUndefined();
     });
 
     it('Cas 7 : getQuestionByCode() indexe et retourne la question par code ou id en O(1)', () => {
