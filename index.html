@@ -1604,6 +1604,28 @@
                         <i class="ri-table-line"></i> Comparer
                     </button>
                 </div>
+                <!-- Choix de l'heure de prévision : toute la liste et la carte affichent la météo de cette
+                     heure (synchronisé avec les points horaires de chaque fiche de site). -->
+                <div class="forecast-sticky-container">
+                    <div class="slider-labels">
+                        <label for="forecast-slider" class="slider-label-left">
+                            <i class="ri-time-line" style="color: var(--accent-blue)"></i> Heure de vol :
+                        </label>
+                        <span id="forecast-time-label" class="slider-label-right" aria-live="polite"
+                            >Chargement des prévisions...</span
+                        >
+                    </div>
+                    <input
+                        type="range"
+                        id="forecast-slider"
+                        class="slider-input"
+                        min="0"
+                        max="120"
+                        value="0"
+                        step="1"
+                        disabled
+                    />
+                </div>
                 <!-- UNIFIED SITE CARD LIST -->
                 <div
                     id="sites-list-container"
