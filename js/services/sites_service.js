@@ -820,6 +820,9 @@ class SitesService {
         if (this.state.hideUnflyable) {
             activeSites = activeSites.filter((site) => {
                 const forecasts = this.state.weatherForecasts[site.id] || [];
+                // Météo pas (encore) chargée pour ce site : inconnu n'est pas « non volable ».
+                // Sans ça, un échec ou un chargement en cours vidait toute la liste.
+                if (forecasts.length === 0) return true;
                 let hours = 0;
                 for (let i = 0; i < Math.min(forecasts.length, 48); i++) {
                     if (this.isForecastFlyable(site, forecasts[i]).flyable) hours++;

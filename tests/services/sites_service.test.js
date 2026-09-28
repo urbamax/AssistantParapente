@@ -195,4 +195,19 @@ describe('SitesService', () => {
         expect(SitesService.getSiteById(999)).toBeNull();
         expect(SitesService.getSiteById(null)).toBeNull();
     });
+
+    it('hideUnflyable hides sites with no flyable hour but keeps sites whose forecast is not loaded', () => {
+        const sites = SitesService.getSites().filter((site) => site.affiche !== false);
+        vi.spyOn(SitesService, 'getGeoFilteredSites').mockImplementation((data) => data);
+        vi.spyOn(SitesService, 'isForecastFlyable').mockReturnValue({ flyable: false });
+        SitesService.state.hideUnflyable = true;
+        SitesService.state.filterFavoritesOnly = false;
+        SitesService.state.weatherForecasts = { 1: [{ time: '2026-09-28T12:00' }] }; // 2 : météo absente
+
+        const ids = SitesService.getFilteredAndSortedSites(sites).map((site) => site.id);
+        SitesService.state.hideUnflyable = false;
+
+        expect(ids).not.toContain(1);
+        expect(ids).toContain(2);
+    });
 });

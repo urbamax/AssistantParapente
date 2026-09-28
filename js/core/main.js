@@ -163,6 +163,9 @@ async function bootApplication() {
         AppEvents.register('SitesService' + action, (value) => SitesService[action](value));
     });
     AppEvents.register('SitesServicesetRadiusLimit', (value) => SitesService.setRadiusLimit(parseInt(value)));
+    AppEvents.register('SitesServicetoggleHideUnflyable', (_value, _e, target) =>
+        SitesService.toggleHideUnflyable(target.checked),
+    );
     AppEvents.register('SitessetForecastOffset', (offset) => SitesService.setForecastOffset(parseInt(offset)));
     AppEvents.register('SitesopenSpotairModal', (_args, _e, target) =>
         SitesView.openSpotairModal(target.dataset.spotairId, target.dataset.siteId),
