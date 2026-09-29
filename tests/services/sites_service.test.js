@@ -1,11 +1,9 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import SitesService from '../../js/services/sites_service.js';
-import { aromeTailResponse, COMPLETE_HOUR, completeHourWith } from '../fixtures/forecasts.js';
+import { aromeTailResponse, COMPLETE_HOUR, completeHourWith, nearestHourIso } from '../fixtures/forecasts.js';
 
 function currentHourIso() {
-    const d = new Date();
-    d.setMinutes(0, 0, 0);
-    return d.toISOString();
+    return nearestHourIso();
 }
 
 describe('SitesService', () => {
@@ -363,11 +361,7 @@ describe('SitesService', () => {
     });
 
     describe('thunderstorm indicator (spec 001, US3)', () => {
-        const currentStart = () => {
-            const d = new Date();
-            d.setMinutes(0, 0, 0);
-            return d.toISOString();
-        };
+        const currentStart = () => nearestHourIso();
 
         it('requests CAPE in the primary forecast and stores it on each hour', async () => {
             const site = aromeTailResponse(currentStart(), { complete: 2, empty: 1 });

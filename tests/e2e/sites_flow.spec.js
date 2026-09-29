@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { aromeTailResponse } from '../fixtures/forecasts.js';
+import { aromeTailResponse, nearestHourIso } from '../fixtures/forecasts.js';
 
 /**
  * Intercepte TOUS les appels Open-Meteo (quel que soit le modèle) et renvoie, pour chaque site
@@ -10,9 +10,7 @@ async function mockOpenMeteo(page, { complete, empty }) {
     await page.route('https://api.open-meteo.com/**', async (route) => {
         const url = new URL(route.request().url());
         const count = (url.searchParams.get('latitude') || '').split(',').length;
-        const start = new Date();
-        start.setMinutes(0, 0, 0);
-        const one = aromeTailResponse(start.toISOString(), { complete, empty });
+        const one = aromeTailResponse(nearestHourIso(), { complete, empty });
         await route.fulfill({ json: count > 1 ? Array.from({ length: count }, () => one) : one });
     });
 }
