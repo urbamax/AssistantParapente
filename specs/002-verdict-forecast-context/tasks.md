@@ -35,11 +35,11 @@ the provider quota that US3 uses more (plan.md, Implementation Phases).
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-- [ ] T004 Write tests in `tests/services/site_prefs_migration.test.js` for `migrateSitePrefs(prefs)` (pure, exported from `js/services/sites_service.js`): `radiusLimit` missing, `210`, `500` → `50`; `120` unchanged; `5` → `10`; `weatherModel: 'meteoblue'` → `'best_match'`; other keys untouched; input object not mutated; and `FirebaseAuthEngine.getLocalPreferences()` (`js/services/firebase_service.js`) returns a migrated radius/model when LocalStorage holds `radiusLimit: 210` / `weatherModel: 'meteoblue'`
-- [ ] T005 Run `npx vitest run tests/services/site_prefs_migration.test.js`; confirm it fails
-- [ ] T006 Implement and export `migrateSitePrefs` in `js/services/sites_service.js` using `RADIUS` from `js/data/weather_config.js`; apply it to `prefs` before the `PREFERENCE_KEYS` loop (around line 191); change the state defaults `radiusLimit: 210` (lines ~48 and ~81) to `RADIUS.DEFAULT`
-- [ ] T007 In `js/services/firebase_service.js` (defaults around line 1350), set `radiusLimit: 50`, and apply the same migration (import `migrateSitePrefs`) to local and merged cloud preferences before they are returned
-- [ ] T008 Run `npx vitest run tests/services/site_prefs_migration.test.js tests/services/sites_service.test.js`; all pass
+- [X] T004 Write tests in `tests/services/site_prefs_migration.test.js` for `migrateSitePrefs(prefs)` (pure, exported from `js/services/sites_service.js`): `radiusLimit` missing, `210`, `500` → `50`; `120` unchanged; `5` → `10`; `weatherModel: 'meteoblue'` → `'best_match'`; other keys untouched; input object not mutated; and `FirebaseAuthEngine.getLocalPreferences()` (`js/services/firebase_service.js`) returns a migrated radius/model when LocalStorage holds `radiusLimit: 210` / `weatherModel: 'meteoblue'`
+- [X] T005 Run `npx vitest run tests/services/site_prefs_migration.test.js`; confirm it fails
+- [X] T006 Implement and export `migrateSitePrefs` in `js/services/sites_service.js` using `RADIUS` from `js/data/weather_config.js`; apply it to `prefs` before the `PREFERENCE_KEYS` loop (around line 191); change the state defaults `radiusLimit: 210` (lines ~48 and ~81) to `RADIUS.DEFAULT`
+- [X] T007 In `js/services/firebase_service.js` (defaults around line 1350), set `radiusLimit: 50`, and apply the same migration (import `migrateSitePrefs`) to local and merged cloud preferences before they are returned
+- [X] T008 Run `npx vitest run tests/services/site_prefs_migration.test.js tests/services/sites_service.test.js`; all pass
 
 **Checkpoint**: saved « Illimité » radii and « meteoblue » models are migrated on load.
 

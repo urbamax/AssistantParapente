@@ -3,7 +3,7 @@
  * Business logic, GPS calculations, Weather API fetching, and Data Filtering
  */
 import StorageService from '../services/storage.js';
-import { WIND_THRESHOLDS, WEATHER_MODELS } from '../data/weather_config.js';
+import { WIND_THRESHOLDS, WEATHER_MODELS, RADIUS } from '../data/weather_config.js';
 import { calculateDistance, getAngularDifference, degreesToCardinal } from '../utils/geo_utils.js';
 import { removeAccents } from '../utils/text_utils.js';
 import { escapeHTML } from '../core/security.js';
@@ -12,6 +12,26 @@ import { evaluateSpotForecast, normalizeForecastValue, getSiteOrientations } fro
 import { toSorted } from '../utils/array_utils.js';
 
 const sitesView = () => AppRouter.getView('SITES');
+
+/**
+ * Convertit les préférences enregistrées vers les réglages actuels (spec 002, FR-018) :
+ * - le rayon « Illimité » (ancienne valeur 210) et tout rayon au-dessus de 200 km → 50 km par
+ *   défaut, en dessous de 10 km → 10 km : « Illimité » épuisait le quota Open-Meteo ;
+ * - le modèle « meteoblue » → « best_match » : il n'a jamais utilisé Meteoblue, mais la
+ *   sélection automatique multi-modèles d'Open-Meteo.
+ * Ne modifie pas l'objet reçu.
+ * @param {Object} prefs
+ * @returns {Object}
+ */
+export function migrateSitePrefs(prefs) {
+    const out = { ...(prefs || {}) };
+    const radius = Number(out.radiusLimit);
+    if (out.radiusLimit === undefined || !Number.isFinite(radius) || radius > RADIUS.MAX)
+        out.radiusLimit = RADIUS.DEFAULT;
+    else if (radius < RADIUS.MIN) out.radiusLimit = RADIUS.MIN;
+    if (out.weatherModel === 'meteoblue') out.weatherModel = 'best_match';
+    return out;
+}
 
 class SitesService {
     constructor() {
@@ -45,7 +65,7 @@ class SitesService {
             filterTypeInclude: [],
             filterTypeExclude: [],
             userLocation: null,
-            radiusLimit: 210,
+            radiusLimit: /** @type {number} */ (RADIUS.DEFAULT),
             sortMode: 'CONDITIONS',
             conditionsStrategy: 'CONSECUTIVE',
             forecastOffset: 0,
@@ -78,7 +98,7 @@ class SitesService {
                 limitGustDelta: WIND_THRESHOLDS.GUST_DELTA,
                 hideUnflyable: false,
                 filterTypeExclude: [],
-                radiusLimit: 210,
+                radiusLimit: /** @type {number} */ (RADIUS.DEFAULT),
                 sortMode: 'CONDITIONS',
                 conditionsStrategy: 'CONSECUTIVE',
                 weatherModel: WEATHER_MODELS.AROME,
@@ -174,8 +194,10 @@ class SitesService {
         if (!this.state.userPreferences.savedLocations) this.state.userPreferences.savedLocations = [];
         if (!this.state.userPreferences.forecastMaxRange) this.state.userPreferences.forecastMaxRange = 120;
 
-        // Apply saved limit and filter settings if they exist dynamically
-        const prefs = this.state.userPreferences;
+        // Apply saved limit and filter settings if they exist dynamically.
+        // Réglages retirés ou renommés (spec 002) convertis d'abord : rayon « Illimité », modèle « meteoblue ».
+        const prefs = migrateSitePrefs(this.state.userPreferences);
+        this.state.userPreferences = prefs;
         const typeMapping = {
             Atterrissage: 'ATTERRO',
             'Site Naturel': 'NATUREL',

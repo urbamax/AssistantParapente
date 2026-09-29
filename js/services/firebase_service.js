@@ -6,7 +6,7 @@ import StorageService from './storage.js';
 import GdprEngine from '../gdpr_engine.js';
 import AppRouter from '../core/router.js';
 import GlobalState from '../core/app_state.js';
-import SitesService from './sites_service.js';
+import SitesService, { migrateSitePrefs } from './sites_service.js';
 import LogbookService from './logbook_service.js';
 import QuizView from '../views/quiz.js';
 
@@ -1318,7 +1318,8 @@ export const FirebaseAuthEngine = {
         (local.savedLocations || []).forEach((loc) => mergedLocsMap.set(loc.name, loc));
         merged.savedLocations = Array.from(mergedLocsMap.values());
 
-        return merged;
+        // Réglages retirés ou renommés (spec 002) : rayon « Illimité », modèle « meteoblue ».
+        return migrateSitePrefs(merged);
     },
 
     // LocalStorage Getters
@@ -1347,7 +1348,7 @@ export const FirebaseAuthEngine = {
             limitWindMax: 25,
             limitGustDelta: 10,
             hideUnflyable: false,
-            radiusLimit: 210,
+            radiusLimit: 50,
             sortMode: 'CONDITIONS',
             conditionsStrategy: 'CONSECUTIVE',
             weatherModel: 'meteofrance',
@@ -1374,7 +1375,8 @@ export const FirebaseAuthEngine = {
             prefs.themeMode = themeMode;
         }
 
-        return prefs;
+        // Réglages retirés ou renommés (spec 002) : rayon « Illimité », modèle « meteoblue ».
+        return migrateSitePrefs(prefs);
     },
 
     // Alert UI management
