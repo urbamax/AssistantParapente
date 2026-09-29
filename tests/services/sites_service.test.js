@@ -684,8 +684,10 @@ describe('SitesService', () => {
 
     describe('last forecast available offline (spec 007, US1)', () => {
         const pad = (n) => String(n).padStart(2, '0');
+        // Heure en cours (tronquée), comme restoreForecastSnapshot : l'heure en cours est encore utile.
         const localHour = (offsetHours) => {
-            const d = new Date(nearestHourIso());
+            const d = new Date();
+            d.setMinutes(0, 0, 0);
             d.setHours(d.getHours() + offsetHours);
             return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:00`;
         };
