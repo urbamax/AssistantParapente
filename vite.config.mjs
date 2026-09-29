@@ -12,6 +12,8 @@ const STATIC_PATHS = [
     'components',
     'courses',
     'img',
+    // Bibliothèques et polices hébergées (spec 009) ; leaflet.js est un script classique copié tel quel.
+    'vendor',
     'manifest.json',
     'js/firebase_config.js',
     'js/data/sites_data.json',

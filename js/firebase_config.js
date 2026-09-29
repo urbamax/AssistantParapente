@@ -8,7 +8,6 @@ const FIREBASE_CONFIG = {
     storageBucket: 'assistantparapente.firebasestorage.app',
     messagingSenderId: '486480233693',
     appId: '1:486480233693:web:63320cb14b9076affbc734',
-    measurementId: 'G-PERCHHV7ZZ',
 };
 
 // Variable d'activation globale.

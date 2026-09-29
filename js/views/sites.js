@@ -857,7 +857,7 @@ class SitesViewClass extends BaseView {
                     safeHttpUrl(site.url)
                         ? `
                 <a class="action-btn-secondary ffvl-btn" href="${escapeHTML(safeHttpUrl(site.url))}" target="_blank" rel="noopener noreferrer" style="padding: 6px 8px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;" title="Fiche FFVL">
-                    <img src="https://federation.ffvl.fr/sites/all/themes/ffvl/favicon.ico" alt="FFVL" style="width: 14px; height: 14px; border-radius: 2px;">
+                    <img src="img/logos/ffvl.png" alt="FFVL" style="width: 14px; height: 14px; border-radius: 2px;">
                 </a>
                 `
                         : ''
@@ -2260,7 +2260,7 @@ class SitesViewClass extends BaseView {
                         safeHttpUrl(site.url)
                             ? `
                     <a class="action-btn-secondary ffvl-btn" href="${escapeHTML(safeHttpUrl(site.url))}" target="_blank" rel="noopener noreferrer" title="Fiche officielle FFVL">
-                        <img src="https://federation.ffvl.fr/sites/all/themes/ffvl/favicon.ico" alt="FFVL"> FFVL
+                        <img src="img/logos/ffvl.png" alt="FFVL"> FFVL
                     </a>
                     `
                             : ''

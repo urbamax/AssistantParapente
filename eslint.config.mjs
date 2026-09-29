@@ -47,6 +47,9 @@ export default [
             // Copies générées de js/ pour la Cloud Function (scripts/sync_functions_shared.mjs) :
             // vérifiées via leurs sources, et par tests/functions/shared_copy.test.js.
             'functions/shared/**',
+            // Bibliothèques tierces hébergées telles quelles (spec 009) : ni vérifiées ni reformatées,
+            // leur empreinte est contrôlée par tests/core/third_party.test.js.
+            'vendor/**',
             'functions/node_modules/**',
         ],
     },
