@@ -5,7 +5,7 @@
 import GlobalState from '../core/app_state.js';
 import SitesService from '../services/sites_service.js';
 import LogbookService from '../services/logbook_service.js';
-import { WIND_DIRECTIONS } from '../data/weather_config.js';
+import { WIND_DIRECTIONS, RADIUS } from '../data/weather_config.js';
 import { getSpotairWidgetId } from '../data/spotair_widgets.js';
 import { escapeHTML } from '../core/security.js';
 import GdprEngine from '../gdpr_engine.js';
@@ -49,6 +49,11 @@ function verdictColor(status, { bar = false } = {}) {
 function verdictReminderHtml(status) {
     if (status && status.status !== 'flyable' && status.status !== 'unflyable') return '';
     return `<p class="verdict-reminder"><i class="ri-information-line" aria-hidden="true"></i> ${escapeHTML(t('weather.reminder'))}</p>`;
+}
+
+/** Libellé du rayon (10–200 km ; « Illimité » n'existe plus, spec 002 FR-015). */
+export function radiusLabel(km) {
+    return t('forecast.radiusKm', { km: Math.min(RADIUS.MAX, Number(km)) });
 }
 
 /** Libellé court d'un verdict (infobulles, tableau) : raison + données manquantes éventuelles. */
@@ -247,7 +252,7 @@ class SitesViewClass extends BaseView {
             if (el.id === 'radius-slider') {
                 SitesService.setRadiusLimit(el.value);
                 const label = document.getElementById('radius-val-label');
-                if (label) label.textContent = Number(el.value) === 210 ? 'Illimité' : `${el.value} km`;
+                if (label) label.textContent = radiusLabel(SitesService.state.radiusLimit);
                 // Debounce rendering
                 clearTimeout(this._radiusTimeout);
                 this._radiusTimeout = setTimeout(() => {
@@ -365,7 +370,7 @@ class SitesViewClass extends BaseView {
             const modelSelect = /** @type {HTMLSelectElement} */ (document.getElementById('weather-model-select'));
             const sortSelect = /** @type {HTMLSelectElement} */ (document.getElementById('select-sort-mode'));
             const radiusSlider = /** @type {HTMLInputElement} */ (document.getElementById('radius-slider'));
-            const radiusLabel = document.getElementById('radius-val-label');
+            const radiusLabelEl = document.getElementById('radius-val-label');
 
             if (minInput) minInput.value = String(SitesService.state.limitWindMin);
             if (maxInput) maxInput.value = String(SitesService.state.limitWindMax);
@@ -374,9 +379,7 @@ class SitesViewClass extends BaseView {
             if (modelSelect) modelSelect.value = SitesService.state.weatherModel;
             if (sortSelect) sortSelect.value = SitesService.state.sortMode;
             if (radiusSlider) radiusSlider.value = String(SitesService.state.radiusLimit);
-            if (radiusLabel)
-                radiusLabel.textContent =
-                    SitesService.state.radiusLimit === 210 ? 'Illimité' : `${SitesService.state.radiusLimit} km`;
+            if (radiusLabelEl) radiusLabelEl.textContent = radiusLabel(SitesService.state.radiusLimit);
 
             // Adjust strategy display panel & strategy buttons active classes
             const strategyPanel = document.getElementById('conditions-strategy-panel');
@@ -534,11 +537,11 @@ class SitesViewClass extends BaseView {
                 const bounds = this.state.map.getBounds();
                 if (!bounds || !bounds.isValid()) return;
 
-                if (SitesService.state.userLocation && SitesService.state.userLocation.lat !== undefined) {
-                    const userLatLng = L.latLng(
-                        SitesService.state.userLocation.lat,
-                        SitesService.state.userLocation.lng,
-                    );
+                // Même position de référence que le filtre du rayon : GPS, adresse, ou
+                // Boulogne-sur-Mer par défaut (spec 002, FR-017) — jamais le centre de la carte.
+                const reference = SitesService.getEffectiveLocation();
+                if (reference && reference.lat !== undefined) {
+                    const userLatLng = L.latLng(reference.lat, reference.lng);
                     const corners = [
                         bounds.getNorthWest(),
                         bounds.getNorthEast(),
@@ -557,8 +560,8 @@ class SitesViewClass extends BaseView {
                     radius = Math.round(center.distanceTo(northEast) / 1000 / 10) * 10;
                 }
 
-                if (radius > 200) radius = 210;
-                if (radius < 10) radius = 10;
+                // Le zoom de la carte ne peut plus repasser en « Illimité » (spec 002, FR-015).
+                radius = Math.min(RADIUS.MAX, Math.max(RADIUS.MIN, radius));
 
                 if (SitesService.state.radiusLimit !== radius) {
                     this.state.ignoreNextFitBounds = true;
@@ -1707,11 +1710,36 @@ class SitesViewClass extends BaseView {
         `;
     }
 
+    /**
+     * Message « Recherche centrée sur Boulogne-sur-Mer » tant qu'aucune position (GPS, adresse)
+     * n'est connue (spec 002, FR-017). Appelé à chaque rendu de la liste.
+     */
+    renderLocationContext() {
+        const notice = document.getElementById('default-location-notice');
+        if (!notice) return;
+        const isDefault = !!SitesService.getEffectiveLocation().isDefault;
+        notice.hidden = !isDefault;
+        notice.textContent = isDefault ? t('forecast.defaultLocationNotice') : '';
+    }
+
+    /** Sites trouvés par la recherche mais hors du rayon : signalés, jamais interrogés (FR-019). */
+    buildSearchOutsideNotice() {
+        const count = SitesService.countSearchMatchesOutsideRadius();
+        if (!count) return '';
+        const km = SitesService.state.radiusLimit;
+        const text =
+            count === 1
+                ? t('forecast.searchOutsideRadiusOne', { km })
+                : t('forecast.searchOutsideRadius', { count, km });
+        return `<p class="location-notice search-outside-notice" role="status">${escapeHTML(text)}</p>`;
+    }
+
     renderList() {
         const listDiv = document.getElementById('sites-list-container');
         if (!listDiv) return;
 
         const activeSites = SitesService.getFilteredAndSortedSites(SitesService.getSites());
+        this.renderLocationContext();
 
         if (this.state.showComparator) {
             this.renderComparator(activeSites);
@@ -1722,6 +1750,7 @@ class SitesViewClass extends BaseView {
         if (activeSites.length === 0) {
             listDiv.style.display = 'block';
             listDiv.innerHTML =
+                this.buildSearchOutsideNotice() +
                 '<div class="card" style="text-align: center; padding: 20px;">Aucun site trouvé pour ces critères</div>';
         } else {
             listDiv.style.display = 'flex';
@@ -1911,7 +1940,7 @@ class SitesViewClass extends BaseView {
                     ) +
                     `</div>`;
             }
-            listDiv.innerHTML = html;
+            listDiv.innerHTML = this.buildSearchOutsideNotice() + html;
         }
 
         this.updateBadges();

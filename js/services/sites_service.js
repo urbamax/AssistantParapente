@@ -3,7 +3,7 @@
  * Business logic, GPS calculations, Weather API fetching, and Data Filtering
  */
 import StorageService from '../services/storage.js';
-import { WIND_THRESHOLDS, WEATHER_MODELS, RADIUS } from '../data/weather_config.js';
+import { WIND_THRESHOLDS, WEATHER_MODELS, RADIUS, DEFAULT_LOCATION } from '../data/weather_config.js';
 import { calculateDistance, getAngularDifference, degreesToCardinal } from '../utils/geo_utils.js';
 import { removeAccents } from '../utils/text_utils.js';
 import { escapeHTML } from '../core/security.js';
@@ -727,7 +727,48 @@ class SitesService {
     // pour quels sites récupérer la météo — inutile d'interroger Open-Meteo
     // pour 1800 sites dans le monde entier quand le rayon/la recherche n'en
     // laissent que quelques dizaines de candidats à l'écran.
-    getGeoFilteredSites(sitesData) {
+    /**
+     * Position de référence des distances : celle du pilote (GPS ou adresse), sinon
+     * Boulogne-sur-Mer (spec 002, FR-017) — le filtre du rayon s'applique donc toujours.
+     * @returns {{lat: number, lng: number, name?: string, isDefault?: boolean}}
+     */
+    getEffectiveLocation() {
+        return this.state.userLocation || DEFAULT_LOCATION;
+    }
+
+    /** Distance (km) d'un site à la position de référence, mémorisée tant que celle-ci ne change pas. */
+    _distanceFromReference(site) {
+        const ref = this.getEffectiveLocation();
+        const key = `${ref.lat},${ref.lng}`;
+        if (site.distance === undefined || site._distanceFrom !== key) {
+            site.distance = calculateDistance(
+                ref.lat,
+                ref.lng,
+                parseFloat(site.latitude || site.lat),
+                parseFloat(site.longitude || site.lon),
+            );
+            site._distanceFrom = key;
+        }
+        return site.distance;
+    }
+
+    _isFavorite(site) {
+        const favs = this.state.userPreferences?.favoriteSites || [];
+        return favs.includes(site.id);
+    }
+
+    /**
+     * Sites qui correspondent à la recherche en cours mais sont hors du rayon (hors favoris) :
+     * ni affichés ni interrogés, seulement comptés pour le signaler (spec 002, FR-019).
+     */
+    countSearchMatchesOutsideRadius() {
+        if (!this.state.searchQuery || !this.state.searchQuery.trim()) return 0;
+        return this.getGeoFilteredSites(this.getSites(), { applyRadius: false }).filter(
+            (site) => !this._isFavorite(site) && this._distanceFromReference(site) > this.state.radiusLimit,
+        ).length;
+    }
+
+    getGeoFilteredSites(sitesData, { applyRadius = true } = {}) {
         let activeSites = sitesData.filter(
             (s) =>
                 s.affiche !== false &&
@@ -832,18 +873,13 @@ class SitesService {
             return true;
         });
 
-        if (this.state.userLocation && this.state.radiusLimit < 210) {
-            activeSites = activeSites.filter((site) => {
-                if (site.distance === undefined) {
-                    site.distance = calculateDistance(
-                        this.state.userLocation.lat,
-                        this.state.userLocation.lng,
-                        parseFloat(site.latitude || site.lat),
-                        parseFloat(site.longitude || site.lon),
-                    );
-                }
-                return site.distance <= this.state.radiusLimit;
-            });
+        // Rayon toujours appliqué autour de la position de référence (GPS, adresse, ou
+        // Boulogne-sur-Mer) : la météo n'est demandée que pour ces sites, jamais pour toute la
+        // base (spec 002, FR-016). Les favoris restent visibles quelle que soit leur distance.
+        if (applyRadius) {
+            activeSites = activeSites.filter(
+                (site) => this._isFavorite(site) || this._distanceFromReference(site) <= this.state.radiusLimit,
+            );
         }
 
         return activeSites;
@@ -1047,8 +1083,10 @@ class SitesService {
     }
 
     setRadiusLimit(value) {
-        const radius = parseInt(value);
-        if (isNaN(radius)) return;
+        const parsed = parseInt(value);
+        if (isNaN(parsed)) return;
+        // 10–200 km : « Illimité » a été retiré (spec 002, FR-015).
+        const radius = Math.min(RADIUS.MAX, Math.max(RADIUS.MIN, parsed));
         this.state.radiusLimit = radius;
 
         const slider = /** @type {HTMLInputElement} */ (document.getElementById('radius-slider'));

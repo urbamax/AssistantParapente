@@ -2642,3 +2642,16 @@ body.light-mode .back-to-top-btn {
         height: 32px !important;
     }
 }
+/* Spec 002 : position de référence par défaut et recherche hors du rayon. */
+.location-notice {
+    margin: 0 0 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px dashed rgba(148, 163, 184, 0.6);
+    font-size: 0.85rem;
+    color: var(--text-main);
+}
+
+.search-outside-notice {
+    width: 100%;
+}

@@ -13,6 +13,7 @@
 - Q: Which sites get the second-model comparison? → A: Favourite sites plus the sites shown in the list within the chosen radius (FR-010).
 - Q: When is a forecast "old"? → A: More than 3 hours after it was retrieved, in line with the AROME run cycle (FR-005).
 - Owner input: the default search radius must be 50 km; the "Illimité" (unlimited) setting is useless and exceeds Open-Meteo's request limit on its own, so it is removed and the radius slider ends at 200 km (User Story 4, FR-014–FR-018).
+- Found during implementation: with the radius always applied, a name search for a distant site would silently return nothing; FR-019 adds a message (no extra weather requests).
 - Owner input: without GPS or an address, the reference position is Boulogne-sur-Mer — the owner's home and the app's place of origin (FR-017).
 
 **Input**: User description: "Show forecast context next to every flyability verdict (constitution audit gap A6, Principle II). Today a verdict (map marker and popup, site card in the list with its 120-hour timeline, favourites comparison table) does not say which weather model it comes from (AROME, ICON, GFS, ECMWF...), when that forecast was issued or fetched, or whether other models disagree. The model name only appears in the loading message, and model disagreement ("Fiable"/"Incertain") is only computed for favourite sites in the comparison table, for the current hour only, and currently compares the secondary model's current hour with the primary model's selected hour. Pilots need to judge how much to trust a verdict: every verdict must show the model it is based on and the age of the forecast (fetch time, and model run time if available), clearly flag stale forecasts (e.g. data served from cache or fetched long ago), and make model disagreement visible wherever a verdict is shown, for the same hour being displayed. This is an aid to the pilot's own analysis, not a decision."
@@ -89,6 +90,7 @@ A pilot opening the sites screen gets weather for the sites within 50 km of thei
 3. **Given** no known position (no GPS, no address), **When** the sites screen opens, **Then** Boulogne-sur-Mer is used as the reference position: weather is requested for sites within 50 km of it (plus favourites), and a message states that the search is centred on Boulogne-sur-Mer and invites the pilot to enable GPS or enter an address.
 4. **Given** a user whose saved preferences still hold the former "unlimited" value, **When** the app loads them, **Then** the radius becomes 50 km.
 5. **Given** the pilot then enables GPS or enters an address, **When** the position is known, **Then** it replaces Boulogne-sur-Mer and the message disappears.
+6. **Given** a name search for a site outside the radius (e.g. « Annecy » from Boulogne-sur-Mer), **When** the list is filtered, **Then** a message says how many sites match outside the radius and suggests widening it or changing position; no weather is requested for them.
 
 ---
 
@@ -124,6 +126,7 @@ A pilot opening the sites screen gets weather for the sites within 50 km of thei
 - **FR-016**: Weather MUST be requested only for sites within the radius of the pilot's position, plus favourite sites; never for the whole site database.
 - **FR-017**: Without a known position (no GPS, no address), the reference position MUST be Boulogne-sur-Mer (town centre); distances, the radius filter and weather requests MUST use it, and the screen MUST state that the search is centred on Boulogne-sur-Mer and invite the pilot to enable GPS or enter an address. A known position always replaces it.
 - **FR-018**: A saved radius above 200 km or equal to the former "unlimited" value MUST be replaced by 50 km when preferences are loaded (locally and from the cloud).
+- **FR-019**: When a name search matches sites outside the radius, the screen MUST say how many match outside it (e.g. « 3 sites correspondent hors du rayon de 50 km — élargissez le rayon ou changez de position »); their weather MUST NOT be requested.
 - **FR-013**: All new texts MUST follow the existing verdict reminder rules (spec 001) and live in the French strings catalogue.
 
 ### Key Entities

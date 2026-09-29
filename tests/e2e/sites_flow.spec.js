@@ -1,6 +1,15 @@
 import { test, expect } from '@playwright/test';
 import { aromeTailResponse, nearestHourIso } from '../fixtures/forecasts.js';
 
+/** Rayon enregistré de 200 km : AUTEUIL (~160 km de Boulogne-sur-Mer) reste dans la liste. */
+async function useRadius200(page) {
+    await page.addInitScript(() => {
+        const key = 'parapente_user_prefs';
+        const prefs = JSON.parse(localStorage.getItem(key) || '{}');
+        localStorage.setItem(key, JSON.stringify({ ...prefs, radiusLimit: 200 }));
+    });
+}
+
 /**
  * Intercepte TOUS les appels Open-Meteo (quel que soit le modèle) et renvoie, pour chaque site
  * demandé, une prévision dont les `complete` premières heures sont renseignées et les suivantes
@@ -16,6 +25,7 @@ async function mockOpenMeteo(page, { complete, empty }) {
 }
 
 async function openSitesAndSearch(page, name) {
+    await useRadius200(page);
     await page.goto('/?bypassGdpr=true');
     const gdprBanner = page.locator('#gdpr-banner');
     if (await gdprBanner.isVisible()) {
@@ -61,6 +71,7 @@ test.describe('E2E - Sites Flow', () => {
             await route.fulfill({ json });
         });
 
+        await useRadius200(page);
         await page.goto('/?bypassGdpr=true'); // Or just accept GDPR
 
         // Accept GDPR to enable network/features
@@ -158,5 +169,48 @@ test.describe('E2E - Sites Flow', () => {
         const reminder = 'la décision vous appartient, vérifiez sur place';
         await expect(card.locator('.verdict-reminder')).toHaveCount(1);
         await expect(card.locator('.verdict-reminder')).toContainText(reminder);
+    });
+
+    test('Spec 002 US4 : sans position, recherche centrée sur Boulogne-sur-Mer dans un rayon de 50 km', async ({
+        page,
+    }) => {
+        const requestedLocations = [];
+        await page.route('https://api.open-meteo.com/**', async (route) => {
+            const url = new URL(route.request().url());
+            if (url.pathname.endsWith('meta.json')) return route.fulfill({ json: {} });
+            const count = (url.searchParams.get('latitude') || '').split(',').length;
+            requestedLocations.push(count);
+            const one = aromeTailResponse(nearestHourIso(), { complete: 4, empty: 0 });
+            await route.fulfill({ json: count > 1 ? Array.from({ length: count }, () => one) : one });
+        });
+        await page.route('**/nominatim.openstreetmap.org/**', (route) =>
+            route.fulfill({ json: [{ lat: '45.8992', lon: '6.1294', display_name: 'Annecy, France' }] }),
+        );
+
+        await page.goto('/?bypassGdpr=true');
+        const gdprBanner = page.locator('#gdpr-banner');
+        if (await gdprBanner.isVisible()) await page.locator('[data-action="refuseAll"]').first().click();
+        await page.locator('.nav-menu-btn[data-target="SITES"]').click();
+
+        const notice = page.locator('#default-location-notice');
+        await expect(notice).toBeVisible();
+        await expect(notice).toContainText('Recherche centrée sur Boulogne-sur-Mer');
+        await expect(page.locator('#radius-slider')).toHaveAttribute('max', '200');
+        await expect(page.locator('#radius-slider')).toHaveValue('50');
+        await expect(page.locator('#radius-val-label')).toHaveText('50 km');
+        // La demande de météo porte exactement sur les sites retenus par l'application, tous à
+        // 50 km au plus de Boulogne-sur-Mer (spec 002, FR-016) — jamais sur toute la base.
+        const kept = await page.evaluate(async () => {
+            const S = (await import('/js/services/sites_service.js')).default;
+            const sites = S.getGeoFilteredSites(S.getSites());
+            return { count: sites.length, maxKm: Math.max(...sites.map((x) => x.distance)) };
+        });
+        expect(kept.count).toBeGreaterThan(0);
+        expect(kept.maxKm).toBeLessThanOrEqual(50);
+        await expect.poll(() => requestedLocations[0]).toBe(kept.count);
+
+        await page.locator('#address-input').fill('Annecy');
+        await page.locator('[data-action="SitesvalidateAddress"]').click();
+        await expect(notice).toBeHidden();
     });
 });

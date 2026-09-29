@@ -1,6 +1,13 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import SitesService from '../../js/services/sites_service.js';
-import { aromeTailResponse, COMPLETE_HOUR, completeHourWith, nearestHourIso } from '../fixtures/forecasts.js';
+import {
+    aromeTailResponse,
+    COMPLETE_HOUR,
+    completeHourWith,
+    nearestHourIso,
+    SITES_AROUND_BOULOGNE,
+} from '../fixtures/forecasts.js';
+import { DEFAULT_LOCATION } from '../../js/data/weather_config.js';
 
 function currentHourIso() {
     return nearestHourIso();
@@ -14,6 +21,11 @@ describe('SitesService', () => {
         SitesService.state.filterWindExclude = [];
         SitesService._weatherCache = new Map(); // avoid cross-test hits on the 10-min weather cache
         SitesService._weatherCooldownUntil = 0; // avoid cross-test hits on the post-429 cooldown
+        // Spec 002 : le rayon s'applique toujours (Boulogne-sur-Mer sans position). Les sites de
+        // test sont à Annecy / Chamonix : on se place à Annecy avec le rayon maximal.
+        SitesService.state.userLocation = { lat: 45.9, lng: 6.1 };
+        SitesService.state.radiusLimit = 200;
+        SitesService.state.userPreferences = { ...(SitesService.state.userPreferences || {}), favoriteSites: [] };
         SitesService.setSites([
             {
                 id: 1,
@@ -383,6 +395,70 @@ describe('SitesService', () => {
             const url = global.fetch.mock.calls[0][0];
             expect(new URL(url).searchParams.get('hourly').split(',')).toContain('cape');
             expect(SitesService.state.weatherForecastsSecondary[7].cape).toBe(100);
+        });
+    });
+
+    describe('bounded weather requests around the pilot (spec 002, US4)', () => {
+        const ids = (sites) => sites.map((x) => x.id).sort((a, b) => a - b);
+
+        beforeEach(() => {
+            SitesService.setSites(SITES_AROUND_BOULOGNE.map((x) => ({ ...x })));
+            SitesService.state.userLocation = null;
+            SitesService.state.radiusLimit = 50;
+            SitesService.state.searchQuery = '';
+            SitesService.state.userPreferences = { favoriteSites: [] };
+        });
+
+        it('uses Boulogne-sur-Mer when no position is known, the real position otherwise', () => {
+            expect(SitesService.getEffectiveLocation()).toEqual(DEFAULT_LOCATION);
+            SitesService.state.userLocation = { lat: 45.9, lng: 6.1 };
+            expect(SitesService.getEffectiveLocation()).toEqual({ lat: 45.9, lng: 6.1 });
+        });
+
+        it('applies the radius around Boulogne-sur-Mer when no position is known', () => {
+            expect(ids(SitesService.getGeoFilteredSites(SitesService.getSites()))).toEqual([101, 102, 103]);
+        });
+
+        it('widens up to 200 km', () => {
+            SitesService.state.radiusLimit = 200;
+            expect(ids(SitesService.getGeoFilteredSites(SitesService.getSites()))).toEqual([101, 102, 103, 104, 105]);
+        });
+
+        it('always keeps favourite sites, even beyond the radius', () => {
+            SitesService.state.userPreferences = { favoriteSites: [106] };
+            expect(ids(SitesService.getGeoFilteredSites(SitesService.getSites()))).toEqual([101, 102, 103, 106]);
+        });
+
+        it('clamps the radius to 10–200 km', () => {
+            SitesService.setRadiusLimit(500);
+            expect(SitesService.state.radiusLimit).toBe(200);
+            SitesService.setRadiusLimit(2);
+            expect(SitesService.state.radiusLimit).toBe(10);
+        });
+
+        it('requests weather only for the sites in the radius plus favourites', async () => {
+            SitesService.state.userPreferences = { favoriteSites: [106] };
+            const one = aromeTailResponse(nearestHourIso(), { complete: 2, empty: 0 });
+            global.fetch.mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: vi.fn().mockResolvedValue([one, one, one, one]),
+            });
+            await SitesService.fetchWeatherForSites();
+            const forecastCalls = global.fetch.mock.calls
+                .map((c) => String(c[0]))
+                .filter((u) => u.includes('latitude='));
+            expect(forecastCalls).toHaveLength(1);
+            const lats = new URL(forecastCalls[0]).searchParams.get('latitude').split(',');
+            expect(lats).toHaveLength(4);
+        });
+
+        it('counts search matches outside the radius without requesting them (FR-019)', () => {
+            SitesService.state.searchQuery = 'amiens';
+            expect(SitesService.getGeoFilteredSites(SitesService.getSites())).toEqual([]);
+            expect(SitesService.countSearchMatchesOutsideRadius()).toBe(1);
+            SitesService.state.searchQuery = 'wimereux';
+            expect(SitesService.countSearchMatchesOutsideRadius()).toBe(0);
         });
     });
 });

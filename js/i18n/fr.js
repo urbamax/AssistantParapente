@@ -63,6 +63,10 @@ export const FR = Object.freeze({
         comparisonUnavailable: 'Comparaison {model} indisponible',
         defaultLocationNotice: 'Recherche centrée sur Boulogne-sur-Mer — activez le GPS ou saisissez une adresse.',
         radiusKm: '{km} km',
+        searchOutsideRadius:
+            '{count} sites correspondent hors du rayon de {km} km — élargissez le rayon ou changez de position.',
+        searchOutsideRadiusOne:
+            '1 site correspond hors du rayon de {km} km — élargissez le rayon ou changez de position.',
         loading: 'Chargement météo {model}...',
     }),
 });
