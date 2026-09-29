@@ -1360,6 +1360,22 @@ body.light-mode .forecast-sticky-container {
     font-weight: 700;
 }
 
+.hide-unflyable-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+
+    & input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--accent-blue);
+        cursor: pointer;
+    }
+}
+
 .slider-label-right {
     color: var(--accent-blue);
     font-weight: 800;
