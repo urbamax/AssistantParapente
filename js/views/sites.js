@@ -643,28 +643,53 @@ class SitesViewClass extends BaseView {
             this.state.mapResizeObserver.observe(mapCanvas);
         }
 
-        try {
-            const bounds = this.state.markersGroup.getBounds();
-            this.state.isProgrammaticZoom = true;
-            if (bounds.isValid()) this.state.map.fitBounds(bounds, { padding: [30, 30] });
-            else this.state.map.setView([50.5, 2.5], 9);
-            if (this._progZoomTimeout) clearTimeout(this._progZoomTimeout);
-            this._progZoomTimeout = setTimeout(() => {
-                this.state.isProgrammaticZoom = false;
-            }, 1000);
-        } catch {
-            this.state.map.setView([50.5, 2.5], 9);
-        }
-
+        this.fitMapToRadius();
         this.bindMapSync();
+    }
+
+    /**
+     * Cadre la carte sur le cercle du rayon autour de la position de référence (GPS, adresse ou
+     * Boulogne-sur-Mer) — jamais sur l'étendue de tous les marqueurs : un favori lointain reste
+     * affiché sans faire dézoomer la carte (spec 004, FR-001/FR-002).
+     */
+    fitMapToRadius() {
+        if (!this.state.map) return;
+        const ref = SitesService.getEffectiveLocation();
+        const diameterMeters = SitesService.state.radiusLimit * 2 * 1000;
+        this.state.isProgrammaticZoom = true;
+        try {
+            this.state.map.fitBounds(L.latLng(ref.lat, ref.lng).toBounds(diameterMeters), { padding: [20, 20] });
+        } catch {
+            this.state.map.setView([ref.lat, ref.lng], 9);
+        }
+        if (this._progZoomTimeout) clearTimeout(this._progZoomTimeout);
+        this._progZoomTimeout = setTimeout(() => {
+            this.state.isProgrammaticZoom = false;
+        }, 1000);
     }
 
     bindMapSync() {
         if (!this.state.map) return;
 
+        // Le rayon ne suit la carte qu'après un geste du pilote sur la carte (glisser, molette,
+        // pincer, boutons, clavier). Un redimensionnement, le chargement des fonds ou un cadrage
+        // automatique déclenchent aussi « moveend » : les suivre faisait grandir le rayon en
+        // boucle jusqu'à 200 km (spec 004, FR-004).
+        const container = this.state.map.getContainer();
+        if (this._gestureContainer !== container) {
+            this._gestureContainer = container; // la carte est recréée à chaque retour sur l'écran
+            const markGesture = () => {
+                this._lastMapGestureAt = Date.now();
+            };
+            ['pointerdown', 'wheel', 'touchstart', 'keydown'].forEach((type) =>
+                container.addEventListener(type, markGesture, { passive: true }),
+            );
+        }
+
         this.state.map.off('zoomend moveend');
         this.state.map.on('zoomend moveend', (e) => {
             if (this.state.isProgrammaticZoom) return;
+            if (!this._lastMapGestureAt || Date.now() - this._lastMapGestureAt > 1500) return;
 
             try {
                 let radius;
@@ -792,14 +817,8 @@ class SitesViewClass extends BaseView {
             this.state.markersGroup.addLayer(marker);
         });
 
-        if (activeSites.length > 0 && this.state.map && !this.state.ignoreNextFitBounds) {
-            const coords = activeSites.map((s) => [parseFloat(s.latitude || s.lat), parseFloat(s.longitude || s.lon)]);
-            this.state.isProgrammaticZoom = true;
-            this.state.map.fitBounds(coords, { padding: [30, 30] });
-            if (this._progZoomTimeout) clearTimeout(this._progZoomTimeout);
-            this._progZoomTimeout = setTimeout(() => {
-                this.state.isProgrammaticZoom = false;
-            }, 1000);
+        if (this.state.map && !this.state.ignoreNextFitBounds) {
+            this.fitMapToRadius();
         }
     }
     buildWeatherPopupHtml(weather, color, site) {
@@ -963,12 +982,7 @@ class SitesViewClass extends BaseView {
 
                 setTimeout(() => {
                     this.state.map.invalidateSize();
-                    if (this.state.markersGroup) {
-                        const bounds = this.state.markersGroup.getBounds();
-                        if (bounds.isValid()) {
-                            this.state.map.fitBounds(bounds, { padding: [30, 30] });
-                        }
-                    }
+                    this.fitMapToRadius(); // cercle du rayon, pas l'étendue des marqueurs (spec 004)
                 }, 150);
             }
         } else {
@@ -1118,12 +1132,7 @@ class SitesViewClass extends BaseView {
             if (this.state.map && document.getElementById('sites-map-canvas').style.display !== 'none') {
                 setTimeout(() => {
                     this.state.map.invalidateSize();
-                    if (this.state.markersGroup) {
-                        const bounds = this.state.markersGroup.getBounds();
-                        if (bounds.isValid()) {
-                            this.state.map.fitBounds(bounds, { padding: [30, 30] });
-                        }
-                    }
+                    this.fitMapToRadius(); // cercle du rayon, pas l'étendue des marqueurs (spec 004)
                 }, 150);
             }
         } else {
@@ -1137,12 +1146,7 @@ class SitesViewClass extends BaseView {
             if (this.state.map && document.getElementById('sites-map-canvas').style.display !== 'none') {
                 setTimeout(() => {
                     this.state.map.invalidateSize();
-                    if (this.state.markersGroup) {
-                        const bounds = this.state.markersGroup.getBounds();
-                        if (bounds.isValid()) {
-                            this.state.map.fitBounds(bounds, { padding: [30, 30] });
-                        }
-                    }
+                    this.fitMapToRadius(); // cercle du rayon, pas l'étendue des marqueurs (spec 004)
                 }, 150);
             }
         }
