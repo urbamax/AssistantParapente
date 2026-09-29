@@ -552,7 +552,7 @@ class QuizViewClass extends BaseView {
             let levelQs = [];
             console.log('DEBUG RENDER STATS: Normalized Level =', currentLevel);
 
-            // Mapping levels to QCM_OFFICIAL 'niveau' property
+            // Mapping levels to the questions' 'niveau' property
             // 0: Vert (Intro)? 1: Bleu (BI)? 2: Marron (BP)? 3: Rouge/Confirme (BPC)?
 
             if (currentLevel === 'ALL') {
@@ -1268,7 +1268,7 @@ class QuizViewClass extends BaseView {
                             ${optionsHtml}
                         </div>
                         ${(function () {
-                            // Try to get explanation from saved question, or lookup in current QCM_OFFICIAL
+                            // Try to get explanation from saved question, or lookup in the current question bank
                             let expl = q.explanation || q.explication;
                             if (!expl) {
                                 const currentQ = QuizView.getQuestionByCode(q.code);
@@ -1289,7 +1289,7 @@ class QuizViewClass extends BaseView {
             questionsHtml += '</div></div>';
 
             html += `
-    <div data-exam-id="${exam.id}" style="background:var(--bg-card); padding:16px; border-radius:12px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleExamDetails" data-args="[${exam.id}]" >
+    <div data-exam-id="${exam.id}" style="background:var(--bg-card); padding:16px; border-radius:12px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleExamDetails" data-args="['${exam.id}']" >
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div style="flex:1;">
                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -1321,7 +1321,7 @@ class QuizViewClass extends BaseView {
             examId = examIdArgs[0];
         }
         const history = QuizService.getExamHistory();
-        const exam = history.find((e) => e.id === examId);
+        const exam = history.find((e) => String(e.id) === String(examId));
         if (!exam) return;
 
         const statsContent = document.getElementById('stats-content');
@@ -1846,7 +1846,10 @@ class QuizViewClass extends BaseView {
             }
 
             const exam = {
-                id: Date.now(),
+                id:
+                    typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+                        ? crypto.randomUUID()
+                        : Date.now().toString(),
                 date: new Date().toISOString(),
                 level: level,
                 score: score,
@@ -1872,48 +1875,44 @@ class QuizViewClass extends BaseView {
         input.type = 'file';
         input.accept = '.json';
 
-        input.onchange = (e) => {
+        input.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    const data = JSON.parse(event.target.result);
+            try {
+                const data = JSON.parse(await file.text());
 
-                    // Basic validation of the file structure
-                    if (!data.stats || !data.examHistory) {
-                        alert('❌ Fichier invalide: Format de données incorrect');
-                        return;
-                    }
-
-                    if (confirm('⚠️ Cela va remplacer toutes vos statistiques et historiques actuels. Continuer ?')) {
-                        // Save directly to localStorage
-                        StorageService.set(StorageService.KEYS.QCM_STATS, data.stats);
-                        StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: data.examHistory });
-
-                        // Force update of current runtime stats if needed?
-                        // Actually getPersistentStats reads from localStorage so it's fine.
-
-                        alert('✅ Données importées avec succès !');
-
-                        try {
-                            // Refresh stats display
-                            QuizView.renderStats();
-                        } catch (renderError) {
-                            console.error('Render failed after import', renderError);
-                            alert(
-                                "Données importées, mais une erreur est survenue lors de l'affichage. Veuillez recharger la page.",
-                            );
-                        }
-                    }
-                } catch (e) {
-                    console.error('Import failed', e);
-                    alert("❌ Erreur lors de l'import : " + e.message);
+                // Basic validation of the file structure
+                if (!data.stats || !data.examHistory) {
+                    alert('❌ Fichier invalide: Format de données incorrect');
+                    return;
                 }
-            };
-            reader.readAsText(file);
-        };
+
+                if (confirm('⚠️ Cela va remplacer toutes vos statistiques et historiques actuels. Continuer ?')) {
+                    // Save directly to localStorage
+                    StorageService.set(StorageService.KEYS.QCM_STATS, data.stats);
+                    StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: data.examHistory });
+
+                    // Force update of current runtime stats if needed?
+                    // Actually getPersistentStats reads from localStorage so it's fine.
+
+                    alert('✅ Données importées avec succès !');
+
+                    try {
+                        // Refresh stats display
+                        QuizView.renderStats();
+                    } catch (renderError) {
+                        console.error('Render failed after import', renderError);
+                        alert(
+                            "Données importées, mais une erreur est survenue lors de l'affichage. Veuillez recharger la page.",
+                        );
+                    }
+                }
+            } catch (e) {
+                console.error('Import failed', e);
+                alert("❌ Erreur lors de l'import : " + e.message);
+            }
+        });
 
         input.click();
     }

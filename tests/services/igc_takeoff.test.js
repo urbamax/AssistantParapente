@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import IGCParser from '../../js/services/igc_parser.js';
 import LogbookView from '../../js/views/logbook.js';
+import SitesService from '../../js/services/sites_service.js';
 
 const START = Date.UTC(2026, 8, 26, 10, 0, 0);
 const M_PER_DEG_LAT = 111320;
@@ -132,21 +133,21 @@ describe('LogbookView.findNearestSite (import IGC)', () => {
     const hidden = { nom: 'A renseigner', latitude: 45.9, longitude: 6.87, type: ['NATUREL'], affiche: false };
 
     afterEach(() => {
-        globalThis.SITES_DATA = undefined;
+        SitesService.setSites([]);
     });
 
     it('only proposes visible takeoff sites, even when a landing is closer', () => {
-        globalThis.SITES_DATA = [atterro, kite, hidden, deco];
+        SitesService.setSites([atterro, kite, hidden, deco]);
         expect(LogbookView.findNearestSite(45.9001, 6.8701)).toBe(deco);
     });
 
     it('returns null when the only nearby sites are not takeoffs', () => {
-        globalThis.SITES_DATA = [atterro, kite, hidden];
+        SitesService.setSites([atterro, kite, hidden]);
         expect(LogbookView.findNearestSite(45.9, 6.87)).toBeNull();
     });
 
     it('returns null beyond 2 km', () => {
-        globalThis.SITES_DATA = [deco];
+        SitesService.setSites([deco]);
         expect(LogbookView.findNearestSite(45.93, 6.87)).toBeNull();
     });
 });

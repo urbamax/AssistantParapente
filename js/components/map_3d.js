@@ -20,6 +20,13 @@ const Map3DComponent = {
     // (voir PR #35 pour l'investigation complète — deck.gl n'a pas encore de version
     // compatible avec MapLibre v6 au moment où ceci est écrit).
     MAPLIBRE_VERSION: '5.24.0',
+    // Empreintes SRI (sha384) des fichiers CDN : à recalculer à chaque changement de version,
+    // sinon le navigateur refuse de les charger.
+    CDN_INTEGRITY: {
+        'maplibre-gl.css': 'sha384-uTttxo/aOKbdE5RlD/SPzSDoDmNvGlUYPjONi2MN/b7c9HPSvW07OIuyP7uL6jxK',
+        'maplibre-gl.js': 'sha384-5+cfbwT0iiub6VsQAdn6yz16nr6sDiQoHx6tm4O8OVYXHYOxcffFmCJBL0dgdvGp',
+        'deck.gl.js': 'sha384-NrpHmp6N6IhXZ+gSV+uRLo+Hqprkw4BfdGzmxgWXhjakjkAabyfQxokSmn/aK0VB',
+    },
     SATELLITE_TILES: ['https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'],
     // Tuiles de relief brutes (AWS Terrarium / Mapzen). Elles sont servies à MapLibre
     // via un protocole personnalisé (voir _registerSmoothTerrainProtocol) qui les lisse
@@ -63,7 +70,7 @@ const Map3DComponent = {
         }
 
         this._loadDependenciesPromise = new Promise((resolve, reject) => {
-            const loadScript = (src) => {
+            const loadScript = (src, integrity) => {
                 return new Promise((res, rej) => {
                     const existing = document.querySelector(`script[src="${src}"]`);
                     if (existing) {
@@ -75,6 +82,7 @@ const Map3DComponent = {
                     const s = document.createElement('script');
                     s.src = src;
                     s.async = true;
+                    s.integrity = integrity;
                     s.crossOrigin = 'anonymous';
                     s.onload = () => {
                         s.dataset.loaded = 'true';
@@ -85,20 +93,27 @@ const Map3DComponent = {
                 });
             };
 
-            const loadCss = (href) => {
+            const loadCss = (href, integrity) => {
                 if (document.querySelector(`link[href="${href}"]`)) return;
                 const link = document.createElement('link');
                 link.rel = 'stylesheet';
                 link.href = href;
+                link.integrity = integrity;
                 link.crossOrigin = 'anonymous';
                 document.head.appendChild(link);
             };
 
-            loadCss(`https://unpkg.com/maplibre-gl@${this.MAPLIBRE_VERSION}/dist/maplibre-gl.css`);
+            loadCss(
+                `https://unpkg.com/maplibre-gl@${this.MAPLIBRE_VERSION}/dist/maplibre-gl.css`,
+                this.CDN_INTEGRITY['maplibre-gl.css'],
+            );
 
             Promise.all([
-                loadScript(`https://unpkg.com/maplibre-gl@${this.MAPLIBRE_VERSION}/dist/maplibre-gl.js`),
-                loadScript('https://unpkg.com/deck.gl@9.4.0/dist.min.js'),
+                loadScript(
+                    `https://unpkg.com/maplibre-gl@${this.MAPLIBRE_VERSION}/dist/maplibre-gl.js`,
+                    this.CDN_INTEGRITY['maplibre-gl.js'],
+                ),
+                loadScript('https://unpkg.com/deck.gl@9.4.0/dist.min.js', this.CDN_INTEGRITY['deck.gl.js']),
             ])
                 .then(() => resolve())
                 .catch((err) => {

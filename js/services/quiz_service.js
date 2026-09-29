@@ -41,11 +41,6 @@ class QuizService {
             this.state.isLoaded = true;
             return { success: true, data: this.questions, error: null };
         }
-        if (typeof window !== 'undefined' && window.QCM_OFFICIAL && window.QCM_OFFICIAL.questions) {
-            this.questions = window.QCM_OFFICIAL.questions;
-            this.state.isLoaded = true;
-            return { success: true, data: this.questions, error: null };
-        }
 
         try {
             const cacheBuster = `v=${Date.now()}`;
@@ -66,12 +61,7 @@ class QuizService {
             const explications = this.parseExplicationsCSV(explicationsCSV);
             const questions = this.parseQuestionsCSV(questionsCSV, explications, courseMapping);
 
-            this.questions = questions;
-            this._questionMap = null;
-            this._questionMapSource = null;
-            if (typeof window !== 'undefined') {
-                window.QCM_OFFICIAL = { questions };
-            }
+            this.setQuestions(questions);
             this.state.isLoaded = true;
             return { success: true, data: questions, error: null };
         } catch (err) {
@@ -82,9 +72,6 @@ class QuizService {
     }
 
     getQuestions() {
-        if (typeof window !== 'undefined' && window.QCM_OFFICIAL && Array.isArray(window.QCM_OFFICIAL.questions)) {
-            return window.QCM_OFFICIAL.questions;
-        }
         return this.questions || [];
     }
 
@@ -92,9 +79,6 @@ class QuizService {
         this.questions = Array.isArray(questions) ? questions : [];
         this._questionMap = null;
         this._questionMapSource = null;
-        if (typeof window !== 'undefined') {
-            window.QCM_OFFICIAL = { questions: this.questions };
-        }
     }
 
     getQuestionByCode(code) {
@@ -256,7 +240,7 @@ class QuizService {
     }
 
     // Retourne une copie de la question avec ses choix mélangés (nouveau tableau, mêmes objets
-    // choix) : ne mute jamais window.QCM_OFFICIAL.questions[].choices, dont l'ordre canonique
+    // choix) : ne mute jamais QuizService.questions[].choices, dont l'ordre canonique
     // reste stable pour la Banque de Questions.
     shuffleQuestionChoices(q) {
         if (!q || !Array.isArray(q.choices)) return { ...q };
@@ -494,7 +478,7 @@ class QuizService {
         if (questions.length === 0) throw new Error('Aucune question trouvée');
 
         // Mélange l'ordre des choix de chaque question (sur une copie : les objets choix eux-mêmes
-        // et le tableau canonique QCM_OFFICIAL.questions[].choices ne sont pas mutés, pour que la
+        // et le tableau canonique QuizService.questions[].choices ne sont pas mutés, pour que la
         // Banque de Questions garde un ordre de référence stable). Sans cela, la bonne réponse
         // apparaît toujours à la même position d'une session à l'autre et l'élève finit par
         // mémoriser un emplacement plutôt que la théorie.
