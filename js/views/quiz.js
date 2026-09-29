@@ -1042,7 +1042,7 @@ class QuizViewClass extends BaseView {
                             answersHtml += `
                                 <div style="margin-top:12px; padding:12px; background:rgba(251, 146, 60, 0.15); border-left:3px solid #fb923c; font-size:0.9rem; color:var(--text-main); border-radius:8px;">
                                     <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">Explication</div>
-                                    ${qObj.explication}
+                                    ${escapeHTML(qObj.explication)}
                                 </div>
                             `;
                         }
@@ -1064,7 +1064,7 @@ class QuizViewClass extends BaseView {
                                     ${streak >= 3 ? `<span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 ${streak}</span>` : ''}
                                     ${hasAnswers ? '<i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-' + code + '"></i>' : ''}
                                 </div>
-                                <div style="font-size:0.9rem; line-height:1.4;">${displayText}</div>
+                                <div style="font-size:0.9rem; line-height:1.4;">${escapeHTML(displayText)}</div>
                                 <div style="font-size:0.75rem; opacity:0.6; margin-top:4px;">
                                     ${data.correct}/${data.total} corrects • ${data.total} tentative${data.total > 1 ? 's' : ''} • Série en cours : ${streak}
                                 </div>
@@ -1255,7 +1255,7 @@ class QuizViewClass extends BaseView {
                     optionsHtml += `
             <div style="padding:8px 12px; border-radius:6px; ${statusClass} display:flex; align-items:center; gap:8px; font-size:0.85rem;" >
                 ${icon}
-        <span style="flex:1;">${opt.text}</span>
+        <span style="flex:1;">${escapeHTML(opt.text)}</span>
                         </div >
     `;
                 });
@@ -1263,7 +1263,7 @@ class QuizViewClass extends BaseView {
                 questionsHtml += `
     <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; ${!r.isCorrect ? 'border:1px solid #f87171;' : ''}" >
                         <div style="font-size:0.75rem; opacity:0.6; margin-bottom:6px;">Question ${idx + 1}</div>
-                        <div style="font-weight:600; margin-bottom:12px;">${q.question}</div>
+                        <div style="font-weight:600; margin-bottom:12px;">${escapeHTML(q.question)}</div>
                         <div style="display:flex; flex-direction:column; gap:6px;">
                             ${optionsHtml}
                         </div>
@@ -1278,7 +1278,7 @@ class QuizViewClass extends BaseView {
                             if (expl) {
                                 return `<div style="margin-top:12px; padding:8px; background:rgba(251, 146, 60, 0.15); border-left:3px solid #fb923c; font-size:0.85rem; color:var(--text-main); border-radius:8px;">
                                     <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">Explication</div>
-                                    ${expl}</div>`;
+                                    ${escapeHTML(expl)}</div>`;
                             }
                             return '';
                         })()}
@@ -1569,7 +1569,7 @@ class QuizViewClass extends BaseView {
         feedbackDiv.style.display = 'block';
         feedbackDiv.innerHTML = `
             <div class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}">
-                <div>${result.question.explication}</div>
+                <div>${escapeHTML(result.question.explication)}</div>
                 ${courseUrl ? `<button data-action="openUrl" data-url="${escapeHTML(courseUrl)}" style="margin-top:10px; background:var(--accent-blue); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR DANS LE COURS</button>` : ''}
             </div>
         `;
@@ -1684,7 +1684,7 @@ class QuizViewClass extends BaseView {
 
                                     return `
                                 <div class="bank-choice" style="${bgStyle} border: ${borderStyle}; padding: 12px 16px; border-radius: 8px; font-size: 0.95rem; display: flex; justify-content: space-between; align-items:center;">
-                                    <span style="display:flex; align-items:center; flex:1;">${icon} <span style="flex:1;">${c.text}</span></span>
+                                    <span style="display:flex; align-items:center; flex:1;">${icon} <span style="flex:1;">${escapeHTML(c.text)}</span></span>
                                     <span style="font-weight:bold; margin-left:12px; color:var(--text-secondary);">${isUserSelected ? '<i class="ri-user-line" style="margin-right: 4px;" title="Votre réponse"></i>' : ''}${c.pts > 0 ? '+' + c.pts : c.pts < 0 ? c.pts : ''}</span>
                                 </div>
                                 `;

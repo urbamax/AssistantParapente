@@ -308,4 +308,42 @@ test.describe('E2E - Sites Flow', () => {
         await current().locator('.timeline-hour-dot').nth(0).click();
         await expect(current().locator('.model-agreement')).not.toContainText('n’est pas');
     });
+
+    test('Spec 003 : les détails des sites s’affichent en entier, liens sûrs et caractères réparés', async ({
+        page,
+    }) => {
+        // Favoris : toujours affichés, quel que soit le rayon autour de Boulogne-sur-Mer.
+        await page.addInitScript(() => {
+            localStorage.setItem(
+                'parapente_user_prefs',
+                JSON.stringify({ favoriteSites: ['mathay-13452', 'notre-dame-de-la-mer-1098'], radiusLimit: 10 }),
+            );
+        });
+        await mockOpenMeteo(page, { complete: 2, empty: 0 });
+        await page.goto('/?bypassGdpr=true');
+        const gdprBanner = page.locator('#gdpr-banner');
+        if (await gdprBanner.isVisible()) await page.locator('[data-action="refuseAll"]').first().click();
+        await page.locator('.nav-menu-btn[data-target="SITES"]').click();
+
+        const openDetails = async (name) => {
+            const card = page.locator('#sites-list-container .site-card', { hasText: name }).first();
+            await expect(card).toBeVisible();
+            if (await card.evaluate((el) => el.classList.contains('minimized'))) {
+                await card.locator('[data-action="toggleMinimize"]').click();
+            }
+            const open = page.locator('#sites-list-container .site-card:not(.minimized)', { hasText: name }).first();
+            await open.locator('details.site-details-toggle summary').click();
+            return open;
+        };
+
+        // MATHAY (site de décollage) : SORGIA — Les Prés Gelés est un atterrissage seul, masqué par défaut.
+        const mathay = await openDetails('MATHAY');
+        await expect(mathay).toContainText('<<corniches calcaires du Doubs>>');
+
+        const ndm = await openDetails('Les Grandes Bruy');
+        const charter = ndm.locator('a[href*="thermiquefrancilien.org"]').first();
+        await expect(charter).toHaveAttribute('target', '_blank');
+        await expect(charter).toHaveAttribute('rel', 'noopener noreferrer');
+        await expect(ndm).toContainText('l’objectif exclusif');
+    });
 });

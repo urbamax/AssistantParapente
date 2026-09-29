@@ -29,6 +29,7 @@ import unicodedata
 import re
 import urllib.request
 from pathlib import Path
+from text_repair import repair_cp1252
 
 REPO = Path(__file__).resolve().parent.parent
 OUT = REPO / "js" / "data" / "sites_data.json"
@@ -42,7 +43,8 @@ MATCH_RADIUS_M = 250.0
 def clean(v):
     if v is None:
         return None
-    v = str(v).replace("\r\n", "\n").replace("\r", "\n").strip()
+    # Caractères Windows-1252 mal décodés à la source (’ • … €) : réparés à chaque import (spec 003).
+    v = repair_cp1252(str(v)).replace("\r\n", "\n").replace("\r", "\n").strip()
     return v or None
 
 

@@ -7,7 +7,7 @@ import SitesService from '../services/sites_service.js';
 import LogbookService from '../services/logbook_service.js';
 import { WIND_DIRECTIONS, RADIUS, WEATHER_MODEL_INFO, STALE_AFTER_MS } from '../data/weather_config.js';
 import { getSpotairWidgetId } from '../data/spotair_widgets.js';
-import { escapeHTML } from '../core/security.js';
+import { escapeHTML, renderSiteText, safeHttpUrl } from '../core/security.js';
 import GdprEngine from '../gdpr_engine.js';
 
 import BaseView from '../core/base_view.js';
@@ -824,9 +824,9 @@ class SitesViewClass extends BaseView {
             ${weatherPopupHtml}
             <div style="display: flex; gap: 6px; margin-top: 10px;">
                 ${
-                    site.url
+                    safeHttpUrl(site.url)
                         ? `
-                <a class="action-btn-secondary ffvl-btn" href="${site.url}" target="_blank" rel="noopener noreferrer" style="padding: 6px 8px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;" title="Fiche FFVL">
+                <a class="action-btn-secondary ffvl-btn" href="${escapeHTML(safeHttpUrl(site.url))}" target="_blank" rel="noopener noreferrer" style="padding: 6px 8px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;" title="Fiche FFVL">
                     <img src="https://federation.ffvl.fr/sites/all/themes/ffvl/favicon.ico" alt="FFVL" style="width: 14px; height: 14px; border-radius: 2px;">
                 </a>
                 `
@@ -2214,9 +2214,9 @@ class SitesViewClass extends BaseView {
                 </div>
                 <div class="site-actions-container">
                     ${
-                        site.url
+                        safeHttpUrl(site.url)
                             ? `
-                    <a class="action-btn-secondary ffvl-btn" href="${site.url}" target="_blank" rel="noopener noreferrer" title="Fiche officielle FFVL">
+                    <a class="action-btn-secondary ffvl-btn" href="${escapeHTML(safeHttpUrl(site.url))}" target="_blank" rel="noopener noreferrer" title="Fiche officielle FFVL">
                         <img src="https://federation.ffvl.fr/sites/all/themes/ffvl/favicon.ico" alt="FFVL"> FFVL
                     </a>
                     `
@@ -2286,7 +2286,7 @@ class SitesViewClass extends BaseView {
                                 <i class="ri-shield-check-line rich-detail-icon blue"></i>
                                 <div>
                                     <strong class="rich-detail-label muted">Conventionnement</strong>
-                                    <span class="rich-detail-value">${site.conventionnement}</span>
+                                    <span class="rich-detail-value">${renderSiteText(site.conventionnement)}</span>
                                 </div>
                             </div>
                             `
@@ -2299,7 +2299,7 @@ class SitesViewClass extends BaseView {
                                 <i class="ri-checkbox-circle-line rich-detail-icon ${site.affiche ? 'green' : 'red'}"></i>
                                 <div>
                                     <strong class="rich-detail-label muted">Praticabilité</strong>
-                                    <span class="rich-detail-value">${site.praticabilite}</span>
+                                    <span class="rich-detail-value">${renderSiteText(site.praticabilite)}</span>
                                 </div>
                             </div>
                             `
@@ -2312,7 +2312,7 @@ class SitesViewClass extends BaseView {
                                 <i class="ri-group-line rich-detail-icon secondary"></i>
                                 <div>
                                     <strong class="rich-detail-label muted">Structure Gestionnaire</strong>
-                                    <span class="rich-detail-value">${site.structure_gestionnaire}</span>
+                                    <span class="rich-detail-value">${renderSiteText(site.structure_gestionnaire)}</span>
                                 </div>
                             </div>
                             `
@@ -2325,7 +2325,7 @@ class SitesViewClass extends BaseView {
                                 <i class="ri-compass-3-line rich-detail-icon blue"></i>
                                 <div>
                                     <strong class="rich-detail-label muted">Aérologie Idéale</strong>
-                                    <span class="rich-detail-value">${site.aerologie_ideale}</span>
+                                    <span class="rich-detail-value">${renderSiteText(site.aerologie_ideale)}</span>
                                 </div>
                             </div>
                             `
@@ -2338,7 +2338,7 @@ class SitesViewClass extends BaseView {
                                 <i class="ri-first-aid-kit-line rich-detail-icon green"></i>
                                 <div>
                                     <strong class="rich-detail-label muted">Accès Secours</strong>
-                                    <span class="rich-detail-value">${site.secours_acces}</span>
+                                    <span class="rich-detail-value">${renderSiteText(site.secours_acces)}</span>
                                 </div>
                             </div>
                             `
@@ -2351,7 +2351,7 @@ class SitesViewClass extends BaseView {
                                 <i class="ri-error-warning-line rich-detail-icon red"></i>
                                 <div>
                                     <strong class="rich-detail-label red">Dangers Signalés</strong>
-                                    <span class="rich-detail-value">${site.dangers}</span>
+                                    <span class="rich-detail-value">${renderSiteText(site.dangers)}</span>
                                 </div>
                             </div>
                             `
@@ -2364,7 +2364,7 @@ class SitesViewClass extends BaseView {
                                 <i class="ri-walk-line rich-detail-icon secondary"></i>
                                 <div>
                                     <strong class="rich-detail-label muted">Accès & Topo</strong>
-                                    <span class="rich-detail-value">${site.acces_topo}</span>
+                                    <span class="rich-detail-value">${renderSiteText(site.acces_topo)}</span>
                                 </div>
                             </div>
                             `
@@ -2377,7 +2377,7 @@ class SitesViewClass extends BaseView {
                                 <i class="ri-information-line rich-detail-icon blue"></i>
                                 <div>
                                     <strong class="rich-detail-label muted">Observations</strong>
-                                    <span class="rich-detail-value">${site.observations}</span>
+                                    <span class="rich-detail-value">${renderSiteText(site.observations)}</span>
                                 </div>
                             </div>
                             `
@@ -2390,7 +2390,7 @@ class SitesViewClass extends BaseView {
                                 <i class="ri-forbid-line rich-detail-icon red"></i>
                                 <div>
                                     <strong class="rich-detail-label red">Restrictions</strong>
-                                    <span class="rich-detail-value">${site.restrictions}</span>
+                                    <span class="rich-detail-value">${renderSiteText(site.restrictions)}</span>
                                 </div>
                             </div>
                             `
@@ -2403,7 +2403,7 @@ class SitesViewClass extends BaseView {
                                 <i class="ri-article-line rich-detail-icon blue"></i>
                                 <div>
                                     <strong class="rich-detail-label muted">Réglementation</strong>
-                                    <span class="rich-detail-value">${site.reglementation}</span>
+                                    <span class="rich-detail-value">${renderSiteText(site.reglementation)}</span>
                                 </div>
                             </div>
                             `

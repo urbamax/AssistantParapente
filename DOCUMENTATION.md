@@ -19,7 +19,7 @@ Assistant Parapente is a modern, responsive single-page web application (SPA) de
 - **Declarative Event Delegation**: Eliminates inline HTML event attributes (`onclick=...`). Interactivity uses HTML data attributes `data-action="..."` and `data-args="..."` dispatched via `EventDelegator` (`js/core/events.js`).
 - **Service & View Separation**: UI views (`js/views/`) strictly handle DOM rendering and user interactions, delegating state management, data processing, and external APIs to stateless services (`js/services/`).
 - **Offline-First & Hybrid Storage**: High-capacity persistent offline storage via native `IndexedDB` (`IDBStorageService`) for heavy datasets (IGC flight traces and telemetry) alongside `LocalStorage` (`StorageService`) for instant synchronous preferences, automatically syncing with Cloud Firestore when user signs in (`FirebaseService`).
-- **Security Policy (XSS & Tabnabbing Prevention)**: To prevent Cross-Site Scripting, the usage of raw `innerHTML` with unsanitized user or external data is **strictly forbidden**. All dynamic injections must either use `document.createElement()` + `textContent` or wrap variables in `escapeHTML()` (from `js/core/security.js`). Furthermore, all external targets (`target="_blank"` and `window.open`) strictly enforce `rel="noopener noreferrer"` to prevent Reverse Tabnabbing.
+- **Security Policy (XSS & Tabnabbing Prevention)**: To prevent Cross-Site Scripting, the usage of raw `innerHTML` with unsanitized user or external data is **strictly forbidden**. All dynamic injections must either use `document.createElement()` + `textContent` or wrap variables in `escapeHTML()` (from `js/core/security.js`). Furthermore, all external targets (`target="_blank"` and `window.open`) strictly enforce `rel="noopener noreferrer"` to prevent Reverse Tabnabbing. Site detail texts (FFVL / community data) are rendered with `renderSiteText()` (spec 003): everything is escaped, then only line breaks, bold and `http(s)` links (new tab, `noopener`) are restored; any other markup stays visible as text. Addresses taken from data go through `safeHttpUrl()` (non-`http(s)` → no link). Quiz questions, choices and explanations are always escaped.
 
 ---
 
@@ -395,3 +395,9 @@ The build rewrites `sw.js` into `dist/sw.js`: the precache list is generated fro
 ---
 
 *Documentation maintained for Assistant Parapente project.*
+
+### Site data text repair (spec 003)
+Some source texts were Windows-1252 decoded as Latin-1 (C1 control characters instead of ’ • … € œ).
+`scripts/text_repair.py` (`repair_cp1252`) repairs them; both import scripts call it in `clean()`,
+and `tests/data/sites_data_text.test.js` fails in CI if any such character reappears in
+`js/data/sites_data.json` or its server copy. Python helper tests: `python3 -m unittest discover -s tests/scripts`.
