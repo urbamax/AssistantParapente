@@ -50,7 +50,7 @@ export function aromeTailResponse(startIso, { complete = 3, empty = 3 } = {}) {
         time.push(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:00`);
     }
     const values = (v) => [...Array(complete).fill(v), ...Array(empty).fill(null)];
-    const day = time[0].substring(0, 10);
+    const days = [...new Set(time.map((t) => t.substring(0, 10)))];
     return {
         hourly: {
             time,
@@ -60,7 +60,11 @@ export function aromeTailResponse(startIso, { complete = 3, empty = 3 } = {}) {
             precipitation: values(0),
             cape: values(100),
         },
-        daily: { time: [day], sunrise: [`${day}T00:00`], sunset: [`${day}T23:59`] },
+        daily: {
+            time: days,
+            sunrise: days.map((d) => `${d}T00:00`),
+            sunset: days.map((d) => `${d}T23:59`),
+        },
     };
 }
 

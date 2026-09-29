@@ -7,6 +7,7 @@
  */
 
 import { getAngularDifference } from './utils/geo_utils.js';
+import { t } from './utils/i18n.js';
 
 // Configuration des pondérations pour le score final (ajustable)
 const SCORING_WEIGHTS = {
@@ -72,65 +73,88 @@ export function getSiteOrientations(site) {
 /**
  * Évalue la météo d'un spot et calcule son score global.
  *
+ * Contrat : specs/001-honest-missing-weather/contracts/evaluation.md. Toute valeur requise
+ * manquante ou invalide donne un résultat `incomplete` (aucun verdict, aucun défaut inventé).
+ *
  * @param {Object} site - Caractéristiques géographiques du spot.
- * @param {string} site.orientation - Orientations acceptées séparées par des virgules (ex: "S,SO").
+ * @param {string} [site.orientation] - Orientations acceptées séparées par des virgules (ex: "S,SO").
  * @param {string|string[]} [site.orientations_vent] - Orientations acceptées (liste, ou chaîne séparée par des virgules).
  * @param {number} [site.orientation_ideale_deg] - Orientation idéale du site en degrés (le cas échéant).
  *
- * @param {Object} weather - Prévisions météo actuelles fournies par l'API.
- * @param {boolean} weather.isDaytime - Indique s'il fait jour.
- * @param {number} weather.windSpeed - Vitesse du vent moyen.
- * @param {number} weather.windGust - Vitesse des rafales.
- * @param {number|string} weather.windDir - Direction d'où vient le vent (degrés ou cardinal).
- * @param {number} [weather.windDirDeg] - Direction d'où vient le vent en degrés (degrés).
- * @param {string} [weather.windCard] - Direction cardinale du vent.
- * @param {number} weather.precipitation - Quantité de précipitations (mm).
- * @param {number} [weather.cape] - (Optionnel) CAPE / Index de stabilité (J/kg).
+ * @param {Object} weather - Prévision d'une heure (null = pas encore chargée).
+ * @param {boolean|null} [weather.isDaytime] - Jour (true), nuit (false), inconnu (null).
+ * @param {number|null} [weather.windSpeed] - Vitesse du vent moyen (km/h).
+ * @param {number|null} [weather.windGust] - Vitesse des rafales (km/h).
+ * @param {number|string} [weather.windDir] - Direction d'où vient le vent (degrés ou cardinal).
+ * @param {number|null} [weather.windDirDeg] - Direction d'où vient le vent en degrés.
+ * @param {string|null} [weather.windCard] - Direction cardinale du vent.
+ * @param {number|null} [weather.precipitation] - Quantité de précipitations (mm).
+ * @param {number|null} [weather.cape] - CAPE / énergie convective disponible (J/kg).
  *
  * @param {Object} userPreferences - Filtres dynamiques issus des champs de l'interface.
  * @param {number} userPreferences.vMin - Vitesse de vent minimale requise.
  * @param {number} userPreferences.vMax - Vitesse de vent maximale autorisée.
  * @param {number} userPreferences.deltaRafaleMax - Écart maximal toléré (rafale - vent moyen).
  * @param {string} [userPreferences.filterMode] - 'hardware' pour filtrer selon les voiles de l'inventaire.
+ * @param {Array<{type: string, nom: string, ventMin?: number, ventMax?: number}>} [userPreferences.wings] -
+ *   Voiles du pilote (mode 'hardware'), fournies par l'appelant.
  *
  * @returns {Object} Résultat complet du diagnostic pour l'affichage et le tri.
  */
 export function evaluateSpotForecast(site, weather, userPreferences) {
     // ---------------------------------------------------------
-    // 1. CAS DE CHARGEMENT OU DONNÉES INCOMPLÈTES
+    // 1. CHARGEMENT (aucune prévision reçue pour ce créneau)
     // ---------------------------------------------------------
     if (!weather) {
-        return {
+        return outcome('loading', 'LOADING', t('weather.loading'), {
             score: 0,
-            flyable: false,
-            reason: 'Chargement...',
-            class: 'weather-unknown',
+            className: 'weather-unknown',
             icon: 'ri-loader-4-line',
-        };
+        });
     }
 
     // ---------------------------------------------------------
-    // 2. VERROUS DE SÉCURITÉ ABSOLUS (Kill Switches)
+    // 2. DONNÉES MANQUANTES → PAS DE VERDICT (spec 001, FR-002/004/005)
+    // Une valeur absente ou invalide n'est jamais remplacée par un défaut : l'heure est
+    // « incomplète » et toutes les valeurs manquantes sont listées, avant tout contrôle.
+    // ---------------------------------------------------------
+    const orientations = getSiteOrientations(site);
+    const windCard = resolveWindCard(weather);
+    const missing = [];
+    if (normalizeForecastValue(weather.windSpeed, 'windSpeed') === null) missing.push('windSpeed');
+    if (normalizeForecastValue(weather.windGust, 'windGust') === null) missing.push('windGust');
+    if (orientations.length > 0 && windCard === null) missing.push('windDir');
+    if (normalizeForecastValue(weather.precipitation, 'precipitation') === null) missing.push('precipitation');
+    if (typeof weather.isDaytime !== 'boolean') missing.push('daylight');
+
+    if (missing.length > 0) {
+        return outcome('incomplete', 'INCOMPLETE', t('weather.incomplete'), {
+            missing,
+            score: null,
+            className: 'weather-incomplete',
+            icon: 'ri-question-line',
+        });
+    }
+
+    // Valeurs validées. On garde la valeur numérique d'origine (non arrondie) pour que les
+    // verdicts sur données complètes restent identiques à avant la spec 001 (FR-013).
+    const windSpeed = Number(weather.windSpeed);
+    const windGust = Number(weather.windGust);
+    const precip = Number(weather.precipitation);
+    const unflyable = (code, reason, icon = 'ri-close-circle-fill') =>
+        outcome('unflyable', code, reason, { score: 0, className: 'weather-unflyable', icon });
+
+    // ---------------------------------------------------------
+    // 3. VERROUS DE SÉCURITÉ ABSOLUS (Kill Switches)
     // ---------------------------------------------------------
 
-    // A. Gestion de la nuit
-    if (!weather.isDaytime) {
-        return { score: 0, flyable: false, reason: 'Nuit', class: 'weather-unflyable', icon: 'ri-moon-clear-line' };
-    }
+    // A. Nuit
+    if (!weather.isDaytime) return unflyable('NIGHT', t('weather.night'), 'ri-moon-clear-line');
 
     // B. Précipitations (Pluie)
-    const precip = weather.precipitation ?? 0;
-    if (precip > 0) {
-        return {
-            score: 0,
-            flyable: false,
-            reason: `Pluie (${precip.toFixed(1)} mm)`,
-            class: 'weather-unflyable',
-            icon: 'ri-showers-fill',
-        };
-    }
+    if (precip > 0) return unflyable('RAIN', t('weather.rain', { mm: precip.toFixed(1) }), 'ri-showers-fill');
 
-    // C. Limites de vitesse du vent moyen (vMin / vMax de l'utilisateur)
+    // C. Limites de vitesse du vent moyen (vMin / vMax de l'utilisateur, ou voiles du pilote)
     let hardwareWingsNames = [];
     if (userPreferences.filterMode === 'hardware') {
         // Les voiles sont fournies par l'appelant (SitesService) : ce module reste pur et
@@ -141,88 +165,35 @@ export function evaluateSpotForecast(site, weather, userPreferences) {
                 wing.type === 'voile' &&
                 wing.ventMin !== undefined &&
                 wing.ventMax !== undefined &&
-                weather.windSpeed >= wing.ventMin &&
-                weather.windSpeed <= wing.ventMax,
+                windSpeed >= wing.ventMin &&
+                windSpeed <= wing.ventMax,
         );
-
-        if (flyableWings.length > 0) {
-            hardwareWingsNames = flyableWings.map((w) => w.nom);
-        } else {
-            return {
-                score: 0,
-                flyable: false,
-                reason: 'Vent hors limites (Matériel)',
-                class: 'weather-unflyable',
-                icon: 'ri-close-circle-fill',
-            };
+        if (flyableWings.length === 0) {
+            return unflyable('WIND_OUT_OF_EQUIPMENT_LIMITS', t('weather.windOutOfEquipmentLimits'));
         }
-    } else {
-        if (weather.windSpeed < userPreferences.vMin || weather.windSpeed > userPreferences.vMax) {
-            return {
-                score: 0,
-                flyable: false,
-                reason: 'Vent hors limites',
-                class: 'weather-unflyable',
-                icon: 'ri-close-circle-fill',
-            };
-        }
+        hardwareWingsNames = flyableWings.map((w) => w.nom);
+    } else if (windSpeed < userPreferences.vMin || windSpeed > userPreferences.vMax) {
+        return unflyable('WIND_OUT_OF_LIMITS', t('weather.windOutOfLimits'));
     }
 
     // D. Limite de la turbulence (delta rafale de l'utilisateur)
-    const rafalesEffectives = Math.max(weather.windGust || 0, weather.windSpeed);
-    const deltaRafale = rafalesEffectives - weather.windSpeed;
-    if (deltaRafale > userPreferences.deltaRafaleMax) {
-        return {
-            score: 0,
-            flyable: false,
-            reason: 'Rafales hors limites',
-            class: 'weather-unflyable',
-            icon: 'ri-close-circle-fill',
-        };
+    const rafalesEffectives = Math.max(windGust, windSpeed);
+    if (rafalesEffectives - windSpeed > userPreferences.deltaRafaleMax) {
+        return unflyable('GUST_OUT_OF_LIMITS', t('weather.gustOutOfLimits'));
     }
 
     // E. Risque orageux (CAPE)
     if (weather.cape !== undefined && weather.cape > 1000) {
-        return {
-            score: 0,
-            flyable: false,
-            reason: 'Risque orageux (CAPE)',
-            class: 'weather-unflyable',
-            icon: 'ri-thunderstorms-line',
-        };
+        return unflyable('STORM_RISK', t('weather.stormRisk'), 'ri-thunderstorms-line');
     }
 
     // F. Orientation du vent (Filtrage par Point Cardinal - Tolérance Zéro)
-    let orientations = [];
-    if (Array.isArray(site.orientations_vent)) orientations = site.orientations_vent;
-    else if (typeof site.orientations_vent === 'string')
-        orientations = site.orientations_vent.split(',').map((v) => v.trim());
-    else if (typeof site.orientation === 'string' && site.orientation.length > 0)
-        orientations = site.orientation.split(',').map((v) => v.trim());
-    if (orientations.length > 0) {
-        let ventCardinal = '';
-
-        if (weather.windCard && String(weather.windCard).trim() !== '') {
-            ventCardinal = String(weather.windCard);
-        } else if (weather.windDir !== undefined && weather.windDir !== null && String(weather.windDir).trim() !== '') {
-            ventCardinal = degreesToCardinal(Number(weather.windDir));
-        }
-
-        ventCardinal = ventCardinal.trim().toUpperCase();
-
-        if (!orientations.includes(ventCardinal)) {
-            return {
-                score: 0,
-                flyable: false,
-                reason: 'Mauvaise orientation',
-                class: 'weather-unflyable',
-                icon: 'ri-close-circle-fill',
-            };
-        }
+    if (orientations.length > 0 && !orientations.includes(windCard)) {
+        return unflyable('WRONG_ORIENTATION', t('weather.wrongOrientation'));
     }
 
     // ---------------------------------------------------------
-    // 3. CALCUL DU SCORE ÉVOLUTIF (Si tous les verrous sont au vert)
+    // 4. CALCUL DU SCORE ÉVOLUTIF (Si tous les verrous sont au vert)
     // ---------------------------------------------------------
 
     // A. Note de Vitesse du Vent (0 à 100)
@@ -231,47 +202,22 @@ export function evaluateSpotForecast(site, weather, userPreferences) {
 
     let scoreVentMoyen;
     if (demiPlage > 0) {
-        const ecartVent = Math.abs(weather.windSpeed - vIdeal);
+        const ecartVent = Math.abs(windSpeed - vIdeal);
         scoreVentMoyen = Math.max(0, 100 * (1 - ecartVent / demiPlage));
     } else {
         // Protection division par zéro si vMin == vMax
-        scoreVentMoyen = weather.windSpeed === vIdeal ? 100 : 0;
-    }
-
-    // Extraction et conversion de la direction du vent en degrés
-    let windDirDeg = null;
-    if (weather.windDirDeg !== undefined && weather.windDirDeg !== null) {
-        windDirDeg = Number(weather.windDirDeg);
-    } else if (weather.windDir !== undefined && weather.windDir !== null) {
-        const parsed = Number(weather.windDir);
-        if (!isNaN(parsed)) {
-            windDirDeg = parsed;
-        } else {
-            const CARD_TO_DEG = { N: 0, NE: 45, E: 90, SE: 135, S: 180, SO: 225, O: 270, NO: 315 };
-            const cleanCard = String(weather.windDir).trim().toUpperCase();
-            if (CARD_TO_DEG[cleanCard] !== undefined) {
-                windDirDeg = CARD_TO_DEG[cleanCard];
-            }
-        }
-    }
-
-    if (windDirDeg === null && weather.windCard) {
-        const CARD_TO_DEG = { N: 0, NE: 45, E: 90, SE: 135, S: 180, SO: 225, O: 270, NO: 315 };
-        const cleanCard = String(weather.windCard).trim().toUpperCase();
-        if (CARD_TO_DEG[cleanCard] !== undefined) {
-            windDirDeg = CARD_TO_DEG[cleanCard];
-        }
+        scoreVentMoyen = windSpeed === vIdeal ? 100 : 0;
     }
 
     // B. Note d'Orientation (0 à 100)
     // Plus le vent est aligné avec l'orientation de la pente, plus le score est élevé.
+    const windDirDeg = resolveWindDirDeg(weather);
     const hasOrientation =
         site.orientation_ideale_deg !== undefined && site.orientation_ideale_deg !== null && windDirDeg !== null;
-    let angularDiff;
     let scoreOrientation = 100; // 100 par défaut si pas d'orientation idéale spécifiée
 
     if (hasOrientation) {
-        angularDiff = getAngularDifference(windDirDeg, site.orientation_ideale_deg);
+        const angularDiff = getAngularDifference(windDirDeg, site.orientation_ideale_deg);
 
         // Logique de paliers pour le rendement en soaring / thermique
         if (angularDiff <= 11.25) {
@@ -297,21 +243,85 @@ export function evaluateSpotForecast(site, weather, userPreferences) {
         0;
 
     // ---------------------------------------------------------
-    // 4. RETOUR DU DIAGNOSTIC COMPLET
+    // 5. RETOUR DU DIAGNOSTIC COMPLET
     // ---------------------------------------------------------
-    let reasonText = `Excellent (${finalScore}/100)`;
-    if (finalScore < 50) reasonText = `Passable (${finalScore}/100)`;
-    else if (finalScore < 80) reasonText = `Bon (${finalScore}/100)`;
-
-    if (hardwareWingsNames && hardwareWingsNames.length > 0) {
-        reasonText += ` avec ${hardwareWingsNames.join(', ')}`;
+    let reasonCode = 'EXCELLENT';
+    let reasonText = t('weather.excellent', { score: finalScore });
+    if (finalScore < 50) {
+        reasonCode = 'FAIR';
+        reasonText = t('weather.fair', { score: finalScore });
+    } else if (finalScore < 80) {
+        reasonCode = 'GOOD';
+        reasonText = t('weather.good', { score: finalScore });
     }
 
-    return {
+    if (hardwareWingsNames.length > 0) {
+        reasonText += t('weather.withWings', { wings: hardwareWingsNames.join(', ') });
+    }
+
+    return outcome('flyable', reasonCode, reasonText, {
         score: finalScore,
-        flyable: true,
-        reason: reasonText,
-        class: 'weather-flyable',
+        className: 'weather-flyable',
         icon: 'ri-checkbox-circle-fill',
+    });
+}
+
+/**
+ * Construit un résultat d'évaluation (contrat : specs/001-honest-missing-weather/data-model.md).
+ * `flyable` est conservé pour compatibilité ; `status` fait foi.
+ */
+function outcome(
+    status,
+    reasonCode,
+    reason,
+    { score, className, icon, missing = [], orientationUnknown = false, warning = false },
+) {
+    return {
+        status,
+        flyable: status === 'flyable',
+        reasonCode,
+        reason,
+        missing,
+        orientationUnknown,
+        score,
+        class: className,
+        icon,
+        warning,
     };
 }
+
+/**
+ * Direction cardinale du vent : `windCard` si c'est un libellé connu, sinon déduite de
+ * `windDirDeg` / `windDir` s'ils sont valides. null si la direction est inconnue.
+ * @returns {string|null}
+ */
+function resolveWindCard(weather) {
+    if (weather.windCard !== undefined && weather.windCard !== null) {
+        const card = String(weather.windCard).trim().toUpperCase();
+        if (KNOWN_ORIENTATIONS.has(card)) return card;
+    }
+    const deg = resolveWindDirDeg(weather);
+    return deg === null ? null : degreesToCardinal(deg);
+}
+
+/**
+ * Direction du vent en degrés depuis `windDirDeg`, ou `windDir` (degrés ou libellé cardinal),
+ * ou `windCard`. null si aucune n'est valide.
+ * @returns {number|null}
+ */
+function resolveWindDirDeg(weather) {
+    const deg = normalizeForecastValue(weather.windDirDeg, 'windDir');
+    if (deg !== null) return Number(weather.windDirDeg);
+    if (weather.windDir !== undefined && weather.windDir !== null) {
+        if (normalizeForecastValue(weather.windDir, 'windDir') !== null) return Number(weather.windDir);
+        const card = String(weather.windDir).trim().toUpperCase();
+        if (card in CARD_TO_DEG) return CARD_TO_DEG[card];
+    }
+    if (weather.windCard) {
+        const card = String(weather.windCard).trim().toUpperCase();
+        if (card in CARD_TO_DEG) return CARD_TO_DEG[card];
+    }
+    return null;
+}
+
+const CARD_TO_DEG = Object.freeze({ N: 0, NE: 45, E: 90, SE: 135, S: 180, SO: 225, O: 270, NO: 315 });
