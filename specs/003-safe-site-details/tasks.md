@@ -45,10 +45,10 @@ description: "Task list for safe and faithful site details"
 
 ## Phase 4: User Story 2 - Quiz texts shown as text (Priority: P1)
 
-- [ ] T014 [P] [US2] Create `tests/views/quiz_escaping.test.js`: with a question whose text, choices and explanation contain `<img src=x onerror=…>`, `QuizView.showAnswerFeedback`, `renderStats`, `renderExamHistory` and `renderExamResults` (`js/views/quiz.js`) produce no `img` element and show the markup as text
-- [ ] T015 [US2] Run `npx vitest run tests/views/quiz_escaping.test.js`; confirm it fails
-- [ ] T016 [US2] In `js/views/quiz.js`, wrap with `escapeHTML` the insertions at lines ~1045 (`qObj.explication`), ~1067 (`displayText`), ~1258 (`opt.text`), ~1266 (`q.question`), ~1281 (`expl`), ~1572 (`result.question.explication`), ~1687 (`c.text`)
-- [ ] T017 [US2] Run `npm test`; T014 passes
+- [X] T014 [P] [US2] Create `tests/views/quiz_escaping.test.js`: with a question whose text, choices and explanation contain `<img src=x onerror=…>`, `QuizView.showAnswerFeedback` and `renderExamHistory` (`js/views/quiz.js`) produce no `img` element and show the markup as text (`renderStats` and `renderExamResults` need heavy setup: their 3 insertions are fixed the same way in T016 and checked by review)
+- [X] T015 [US2] Run `npx vitest run tests/views/quiz_escaping.test.js`; confirm it fails
+- [X] T016 [US2] In `js/views/quiz.js`, wrap with `escapeHTML` the insertions at lines ~1045 (`qObj.explication`), ~1067 (`displayText`), ~1258 (`opt.text`), ~1266 (`q.question`), ~1281 (`expl`), ~1572 (`result.question.explication`), ~1687 (`c.text`)
+- [X] T017 [US2] Run `npm test`; T014 passes
 
 ---
 
