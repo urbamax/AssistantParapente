@@ -30,6 +30,10 @@ describe('IDBStorageService', () => {
             expect(await service.deleteTrace('vol-1')).toBe(false);
             const migration = await service.migrateFromLocalStorage([{ id: 'vol-1' }]);
             expect(migration).toEqual({ migrated: 0, tracesMigrated: 0 });
+            // Spec 007 : paires clé-valeur (prévisions enregistrées pour le hors-ligne).
+            expect(await service.setValues([{ key: 'forecast:1', value: { a: 1 } }])).toBe(false);
+            expect(await service.getValuesByPrefix('forecast:')).toEqual([]);
+            expect(await service.deleteValues(['forecast:1'])).toBe(false);
         });
     });
 

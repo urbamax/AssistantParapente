@@ -335,6 +335,80 @@ export class IDBStorageService {
             }
         });
     }
+
+    /**
+     * Enregistre des paires clé-valeur (magasin `keyval`) dans une transaction unique.
+     * Utilisé pour garder la dernière prévision sur l'appareil (spec 007).
+     * @param {Array<{key: string, value: any}>} entries
+     * @returns {Promise<boolean>}
+     */
+    async setValues(entries) {
+        if (!this.isSupported() || !Array.isArray(entries)) return false;
+        const db = await this.open();
+        if (!db) return false;
+
+        return new Promise((resolve) => {
+            try {
+                const tx = db.transaction(STORE_KEYVAL, 'readwrite');
+                const store = tx.objectStore(STORE_KEYVAL);
+                entries.forEach((entry) => {
+                    if (entry && entry.key) store.put({ key: entry.key, value: entry.value });
+                });
+                tx.oncomplete = () => resolve(true);
+                tx.onerror = () => resolve(false);
+                tx.onabort = () => resolve(false);
+            } catch {
+                resolve(false);
+            }
+        });
+    }
+
+    /**
+     * Toutes les paires dont la clé commence par `prefix`.
+     * @param {string} prefix
+     * @returns {Promise<Array<{key: string, value: any}>>}
+     */
+    async getValuesByPrefix(prefix) {
+        if (!this.isSupported()) return [];
+        const db = await this.open();
+        if (!db) return [];
+
+        return new Promise((resolve) => {
+            try {
+                const tx = db.transaction(STORE_KEYVAL, 'readonly');
+                const request = tx.objectStore(STORE_KEYVAL).getAll();
+                request.onsuccess = () =>
+                    resolve((request.result || []).filter((entry) => String(entry.key).startsWith(prefix)));
+                request.onerror = () => resolve([]);
+            } catch {
+                resolve([]);
+            }
+        });
+    }
+
+    /**
+     * Supprime des paires clé-valeur.
+     * @param {string[]} keys
+     * @returns {Promise<boolean>}
+     */
+    async deleteValues(keys) {
+        if (!this.isSupported() || !Array.isArray(keys)) return false;
+        const db = await this.open();
+        if (!db) return false;
+
+        return new Promise((resolve) => {
+            try {
+                const tx = db.transaction(STORE_KEYVAL, 'readwrite');
+                const store = tx.objectStore(STORE_KEYVAL);
+                keys.forEach((key) => store.delete(key));
+                tx.oncomplete = () => resolve(true);
+                tx.onerror = () => resolve(false);
+                tx.onabort = () => resolve(false);
+            } catch {
+                resolve(false);
+            }
+        });
+    }
 }
 
 export const IDBStorage = new IDBStorageService();
