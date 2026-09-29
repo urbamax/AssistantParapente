@@ -29,6 +29,46 @@ function degreesToCardinal(deg) {
     const index = Math.round(normalizedDeg / 45) % 8;
     return directions[index];
 }
+
+const ROUNDED_KINDS = new Set(['windSpeed', 'windGust', 'windDir']);
+
+/**
+ * Valide une valeur de prévision brute (spec 001, FR-001). Une valeur absente, vide, non
+ * numérique, infinie ou physiquement impossible (négative ; direction hors 0–360°) est
+ * « manquante » et renvoyée à null : elle ne doit JAMAIS être remplacée par une valeur par
+ * défaut (0 km/h, 0 mm…), sinon un trou de données devient un verdict.
+ * @param {unknown} value
+ * @param {'windSpeed'|'windGust'|'windDir'|'precipitation'|'cape'} kind
+ * @returns {number|null}
+ */
+export function normalizeForecastValue(value, kind) {
+    let num;
+    if (typeof value === 'number') num = value;
+    else if (typeof value === 'string' && value.trim() !== '') num = Number(value);
+    else return null;
+
+    if (!Number.isFinite(num) || num < 0) return null;
+    if (kind === 'windDir' && num > 360) return null;
+    return ROUNDED_KINDS.has(kind) ? Math.round(num) : num;
+}
+
+const KNOWN_ORIENTATIONS = new Set(['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO']);
+
+/**
+ * Orientations de décollage reconnues d'un site (liste, chaîne séparée par des virgules, ou
+ * champ historique `orientation`). Un libellé non reconnu est ignoré ; une liste vide
+ * signifie « orientation inconnue » (spec 001, FR-007).
+ * @param {any} site
+ * @returns {string[]}
+ */
+export function getSiteOrientations(site) {
+    if (!site) return [];
+    let raw = [];
+    if (Array.isArray(site.orientations_vent)) raw = site.orientations_vent;
+    else if (typeof site.orientations_vent === 'string') raw = site.orientations_vent.split(',');
+    else if (typeof site.orientation === 'string') raw = site.orientation.split(',');
+    return raw.map((v) => String(v).trim().toUpperCase()).filter((v) => KNOWN_ORIENTATIONS.has(v));
+}
 /**
  * Évalue la météo d'un spot et calcule son score global.
  *
@@ -93,7 +133,9 @@ export function evaluateSpotForecast(site, weather, userPreferences) {
     // C. Limites de vitesse du vent moyen (vMin / vMax de l'utilisateur)
     let hardwareWingsNames = [];
     if (userPreferences.filterMode === 'hardware') {
-        const wings = JSON.parse(localStorage.getItem('tp_equipment_data')) || [];
+        // Les voiles sont fournies par l'appelant (SitesService) : ce module reste pur et
+        // partagé avec le serveur, il ne lit aucun stockage (constitution, principe VIII).
+        const wings = Array.isArray(userPreferences.wings) ? userPreferences.wings : [];
         const flyableWings = wings.filter(
             (wing) =>
                 wing.type === 'voile' &&

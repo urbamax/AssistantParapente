@@ -248,6 +248,10 @@ class SitesService {
             vMax: this.state.limitWindMax,
             deltaRafaleMax: this.state.limitGustDelta,
             filterMode: this.state.filterMode,
+            wings:
+                this.state.filterMode === 'hardware'
+                    ? StorageService.get(StorageService.KEYS.EQUIPMENT_DATA, []) || []
+                    : [],
         };
 
         // 2. Déterminer la meilleure orientation du site par rapport au vent actuel
