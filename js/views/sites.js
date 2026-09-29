@@ -11,6 +11,51 @@ import { escapeHTML } from '../core/security.js';
 import GdprEngine from '../gdpr_engine.js';
 
 import BaseView from '../core/base_view.js';
+import { t } from '../utils/i18n.js';
+
+// ---------------------------------------------------------------------------------------------
+// Affichage des verdicts météo (spec 001, contracts/ui-states.md). Les couleurs et libellés sont
+// choisis à partir de `status` / `reasonCode`, jamais en comparant le texte affiché.
+// ---------------------------------------------------------------------------------------------
+
+/** Valeur de prévision affichable : « — » quand elle manque, jamais null, NaN ou 0 inventé. */
+function forecastValue(value) {
+    return value === null || value === undefined || Number.isNaN(value) ? t('weather.missingPlaceholder') : value;
+}
+
+/** « Indisponible : vent moyen, rafales » pour une heure incomplète, sinon ''. */
+function missingValuesText(status) {
+    if (!status || status.status !== 'incomplete' || !status.missing?.length) return '';
+    const labels = status.missing.map((code) => t(`weather.missing.${code}`));
+    return t('weather.unavailableList', { list: labels.join(', ') });
+}
+
+/** Couleur d'un verdict pour le marqueur de carte (`bar: false`) ou la frise horaire. */
+function verdictColor(status, { bar = false } = {}) {
+    if (!status || status.status === 'loading' || status.status === 'incomplete')
+        return bar ? 'transparent' : '#94a3b8';
+    if (status.status === 'flyable') return status.warning ? '#eab308' : bar ? 'var(--accent-green)' : '#22c55e';
+    if (status.reasonCode === 'NIGHT') return bar ? 'rgba(100,100,120,0.3)' : '#475569';
+    if (status.reasonCode === 'RAIN') return '#3b82f6';
+    if (status.reasonCode === 'WRONG_ORIENTATION') return '#f97316';
+    return '#ef4444';
+}
+
+/**
+ * Rappel affiché avec chaque verdict (spec 001 FR-010b, constitution principe II) : l'avis de
+ * l'application repose sur des prévisions, le risque d'orage est estimé, le pilote décide.
+ * Rien quand il n'y a pas de verdict (chargement, prévision incomplète).
+ */
+function verdictReminderHtml(status) {
+    if (status && status.status !== 'flyable' && status.status !== 'unflyable') return '';
+    return `<p class="verdict-reminder"><i class="ri-information-line" aria-hidden="true"></i> ${escapeHTML(t('weather.reminder'))}</p>`;
+}
+
+/** Libellé court d'un verdict (infobulles, tableau) : raison + données manquantes éventuelles. */
+function verdictLabel(status) {
+    const missing = missingValuesText(status);
+    return missing ? `${status.reason} — ${missing}` : status.reason;
+}
 
 class SitesViewClass extends BaseView {
     constructor() {
@@ -573,25 +618,22 @@ class SitesViewClass extends BaseView {
         const activeSites = SitesService.getFilteredAndSortedSites(SitesService.getSites());
 
         activeSites.forEach((site) => {
-            let color = '#94a3b8';
             let flyableClass = 'weather-unknown';
             const weather = (SitesService.state.weatherForecasts[site.id] || [])[SitesService.state.forecastOffset];
-            if (weather) {
-                const status = SitesService.isForecastFlyable(site, weather);
-                flyableClass = status.class;
-                if (status.flyable) color = status.warning ? '#eab308' : '#22c55e';
-                else {
-                    if (status.reason === 'Nuit') color = '#475569';
-                    else if (status.reason.startsWith('Pluie')) color = '#3b82f6';
-                    else if (status.reason === 'Mauvaise orientation') color = '#f97316';
-                    else color = '#ef4444';
-                }
-            }
-            const isCurrentlyFlyable = weather && SitesService.isForecastFlyable(site, weather).flyable;
+            const status = weather ? SitesService.isForecastFlyable(site, weather) : null;
+            if (status) flyableClass = status.class;
+            const color = verdictColor(status);
+            const isIncomplete = status?.status === 'incomplete';
+            // Pas de pulsation pour un site dont l'orientation est inconnue (spec 001, US2).
+            const isCurrentlyFlyable = status?.flyable && !status.warning;
             const pulseHtml = isCurrentlyFlyable
                 ? `<div class="marker-pulse" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; background: ${color}; opacity: 0.35; animation: marker-pulse-anim 1.8s infinite ease-out;"></div>`
                 : '';
-            const iconHtml = `<div class="custom-map-marker ${flyableClass}" style="position: relative; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;" title="${escapeHTML(site.nom)}">${pulseHtml}<div class="marker-core" style="width: 14px; height: 14px; border-radius: 50%; background: ${color}; border: 2px solid var(--bg-surface); box-shadow: 0 2px 6px rgba(0,0,0,0.4); z-index: 2; transition: background-color 0.3s;"></div></div>`;
+            const iconHtml = `<div class="custom-map-marker ${flyableClass}" style="position: relative; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;" title="${escapeHTML(site.nom)}">${pulseHtml}${
+                isIncomplete
+                    ? `<div class="marker-core marker-core--incomplete" title="${escapeHTML(verdictLabel(status))}">?</div>`
+                    : `<div class="marker-core" style="width: 14px; height: 14px; border-radius: 50%; background: ${color}; border: 2px solid var(--bg-surface); box-shadow: 0 2px 6px rgba(0,0,0,0.4); z-index: 2; transition: background-color 0.3s;"></div>`
+            }</div>`;
             const marker = L.marker([parseFloat(site.latitude || site.lat), parseFloat(site.longitude || site.lon)], {
                 icon: L.divIcon({
                     html: iconHtml,
@@ -625,12 +667,15 @@ class SitesViewClass extends BaseView {
     }
     buildWeatherPopupHtml(weather, color, site) {
         const status = SitesService.isForecastFlyable(site, weather);
+        const missing = missingValuesText(status);
         return `<div style="margin-top: 8px; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.1); border: 1px solid var(--border-color); font-size: 0.85rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; gap: 8px;">
-                <span style="font-weight: 700; white-space: nowrap;"><i class="ri-windy-line"></i> ${weather.windCard} ${weather.windSpeed} km/h</span>
-                <span style="color: ${color}; font-weight: bold; font-size: 0.75rem;"><i class="${status.icon}"></i> ${status.reason}</span>
+                <span style="font-weight: 700; white-space: nowrap;"><i class="ri-windy-line"></i> ${escapeHTML(String(forecastValue(weather.windCard)))} ${escapeHTML(String(forecastValue(weather.windSpeed)))} km/h</span>
+                <span style="color: ${status.status === 'incomplete' ? 'var(--text-muted)' : color}; font-weight: bold; font-size: 0.75rem;"><i class="${status.icon}"></i> ${escapeHTML(status.reason)}</span>
             </div>
-            <div style="opacity: 0.8; font-size: 0.8rem;">Rafales : ${weather.windGust} km/h</div>
+            <div style="opacity: 0.8; font-size: 0.8rem;">Rafales : ${escapeHTML(String(forecastValue(weather.windGust)))} km/h</div>
+            ${missing ? `<div class="weather-missing-values" style="margin-top: 4px; font-size: 0.8rem;">${escapeHTML(missing)}</div>` : ''}
+            ${verdictReminderHtml(status)}
         </div>`;
     }
 
@@ -1600,7 +1645,7 @@ class SitesViewClass extends BaseView {
                 const weather = forecasts[SitesService.state.forecastOffset];
                 const status = weather ? SitesService.isForecastFlyable(site, weather) : null;
                 const statusHtml = status
-                    ? `<span class="${status.class}" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><i class="${status.icon}"></i> ${escapeHTML(status.reason)}</span>`
+                    ? `<span class="${status.class}" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><i class="${status.icon}"></i> ${escapeHTML(verdictLabel(status))}</span>`
                     : '<span style="color: var(--text-muted);">Chargement...</span>';
 
                 // Meilleur créneau à venir = le plus long slot volable de flyableSlots (déjà groupé
@@ -1616,9 +1661,16 @@ class SitesViewClass extends BaseView {
                     : '<span style="color: var(--text-muted);">Aucun</span>';
 
                 const agreement = SitesService.getModelAgreement(site);
+                // Indice calculable seulement sur deux prévisions complètes (spec 001) : si les deux
+                // modèles sont chargés mais qu'il reste null, c'est qu'une prévision est incomplète.
+                const secondaryLoaded = !!SitesService.state.weatherForecastsSecondary?.[site.id];
+                const confidenceUnavailable =
+                    agreement === null && (status?.status === 'incomplete' || (secondaryLoaded && !!weather));
                 const confidenceHtml =
                     agreement === null
-                        ? '<span style="color: var(--text-muted);">—</span>'
+                        ? confidenceUnavailable
+                            ? `<span style="color: var(--text-muted);" title="${escapeHTML(t('weather.incomplete'))}">${escapeHTML(t('weather.confidenceUnavailable'))}</span>`
+                            : '<span style="color: var(--text-muted);">—</span>'
                         : agreement
                           ? '<span style="color: var(--accent-green);" title="Le modèle principal et le modèle de référence sont d\'accord sur la volabilité actuelle"><i class="ri-shield-check-line"></i> Fiable</span>'
                           : '<span style="color: #f59e0b;" title="Les modèles météo divergent sur la volabilité actuelle : prudence"><i class="ri-error-warning-line"></i> Incertain</span>';
@@ -1637,6 +1689,7 @@ class SitesViewClass extends BaseView {
 
         listDiv.innerHTML = `
             <div class="card" style="padding: 16px; overflow-x: auto;">
+                ${verdictReminderHtml(null)}
                 <table style="width: 100%; border-collapse: collapse; min-width: 480px;">
                     <thead>
                         <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
@@ -1734,13 +1787,15 @@ class SitesViewClass extends BaseView {
                             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;">
                                 <span style="display: flex; align-items: center; gap: 6px;">
                                     <i class="ri-windy-line"></i>
-                                    <span>Vent <b>${weather.windCard}</b> (${weather.windDirDeg}°) : <b>${weather.windSpeed} km/h</b> (raf. <b>${weather.windGust}</b>)</span>
+                                    <span>Vent <b>${escapeHTML(String(forecastValue(weather.windCard)))}</b> (${escapeHTML(String(forecastValue(weather.windDirDeg)))}°) : <b>${escapeHTML(String(forecastValue(weather.windSpeed)))} km/h</b> (raf. <b>${escapeHTML(String(forecastValue(weather.windGust)))}</b>)</span>
                                 </span>
                                 <span style="display: flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; text-transform: uppercase;">
-                                    <i class="${status.icon}"></i> ${status.reason}
+                                    <i class="${status.icon}"></i> ${escapeHTML(status.reason)}
                                 </span>
                             </div>
+                            ${missingValuesText(status) ? `<div class="weather-missing-values" style="font-size: 0.8rem;">${escapeHTML(missingValuesText(status))}</div>` : ''}
                         </div>
+                        ${verdictReminderHtml(status)}
                     `;
                 } else if (hasWeatherEntry) {
                     weatherHtml = `
@@ -1775,6 +1830,14 @@ class SitesViewClass extends BaseView {
                             <i class="ri-calendar-todo-line"></i> Prochains créneaux : ${slotsDetails}
                         </div>
                     `;
+                } else if (forecasts.length > 0 && site.completeHours === 0) {
+                    // Aucune heure complète : ne pas laisser croire que les conditions sont
+                    // mauvaises, il n'y a simplement pas de prévision fiable (spec 001, FR-009).
+                    slotsTextHtml = `
+                        <div class="creneaux-list incomplete">
+                            <i class="ri-question-line"></i> ${escapeHTML(t('weather.noReliableForecast'))}
+                        </div>
+                    `;
                 } else if (!site.flyableHours) {
                     const maxRange = SitesService.state.forecastMaxRange || 120;
                     slotsTextHtml = `
@@ -1792,6 +1855,7 @@ class SitesViewClass extends BaseView {
                     let barColor = 'rgba(255,255,255,0.05)';
                     let statusLabel = 'Inconnu';
                     let timeStr = `+${j}h`;
+                    let dotClass = 'timeline-hour-dot';
 
                     if (w) {
                         const status = SitesService.isForecastFlyable(site, w);
@@ -1800,27 +1864,25 @@ class SitesViewClass extends BaseView {
                         const m = String(date.getMinutes()).padStart(2, '0');
                         const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
                         timeStr = `${days[date.getDay()]} ${h}:${m}`;
-                        if (status.flyable) {
-                            if (status.warning) {
-                                barColor = '#eab308'; // yellow for uncertain
-                                statusLabel = `${w.windCard} ${w.windSpeed} km/h — ${status.reason}`;
-                            } else {
-                                barColor = 'var(--accent-green)';
-                                statusLabel = `Volable — ${w.windCard} ${w.windSpeed} km/h (raf. ${w.windGust})`;
-                            }
+                        barColor = verdictColor(status, { bar: true });
+                        if (status.status === 'incomplete') {
+                            dotClass += ' timeline-hour-dot--incomplete';
+                            statusLabel = verdictLabel(status);
+                        } else if (status.flyable) {
+                            statusLabel = status.warning
+                                ? `${forecastValue(w.windCard)} ${forecastValue(w.windSpeed)} km/h — ${status.reason}`
+                                : `Volable — ${forecastValue(w.windCard)} ${forecastValue(w.windSpeed)} km/h (raf. ${forecastValue(w.windGust)})`;
                         } else {
                             statusLabel = status.reason;
-                            if (status.reason === 'Nuit') barColor = 'rgba(100,100,120,0.3)';
-                            else if (status.reason.startsWith('Pluie')) barColor = '#3b82f6';
-                            else if (status.reason === 'Mauvaise orientation') barColor = '#f97316';
-                            else barColor = '#ef4444';
                         }
                     }
-                    let dotStyle = `flex: 1; height: 100%; background: ${barColor}; transition: all 0.2s; cursor: pointer;`;
+                    // Une heure incomplète garde le fond hachuré de sa classe CSS (pas de couleur).
+                    const background = dotClass.includes('--incomplete') ? '' : ` background: ${barColor};`;
+                    let dotStyle = `flex: 1; height: 100%;${background} transition: all 0.2s; cursor: pointer;`;
                     if (j === SitesService.state.forecastOffset) {
                         dotStyle += ` outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);`;
                     }
-                    timelineBarsHtml += `<div class="timeline-hour-dot" style="${dotStyle}" title="${timeStr} : ${statusLabel}" data-action="SitessetForecastOffset" data-args="${j}"></div>`;
+                    timelineBarsHtml += `<div class="${dotClass}" style="${dotStyle}" title="${escapeHTML(`${timeStr} : ${statusLabel}`)}" data-action="SitessetForecastOffset" data-args="${j}"></div>`;
                 }
 
                 const isFav =
@@ -1996,6 +2058,7 @@ class SitesViewClass extends BaseView {
                     <span class="legend-item"><span class="legend-color" style="background:#f97316;"></span> Mauvaise orientation</span>
                     <span class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span> Pluie</span>
                     <span class="legend-item"><span class="legend-color" style="background:rgba(100,100,120,0.5);"></span> Nuit</span>
+                    <span class="legend-item"><span class="legend-color legend-color--incomplete"></span> ${escapeHTML(t('weather.legendIncomplete'))}</span>
                 </div>
             </div>
             ${slotsTextHtml}

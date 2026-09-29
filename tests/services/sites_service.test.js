@@ -1,5 +1,12 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import SitesService from '../../js/services/sites_service.js';
+import { aromeTailResponse, COMPLETE_HOUR, completeHourWith } from '../fixtures/forecasts.js';
+
+function currentHourIso() {
+    const d = new Date();
+    d.setMinutes(0, 0, 0);
+    return d.toISOString();
+}
 
 describe('SitesService', () => {
     beforeEach(() => {
@@ -209,5 +216,179 @@ describe('SitesService', () => {
 
         expect(ids).not.toContain(1);
         expect(ids).toContain(2);
+    });
+
+    describe('missing forecast values (spec 001, US1)', () => {
+        const mockOnce = (payload) =>
+            global.fetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue(payload) });
+
+        it('stores null, never 0, for values missing at the end of the AROME horizon', async () => {
+            const site = aromeTailResponse(currentHourIso(), { complete: 2, empty: 3 });
+            mockOnce([site, site]);
+            await SitesService.fetchWeatherForSites();
+
+            const hours = SitesService.state.weatherForecasts[1];
+            expect(hours.length).toBeGreaterThanOrEqual(5);
+            expect(hours[0].windSpeed).toBe(15);
+            const empty = hours[3];
+            expect(empty.windSpeed).toBeNull();
+            expect(empty.windGust).toBeNull();
+            expect(empty.windDirDeg).toBeNull();
+            expect(empty.windCard).toBeNull();
+            expect(empty.precipitation).toBeNull();
+        });
+
+        it('stores isDaytime null when sunrise/sunset is missing for that day', async () => {
+            const site = aromeTailResponse(currentHourIso(), { complete: 2, empty: 0 });
+            site.daily = { time: [], sunrise: [], sunset: [] };
+            mockOnce([site, site]);
+            await SitesService.fetchWeatherForSites();
+            expect(SitesService.state.weatherForecasts[1][0].isDaytime).toBeNull();
+        });
+
+        describe('aggregates', () => {
+            const site = { id: 42, nom: 'Test', orientations_vent: ['S'], latitude: 45, longitude: 6 };
+            const hour = (h, overrides = {}) =>
+                completeHourWith({ time: `2026-09-29T${String(h).padStart(2, '0')}:00`, ...overrides });
+            const empty = (h) => hour(h, { windSpeed: null, windGust: null });
+            const night = (h) => hour(h, { isDaytime: false });
+
+            beforeEach(() => {
+                vi.spyOn(SitesService, 'getGeoFilteredSites').mockImplementation((data) => data);
+                SitesService.state.hideUnflyable = false;
+                SitesService.state.filterFavoritesOnly = false;
+                SitesService.state.forecastMaxRange = 24;
+                SitesService.state.conditionsStrategy = 'TOTAL';
+                SitesService.state.limitWindMin = 5;
+                SitesService.state.limitWindMax = 25;
+                SitesService.state.limitGustDelta = 15;
+                SitesService.state.filterMode = 'manual';
+            });
+
+            it('never counts incomplete hours as flyable, and they end a consecutive run', () => {
+                SitesService.state.weatherForecasts = {
+                    42: [hour(10), hour(11), empty(12), hour(13), night(14), empty(15)],
+                };
+                const [res] = SitesService.getFilteredAndSortedSites([site]);
+                expect(res.flyableHours).toBe(3);
+                expect(res.maxConsecutiveHours).toBe(2);
+                expect(res.conditionScore).toBe(3);
+                expect(res.flyableSlots).toEqual([
+                    { dayLabel: 'Mar', start: 10, end: 11 },
+                    { dayLabel: 'Mar', start: 13, end: 13 },
+                ]);
+                expect(res.completeHours).toBe(4);
+            });
+
+            it('reports 0 complete hours when every hour is incomplete', () => {
+                SitesService.state.weatherForecasts = { 42: [empty(10), empty(11)] };
+                const [res] = SitesService.getFilteredAndSortedSites([site]);
+                expect(res.flyableHours).toBe(0);
+                expect(res.completeHours).toBe(0);
+            });
+
+            it('hideUnflyable hides a site whose loaded hours are all incomplete (spec assumption)', () => {
+                SitesService.state.hideUnflyable = true;
+                SitesService.state.weatherForecasts = { 42: [empty(10), empty(11)] };
+                const ids = SitesService.getFilteredAndSortedSites([site]).map((x) => x.id);
+                SitesService.state.hideUnflyable = false;
+                expect(ids).toEqual([]);
+            });
+        });
+
+        describe('model agreement', () => {
+            const site = { id: 7, orientations_vent: ['S'] };
+            beforeEach(() => {
+                SitesService.state.forecastOffset = 0;
+                SitesService.state.limitWindMin = 5;
+                SitesService.state.limitWindMax = 25;
+                SitesService.state.limitGustDelta = 15;
+                SitesService.state.filterMode = 'manual';
+            });
+
+            it('is unavailable (null) when the primary hour is incomplete', () => {
+                SitesService.state.weatherForecasts = { 7: [completeHourWith({ windGust: null })] };
+                SitesService.state.weatherForecastsSecondary = { 7: COMPLETE_HOUR };
+                expect(SitesService.getModelAgreement(site)).toBeNull();
+            });
+
+            it('is unavailable (null) when the secondary hour is incomplete', () => {
+                SitesService.state.weatherForecasts = { 7: [COMPLETE_HOUR] };
+                SitesService.state.weatherForecastsSecondary = { 7: completeHourWith({ windSpeed: null }) };
+                expect(SitesService.getModelAgreement(site)).toBeNull();
+            });
+
+            it('secondary fetch stores null for missing values', async () => {
+                SitesService.setSites([{ id: 7, nom: 'Fav', latitude: 45, longitude: 6, orientations_vent: ['S'] }]);
+                SitesService.state.userPreferences = { favoriteSites: [7] };
+                const payload = aromeTailResponse(currentHourIso(), { complete: 0, empty: 2 });
+                mockOnce(payload);
+                await SitesService.fetchSecondaryModelForFavorites();
+                const sec = SitesService.state.weatherForecastsSecondary[7];
+                expect(sec.windSpeed).toBeNull();
+                expect(sec.windGust).toBeNull();
+                expect(sec.windCard).toBeNull();
+                expect(sec.precipitation).toBeNull();
+            });
+        });
+    });
+
+    describe('unknown orientation (spec 001, US2)', () => {
+        beforeEach(() => {
+            vi.spyOn(SitesService, 'getGeoFilteredSites').mockImplementation((data) => data);
+            SitesService.state.hideUnflyable = false;
+            SitesService.state.filterFavoritesOnly = false;
+            SitesService.state.forecastMaxRange = 24;
+            SitesService.state.conditionsStrategy = 'TOTAL';
+            SitesService.state.limitWindMin = 5;
+            SitesService.state.limitWindMax = 25;
+            SitesService.state.limitGustDelta = 15;
+            SitesService.state.filterMode = 'manual';
+        });
+
+        it('counts flyable hours for a site without orientation and sorts without crashing on a null score', () => {
+            const noOrientation = { id: 50, nom: 'Sans orientation', latitude: 45, longitude: 6 };
+            const south = { id: 51, nom: 'Sud', latitude: 45, longitude: 6, orientations_vent: ['S'] };
+            const hours = [
+                completeHourWith({ time: '2026-09-29T10:00' }),
+                completeHourWith({ time: '2026-09-29T11:00' }),
+            ];
+            SitesService.state.weatherForecasts = { 50: hours, 51: hours };
+            const res = SitesService.getFilteredAndSortedSites([noOrientation, south]);
+            const byId = Object.fromEntries(res.map((x) => [x.id, x]));
+            expect(byId[50].flyableHours).toBe(2);
+            expect(byId[51].flyableHours).toBe(2);
+            expect(SitesService.isForecastFlyable(noOrientation, hours[0]).score).toBeNull();
+        });
+    });
+
+    describe('thunderstorm indicator (spec 001, US3)', () => {
+        const currentStart = () => {
+            const d = new Date();
+            d.setMinutes(0, 0, 0);
+            return d.toISOString();
+        };
+
+        it('requests CAPE in the primary forecast and stores it on each hour', async () => {
+            const site = aromeTailResponse(currentStart(), { complete: 2, empty: 1 });
+            global.fetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue([site, site]) });
+            await SitesService.fetchWeatherForSites();
+            const url = global.fetch.mock.calls[0][0];
+            expect(new URL(url).searchParams.get('hourly').split(',')).toContain('cape');
+            const hours = SitesService.state.weatherForecasts[1];
+            expect(hours[0].cape).toBe(100);
+            expect(hours[2].cape).toBeNull();
+        });
+
+        it('requests CAPE for the secondary (confidence) model too', async () => {
+            SitesService.setSites([{ id: 7, nom: 'Fav', latitude: 45, longitude: 6, orientations_vent: ['S'] }]);
+            SitesService.state.userPreferences = { favoriteSites: [7] };
+            const payload = aromeTailResponse(currentStart(), { complete: 1, empty: 0 });
+            global.fetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue(payload) });
+            await SitesService.fetchSecondaryModelForFavorites();
+            const url = global.fetch.mock.calls[0][0];
+            expect(new URL(url).searchParams.get('hourly').split(',')).toContain('cape');
+            expect(SitesService.state.weatherForecastsSecondary[7].cape).toBe(100);
+        });
     });
 });

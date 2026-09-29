@@ -6,6 +6,9 @@
       "ignore": [
         "node_modules",
         ".git"
+      ],
+      "predeploy": [
+        "node scripts/sync_functions_shared.mjs"
       ]
     }
   ]

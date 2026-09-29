@@ -8,7 +8,7 @@ import { calculateDistance, getAngularDifference, degreesToCardinal } from '../u
 import { removeAccents } from '../utils/text_utils.js';
 import { escapeHTML } from '../core/security.js';
 import AppRouter from '../core/router.js';
-import { evaluateSpotForecast } from '../weatherScoring.js';
+import { evaluateSpotForecast, normalizeForecastValue, getSiteOrientations } from '../weatherScoring.js';
 import { toSorted } from '../utils/array_utils.js';
 
 const sitesView = () => AppRouter.getView('SITES');
@@ -248,17 +248,17 @@ class SitesService {
             vMax: this.state.limitWindMax,
             deltaRafaleMax: this.state.limitGustDelta,
             filterMode: this.state.filterMode,
+            wings:
+                this.state.filterMode === 'hardware'
+                    ? StorageService.get(StorageService.KEYS.EQUIPMENT_DATA, []) || []
+                    : [],
         };
 
         // 2. Déterminer la meilleure orientation du site par rapport au vent actuel
         let bestOrientation = undefined;
 
-        let orientations = [];
-        if (Array.isArray(site.orientations_vent)) orientations = site.orientations_vent;
-        else if (typeof site.orientations_vent === 'string')
-            orientations = site.orientations_vent.split(',').map((v) => v.trim());
-        else if (site.orientation) orientations = site.orientation.split(',').map((v) => v.trim());
-        if (orientations.length > 0 && weather) {
+        const orientations = getSiteOrientations(site);
+        if (orientations.length > 0 && weather && weather.windDirDeg !== null && weather.windDirDeg !== undefined) {
             const CARD_TO_DEG = { N: 0, NE: 45, E: 90, SE: 135, S: 180, SO: 225, O: 270, NO: 315 };
             let minDiff = 180;
 
@@ -331,7 +331,7 @@ class SitesService {
 
         const lats = favoriteSites.map((s) => parseFloat(s.latitude || s.lat)).join(',');
         const lons = favoriteSites.map((s) => parseFloat(s.longitude || s.lon)).join(',');
-        const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${lats}&longitude=${lons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation&timezone=Europe%2FParis&forecast_days=2${modelParam}`;
+        const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${lats}&longitude=${lons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,cape&timezone=Europe%2FParis&forecast_days=2${modelParam}`;
 
         try {
             const response = await fetch(url);
@@ -355,14 +355,16 @@ class SitesService {
                     }
                 });
 
-                const dirDeg = hourly.wind_direction_10m[idx];
+                // Valeurs validées : une donnée absente reste null, jamais 0 (spec 001, FR-005).
+                const dirDeg = normalizeForecastValue(hourly.wind_direction_10m?.[idx], 'windDir');
                 this.state.weatherForecastsSecondary[site.id] = {
                     time: hourly.time[idx],
-                    windSpeed: Math.round(hourly.wind_speed_10m[idx]),
-                    windGust: Math.round(hourly.wind_gusts_10m[idx]),
-                    windDirDeg: Math.round(dirDeg),
-                    windCard: degreesToCardinal(dirDeg),
-                    precipitation: hourly.precipitation ? (hourly.precipitation[idx] ?? 0) : 0,
+                    windSpeed: normalizeForecastValue(hourly.wind_speed_10m?.[idx], 'windSpeed'),
+                    windGust: normalizeForecastValue(hourly.wind_gusts_10m?.[idx], 'windGust'),
+                    windDirDeg: dirDeg,
+                    windCard: dirDeg === null ? null : degreesToCardinal(dirDeg),
+                    precipitation: normalizeForecastValue(hourly.precipitation?.[idx], 'precipitation'),
+                    cape: normalizeForecastValue(hourly.cape?.[idx], 'cape'),
                 };
             });
             return { success: true };
@@ -383,9 +385,13 @@ class SitesService {
         const primaryForecast = primaryForecasts[this.state.forecastOffset];
         if (!primaryForecast) return null;
 
-        const primaryFlyable = this.isForecastFlyable(site, primaryForecast).flyable;
-        const secondaryFlyable = this.isForecastFlyable(site, secondaryForecast).flyable;
-        return primaryFlyable === secondaryFlyable;
+        // Le jour/la nuit ne dépend pas du modèle : la requête secondaire ne demande pas les
+        // heures de lever/coucher, on reprend celles du modèle principal.
+        const primary = this.isForecastFlyable(site, primaryForecast);
+        const secondary = this.isForecastFlyable(site, { ...secondaryForecast, isDaytime: primaryForecast.isDaytime });
+        // Une prévision incomplète ne permet pas de comparer : indice indisponible (spec 001).
+        if (primary.status === 'incomplete' || secondary.status === 'incomplete') return null;
+        return primary.flyable === secondary.flyable;
     }
 
     // Après un lot rejeté par Open-Meteo malgré les 3 tentatives ci-dessous, on arrête
@@ -490,7 +496,7 @@ class SitesService {
                 const chunkLons = chunkSites.map((s) => parseFloat(s.longitude || s.lon)).join(',');
                 // forecast_days=8 (et non 6) pour garder ~168h (7 jours) de marge même quand
                 // l'heure courante tombe tard dans la journée 1 (cf. digest 7 jours, forecastMaxRange=168).
-                const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${chunkLats}&longitude=${chunkLons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation&daily=sunrise,sunset&timezone=Europe%2FParis&forecast_days=8${modelParam}`;
+                const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${chunkLats}&longitude=${chunkLons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,cape&daily=sunrise,sunset&timezone=Europe%2FParis&forecast_days=8${modelParam}`;
 
                 const cached = this._weatherCache.get(url);
                 if (cached && Date.now() - cached.timestamp < WEATHER_CACHE_TTL_MS) {
@@ -558,19 +564,25 @@ class SitesService {
                             Object.keys(hourly).find((k) => k.startsWith('wind_gusts_10m')) || 'wind_gusts_10m';
                         const precipKey =
                             Object.keys(hourly).find((k) => k.startsWith('precipitation')) || 'precipitation';
+                        const capeKey = Object.keys(hourly).find((k) => k.startsWith('cape')) || 'cape';
 
                         // Keep up to 168 hours (7 jours, cf. digest hebdo) starting from currentHourIndex
                         for (let i = 0; i <= 168; i++) {
                             const idx = currentHourIndex + i;
                             if (idx < hourly.time.length) {
-                                const dirDeg = hourly[windDirKey][idx];
-                                const card = degreesToCardinal(dirDeg);
+                                // Valeurs validées : une donnée absente (ex. au-delà de l'horizon
+                                // AROME, ~108 h) reste null, jamais 0 (spec 001, FR-005).
+                                const dirDeg = normalizeForecastValue(hourly[windDirKey]?.[idx], 'windDir');
+                                const card = dirDeg === null ? null : degreesToCardinal(dirDeg);
 
                                 let sunriseText = '';
                                 let sunsetText = '';
                                 let legalStartText = '';
                                 let legalEndText = '';
-                                let isDaytime = true;
+                                // Inconnu tant que lever/coucher du soleil ne sont pas fournis pour ce
+                                // jour : on ne suppose plus qu'il fait jour (spec 001, FR-002).
+                                /** @type {boolean|null} */
+                                let isDaytime = null;
 
                                 const daily = results[index]?.daily;
                                 if (daily && daily.time) {
@@ -617,11 +629,12 @@ class SitesService {
 
                                 forecasts.push({
                                     time: hourly.time[idx],
-                                    windSpeed: Math.round(hourly[windSpeedKey][idx]),
-                                    windGust: Math.round(hourly[windGustKey][idx]),
-                                    windDirDeg: Math.round(dirDeg),
+                                    windSpeed: normalizeForecastValue(hourly[windSpeedKey]?.[idx], 'windSpeed'),
+                                    windGust: normalizeForecastValue(hourly[windGustKey]?.[idx], 'windGust'),
+                                    windDirDeg: dirDeg,
                                     windCard: card,
-                                    precipitation: hourly[precipKey] ? (hourly[precipKey][idx] ?? 0) : 0,
+                                    precipitation: normalizeForecastValue(hourly[precipKey]?.[idx], 'precipitation'),
+                                    cape: normalizeForecastValue(hourly[capeKey]?.[idx], 'cape'),
                                     sunriseText: sunriseText,
                                     sunsetText: sunsetText,
                                     legalStartText: legalStartText,
@@ -836,6 +849,7 @@ class SitesService {
         activeSites.forEach((site) => {
             const forecasts = this.state.weatherForecasts[site.id] || [];
             let totalFlyable = 0;
+            let completeHours = 0;
             let maxConsecutive = 0;
             let currentConsecutive = 0;
             let score = 0;
@@ -846,7 +860,11 @@ class SitesService {
 
             for (let i = 0; i < limit; i++) {
                 if (forecasts[i]) {
-                    const isFlyable = this.isForecastFlyable(site, forecasts[i]).flyable;
+                    // Une heure « incomplète » n'est ni volable ni non volable : elle n'est pas
+                    // comptée, mais elle interrompt un créneau (spec 001, FR-008).
+                    const status = this.isForecastFlyable(site, forecasts[i]).status;
+                    const isFlyable = status === 'flyable';
+                    if (status !== 'incomplete') completeHours++;
                     const date = new Date(forecasts[i].time);
                     const h = date.getHours();
                     const dayLabel = days[date.getDay()];
@@ -895,6 +913,7 @@ class SitesService {
             if (this.state.conditionsStrategy === 'CONSECUTIVE') score = maxConsecutive;
 
             site.flyableHours = totalFlyable;
+            site.completeHours = completeHours;
             site.maxConsecutiveHours = maxConsecutive;
             site.conditionScore = score;
         });

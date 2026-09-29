@@ -12,9 +12,10 @@
  *     dans js/firebase_config.js (FCM_VAPID_KEY).
  *   - `firebase deploy --only functions` depuis la racine du projet (dossier functions/).
  *
- * Maintenance : functions/sites_data.json est une COPIE de js/data/sites_data.json (les
- * Cloud Functions ne peuvent pas lire les fichiers du site web directement). Si la base de
- * sites est mise à jour, recopier le fichier avant de redéployer.
+ * Maintenance : functions/sites_data.json et functions/shared/ sont des COPIES générées de
+ * js/ (les Cloud Functions ne peuvent pas lire les fichiers du site web). Elles sont
+ * régénérées avant chaque déploiement (predeploy dans firebase.json) ou via
+ * `npm run sync:functions` ; tests/functions/shared_copy.test.js vérifie qu'elles sont à jour.
  */
 
 const { onSchedule } = require('firebase-functions/v2/scheduler');
@@ -29,73 +30,33 @@ const sitesById = new Map(sitesData.map((s) => [s.id, s]));
 
 const DEFAULT_PREFS = { limitWindMin: 0, limitWindMax: 25, limitGustDelta: 10 };
 
-function degreesToCardinal(deg) {
-    const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
-    const norm = ((deg % 360) + 360) % 360;
-    return dirs[Math.round(norm / 45) % 8];
+// Calcul météo partagé avec l'application (spec 001, US4) : functions/shared/ est une copie
+// générée de js/weatherScoring.js (scripts/sync_functions_shared.mjs, lancé avant chaque
+// déploiement). Modules ES chargés à la demande depuis ce fichier CommonJS.
+let sharedModules = null;
+async function loadShared() {
+    if (!sharedModules) {
+        const [scoring, evaluate] = await Promise.all([
+            import('./shared/weatherScoring.mjs'),
+            import('./evaluate.mjs'),
+        ]);
+        sharedModules = { evaluateSpotForecast: scoring.evaluateSpotForecast, ...evaluate };
+    }
+    return sharedModules;
 }
 
-// Version simplifiée de js/weatherScoring.js:evaluateSpotForecast, portée en Node. Ne garde
-// que les verrous binaires flyable/non-flyable (pas le score fin ni le mode "matériel") —
-// suffisant pour détecter une transition "devient volable" et déclencher une notification.
-function isFlyable(site, weather, prefs) {
-    if (!weather || !weather.isDaytime) return false;
-    if ((weather.precipitation ?? 0) > 0) return false;
-    if (weather.windSpeed < prefs.limitWindMin || weather.windSpeed > prefs.limitWindMax) return false;
-
-    const gust = Math.max(weather.windGust || 0, weather.windSpeed);
-    if (gust - weather.windSpeed > prefs.limitGustDelta) return false;
-
-    let orientations = [];
-    if (Array.isArray(site.orientations_vent)) orientations = site.orientations_vent;
-    else if (typeof site.orientations_vent === 'string')
-        orientations = site.orientations_vent.split(',').map((v) => v.trim());
-    else if (typeof site.orientation === 'string') orientations = site.orientation.split(',').map((v) => v.trim());
-    if (orientations.length > 0 && !orientations.includes(weather.windCard)) return false;
-
-    return true;
-}
-
-async function fetchWeatherForSite(site) {
+async function fetchWeatherForSite(site, { forecastUrl, buildHourlyForecast }) {
     const lat = parseFloat(site.latitude || site.lat);
     const lon = parseFloat(site.longitude || site.lon);
     if (isNaN(lat) || isNaN(lon)) return null;
 
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation&daily=sunrise,sunset&timezone=Europe%2FParis&forecast_days=1`;
-    const res = await fetch(url);
+    const res = await fetch(forecastUrl(lat, lon));
     if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
-    const data = await res.json();
-
-    const hourly = data.hourly;
-    const now = Date.now();
-    let idx = 0;
-    let minDiff = Infinity;
-    hourly.time.forEach((t, i) => {
-        const diff = Math.abs(new Date(t).getTime() - now);
-        if (diff < minDiff) {
-            minDiff = diff;
-            idx = i;
-        }
-    });
-
-    let isDaytime = true;
-    if (data.daily && data.daily.sunrise && data.daily.sunset) {
-        const sunrise = new Date(data.daily.sunrise[0]).getTime();
-        const sunset = new Date(data.daily.sunset[0]).getTime();
-        // Même marge de 30 min avant lever/après coucher que côté client (sites_service.js).
-        isDaytime = now >= sunrise - 30 * 60 * 1000 && now <= sunset - 30 * 60 * 1000;
-    }
-
-    return {
-        windSpeed: Math.round(hourly.wind_speed_10m[idx]),
-        windGust: Math.round(hourly.wind_gusts_10m[idx]),
-        windCard: degreesToCardinal(hourly.wind_direction_10m[idx]),
-        precipitation: hourly.precipitation ? (hourly.precipitation[idx] ?? 0) : 0,
-        isDaytime,
-    };
+    return buildHourlyForecast(await res.json(), Date.now());
 }
 
 exports.checkFavoriteSitesWeather = onSchedule('every 30 minutes', async () => {
+    const shared = await loadShared();
     const usersSnap = await db.collection('users').get();
 
     for (const userDoc of usersSnap.docs) {
@@ -122,13 +83,15 @@ exports.checkFavoriteSitesWeather = onSchedule('every 30 minutes', async () => {
             if (!site) continue;
 
             try {
-                const weather = await fetchWeatherForSite(site);
-                const flyable = isFlyable(site, weather, prefs);
-                newState[siteId] = flyable;
+                const weather = await fetchWeatherForSite(site, shared);
+                const outcome = shared.evaluateSpotForecast(site, weather, shared.toScoringPrefs(prefs));
+                newState[siteId] = shared.nextState(previousState[siteId], outcome);
 
-                // Notification uniquement sur la transition non-volable -> volable, jamais à
-                // chaque exécution tant que ça reste volable (sinon spam toutes les 30 min).
-                if (flyable && previousState[siteId] === false && weather) {
+                // Notification uniquement sur la transition non-volable -> volable, avec des données
+                // complètes et une orientation connue (spec 001, FR-011) ; jamais à chaque exécution
+                // tant que ça reste volable (sinon spam toutes les 30 min).
+                // Le texte de la notification relève d'une autre spécification (audit, écart A3).
+                if (shared.shouldNotify(previousState[siteId], outcome)) {
                     await messaging
                         .send({
                             token: user.fcmToken,
@@ -141,6 +104,8 @@ exports.checkFavoriteSitesWeather = onSchedule('every 30 minutes', async () => {
                 }
             } catch (e) {
                 console.error(`Erreur météo pour le site ${siteId} (utilisateur ${userDoc.id}):`, e.message);
+                // Erreur réseau : on garde le dernier état connu plutôt que de l'effacer.
+                if (previousState[siteId] !== undefined) newState[siteId] = previousState[siteId];
             }
         }
 

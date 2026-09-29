@@ -67,8 +67,9 @@ AssistantParapente/
 │   │   └── idb_storage.js      # Native IndexedDB wrapper for heavy flights & IGC traces
 │   ├── components/
 │   │   └── map_3d.js           # MapLibre GL 3D terrain viewer & line extrusion
+│   ├── i18n/fr.js              # French UI strings catalogue (read via js/utils/i18n.js t())
 │   ├── data/                   # Static Datasets & Configs
-│   │   ├── sites_data.js       # French paragliding takeoffs & landings database
+│   │   ├── sites_data.json     # French paragliding takeoffs & landings database
 │   │   ├── courses_data.js     # Theoretical courses catalog & metadata
 │   │   ├── weather_config.js   # Wind directions, thresholds & weather model definitions
 │   │   ├── equipment_config.js # Wing & harness default parameters
@@ -174,6 +175,7 @@ To maintain the DRY (Don't Repeat Yourself) principle, all reusable domain-agnos
 - `date_utils.js`: Date, time, and duration formatting (`formatDateTime`, `formatDuration`).
 - `math_utils.js`: Mathematical functions (e.g., rounding `roundToDecimals`, percentages).
 - `geo_utils.js`: Geographic and trigonometric calculations (Haversine distance, angle normalizations, cardinal conversions).
+- `i18n.js`: `t(key, params)` reads the French strings catalogue `js/i18n/fr.js`.
 - `text_utils.js`: Text manipulation and sanitization. *(Planned)*
 
 Views and services must import these utilities rather than duplicating logic.
@@ -183,18 +185,45 @@ Views and services must import these utilities rather than duplicating logic.
 ## 🌤️ Sites & Weather Scoring Engine
 
 ### 1. Flyability Scoring Algorithm (`js/weatherScoring.js`)
-The weather scoring algorithm processes wind speed, wind direction, gust delta, and weather model predictions to produce a flyability score (0 to 100%):
+`evaluateSpotForecast(site, weather, prefs)` is a **pure** function (no DOM, no storage — the
+pilot's wings are passed in `prefs.wings`) shared with the notification Cloud Function. Contract:
+`specs/001-honest-missing-weather/contracts/evaluation.md`. It returns
+`{ status, flyable, reasonCode, reason, missing, orientationUnknown, score, class, icon, warning }`
+where `status` is `'loading' | 'incomplete' | 'unflyable' | 'flyable'` (authoritative; `flyable`
+is kept for compatibility). Views choose colours from `status` / `reasonCode`, never from the
+French `reason` text.
 
-- **Wind Direction Masking**: Checks if the forecast direction falls within the takeoff site's favorable orientation sector (calculated using 8-bit binary bitwise masks or directional arrays `['N', 'NE', 'E']`).
-- **Wind Speed Range**:
-  - `minWind` (default 5 km/h) to `maxWind` (default 25 km/h).
-  - Wind speed above `maxWind` or below `minWind` penalizes the score proportionally.
-  - Wind speed exceeding safety threshold (> 35 km/h) reduces flyability to 0% (RED / DANGEROUS).
-- **Gust Delta**: If `(gustSpeed - windSpeed) > gustDeltaThreshold` (default 15 km/h), a penalty is applied for thermal instability/turbulence.
+Evaluation order:
+1. **No forecast** → `loading`.
+2. **Missing data → no verdict** (`incomplete`): if any required value is absent or invalid
+   (`normalizeForecastValue`: `null`, non-numeric, non-finite, negative, direction outside
+   0–360°), the hour gets no verdict and `missing` lists every missing value. Required values:
+   mean wind, gusts, precipitation, CAPE, daylight, plus wind direction when the site's
+   orientation is known. **A missing value is never replaced by a default** (0 km/h, 0 mm,
+   daytime). With the default AROME model every hour beyond ~108 h is empty and shows
+   « Prévision incomplète ».
+3. **Kill switches** (`unflyable`): night (legal flying time = sunrise−30 min to sunset−30 min),
+   rain (> 0 mm), mean wind outside `vMin`/`vMax` (or outside every wing's range in equipment
+   mode), gust delta above `deltaRafaleMax`, **thunderstorm risk** when CAPE >
+   `STORM_CAPE_THRESHOLD` (1000 J/kg — source: FFVL, Commissions Nationales Sécurité et
+   Technique, « Canicule, vague de chaleur et vol libre », 2026-07-31; a reference value, not a
+   regulatory limit), wind direction not in the site's orientations.
+4. **Unknown take-off orientation** (`getSiteOrientations` finds none of N, NE, E, SE, S, SO, O,
+   NO): `flyable` with `orientationUnknown: true`, **no score**, and the notice « Orientation du
+   décollage inconnue : à vérifier » (yellow, no pulse). Unknown data is never scored as ideal.
+5. **Score** (0–100, unchanged): 50 % wind speed (distance to the middle of the pilot's range),
+   50 % orientation (distance to `orientation_ideale_deg`), rated Excellent / Bon / Passable.
+
+Every display of a verdict (map popup, site card, favourites comparison table) carries the
+reminder « Avis basé sur des prévisions, risque d'orage estimé : la décision vous appartient,
+vérifiez sur place. » (constitution, Principle II). Incomplete hours are excluded from flyable
+hours, slots and consecutive counts (and not counted as unflyable); a site with no complete hour
+shows « Aucune prévision fiable pour ce site ».
 
 ### 2. Forecast API Integration (`js/services/sites_service.js`)
 Sites service fetches open-access meteorological data from **Open-Meteo API**:
-- **AROME (Météo-France)**: High-resolution (1.3km) short-range forecast (up to 42 hours).
+- Hourly variables requested: `wind_speed_10m, wind_direction_10m, wind_gusts_10m, precipitation, cape`; values are validated with `normalizeForecastValue` when parsed (missing stays `null`).
+- **AROME (Météo-France)**: High-resolution short-range forecast (Open-Meteo `meteofrance` endpoint; empty beyond ~108 h, shown as incomplete).
 - **GFS / ICON**: Medium-range forecast (up to 7 days).
 
 ### 3. Interactive Cartography (2D & 3D)
@@ -300,8 +329,14 @@ When modifying or expanding the codebase, follow these rules strictly:
   - Prefer declarative grouping via `Object.groupBy(items, fn)` (with fallback) over manual accumulator loops.
   - Wrap search inputs in semantic HTML5 `<search role="search">` containers and use `type="search"`.
 
-### JS type checking (optional, best-effort)
-`npm run typecheck` runs plain TypeScript's `checkJs` over `js/**/*.js` (config: `jsconfig.json`, ambient types for CDN globals in `types/`). It's not wired into CI and won't reach 0 errors: most of what it reports is `document.getElementById()` returning a bare `HTMLElement` (no `.value`, `.checked`, etc. without a cast), which is expected for a codebase with no `/** @type {...} */` casts at every DOM read — not a bug list. Run it after a change to a service/view file to catch the kind of error it's actually good at: a wrong property name, a function called with the wrong arguments, a reference to something that was renamed or removed elsewhere. `sw.js` is excluded (service worker globals need a different `lib` set than the rest of the app, which targets the browser DOM).
+### JS type checking
+`npm run typecheck` runs plain TypeScript's `checkJs` over `js/**/*.js` (config: `jsconfig.json`, ambient types for CDN globals in `types/`). It is part of CI and must stay at **0 errors**. Use JSDoc (`/** @type {HTMLInputElement} */`) casts for DOM reads. `sw.js` is excluded (service worker globals need a different `lib` set than the rest of the app, which targets the browser DOM).
+
+### UI strings
+User-facing text of new or reworked features lives in `js/i18n/fr.js` (frozen catalogue) and is read with `t('section.key', { placeholder })` from `js/utils/i18n.js` — never hard-coded in views (constitution, Language constraint). Existing screens migrate when they are touched.
+
+### Code shared with the notification Cloud Function
+Firebase deploys `functions/` alone, so it cannot import `js/`. `scripts/sync_functions_shared.mjs` copies `js/weatherScoring.js` and its imports into `functions/shared/*.mjs` (imports rewritten) and `js/data/sites_data.json` into `functions/`. It runs as a `predeploy` hook (`firebase.json`) and via `npm run sync:functions`; `tests/functions/shared_copy.test.js` fails in CI if a copy is stale. Never edit `functions/shared/` by hand. Server-only helpers (hour selection, notification rule) live in `functions/evaluate.mjs`.
 
 ### 2. Event Handler Registration Rule
 When creating new interactive actions in views, register them in `main.js`:
@@ -320,10 +355,15 @@ AppEvents.register('myCustomAction', (args, event, target) => {
 
 ## 🔍 Verification & Debugging Toolkit
 
-The repository includes lightweight test helpers for developer verification:
-- `debug_sites.js`: Debugs Open-Meteo weather response payloads.
-- `test_logbook.js`: Validates IGC parsing against sample tracks.
-- `test_scoring.js`: Validates weather flyability formulas.
+Automated checks (all run in CI except end-to-end, which must be run locally before merging):
+```bash
+npm run lint && npm run format:check && npm run typecheck
+npm test            # Vitest unit tests (tests/**, happy-dom; tests/functions/** run under node)
+npm run test:e2e    # Playwright (tests/e2e/**) — mocks Open-Meteo, blocks the service worker
+npm run build
+```
+Shared test data for the weather scoring lives in `tests/fixtures/forecasts.js` (including 96
+reference cases recorded before spec 001: complete-data verdicts must never change).
 
 To run a local server for testing:
 ```bash
