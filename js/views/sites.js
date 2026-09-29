@@ -769,6 +769,8 @@ class SitesViewClass extends BaseView {
             'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
             {
                 attribution: 'Tiles &copy; Esri',
+                // CORS : réponses lisibles, donc gardées pour le hors-ligne par le service worker (spec 008).
+                crossOrigin: true,
                 maxZoom: 17,
                 maxNativeZoom: 15, // Astuce Ligne Claire : Étire les tuiles (lignes épaisses, pas de lissage)
             },

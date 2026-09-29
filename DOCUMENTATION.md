@@ -393,6 +393,8 @@ To produce an optimized build (hashed and minified JS/CSS, versioned service wor
 npm run build      # outputs dist/
 npm run preview    # serves dist/ locally
 ```
+The service worker also keeps two **runtime caches that survive app updates** (spec 008): `parapente-courses-v1` (course PDFs the pilot has opened — never downloaded in advance; a partial Range read triggers one full download; offline, the stored document is served, never `index.html`) and `parapente-tiles-v1` (Esri map tiles already displayed, requested with CORS via `crossOrigin: true`, capped at 1 500 tiles, oldest removed first; no area pre-download, as the tile provider's terms do not allow it). Activation deletes every other old cache.
+
 The build rewrites `sw.js` into `dist/sw.js`: the precache list is generated from the emitted files and `CACHE_NAME` is derived from their names, so no manual `bump.py` is needed for a `dist/` deployment.
 
 ---

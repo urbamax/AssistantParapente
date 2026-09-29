@@ -16,6 +16,14 @@ const CACHE_NAME = 'parapente-app-v2026.09.26_v1';
 // outil de volabilité. Uniquement du network-only pour ce domaine, jamais de fallback cache.
 const WEATHER_API_HOSTNAME = 'api.open-meteo.com';
 
+// Caches « d'usage » conservés d'une version de l'application à l'autre (spec 008) : seulement ce
+// que le pilote a réellement ouvert ou affiché, jamais de téléchargement d'avance.
+const COURSE_CACHE = 'parapente-courses-v1'; // cours (PDF) déjà ouverts
+const TILE_CACHE = 'parapente-tiles-v1'; // zones de carte déjà affichées
+const TILE_CACHE_MAX = 1500; // ≈ 35 Mo à ≈ 23 Ko par morceau ; les plus anciens partent d'abord
+const TILE_HOSTNAME = 'server.arcgisonline.com';
+const RUNTIME_CACHES = [COURSE_CACHE, TILE_CACHE];
+
 // --- Firebase Cloud Messaging : réception des alertes météo en arrière-plan (app fermée) ---
 // importScripts (et non `import`) car ce SW est un script classique, pas un module worker.
 // Volontairement protégé par try/catch : un échec de chargement (offline à l'installation,
@@ -142,7 +150,11 @@ self.addEventListener('activate', (event) => {
                 }
             }
             const cacheNames = await caches.keys();
-            await Promise.all(cacheNames.map((name) => (name !== CACHE_NAME ? caches.delete(name) : null)));
+            await Promise.all(
+                cacheNames.map((name) =>
+                    name !== CACHE_NAME && !RUNTIME_CACHES.includes(name) ? caches.delete(name) : null,
+                ),
+            );
             await self.clients.claim();
         })(),
     );
@@ -159,10 +171,21 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Les PDF de cours (plusieurs Mo, lus par Range par les lecteurs PDF) ne doivent jamais passer
-    // par le SW : le navigateur les gère mieux seul, et un échec ici retombait sur index.html servi
-    // à l'URL du PDF (app affichée sans CSS, les chemins relatifs ne se résolvant plus).
-    if (url.origin === location.origin && (/\.pdf$/i.test(url.pathname) || request.headers.has('range'))) return;
+    // Cours (PDF) : réseau d'abord ; le document complet est gardé dès qu'il a été ouvert, et servi
+    // hors ligne (y compris pour une demande partielle « Range » du lecteur). Jamais index.html à la
+    // place d'un PDF : sans copie, erreur réseau normale du navigateur (spec 008, FR-001–FR-003).
+    if (url.origin === location.origin && /\.pdf$/i.test(url.pathname)) {
+        event.respondWith(serveCourse(event, request, url));
+        return;
+    }
+    // Autres demandes partielles du même site : laissées au navigateur.
+    if (url.origin === location.origin && request.headers.has('range')) return;
+
+    // Morceaux de fond de carte : cache d'abord, dans le cache des zones affichées (spec 008).
+    if (url.hostname === TILE_HOSTNAME) {
+        event.respondWith(serveTile(request));
+        return;
+    }
 
     // Navigation (chargement de page) : network-first, pour qu'un déploiement soit visible
     // dès le prochain chargement avec réseau, avec repli sur le HTML en cache si hors-ligne.
@@ -253,3 +276,52 @@ self.addEventListener('fetch', (event) => {
         }),
     );
 });
+
+/** Clé de cache d'un cours : l'adresse sans l'ancre (#page=N), commune aux ouvertures complètes et partielles. */
+function courseKey(url) {
+    return `${url.origin}${url.pathname}`;
+}
+
+async function serveCourse(event, request, url) {
+    const cache = await caches.open(COURSE_CACHE);
+    const key = courseKey(url);
+    try {
+        const response = await fetch(request);
+        if (response.status === 200) {
+            cache.put(key, response.clone()).catch(() => {});
+        } else if (response.status === 206) {
+            // Le lecteur ne demande que des morceaux : on garde une fois le document entier.
+            event.waitUntil(
+                (async () => {
+                    if (await cache.match(key)) return;
+                    const full = await fetch(key);
+                    if (full.status === 200) await cache.put(key, full);
+                })().catch(() => {}),
+            );
+        }
+        return response;
+    } catch {
+        const cached = await cache.match(key);
+        return cached || Response.error();
+    }
+}
+
+async function serveTile(request) {
+    const cache = await caches.open(TILE_CACHE);
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    const response = await fetch(request);
+    // Seules les réponses lisibles (CORS) sont gardées : une réponse « opaque » occupe beaucoup
+    // de place et ne peut pas être vérifiée.
+    if (response.ok && response.type !== 'opaque') {
+        await cache.put(request, response.clone());
+        trimCache(cache, TILE_CACHE_MAX);
+    }
+    return response;
+}
+
+/** Limite le nombre d'entrées : les plus anciennes (ordre d'insertion) sont retirées d'abord. */
+async function trimCache(cache, max) {
+    const keys = await cache.keys();
+    for (let i = 0; i < keys.length - max; i++) await cache.delete(keys[i]);
+}
