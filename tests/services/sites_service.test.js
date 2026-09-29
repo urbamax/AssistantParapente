@@ -6,6 +6,7 @@ import {
     completeHourWith,
     nearestHourIso,
     SITES_AROUND_BOULOGNE,
+    metaJson,
 } from '../fixtures/forecasts.js';
 import { DEFAULT_LOCATION } from '../../js/data/weather_config.js';
 
@@ -25,6 +26,7 @@ describe('SitesService', () => {
         // test sont à Annecy / Chamonix : on se place à Annecy avec le rayon maximal.
         SitesService.state.userLocation = { lat: 45.9, lng: 6.1 };
         SitesService.state.radiusLimit = 200;
+        SitesService.state.searchQuery = '';
         SitesService.state.userPreferences = { ...(SitesService.state.userPreferences || {}), favoriteSites: [] };
         SitesService.setSites([
             {
@@ -459,6 +461,74 @@ describe('SitesService', () => {
             expect(SitesService.countSearchMatchesOutsideRadius()).toBe(1);
             SitesService.state.searchQuery = 'wimereux';
             expect(SitesService.countSearchMatchesOutsideRadius()).toBe(0);
+        });
+    });
+
+    describe('forecast provenance (spec 002, US1)', () => {
+        const payload = () => {
+            const one = aromeTailResponse(nearestHourIso(), { complete: 2, empty: 0 });
+            return [one, one];
+        };
+
+        it('records the model and the original retrieval time, unchanged when read from cache', async () => {
+            const now = vi.spyOn(Date, 'now').mockReturnValue(1_800_000_000_000);
+            global.fetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue(payload()) });
+            SitesService.state.weatherModel = 'meteofrance';
+            await SitesService.fetchWeatherForSites();
+            expect(SitesService.getForecastProvenance(1)).toMatchObject({
+                modelKey: 'meteofrance',
+                fetchedAt: 1_800_000_000_000,
+            });
+
+            now.mockReturnValue(1_800_000_000_000 + 5 * 60 * 1000); // 5 min plus tard : servi par le cache
+            await SitesService.fetchWeatherForSites();
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+            expect(SitesService.getForecastProvenance(1).fetchedAt).toBe(1_800_000_000_000);
+        });
+
+        it('reads the model run time from Open-Meteo metadata and caches it', async () => {
+            global.fetch.mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: vi.fn().mockResolvedValue(metaJson({ runAtS: 1_790_000_000 })),
+            });
+            SitesService._runTimeCache = new Map();
+            expect(await SitesService.fetchModelRunTime('meteofrance')).toBe(1_790_000_000_000);
+            expect(String(global.fetch.mock.calls[0][0])).toBe(
+                'https://api.open-meteo.com/data/meteofrance_arome_france_hd/static/meta.json',
+            );
+            await SitesService.fetchModelRunTime('meteofrance');
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+        });
+
+        it('has no run time for the automatic multi-model selection, and never asks for one', async () => {
+            SitesService._runTimeCache = new Map();
+            expect(await SitesService.fetchModelRunTime('best_match')).toBeNull();
+            expect(global.fetch).not.toHaveBeenCalled();
+        });
+
+        it('returns null (no run time shown) when the metadata request fails', async () => {
+            SitesService._runTimeCache = new Map();
+            global.fetch.mockResolvedValue({ ok: false, status: 500, json: vi.fn() });
+            expect(await SitesService.fetchModelRunTime('gfs')).toBeNull();
+            global.fetch.mockRejectedValue(new Error('offline'));
+            SitesService._runTimeCache = new Map();
+            expect(await SitesService.fetchModelRunTime('gfs')).toBeNull();
+        });
+
+        it('exposes the run time in the provenance once known', async () => {
+            vi.spyOn(Date, 'now').mockReturnValue(1_800_000_000_000);
+            global.fetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue(payload()) });
+            SitesService.state.weatherModel = 'gfs';
+            await SitesService.fetchWeatherForSites();
+            expect(SitesService.getForecastProvenance(1).runAt).toBeNull();
+            SitesService._runTimeCache = new Map([['gfs', { at: 1_800_000_000_000, value: 1_799_990_000_000 }]]);
+            expect(SitesService.getForecastProvenance(1).runAt).toBe(1_799_990_000_000);
+        });
+
+        it('uses the automatic selection endpoint for best_match; "meteoblue" no longer exists', () => {
+            expect(SitesService._resolveModelEndpoint('best_match').apiEndpoint).toBe('forecast');
+            expect(SitesService._resolveModelEndpoint('meteoblue').apiEndpoint).not.toBe('forecast');
         });
     });
 });

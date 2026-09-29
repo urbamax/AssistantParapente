@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import SitesView, { radiusLabel } from '../../js/views/sites.js';
+import SitesView, { radiusLabel, formatForecastContext } from '../../js/views/sites.js';
 import SitesService from '../../js/services/sites_service.js';
 import { completeHourWith, SITE_SOUTH } from '../fixtures/forecasts.js';
 
@@ -87,5 +87,62 @@ describe('SitesView location and radius (spec 002, US4)', () => {
     it('shows nothing when no searched site is outside the radius', () => {
         vi.spyOn(SitesService, 'countSearchMatchesOutsideRadius').mockReturnValue(0);
         expect(SitesView.buildSearchOutsideNotice()).toBe('');
+    });
+});
+
+describe('forecast context line (spec 002, US1)', () => {
+    const at = (y, mo, d, h, mi) => new Date(y, mo - 1, d, h, mi).getTime();
+    const NOW = at(2026, 9, 30, 15, 0);
+
+    it('names the model, the retrieval time and the run time', () => {
+        const text = formatForecastContext(
+            { modelKey: 'meteofrance', fetchedAt: at(2026, 9, 30, 14, 5), runAt: at(2026, 9, 30, 8, 0) },
+            NOW,
+        );
+        expect(text).toBe('AROME (Météo-France) · récupérée à 14 h 05 · run AROME de 08 h');
+    });
+
+    it('shows no run time when it is unknown', () => {
+        const text = formatForecastContext(
+            { modelKey: 'best_match', fetchedAt: at(2026, 9, 30, 14, 5), runAt: null },
+            NOW,
+        );
+        expect(text).toBe('Sélection automatique (Open-Meteo, multi-modèles) · récupérée à 14 h 05');
+        expect(text).not.toContain('run');
+    });
+
+    it('prefixes the day when it is not today', () => {
+        const yesterday = formatForecastContext(
+            { modelKey: 'gfs', fetchedAt: at(2026, 9, 29, 23, 40), runAt: at(2026, 9, 29, 20, 0) },
+            NOW,
+        );
+        expect(yesterday).toBe('GFS (NOAA) · récupérée hier à 23 h 40 · run GFS d’hier 20 h');
+        const older = formatForecastContext({ modelKey: 'gfs', fetchedAt: at(2026, 9, 27, 9, 0), runAt: null }, NOW);
+        expect(older).toBe('GFS (NOAA) · récupérée dim. à 09 h 00');
+    });
+
+    it('appears once in the popup, the site card weather block and the comparison table', () => {
+        SitesService.state.weatherModel = 'meteofrance';
+        SitesService.state.limitWindMin = 5;
+        SitesService.state.limitWindMax = 25;
+        SitesService.state.limitGustDelta = 15;
+        SitesService.state.forecastOffset = 0;
+        vi.spyOn(SitesService, 'getForecastProvenance').mockReturnValue({
+            modelKey: 'meteofrance',
+            fetchedAt: Date.now(),
+            runAt: null,
+        });
+        const site = { id: 91, nom: 'Contexte', ...SITE_SOUTH };
+        const popup = SitesView.buildWeatherPopupHtml(completeHourWith(), '#22c55e', site);
+        expect(popup.split('forecast-context').length - 1).toBe(1);
+        expect(popup).toContain('AROME (Météo-France) · récupérée à');
+
+        document.body.innerHTML = '<div id="sites-list-container"></div>';
+        SitesService.state.userPreferences = { favoriteSites: [91] };
+        SitesService.state.weatherForecasts = { 91: [completeHourWith()] };
+        SitesView.renderComparator([site]);
+        const table = document.getElementById('sites-list-container').innerHTML;
+        expect(table.split('forecast-context').length - 1).toBe(1);
+        vi.restoreAllMocks();
     });
 });

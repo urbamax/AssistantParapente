@@ -77,19 +77,19 @@ the provider quota that US3 uses more (plan.md, Implementation Phases).
 
 ### Tests for User Story 1 ⚠️ write first, see them fail
 
-- [ ] T017 [P] [US1] In `tests/services/sites_service.test.js`: after `fetchWeatherForSites`, `state.forecastProvenance[siteId]` = `{ modelKey, fetchedAt, runAt }`; a second call within the 10-min cache keeps the **original** `fetchedAt` (mock `Date.now`); `fetchModelRunTime(modelKey)` requests `https://api.open-meteo.com/data/{metaModel}/static/meta.json` and returns `last_run_initialisation_time * 1000`, returns `null` for `best_match` without any request, returns `null` on HTTP error, and is cached 30 min
-- [ ] T018 [P] [US1] In `tests/services/sites_service.test.js`: `_resolveModelEndpoint('best_match')` returns the `forecast` endpoint; `'meteoblue'` is no longer a key
-- [ ] T019 [P] [US1] In `tests/views/sites_verdict.test.js`: `formatForecastContext(provenance, now)` → « AROME (Météo-France) · récupérée à 14 h 05 · run AROME de 08 h » (local time); without `runAt` no « run »; day prefix « hier » for yesterday; `buildWeatherPopupHtml`, the site card weather block and `renderComparator` contain the context line once
-- [ ] T020 [US1] In `tests/e2e/sites_flow.spec.js`: mock `**/static/meta.json` too; the expanded AUTEUIL card shows « AROME (Météo-France) » and « récupérée à »; selecting the « Sélection automatique » option shows no « run »
-- [ ] T021 [US1] Run `npx vitest run tests/services/sites_service.test.js tests/views/sites_verdict.test.js` and `npx playwright test tests/e2e/sites_flow.spec.js --project=chromium`; confirm T017–T020 fail
+- [X] T017 [P] [US1] In `tests/services/sites_service.test.js`: after `fetchWeatherForSites`, `state.forecastProvenance[siteId]` = `{ modelKey, fetchedAt, runAt }`; a second call within the 10-min cache keeps the **original** `fetchedAt` (mock `Date.now`); `fetchModelRunTime(modelKey)` requests `https://api.open-meteo.com/data/{metaModel}/static/meta.json` and returns `last_run_initialisation_time * 1000`, returns `null` for `best_match` without any request, returns `null` on HTTP error, and is cached 30 min
+- [X] T018 [P] [US1] In `tests/services/sites_service.test.js`: `_resolveModelEndpoint('best_match')` returns the `forecast` endpoint; `'meteoblue'` is no longer a key
+- [X] T019 [P] [US1] In `tests/views/sites_verdict.test.js`: `formatForecastContext(provenance, now)` → « AROME (Météo-France) · récupérée à 14 h 05 · run AROME de 08 h » (local time); without `runAt` no « run »; day prefix « hier » for yesterday; `buildWeatherPopupHtml`, the site card weather block and `renderComparator` contain the context line once
+- [X] T020 [US1] In `tests/e2e/sites_flow.spec.js`: mock `**/static/meta.json` too; the expanded AUTEUIL card shows « AROME (Météo-France) » and « récupérée à »; selecting the « Sélection automatique » option shows no « run »
+- [X] T021 [US1] Run `npx vitest run tests/services/sites_service.test.js tests/views/sites_verdict.test.js` and `npx playwright test tests/e2e/sites_flow.spec.js --project=chromium`; confirm T017–T020 fail
 
 ### Implementation for User Story 1
 
-- [ ] T022 [US1] In `js/services/sites_service.js`: rename the `meteoblue` key to `best_match` in `_resolveModelEndpoint`; record `forecastProvenance[site.id] = { modelKey, fetchedAt: <chunk cache timestamp>, runAt }` in `fetchWeatherForSites` (use the cache entry's `timestamp`, never `Date.now()` on a cache hit); add `fetchModelRunTime(modelKey)` (fetch `static/meta.json`, 30-min cache, errors → `null`, no request when `metaModel` is null) and call it once per fetch
-- [ ] T023 [US1] In `index.html` (model `<select>`, around line 1242): replace `value="meteoblue"` and its label with `value="best_match"` « Sélection automatique (Open-Meteo, multi-modèles) »; align the other option labels with `forecast.*` catalogue labels
-- [ ] T024 [US1] In `js/views/sites.js`: add `formatForecastContext(provenance, now)` (exported for tests) and render the context line (`<p class="forecast-context">`, escaped) once in `buildWeatherPopupHtml`, once in the site card weather block, and in `renderComparator` (one line above the table if all favourites share provenance, else one per row); loading message uses the model label
-- [ ] T025 [P] [US1] In `css/sites.css`: `.forecast-context` (small, muted, wraps on mobile) for both themes
-- [ ] T026 [US1] Run `npm test` and `npx playwright test tests/e2e/sites_flow.spec.js --project=chromium`; T017–T020 pass
+- [X] T022 [US1] In `js/services/sites_service.js`: rename the `meteoblue` key to `best_match` in `_resolveModelEndpoint`; record `forecastProvenance[site.id] = { modelKey, fetchedAt: <chunk cache timestamp>, runAt }` in `fetchWeatherForSites` (use the cache entry's `timestamp`, never `Date.now()` on a cache hit); add `fetchModelRunTime(modelKey)` (fetch `static/meta.json`, 30-min cache, errors → `null`, no request when `metaModel` is null) and call it once per fetch
+- [X] T023 [US1] In `index.html` (model `<select>`, around line 1242): replace `value="meteoblue"` and its label with `value="best_match"` « Sélection automatique (Open-Meteo, multi-modèles) »; align the other option labels with `forecast.*` catalogue labels
+- [X] T024 [US1] In `js/views/sites.js`: add `formatForecastContext(provenance, now)` (exported for tests) and render the context line (`<p class="forecast-context">`, escaped) once in `buildWeatherPopupHtml`, once in the site card weather block, and in `renderComparator` (one line above the table if all favourites share provenance, else one per row); loading message uses the model label
+- [X] T025 [P] [US1] In `css/sites.css`: `.forecast-context` (small, muted, wraps on mobile) for both themes
+- [X] T026 [US1] Run `npm test` and `npx playwright test tests/e2e/sites_flow.spec.js --project=chromium`; T017–T020 pass
 
 **Checkpoint**: source and retrieval/run time visible on every verdict.
 

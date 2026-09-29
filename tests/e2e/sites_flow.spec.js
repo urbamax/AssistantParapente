@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { aromeTailResponse, nearestHourIso } from '../fixtures/forecasts.js';
+import { aromeTailResponse, nearestHourIso, metaJson } from '../fixtures/forecasts.js';
 
 /** Rayon enregistré de 200 km : AUTEUIL (~160 km de Boulogne-sur-Mer) reste dans la liste. */
 async function useRadius200(page) {
@@ -18,6 +18,12 @@ async function useRadius200(page) {
 async function mockOpenMeteo(page, { complete, empty }) {
     await page.route('https://api.open-meteo.com/**', async (route) => {
         const url = new URL(route.request().url());
+        // Heure de calcul du modèle (spec 002) : run de 06 h UTC aujourd'hui.
+        if (url.pathname.endsWith('/static/meta.json')) {
+            const run = new Date();
+            run.setUTCHours(6, 0, 0, 0);
+            return route.fulfill({ json: metaJson({ runAtS: Math.floor(run.getTime() / 1000) }) });
+        }
         const count = (url.searchParams.get('latitude') || '').split(',').length;
         const one = aromeTailResponse(nearestHourIso(), { complete, empty });
         await route.fulfill({ json: count > 1 ? Array.from({ length: count }, () => one) : one });
@@ -212,5 +218,22 @@ test.describe('E2E - Sites Flow', () => {
         await page.locator('#address-input').fill('Annecy');
         await page.locator('[data-action="SitesvalidateAddress"]').click();
         await expect(notice).toBeHidden();
+    });
+
+    test('Spec 002 US1 : chaque verdict indique le modèle, l’heure de récupération et le run', async ({ page }) => {
+        await mockOpenMeteo(page, { complete: 6, empty: 0 });
+        const card = await openSitesAndSearch(page, 'AUTEUIL');
+        const context = card.locator('.forecast-context');
+        await expect(context).toHaveCount(1);
+        await expect(context).toContainText('AROME (Météo-France) · récupérée à');
+        await expect(context).toContainText('run AROME');
+
+        await page.locator('[data-action="toggleAdvancedSettings"]').click();
+        await page.locator('#weather-model-select').selectOption('best_match');
+        const refreshed = page.locator('.site-card:not(.minimized)', { hasText: 'AUTEUIL' }).first();
+        await expect(refreshed.locator('.forecast-context')).toContainText(
+            'Sélection automatique (Open-Meteo, multi-modèles)',
+        );
+        await expect(refreshed.locator('.forecast-context')).not.toContainText('run');
     });
 });

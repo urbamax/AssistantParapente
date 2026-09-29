@@ -2655,3 +2655,12 @@ body.light-mode .back-to-top-btn {
 .search-outside-notice {
     width: 100%;
 }
+
+/* Spec 002 : contexte de la prévision (modèle, heure de récupération, run). */
+.forecast-context {
+    margin: 6px 0 0;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+}

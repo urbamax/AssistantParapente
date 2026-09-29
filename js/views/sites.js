@@ -5,13 +5,16 @@
 import GlobalState from '../core/app_state.js';
 import SitesService from '../services/sites_service.js';
 import LogbookService from '../services/logbook_service.js';
-import { WIND_DIRECTIONS, RADIUS } from '../data/weather_config.js';
+import { WIND_DIRECTIONS, RADIUS, WEATHER_MODEL_INFO } from '../data/weather_config.js';
 import { getSpotairWidgetId } from '../data/spotair_widgets.js';
 import { escapeHTML } from '../core/security.js';
 import GdprEngine from '../gdpr_engine.js';
 
 import BaseView from '../core/base_view.js';
 import { t } from '../utils/i18n.js';
+import { FR } from '../i18n/fr.js';
+
+const FR_WEEKDAYS = FR.forecast.weekdays;
 
 // ---------------------------------------------------------------------------------------------
 // Affichage des verdicts météo (spec 001, contracts/ui-states.md). Les couleurs et libellés sont
@@ -49,6 +52,64 @@ function verdictColor(status, { bar = false } = {}) {
 function verdictReminderHtml(status) {
     if (status && status.status !== 'flyable' && status.status !== 'unflyable') return '';
     return `<p class="verdict-reminder"><i class="ri-information-line" aria-hidden="true"></i> ${escapeHTML(t('weather.reminder'))}</p>`;
+}
+
+/** Libellé français d'un modèle météo (spec 002, FR-001). */
+export function modelLabel(modelKey) {
+    const info = WEATHER_MODEL_INFO[modelKey];
+    return info ? t(info.labelKey) : String(modelKey || '').toUpperCase();
+}
+
+const pad2 = (n) => String(n).padStart(2, '0');
+
+/** « aujourd'hui » / « hier » / autre jour, en heure locale, par rapport à `now`. */
+function dayOffset(timestamp, now) {
+    const a = new Date(timestamp);
+    const b = new Date(now);
+    const startA = new Date(a.getFullYear(), a.getMonth(), a.getDate()).getTime();
+    const startB = new Date(b.getFullYear(), b.getMonth(), b.getDate()).getTime();
+    return Math.round((startB - startA) / 86400000);
+}
+
+/**
+ * Ligne de contexte d'un verdict (spec 002, US1) : « AROME (Météo-France) · récupérée à 14 h 05
+ * · run AROME de 08 h ». L'heure de calcul n'apparaît que si elle est connue (FR-003).
+ * @param {{modelKey: string, fetchedAt: number, runAt?: number|null}} provenance
+ * @param {number} [now]
+ */
+export function formatForecastContext(provenance, now = Date.now()) {
+    const fetched = new Date(provenance.fetchedAt);
+    const time = `${pad2(fetched.getHours())} h ${pad2(fetched.getMinutes())}`;
+    const offset = dayOffset(provenance.fetchedAt, now);
+    const when =
+        offset === 0
+            ? t('forecast.whenToday', { time })
+            : offset === 1
+              ? t('forecast.whenYesterday', { time })
+              : t('forecast.whenOtherDay', { day: FR_WEEKDAYS[fetched.getDay()], time });
+    let text = t('forecast.context', { model: modelLabel(provenance.modelKey), when });
+
+    const info = WEATHER_MODEL_INFO[provenance.modelKey];
+    if (provenance.runAt && info && info.runLabel) {
+        const run = new Date(provenance.runAt);
+        const hour = `${pad2(run.getHours())} h`;
+        const runOffset = dayOffset(provenance.runAt, now);
+        const runWhen =
+            runOffset === 0
+                ? t('forecast.runToday', { hour })
+                : runOffset === 1
+                  ? t('forecast.runYesterday', { hour })
+                  : t('forecast.runOtherDay', { day: FR_WEEKDAYS[run.getDay()], hour });
+        text += t('forecast.run', { component: info.runLabel, when: runWhen });
+    }
+    return text;
+}
+
+/** Ligne de contexte HTML d'un site (vide si sa prévision n'a pas encore de provenance). */
+function forecastContextHtml(siteId) {
+    const provenance = SitesService.getForecastProvenance(siteId);
+    if (!provenance) return '';
+    return `<p class="forecast-context" data-fetched-at="${provenance.fetchedAt}">${escapeHTML(formatForecastContext(provenance))}</p>`;
 }
 
 /** Libellé du rayon (10–200 km ; « Illimité » n'existe plus, spec 002 FR-015). */
@@ -488,6 +549,11 @@ class SitesViewClass extends BaseView {
             this.updateForecastLabel();
             this.renderList();
             this.updateMapMarkers();
+            // Heure de calcul du modèle (spec 002, FR-003) : demandée à part, sans bloquer ni
+            // faire échouer l'affichage ; on ne ré-affiche que si elle est connue.
+            SitesService.fetchModelRunTime(SitesService.state.weatherModel).then((runAt) => {
+                if (runAt) this.renderList();
+            });
         }
     }
 
@@ -678,6 +744,7 @@ class SitesViewClass extends BaseView {
             </div>
             <div style="opacity: 0.8; font-size: 0.8rem;">Rafales : ${escapeHTML(String(forecastValue(weather.windGust)))} km/h</div>
             ${missing ? `<div class="weather-missing-values" style="margin-top: 4px; font-size: 0.8rem;">${escapeHTML(missing)}</div>` : ''}
+            ${forecastContextHtml(site.id)}
             ${verdictReminderHtml(status)}
         </div>`;
     }
@@ -1642,6 +1709,17 @@ class SitesViewClass extends BaseView {
             return;
         }
 
+        // Contexte des prévisions (spec 002) : une seule ligne si tous les favoris viennent de la
+        // même récupération, sinon une par ligne du tableau.
+        const provenanceKeys = new Set(
+            favoriteSites.map((site) => {
+                const p = SitesService.getForecastProvenance(site.id);
+                return p ? `${p.modelKey}|${p.fetchedAt}` : 'none';
+            }),
+        );
+        const sharedContext = provenanceKeys.size === 1;
+        const tableContextHtml = sharedContext && favoriteSites.length ? forecastContextHtml(favoriteSites[0].id) : '';
+
         const rows = favoriteSites
             .map((site) => {
                 const forecasts = SitesService.state.weatherForecasts[site.id] || [];
@@ -1681,7 +1759,7 @@ class SitesViewClass extends BaseView {
                 return `
                 <tr>
                     <td style="padding: 10px; font-weight: 700;">${escapeHTML(site.nom || site.name || '')}</td>
-                    <td style="padding: 10px;">${statusHtml}</td>
+                    <td style="padding: 10px;">${statusHtml}${sharedContext ? '' : forecastContextHtml(site.id)}</td>
                     <td style="padding: 10px; text-align: center;">${site.flyableHours || 0}h</td>
                     <td style="padding: 10px; text-align: center;">${bestSlotHtml}</td>
                     <td style="padding: 10px;">${confidenceHtml}</td>
@@ -1692,6 +1770,7 @@ class SitesViewClass extends BaseView {
 
         listDiv.innerHTML = `
             <div class="card" style="padding: 16px; overflow-x: auto;">
+                ${tableContextHtml}
                 ${verdictReminderHtml(null)}
                 <table style="width: 100%; border-collapse: collapse; min-width: 480px;">
                     <thead>
@@ -1824,6 +1903,7 @@ class SitesViewClass extends BaseView {
                             </div>
                             ${missingValuesText(status) ? `<div class="weather-missing-values" style="font-size: 0.8rem;">${escapeHTML(missingValuesText(status))}</div>` : ''}
                         </div>
+                        ${forecastContextHtml(site.id)}
                         ${verdictReminderHtml(status)}
                     `;
                 } else if (hasWeatherEntry) {
@@ -1837,7 +1917,7 @@ class SitesViewClass extends BaseView {
                     weatherHtml = `
                         <div class="weather-loading">
                             <i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i>
-                            <span>Chargement météo ${SitesService.state.weatherModel.toUpperCase()}...</span>
+                            <span>${escapeHTML(t('forecast.loading', { model: modelLabel(SitesService.state.weatherModel) }))}</span>
                         </div>
                     `;
                 }

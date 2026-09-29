@@ -3,7 +3,13 @@
  * Business logic, GPS calculations, Weather API fetching, and Data Filtering
  */
 import StorageService from '../services/storage.js';
-import { WIND_THRESHOLDS, WEATHER_MODELS, RADIUS, DEFAULT_LOCATION } from '../data/weather_config.js';
+import {
+    WIND_THRESHOLDS,
+    WEATHER_MODELS,
+    RADIUS,
+    DEFAULT_LOCATION,
+    WEATHER_MODEL_INFO,
+} from '../data/weather_config.js';
 import { calculateDistance, getAngularDifference, degreesToCardinal } from '../utils/geo_utils.js';
 import { removeAccents } from '../utils/text_utils.js';
 import { escapeHTML } from '../core/security.js';
@@ -316,7 +322,9 @@ class SitesService {
         if (modelKey === 'icon' || modelKey === 'iconeu') apiEndpoint = 'dwd-icon';
         else if (modelKey === 'gfs') apiEndpoint = 'gfs';
         else if (modelKey === 'ecmwf') apiEndpoint = 'ecmwf';
-        else if (modelKey === 'meteoblue') apiEndpoint = 'forecast';
+        // Sélection automatique multi-modèles d'Open-Meteo (anciennement libellée « Meteoblue »,
+        // qu'elle n'a jamais utilisé — spec 002, FR-008).
+        else if (modelKey === 'best_match') apiEndpoint = 'forecast';
 
         let modelParam = '';
         if (modelKey === 'iconeu') modelParam = '&models=icon_eu';
@@ -507,12 +515,15 @@ class SitesService {
         const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
         let results;
+        /** @type {number[]} heure de récupération de chaque résultat (même index que results) */
+        let resultsFetchedAt = [];
         try {
             // Séquentiel (pas Promise.all) : 5 lots tirés en même temps se sont déjà
             // fait rejeter en bloc par Open-Meteo avec un 429 "Hourly API request
             // limit exceeded" — un seul lot à la fois, avec une pause entre chaque
             // et un backoff sur 429 (voir _fetchWithBackoff), reste sous ce seuil.
             const chunkResults = [];
+            const chunkFetchedAt = [];
             for (const chunkSites of chunks) {
                 const chunkLats = chunkSites.map((s) => parseFloat(s.latitude || s.lat)).join(',');
                 const chunkLons = chunkSites.map((s) => parseFloat(s.longitude || s.lon)).join(',');
@@ -523,6 +534,9 @@ class SitesService {
                 const cached = this._weatherCache.get(url);
                 if (cached && Date.now() - cached.timestamp < WEATHER_CACHE_TTL_MS) {
                     chunkResults.push(cached.results);
+                    // Heure de la récupération d'origine, jamais celle de la relecture du cache
+                    // (spec 002, FR-004).
+                    chunkFetchedAt.push(...cached.results.map(() => cached.timestamp));
                     continue;
                 }
 
@@ -535,12 +549,15 @@ class SitesService {
                 }
                 const data = await response.json();
                 const chunkArr = Array.isArray(data) ? data : [data];
-                this._weatherCache.set(url, { timestamp: Date.now(), results: chunkArr });
+                const fetchedAt = Date.now();
+                this._weatherCache.set(url, { timestamp: fetchedAt, results: chunkArr });
                 chunkResults.push(chunkArr);
+                chunkFetchedAt.push(...chunkArr.map(() => fetchedAt));
 
                 if (chunks.length > 1) await sleep(250);
             }
             results = chunkResults.flat();
+            resultsFetchedAt = chunkFetchedAt;
         } catch (e) {
             // Un appel plus récent à fetchWeatherForSites() (filtre changé, GPS mis à jour,
             // modèle météo changé...) a annulé celui-ci pour prendre le relais : ce n'est pas
@@ -556,6 +573,7 @@ class SitesService {
 
         try {
             this.state.weatherForecasts = {};
+            this.state.forecastProvenance = {};
 
             // Find current time index in hourly forecast to align offset=0 with current hour
             const now = new Date();
@@ -666,6 +684,10 @@ class SitesService {
                             }
                         }
                         this.state.weatherForecasts[site.id] = forecasts;
+                        this.state.forecastProvenance[site.id] = {
+                            modelKey: this.state.weatherModel,
+                            fetchedAt: resultsFetchedAt[index],
+                        };
                     }
                 } catch (siteErr) {
                     console.error(`Erreur lors du traitement météo pour le site ${site.nom}:`, siteErr);
@@ -727,6 +749,49 @@ class SitesService {
     // pour quels sites récupérer la météo — inutile d'interroger Open-Meteo
     // pour 1800 sites dans le monde entier quand le rayon/la recherche n'en
     // laissent que quelques dizaines de candidats à l'écran.
+    /**
+     * Provenance de la prévision d'un site (spec 002, US1) : modèle, heure de récupération
+     * d'origine et heure de calcul du modèle si Open-Meteo la fournit (sinon null).
+     * @returns {{modelKey: string, fetchedAt: number, runAt: number|null} | null}
+     */
+    getForecastProvenance(siteId) {
+        const p = this.state.forecastProvenance && this.state.forecastProvenance[siteId];
+        if (!p) return null;
+        const cachedRun = this._runTimeCache && this._runTimeCache.get(p.modelKey);
+        return { modelKey: p.modelKey, fetchedAt: p.fetchedAt, runAt: cachedRun ? cachedRun.value : null };
+    }
+
+    /**
+     * Heure de calcul (run) du modèle, lue dans les métadonnées Open-Meteo
+     * (`/data/{metaModel}/static/meta.json`), gardée 30 min. null si le modèle n'a pas d'heure de
+     * calcul unique (sélection automatique) ou si la demande échoue : rien n'est alors affiché
+     * plutôt qu'une heure inventée (spec 002, FR-003).
+     * @param {string} modelKey
+     * @returns {Promise<number|null>}
+     */
+    async fetchModelRunTime(modelKey) {
+        const info = WEATHER_MODEL_INFO[modelKey];
+        if (!info || !info.metaModel) return null;
+        if (!this._runTimeCache) this._runTimeCache = new Map();
+        const cached = this._runTimeCache.get(modelKey);
+        if (cached && Date.now() - cached.at < SitesService.RUN_TIME_CACHE_MS) return cached.value;
+        let value = null;
+        try {
+            const response = await fetch(`https://api.open-meteo.com/data/${info.metaModel}/static/meta.json`);
+            if (response.ok) {
+                const meta = await response.json();
+                const seconds = Number(meta && meta.last_run_initialisation_time);
+                if (Number.isFinite(seconds) && seconds > 0) value = seconds * 1000;
+            }
+        } catch {
+            value = null;
+        }
+        this._runTimeCache.set(modelKey, { at: Date.now(), value });
+        return value;
+    }
+
+    static RUN_TIME_CACHE_MS = 30 * 60 * 1000;
+
     /**
      * Position de référence des distances : celle du pilote (GPS ou adresse), sinon
      * Boulogne-sur-Mer (spec 002, FR-017) — le filtre du rayon s'applique donc toujours.
