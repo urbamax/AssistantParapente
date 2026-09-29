@@ -2,11 +2,19 @@ import { test, expect } from '@playwright/test';
 
 test.describe('E2E - Logbook Offline Flow', () => {
     test.beforeEach(async ({ page }) => {
-        // Évite les alertes GDPR ou autres modals au démarrage
+        // Consentement RGPD déjà donné, sous la clé et au format réellement lus par gdpr_engine.js
+        // (l'ancienne clé « gdprConsent » dans les préférences était ignorée : la bannière
+        // apparaissait avec un léger retard et bloquait parfois le clic suivant — test instable).
         await page.addInitScript(() => {
             window.localStorage.setItem(
-                'parapente_user_prefs',
-                JSON.stringify({ gdprConsent: { stats: true, firebase: true } }),
+                'parapente_gdpr_consent',
+                JSON.stringify({
+                    stats: true,
+                    firebase: true,
+                    gps: false,
+                    version: 2026,
+                    date: new Date().toISOString(),
+                }),
             );
         });
 
