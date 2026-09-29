@@ -346,4 +346,53 @@ test.describe('E2E - Sites Flow', () => {
         await expect(charter).toHaveAttribute('rel', 'noopener noreferrer');
         await expect(ndm).toContainText('l’objectif exclusif');
     });
+
+    // Spec 004 : la carte reste cadrée sur le rayon autour de Boulogne-sur-Mer, et le rayon ne
+    // bouge pas tout seul (boucle redimensionnement → rayon → recadrage qui finissait à 200 km).
+    async function openSitesWithoutPosition(page, prefs) {
+        if (prefs) {
+            await page.addInitScript((p) => localStorage.setItem('parapente_user_prefs', JSON.stringify(p)), prefs);
+        }
+        await mockOpenMeteo(page, { complete: 2, empty: 0 });
+        await page.goto('/?bypassGdpr=true');
+        const gdprBanner = page.locator('#gdpr-banner');
+        if (await gdprBanner.isVisible()) await page.locator('[data-action="refuseAll"]').first().click();
+        await page.locator('.nav-menu-btn[data-target="SITES"]').click();
+        await expect(page.locator('#sites-map-canvas')).toBeVisible();
+    }
+    const mapState = (page) =>
+        page.evaluate(async () => {
+            const V = (await import('/js/views/sites.js')).default;
+            const c = V.state.map.getCenter();
+            const b = V.state.map.getBounds();
+            const boulogne = L.latLng(50.7264, 1.6147);
+            return {
+                centerKm: c.distanceTo(boulogne) / 1000,
+                north45: b.contains([50.7264 + 45 / 111, 1.6147]),
+                south45: b.contains([50.7264 - 45 / 111, 1.6147]),
+                sorgia: b.contains([46.1382, 5.856]),
+            };
+        });
+
+    test('Spec 004 : sans interaction, le rayon reste à 50 km et la carte sur Boulogne-sur-Mer', async ({ page }) => {
+        await openSitesWithoutPosition(page, null);
+        await page.waitForTimeout(5000);
+        await expect(page.locator('#radius-val-label')).toHaveText('50 km');
+        await page.setViewportSize({ width: 900, height: 700 });
+        await page.waitForTimeout(3000);
+        await expect(page.locator('#radius-val-label')).toHaveText('50 km');
+        const state = await mapState(page);
+        expect(state.centerKm).toBeLessThan(5);
+    });
+
+    test('Spec 004 : un favori lointain ne fait pas dézoomer la carte', async ({ page }) => {
+        await openSitesWithoutPosition(page, { favoriteSites: ['sorgia-601'] });
+        await page.waitForTimeout(3000);
+        const state = await mapState(page);
+        expect(state.centerKm).toBeLessThan(5);
+        expect(state.north45).toBe(true);
+        expect(state.south45).toBe(true);
+        expect(state.sorgia).toBe(false);
+        await expect(page.locator('#radius-val-label')).toHaveText('50 km');
+    });
 });

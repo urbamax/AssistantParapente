@@ -7,7 +7,7 @@
 Replace the two automatic `fitBounds` on all markers (`initMap`, `updateMapMarkers` in
 `js/views/sites.js`) with `fitMapToRadius()`: bounds of the circle `radiusLimit` km around
 `SitesService.getEffectiveLocation()` (Leaflet `LatLng.toBounds(diameter in metres)`), with the
-existing `isProgrammaticZoom` guard so the map/radius sync does not react to it.
+existing `isProgrammaticZoom` guard; and the map/radius sync (`bindMapSync`) only reacts after a pilot gesture on the map (pointer, wheel, touch, keyboard), which breaks the resize → radius → re-frame loop that inflated the radius to 200 km.
 
 ## Technical Context
 
