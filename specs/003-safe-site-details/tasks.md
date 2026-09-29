@@ -65,9 +65,9 @@ description: "Task list for safe and faithful site details"
 
 ## Phase 6: Polish
 
-- [ ] T024 [P] Update `DOCUMENTATION.md` (security policy: `renderSiteText` for data with limited formatting, `safeHttpUrl` for addresses; data pipeline: `repair_cp1252`)
-- [ ] T025 Run `npm run lint`, `npm run format:check`, `npm run typecheck` (configs `eslint.config.mjs`, `.prettierrc.json`, `jsconfig.json`), `npm test`, `npm run test:e2e` (`playwright.config.js`, Chromium + WebKit), `npm run build` (`vite.config.mjs`); all green
-- [ ] T026 Follow `specs/003-safe-site-details/quickstart.md` §2 in the browser (light and dark)
+- [X] T024 [P] Update `DOCUMENTATION.md` (security policy: `renderSiteText` for data with limited formatting, `safeHttpUrl` for addresses; data pipeline: `repair_cp1252`)
+- [X] T025 Run `npm run lint`, `npm run format:check`, `npm run typecheck` (configs `eslint.config.mjs`, `.prettierrc.json`, `jsconfig.json`), `npm test`, `npm run test:e2e` (`playwright.config.js`, Chromium + WebKit), `npm run build` (`vite.config.mjs`); all green
+- [X] T026 Follow `specs/003-safe-site-details/quickstart.md` §2 in the browser (light and dark)
 
 ## Dependencies
 
