@@ -1,7 +1,8 @@
 .DS_Store
 node_modules/
 .*smbdelete*
-.claude/
+.claude/*
+!.claude/skills/
 .venv/
 playwright-report/
 test-results/
