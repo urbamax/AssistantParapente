@@ -102,8 +102,8 @@ class UIManager {
 
     applyThemeMode(mode) {
         const body = document.body;
-        const iconSun = document.querySelector('.ri-sun-line');
-        const iconMoon = document.querySelector('.ri-moon-line');
+        const iconSun = /** @type {HTMLElement} */ (document.querySelector('.ri-sun-line'));
+        const iconMoon = /** @type {HTMLElement} */ (document.querySelector('.ri-moon-line'));
         const btn = document.getElementById('theme-toggle');
 
         // Le <head> pose `light-mode` sur <html> au chargement (anti-flash) et personne ne le retirait :
@@ -188,12 +188,14 @@ class UIManager {
     }
 
     restoreLevelUI(attempts = 0) {
-        const levelSelect = document.getElementById('global-level-select');
+        const levelSelect = /** @type {HTMLSelectElement} */ (document.getElementById('global-level-select'));
         const currentLevel = GlobalState.get('level');
 
         if (levelSelect && currentLevel) {
             levelSelect.value = currentLevel;
-            const targetOption = levelSelect.querySelector(`option[value="${currentLevel}"]`);
+            const targetOption = /** @type {HTMLOptionElement} */ (
+                levelSelect.querySelector(`option[value="${currentLevel}"]`)
+            );
             if (targetOption) targetOption.selected = true;
             return;
         }
@@ -220,7 +222,9 @@ class UIManager {
             }
         }
 
-        const modal = document.getElementById('manual-modal');
+        const modal = /** @type {HTMLDialogElement & { _cancelBound?: boolean }} */ (
+            document.getElementById('manual-modal')
+        );
         if (modal) {
             if (typeof modal.showModal === 'function' && !modal.open) {
                 modal.showModal();
@@ -240,7 +244,9 @@ class UIManager {
     }
 
     hideManual() {
-        const modal = document.getElementById('manual-modal');
+        const modal = /** @type {HTMLDialogElement & { _cancelBound?: boolean }} */ (
+            document.getElementById('manual-modal')
+        );
         if (modal) {
             modal.classList.remove('active');
             setTimeout(() => {
@@ -259,7 +265,9 @@ class UIManager {
         const tab = document.getElementById(`manual-tab-${section}`);
         if (tab) tab.classList.add('active');
 
-        document.querySelectorAll('.manual-section').forEach((sec) => (sec.style.display = 'none'));
+        /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.manual-section')).forEach(
+            (sec) => (sec.style.display = 'none'),
+        );
         const sec = document.getElementById(`manual-section-${section}`);
         if (sec) sec.style.display = 'block';
     }

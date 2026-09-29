@@ -21,9 +21,11 @@ class WelcomeViewClass extends BaseView {
     }
 
     highlightLevel(level) {
-        document.querySelectorAll('#welcome-screen [data-level]').forEach((btn) => {
-            btn.setAttribute('aria-pressed', String(btn.dataset.level === level));
-        });
+        /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('#welcome-screen [data-level]')).forEach(
+            (btn) => {
+                btn.setAttribute('aria-pressed', String(btn.dataset.level === level));
+            },
+        );
     }
 }
 

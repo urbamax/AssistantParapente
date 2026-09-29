@@ -133,8 +133,8 @@ class QuizViewClass extends BaseView {
         }
     }
 
-    unmount() {
-        super.unmount();
+    async unmount() {
+        await super.unmount();
         if (this._handleClick) document.body.removeEventListener('click', this._handleClick);
 
         if (this._unsubscribeLevel) {
@@ -261,7 +261,7 @@ class QuizViewClass extends BaseView {
         if (e.target.id === 'qcm-theme-select') {
             QuizService.setTheme(e.target.value);
         } else if (e.target.id === 'bank-theme-filter' || e.target.id === 'bank-search') {
-            const select = document.getElementById('bank-theme-filter');
+            const select = /** @type {HTMLSelectElement} */ (document.getElementById('bank-theme-filter'));
             this.renderBankContent(select ? select.value : 'ALL');
         }
     }
@@ -272,7 +272,7 @@ class QuizViewClass extends BaseView {
         const bankScreen = document.getElementById('qcm-bank-screen');
         if (bankScreen) {
             bankScreen.classList.add('active');
-            const select = document.getElementById('bank-theme-filter');
+            const select = /** @type {HTMLSelectElement} */ (document.getElementById('bank-theme-filter'));
             this.renderBankContent(select ? select.value : 'ALL');
         }
     }
@@ -281,7 +281,7 @@ class QuizViewClass extends BaseView {
         const container = document.getElementById('bank-results');
         if (!container) return;
 
-        const searchInput = document.getElementById('bank-search');
+        const searchInput = /** @type {HTMLInputElement} */ (document.getElementById('bank-search'));
         const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
         let sourceData = QuizService.getQuestions();
@@ -1535,7 +1535,7 @@ class QuizViewClass extends BaseView {
     // Affiche les réponses figées (corrigées) + l'explication, que ce soit juste après avoir
     // validé ou en revenant sur une question déjà répondue via le bouton "retour".
     showAnswerFeedback(result, showBackButton) {
-        const btns = document.querySelectorAll('.qcm-option');
+        const btns = /** @type {NodeListOf<HTMLButtonElement>} */ (document.querySelectorAll('.qcm-option'));
 
         btns.forEach((btn) => {
             btn.disabled = true;
@@ -1718,7 +1718,7 @@ class QuizViewClass extends BaseView {
         }
 
         const dir = QuizView.state.questionSortDir;
-        const items = Array.from(list.querySelectorAll('.question-stat-item'));
+        const items = Array.from(/** @type {NodeListOf<HTMLElement>} */ (list.querySelectorAll('.question-stat-item')));
 
         // Update button states & Icons
         // Update button states & Icons - Scope only to Stats buttons
@@ -1750,8 +1750,8 @@ class QuizViewClass extends BaseView {
                 valA = parseInt(a.dataset.pct);
                 valB = parseInt(b.dataset.pct);
             } else if (sortBy === 'streak') {
-                valA = parseInt(a.dataset.streak || 0);
-                valB = parseInt(b.dataset.streak || 0);
+                valA = parseInt(a.dataset.streak || '0');
+                valB = parseInt(b.dataset.streak || '0');
             } else {
                 valA = parseInt(a.dataset.total);
                 valB = parseInt(b.dataset.total);
@@ -1769,7 +1769,7 @@ class QuizViewClass extends BaseView {
         const card = document.querySelector(`[data-code="${code}"]`);
         if (!card) return;
 
-        const answersDiv = card.querySelector('.question-answers');
+        const answersDiv = /** @type {HTMLElement} */ (card.querySelector('.question-answers'));
         const arrow = document.getElementById('arrow-' + code);
 
         if (!answersDiv) return;
@@ -1876,7 +1876,7 @@ class QuizViewClass extends BaseView {
         input.accept = '.json';
 
         input.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
+            const file = /** @type {HTMLInputElement} */ (e.target).files[0];
             if (!file) return;
 
             try {
@@ -1920,8 +1920,8 @@ class QuizViewClass extends BaseView {
         const card = document.querySelector(`[data-exam-id="${examId}"]`);
         if (!card) return;
 
-        const detailsDiv = card.querySelector('.exam-details');
-        const arrow = card.querySelector('.exam-arrow');
+        const detailsDiv = /** @type {HTMLElement} */ (card.querySelector('.exam-details'));
+        const arrow = /** @type {HTMLElement} */ (card.querySelector('.exam-arrow'));
 
         if (!detailsDiv) return;
 

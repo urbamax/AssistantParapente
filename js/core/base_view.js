@@ -33,7 +33,7 @@ class BaseView {
     /**
      * Standard UI fallback for critical view errors.
      * @param {string} errorMsg - The error detail to display
-     * @param {string} viewContainerId - The DOM ID of the container to hide/replace
+     * @param {string} [viewContainerId] - The DOM ID of the container to hide/replace
      */
     renderErrorState(errorMsg, viewContainerId) {
         console.error(`[BaseView] Error state triggered:`, errorMsg);

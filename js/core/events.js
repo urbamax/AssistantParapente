@@ -32,7 +32,7 @@ class EventDelegator {
         // Global click delegator
         document.addEventListener('click', (e) => {
             // data-backdrop-action: fires only when the overlay itself (not its content) is clicked.
-            const backdrop = e.target.closest('[data-backdrop-action]');
+            const backdrop = /** @type {HTMLElement} */ (e.target).closest('[data-backdrop-action]');
             if (backdrop && e.target === backdrop) {
                 this.dispatch(
                     backdrop.getAttribute('data-backdrop-action'),
@@ -42,7 +42,9 @@ class EventDelegator {
                 );
             }
 
-            const target = e.target.closest('[data-action]');
+            const target = /** @type {HTMLInputElement | null} */ (
+                /** @type {HTMLElement} */ (e.target).closest('[data-action]')
+            );
             if (!target) return;
             if (target.hasAttribute('data-prevent-default')) e.preventDefault();
 
@@ -56,12 +58,16 @@ class EventDelegator {
 
         // Global change delegator
         document.addEventListener('change', (e) => {
-            const changeTarget = e.target.closest('[data-change-action]');
+            const changeTarget = /** @type {HTMLInputElement | null} */ (
+                /** @type {HTMLElement} */ (e.target).closest('[data-change-action]')
+            );
             if (changeTarget) {
                 this.dispatch(changeTarget.getAttribute('data-change-action'), changeTarget.value, e, changeTarget);
             }
 
-            const target = e.target.closest('[data-action]');
+            const target = /** @type {HTMLInputElement | null} */ (
+                /** @type {HTMLElement} */ (e.target).closest('[data-action]')
+            );
             if (!target) return;
 
             this.dispatch(target.getAttribute('data-action'), target.value, e, target);
@@ -69,14 +75,18 @@ class EventDelegator {
 
         // Live typing (search boxes, sliders, form previews)
         document.addEventListener('input', (e) => {
-            const target = e.target.closest('[data-input-action]');
+            const target = /** @type {HTMLInputElement | null} */ (
+                /** @type {HTMLElement} */ (e.target).closest('[data-input-action]')
+            );
             if (target) this.dispatch(target.getAttribute('data-input-action'), target.value, e, target);
         });
 
         // Enter key on a text field
         document.addEventListener('keydown', (e) => {
             if (e.key !== 'Enter') return;
-            const target = e.target.closest('[data-enter-action]');
+            const target = /** @type {HTMLInputElement | null} */ (
+                /** @type {HTMLElement} */ (e.target).closest('[data-enter-action]')
+            );
             if (target) this.dispatch(target.getAttribute('data-enter-action'), target.value, e, target);
         });
     }

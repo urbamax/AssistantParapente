@@ -32,7 +32,7 @@ class LogbookService {
         this.flights = StorageService.get(StorageService.KEYS.LOGBOOK_DATA) || [];
         if (!Array.isArray(this.flights)) this.flights = [];
         this.flights.forEach(normalizeFlight);
-        this.flights.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+        this.flights.sort((a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime());
 
         this.equipment = StorageService.get(StorageService.KEYS.EQUIPMENT_DATA) || [];
         if (!Array.isArray(this.equipment)) this.equipment = [];
@@ -152,7 +152,7 @@ class LogbookService {
         flight.syncPending = true;
         normalizeFlight(flight);
         this.flights.push(flight);
-        this.flights.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+        this.flights.sort((a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime());
         this.saveFlights();
         return flight;
     }
@@ -162,7 +162,7 @@ class LogbookService {
         if (index !== -1) {
             this.flights[index] = { ...this.flights[index], ...updatedData, updatedAt: Date.now(), syncPending: true };
             normalizeFlight(this.flights[index]);
-            this.flights.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+            this.flights.sort((a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime());
             this.saveFlights();
         }
     }

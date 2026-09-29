@@ -512,7 +512,7 @@ class SafetyViewClass extends BaseView {
 
     applyTab() {
         TABS.forEach((tab) => {
-            const btn = document.getElementById(`safety-tab-${tab}`);
+            const btn = /** @type {HTMLElement} */ (document.getElementById(`safety-tab-${tab}`));
             const panel = document.getElementById(`safety-panel-${tab}`);
             const active = tab === this.activeTab;
             if (btn) {
@@ -628,7 +628,9 @@ class SafetyViewClass extends BaseView {
     }
 
     renderChecklistState() {
-        document.querySelectorAll('#safety-panel-prevol [data-check-index]').forEach((btn) => {
+        /** @type {NodeListOf<HTMLElement>} */ (
+            document.querySelectorAll('#safety-panel-prevol [data-check-index]')
+        ).forEach((btn) => {
             btn.setAttribute('aria-checked', String(this.checked.has(Number(btn.dataset.checkIndex))));
         });
         const progress = document.getElementById('safety-check-progress');
@@ -671,7 +673,9 @@ class SafetyViewClass extends BaseView {
     }
 
     renderReadyState() {
-        document.querySelectorAll('#safety-panel-prevol .safety-answer').forEach((btn) => {
+        /** @type {NodeListOf<HTMLElement>} */ (
+            document.querySelectorAll('#safety-panel-prevol .safety-answer')
+        ).forEach((btn) => {
             btn.setAttribute(
                 'aria-pressed',
                 String(this.readyAnswers[btn.dataset.question] === Number(btn.dataset.answer)),
@@ -706,9 +710,11 @@ class SafetyViewClass extends BaseView {
 
     renderSigrState() {
         const ratings = this.getSigrRatings();
-        document.querySelectorAll('#safety-panel-sigr .safety-rate').forEach((btn) => {
-            btn.setAttribute('aria-pressed', String(ratings[btn.dataset.plate] === btn.dataset.rating));
-        });
+        /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('#safety-panel-sigr .safety-rate')).forEach(
+            (btn) => {
+                btn.setAttribute('aria-pressed', String(ratings[btn.dataset.plate] === btn.dataset.rating));
+            },
+        );
         const summary = document.getElementById('safety-sigr-summary');
         if (!summary) return;
         const weak = SIGR_PLATES.filter((p) => ratings[p.id] === 'weak').map((p) => p.title);

@@ -8,7 +8,7 @@
  * moteurs qui ne l'implémentent pas encore (ex: Safari < 16, Chrome < 110, Firefox < 115) —
  * `toSorted` est trop récent pour être appelé sans détection sur une app grand public.
  * @param {Array} arr
- * @param {Function} [compareFn]
+ * @param {(a: any, b: any) => number} [compareFn]
  * @returns {Array} Une nouvelle liste triée, sans muter `arr`.
  */
 export function toSorted(arr, compareFn) {

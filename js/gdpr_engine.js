@@ -60,7 +60,7 @@ const GdprEngine = {
     },
 
     showModal: function (modalId) {
-        const modal = document.getElementById(modalId);
+        const modal = /** @type {HTMLDialogElement & { _cancelBound?: boolean }} */ (document.getElementById(modalId));
         if (modal) {
             if (typeof modal.showModal === 'function' && !modal.open) {
                 modal.showModal();
@@ -84,7 +84,7 @@ const GdprEngine = {
     },
 
     hideModal: function (modalId) {
-        const modal = document.getElementById(modalId);
+        const modal = /** @type {HTMLDialogElement} */ (document.getElementById(modalId));
         if (modal) {
             modal.classList.remove('active');
             setTimeout(() => {
@@ -131,9 +131,11 @@ const GdprEngine = {
 
     // Save custom settings from toggles
     saveCustomSettings: function () {
-        const statsVal = document.getElementById('gdpr-toggle-stats')?.checked || false;
-        const firebaseVal = document.getElementById('gdpr-toggle-firebase')?.checked || false;
-        const gpsVal = document.getElementById('gdpr-toggle-gps')?.checked || false;
+        const statsVal =
+            /** @type {HTMLInputElement} */ (document.getElementById('gdpr-toggle-stats'))?.checked || false;
+        const firebaseVal =
+            /** @type {HTMLInputElement} */ (document.getElementById('gdpr-toggle-firebase'))?.checked || false;
+        const gpsVal = /** @type {HTMLInputElement} */ (document.getElementById('gdpr-toggle-gps'))?.checked || false;
 
         this.consent = {
             stats: statsVal,
@@ -159,9 +161,9 @@ const GdprEngine = {
 
     // Sync toggle switches in the settings modal to current consent state
     syncTogglesToState: function () {
-        const toggleStats = document.getElementById('gdpr-toggle-stats');
-        const toggleFirebase = document.getElementById('gdpr-toggle-firebase');
-        const toggleGps = document.getElementById('gdpr-toggle-gps');
+        const toggleStats = /** @type {HTMLInputElement} */ (document.getElementById('gdpr-toggle-stats'));
+        const toggleFirebase = /** @type {HTMLInputElement} */ (document.getElementById('gdpr-toggle-firebase'));
+        const toggleGps = /** @type {HTMLInputElement} */ (document.getElementById('gdpr-toggle-gps'));
 
         if (toggleStats) toggleStats.checked = this.consent.stats;
         if (toggleFirebase) toggleFirebase.checked = this.consent.firebase;

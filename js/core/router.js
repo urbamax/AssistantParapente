@@ -128,7 +128,7 @@ class Router {
 
         // Push/replace state for browser history
         if (params.pushState !== false) {
-            const url = new URL(window.location);
+            const url = new URL(window.location.href);
             const currentModeInUrl = url.searchParams.get('mode');
             url.searchParams.set('mode', mode);
             if (currentModeInUrl === mode) {

@@ -58,6 +58,7 @@ class SitesService {
             searchQuery: '',
             filterFavoritesOnly: false,
             forecastMaxRange: 120,
+            /** @type {Record<string, any>} */
             userPreferences: {
                 pilotLevel: 'ALL',
                 favoriteSites: [],
@@ -198,14 +199,14 @@ class SitesService {
         }
 
         // Sync UI with state
-        const maxInput = document.getElementById('limit-wind-max');
-        const gustInput = document.getElementById('limit-gust-delta');
-        const forecastRangeSelect = document.getElementById('forecast-range-select');
-        const filterModeSelect = document.getElementById('filter-mode-select');
+        const maxInput = /** @type {HTMLInputElement} */ (document.getElementById('limit-wind-max'));
+        const gustInput = /** @type {HTMLInputElement} */ (document.getElementById('limit-gust-delta'));
+        const forecastRangeSelect = /** @type {HTMLSelectElement} */ (document.getElementById('forecast-range-select'));
+        const filterModeSelect = /** @type {HTMLSelectElement} */ (document.getElementById('filter-mode-select'));
 
-        if (maxInput) maxInput.value = this.state.limitWindMax;
-        if (gustInput) gustInput.value = this.state.limitGustDelta;
-        if (forecastRangeSelect) forecastRangeSelect.value = this.state.forecastMaxRange;
+        if (maxInput) maxInput.value = String(this.state.limitWindMax);
+        if (gustInput) gustInput.value = String(this.state.limitGustDelta);
+        if (forecastRangeSelect) forecastRangeSelect.value = String(this.state.forecastMaxRange);
         if (filterModeSelect && this.state.filterMode) filterModeSelect.value = this.state.filterMode;
 
         // UI logic moved to sites.js
@@ -637,18 +638,19 @@ class SitesService {
             });
 
             // Enable the forecast slider
-            const slider = document.getElementById('forecast-slider');
+            const slider = /** @type {HTMLInputElement} */ (document.getElementById('forecast-slider'));
             if (slider) {
                 slider.disabled = false;
                 const maxVal = Math.max(0, (results[0]?.hourly?.time?.length || 121) - currentHourIndex - 1);
-                slider.max = Math.min(maxVal, this.state.forecastMaxRange || 120);
+                const sliderMax = Math.min(maxVal, this.state.forecastMaxRange || 120);
+                slider.max = String(sliderMax);
 
                 // Adjust offset if it exceeds new max
-                if (this.state.forecastOffset > slider.max) {
-                    this.state.forecastOffset = parseInt(slider.max);
+                if (this.state.forecastOffset > sliderMax) {
+                    this.state.forecastOffset = sliderMax;
                 }
-                slider.value = this.state.forecastOffset;
-                const percentage = slider.max > 0 ? (this.state.forecastOffset / slider.max) * 100 : 0;
+                slider.value = String(this.state.forecastOffset);
+                const percentage = sliderMax > 0 ? (this.state.forecastOffset / sliderMax) * 100 : 0;
                 slider.style.background = `linear-gradient(to right, var(--accent-blue) 0%, var(--accent-blue) ${percentage}%, rgba(255,255,255,0.1) ${percentage}%, rgba(255,255,255,0.1) 100%)`;
             }
             clearLoadingIndicator();
@@ -931,9 +933,9 @@ class SitesService {
         if (!isNaN(range)) {
             this.state.forecastMaxRange = range;
 
-            const slider = document.getElementById('forecast-slider');
+            const slider = /** @type {HTMLInputElement} */ (document.getElementById('forecast-slider'));
             if (slider) {
-                slider.max = range;
+                slider.max = String(range);
                 let currentOffset = this.state.forecastOffset;
                 if (currentOffset > range) {
                     currentOffset = range;
@@ -945,7 +947,7 @@ class SitesService {
     }
 
     updateWindLimits() {
-        const filterModeSelect = document.getElementById('filter-mode-select');
+        const filterModeSelect = /** @type {HTMLSelectElement} */ (document.getElementById('filter-mode-select'));
         let filterMode = filterModeSelect ? filterModeSelect.value : 'manual';
         const warningNotice = document.getElementById('hardware-warning-notice');
 
@@ -978,9 +980,12 @@ class SitesService {
 
         this.state.filterMode = filterMode;
 
-        const minVal = parseFloat(document.getElementById('limit-wind-min').value) || 0;
-        const maxVal = parseFloat(document.getElementById('limit-wind-max').value) || 25;
-        const deltaVal = parseFloat(document.getElementById('limit-gust-delta').value) || 10;
+        const minVal =
+            parseFloat(/** @type {HTMLInputElement} */ (document.getElementById('limit-wind-min')).value) || 0;
+        const maxVal =
+            parseFloat(/** @type {HTMLInputElement} */ (document.getElementById('limit-wind-max')).value) || 25;
+        const deltaVal =
+            parseFloat(/** @type {HTMLInputElement} */ (document.getElementById('limit-gust-delta')).value) || 10;
         this.state.limitWindMin = minVal;
         this.state.limitWindMax = maxVal;
         this.state.limitGustDelta = deltaVal;
@@ -1002,9 +1007,9 @@ class SitesService {
         if (isNaN(radius)) return;
         this.state.radiusLimit = radius;
 
-        const slider = document.getElementById('radius-slider');
+        const slider = /** @type {HTMLInputElement} */ (document.getElementById('radius-slider'));
         if (slider) {
-            slider.value = radius;
+            slider.value = String(radius);
         }
 
         const label = document.getElementById('radius-val-label');
@@ -1163,9 +1168,9 @@ class SitesService {
         this.state.forecastOffset = offset;
 
         // Synchronize HTML range slider position in the DOM
-        const slider = document.getElementById('forecast-slider');
+        const slider = /** @type {HTMLInputElement} */ (document.getElementById('forecast-slider'));
         if (slider) {
-            slider.value = offset;
+            slider.value = String(offset);
             const maxVal = parseInt(slider.max) || 120;
             const percentage = maxVal > 0 ? (offset / maxVal) * 100 : 0;
             slider.style.background = `linear-gradient(to right, var(--accent-blue) 0%, var(--accent-blue) ${percentage}%, rgba(255,255,255,0.1) ${percentage}%, rgba(255,255,255,0.1) 100%)`;
@@ -1366,7 +1371,7 @@ class SitesService {
 
     saveCurrentLocation() {
         if (!this.state.userLocation) return;
-        const inputEl = document.getElementById('address-input');
+        const inputEl = /** @type {HTMLInputElement} */ (document.getElementById('address-input'));
         const name =
             inputEl.value ||
             (inputEl.placeholder !== 'Adresse ou ville (ex: Annecy, Gourdon)...'
@@ -1394,8 +1399,9 @@ class SitesService {
         const loc = this.state.userPreferences.savedLocations[index];
         if (loc) {
             this.state.userLocation = { lat: loc.lat, lng: loc.lng, name: loc.name };
-            document.getElementById('address-input').value = loc.name;
-            document.getElementById('address-input').placeholder = 'Adresse ou ville (ex: Annecy, Gourdon)...';
+            /** @type {HTMLInputElement} */ (document.getElementById('address-input')).value = loc.name;
+            /** @type {HTMLInputElement} */ (document.getElementById('address-input')).placeholder =
+                'Adresse ou ville (ex: Annecy, Gourdon)...';
             document.getElementById('address-status-message').innerHTML =
                 '<i class="ri-check-line"></i> Lieu favori chargé';
             const btnSave = document.getElementById('btn-save-location');

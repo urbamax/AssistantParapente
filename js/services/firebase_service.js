@@ -190,7 +190,9 @@ export const FirebaseAuthEngine = {
 
     // UI Helpers
     openAuthModal: function () {
-        const overlay = document.getElementById('auth-modal-overlay');
+        const overlay = /** @type {HTMLDialogElement & { _cancelBound?: boolean }} */ (
+            document.getElementById('auth-modal-overlay')
+        );
         if (overlay) {
             if (typeof overlay.showModal === 'function' && !overlay.open) {
                 overlay.showModal();
@@ -211,7 +213,9 @@ export const FirebaseAuthEngine = {
     },
 
     closeAuthModal: function () {
-        const overlay = document.getElementById('auth-modal-overlay');
+        const overlay = /** @type {HTMLDialogElement & { _cancelBound?: boolean }} */ (
+            document.getElementById('auth-modal-overlay')
+        );
         if (overlay) {
             overlay.classList.remove('active');
             setTimeout(() => {
@@ -332,9 +336,9 @@ export const FirebaseAuthEngine = {
         this.clearAlerts();
 
         // Lire les champs directement dans le DOM
-        const emailEl = document.getElementById('register-email');
-        const passwordEl = document.getElementById('register-password');
-        const confirmEl = document.getElementById('register-confirm-password');
+        const emailEl = /** @type {HTMLInputElement} */ (document.getElementById('register-email'));
+        const passwordEl = /** @type {HTMLInputElement} */ (document.getElementById('register-password'));
+        const confirmEl = /** @type {HTMLInputElement} */ (document.getElementById('register-confirm-password'));
         const email = emailEl ? emailEl.value.trim() : '';
         const password = passwordEl ? passwordEl.value : '';
         const confirmPassword = confirmEl ? confirmEl.value : '';
@@ -359,7 +363,7 @@ export const FirebaseAuthEngine = {
             this.showStatus('Création du compte...', 'info');
 
             // Set persistence dynamically
-            const rememberMeEl = document.getElementById('register-remember-me');
+            const rememberMeEl = /** @type {HTMLInputElement} */ (document.getElementById('register-remember-me'));
             const rememberMe = rememberMeEl ? rememberMeEl.checked : true;
             await setPersistence(auth, rememberMe ? indexedDBLocalPersistence : browserSessionPersistence);
 
@@ -384,8 +388,8 @@ export const FirebaseAuthEngine = {
         this.clearAlerts();
 
         // Lire les champs directement dans le DOM (les args du dispatcher ne sont pas exploitables)
-        const emailEl = document.getElementById('login-email');
-        const passwordEl = document.getElementById('login-password');
+        const emailEl = /** @type {HTMLInputElement} */ (document.getElementById('login-email'));
+        const passwordEl = /** @type {HTMLInputElement} */ (document.getElementById('login-password'));
         const email = emailEl ? emailEl.value.trim() : '';
         const password = passwordEl ? passwordEl.value : '';
 
@@ -400,7 +404,7 @@ export const FirebaseAuthEngine = {
             this.showStatus('Connexion...', 'info');
 
             // Set persistence dynamically
-            const rememberMeEl = document.getElementById('login-remember-me');
+            const rememberMeEl = /** @type {HTMLInputElement} */ (document.getElementById('login-remember-me'));
             const rememberMe = rememberMeEl ? rememberMeEl.checked : true;
             await setPersistence(auth, rememberMe ? indexedDBLocalPersistence : browserSessionPersistence);
 
@@ -548,7 +552,7 @@ export const FirebaseAuthEngine = {
             });
 
             const mergedLogbook = Array.from(mergedLogbookMap.values());
-            mergedLogbook.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+            mergedLogbook.sort((a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime());
 
             StorageService.set(StorageService.KEYS.LOGBOOK_DATA, mergedLogbook);
 
@@ -1118,7 +1122,7 @@ export const FirebaseAuthEngine = {
         const reader = new FileReader();
         reader.onload = async (event) => {
             try {
-                const data = JSON.parse(event.target.result);
+                const data = JSON.parse(String(event.target.result));
 
                 // Validation minimale : vérifie la présence des méta-données
                 if (!data._meta || data._meta.appName !== 'AssistantParapente') {

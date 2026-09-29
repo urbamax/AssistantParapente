@@ -38,7 +38,7 @@ class LogbookViewClass extends BaseView {
 
             // Note: input change events
             container.addEventListener('change', (e) => {
-                const target = e.target;
+                const target = /** @type {HTMLInputElement} */ (e.target);
                 if (target.id === 'lb-voile' || target.id === 'lb-sellette') {
                     LogbookView.setSelectOrAutre(target.id, target.id + '-autre', target.value);
                 } else if (
@@ -58,10 +58,10 @@ class LogbookViewClass extends BaseView {
 
             // Logbook form submit
             container.addEventListener('submit', (e) => {
-                if (e.target.id === 'logbook-add-form') {
+                if (/** @type {HTMLElement} */ (e.target).id === 'logbook-add-form') {
                     e.preventDefault();
                     LogbookView.submitForm();
-                } else if (e.target.id === 'equip-form') {
+                } else if (/** @type {HTMLElement} */ (e.target).id === 'equip-form') {
                     e.preventDefault();
                     // Equipment form doesn't have an explicit submit function globally, it is handled in renderEquipment
                 }
@@ -85,7 +85,7 @@ class LogbookViewClass extends BaseView {
         const wear = LogbookService.computeEquipmentWear();
         const alertCount = Object.values(wear).filter((s) => s.alerts.dateAlert || s.alerts.hoursAlert).length;
         if (alertCount > 0) {
-            badge.textContent = alertCount;
+            badge.textContent = String(alertCount);
             badge.style.display = 'flex';
         } else {
             badge.style.display = 'none';
@@ -189,12 +189,13 @@ class LogbookViewClass extends BaseView {
         // Populate dropdowns initially
         this.populateEquipmentDropdowns();
 
-        const eqTypeSelect = document.getElementById('eq-type');
+        const eqTypeSelect = /** @type {HTMLSelectElement} */ (document.getElementById('eq-type'));
         const windLimitsDiv = document.getElementById('eq-wind-limits');
 
         if (eqTypeSelect && windLimitsDiv) {
             eqTypeSelect.addEventListener('change', function (e) {
-                windLimitsDiv.style.display = e.target.value === 'voile' ? 'flex' : 'none';
+                windLimitsDiv.style.display =
+                    /** @type {HTMLInputElement} */ (e.target).value === 'voile' ? 'flex' : 'none';
             });
             // Initiale state
             windLimitsDiv.style.display = eqTypeSelect.value === 'voile' ? 'flex' : 'none';
@@ -202,8 +203,8 @@ class LogbookViewClass extends BaseView {
 
         // Setup event listeners for the dropdowns
         const setupAutreListener = (selectId, autreId) => {
-            const selectEl = document.getElementById(selectId);
-            const autreEl = document.getElementById(autreId);
+            const selectEl = /** @type {HTMLSelectElement} */ (document.getElementById(selectId));
+            const autreEl = /** @type {HTMLInputElement} */ (document.getElementById(autreId));
             if (selectEl && autreEl) {
                 selectEl.addEventListener('change', () => {
                     autreEl.style.display = selectEl.value === 'Autre' ? 'block' : 'none';
@@ -228,21 +229,29 @@ class LogbookViewClass extends BaseView {
             equipForm.onsubmit = (e) => {
                 e.preventDefault();
 
-                const idEdit = document.getElementById('eq-id-edit').value;
-                const periodicite = parseInt(document.getElementById('eq-periodicite').value, 10);
-                const periodiciteHeures = parseInt(document.getElementById('eq-periodicite-heures').value, 10);
-                const dateAchat = document.getElementById('eq-achat').value;
-                const derniereRevision = document.getElementById('eq-derniere-revision').value;
+                const idEdit = /** @type {HTMLInputElement} */ (document.getElementById('eq-id-edit')).value;
+                const periodicite = parseInt(
+                    /** @type {HTMLSelectElement} */ (document.getElementById('eq-periodicite')).value,
+                    10,
+                );
+                const periodiciteHeures = parseInt(
+                    /** @type {HTMLSelectElement} */ (document.getElementById('eq-periodicite-heures')).value,
+                    10,
+                );
+                const dateAchat = /** @type {HTMLInputElement} */ (document.getElementById('eq-achat')).value;
+                const derniereRevision = /** @type {HTMLInputElement} */ (
+                    document.getElementById('eq-derniere-revision')
+                ).value;
 
-                const type = document.getElementById('eq-type').value;
+                const type = /** @type {HTMLSelectElement} */ (document.getElementById('eq-type')).value;
 
                 // Extraire Marque, Modele, Taille, Couleur avec la logique "Autre"
                 const getValOrAutre = (selectId, autreId, localStorageKey, defaultList) => {
-                    const selectEl = document.getElementById(selectId);
+                    const selectEl = /** @type {HTMLSelectElement} */ (document.getElementById(selectId));
                     if (!selectEl) return '';
                     let value = selectEl.value;
                     if (value === 'Autre') {
-                        const inputEl = document.getElementById(autreId);
+                        const inputEl = /** @type {HTMLInputElement} */ (document.getElementById(autreId));
                         const rawVal = inputEl ? inputEl.value.trim() : '';
                         if (rawVal) {
                             value = rawVal;
@@ -297,7 +306,9 @@ class LogbookViewClass extends BaseView {
                 ]);
 
                 const equipDataObj = {
-                    nom: document.getElementById('eq-nom').value.trim() || `${marque} ${modele}`.trim(),
+                    nom:
+                        /** @type {HTMLInputElement} */ (document.getElementById('eq-nom')).value.trim() ||
+                        `${marque} ${modele}`.trim(),
                     marque: marque,
                     modele: modele,
                     taille: taille,
@@ -311,8 +322,12 @@ class LogbookViewClass extends BaseView {
                 };
 
                 if (type === 'voile') {
-                    equipDataObj.ventMin = parseInt(document.getElementById('eq-vent-min').value, 10) || 0;
-                    equipDataObj.ventMax = parseInt(document.getElementById('eq-vent-max').value, 10) || 25;
+                    equipDataObj.ventMin =
+                        parseInt(/** @type {HTMLInputElement} */ (document.getElementById('eq-vent-min')).value, 10) ||
+                        0;
+                    equipDataObj.ventMax =
+                        parseInt(/** @type {HTMLInputElement} */ (document.getElementById('eq-vent-max')).value, 10) ||
+                        25;
                 }
 
                 if (idEdit) {
@@ -340,8 +355,8 @@ class LogbookViewClass extends BaseView {
     }
 
     setSelectOrAutre(selectId, autreId, value) {
-        const selectEl = document.getElementById(selectId);
-        const autreEl = document.getElementById(autreId);
+        const selectEl = /** @type {HTMLSelectElement} */ (document.getElementById(selectId));
+        const autreEl = /** @type {HTMLInputElement} */ (document.getElementById(autreId));
         if (!selectEl) return;
         if (!value) {
             selectEl.value = '';
@@ -424,14 +439,14 @@ class LogbookViewClass extends BaseView {
         const modeleEl = document.getElementById('eq-modele');
         const tailleEl = document.getElementById('eq-taille');
         const couleurEl = document.getElementById('eq-couleur');
-        const nomEl = document.getElementById('eq-nom');
+        const nomEl = /** @type {HTMLInputElement} */ (document.getElementById('eq-nom'));
 
         if (!nomEl) return;
 
         const getVal = (selectEl, autreId) => {
             if (!selectEl) return '';
             if (selectEl.value === 'Autre') {
-                const autreEl = document.getElementById(autreId);
+                const autreEl = /** @type {HTMLInputElement} */ (document.getElementById(autreId));
                 return autreEl ? autreEl.value.trim() : '';
             }
             return selectEl.value;
@@ -488,23 +503,24 @@ class LogbookViewClass extends BaseView {
         if (this.currentFormType === type) return;
 
         // 1. Sauvegarder les valeurs des champs communs
-        const editId = document.getElementById('lb-id-edit')?.value || '';
-        const datetime = document.getElementById('lb-datetime')?.value || '';
+        const editId = /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit'))?.value || '';
+        const datetime = /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime'))?.value || '';
         const location =
             this.currentFormType === 'vol'
-                ? document.getElementById('lb-site')?.value
-                : document.getElementById('lb-lieu')?.value;
+                ? /** @type {HTMLInputElement} */ (document.getElementById('lb-site'))?.value
+                : /** @type {HTMLInputElement} */ (document.getElementById('lb-lieu'))?.value;
 
-        const voile = document.getElementById('lb-voile')?.value || '';
-        const voileAutre = document.getElementById('lb-voile-autre')?.value || '';
+        const voile = /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile'))?.value || '';
+        const voileAutre = /** @type {HTMLInputElement} */ (document.getElementById('lb-voile-autre'))?.value || '';
         const voileAutreVisible = document.getElementById('lb-voile-autre')?.style.display === 'block';
 
-        const sellette = document.getElementById('lb-sellette')?.value || '';
-        const selletteAutre = document.getElementById('lb-sellette-autre')?.value || '';
+        const sellette = /** @type {HTMLSelectElement} */ (document.getElementById('lb-sellette'))?.value || '';
+        const selletteAutre =
+            /** @type {HTMLInputElement} */ (document.getElementById('lb-sellette-autre'))?.value || '';
         const selletteAutreVisible = document.getElementById('lb-sellette-autre')?.style.display === 'block';
 
-        const duree = document.getElementById('lb-duree')?.value || '';
-        const commentaire = document.getElementById('lb-commentaire')?.value || '';
+        const duree = /** @type {HTMLInputElement} */ (document.getElementById('lb-duree'))?.value || '';
+        const commentaire = /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire'))?.value || '';
 
         const submitText = document.getElementById('lb-submit-btn')?.innerText || 'Enregistrer';
         const cancelBtnVisible = document.getElementById('lb-cancel-btn')?.style.display || 'none';
@@ -518,23 +534,25 @@ class LogbookViewClass extends BaseView {
 
         // 2. Réinjecter les valeurs dans le nouveau formulaire
         if (editId) {
-            const el = document.getElementById('lb-id-edit');
+            const el = /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit'));
             if (el) el.value = editId;
         }
         if (datetime) {
-            const el = document.getElementById('lb-datetime');
+            const el = /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime'));
             if (el) el.value = datetime;
         }
         if (location) {
-            const el = type === 'vol' ? document.getElementById('lb-site') : document.getElementById('lb-lieu');
+            const el = /** @type {HTMLInputElement} */ (
+                type === 'vol' ? document.getElementById('lb-site') : document.getElementById('lb-lieu')
+            );
             if (el) el.value = location;
         }
         if (voile) {
-            const el = document.getElementById('lb-voile');
+            const el = /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile'));
             if (el) {
                 el.value = voile;
                 if (voile === 'Autre') {
-                    const elAutre = document.getElementById('lb-voile-autre');
+                    const elAutre = /** @type {HTMLInputElement} */ (document.getElementById('lb-voile-autre'));
                     if (elAutre) {
                         elAutre.style.display = voileAutreVisible ? 'block' : 'none';
                         elAutre.value = voileAutre;
@@ -543,11 +561,11 @@ class LogbookViewClass extends BaseView {
             }
         }
         if (sellette) {
-            const el = document.getElementById('lb-sellette');
+            const el = /** @type {HTMLSelectElement} */ (document.getElementById('lb-sellette'));
             if (el) {
                 el.value = sellette;
                 if (sellette === 'Autre') {
-                    const elAutre = document.getElementById('lb-sellette-autre');
+                    const elAutre = /** @type {HTMLInputElement} */ (document.getElementById('lb-sellette-autre'));
                     if (elAutre) {
                         elAutre.style.display = selletteAutreVisible ? 'block' : 'none';
                         elAutre.value = selletteAutre;
@@ -556,11 +574,11 @@ class LogbookViewClass extends BaseView {
             }
         }
         if (duree) {
-            const el = document.getElementById('lb-duree');
+            const el = /** @type {HTMLInputElement} */ (document.getElementById('lb-duree'));
             if (el) el.value = duree;
         }
         if (commentaire) {
-            const el = document.getElementById('lb-commentaire');
+            const el = /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire'));
             if (el) el.value = commentaire;
         }
 
@@ -736,7 +754,7 @@ class LogbookViewClass extends BaseView {
         this.populateDropdowns();
         this.fillLastEquipment();
 
-        const uploadContainer = document.querySelector('.igc-upload-container');
+        const uploadContainer = /** @type {HTMLElement} */ (document.querySelector('.igc-upload-container'));
         if (uploadContainer) {
             uploadContainer.addEventListener('dragenter', (e) => {
                 e.preventDefault();
@@ -829,8 +847,8 @@ class LogbookViewClass extends BaseView {
         // Automatically fill voile and sellette with the last used ones
         if (LogbookService.getFlights().length > 0) {
             const lastSession = LogbookService.getFlights()[0];
-            const voileInput = document.getElementById('lb-voile');
-            const selletteInput = document.getElementById('lb-sellette');
+            const voileInput = /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile'));
+            const selletteInput = /** @type {HTMLSelectElement} */ (document.getElementById('lb-sellette'));
             if (voileInput && lastSession.voile) voileInput.value = lastSession.voile;
             if (selletteInput && lastSession.sellette) selletteInput.value = lastSession.sellette;
         }
@@ -877,25 +895,25 @@ class LogbookViewClass extends BaseView {
                     avgSpeedKmh: parsed.avgSpeedKmh,
                 };
 
-                const durationInput = document.getElementById('lb-duree');
+                const durationInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-duree'));
                 if (durationInput && parsed.duration > 0) {
                     durationInput.value = parsed.duration;
                 }
-                const datetimeInput = document.getElementById('lb-datetime');
+                const datetimeInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime'));
                 if (datetimeInput && parsed.dateStr) {
                     datetimeInput.value = parsed.dateStr;
                 }
 
-                const altMaxInput = document.getElementById('lb-altMax');
+                const altMaxInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-altMax'));
                 if (altMaxInput && parsed.maxAltitude !== null) {
                     altMaxInput.value = parsed.maxAltitude;
                 }
-                const gainInput = document.getElementById('lb-gain');
+                const gainInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-gain'));
                 if (gainInput && parsed.gain !== null) {
                     gainInput.value = parsed.gain;
                 }
 
-                const siteInput = document.getElementById('lb-site');
+                const siteInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-site'));
                 // Le vrai décollage (pas forcément le 1er point : vario allumé au parking,
                 // montée à pied…), voir IGCParser.detectTakeoffIndex.
                 const takeoff = parsed.points[parsed.takeoffIndex] || parsed.points[0];
@@ -944,7 +962,7 @@ class LogbookViewClass extends BaseView {
         this.currentIgcAltOffset = existingOffset;
         const box = document.getElementById('igc-alt-check');
         const info = document.getElementById('igc-alt-info');
-        const input = document.getElementById('lb-real-alt');
+        const input = /** @type {HTMLInputElement} */ (document.getElementById('lb-real-alt'));
         if (!box || !info || !input) return;
 
         const landing = Math.round(parsed.landingAlt);
@@ -958,16 +976,18 @@ class LogbookViewClass extends BaseView {
             ? `⚠️ <strong>Attention, c'est bizarre :</strong> altitude d'atterrissage négative (vario probablement mal calé au décollage). ${altitudes} Tu veux corriger ?`
             : `${altitudes} Tu peux les corriger si ton vario était mal calé.`;
         // Le point de référence (atterro ou décollage) dont l'utilisateur connaît l'altitude réelle
-        const radios = box.querySelectorAll('input[name="lb-alt-ref"]');
+        const radios = /** @type {NodeListOf<HTMLInputElement>} */ (box.querySelectorAll('input[name="lb-alt-ref"]'));
         const refAlt = () =>
-            box.querySelector('input[name="lb-alt-ref"]:checked').value === 'takeoff' ? takeoff : landing;
+            /** @type {HTMLInputElement} */ (box.querySelector('input[name="lb-alt-ref"]:checked')).value === 'takeoff'
+                ? takeoff
+                : landing;
         radios.forEach((r) => (r.checked = r.value === 'landing'));
-        input.value = existingOffset ? landing + existingOffset : '';
+        input.value = String(existingOffset ? landing + existingOffset : '');
 
         input.oninput = () => {
             const real = parseInt(input.value, 10);
             this.currentIgcAltOffset = Number.isNaN(real) ? 0 : real - refAlt();
-            const altMaxInput = document.getElementById('lb-altMax');
+            const altMaxInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-altMax'));
             if (altMaxInput && parsed.maxAltitude !== null) {
                 altMaxInput.value = parsed.maxAltitude + this.currentIgcAltOffset;
             }
@@ -982,24 +1002,26 @@ class LogbookViewClass extends BaseView {
     }
 
     submitForm() {
-        const datetime = document.getElementById('lb-datetime').value;
-        let voile = document.getElementById('lb-voile').value.trim();
+        const datetime = /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime')).value;
+        let voile = /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile')).value.trim();
         let sellette = document.getElementById('lb-sellette')
-            ? document.getElementById('lb-sellette').value.trim()
+            ? /** @type {HTMLSelectElement} */ (document.getElementById('lb-sellette')).value.trim()
             : '';
 
         if (voile === 'Autre') {
-            const voileAutreInput = document.getElementById('lb-voile-autre');
+            const voileAutreInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-voile-autre'));
             voile = voileAutreInput ? voileAutreInput.value.trim() : '';
         }
         if (sellette === 'Autre') {
-            const selletteAutreInput = document.getElementById('lb-sellette-autre');
+            const selletteAutreInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-sellette-autre'));
             sellette = selletteAutreInput ? selletteAutreInput.value.trim() : '';
         }
-        const duree = parseInt(document.getElementById('lb-duree').value, 10);
-        const commentaire = document.getElementById('lb-commentaire').value.trim();
+        const duree = parseInt(/** @type {HTMLInputElement} */ (document.getElementById('lb-duree')).value, 10);
+        const commentaire = /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire')).value.trim();
 
-        const editId = document.getElementById('lb-id-edit') ? document.getElementById('lb-id-edit').value : '';
+        const editId = document.getElementById('lb-id-edit')
+            ? /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit')).value
+            : '';
 
         const session = {
             id: editId
@@ -1016,14 +1038,16 @@ class LogbookViewClass extends BaseView {
         };
 
         if (this.currentFormType === 'vol') {
-            session.site = document.getElementById('lb-site').value.trim();
-            session.typeVol = document.getElementById('lb-typeVol').value;
+            session.site = /** @type {HTMLInputElement} */ (document.getElementById('lb-site')).value.trim();
+            session.typeVol = /** @type {HTMLSelectElement} */ (document.getElementById('lb-typeVol')).value;
 
-            const techDecoEl = document.getElementById('lb-tech-decollage');
+            const techDecoEl = /** @type {HTMLSelectElement} */ (document.getElementById('lb-tech-decollage'));
             if (techDecoEl) {
                 let techDecollage = techDecoEl.value;
                 if (techDecollage === 'Autre') {
-                    const techAutreInput = document.getElementById('lb-tech-decollage-autre');
+                    const techAutreInput = /** @type {HTMLInputElement} */ (
+                        document.getElementById('lb-tech-decollage-autre')
+                    );
                     let rawTech = techAutreInput ? techAutreInput.value.trim() : '';
                     if (rawTech) {
                         rawTech = capitalizeFirstLetter(rawTech);
@@ -1045,10 +1069,10 @@ class LogbookViewClass extends BaseView {
                 session.techDecollage = techDecollage;
             }
 
-            const altMax = document.getElementById('lb-altMax').value;
+            const altMax = /** @type {HTMLInputElement} */ (document.getElementById('lb-altMax')).value;
             if (altMax) session.altitudeMax = parseInt(altMax, 10);
 
-            const gain = document.getElementById('lb-gain').value;
+            const gain = /** @type {HTMLInputElement} */ (document.getElementById('lb-gain')).value;
             if (gain) session.gain = parseInt(gain, 10);
 
             if (this.currentTraceData) {
@@ -1072,8 +1096,10 @@ class LogbookViewClass extends BaseView {
                 this.currentIgcAltOffset = null;
             }
         } else {
-            session.lieu = document.getElementById('lb-lieu').value.trim();
-            const checkboxes = document.querySelectorAll('input[name="lb-typeExercice"]:checked');
+            session.lieu = /** @type {HTMLInputElement} */ (document.getElementById('lb-lieu')).value.trim();
+            const checkboxes = /** @type {NodeListOf<HTMLInputElement>} */ (
+                document.querySelectorAll('input[name="lb-typeExercice"]:checked')
+            );
             if (checkboxes.length > 0) {
                 session.typeExercice = Array.from(checkboxes).map((cb) => cb.value);
             } else {
@@ -1134,9 +1160,9 @@ class LogbookViewClass extends BaseView {
     }
 
     resetForm() {
-        const form = document.getElementById('logbook-add-form');
+        const form = /** @type {HTMLFormElement} */ (document.getElementById('logbook-add-form'));
         if (form) form.reset();
-        const idEditField = document.getElementById('lb-id-edit');
+        const idEditField = /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit'));
         if (idEditField) idEditField.value = '';
         const submitBtn = document.getElementById('lb-submit-btn');
         if (submitBtn) submitBtn.innerText = 'Enregistrer';
@@ -1160,13 +1186,13 @@ class LogbookViewClass extends BaseView {
         this.switchTab('add');
 
         // Populate common fields
-        document.getElementById('lb-id-edit').value = session.id;
-        document.getElementById('lb-datetime').value = session.datetime;
+        /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit')).value = session.id;
+        /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime')).value = session.datetime;
 
         // Helper pour "Autre..."
         const setSelectOrAutre = (selectId, autreId, value) => {
-            const selectEl = document.getElementById(selectId);
-            const autreEl = document.getElementById(autreId);
+            const selectEl = /** @type {HTMLSelectElement} */ (document.getElementById(selectId));
+            const autreEl = /** @type {HTMLInputElement} */ (document.getElementById(autreId));
             if (!selectEl || !value) return;
 
             // On regarde si la valeur existe dans les options
@@ -1186,18 +1212,20 @@ class LogbookViewClass extends BaseView {
         setSelectOrAutre('lb-voile', 'lb-voile-autre', session.voile);
         setSelectOrAutre('lb-sellette', 'lb-sellette-autre', session.sellette);
 
-        document.getElementById('lb-duree').value = session.duree;
-        document.getElementById('lb-commentaire').value = session.commentaire || '';
+        /** @type {HTMLInputElement} */ (document.getElementById('lb-duree')).value = session.duree;
+        /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire')).value =
+            session.commentaire || '';
 
         // Populate specific fields
         if (session.type === 'vol') {
-            document.getElementById('lb-site').value = session.site || '';
-            document.getElementById('lb-typeVol').value = session.typeVol || 'Plouf';
+            /** @type {HTMLInputElement} */ (document.getElementById('lb-site')).value = session.site || '';
+            /** @type {HTMLSelectElement} */ (document.getElementById('lb-typeVol')).value = session.typeVol || 'Plouf';
 
             setSelectOrAutre('lb-tech-decollage', 'lb-tech-decollage-autre', session.techDecollage);
 
-            if (session.altitudeMax) document.getElementById('lb-altMax').value = session.altitudeMax;
-            if (session.gain) document.getElementById('lb-gain').value = session.gain;
+            if (session.altitudeMax)
+                /** @type {HTMLInputElement} */ (document.getElementById('lb-altMax')).value = session.altitudeMax;
+            if (session.gain) /** @type {HTMLInputElement} */ (document.getElementById('lb-gain')).value = session.gain;
 
             // Vol déjà enregistré : on peut corriger (ou annuler) l'altitude d'une trace ajoutée avant
             if (session.rawIgc) {
@@ -1210,9 +1238,11 @@ class LogbookViewClass extends BaseView {
                 if (filenameLabel) filenameLabel.textContent = 'Trace GPS (existante)';
             }
         } else {
-            document.getElementById('lb-lieu').value = session.lieu || '';
+            /** @type {HTMLInputElement} */ (document.getElementById('lb-lieu')).value = session.lieu || '';
             if (session.typeExercice) {
-                const checkboxes = document.querySelectorAll('input[name="lb-typeExercice"]');
+                const checkboxes = /** @type {NodeListOf<HTMLInputElement>} */ (
+                    document.querySelectorAll('input[name="lb-typeExercice"]')
+                );
                 const typesArray = Array.isArray(session.typeExercice) ? session.typeExercice : [session.typeExercice];
                 checkboxes.forEach((cb) => {
                     cb.checked = typesArray.includes(cb.value);
@@ -1269,9 +1299,9 @@ class LogbookViewClass extends BaseView {
     // l'historique ferme la trace GPS ouverte et détruit sa carte 3D (position, lecture).
     refreshSessionWeather(sessionId) {
         const session = LogbookService.getFlightById(sessionId);
-        const slot = [...document.querySelectorAll('[data-session-weather]')].find(
-            (el) => el.dataset.sessionWeather === String(sessionId),
-        );
+        const slot = [
+            .../** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('[data-session-weather]')),
+        ].find((el) => el.dataset.sessionWeather === String(sessionId));
         if (session && slot) slot.innerHTML = this.renderSessionWeatherHtml(session);
     }
 
@@ -1771,8 +1801,8 @@ class LogbookViewClass extends BaseView {
         const equip = LogbookService.getEquipmentById(id);
         if (!equip) return;
 
-        document.getElementById('eq-id-edit').value = equip.id;
-        document.getElementById('eq-nom').value = equip.nom || '';
+        /** @type {HTMLInputElement} */ (document.getElementById('eq-id-edit')).value = equip.id;
+        /** @type {HTMLInputElement} */ (document.getElementById('eq-nom')).value = equip.nom || '';
 
         // Populate and set dropdowns for brand, model, size, color
         this.populateEquipmentDropdowns();
@@ -1781,7 +1811,7 @@ class LogbookViewClass extends BaseView {
         this.setSelectOrAutre('eq-taille', 'eq-taille-autre', equip.taille || '');
         this.setSelectOrAutre('eq-couleur', 'eq-couleur-autre', equip.couleur || '');
 
-        const typeSelect = document.getElementById('eq-type');
+        const typeSelect = /** @type {HTMLSelectElement} */ (document.getElementById('eq-type'));
         typeSelect.value = equip.type || 'voile';
 
         const windLimitsDiv = document.getElementById('eq-wind-limits');
@@ -1789,23 +1819,26 @@ class LogbookViewClass extends BaseView {
             windLimitsDiv.style.display = typeSelect.value === 'voile' ? 'flex' : 'none';
         }
 
-        const minField = document.getElementById('eq-vent-min');
+        const minField = /** @type {HTMLInputElement} */ (document.getElementById('eq-vent-min'));
         if (minField) minField.value = equip.ventMin !== undefined ? equip.ventMin : 0;
 
-        const maxField = document.getElementById('eq-vent-max');
+        const maxField = /** @type {HTMLInputElement} */ (document.getElementById('eq-vent-max'));
         if (maxField) maxField.value = equip.ventMax !== undefined ? equip.ventMax : 25;
 
-        document.getElementById('eq-achat').value = equip.dateAchat || '';
-        document.getElementById('eq-derniere-revision').value = equip.derniereRevision || '';
+        /** @type {HTMLInputElement} */ (document.getElementById('eq-achat')).value = equip.dateAchat || '';
+        /** @type {HTMLInputElement} */ (document.getElementById('eq-derniere-revision')).value =
+            equip.derniereRevision || '';
 
-        const periodiciteSelect = document.getElementById('eq-periodicite');
+        const periodiciteSelect = /** @type {HTMLSelectElement} */ (document.getElementById('eq-periodicite'));
         if (equip.periodicite !== undefined) {
             periodiciteSelect.value = equip.periodicite;
         } else {
             periodiciteSelect.value = '24'; // Default
         }
 
-        const periodiciteHeuresSelect = document.getElementById('eq-periodicite-heures');
+        const periodiciteHeuresSelect = /** @type {HTMLSelectElement} */ (
+            document.getElementById('eq-periodicite-heures')
+        );
         if (periodiciteHeuresSelect) {
             if (equip.periodiciteHeures !== undefined) {
                 periodiciteHeuresSelect.value = equip.periodiciteHeures;
@@ -1831,12 +1864,12 @@ class LogbookViewClass extends BaseView {
     }
 
     resetEquipmentForm() {
-        const form = document.getElementById('equip-form');
+        const form = /** @type {HTMLFormElement} */ (document.getElementById('equip-form'));
         if (form) form.reset();
 
         // Hide all "Autre" text inputs
         ['eq-marque-autre', 'eq-modele-autre', 'eq-taille-autre', 'eq-couleur-autre'].forEach((id) => {
-            const el = document.getElementById(id);
+            const el = /** @type {HTMLInputElement} */ (document.getElementById(id));
             if (el) {
                 el.style.display = 'none';
                 el.value = '';
@@ -1846,7 +1879,7 @@ class LogbookViewClass extends BaseView {
         const windLimitsDiv = document.getElementById('eq-wind-limits');
         if (windLimitsDiv) windLimitsDiv.style.display = 'flex'; // Default type is 'voile'
 
-        const idEditField = document.getElementById('eq-id-edit');
+        const idEditField = /** @type {HTMLInputElement} */ (document.getElementById('eq-id-edit'));
         if (idEditField) idEditField.value = '';
 
         const submitBtn = document.getElementById('eq-submit-btn');
