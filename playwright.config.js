@@ -6,7 +6,8 @@ export default defineConfig({
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 2 : 0,
     workers: process.env.CI ? 1 : undefined,
-    reporter: 'html',
+    // En CI : annotations GitHub + rapport HTML téléversé en cas d'échec (spec 006).
+    reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'html',
     use: {
         baseURL: 'http://localhost:8080',
         trace: 'on-first-retry',

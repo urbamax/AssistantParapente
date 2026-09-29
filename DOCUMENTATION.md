@@ -369,7 +369,7 @@ AppEvents.register('myCustomAction', (args, event, target) => {
 
 ## 🔍 Verification & Debugging Toolkit
 
-Automated checks (all run in CI except end-to-end, which must be run locally before merging):
+Automated checks (all run in CI on every pull request and push to `main`: job `lint-and-test`, and job `e2e` for Playwright on Chromium + WebKit with the HTML report uploaded on failure; the Python tests of `scripts/` run in `lint-and-test`):
 ```bash
 npm run lint && npm run format:check && npm run typecheck
 npm test            # Vitest unit tests (tests/**, happy-dom; tests/functions/** run under node)
