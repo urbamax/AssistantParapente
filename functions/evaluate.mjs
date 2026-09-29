@@ -8,6 +8,7 @@
  */
 import { normalizeForecastValue } from './shared/weatherScoring.mjs';
 import { degreesToCardinal } from './shared/geo_utils.mjs';
+import { t } from './shared/i18n.mjs';
 
 /** Même marge que l'application (sites_service.js) : vol autorisé de lever−30 min à coucher−30 min. */
 const LEGAL_MARGIN_S = 30 * 60;
@@ -61,6 +62,7 @@ export function buildHourlyForecast(data, nowMs) {
         precipitation: normalizeForecastValue(hourly.precipitation?.[idx], 'precipitation'),
         cape: normalizeForecastValue(hourly.cape?.[idx], 'cape'),
         isDaytime,
+        timeMs: Number(hourly.time[idx]) * 1000,
     };
 }
 
@@ -95,4 +97,37 @@ export function nextState(previous, outcome) {
     }
     if (outcome.status === 'flyable') return outcome.orientationUnknown ? 'unknown' : true;
     return false;
+}
+
+/** Source des prévisions du serveur : point d'accès « forecast » d'Open-Meteo (sélection automatique). */
+const NOTIFICATION_SOURCE_KEY = 'forecast.models.best_match';
+
+const PARIS_HOUR = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', hourCycle: 'h23' });
+
+/**
+ * Texte de la notification « conditions favorables » (spec 005, audit A3) : jamais « volable »,
+ * avec l'heure de prévision (heure de Paris), le vent, la source et le rappel que la décision
+ * revient au pilote, à vérifier sur place (constitution, principe II).
+ * @param {{nom?: string, name?: string}} site
+ * @param {{windSpeed: number|null, windGust: number|null, windCard: string|null}} weather
+ * @param {number} forecastTimeMs
+ * @returns {{title: string, body: string}}
+ */
+export function buildNotification(site, weather, forecastTimeMs) {
+    const value = (v) => (v === null || v === undefined ? '—' : String(v));
+    const name = (site && (site.nom || site.name)) || t('notification.defaultSite');
+    // Heure seule, en chiffres (« 14 ») : le texte ajoute lui-même « à … h ».
+    const hourNumber = PARIS_HOUR.formatToParts(new Date(forecastTimeMs)).find((p) => p.type === 'hour').value;
+    const hour = t('notification.hour', { hour: hourNumber });
+    return {
+        title: t('notification.title', { site: name }),
+        body: t('notification.body', {
+            hour,
+            card: value(weather && weather.windCard),
+            speed: value(weather && weather.windSpeed),
+            gust: value(weather && weather.windGust),
+            source: t(NOTIFICATION_SOURCE_KEY),
+            reminder: t('notification.reminder'),
+        }),
+    };
 }

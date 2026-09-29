@@ -1,7 +1,13 @@
 // @vitest-environment node
 // Code serveur (Cloud Function) : environnement Node, pas de DOM simulé.
 import { describe, it, expect } from 'vitest';
-import { buildHourlyForecast, nextState, shouldNotify, toScoringPrefs } from '../../functions/evaluate.mjs';
+import {
+    buildHourlyForecast,
+    buildNotification,
+    nextState,
+    shouldNotify,
+    toScoringPrefs,
+} from '../../functions/evaluate.mjs';
 import { evaluateSpotForecast as serverEvaluate } from '../../functions/shared/weatherScoring.mjs';
 import { evaluateSpotForecast as appEvaluate } from '../../js/weatherScoring.js';
 import {
@@ -138,5 +144,39 @@ describe('server and app reach the same outcome (spec 001, FR-012, SC-006)', () 
         ]) {
             expect(serverEvaluate(site, weather, DEFAULT_PREFS)).toEqual(appEvaluate(site, weather, DEFAULT_PREFS));
         }
+    });
+});
+
+describe('server: notification wording (spec 005, audit A3)', () => {
+    const weather = { windSpeed: 15, windGust: 20, windCard: 'S' };
+    const NOON_UTC_SUMMER = Date.UTC(2026, 6, 15, 12, 0); // 14 h à Paris (heure d'été)
+    const REMINDER = 'Avis basé sur des prévisions : la décision vous appartient, vérifiez sur place.';
+
+    it('announces favourable conditions without saying the site is flyable', () => {
+        const n = buildNotification({ nom: 'Mont Test' }, weather, NOON_UTC_SUMMER);
+        expect(n.title).toBe('Mont Test : conditions favorables annoncées');
+        expect(`${n.title} ${n.body}`).not.toMatch(/volable/i);
+    });
+
+    it('gives the hour in Paris time, the wind, the source, and ends with the reminder', () => {
+        const { body } = buildNotification({ nom: 'Mont Test' }, weather, NOON_UTC_SUMMER);
+        expect(body.startsWith('Prévision à 14 h : vent S 15 km/h')).toBe(true);
+        expect(body).not.toMatch(/h h|pour à/);
+        expect(body).toContain('S 15 km/h (rafales 20)');
+        expect(body).toContain('Sélection automatique (Open-Meteo, multi-modèles)');
+        expect(body.endsWith(REMINDER)).toBe(true);
+        expect(body.length).toBeLessThanOrEqual(240);
+    });
+
+    it('falls back to « Site favori » and « — » for missing values', () => {
+        const n = buildNotification({}, { windSpeed: null, windGust: null, windCard: null }, NOON_UTC_SUMMER);
+        expect(n.title).toBe('Site favori : conditions favorables annoncées');
+        expect(n.body).toContain('— — km/h (rafales —)');
+        expect(n.body).not.toContain('null');
+    });
+
+    it('buildHourlyForecast returns the time of the selected hour', () => {
+        const w = buildHourlyForecast(payload({ now: NOW }), NOW * 1000);
+        expect(w.timeMs).toBe(NOW * 1000);
     });
 });

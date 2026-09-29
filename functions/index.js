@@ -90,15 +90,12 @@ exports.checkFavoriteSitesWeather = onSchedule('every 30 minutes', async () => {
                 // Notification uniquement sur la transition non-volable -> volable, avec des données
                 // complètes et une orientation connue (spec 001, FR-011) ; jamais à chaque exécution
                 // tant que ça reste volable (sinon spam toutes les 30 min).
-                // Le texte de la notification relève d'une autre spécification (audit, écart A3).
                 if (shared.shouldNotify(previousState[siteId], outcome)) {
                     await messaging
                         .send({
                             token: user.fcmToken,
-                            notification: {
-                                title: `${site.nom || site.name || 'Site favori'} est volable !`,
-                                body: `Vent ${weather.windSpeed} km/h (${weather.windCard}), conditions favorables maintenant.`,
-                            },
+                            // Informe sans autoriser : ni « volable », ni certitude (spec 005, audit A3).
+                            notification: shared.buildNotification(site, weather, weather.timeMs),
                         })
                         .catch((err) => console.error(`Échec envoi push (${userDoc.id}/${siteId}):`, err.message));
                 }
