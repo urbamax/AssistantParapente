@@ -15,18 +15,18 @@ description: "Task list for safe and faithful site details"
 
 ## Phase 1: Setup
 
-- [ ] T001 [P] Create `tests/core/security.test.js` importing `escapeHTML`, `renderSiteText`, `safeHttpUrl` from `js/core/security.js` (empty describe blocks filled by later tasks)
-- [ ] T002 [P] Create `tests/scripts/__init__.py` (empty) so `python3 -m unittest discover -s tests/scripts` finds the Python tests
+- [X] T001 [P] Create `tests/core/security.test.js` importing `escapeHTML`, `renderSiteText`, `safeHttpUrl` from `js/core/security.js` (empty describe blocks filled by later tasks)
+- [X] T002 [P] Create `tests/scripts/__init__.py` (empty) so `python3 -m unittest discover -s tests/scripts` finds the Python tests
 
 ---
 
 ## Phase 2: Foundational — renderer and safe URLs (serves US1 and US2)
 
-- [ ] T003 [P] [US2] In `tests/core/security.test.js`, test `renderSiteText` per `contracts/sanitizer.md`: keeps `<br>`, `<br/>`, `<br />`, `<b>x</b>`, `<a href="https://a.fr/p?x=1&y=2">t</a>` (→ `target="_blank" rel="noopener noreferrer"`); shows as text « <Les terrains », « <<corniches>> », « < 25 km/h », unclosed `<b>`; at least 10 attack patterns produce no element other than `br`/`b`/`a[href^=http]` and no attribute other than `href`/`target`/`rel` (parse the output with `document.createElement('div').innerHTML`): `<script>`, `<img src=x onerror=…>`, `<svg onload=…>`, `<a href="javascript:…">`, `<a href="data:…">`, `<a href="https://x" onclick="…">`, `<b onmouseover=…>`, `<iframe>`, `"><script>`, `<a href='https://x'>` (single quotes), `<A HREF="HTTPS://X">` (case); a non-http link keeps its text without link; `null`/`undefined` → `''`
-- [ ] T004 [P] [US2] In `tests/core/security.test.js`, test `safeHttpUrl`: `http(s)` kept, `javascript:`, `data:`, relative, empty, malformed → `''`
-- [ ] T005 [US2] Run `npx vitest run tests/core/security.test.js`; confirm T003–T004 fail
-- [ ] T006 [US2] Implement `renderSiteText` and `safeHttpUrl` in `js/core/security.js` exactly as `contracts/sanitizer.md`
-- [ ] T007 [US2] Run `npx vitest run tests/core/security.test.js`; all pass
+- [X] T003 [P] [US2] In `tests/core/security.test.js`, test `renderSiteText` per `contracts/sanitizer.md`: keeps `<br>`, `<br/>`, `<br />`, `<b>x</b>`, `<a href="https://a.fr/p?x=1&y=2">t</a>` (→ `target="_blank" rel="noopener noreferrer"`); shows as text « <Les terrains », « <<corniches>> », « < 25 km/h », unclosed `<b>`; at least 10 attack patterns produce no element other than `br`/`b`/`a[href^=http]` and no attribute other than `href`/`target`/`rel` (parse the output with `document.createElement('div').innerHTML`): `<script>`, `<img src=x onerror=…>`, `<svg onload=…>`, `<a href="javascript:…">`, `<a href="data:…">`, `<a href="https://x" onclick="…">`, `<b onmouseover=…>`, `<iframe>`, `"><script>`, `<a href='https://x'>` (single quotes), `<A HREF="HTTPS://X">` (case); a non-http link keeps its text without link; `null`/`undefined` → `''`
+- [X] T004 [P] [US2] In `tests/core/security.test.js`, test `safeHttpUrl`: `http(s)` kept, `javascript:`, `data:`, relative, empty, malformed → `''`
+- [X] T005 [US2] Run `npx vitest run tests/core/security.test.js`; confirm T003–T004 fail
+- [X] T006 [US2] Implement `renderSiteText` and `safeHttpUrl` in `js/core/security.js` exactly as `contracts/sanitizer.md`
+- [X] T007 [US2] Run `npx vitest run tests/core/security.test.js`; all pass
 
 ---
 
@@ -34,12 +34,12 @@ description: "Task list for safe and faithful site details"
 
 **Independent Test**: whole-database text equality; SORGIA / MATHAY / NOTRE-DAME-DE-LA-MER in the browser.
 
-- [ ] T008 [P] [US1] Create `tests/data/sites_data_text.test.js`: for every site of `js/data/sites_data.json` and every detail field (`dangers, restrictions, observations, acces_topo, secours_acces, aerologie_ideale, reglementation, praticabilite, conventionnement, structure_gestionnaire`), `div.innerHTML = renderSiteText(v)` then `div.textContent` equals `v` with only the restored tags removed (SC-001)
-- [ ] T009 [P] [US1] Create `tests/views/sites_details.test.js`: `SitesView.buildSiteCardHtml(...)` for `sorgia-602`, `mathay-13452`, `notre-dame-de-la-mer-1098` (loaded from `js/data/sites_data.json`) contains « <Les terrains concédés » / « <<corniches calcaires du Doubs>> » as text, the charter link with `rel="noopener noreferrer"`; `col-des-limouches-728` keeps its bold (`<b>`); a site with `url: 'javascript:alert(1)'` renders no « Fiche FFVL » link; `buildMapPopupHtml` likewise
-- [ ] T010 [US1] In `tests/e2e/sites_flow.spec.js`: with saved favourites `sorgia-602` and `notre-dame-de-la-mer-1098` (favourites are always shown), expand SORGIA's card and « Voir plus d'infos »: « <Les terrains concédés » is visible; NOTRE-DAME-DE-LA-MER shows a link to `thermiquefrancilien.org` with `target="_blank"` and a proper apostrophe « l’objectif » (US3, after T022)
-- [ ] T011 [US1] Run `npx vitest run tests/data/sites_data_text.test.js tests/views/sites_details.test.js` and `npx playwright test tests/e2e/sites_flow.spec.js --project=chromium`; confirm T009–T010 fail (T008 passes: it tests the renderer on real data)
-- [ ] T012 [US1] In `js/views/sites.js`, render the 10 detail fields (around lines 2289–2406) with `renderSiteText(site.<field>)` and the two « Fiche FFVL » links (around lines 827 and 2217) only when `safeHttpUrl(site.url)` is non-empty, with the URL escaped
-- [ ] T013 [US1] Run `npm test` and `npx playwright test tests/e2e/sites_flow.spec.js --project=chromium`; T008–T010 pass
+- [X] T008 [P] [US1] Create `tests/data/sites_data_text.test.js`: for every site of `js/data/sites_data.json` and every detail field (`dangers, restrictions, observations, acces_topo, secours_acces, aerologie_ideale, reglementation, praticabilite, conventionnement, structure_gestionnaire`), `div.innerHTML = renderSiteText(v)` then `div.textContent` equals `v` with only the restored tags removed (SC-001)
+- [X] T009 [P] [US1] Create `tests/views/sites_details.test.js`: `SitesView.buildSiteCardHtml(...)` for `sorgia-602`, `mathay-13452`, `notre-dame-de-la-mer-1098` (loaded from `js/data/sites_data.json`) contains « <Les terrains concédés » / « <<corniches calcaires du Doubs>> » as text, the charter link with `rel="noopener noreferrer"`; `col-des-limouches-728` keeps its bold (`<b>`); a site with `url: 'javascript:alert(1)'` renders no « Fiche FFVL » link; `buildMapPopupHtml` likewise
+- [X] T010 [US1] In `tests/e2e/sites_flow.spec.js`: with saved favourites `sorgia-602` and `notre-dame-de-la-mer-1098` (favourites are always shown), expand SORGIA's card and « Voir plus d'infos »: « <Les terrains concédés » is visible; NOTRE-DAME-DE-LA-MER shows a link to `thermiquefrancilien.org` with `target="_blank"` and a proper apostrophe « l’objectif » (US3, after T022)
+- [X] T011 [US1] Run `npx vitest run tests/data/sites_data_text.test.js tests/views/sites_details.test.js` and `npx playwright test tests/e2e/sites_flow.spec.js --project=chromium`; confirm T009–T010 fail (T008 passes: it tests the renderer on real data)
+- [X] T012 [US1] In `js/views/sites.js`, render the 10 detail fields (around lines 2289–2406) with `renderSiteText(site.<field>)` and the two « Fiche FFVL » links (around lines 827 and 2217) only when `safeHttpUrl(site.url)` is non-empty, with the URL escaped
+- [X] T013 [US1] Run `npm test` and `npx playwright test tests/e2e/sites_flow.spec.js --project=chromium`; T008–T010 pass
 
 ---
 
