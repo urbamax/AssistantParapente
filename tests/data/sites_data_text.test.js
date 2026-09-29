@@ -49,3 +49,20 @@ describe('site details shown in full (spec 003, SC-001)', () => {
         expect(lost).toEqual([]);
     });
 });
+
+describe('no broken Windows-1252 characters (spec 003, SC-003)', () => {
+    const C1 = /[\u0080-\u009f]/;
+    function brokenFields(sites) {
+        const out = [];
+        for (const site of sites) {
+            for (const [key, value] of Object.entries(site)) {
+                if (typeof value === 'string' && C1.test(value)) out.push(`${site.id}.${key}`);
+            }
+        }
+        return out;
+    }
+
+    it.each([['js/data/sites_data.json'], ['functions/sites_data.json']])('%s has none', (path) => {
+        expect(brokenFields(load(path))).toEqual([]);
+    });
+});

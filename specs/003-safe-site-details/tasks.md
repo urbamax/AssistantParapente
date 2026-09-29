@@ -54,12 +54,12 @@ description: "Task list for safe and faithful site details"
 
 ## Phase 5: User Story 3 - Broken characters repaired (Priority: P2)
 
-- [ ] T018 [P] [US3] In `tests/data/sites_data_text.test.js`, add: no string field of `js/data/sites_data.json` or `functions/sites_data.json` contains a character U+0080–U+009F (SC-003)
-- [ ] T019 [P] [US3] Create `tests/scripts/test_text_repair.py` (`unittest`): `repair_cp1252('l\x92objectif')` → `l’objectif`; `\x95`→`•`, `\x85`→`…`, `\x80`→`€`, `\x9c`→`œ`, `\x96`→`–`, `\x97`→`—`, `\x93\x94`→`“”`; undefined `\x81` removed; plain text unchanged; idempotent; `None` → `None`
-- [ ] T020 [US3] Run `npx vitest run tests/data/sites_data_text.test.js` and `python3 -m unittest discover -s tests/scripts`; confirm T018–T019 fail
-- [ ] T021 [US3] Create `scripts/text_repair.py` with `repair_cp1252`; import it in `clean()` of `scripts/import_ffvl_sites.py` and `scripts/refresh_paraglidingearth.py`
-- [ ] T022 [US3] Apply `repair_cp1252` once to every string field of `js/data/sites_data.json` (keep `ensure_ascii=False, indent=2`, trailing newline, key order), then `npm run sync:functions`
-- [ ] T023 [US3] Run `npm test` and `python3 -m unittest discover -s tests/scripts`; all pass
+- [X] T018 [P] [US3] In `tests/data/sites_data_text.test.js`, add: no string field of `js/data/sites_data.json` or `functions/sites_data.json` contains a character U+0080–U+009F (SC-003)
+- [X] T019 [P] [US3] Create `tests/scripts/test_text_repair.py` (`unittest`): `repair_cp1252('l\x92objectif')` → `l’objectif`; `\x95`→`•`, `\x85`→`…`, `\x80`→`€`, `\x9c`→`œ`, `\x96`→`–`, `\x97`→`—`, `\x93\x94`→`“”`; undefined `\x81` removed; plain text unchanged; idempotent; `None` → `None`
+- [X] T020 [US3] Run `npx vitest run tests/data/sites_data_text.test.js` and `python3 -m unittest discover -s tests/scripts`; confirm T018–T019 fail
+- [X] T021 [US3] Create `scripts/text_repair.py` with `repair_cp1252`; import it in `clean()` of `scripts/import_ffvl_sites.py` and `scripts/refresh_paraglidingearth.py`
+- [X] T022 [US3] Apply `repair_cp1252` once to every string field of `js/data/sites_data.json` (keep `ensure_ascii=False, indent=2`, trailing newline, key order), then `npm run sync:functions`
+- [X] T023 [US3] Run `npm test` and `python3 -m unittest discover -s tests/scripts`; all pass
 
 ---
 
