@@ -331,7 +331,7 @@ class SitesService {
 
         const lats = favoriteSites.map((s) => parseFloat(s.latitude || s.lat)).join(',');
         const lons = favoriteSites.map((s) => parseFloat(s.longitude || s.lon)).join(',');
-        const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${lats}&longitude=${lons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation&timezone=Europe%2FParis&forecast_days=2${modelParam}`;
+        const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${lats}&longitude=${lons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,cape&timezone=Europe%2FParis&forecast_days=2${modelParam}`;
 
         try {
             const response = await fetch(url);
@@ -364,6 +364,7 @@ class SitesService {
                     windDirDeg: dirDeg,
                     windCard: dirDeg === null ? null : degreesToCardinal(dirDeg),
                     precipitation: normalizeForecastValue(hourly.precipitation?.[idx], 'precipitation'),
+                    cape: normalizeForecastValue(hourly.cape?.[idx], 'cape'),
                 };
             });
             return { success: true };
@@ -495,7 +496,7 @@ class SitesService {
                 const chunkLons = chunkSites.map((s) => parseFloat(s.longitude || s.lon)).join(',');
                 // forecast_days=8 (et non 6) pour garder ~168h (7 jours) de marge même quand
                 // l'heure courante tombe tard dans la journée 1 (cf. digest 7 jours, forecastMaxRange=168).
-                const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${chunkLats}&longitude=${chunkLons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation&daily=sunrise,sunset&timezone=Europe%2FParis&forecast_days=8${modelParam}`;
+                const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${chunkLats}&longitude=${chunkLons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,cape&daily=sunrise,sunset&timezone=Europe%2FParis&forecast_days=8${modelParam}`;
 
                 const cached = this._weatherCache.get(url);
                 if (cached && Date.now() - cached.timestamp < WEATHER_CACHE_TTL_MS) {
@@ -563,6 +564,7 @@ class SitesService {
                             Object.keys(hourly).find((k) => k.startsWith('wind_gusts_10m')) || 'wind_gusts_10m';
                         const precipKey =
                             Object.keys(hourly).find((k) => k.startsWith('precipitation')) || 'precipitation';
+                        const capeKey = Object.keys(hourly).find((k) => k.startsWith('cape')) || 'cape';
 
                         // Keep up to 168 hours (7 jours, cf. digest hebdo) starting from currentHourIndex
                         for (let i = 0; i <= 168; i++) {
@@ -632,6 +634,7 @@ class SitesService {
                                     windDirDeg: dirDeg,
                                     windCard: card,
                                     precipitation: normalizeForecastValue(hourly[precipKey]?.[idx], 'precipitation'),
+                                    cape: normalizeForecastValue(hourly[capeKey]?.[idx], 'cape'),
                                     sunriseText: sunriseText,
                                     sunsetText: sunsetText,
                                     legalStartText: legalStartText,

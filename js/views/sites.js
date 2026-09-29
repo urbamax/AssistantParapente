@@ -41,6 +41,16 @@ function verdictColor(status, { bar = false } = {}) {
     return '#ef4444';
 }
 
+/**
+ * Rappel affiché avec chaque verdict (spec 001 FR-010b, constitution principe II) : l'avis de
+ * l'application repose sur des prévisions, le risque d'orage est estimé, le pilote décide.
+ * Rien quand il n'y a pas de verdict (chargement, prévision incomplète).
+ */
+function verdictReminderHtml(status) {
+    if (status && status.status !== 'flyable' && status.status !== 'unflyable') return '';
+    return `<p class="verdict-reminder"><i class="ri-information-line" aria-hidden="true"></i> ${escapeHTML(t('weather.reminder'))}</p>`;
+}
+
 /** Libellé court d'un verdict (infobulles, tableau) : raison + données manquantes éventuelles. */
 function verdictLabel(status) {
     const missing = missingValuesText(status);
@@ -665,6 +675,7 @@ class SitesViewClass extends BaseView {
             </div>
             <div style="opacity: 0.8; font-size: 0.8rem;">Rafales : ${escapeHTML(String(forecastValue(weather.windGust)))} km/h</div>
             ${missing ? `<div class="weather-missing-values" style="margin-top: 4px; font-size: 0.8rem;">${escapeHTML(missing)}</div>` : ''}
+            ${verdictReminderHtml(status)}
         </div>`;
     }
 
@@ -1678,6 +1689,7 @@ class SitesViewClass extends BaseView {
 
         listDiv.innerHTML = `
             <div class="card" style="padding: 16px; overflow-x: auto;">
+                ${verdictReminderHtml(null)}
                 <table style="width: 100%; border-collapse: collapse; min-width: 480px;">
                     <thead>
                         <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
@@ -1783,6 +1795,7 @@ class SitesViewClass extends BaseView {
                             </div>
                             ${missingValuesText(status) ? `<div class="weather-missing-values" style="font-size: 0.8rem;">${escapeHTML(missingValuesText(status))}</div>` : ''}
                         </div>
+                        ${verdictReminderHtml(status)}
                     `;
                 } else if (hasWeatherEntry) {
                     weatherHtml = `

@@ -1,5 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
-import { evaluateSpotForecast, normalizeForecastValue, getSiteOrientations } from '../js/weatherScoring.js';
+import {
+    evaluateSpotForecast,
+    normalizeForecastValue,
+    getSiteOrientations,
+    STORM_CAPE_THRESHOLD,
+} from '../js/weatherScoring.js';
 import {
     DEFAULT_PREFS,
     SITE_SOUTH,
@@ -27,6 +32,7 @@ describe('weatherScoring.js', () => {
     it('returns unflyable if it is night', () => {
         const weather = {
             isDaytime: false,
+            cape: 100,
             precipitation: 0,
             windSpeed: 12,
             windGust: 14,
@@ -41,6 +47,7 @@ describe('weatherScoring.js', () => {
     it('returns unflyable if raining', () => {
         const weather = {
             isDaytime: true,
+            cape: 100,
             precipitation: 2.5,
             windSpeed: 12,
             windGust: 14,
@@ -55,6 +62,7 @@ describe('weatherScoring.js', () => {
     it('returns unflyable if wind speed is out of limits', () => {
         const weatherHigh = {
             isDaytime: true,
+            cape: 100,
             precipitation: 0,
             windSpeed: 25,
             windGust: 25,
@@ -67,6 +75,7 @@ describe('weatherScoring.js', () => {
 
         const weatherLow = {
             isDaytime: true,
+            cape: 100,
             precipitation: 0,
             windSpeed: 2,
             windGust: 2,
@@ -80,6 +89,7 @@ describe('weatherScoring.js', () => {
     it('returns unflyable if wind gust delta is too high', () => {
         const weather = {
             isDaytime: true,
+            cape: 100,
             precipitation: 0,
             windSpeed: 15,
             windGust: 30,
@@ -94,6 +104,7 @@ describe('weatherScoring.js', () => {
     it('returns unflyable if orientation is wrong', () => {
         const weather = {
             isDaytime: true,
+            cape: 100,
             precipitation: 0,
             windSpeed: 10,
             windGust: 12,
@@ -110,6 +121,7 @@ describe('weatherScoring.js', () => {
         // Perfect direction is 90
         const weather = {
             isDaytime: true,
+            cape: 100,
             precipitation: 0,
             windSpeed: 12.5,
             windGust: 12.5,
@@ -237,6 +249,7 @@ describe('incomplete forecasts never produce a verdict (spec 001, US1, FR-002/00
         windGust: { windGust: null },
         windDir: { windDirDeg: null, windCard: null },
         precipitation: { precipitation: null },
+        cape: { cape: null },
         daylight: { isDaytime: null },
     };
     const ORDER = ['windSpeed', 'windGust', 'windDir', 'precipitation', 'cape', 'daylight'];
@@ -325,7 +338,9 @@ describe('incomplete forecasts never produce a verdict (spec 001, US1, FR-002/00
 
 describe('complete forecasts keep their pre-spec verdicts (spec 001, FR-013, SC-004)', () => {
     it.each(REFERENCE_CASES.map((c, i) => [i, c]))('reference case #%i', (_i, c) => {
-        const res = evaluateSpotForecast(REFERENCE_SITES[c.siteName], c.weather, c.prefs);
+        // Les cas ont été enregistrés avant que la CAPE soit demandée : on ajoute une CAPE
+        // faible (sans risque d'orage), sans toucher aux résultats attendus.
+        const res = evaluateSpotForecast(REFERENCE_SITES[c.siteName], { ...c.weather, cape: 100 }, c.prefs);
         expect(res.flyable).toBe(c.expected.flyable);
         expect(res.score).toBe(c.expected.score);
         expect(res.reason).toBe(c.expected.reason);
@@ -400,5 +415,39 @@ describe('unknown take-off orientation is never shown as ideal (spec 001, US2, F
         const res = evaluateSpotForecast(SITE_NO_ORIENTATION, COMPLETE_HOUR, prefs);
         expect(res.reason).toBe('Orientation du décollage inconnue : à vérifier avec Ma voile');
         expect(res.score).toBeNull();
+    });
+});
+
+describe('thunderstorm risk (spec 001, US3, FR-010)', () => {
+    it('uses the FFVL-sourced threshold of 1000 J/kg', () => {
+        expect(STORM_CAPE_THRESHOLD).toBe(1000);
+    });
+
+    it('is unflyable with a storm reason above the threshold', () => {
+        const res = evaluateSpotForecast(SITE_SOUTH, completeHourWith({ cape: 1001 }), DEFAULT_PREFS);
+        expect(res.status).toBe('unflyable');
+        expect(res.reasonCode).toBe('STORM_RISK');
+        expect(res.reason).toBe('Risque orageux (CAPE)');
+    });
+
+    it('does not flag storm risk at or below the threshold', () => {
+        for (const cape of [1000, 999, 0]) {
+            const res = evaluateSpotForecast(SITE_SOUTH, completeHourWith({ cape }), DEFAULT_PREFS);
+            expect(res.reasonCode).not.toBe('STORM_RISK');
+            expect(res.status).toBe('flyable');
+        }
+    });
+
+    it('is incomplete when CAPE is missing', () => {
+        for (const cape of [null, undefined]) {
+            const res = evaluateSpotForecast(SITE_SOUTH, completeHourWith({ cape }), DEFAULT_PREFS);
+            expect(res.status).toBe('incomplete');
+            expect(res.missing).toEqual(['cape']);
+        }
+    });
+
+    it('also applies to sites with unknown orientation', () => {
+        const res = evaluateSpotForecast(SITE_NO_ORIENTATION, completeHourWith({ cape: 2500 }), DEFAULT_PREFS);
+        expect(res.reasonCode).toBe('STORM_RISK');
     });
 });

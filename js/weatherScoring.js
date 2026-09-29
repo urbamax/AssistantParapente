@@ -31,6 +31,19 @@ function degreesToCardinal(deg) {
     return directions[index];
 }
 
+/**
+ * Seuil de CAPE (énergie potentielle convective disponible, J/kg) au-delà duquel une heure est
+ * jugée non volable pour risque orageux (spec 001, FR-010/FR-010a).
+ *
+ * Source : FFVL, Commissions Nationales Sécurité et Technique, « Canicule, vague de chaleur et
+ * vol libre », federation.ffvl.fr, 2026-07-31 : une CAPE « dépassant largement la valeur de
+ * 1000 » y est présentée comme le signe d'une aérologie brutale et d'une convection explosive.
+ * Nuance : la FFVL cite 1000 comme valeur de référence dans un exemple, pas comme une limite
+ * réglementaire ; l'application la présente donc comme une estimation à confirmer sur place.
+ * Toute modification de cette valeur passe par une modification de la spécification.
+ */
+export const STORM_CAPE_THRESHOLD = 1000;
+
 const ROUNDED_KINDS = new Set(['windSpeed', 'windGust', 'windDir']);
 
 /**
@@ -125,6 +138,7 @@ export function evaluateSpotForecast(site, weather, userPreferences) {
     if (normalizeForecastValue(weather.windGust, 'windGust') === null) missing.push('windGust');
     if (orientations.length > 0 && windCard === null) missing.push('windDir');
     if (normalizeForecastValue(weather.precipitation, 'precipitation') === null) missing.push('precipitation');
+    if (normalizeForecastValue(weather.cape, 'cape') === null) missing.push('cape');
     if (typeof weather.isDaytime !== 'boolean') missing.push('daylight');
 
     if (missing.length > 0) {
@@ -141,6 +155,7 @@ export function evaluateSpotForecast(site, weather, userPreferences) {
     const windSpeed = Number(weather.windSpeed);
     const windGust = Number(weather.windGust);
     const precip = Number(weather.precipitation);
+    const cape = Number(weather.cape);
     const unflyable = (code, reason, icon = 'ri-close-circle-fill') =>
         outcome('unflyable', code, reason, { score: 0, className: 'weather-unflyable', icon });
 
@@ -183,7 +198,7 @@ export function evaluateSpotForecast(site, weather, userPreferences) {
     }
 
     // E. Risque orageux (CAPE)
-    if (weather.cape !== undefined && weather.cape > 1000) {
+    if (cape > STORM_CAPE_THRESHOLD) {
         return unflyable('STORM_RISK', t('weather.stormRisk'), 'ri-thunderstorms-line');
     }
 

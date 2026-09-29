@@ -525,6 +525,13 @@ body.light-mode .site-weather-row.weather-unflyable span:last-child {
     font-weight: 500;
 }
 
+.verdict-reminder {
+    margin: 8px 0 0;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    color: var(--text-muted);
+}
+
 .marker-core--incomplete {
     width: 16px;
     height: 16px;

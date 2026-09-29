@@ -151,4 +151,14 @@ test.describe('E2E - Sites Flow', () => {
         await expect(weatherRow).not.toContainText('/100');
         await expect(weatherRow).not.toContainText(/Excellent|Bon \(|Passable/);
     });
+
+    test('Spec 001 US3 : le rappel « la décision vous appartient » accompagne le verdict et la légende', async ({
+        page,
+    }) => {
+        await mockOpenMeteo(page, { complete: 6, empty: 0 });
+        const card = await openSitesAndSearch(page, 'AUTEUIL');
+        const reminder = 'la décision vous appartient, vérifiez sur place';
+        await expect(card.locator('.verdict-reminder')).toHaveCount(1);
+        await expect(card.locator('.verdict-reminder')).toContainText(reminder);
+    });
 });

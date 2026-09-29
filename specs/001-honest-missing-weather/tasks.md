@@ -117,17 +117,17 @@ on its own.
 
 ### Tests for User Story 3 ⚠️ write first, see them fail
 
-- [ ] T034 [P] [US3] In `tests/weatherScoring.test.js`: `STORM_CAPE_THRESHOLD === 1000`; CAPE 1001 → unflyable `STORM_RISK` with text "Risque orageux (CAPE)"; CAPE 1000 and 999 → not storm; `cape: null` → incomplete with `missing` containing `'cape'`; update `COMPLETE_HOUR`-based fixtures and `REFERENCE_CASES` inputs to include a low `cape` (e.g. 100) without changing expected outputs
-- [ ] T035 [P] [US3] In `tests/services/sites_service.test.js`: the primary and secondary request URLs contain `cape` in `hourly=`; parsed hours carry `cape`
-- [ ] T036 [US3] In `tests/e2e/sites_flow.spec.js`: add `cape` to the mocked hourly data; assert the reminder "la décision vous appartient, vérifiez sur place" is visible once on the list card, in the map popup, above the favourites comparison table and next to the legend
-- [ ] T037 [US3] Run `npx vitest run tests/weatherScoring.test.js tests/services/sites_service.test.js` and `npx playwright test tests/e2e/sites_flow.spec.js`; confirm T034–T036 fail
+- [X] T034 [P] [US3] In `tests/weatherScoring.test.js`: `STORM_CAPE_THRESHOLD === 1000`; CAPE 1001 → unflyable `STORM_RISK` with text "Risque orageux (CAPE)"; CAPE 1000 and 999 → not storm; `cape: null` → incomplete with `missing` containing `'cape'`; update `COMPLETE_HOUR`-based fixtures and `REFERENCE_CASES` inputs to include a low `cape` (e.g. 100) without changing expected outputs
+- [X] T035 [P] [US3] In `tests/services/sites_service.test.js`: the primary and secondary request URLs contain `cape` in `hourly=`; parsed hours carry `cape`
+- [X] T036 [US3] In `tests/e2e/sites_flow.spec.js`: add `cape` to the mocked hourly data; assert the reminder "la décision vous appartient, vérifiez sur place" is visible once on the list card, in the map popup, above the favourites comparison table and next to the legend
+- [X] T037 [US3] Run `npx vitest run tests/weatherScoring.test.js tests/services/sites_service.test.js` and `npx playwright test tests/e2e/sites_flow.spec.js`; confirm T034–T036 fail
 
 ### Implementation for User Story 3
 
-- [ ] T038 [US3] In `js/weatherScoring.js`, export `STORM_CAPE_THRESHOLD = 1000` with a comment citing "FFVL, Commissions Nationales Sécurité et Technique, « Canicule, vague de chaleur et vol libre », 2026-07-31" and the nuance from research R3; add `cape` to the required values and apply the check `cape > STORM_CAPE_THRESHOLD` in the order of data-model.md
-- [ ] T039 [US3] In `js/services/sites_service.js`, add `cape` to `hourly=` in the primary URL (around line 493) and the secondary URL (around line 334); parse it with `normalizeForecastValue(…, 'cape')` in both builders
-- [ ] T040 [US3] In `js/views/sites.js`, add the reminder line (catalogue key from T002, via `textContent`/`escapeHTML`) once per map popup, list card (weather block, also visible when details are expanded) and above the favourites comparison table, and next to the legend
-- [ ] T041 [US3] Run `npm test` and `npx playwright test tests/e2e/sites_flow.spec.js`: T034–T036 pass
+- [X] T038 [US3] In `js/weatherScoring.js`, export `STORM_CAPE_THRESHOLD = 1000` with a comment citing "FFVL, Commissions Nationales Sécurité et Technique, « Canicule, vague de chaleur et vol libre », 2026-07-31" and the nuance from research R3; add `cape` to the required values and apply the check `cape > STORM_CAPE_THRESHOLD` in the order of data-model.md
+- [X] T039 [US3] In `js/services/sites_service.js`, add `cape` to `hourly=` in the primary URL (around line 493) and the secondary URL (around line 334); parse it with `normalizeForecastValue(…, 'cape')` in both builders
+- [X] T040 [US3] In `js/views/sites.js`, add the reminder line (catalogue key from T002, via `textContent`/`escapeHTML`) once per map popup, list card (weather block, also visible when details are expanded) and above the favourites comparison table, and next to the legend
+- [X] T041 [US3] Run `npm test` and `npx playwright test tests/e2e/sites_flow.spec.js`: T034–T036 pass
 
 **Checkpoint**: US1–US3 complete.
 

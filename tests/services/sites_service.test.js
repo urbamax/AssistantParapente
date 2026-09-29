@@ -361,4 +361,34 @@ describe('SitesService', () => {
             expect(SitesService.isForecastFlyable(noOrientation, hours[0]).score).toBeNull();
         });
     });
+
+    describe('thunderstorm indicator (spec 001, US3)', () => {
+        const currentStart = () => {
+            const d = new Date();
+            d.setMinutes(0, 0, 0);
+            return d.toISOString();
+        };
+
+        it('requests CAPE in the primary forecast and stores it on each hour', async () => {
+            const site = aromeTailResponse(currentStart(), { complete: 2, empty: 1 });
+            global.fetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue([site, site]) });
+            await SitesService.fetchWeatherForSites();
+            const url = global.fetch.mock.calls[0][0];
+            expect(new URL(url).searchParams.get('hourly').split(',')).toContain('cape');
+            const hours = SitesService.state.weatherForecasts[1];
+            expect(hours[0].cape).toBe(100);
+            expect(hours[2].cape).toBeNull();
+        });
+
+        it('requests CAPE for the secondary (confidence) model too', async () => {
+            SitesService.setSites([{ id: 7, nom: 'Fav', latitude: 45, longitude: 6, orientations_vent: ['S'] }]);
+            SitesService.state.userPreferences = { favoriteSites: [7] };
+            const payload = aromeTailResponse(currentStart(), { complete: 1, empty: 0 });
+            global.fetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue(payload) });
+            await SitesService.fetchSecondaryModelForFavorites();
+            const url = global.fetch.mock.calls[0][0];
+            expect(new URL(url).searchParams.get('hourly').split(',')).toContain('cape');
+            expect(SitesService.state.weatherForecastsSecondary[7].cape).toBe(100);
+        });
+    });
 });
