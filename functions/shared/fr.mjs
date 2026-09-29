@@ -76,4 +76,11 @@ export const FR = Object.freeze({
             '1 site correspond hors du rayon de {km} km — élargissez le rayon ou changez de position.',
         loading: 'Chargement météo {model}...',
     }),
+    notification: Object.freeze({
+        title: '{site} : conditions favorables annoncées',
+        body: 'Prévision {hour} : vent {card} {speed} km/h (rafales {gust}), source {source}. {reminder}',
+        reminder: 'Avis basé sur des prévisions : la décision vous appartient, vérifiez sur place.',
+        defaultSite: 'Site favori',
+        hour: 'à {hour} h',
+    }),
 });
