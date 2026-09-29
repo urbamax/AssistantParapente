@@ -146,11 +146,11 @@ the provider quota that US3 uses more (plan.md, Implementation Phases).
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
-- [ ] T044 [P] Update `DOCUMENTATION.md`: forecast context line, provenance and run-time metadata, 3 h staleness, per-hour model agreement and request set, radius 10–200 km default 50 with Boulogne-sur-Mer fallback, `best_match` model, preference migration
-- [ ] T045 Run `npm run lint`, `npm run format:check`, `npm run typecheck` (configs `eslint.config.mjs`, `.prettierrc.json`, `jsconfig.json`) and fix touched files
-- [ ] T046 Run `npm test` (`vitest.config.js`), `npm run test:e2e` (`playwright.config.js`, Chromium + WebKit) and `npm run build` (`vite.config.mjs`); all green; record the local e2e run in the PR
-- [ ] T047 Follow `specs/002-verdict-forecast-context/quickstart.md` §2 in the browser (fresh profile, light and dark, mobile width) and count Open-Meteo locations requested in the Network panel
-- [ ] T048 Run `/speckit-analyze` on `specs/002-verdict-forecast-context/` and resolve inconsistencies
+- [X] T044 [P] Update `DOCUMENTATION.md`: forecast context line, provenance and run-time metadata, 3 h staleness, per-hour model agreement and request set, radius 10–200 km default 50 with Boulogne-sur-Mer fallback, `best_match` model, preference migration
+- [X] T045 Run `npm run lint`, `npm run format:check`, `npm run typecheck` (configs `eslint.config.mjs`, `.prettierrc.json`, `jsconfig.json`) and fix touched files
+- [X] T046 Run `npm test` (`vitest.config.js`), `npm run test:e2e` (`playwright.config.js`, Chromium + WebKit) and `npm run build` (`vite.config.mjs`); all green; record the local e2e run in the PR
+- [X] T047 Follow `specs/002-verdict-forecast-context/quickstart.md` §2 in the browser (fresh profile, light and dark, mobile width) and count Open-Meteo locations requested in the Network panel
+- [X] T048 Run `/speckit-analyze` on `specs/002-verdict-forecast-context/` and resolve inconsistencies
 
 ---
 

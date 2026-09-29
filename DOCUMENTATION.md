@@ -225,6 +225,20 @@ Sites service fetches open-access meteorological data from **Open-Meteo API**:
 - Hourly variables requested: `wind_speed_10m, wind_direction_10m, wind_gusts_10m, precipitation, cape`; values are validated with `normalizeForecastValue` when parsed (missing stays `null`).
 - **AROME (Météo-France)**: High-resolution short-range forecast (Open-Meteo `meteofrance` endpoint; empty beyond ~108 h, shown as incomplete).
 - **GFS / ICON**: Medium-range forecast (up to 7 days).
+- Models offered (`WEATHER_MODEL_INFO` in `js/data/weather_config.js`): `meteofrance` (AROME), `iconeu`, `icon`, `ecmwf`, `gfs`, and `best_match` = Open-Meteo's automatic multi-model selection (`forecast` endpoint; formerly mislabelled « Meteoblue »).
+
+#### Which sites are requested (spec 002)
+Weather is requested only for the sites within the search radius of the reference position, plus favourite sites — never for the whole database (one Open-Meteo call per location; free tier ≈ 5 000/hour).
+- Radius 10–200 km, default **50 km**; « Illimité » was removed (it requested ~2 000 sites per load). The map zoom sync is clamped to the same range.
+- Reference position (`SitesService.getEffectiveLocation()`): GPS or geocoded address, otherwise **Boulogne-sur-Mer** (`DEFAULT_LOCATION`), with a notice inviting to enable GPS or enter an address.
+- A name search matching sites outside the radius shows how many, without requesting them.
+- Saved preferences are migrated on load (`migrateSitePrefs`): radius 210/`> 200` → 50, `meteoblue` → `best_match`.
+
+#### Forecast context on every verdict (spec 002)
+The map popup, the site card and the favourites table show, next to each verdict:
+- **Context line**: model, retrieval time (the original network retrieval, unchanged when served from the 10-min cache) and model run time from Open-Meteo metadata (`/data/{model}/static/meta.json`, cached 30 min; not shown when unknown, e.g. `best_match`).
+- **Staleness**: after **3 h** (`STALE_AFTER_MS`) the line shows the age, « peut être dépassée » and an « Actualiser » button (forced refetch; on failure the old forecast stays flagged with the reason). Ages update every minute without re-rendering.
+- **Model agreement for the displayed hour**: a second model (GFS, or AROME when GFS is primary) is fetched for the same sites and hours (paired by date-time, same chunks/cache/429 cooldown); `getModelAgreement(site, offset)` returns agree / disagree (with the second model's verdict) / unavailable. The primary verdict is never changed.
 
 ### 3. Interactive Cartography (2D & 3D)
 - **2D Map**: Built on Leaflet.js with custom markers and SpotAir SVG federal vector icons.
