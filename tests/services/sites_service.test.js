@@ -332,4 +332,33 @@ describe('SitesService', () => {
             });
         });
     });
+
+    describe('unknown orientation (spec 001, US2)', () => {
+        beforeEach(() => {
+            vi.spyOn(SitesService, 'getGeoFilteredSites').mockImplementation((data) => data);
+            SitesService.state.hideUnflyable = false;
+            SitesService.state.filterFavoritesOnly = false;
+            SitesService.state.forecastMaxRange = 24;
+            SitesService.state.conditionsStrategy = 'TOTAL';
+            SitesService.state.limitWindMin = 5;
+            SitesService.state.limitWindMax = 25;
+            SitesService.state.limitGustDelta = 15;
+            SitesService.state.filterMode = 'manual';
+        });
+
+        it('counts flyable hours for a site without orientation and sorts without crashing on a null score', () => {
+            const noOrientation = { id: 50, nom: 'Sans orientation', latitude: 45, longitude: 6 };
+            const south = { id: 51, nom: 'Sud', latitude: 45, longitude: 6, orientations_vent: ['S'] };
+            const hours = [
+                completeHourWith({ time: '2026-09-29T10:00' }),
+                completeHourWith({ time: '2026-09-29T11:00' }),
+            ];
+            SitesService.state.weatherForecasts = { 50: hours, 51: hours };
+            const res = SitesService.getFilteredAndSortedSites([noOrientation, south]);
+            const byId = Object.fromEntries(res.map((x) => [x.id, x]));
+            expect(byId[50].flyableHours).toBe(2);
+            expect(byId[51].flyableHours).toBe(2);
+            expect(SitesService.isForecastFlyable(noOrientation, hours[0]).score).toBeNull();
+        });
+    });
 });

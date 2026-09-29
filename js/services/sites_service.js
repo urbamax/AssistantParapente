@@ -8,7 +8,7 @@ import { calculateDistance, getAngularDifference, degreesToCardinal } from '../u
 import { removeAccents } from '../utils/text_utils.js';
 import { escapeHTML } from '../core/security.js';
 import AppRouter from '../core/router.js';
-import { evaluateSpotForecast, normalizeForecastValue } from '../weatherScoring.js';
+import { evaluateSpotForecast, normalizeForecastValue, getSiteOrientations } from '../weatherScoring.js';
 import { toSorted } from '../utils/array_utils.js';
 
 const sitesView = () => AppRouter.getView('SITES');
@@ -257,12 +257,8 @@ class SitesService {
         // 2. Déterminer la meilleure orientation du site par rapport au vent actuel
         let bestOrientation = undefined;
 
-        let orientations = [];
-        if (Array.isArray(site.orientations_vent)) orientations = site.orientations_vent;
-        else if (typeof site.orientations_vent === 'string')
-            orientations = site.orientations_vent.split(',').map((v) => v.trim());
-        else if (site.orientation) orientations = site.orientation.split(',').map((v) => v.trim());
-        if (orientations.length > 0 && weather) {
+        const orientations = getSiteOrientations(site);
+        if (orientations.length > 0 && weather && weather.windDirDeg !== null && weather.windDirDeg !== undefined) {
             const CARD_TO_DEG = { N: 0, NE: 45, E: 90, SE: 135, S: 180, SO: 225, O: 270, NO: 315 };
             let minDiff = 180;
 

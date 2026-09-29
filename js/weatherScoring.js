@@ -192,6 +192,21 @@ export function evaluateSpotForecast(site, weather, userPreferences) {
         return unflyable('WRONG_ORIENTATION', t('weather.wrongOrientation'));
     }
 
+    // G. Orientation inconnue (spec 001, FR-007) : on ne suppose jamais qu'elle est idéale.
+    // Les contrôles ci-dessus s'appliquent, mais sans score ni appréciation, et avec un
+    // avertissement : c'est au pilote de vérifier si le vent convient au décollage.
+    if (orientations.length === 0) {
+        const wingsSuffix =
+            hardwareWingsNames.length > 0 ? t('weather.withWings', { wings: hardwareWingsNames.join(', ') }) : '';
+        return outcome('flyable', 'ORIENTATION_UNKNOWN', t('weather.orientationUnknown') + wingsSuffix, {
+            score: null,
+            className: 'weather-flyable',
+            icon: 'ri-compass-discover-line',
+            orientationUnknown: true,
+            warning: true,
+        });
+    }
+
     // ---------------------------------------------------------
     // 4. CALCUL DU SCORE ÉVOLUTIF (Si tous les verrous sont au vert)
     // ---------------------------------------------------------
@@ -214,7 +229,7 @@ export function evaluateSpotForecast(site, weather, userPreferences) {
     const windDirDeg = resolveWindDirDeg(weather);
     const hasOrientation =
         site.orientation_ideale_deg !== undefined && site.orientation_ideale_deg !== null && windDirDeg !== null;
-    let scoreOrientation = 100; // 100 par défaut si pas d'orientation idéale spécifiée
+    let scoreOrientation = 100; // orientations connues mais pas d'orientation idéale en degrés
 
     if (hasOrientation) {
         const angularDiff = getAngularDifference(windDirDeg, site.orientation_ideale_deg);

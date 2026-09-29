@@ -7,6 +7,8 @@ import {
     completeHourWith,
     REFERENCE_CASES,
     REFERENCE_SITES,
+    SITE_NO_ORIENTATION,
+    SITE_UNRECOGNISED_ORIENTATION,
 } from './fixtures/forecasts.js';
 
 describe('weatherScoring.js', () => {
@@ -328,5 +330,75 @@ describe('complete forecasts keep their pre-spec verdicts (spec 001, FR-013, SC-
         expect(res.score).toBe(c.expected.score);
         expect(res.reason).toBe(c.expected.reason);
         expect(res.status).toBe(c.expected.flyable ? 'flyable' : 'unflyable');
+    });
+});
+
+describe('unknown take-off orientation is never shown as ideal (spec 001, US2, FR-007)', () => {
+    const DIRECTIONS = [
+        ['N', 0],
+        ['NE', 45],
+        ['E', 90],
+        ['SE', 135],
+        ['S', 180],
+        ['SO', 225],
+        ['O', 270],
+        ['NO', 315],
+    ];
+
+    it.each([
+        ['no orientation field', SITE_NO_ORIENTATION],
+        ['unrecognised orientation label', SITE_UNRECOGNISED_ORIENTATION],
+    ])('%s: flyable with a notice, never a score or rating', (_label, site) => {
+        for (const [card, deg] of DIRECTIONS) {
+            const res = evaluateSpotForecast(
+                site,
+                completeHourWith({ windCard: card, windDirDeg: deg }),
+                DEFAULT_PREFS,
+            );
+            expect(res.status).toBe('flyable');
+            expect(res.orientationUnknown).toBe(true);
+            expect(res.score).toBeNull();
+            expect(res.reasonCode).toBe('ORIENTATION_UNKNOWN');
+            expect(res.warning).toBe(true);
+            expect(res.reason).toBe('Orientation du décollage inconnue : à vérifier');
+            expect(res.reason).not.toMatch(/Excellent|Bon|Passable|\/100/);
+        }
+    });
+
+    it('still applies every other check', () => {
+        const site = SITE_NO_ORIENTATION;
+        expect(evaluateSpotForecast(site, completeHourWith({ isDaytime: false }), DEFAULT_PREFS).reasonCode).toBe(
+            'NIGHT',
+        );
+        expect(evaluateSpotForecast(site, completeHourWith({ precipitation: 1 }), DEFAULT_PREFS).reasonCode).toBe(
+            'RAIN',
+        );
+        expect(
+            evaluateSpotForecast(site, completeHourWith({ windSpeed: 40, windGust: 45 }), DEFAULT_PREFS).reasonCode,
+        ).toBe('WIND_OUT_OF_LIMITS');
+        expect(
+            evaluateSpotForecast(site, completeHourWith({ windSpeed: 10, windGust: 40 }), DEFAULT_PREFS).reasonCode,
+        ).toBe('GUST_OUT_OF_LIMITS');
+    });
+
+    it('is not made incomplete by a missing wind direction', () => {
+        const res = evaluateSpotForecast(
+            SITE_NO_ORIENTATION,
+            completeHourWith({ windDirDeg: null, windCard: null }),
+            DEFAULT_PREFS,
+        );
+        expect(res.status).toBe('flyable');
+        expect(res.orientationUnknown).toBe(true);
+    });
+
+    it('keeps the equipment wing names in the notice', () => {
+        const prefs = {
+            ...DEFAULT_PREFS,
+            filterMode: 'hardware',
+            wings: [{ type: 'voile', nom: 'Ma voile', ventMin: 0, ventMax: 40 }],
+        };
+        const res = evaluateSpotForecast(SITE_NO_ORIENTATION, COMPLETE_HOUR, prefs);
+        expect(res.reason).toBe('Orientation du décollage inconnue : à vérifier avec Ma voile');
+        expect(res.score).toBeNull();
     });
 });

@@ -93,17 +93,17 @@ on its own.
 
 ### Tests for User Story 2 ⚠️ write first, see them fail
 
-- [ ] T026 [P] [US2] In `tests/weatherScoring.test.js`: for `SITE_NO_ORIENTATION` and `SITE_UNRECOGNISED_ORIENTATION` with complete in-limit forecasts from all 8 directions → `status: 'flyable'`, `orientationUnknown: true`, `score: null`, `reasonCode: 'ORIENTATION_UNKNOWN'`, `warning: true`, reason text "Orientation du décollage inconnue : à vérifier"; with night, rain, wind or gust out of limits → the corresponding unflyable outcome; a missing `windDir` alone does not make such a site incomplete
-- [ ] T027 [P] [US2] In `tests/services/sites_service.test.js`: sorting and `conditionScore` do not crash with `score: null`; sites with unknown orientation still count their flyable hours
-- [ ] T028 [US2] In `tests/e2e/sites_flow.spec.js`, add a scenario with a site without orientation in the mocked site list (route `**/sites_data.json` returning a copy of the fixture site with `orientations_vent` removed) and a complete in-limit forecast: the list card and the map popup show "Orientation du décollage inconnue : à vérifier", no score ("/100") and no "Excellent"/"Bon"/"Passable"; the marker is yellow without pulse (constitution Principle IV)
-- [ ] T029 [US2] Run `npx vitest run tests/weatherScoring.test.js tests/services/sites_service.test.js` and `npx playwright test tests/e2e/sites_flow.spec.js`; confirm T026–T028 fail
+- [X] T026 [P] [US2] In `tests/weatherScoring.test.js`: for `SITE_NO_ORIENTATION` and `SITE_UNRECOGNISED_ORIENTATION` with complete in-limit forecasts from all 8 directions → `status: 'flyable'`, `orientationUnknown: true`, `score: null`, `reasonCode: 'ORIENTATION_UNKNOWN'`, `warning: true`, reason text "Orientation du décollage inconnue : à vérifier"; with night, rain, wind or gust out of limits → the corresponding unflyable outcome; a missing `windDir` alone does not make such a site incomplete
+- [X] T027 [P] [US2] In `tests/services/sites_service.test.js`: sorting and `conditionScore` do not crash with `score: null`; sites with unknown orientation still count their flyable hours
+- [X] T028 [US2] In `tests/e2e/sites_flow.spec.js`, add a scenario with a site without orientation in the mocked site list (route `**/sites_data.json` returning a copy of the fixture site with `orientations_vent` removed) and a complete in-limit forecast: the list card and the map popup show "Orientation du décollage inconnue : à vérifier", no score ("/100") and no "Excellent"/"Bon"/"Passable"; the marker is yellow without pulse (constitution Principle IV)
+- [X] T029 [US2] Run `npx vitest run tests/weatherScoring.test.js tests/services/sites_service.test.js` and `npx playwright test tests/e2e/sites_flow.spec.js`; confirm T026–T028 fail
 
 ### Implementation for User Story 2
 
-- [ ] T030 [US2] In `js/weatherScoring.js`, after all checks pass, when `getSiteOrientations(site)` is empty return `{ status: 'flyable', flyable: true, orientationUnknown: true, score: null, reasonCode: 'ORIENTATION_UNKNOWN', warning: true, class: 'weather-flyable', icon: 'ri-compass-discover-line' }` with the catalogue text; never compute `scoreOrientation = 100` for unknown orientation; keep the wrong-orientation check on the shared `getSiteOrientations` result
-- [ ] T031 [US2] In `js/services/sites_service.js` `isForecastFlyable`, compute `bestOrientation` from `getSiteOrientations(site)` (no duplicate parsing)
-- [ ] T032 [US2] In `js/views/sites.js`, for `orientationUnknown` outcomes use the existing yellow `#eab308`, no pulse, show the notice text and no score in marker title, popup, list row, timeline bar title and table
-- [ ] T033 [US2] Run `npx vitest run tests/weatherScoring.test.js tests/services/sites_service.test.js` and `npx playwright test tests/e2e/sites_flow.spec.js`: T026–T028 pass
+- [X] T030 [US2] In `js/weatherScoring.js`, after all checks pass, when `getSiteOrientations(site)` is empty return `{ status: 'flyable', flyable: true, orientationUnknown: true, score: null, reasonCode: 'ORIENTATION_UNKNOWN', warning: true, class: 'weather-flyable', icon: 'ri-compass-discover-line' }` with the catalogue text; never compute `scoreOrientation = 100` for unknown orientation; keep the wrong-orientation check on the shared `getSiteOrientations` result
+- [X] T031 [US2] In `js/services/sites_service.js` `isForecastFlyable`, compute `bestOrientation` from `getSiteOrientations(site)` (no duplicate parsing)
+- [X] T032 [US2] In `js/views/sites.js`, for `orientationUnknown` outcomes use the existing yellow `#eab308`, no pulse, show the notice text and no score in marker title, popup, list row, timeline bar title and table
+- [X] T033 [US2] Run `npx vitest run tests/weatherScoring.test.js tests/services/sites_service.test.js` and `npx playwright test tests/e2e/sites_flow.spec.js`: T026–T028 pass
 
 **Checkpoint**: US1 + US2 complete.
 

@@ -130,4 +130,25 @@ test.describe('E2E - Sites Flow', () => {
         await expect(card).toContainText('Aucune prévision fiable pour ce site');
         await expect(card).not.toContainText('Aucun créneau favorable');
     });
+
+    test("Spec 001 US2 : un site sans orientation connue n'a ni score ni « Excellent »", async ({ page }) => {
+        await mockOpenMeteo(page, { complete: 6, empty: 0 });
+        // Sert la base de sites réelle, en retirant l'orientation d'AUTEUIL.
+        await page.route('**/js/data/sites_data.json*', async (route) => {
+            const response = await route.fetch();
+            const sites = await response.json();
+            for (const site of sites) {
+                if (site.nom === 'AUTEUIL') {
+                    delete site.orientations_vent;
+                    delete site.orientation;
+                }
+            }
+            await route.fulfill({ response, json: sites });
+        });
+        const card = await openSitesAndSearch(page, 'AUTEUIL');
+        const weatherRow = card.locator('.site-weather-row');
+        await expect(weatherRow).toContainText('Orientation du décollage inconnue : à vérifier');
+        await expect(weatherRow).not.toContainText('/100');
+        await expect(weatherRow).not.toContainText(/Excellent|Bon \(|Passable/);
+    });
 });
