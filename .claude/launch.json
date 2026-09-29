@@ -4,8 +4,25 @@
     {
       "name": "static-server",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8000"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8000"
+      ],
       "port": 8000
+    },
+    {
+      "name": "static-server-nocache",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "http-server",
+        ".",
+        "-p",
+        "8001",
+        "-c-1",
+        "--silent"
+      ],
+      "port": 8001
     }
   ]
 }

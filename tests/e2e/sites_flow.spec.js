@@ -1,5 +1,14 @@
 import { test, expect } from '@playwright/test';
-import { aromeTailResponse } from '../fixtures/forecasts.js';
+import { aromeTailResponse, nearestHourIso, metaJson } from '../fixtures/forecasts.js';
+
+/** Rayon enregistré de 200 km : AUTEUIL (~160 km de Boulogne-sur-Mer) reste dans la liste. */
+async function useRadius200(page) {
+    await page.addInitScript(() => {
+        const key = 'parapente_user_prefs';
+        const prefs = JSON.parse(localStorage.getItem(key) || '{}');
+        localStorage.setItem(key, JSON.stringify({ ...prefs, radiusLimit: 200 }));
+    });
+}
 
 /**
  * Intercepte TOUS les appels Open-Meteo (quel que soit le modèle) et renvoie, pour chaque site
@@ -9,15 +18,20 @@ import { aromeTailResponse } from '../fixtures/forecasts.js';
 async function mockOpenMeteo(page, { complete, empty }) {
     await page.route('https://api.open-meteo.com/**', async (route) => {
         const url = new URL(route.request().url());
+        // Heure de calcul du modèle (spec 002) : run de 06 h UTC aujourd'hui.
+        if (url.pathname.endsWith('/static/meta.json')) {
+            const run = new Date();
+            run.setUTCHours(6, 0, 0, 0);
+            return route.fulfill({ json: metaJson({ runAtS: Math.floor(run.getTime() / 1000) }) });
+        }
         const count = (url.searchParams.get('latitude') || '').split(',').length;
-        const start = new Date();
-        start.setMinutes(0, 0, 0);
-        const one = aromeTailResponse(start.toISOString(), { complete, empty });
+        const one = aromeTailResponse(nearestHourIso(), { complete, empty });
         await route.fulfill({ json: count > 1 ? Array.from({ length: count }, () => one) : one });
     });
 }
 
 async function openSitesAndSearch(page, name) {
+    await useRadius200(page);
     await page.goto('/?bypassGdpr=true');
     const gdprBanner = page.locator('#gdpr-banner');
     if (await gdprBanner.isVisible()) {
@@ -63,6 +77,7 @@ test.describe('E2E - Sites Flow', () => {
             await route.fulfill({ json });
         });
 
+        await useRadius200(page);
         await page.goto('/?bypassGdpr=true'); // Or just accept GDPR
 
         // Accept GDPR to enable network/features
@@ -160,5 +175,137 @@ test.describe('E2E - Sites Flow', () => {
         const reminder = 'la décision vous appartient, vérifiez sur place';
         await expect(card.locator('.verdict-reminder')).toHaveCount(1);
         await expect(card.locator('.verdict-reminder')).toContainText(reminder);
+    });
+
+    test('Spec 002 US4 : sans position, recherche centrée sur Boulogne-sur-Mer dans un rayon de 50 km', async ({
+        page,
+    }) => {
+        const requestedLocations = [];
+        await page.route('https://api.open-meteo.com/**', async (route) => {
+            const url = new URL(route.request().url());
+            if (url.pathname.endsWith('meta.json')) return route.fulfill({ json: {} });
+            const count = (url.searchParams.get('latitude') || '').split(',').length;
+            requestedLocations.push(count);
+            const one = aromeTailResponse(nearestHourIso(), { complete: 4, empty: 0 });
+            await route.fulfill({ json: count > 1 ? Array.from({ length: count }, () => one) : one });
+        });
+        await page.route('**/nominatim.openstreetmap.org/**', (route) =>
+            route.fulfill({ json: [{ lat: '45.8992', lon: '6.1294', display_name: 'Annecy, France' }] }),
+        );
+
+        await page.goto('/?bypassGdpr=true');
+        const gdprBanner = page.locator('#gdpr-banner');
+        if (await gdprBanner.isVisible()) await page.locator('[data-action="refuseAll"]').first().click();
+        await page.locator('.nav-menu-btn[data-target="SITES"]').click();
+
+        const notice = page.locator('#default-location-notice');
+        await expect(notice).toBeVisible();
+        await expect(notice).toContainText('Recherche centrée sur Boulogne-sur-Mer');
+        await expect(page.locator('#radius-slider')).toHaveAttribute('max', '200');
+        await expect(page.locator('#radius-slider')).toHaveValue('50');
+        await expect(page.locator('#radius-val-label')).toHaveText('50 km');
+        // La demande de météo porte exactement sur les sites retenus par l'application, tous à
+        // 50 km au plus de Boulogne-sur-Mer (spec 002, FR-016) — jamais sur toute la base.
+        const kept = await page.evaluate(async () => {
+            const S = (await import('/js/services/sites_service.js')).default;
+            const sites = S.getGeoFilteredSites(S.getSites());
+            return { count: sites.length, maxKm: Math.max(...sites.map((x) => x.distance)) };
+        });
+        expect(kept.count).toBeGreaterThan(0);
+        expect(kept.maxKm).toBeLessThanOrEqual(50);
+        await expect.poll(() => requestedLocations[0]).toBe(kept.count);
+
+        await page.locator('#address-input').fill('Annecy');
+        await page.locator('[data-action="SitesvalidateAddress"]').click();
+        await expect(notice).toBeHidden();
+    });
+
+    test('Spec 002 US1 : chaque verdict indique le modèle, l’heure de récupération et le run', async ({ page }) => {
+        await mockOpenMeteo(page, { complete: 6, empty: 0 });
+        const card = await openSitesAndSearch(page, 'AUTEUIL');
+        const context = card.locator('.forecast-context');
+        await expect(context).toHaveCount(1);
+        await expect(context).toContainText('AROME (Météo-France) · récupérée à');
+        await expect(context).toContainText('run AROME');
+
+        await page.locator('[data-action="toggleAdvancedSettings"]').click();
+        await page.locator('#weather-model-select').selectOption('best_match');
+        const refreshed = page.locator('.site-card:not(.minimized)', { hasText: 'AUTEUIL' }).first();
+        await expect(refreshed.locator('.forecast-context')).toContainText(
+            'Sélection automatique (Open-Meteo, multi-modèles)',
+        );
+        await expect(refreshed.locator('.forecast-context')).not.toContainText('run');
+    });
+
+    test('Spec 002 US2 : une prévision de plus de 3 h est signalée, « Actualiser » la rafraîchit', async ({ page }) => {
+        await page.clock.install();
+        let refuse = false;
+        await mockOpenMeteo(page, { complete: 6, empty: 0 });
+        await page.route('https://api.open-meteo.com/v1/**', async (route) => {
+            if (refuse)
+                return route.fulfill({
+                    status: 429,
+                    json: { error: true, reason: 'Hourly API request limit exceeded' },
+                });
+            return route.fallback();
+        });
+        const card = await openSitesAndSearch(page, 'AUTEUIL');
+        await expect(card.locator('.forecast-context')).not.toContainText('peut être dépassée');
+
+        await page.clock.fastForward('03:05:00');
+        const stale = page
+            .locator('.site-card:not(.minimized)', { hasText: 'AUTEUIL' })
+            .first()
+            .locator('.forecast-context');
+        await expect(stale).toContainText('peut être dépassée');
+        await stale.locator('[data-action="SitesrefreshWeather"]').click();
+        const fresh = page
+            .locator('.site-card:not(.minimized)', { hasText: 'AUTEUIL' })
+            .first()
+            .locator('.forecast-context');
+        await expect(fresh).not.toContainText('peut être dépassée');
+
+        await page.clock.fastForward('03:05:00');
+        refuse = true;
+        const again = page
+            .locator('.site-card:not(.minimized)', { hasText: 'AUTEUIL' })
+            .first()
+            .locator('.forecast-context');
+        await expect(again).toContainText('peut être dépassée');
+        await again.locator('[data-action="SitesrefreshWeather"]').click();
+        await page.clock.runFor(20000); // nouvelles tentatives après refus (3 s puis 12 s)
+        const failed = page
+            .locator('.site-card:not(.minimized)', { hasText: 'AUTEUIL' })
+            .first()
+            .locator('.forecast-context');
+        await expect(failed).toContainText('peut être dépassée');
+        await expect(failed).toContainText('Actualisation impossible');
+    });
+
+    test('Spec 002 US3 : le désaccord du second modèle est affiché pour l’heure choisie', async ({ page }) => {
+        await mockOpenMeteo(page, { complete: 6, empty: 0 });
+        // AUTEUIL est orienté N : vent du nord pour que le modèle principal le juge volable, et
+        // second modèle (GFS) identique sauf de la pluie à l'heure 2.
+        const northWind = (rainAt) => async (route) => {
+            const url = new URL(route.request().url());
+            const count = (url.searchParams.get('latitude') || '').split(',').length;
+            const one = aromeTailResponse(nearestHourIso(), { complete: 6, empty: 0 });
+            one.hourly.wind_direction_10m = one.hourly.wind_direction_10m.map(() => 0);
+            if (rainAt !== null) one.hourly.precipitation[rainAt] = 2;
+            await route.fulfill({ json: count > 1 ? Array.from({ length: count }, () => one) : one });
+        };
+        await page.route('https://api.open-meteo.com/v1/meteofrance**', northWind(null));
+        await page.route('https://api.open-meteo.com/v1/gfs**', northWind(2));
+        const card = await openSitesAndSearch(page, 'AUTEUIL');
+        const current = () => page.locator('.site-card:not(.minimized)', { hasText: 'AUTEUIL' }).first();
+
+        await expect(current().locator('.model-agreement')).toContainText('d’accord');
+        await expect(current().locator('.model-agreement')).not.toContainText('n’est pas');
+
+        await card.locator('.timeline-hour-dot').nth(2).click();
+        await expect(current().locator('.model-agreement')).toContainText('GFS (NOAA) n’est pas d’accord');
+
+        await current().locator('.timeline-hour-dot').nth(0).click();
+        await expect(current().locator('.model-agreement')).not.toContainText('n’est pas');
     });
 });

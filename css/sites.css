@@ -2642,3 +2642,85 @@ body.light-mode .back-to-top-btn {
         height: 32px !important;
     }
 }
+/* Spec 002 : position de référence par défaut et recherche hors du rayon. */
+.location-notice {
+    margin: 0 0 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px dashed rgba(148, 163, 184, 0.6);
+    font-size: 0.85rem;
+    color: var(--text-main);
+}
+
+.search-outside-notice {
+    width: 100%;
+}
+
+/* Spec 002 : contexte de la prévision (modèle, heure de récupération, run). */
+.forecast-context {
+    margin: 6px 0 0;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+}
+
+/* Spec 002 : prévision ancienne (> 3 h) — icône + texte, pas seulement la couleur. */
+.forecast-context--stale {
+    color: var(--text-main);
+    padding: 6px 8px;
+    border-left: 3px solid #f59e0b;
+    background: rgba(245, 158, 11, 0.08);
+    border-radius: 4px;
+}
+
+.forecast-stale-text {
+    font-weight: 600;
+}
+
+.forecast-refresh-btn {
+    margin-top: 4px;
+    padding: 2px 10px;
+    border: 1px solid currentColor;
+    border-radius: var(--radius-pill, 999px);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.forecast-refresh-error {
+    color: #b45309;
+}
+
+body.dark-mode .forecast-refresh-error {
+    color: #fbbf24;
+}
+
+/* Spec 002 : accord du second modèle pour l'heure affichée (icône + texte). */
+.model-agreement {
+    margin: 6px 0 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.model-agreement--agree {
+    color: #15803d;
+}
+
+.model-agreement--disagree {
+    color: #b45309;
+}
+
+.model-agreement--unavailable {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+body.dark-mode .model-agreement--agree {
+    color: #4ade80;
+}
+
+body.dark-mode .model-agreement--disagree {
+    color: #fbbf24;
+}

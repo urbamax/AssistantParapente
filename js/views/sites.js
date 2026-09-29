@@ -5,13 +5,16 @@
 import GlobalState from '../core/app_state.js';
 import SitesService from '../services/sites_service.js';
 import LogbookService from '../services/logbook_service.js';
-import { WIND_DIRECTIONS } from '../data/weather_config.js';
+import { WIND_DIRECTIONS, RADIUS, WEATHER_MODEL_INFO, STALE_AFTER_MS } from '../data/weather_config.js';
 import { getSpotairWidgetId } from '../data/spotair_widgets.js';
 import { escapeHTML } from '../core/security.js';
 import GdprEngine from '../gdpr_engine.js';
 
 import BaseView from '../core/base_view.js';
 import { t } from '../utils/i18n.js';
+import { FR } from '../i18n/fr.js';
+
+const FR_WEEKDAYS = FR.forecast.weekdays;
 
 // ---------------------------------------------------------------------------------------------
 // Affichage des verdicts météo (spec 001, contracts/ui-states.md). Les couleurs et libellés sont
@@ -51,6 +54,120 @@ function verdictReminderHtml(status) {
     return `<p class="verdict-reminder"><i class="ri-information-line" aria-hidden="true"></i> ${escapeHTML(t('weather.reminder'))}</p>`;
 }
 
+/** Libellé français d'un modèle météo (spec 002, FR-001). */
+export function modelLabel(modelKey) {
+    const info = WEATHER_MODEL_INFO[modelKey];
+    return info ? t(info.labelKey) : String(modelKey || '').toUpperCase();
+}
+
+const pad2 = (n) => String(n).padStart(2, '0');
+
+/** « aujourd'hui » / « hier » / autre jour, en heure locale, par rapport à `now`. */
+function dayOffset(timestamp, now) {
+    const a = new Date(timestamp);
+    const b = new Date(now);
+    const startA = new Date(a.getFullYear(), a.getMonth(), a.getDate()).getTime();
+    const startB = new Date(b.getFullYear(), b.getMonth(), b.getDate()).getTime();
+    return Math.round((startB - startA) / 86400000);
+}
+
+/**
+ * Ligne de contexte d'un verdict (spec 002, US1) : « AROME (Météo-France) · récupérée à 14 h 05
+ * · run AROME de 08 h ». L'heure de calcul n'apparaît que si elle est connue (FR-003).
+ * @param {{modelKey: string, fetchedAt: number, runAt?: number|null}} provenance
+ * @param {number} [now]
+ */
+export function formatForecastContext(provenance, now = Date.now()) {
+    const fetched = new Date(provenance.fetchedAt);
+    const time = `${pad2(fetched.getHours())} h ${pad2(fetched.getMinutes())}`;
+    const offset = dayOffset(provenance.fetchedAt, now);
+    const when =
+        offset === 0
+            ? t('forecast.whenToday', { time })
+            : offset === 1
+              ? t('forecast.whenYesterday', { time })
+              : t('forecast.whenOtherDay', { day: FR_WEEKDAYS[fetched.getDay()], time });
+    let text = t('forecast.context', { model: modelLabel(provenance.modelKey), when });
+
+    const info = WEATHER_MODEL_INFO[provenance.modelKey];
+    if (provenance.runAt && info && info.runLabel) {
+        const run = new Date(provenance.runAt);
+        const hour = `${pad2(run.getHours())} h`;
+        const runOffset = dayOffset(provenance.runAt, now);
+        const runWhen =
+            runOffset === 0
+                ? t('forecast.runToday', { hour })
+                : runOffset === 1
+                  ? t('forecast.runYesterday', { hour })
+                  : t('forecast.runOtherDay', { day: FR_WEEKDAYS[run.getDay()], hour });
+        text += t('forecast.run', { component: info.runLabel, when: runWhen });
+    }
+    return text;
+}
+
+/**
+ * Accord du second modèle pour l'heure affichée (spec 002, US3) : texte + icône, jamais la
+ * couleur seule. Rien si les modèles n'ont pas été comparés.
+ */
+function modelAgreementHtml(site) {
+    const agreement = SitesService.getModelAgreement(site);
+    if (!agreement || agreement.state === 'not_compared') return '';
+    const model = modelLabel(agreement.secondaryModelKey);
+    let text;
+    if (agreement.state === 'agree') text = t('forecast.agree', { model });
+    else if (agreement.state === 'disagree')
+        text = t('forecast.disagree', { model, verdict: agreement.secondaryOutcome?.reason || '' });
+    else text = t('forecast.comparisonUnavailable', { model });
+    return `<p class="model-agreement model-agreement--${agreement.state}">${escapeHTML(text)}</p>`;
+}
+
+/** Âge d'une prévision : « 45 min », « 3 h 20 », « 1 j 2 h » (spec 002, US2). */
+export function formatAge(ms) {
+    const minutes = Math.max(0, Math.floor(ms / 60000));
+    if (minutes < 60) return `${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} h ${pad2(minutes % 60)}`;
+    return `${Math.floor(hours / 24)} j ${hours % 24} h`;
+}
+
+/** Dernier échec d'« Actualiser » (raison en français), affiché sur les prévisions anciennes. */
+let lastRefreshFailure = '';
+
+/**
+ * Contenu d'une ligne de contexte. Au-delà de 3 h (spec 002, FR-005) : âge, avertissement et
+ * bouton « Actualiser », plus la raison du dernier échec éventuel (FR-006).
+ */
+function forecastContextInner(provenance, now = Date.now()) {
+    const stale = now - provenance.fetchedAt > STALE_AFTER_MS;
+    let html = escapeHTML(formatForecastContext(provenance, now));
+    if (stale) {
+        html +=
+            `<br><span class="forecast-stale-text"><i class="ri-time-line" aria-hidden="true"></i> ` +
+            `${escapeHTML(t('forecast.stale', { age: formatAge(now - provenance.fetchedAt) }))}</span> ` +
+            `<button type="button" class="forecast-refresh-btn" data-action="SitesrefreshWeather">${escapeHTML(t('forecast.refresh'))}</button>`;
+        if (lastRefreshFailure) {
+            html += `<br><span class="forecast-refresh-error">${escapeHTML(t('forecast.refreshFailed', { reason: lastRefreshFailure }))}</span>`;
+        }
+    }
+    return { html, stale };
+}
+
+/** Ligne de contexte HTML d'un site (vide si sa prévision n'a pas encore de provenance). */
+function forecastContextHtml(siteId) {
+    const provenance = SitesService.getForecastProvenance(siteId);
+    if (!provenance) return '';
+    const { html, stale } = forecastContextInner(provenance);
+    return (
+        `<p class="forecast-context${stale ? ' forecast-context--stale' : ''}" data-fetched-at="${provenance.fetchedAt}" ` +
+        `data-model-key="${escapeHTML(provenance.modelKey)}" data-run-at="${provenance.runAt || ''}">${html}</p>`
+    );
+}
+
+/** Libellé du rayon (10–200 km ; « Illimité » n'existe plus, spec 002 FR-015). */
+export function radiusLabel(km) {
+    return t('forecast.radiusKm', { km: Math.min(RADIUS.MAX, Number(km)) });
+}
+
 /** Libellé court d'un verdict (infobulles, tableau) : raison + données manquantes éventuelles. */
 function verdictLabel(status) {
     const missing = missingValuesText(status);
@@ -82,6 +199,8 @@ class SitesViewClass extends BaseView {
         console.timeEnd('SITES_SERVICE_INIT');
 
         this.setupEventListeners();
+        clearInterval(this._forecastAgeInterval);
+        this._forecastAgeInterval = setInterval(() => this.updateForecastAges(), 60 * 1000);
         this.renderSavedLocations();
         console.time('SITES_SHOW_METHOD');
         this.show();
@@ -141,6 +260,7 @@ class SitesViewClass extends BaseView {
     async unmount() {
         await super.unmount();
         clearInterval(this._weatherRetryInterval);
+        clearInterval(this._forecastAgeInterval);
         clearTimeout(this._radiusTimeout);
         clearTimeout(this._progZoomTimeout);
         if (this.state.mapResizeObserver) {
@@ -247,7 +367,7 @@ class SitesViewClass extends BaseView {
             if (el.id === 'radius-slider') {
                 SitesService.setRadiusLimit(el.value);
                 const label = document.getElementById('radius-val-label');
-                if (label) label.textContent = Number(el.value) === 210 ? 'Illimité' : `${el.value} km`;
+                if (label) label.textContent = radiusLabel(SitesService.state.radiusLimit);
                 // Debounce rendering
                 clearTimeout(this._radiusTimeout);
                 this._radiusTimeout = setTimeout(() => {
@@ -365,7 +485,7 @@ class SitesViewClass extends BaseView {
             const modelSelect = /** @type {HTMLSelectElement} */ (document.getElementById('weather-model-select'));
             const sortSelect = /** @type {HTMLSelectElement} */ (document.getElementById('select-sort-mode'));
             const radiusSlider = /** @type {HTMLInputElement} */ (document.getElementById('radius-slider'));
-            const radiusLabel = document.getElementById('radius-val-label');
+            const radiusLabelEl = document.getElementById('radius-val-label');
 
             if (minInput) minInput.value = String(SitesService.state.limitWindMin);
             if (maxInput) maxInput.value = String(SitesService.state.limitWindMax);
@@ -374,9 +494,7 @@ class SitesViewClass extends BaseView {
             if (modelSelect) modelSelect.value = SitesService.state.weatherModel;
             if (sortSelect) sortSelect.value = SitesService.state.sortMode;
             if (radiusSlider) radiusSlider.value = String(SitesService.state.radiusLimit);
-            if (radiusLabel)
-                radiusLabel.textContent =
-                    SitesService.state.radiusLimit === 210 ? 'Illimité' : `${SitesService.state.radiusLimit} km`;
+            if (radiusLabelEl) radiusLabelEl.textContent = radiusLabel(SitesService.state.radiusLimit);
 
             // Adjust strategy display panel & strategy buttons active classes
             const strategyPanel = document.getElementById('conditions-strategy-panel');
@@ -485,7 +603,26 @@ class SitesViewClass extends BaseView {
             this.updateForecastLabel();
             this.renderList();
             this.updateMapMarkers();
+            // Heure de calcul du modèle (spec 002, FR-003) : demandée à part, sans bloquer ni
+            // faire échouer l'affichage ; on ne ré-affiche que si elle est connue.
+            SitesService.fetchModelRunTime(SitesService.state.weatherModel).then((runAt) => {
+                if (runAt) this.renderList();
+            });
+            this.loadModelComparison();
         }
+    }
+
+    /**
+     * Charge le second modèle (même sites, mêmes heures) puis ré-affiche : sans lui, la
+     * comparaison est simplement indiquée comme indisponible (spec 002, US3).
+     */
+    loadModelComparison() {
+        SitesService.fetchSecondaryModel()
+            .then(() => {
+                this.renderList();
+                this.updateMapMarkers();
+            })
+            .catch(() => {});
     }
 
     initMap() {
@@ -534,11 +671,11 @@ class SitesViewClass extends BaseView {
                 const bounds = this.state.map.getBounds();
                 if (!bounds || !bounds.isValid()) return;
 
-                if (SitesService.state.userLocation && SitesService.state.userLocation.lat !== undefined) {
-                    const userLatLng = L.latLng(
-                        SitesService.state.userLocation.lat,
-                        SitesService.state.userLocation.lng,
-                    );
+                // Même position de référence que le filtre du rayon : GPS, adresse, ou
+                // Boulogne-sur-Mer par défaut (spec 002, FR-017) — jamais le centre de la carte.
+                const reference = SitesService.getEffectiveLocation();
+                if (reference && reference.lat !== undefined) {
+                    const userLatLng = L.latLng(reference.lat, reference.lng);
                     const corners = [
                         bounds.getNorthWest(),
                         bounds.getNorthEast(),
@@ -557,8 +694,8 @@ class SitesViewClass extends BaseView {
                     radius = Math.round(center.distanceTo(northEast) / 1000 / 10) * 10;
                 }
 
-                if (radius > 200) radius = 210;
-                if (radius < 10) radius = 10;
+                // Le zoom de la carte ne peut plus repasser en « Illimité » (spec 002, FR-015).
+                radius = Math.min(RADIUS.MAX, Math.max(RADIUS.MIN, radius));
 
                 if (SitesService.state.radiusLimit !== radius) {
                     this.state.ignoreNextFitBounds = true;
@@ -675,6 +812,8 @@ class SitesViewClass extends BaseView {
             </div>
             <div style="opacity: 0.8; font-size: 0.8rem;">Rafales : ${escapeHTML(String(forecastValue(weather.windGust)))} km/h</div>
             ${missing ? `<div class="weather-missing-values" style="margin-top: 4px; font-size: 0.8rem;">${escapeHTML(missing)}</div>` : ''}
+            ${status.status === 'incomplete' ? '' : modelAgreementHtml(site)}
+            ${forecastContextHtml(site.id)}
             ${verdictReminderHtml(status)}
         </div>`;
     }
@@ -1609,14 +1748,6 @@ class SitesViewClass extends BaseView {
             }
         }
         this.renderList();
-
-        if (this.state.showComparator) {
-            // Fetch best-effort : si ça échoue, getModelAgreement renverra simplement null
-            // (colonne "Confiance" affichée comme indisponible) sans bloquer le reste du tableau.
-            SitesService.fetchSecondaryModelForFavorites()
-                .then(() => this.renderList())
-                .catch(() => {});
-        }
     }
 
     // Tableau côte-à-côte des sites favoris pour le créneau actuellement affiché (même offset
@@ -1639,6 +1770,17 @@ class SitesViewClass extends BaseView {
             return;
         }
 
+        // Contexte des prévisions (spec 002) : une seule ligne si tous les favoris viennent de la
+        // même récupération, sinon une par ligne du tableau.
+        const provenanceKeys = new Set(
+            favoriteSites.map((site) => {
+                const p = SitesService.getForecastProvenance(site.id);
+                return p ? `${p.modelKey}|${p.fetchedAt}` : 'none';
+            }),
+        );
+        const sharedContext = provenanceKeys.size === 1;
+        const tableContextHtml = sharedContext && favoriteSites.length ? forecastContextHtml(favoriteSites[0].id) : '';
+
         const rows = favoriteSites
             .map((site) => {
                 const forecasts = SitesService.state.weatherForecasts[site.id] || [];
@@ -1660,25 +1802,13 @@ class SitesViewClass extends BaseView {
                     ? `${escapeHTML(bestSlot.dayLabel)} ${bestSlot.start}h-${bestSlot.end + 1}h`
                     : '<span style="color: var(--text-muted);">Aucun</span>';
 
-                const agreement = SitesService.getModelAgreement(site);
-                // Indice calculable seulement sur deux prévisions complètes (spec 001) : si les deux
-                // modèles sont chargés mais qu'il reste null, c'est qu'une prévision est incomplète.
-                const secondaryLoaded = !!SitesService.state.weatherForecastsSecondary?.[site.id];
-                const confidenceUnavailable =
-                    agreement === null && (status?.status === 'incomplete' || (secondaryLoaded && !!weather));
-                const confidenceHtml =
-                    agreement === null
-                        ? confidenceUnavailable
-                            ? `<span style="color: var(--text-muted);" title="${escapeHTML(t('weather.incomplete'))}">${escapeHTML(t('weather.confidenceUnavailable'))}</span>`
-                            : '<span style="color: var(--text-muted);">—</span>'
-                        : agreement
-                          ? '<span style="color: var(--accent-green);" title="Le modèle principal et le modèle de référence sont d\'accord sur la volabilité actuelle"><i class="ri-shield-check-line"></i> Fiable</span>'
-                          : '<span style="color: #f59e0b;" title="Les modèles météo divergent sur la volabilité actuelle : prudence"><i class="ri-error-warning-line"></i> Incertain</span>';
+                // Accord du second modèle pour l'heure affichée (spec 002, US3).
+                const confidenceHtml = modelAgreementHtml(site) || '<span style="color: var(--text-muted);">—</span>';
 
                 return `
                 <tr>
                     <td style="padding: 10px; font-weight: 700;">${escapeHTML(site.nom || site.name || '')}</td>
-                    <td style="padding: 10px;">${statusHtml}</td>
+                    <td style="padding: 10px;">${statusHtml}${sharedContext ? '' : forecastContextHtml(site.id)}</td>
                     <td style="padding: 10px; text-align: center;">${site.flyableHours || 0}h</td>
                     <td style="padding: 10px; text-align: center;">${bestSlotHtml}</td>
                     <td style="padding: 10px;">${confidenceHtml}</td>
@@ -1689,6 +1819,7 @@ class SitesViewClass extends BaseView {
 
         listDiv.innerHTML = `
             <div class="card" style="padding: 16px; overflow-x: auto;">
+                ${tableContextHtml}
                 ${verdictReminderHtml(null)}
                 <table style="width: 100%; border-collapse: collapse; min-width: 480px;">
                     <thead>
@@ -1707,11 +1838,68 @@ class SitesViewClass extends BaseView {
         `;
     }
 
+    /**
+     * Bouton « Actualiser » d'une prévision ancienne : récupère à nouveau la météo en ignorant
+     * le cache. En cas d'échec, l'ancienne prévision reste affichée, signalée, avec la raison.
+     */
+    async refreshWeather() {
+        const result = await SitesService.fetchWeatherForSites({ force: true });
+        if (result && result.success === null) return; // remplacé par un appel plus récent
+        lastRefreshFailure = result && result.success === false ? result.reason || t('forecast.refreshError') : '';
+        this.updateForecastLabel();
+        this.renderList();
+        this.updateMapMarkers();
+        if (!lastRefreshFailure) this.loadModelComparison();
+    }
+
+    /**
+     * Met à jour chaque minute l'âge et l'avertissement des lignes de contexte déjà affichées,
+     * sans ré-afficher la liste (spec 002, FR-007).
+     */
+    updateForecastAges(now = Date.now()) {
+        document.querySelectorAll('.forecast-context[data-fetched-at]').forEach((el) => {
+            const element = /** @type {HTMLElement} */ (el);
+            const provenance = {
+                modelKey: element.dataset.modelKey,
+                fetchedAt: Number(element.dataset.fetchedAt),
+                runAt: element.dataset.runAt ? Number(element.dataset.runAt) : null,
+            };
+            const { html, stale } = forecastContextInner(provenance, now);
+            element.innerHTML = html;
+            element.classList.toggle('forecast-context--stale', stale);
+        });
+    }
+
+    /**
+     * Message « Recherche centrée sur Boulogne-sur-Mer » tant qu'aucune position (GPS, adresse)
+     * n'est connue (spec 002, FR-017). Appelé à chaque rendu de la liste.
+     */
+    renderLocationContext() {
+        const notice = document.getElementById('default-location-notice');
+        if (!notice) return;
+        const isDefault = !!SitesService.getEffectiveLocation().isDefault;
+        notice.hidden = !isDefault;
+        notice.textContent = isDefault ? t('forecast.defaultLocationNotice') : '';
+    }
+
+    /** Sites trouvés par la recherche mais hors du rayon : signalés, jamais interrogés (FR-019). */
+    buildSearchOutsideNotice() {
+        const count = SitesService.countSearchMatchesOutsideRadius();
+        if (!count) return '';
+        const km = SitesService.state.radiusLimit;
+        const text =
+            count === 1
+                ? t('forecast.searchOutsideRadiusOne', { km })
+                : t('forecast.searchOutsideRadius', { count, km });
+        return `<p class="location-notice search-outside-notice" role="status">${escapeHTML(text)}</p>`;
+    }
+
     renderList() {
         const listDiv = document.getElementById('sites-list-container');
         if (!listDiv) return;
 
         const activeSites = SitesService.getFilteredAndSortedSites(SitesService.getSites());
+        this.renderLocationContext();
 
         if (this.state.showComparator) {
             this.renderComparator(activeSites);
@@ -1722,6 +1910,7 @@ class SitesViewClass extends BaseView {
         if (activeSites.length === 0) {
             listDiv.style.display = 'block';
             listDiv.innerHTML =
+                this.buildSearchOutsideNotice() +
                 '<div class="card" style="text-align: center; padding: 20px;">Aucun site trouvé pour ces critères</div>';
         } else {
             listDiv.style.display = 'flex';
@@ -1795,6 +1984,8 @@ class SitesViewClass extends BaseView {
                             </div>
                             ${missingValuesText(status) ? `<div class="weather-missing-values" style="font-size: 0.8rem;">${escapeHTML(missingValuesText(status))}</div>` : ''}
                         </div>
+                        ${status.status === 'incomplete' ? '' : modelAgreementHtml(site)}
+                        ${forecastContextHtml(site.id)}
                         ${verdictReminderHtml(status)}
                     `;
                 } else if (hasWeatherEntry) {
@@ -1808,7 +1999,7 @@ class SitesViewClass extends BaseView {
                     weatherHtml = `
                         <div class="weather-loading">
                             <i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i>
-                            <span>Chargement météo ${SitesService.state.weatherModel.toUpperCase()}...</span>
+                            <span>${escapeHTML(t('forecast.loading', { model: modelLabel(SitesService.state.weatherModel) }))}</span>
                         </div>
                     `;
                 }
@@ -1911,7 +2102,7 @@ class SitesViewClass extends BaseView {
                     ) +
                     `</div>`;
             }
-            listDiv.innerHTML = html;
+            listDiv.innerHTML = this.buildSearchOutsideNotice() + html;
         }
 
         this.updateBadges();

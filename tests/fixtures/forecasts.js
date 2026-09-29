@@ -32,6 +32,18 @@ export const COMPLETE_HOUR = Object.freeze({
     cape: 100,
 });
 
+/**
+ * Heure pleine la plus proche de maintenant, au format ISO : c'est l'heure que l'application
+ * choisit comme « maintenant » (index de l'heure la plus proche). Partir de l'heure pile
+ * passée décalait tout d'une heure après la demi-heure.
+ */
+export function nearestHourIso(now = new Date()) {
+    const d = new Date(now);
+    if (d.getMinutes() >= 30) d.setHours(d.getHours() + 1);
+    d.setMinutes(0, 0, 0);
+    return d.toISOString();
+}
+
 export function completeHourWith(overrides = {}) {
     return { ...COMPLETE_HOUR, ...overrides };
 }
@@ -2086,3 +2098,45 @@ export const REFERENCE_CASES = Object.freeze([
         },
     },
 ]);
+
+// ---------------------------------------------------------------------------------------------
+// Spec 002 : contexte des prévisions.
+// ---------------------------------------------------------------------------------------------
+
+/** Réponse de https://api.open-meteo.com/data/{model}/static/meta.json (champs utilisés). */
+export function metaJson({ runAtS = 1_790_000_000, updateIntervalS = 10800 } = {}) {
+    return {
+        last_run_initialisation_time: runAtS,
+        last_run_availability_time: runAtS + 4 * 3600,
+        update_interval_seconds: updateIntervalS,
+    };
+}
+
+/** Sites autour de Boulogne-sur-Mer (50.7264, 1.6147), distances réelles vérifiées. */
+export const SITES_AROUND_BOULOGNE = Object.freeze([
+    { id: 101, nom: 'Wimereux', latitude: 50.77, longitude: 1.611, orientations_vent: ['O'] }, // ~5 km
+    { id: 102, nom: 'Hardelot', latitude: 50.633, longitude: 1.58, orientations_vent: ['O'] }, // ~11 km
+    { id: 103, nom: 'Cap Blanc-Nez', latitude: 50.925, longitude: 1.713, orientations_vent: ['NO'] }, // ~23 km
+    { id: 104, nom: 'Saint-Valery', latitude: 50.183, longitude: 1.63, orientations_vent: ['N'] }, // ~60 km
+    { id: 105, nom: 'Amiens', latitude: 49.894, longitude: 2.302, orientations_vent: ['S'] }, // ~105 km
+    { id: 106, nom: 'Paris', latitude: 48.8566, longitude: 2.3522, orientations_vent: ['S'] }, // ~213 km
+]);
+
+/**
+ * Heures alignées de deux modèles pour un site orienté S : complètes et volables par défaut ;
+ * `disagreeAt` = heures où le second modèle annonce de la pluie ; `incompleteAt` = heures où le
+ * second modèle n'a pas de rafales.
+ */
+export function twoModelHours({ disagreeAt = [], incompleteAt = [], length = 48 } = {}) {
+    const primary = [];
+    const secondary = [];
+    for (let i = 0; i < length; i++) {
+        const time = `2026-09-30T${String(i % 24).padStart(2, '0')}:00`;
+        primary.push(completeHourWith({ time }));
+        let second = completeHourWith({ time });
+        if (disagreeAt.includes(i)) second = completeHourWith({ time, precipitation: 2 });
+        if (incompleteAt.includes(i)) second = completeHourWith({ time, windGust: null });
+        secondary.push(second);
+    }
+    return { primary, secondary };
+}

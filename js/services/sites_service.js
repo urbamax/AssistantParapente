@@ -3,15 +3,43 @@
  * Business logic, GPS calculations, Weather API fetching, and Data Filtering
  */
 import StorageService from '../services/storage.js';
-import { WIND_THRESHOLDS, WEATHER_MODELS } from '../data/weather_config.js';
+import {
+    WIND_THRESHOLDS,
+    WEATHER_MODELS,
+    RADIUS,
+    DEFAULT_LOCATION,
+    WEATHER_MODEL_INFO,
+    STALE_AFTER_MS,
+} from '../data/weather_config.js';
 import { calculateDistance, getAngularDifference, degreesToCardinal } from '../utils/geo_utils.js';
 import { removeAccents } from '../utils/text_utils.js';
 import { escapeHTML } from '../core/security.js';
 import AppRouter from '../core/router.js';
 import { evaluateSpotForecast, normalizeForecastValue, getSiteOrientations } from '../weatherScoring.js';
 import { toSorted } from '../utils/array_utils.js';
+import { t } from '../utils/i18n.js';
 
 const sitesView = () => AppRouter.getView('SITES');
+
+/**
+ * Convertit les préférences enregistrées vers les réglages actuels (spec 002, FR-018) :
+ * - le rayon « Illimité » (ancienne valeur 210) et tout rayon au-dessus de 200 km → 50 km par
+ *   défaut, en dessous de 10 km → 10 km : « Illimité » épuisait le quota Open-Meteo ;
+ * - le modèle « meteoblue » → « best_match » : il n'a jamais utilisé Meteoblue, mais la
+ *   sélection automatique multi-modèles d'Open-Meteo.
+ * Ne modifie pas l'objet reçu.
+ * @param {Object} prefs
+ * @returns {Object}
+ */
+export function migrateSitePrefs(prefs) {
+    const out = { ...(prefs || {}) };
+    const radius = Number(out.radiusLimit);
+    if (out.radiusLimit === undefined || !Number.isFinite(radius) || radius > RADIUS.MAX)
+        out.radiusLimit = RADIUS.DEFAULT;
+    else if (radius < RADIUS.MIN) out.radiusLimit = RADIUS.MIN;
+    if (out.weatherModel === 'meteoblue') out.weatherModel = 'best_match';
+    return out;
+}
 
 class SitesService {
     constructor() {
@@ -45,7 +73,7 @@ class SitesService {
             filterTypeInclude: [],
             filterTypeExclude: [],
             userLocation: null,
-            radiusLimit: 210,
+            radiusLimit: /** @type {number} */ (RADIUS.DEFAULT),
             sortMode: 'CONDITIONS',
             conditionsStrategy: 'CONSECUTIVE',
             forecastOffset: 0,
@@ -78,7 +106,7 @@ class SitesService {
                 limitGustDelta: WIND_THRESHOLDS.GUST_DELTA,
                 hideUnflyable: false,
                 filterTypeExclude: [],
-                radiusLimit: 210,
+                radiusLimit: /** @type {number} */ (RADIUS.DEFAULT),
                 sortMode: 'CONDITIONS',
                 conditionsStrategy: 'CONSECUTIVE',
                 weatherModel: WEATHER_MODELS.AROME,
@@ -174,8 +202,10 @@ class SitesService {
         if (!this.state.userPreferences.savedLocations) this.state.userPreferences.savedLocations = [];
         if (!this.state.userPreferences.forecastMaxRange) this.state.userPreferences.forecastMaxRange = 120;
 
-        // Apply saved limit and filter settings if they exist dynamically
-        const prefs = this.state.userPreferences;
+        // Apply saved limit and filter settings if they exist dynamically.
+        // Réglages retirés ou renommés (spec 002) convertis d'abord : rayon « Illimité », modèle « meteoblue ».
+        const prefs = migrateSitePrefs(this.state.userPreferences);
+        this.state.userPreferences = prefs;
         const typeMapping = {
             Atterrissage: 'ATTERRO',
             'Site Naturel': 'NATUREL',
@@ -294,7 +324,9 @@ class SitesService {
         if (modelKey === 'icon' || modelKey === 'iconeu') apiEndpoint = 'dwd-icon';
         else if (modelKey === 'gfs') apiEndpoint = 'gfs';
         else if (modelKey === 'ecmwf') apiEndpoint = 'ecmwf';
-        else if (modelKey === 'meteoblue') apiEndpoint = 'forecast';
+        // Sélection automatique multi-modèles d'Open-Meteo (anciennement libellée « Meteoblue »,
+        // qu'elle n'a jamais utilisé — spec 002, FR-008).
+        else if (modelKey === 'best_match') apiEndpoint = 'forecast';
 
         let modelParam = '';
         if (modelKey === 'iconeu') modelParam = '&models=icon_eu';
@@ -308,91 +340,117 @@ class SitesService {
     // ("modèles d'accord/en désaccord") dans le comparateur multi-sites. Volontairement léger
     // (2 jours, pas de chunking) puisque limité aux favoris, contrairement au fetch principal
     // qui couvre tous les sites actifs sur toute la fenêtre de prévision.
-    async fetchSecondaryModelForFavorites() {
-        this.state.weatherForecastsSecondary = this.state.weatherForecastsSecondary || {};
-        const allSites = this.getSites();
-        if (allSites.length === 0) return { success: false, error: 'Catalogue des sites indisponible' };
+    /** Second modèle de la comparaison : GFS, ou AROME quand GFS est le modèle principal. */
+    getSecondaryModelKey() {
+        return this.state.weatherModel === 'gfs' ? 'meteofrance' : 'gfs';
+    }
 
-        const favoriteIds = (this.state.userPreferences && this.state.userPreferences.favoriteSites) || [];
-        const favoriteSites = allSites.filter(
-            (s) =>
-                favoriteIds.includes(s.id) &&
-                !isNaN(parseFloat(s.latitude || s.lat)) &&
-                !isNaN(parseFloat(s.longitude || s.lon)),
+    /**
+     * Charge le second modèle pour les mêmes sites que le modèle principal (sites du rayon +
+     * favoris) et les mêmes heures, pour comparer l'heure affichée (spec 002, US3, FR-009/010).
+     * Mêmes lots de 400 sites, même cache de 10 min et même pause après un refus d'Open-Meteo
+     * que le modèle principal (FR-010a) : pendant cette pause, rien n'est demandé et la
+     * comparaison est simplement indisponible.
+     * `weatherForecastsSecondary[id]` est un tableau aligné sur `weatherForecasts[id]` (même
+     * index = même heure, appariées par leur date-heure).
+     */
+    async fetchSecondaryModel() {
+        const secondaryModelKey = this.getSecondaryModelKey();
+        if (secondaryModelKey === this.state.weatherModel) {
+            this.state.weatherForecastsSecondary = {};
+            return { success: true };
+        }
+        if (this.getWeatherCooldownRemainingMs() > 0) return { success: false, reason: this._failureReason() };
+
+        const sites = this.getGeoFilteredSites(this.getSites()).filter(
+            (site) => (this.state.weatherForecasts[site.id] || []).length > 0,
         );
-
-        if (favoriteSites.length === 0) {
+        if (sites.length === 0) {
             this.state.weatherForecastsSecondary = {};
             return { success: true };
         }
 
-        const secondaryModelKey = this.state.weatherModel === 'gfs' ? 'meteofrance' : 'gfs';
         const { apiEndpoint, modelParam } = this._resolveModelEndpoint(secondaryModelKey);
-
-        const lats = favoriteSites.map((s) => parseFloat(s.latitude || s.lat)).join(',');
-        const lons = favoriteSites.map((s) => parseFloat(s.longitude || s.lon)).join(',');
-        const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${lats}&longitude=${lons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,cape&timezone=Europe%2FParis&forecast_days=2${modelParam}`;
-
+        if (!this._weatherCache) this._weatherCache = new Map();
+        const CHUNK_SIZE = 400;
+        const secondary = {};
         try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Open-Meteo HTTP ${response.status}`);
-            const data = await response.json();
-            const dataArr = Array.isArray(data) ? data : [data];
+            for (let i = 0; i < sites.length; i += CHUNK_SIZE) {
+                const chunkSites = sites.slice(i, i + CHUNK_SIZE);
+                const lats = chunkSites.map((x) => parseFloat(x.latitude || x.lat)).join(',');
+                const lons = chunkSites.map((x) => parseFloat(x.longitude || x.lon)).join(',');
+                const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${lats}&longitude=${lons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,cape&timezone=Europe%2FParis&forecast_days=8${modelParam}`;
 
-            const now = Date.now();
-            this.state.weatherForecastsSecondary = {};
-            favoriteSites.forEach((site, index) => {
-                const hourly = dataArr[index]?.hourly;
-                if (!hourly || !hourly.time) return;
-
-                let idx = 0,
-                    minDiff = Infinity;
-                hourly.time.forEach((t, i) => {
-                    const diff = Math.abs(new Date(t).getTime() - now);
-                    if (diff < minDiff) {
-                        minDiff = diff;
-                        idx = i;
+                let results;
+                const cached = this._weatherCache.get(url);
+                if (cached && Date.now() - cached.timestamp < SitesService.WEATHER_CACHE_TTL_MS) {
+                    results = cached.results;
+                } else {
+                    const response = await this._fetchWithBackoff(url);
+                    if (response.status === 429) {
+                        this._weatherCooldownUntil = Date.now() + SitesService.WEATHER_COOLDOWN_MS;
                     }
-                });
+                    if (!response.ok) throw new Error(`Open-Meteo HTTP ${response.status} (modèle de comparaison)`);
+                    const data = await response.json();
+                    results = Array.isArray(data) ? data : [data];
+                    this._weatherCache.set(url, { timestamp: Date.now(), results });
+                }
 
-                // Valeurs validées : une donnée absente reste null, jamais 0 (spec 001, FR-005).
-                const dirDeg = normalizeForecastValue(hourly.wind_direction_10m?.[idx], 'windDir');
-                this.state.weatherForecastsSecondary[site.id] = {
-                    time: hourly.time[idx],
-                    windSpeed: normalizeForecastValue(hourly.wind_speed_10m?.[idx], 'windSpeed'),
-                    windGust: normalizeForecastValue(hourly.wind_gusts_10m?.[idx], 'windGust'),
-                    windDirDeg: dirDeg,
-                    windCard: dirDeg === null ? null : degreesToCardinal(dirDeg),
-                    precipitation: normalizeForecastValue(hourly.precipitation?.[idx], 'precipitation'),
-                    cape: normalizeForecastValue(hourly.cape?.[idx], 'cape'),
-                };
-            });
+                chunkSites.forEach((site, index) => {
+                    const hourly = results[index]?.hourly;
+                    if (!hourly || !Array.isArray(hourly.time)) return;
+                    const indexByTime = new Map(hourly.time.map((time, idx) => [time, idx]));
+                    secondary[site.id] = (this.state.weatherForecasts[site.id] || []).map((primaryHour) => {
+                        const idx = indexByTime.get(primaryHour.time);
+                        if (idx === undefined) return null;
+                        // Valeurs validées : une donnée absente reste null, jamais 0 (spec 001).
+                        const dirDeg = normalizeForecastValue(hourly.wind_direction_10m?.[idx], 'windDir');
+                        return {
+                            time: hourly.time[idx],
+                            windSpeed: normalizeForecastValue(hourly.wind_speed_10m?.[idx], 'windSpeed'),
+                            windGust: normalizeForecastValue(hourly.wind_gusts_10m?.[idx], 'windGust'),
+                            windDirDeg: dirDeg,
+                            windCard: dirDeg === null ? null : degreesToCardinal(dirDeg),
+                            precipitation: normalizeForecastValue(hourly.precipitation?.[idx], 'precipitation'),
+                            cape: normalizeForecastValue(hourly.cape?.[idx], 'cape'),
+                        };
+                    });
+                });
+            }
+            this.state.weatherForecastsSecondary = secondary;
+            this.state.secondaryModelKey = secondaryModelKey;
             return { success: true };
         } catch (e) {
-            console.error('Erreur météo (modèle secondaire, indice de confiance):', e);
-            return { success: false, error: e };
+            console.error('Erreur météo (modèle de comparaison):', e);
+            return { success: false, error: e, reason: this._failureReason() };
         }
     }
 
-    // Compare le statut volable/non-volable du modèle principal et du modèle secondaire pour un
-    // site donné, au créneau actuel. Retourne null tant que le modèle secondaire n'a pas été
-    // chargé (fetchSecondaryModelForFavorites), sinon un booléen "les modèles sont d'accord".
-    getModelAgreement(site) {
-        const secondaryForecast = this.state.weatherForecastsSecondary && this.state.weatherForecastsSecondary[site.id];
-        if (!secondaryForecast) return null;
+    /**
+     * Accord entre le modèle principal et le second modèle pour UNE heure (par défaut l'heure
+     * affichée) — les deux modèles à la même heure (spec 002, FR-009). N'altère jamais le
+     * verdict principal (FR-011).
+     * @returns {{state: 'agree'|'disagree'|'unavailable'|'not_compared', secondaryModelKey: string, secondaryOutcome: {reason: string, reasonCode: string}|null}}
+     */
+    getModelAgreement(site, offset = this.state.forecastOffset) {
+        const secondaryModelKey = this.getSecondaryModelKey();
+        const result = (state, secondaryOutcome = null) => ({ state, secondaryModelKey, secondaryOutcome });
+        if (secondaryModelKey === this.state.weatherModel) return result('not_compared');
 
-        const primaryForecasts = this.state.weatherForecasts[site.id] || [];
-        const primaryForecast = primaryForecasts[this.state.forecastOffset];
-        if (!primaryForecast) return null;
+        const primaryForecast = (this.state.weatherForecasts[site.id] || [])[offset];
+        const secondaryForecast = ((this.state.weatherForecastsSecondary || {})[site.id] || [])[offset];
+        if (!primaryForecast || !secondaryForecast) return result('unavailable');
 
-        // Le jour/la nuit ne dépend pas du modèle : la requête secondaire ne demande pas les
-        // heures de lever/coucher, on reprend celles du modèle principal.
+        // Le jour/la nuit ne dépend pas du modèle : la requête du second modèle ne demande pas les
+        // heures de lever/coucher, on reprend celles du modèle principal pour la même heure.
         const primary = this.isForecastFlyable(site, primaryForecast);
         const secondary = this.isForecastFlyable(site, { ...secondaryForecast, isDaytime: primaryForecast.isDaytime });
-        // Une prévision incomplète ne permet pas de comparer : indice indisponible (spec 001).
-        if (primary.status === 'incomplete' || secondary.status === 'incomplete') return null;
-        return primary.flyable === secondary.flyable;
+        // Une prévision incomplète ne permet pas de comparer : jamais présentée comme un accord.
+        if (primary.status === 'incomplete' || secondary.status === 'incomplete') return result('unavailable');
+        return result(primary.flyable === secondary.flyable ? 'agree' : 'disagree', secondary);
     }
+
+    static WEATHER_CACHE_TTL_MS = 10 * 60 * 1000;
 
     // Après un lot rejeté par Open-Meteo malgré les 3 tentatives ci-dessous, on arrête
     // d'appeler l'API pendant ce délai : réessayer plus vite ne fait que reproduire le même
@@ -422,7 +480,24 @@ class SitesService {
         return response;
     }
 
-    async fetchWeatherForSites() {
+    /** Prévision récupérée il y a plus de 3 h (spec 002, FR-005). */
+    isForecastStale(siteId, now = Date.now()) {
+        const p = this.state.forecastProvenance && this.state.forecastProvenance[siteId];
+        return !!p && now - p.fetchedAt > STALE_AFTER_MS;
+    }
+
+    /** Raison d'un échec de récupération, en français, pour l'afficher au pilote (FR-006). */
+    _failureReason() {
+        const cooldownMs = this.getWeatherCooldownRemainingMs();
+        if (cooldownMs > 0) return t('forecast.refreshQuota', { minutes: Math.max(1, Math.ceil(cooldownMs / 60000)) });
+        if (typeof navigator !== 'undefined' && navigator.onLine === false) return t('forecast.refreshOffline');
+        return t('forecast.refreshError');
+    }
+
+    /**
+     * @param {{force?: boolean}} [options] force : ignorer le cache (bouton « Actualiser »).
+     */
+    async fetchWeatherForSites({ force = false } = {}) {
         // Plusieurs déclencheurs (show(), changeWeatherModel(), scheduleWeatherRescopeIfNeeded())
         // peuvent chacun poser cet indicateur puis retourner tôt (cooldown, aucun site) ou
         // s'annuler mutuellement : sans ce nettoyage à chaque sortie, il reste bloqué à l'écran
@@ -444,6 +519,7 @@ class SitesService {
                 success: false,
                 error: { message: 'Service météo momentanément saturé' },
                 cooldownRemainingMs: cooldownRemaining,
+                reason: this._failureReason(),
             };
         }
 
@@ -473,7 +549,7 @@ class SitesService {
 
         // Cache court (10 min) : le vent ne change pas assez vite pour justifier un
         // re-fetch complet à chaque montage de vue ou changement rapide de modèle.
-        const WEATHER_CACHE_TTL_MS = 10 * 60 * 1000;
+        const WEATHER_CACHE_TTL_MS = SitesService.WEATHER_CACHE_TTL_MS;
         if (!this._weatherCache) this._weatherCache = new Map();
 
         if (this.abortController) {
@@ -485,12 +561,15 @@ class SitesService {
         const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
         let results;
+        /** @type {number[]} heure de récupération de chaque résultat (même index que results) */
+        let resultsFetchedAt = [];
         try {
             // Séquentiel (pas Promise.all) : 5 lots tirés en même temps se sont déjà
             // fait rejeter en bloc par Open-Meteo avec un 429 "Hourly API request
             // limit exceeded" — un seul lot à la fois, avec une pause entre chaque
             // et un backoff sur 429 (voir _fetchWithBackoff), reste sous ce seuil.
             const chunkResults = [];
+            const chunkFetchedAt = [];
             for (const chunkSites of chunks) {
                 const chunkLats = chunkSites.map((s) => parseFloat(s.latitude || s.lat)).join(',');
                 const chunkLons = chunkSites.map((s) => parseFloat(s.longitude || s.lon)).join(',');
@@ -499,8 +578,11 @@ class SitesService {
                 const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${chunkLats}&longitude=${chunkLons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,cape&daily=sunrise,sunset&timezone=Europe%2FParis&forecast_days=8${modelParam}`;
 
                 const cached = this._weatherCache.get(url);
-                if (cached && Date.now() - cached.timestamp < WEATHER_CACHE_TTL_MS) {
+                if (!force && cached && Date.now() - cached.timestamp < WEATHER_CACHE_TTL_MS) {
                     chunkResults.push(cached.results);
+                    // Heure de la récupération d'origine, jamais celle de la relecture du cache
+                    // (spec 002, FR-004).
+                    chunkFetchedAt.push(...cached.results.map(() => cached.timestamp));
                     continue;
                 }
 
@@ -513,12 +595,15 @@ class SitesService {
                 }
                 const data = await response.json();
                 const chunkArr = Array.isArray(data) ? data : [data];
-                this._weatherCache.set(url, { timestamp: Date.now(), results: chunkArr });
+                const fetchedAt = Date.now();
+                this._weatherCache.set(url, { timestamp: fetchedAt, results: chunkArr });
                 chunkResults.push(chunkArr);
+                chunkFetchedAt.push(...chunkArr.map(() => fetchedAt));
 
                 if (chunks.length > 1) await sleep(250);
             }
             results = chunkResults.flat();
+            resultsFetchedAt = chunkFetchedAt;
         } catch (e) {
             // Un appel plus récent à fetchWeatherForSites() (filtre changé, GPS mis à jour,
             // modèle météo changé...) a annulé celui-ci pour prendre le relais : ce n'est pas
@@ -529,11 +614,17 @@ class SitesService {
             }
             clearLoadingIndicator();
             console.error('Erreur lors de la récupération météo:', e);
-            return { success: false, error: e, cooldownRemainingMs: this.getWeatherCooldownRemainingMs() };
+            return {
+                success: false,
+                error: e,
+                cooldownRemainingMs: this.getWeatherCooldownRemainingMs(),
+                reason: this._failureReason(),
+            };
         }
 
         try {
             this.state.weatherForecasts = {};
+            this.state.forecastProvenance = {};
 
             // Find current time index in hourly forecast to align offset=0 with current hour
             const now = new Date();
@@ -644,6 +735,10 @@ class SitesService {
                             }
                         }
                         this.state.weatherForecasts[site.id] = forecasts;
+                        this.state.forecastProvenance[site.id] = {
+                            modelKey: this.state.weatherModel,
+                            fetchedAt: resultsFetchedAt[index],
+                        };
                     }
                 } catch (siteErr) {
                     console.error(`Erreur lors du traitement météo pour le site ${site.nom}:`, siteErr);
@@ -705,7 +800,91 @@ class SitesService {
     // pour quels sites récupérer la météo — inutile d'interroger Open-Meteo
     // pour 1800 sites dans le monde entier quand le rayon/la recherche n'en
     // laissent que quelques dizaines de candidats à l'écran.
-    getGeoFilteredSites(sitesData) {
+    /**
+     * Provenance de la prévision d'un site (spec 002, US1) : modèle, heure de récupération
+     * d'origine et heure de calcul du modèle si Open-Meteo la fournit (sinon null).
+     * @returns {{modelKey: string, fetchedAt: number, runAt: number|null} | null}
+     */
+    getForecastProvenance(siteId) {
+        const p = this.state.forecastProvenance && this.state.forecastProvenance[siteId];
+        if (!p) return null;
+        const cachedRun = this._runTimeCache && this._runTimeCache.get(p.modelKey);
+        return { modelKey: p.modelKey, fetchedAt: p.fetchedAt, runAt: cachedRun ? cachedRun.value : null };
+    }
+
+    /**
+     * Heure de calcul (run) du modèle, lue dans les métadonnées Open-Meteo
+     * (`/data/{metaModel}/static/meta.json`), gardée 30 min. null si le modèle n'a pas d'heure de
+     * calcul unique (sélection automatique) ou si la demande échoue : rien n'est alors affiché
+     * plutôt qu'une heure inventée (spec 002, FR-003).
+     * @param {string} modelKey
+     * @returns {Promise<number|null>}
+     */
+    async fetchModelRunTime(modelKey) {
+        const info = WEATHER_MODEL_INFO[modelKey];
+        if (!info || !info.metaModel) return null;
+        if (!this._runTimeCache) this._runTimeCache = new Map();
+        const cached = this._runTimeCache.get(modelKey);
+        if (cached && Date.now() - cached.at < SitesService.RUN_TIME_CACHE_MS) return cached.value;
+        let value = null;
+        try {
+            const response = await fetch(`https://api.open-meteo.com/data/${info.metaModel}/static/meta.json`);
+            if (response.ok) {
+                const meta = await response.json();
+                const seconds = Number(meta && meta.last_run_initialisation_time);
+                if (Number.isFinite(seconds) && seconds > 0) value = seconds * 1000;
+            }
+        } catch {
+            value = null;
+        }
+        this._runTimeCache.set(modelKey, { at: Date.now(), value });
+        return value;
+    }
+
+    static RUN_TIME_CACHE_MS = 30 * 60 * 1000;
+
+    /**
+     * Position de référence des distances : celle du pilote (GPS ou adresse), sinon
+     * Boulogne-sur-Mer (spec 002, FR-017) — le filtre du rayon s'applique donc toujours.
+     * @returns {{lat: number, lng: number, name?: string, isDefault?: boolean}}
+     */
+    getEffectiveLocation() {
+        return this.state.userLocation || DEFAULT_LOCATION;
+    }
+
+    /** Distance (km) d'un site à la position de référence, mémorisée tant que celle-ci ne change pas. */
+    _distanceFromReference(site) {
+        const ref = this.getEffectiveLocation();
+        const key = `${ref.lat},${ref.lng}`;
+        if (site.distance === undefined || site._distanceFrom !== key) {
+            site.distance = calculateDistance(
+                ref.lat,
+                ref.lng,
+                parseFloat(site.latitude || site.lat),
+                parseFloat(site.longitude || site.lon),
+            );
+            site._distanceFrom = key;
+        }
+        return site.distance;
+    }
+
+    _isFavorite(site) {
+        const favs = this.state.userPreferences?.favoriteSites || [];
+        return favs.includes(site.id);
+    }
+
+    /**
+     * Sites qui correspondent à la recherche en cours mais sont hors du rayon (hors favoris) :
+     * ni affichés ni interrogés, seulement comptés pour le signaler (spec 002, FR-019).
+     */
+    countSearchMatchesOutsideRadius() {
+        if (!this.state.searchQuery || !this.state.searchQuery.trim()) return 0;
+        return this.getGeoFilteredSites(this.getSites(), { applyRadius: false }).filter(
+            (site) => !this._isFavorite(site) && this._distanceFromReference(site) > this.state.radiusLimit,
+        ).length;
+    }
+
+    getGeoFilteredSites(sitesData, { applyRadius = true } = {}) {
         let activeSites = sitesData.filter(
             (s) =>
                 s.affiche !== false &&
@@ -810,18 +989,13 @@ class SitesService {
             return true;
         });
 
-        if (this.state.userLocation && this.state.radiusLimit < 210) {
-            activeSites = activeSites.filter((site) => {
-                if (site.distance === undefined) {
-                    site.distance = calculateDistance(
-                        this.state.userLocation.lat,
-                        this.state.userLocation.lng,
-                        parseFloat(site.latitude || site.lat),
-                        parseFloat(site.longitude || site.lon),
-                    );
-                }
-                return site.distance <= this.state.radiusLimit;
-            });
+        // Rayon toujours appliqué autour de la position de référence (GPS, adresse, ou
+        // Boulogne-sur-Mer) : la météo n'est demandée que pour ces sites, jamais pour toute la
+        // base (spec 002, FR-016). Les favoris restent visibles quelle que soit leur distance.
+        if (applyRadius) {
+            activeSites = activeSites.filter(
+                (site) => this._isFavorite(site) || this._distanceFromReference(site) <= this.state.radiusLimit,
+            );
         }
 
         return activeSites;
@@ -1025,8 +1199,10 @@ class SitesService {
     }
 
     setRadiusLimit(value) {
-        const radius = parseInt(value);
-        if (isNaN(radius)) return;
+        const parsed = parseInt(value);
+        if (isNaN(parsed)) return;
+        // 10–200 km : « Illimité » a été retiré (spec 002, FR-015).
+        const radius = Math.min(RADIUS.MAX, Math.max(RADIUS.MIN, parsed));
         this.state.radiusLimit = radius;
 
         const slider = /** @type {HTMLInputElement} */ (document.getElementById('radius-slider'));
