@@ -1349,6 +1349,30 @@ body.light-mode .forecast-sticky-container {
     align-items: center;
 }
 
+.slider-label-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.slider-label-right {
+    color: var(--accent-blue);
+    font-weight: 800;
+    font-size: 0.9rem;
+    background: rgba(14, 165, 233, 0.12);
+    padding: 4px 14px;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgba(14, 165, 233, 0.25);
+    display: flex;
+    align-items: center;
+    line-height: 1;
+}
+
 /* Beautiful Range Slider (Blue Accent) */
 .slider-input {
     -webkit-appearance: none;
@@ -1362,6 +1386,32 @@ body.light-mode .forecast-sticky-container {
     transition: opacity 0.2s, background-color 0.2s;
     cursor: pointer;
     margin: 10px 0;
+}
+
+.slider-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent-blue);
+    border: 2px solid #fff;
+    box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+    transition: transform 0.15s;
+}
+
+.slider-input::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent-blue);
+    border: 2px solid #fff;
+    box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+}
+
+.slider-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .slider-input::-webkit-slider-thumb:hover {

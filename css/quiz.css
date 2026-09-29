@@ -483,6 +483,9 @@ body.light-mode .bank-item-explication {
         margin: calc(var(--header-height, 110px) + 12px) 0 40px 0 !important;
         border-radius: 16px !important;
         overflow-x: hidden !important;
+        /* clip coupe le débordement comme hidden, mais sans créer de zone de défilement :
+           sinon les éléments position: sticky (barre d'heure des Sites) ne collent plus. */
+        overflow-x: clip !important;
     }
 
 

@@ -418,6 +418,12 @@ class SitesViewClass extends BaseView {
 
         if (result && result.success === false) {
             this.renderList();
+            // Sans météo, le curseur d'heure reste désactivé : le dire au lieu de laisser
+            // « Chargement des prévisions... » indéfiniment (sauf si une météo antérieure reste affichée).
+            const timeLabel = document.getElementById('forecast-time-label');
+            if (timeLabel && Object.keys(SitesService.state.weatherForecasts).length === 0) {
+                timeLabel.textContent = 'Météo indisponible';
+            }
             const container = document.getElementById('sites-list-container');
             if (container) {
                 const errorHtml = `
@@ -1350,25 +1356,24 @@ class SitesViewClass extends BaseView {
         if (!label) return;
 
         const offset = SitesService.state.forecastOffset;
+        let text = `+${offset}h`;
         if (offset === 0) {
-            label.textContent = 'Maintenant';
-            return;
-        }
-
-        // Find forecast time from first active site
-        const firstActiveSite = SitesService.getSites().find((s) => s.affiche !== false);
-        const firstSiteId = firstActiveSite?.id;
-        const forecasts = firstSiteId ? SitesService.state.weatherForecasts[firstSiteId] : null;
-        if (forecasts && forecasts[offset]) {
-            const date = new Date(forecasts[offset].time);
-            const days = ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'];
-            const dayName = days[date.getDay()];
-            const hour = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            label.textContent = `+${offset}h (${dayName} ${hour}:${minutes})`;
+            text = 'Maintenant';
         } else {
-            label.textContent = `+${offset}h`;
+            // N'importe quel site dont la météo est chargée donne l'heure de cette échéance
+            // (toutes les séries horaires partent de la même heure).
+            const forecasts = Object.values(SitesService.state.weatherForecasts).find((f) => f && f[offset]);
+            if (forecasts) {
+                const date = new Date(forecasts[offset].time);
+                const day = date.toLocaleDateString('fr-FR', { weekday: 'short' });
+                const hour = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                text = `${day.charAt(0).toUpperCase()}${day.slice(1)} ${hour}:${minutes} (+${offset}h)`;
+            }
         }
+        label.textContent = text;
+        const slider = document.getElementById('forecast-slider');
+        if (slider) slider.setAttribute('aria-valuetext', text);
     }
 
     renderSavedLocations() {
