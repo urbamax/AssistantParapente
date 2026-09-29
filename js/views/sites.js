@@ -5,7 +5,7 @@
 import GlobalState from '../core/app_state.js';
 import SitesService from '../services/sites_service.js';
 import LogbookService from '../services/logbook_service.js';
-import { WIND_DIRECTIONS, RADIUS, WEATHER_MODEL_INFO } from '../data/weather_config.js';
+import { WIND_DIRECTIONS, RADIUS, WEATHER_MODEL_INFO, STALE_AFTER_MS } from '../data/weather_config.js';
 import { getSpotairWidgetId } from '../data/spotair_widgets.js';
 import { escapeHTML } from '../core/security.js';
 import GdprEngine from '../gdpr_engine.js';
@@ -105,11 +105,46 @@ export function formatForecastContext(provenance, now = Date.now()) {
     return text;
 }
 
+/** Âge d'une prévision : « 45 min », « 3 h 20 », « 1 j 2 h » (spec 002, US2). */
+export function formatAge(ms) {
+    const minutes = Math.max(0, Math.floor(ms / 60000));
+    if (minutes < 60) return `${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} h ${pad2(minutes % 60)}`;
+    return `${Math.floor(hours / 24)} j ${hours % 24} h`;
+}
+
+/** Dernier échec d'« Actualiser » (raison en français), affiché sur les prévisions anciennes. */
+let lastRefreshFailure = '';
+
+/**
+ * Contenu d'une ligne de contexte. Au-delà de 3 h (spec 002, FR-005) : âge, avertissement et
+ * bouton « Actualiser », plus la raison du dernier échec éventuel (FR-006).
+ */
+function forecastContextInner(provenance, now = Date.now()) {
+    const stale = now - provenance.fetchedAt > STALE_AFTER_MS;
+    let html = escapeHTML(formatForecastContext(provenance, now));
+    if (stale) {
+        html +=
+            `<br><span class="forecast-stale-text"><i class="ri-time-line" aria-hidden="true"></i> ` +
+            `${escapeHTML(t('forecast.stale', { age: formatAge(now - provenance.fetchedAt) }))}</span> ` +
+            `<button type="button" class="forecast-refresh-btn" data-action="SitesrefreshWeather">${escapeHTML(t('forecast.refresh'))}</button>`;
+        if (lastRefreshFailure) {
+            html += `<br><span class="forecast-refresh-error">${escapeHTML(t('forecast.refreshFailed', { reason: lastRefreshFailure }))}</span>`;
+        }
+    }
+    return { html, stale };
+}
+
 /** Ligne de contexte HTML d'un site (vide si sa prévision n'a pas encore de provenance). */
 function forecastContextHtml(siteId) {
     const provenance = SitesService.getForecastProvenance(siteId);
     if (!provenance) return '';
-    return `<p class="forecast-context" data-fetched-at="${provenance.fetchedAt}">${escapeHTML(formatForecastContext(provenance))}</p>`;
+    const { html, stale } = forecastContextInner(provenance);
+    return (
+        `<p class="forecast-context${stale ? ' forecast-context--stale' : ''}" data-fetched-at="${provenance.fetchedAt}" ` +
+        `data-model-key="${escapeHTML(provenance.modelKey)}" data-run-at="${provenance.runAt || ''}">${html}</p>`
+    );
 }
 
 /** Libellé du rayon (10–200 km ; « Illimité » n'existe plus, spec 002 FR-015). */
@@ -148,6 +183,8 @@ class SitesViewClass extends BaseView {
         console.timeEnd('SITES_SERVICE_INIT');
 
         this.setupEventListeners();
+        clearInterval(this._forecastAgeInterval);
+        this._forecastAgeInterval = setInterval(() => this.updateForecastAges(), 60 * 1000);
         this.renderSavedLocations();
         console.time('SITES_SHOW_METHOD');
         this.show();
@@ -207,6 +244,7 @@ class SitesViewClass extends BaseView {
     async unmount() {
         await super.unmount();
         clearInterval(this._weatherRetryInterval);
+        clearInterval(this._forecastAgeInterval);
         clearTimeout(this._radiusTimeout);
         clearTimeout(this._progZoomTimeout);
         if (this.state.mapResizeObserver) {
@@ -1787,6 +1825,37 @@ class SitesViewClass extends BaseView {
                 <p style="margin: 12px 0 0; font-size: 0.8rem; color: var(--text-muted);">Astuce : choisis "7 Jours" dans les paramètres de calcul météo ci-dessus pour élargir la fenêtre du meilleur créneau.</p>
             </div>
         `;
+    }
+
+    /**
+     * Bouton « Actualiser » d'une prévision ancienne : récupère à nouveau la météo en ignorant
+     * le cache. En cas d'échec, l'ancienne prévision reste affichée, signalée, avec la raison.
+     */
+    async refreshWeather() {
+        const result = await SitesService.fetchWeatherForSites({ force: true });
+        if (result && result.success === null) return; // remplacé par un appel plus récent
+        lastRefreshFailure = result && result.success === false ? result.reason || t('forecast.refreshError') : '';
+        this.updateForecastLabel();
+        this.renderList();
+        this.updateMapMarkers();
+    }
+
+    /**
+     * Met à jour chaque minute l'âge et l'avertissement des lignes de contexte déjà affichées,
+     * sans ré-afficher la liste (spec 002, FR-007).
+     */
+    updateForecastAges(now = Date.now()) {
+        document.querySelectorAll('.forecast-context[data-fetched-at]').forEach((el) => {
+            const element = /** @type {HTMLElement} */ (el);
+            const provenance = {
+                modelKey: element.dataset.modelKey,
+                fetchedAt: Number(element.dataset.fetchedAt),
+                runAt: element.dataset.runAt ? Number(element.dataset.runAt) : null,
+            };
+            const { html, stale } = forecastContextInner(provenance, now);
+            element.innerHTML = html;
+            element.classList.toggle('forecast-context--stale', stale);
+        });
     }
 
     /**

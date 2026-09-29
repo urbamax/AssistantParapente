@@ -531,4 +531,52 @@ describe('SitesService', () => {
             expect(SitesService._resolveModelEndpoint('meteoblue').apiEndpoint).not.toBe('forecast');
         });
     });
+
+    describe('stale forecasts (spec 002, US2)', () => {
+        const T0 = 1_800_000_000_000;
+        const payload = () => {
+            const one = aromeTailResponse(nearestHourIso(), { complete: 2, empty: 0 });
+            return [one, one];
+        };
+
+        it('is stale strictly after 3 hours', () => {
+            SitesService.state.forecastProvenance = { 1: { modelKey: 'meteofrance', fetchedAt: T0 } };
+            expect(SitesService.isForecastStale(1, T0 + (3 * 60 - 1) * 60 * 1000)).toBe(false);
+            expect(SitesService.isForecastStale(1, T0 + (3 * 60 + 1) * 60 * 1000)).toBe(true);
+            expect(SitesService.isForecastStale(999, T0)).toBe(false);
+        });
+
+        it('a forced refresh bypasses the cache and updates the retrieval time', async () => {
+            const now = vi.spyOn(Date, 'now').mockReturnValue(T0);
+            global.fetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue(payload()) });
+            await SitesService.fetchWeatherForSites();
+            now.mockReturnValue(T0 + 60 * 1000);
+            await SitesService.fetchWeatherForSites({ force: true });
+            expect(global.fetch).toHaveBeenCalledTimes(2);
+            expect(SitesService.getForecastProvenance(1).fetchedAt).toBe(T0 + 60 * 1000);
+        });
+
+        it('a failed refresh keeps the old forecast and explains why (quota)', async () => {
+            vi.spyOn(Date, 'now').mockReturnValue(T0);
+            global.fetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue(payload()) });
+            await SitesService.fetchWeatherForSites();
+            vi.spyOn(SitesService, '_fetchWithBackoff').mockResolvedValue({ ok: false, status: 429, json: vi.fn() });
+            const res = await SitesService.fetchWeatherForSites({ force: true });
+            expect(res.success).toBe(false);
+            expect(res.reason).toMatch(/limite de requêtes Open-Meteo atteinte, réessayez dans \d+ min/);
+            expect(SitesService.getForecastProvenance(1).fetchedAt).toBe(T0);
+        });
+
+        it('a failed refresh explains when there is no connection', async () => {
+            vi.spyOn(Date, 'now').mockReturnValue(T0);
+            global.fetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue(payload()) });
+            await SitesService.fetchWeatherForSites();
+            vi.spyOn(SitesService, '_fetchWithBackoff').mockRejectedValue(new TypeError('Failed to fetch'));
+            const online = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+            const res = await SitesService.fetchWeatherForSites({ force: true });
+            online.mockRestore();
+            expect(res.reason).toBe('pas de connexion');
+            expect(SitesService.getForecastProvenance(1).fetchedAt).toBe(T0);
+        });
+    });
 });

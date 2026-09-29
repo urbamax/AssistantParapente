@@ -103,17 +103,17 @@ the provider quota that US3 uses more (plan.md, Implementation Phases).
 
 ### Tests for User Story 2 ⚠️ write first, see them fail
 
-- [ ] T027 [P] [US2] In `tests/services/sites_service.test.js`: `isForecastStale(siteId, now)` false at 2 h 59, true at 3 h 01; `fetchWeatherForSites({ force: true })` bypasses the cache and updates `fetchedAt`; on HTTP 429 or network error it returns `{ success: false, reason }` and leaves provenance unchanged
-- [ ] T028 [P] [US2] In `tests/views/sites_verdict.test.js`: `formatAge(ms)` → « 3 h 20 », « 1 j 2 h »; with a stale provenance the popup, card and comparator contain « peut être dépassée » and a button `data-action="SitesrefreshWeather"`; `updateForecastAges(now)` updates the age text of existing `.forecast-context` elements without re-rendering the list
-- [ ] T029 [US2] In `tests/e2e/sites_flow.spec.js`: install a fake clock (`page.clock.install`), load the sites with mocked Open-Meteo, advance time by 3 h 05 min: the expanded AUTEUIL card shows « peut être dépassée » and an « Actualiser » button; clicking it (Open-Meteo mocked again) removes the warning; with the refresh mocked to HTTP 429 the warning stays and « Actualisation impossible » is shown (constitution Principle IV)
-- [ ] T030 [US2] Run `npx vitest run tests/services/sites_service.test.js tests/views/sites_verdict.test.js`; confirm T027–T029 fail
+- [X] T027 [P] [US2] In `tests/services/sites_service.test.js`: `isForecastStale(siteId, now)` false at 2 h 59, true at 3 h 01; `fetchWeatherForSites({ force: true })` bypasses the cache and updates `fetchedAt`; on HTTP 429 or network error it returns `{ success: false, reason }` and leaves provenance unchanged
+- [X] T028 [P] [US2] In `tests/views/sites_verdict.test.js`: `formatAge(ms)` → « 3 h 20 », « 1 j 2 h »; with a stale provenance the popup, card and comparator contain « peut être dépassée » and a button `data-action="SitesrefreshWeather"`; `updateForecastAges(now)` updates the age text of existing `.forecast-context` elements without re-rendering the list
+- [X] T029 [US2] In `tests/e2e/sites_flow.spec.js`: install a fake clock (`page.clock.install`), load the sites with mocked Open-Meteo, advance time by 3 h 05 min: the expanded AUTEUIL card shows « peut être dépassée » and an « Actualiser » button; clicking it (Open-Meteo mocked again) removes the warning; with the refresh mocked to HTTP 429 the warning stays and « Actualisation impossible » is shown (constitution Principle IV)
+- [X] T030 [US2] Run `npx vitest run tests/services/sites_service.test.js tests/views/sites_verdict.test.js`; confirm T027–T029 fail
 
 ### Implementation for User Story 2
 
-- [ ] T031 [US2] In `js/services/sites_service.js`: `isForecastStale(siteId, now = Date.now())` with `STALE_AFTER_MS`; `fetchWeatherForSites({ force })` skips cache reads when `force`; failures return a French `reason` (offline, provider limit with remaining cooldown)
-- [ ] T032 [US2] In `js/views/sites.js`: stale variant of the context line (class `forecast-context--stale`, age via `formatAge`, « Actualiser » button); register `SitesrefreshWeather` in `js/core/main.js` calling a view method that forces the fetch and shows « Actualisation impossible : {reason} » on failure; a 60 s `setInterval` started in `mount()` and cleared in `unmount()` calls `updateForecastAges(now)` (updates `data-fetched-at` elements in place)
-- [ ] T033 [P] [US2] In `css/sites.css`: `.forecast-context--stale` warning style (icon + text, not colour alone), both themes
-- [ ] T034 [US2] Run `npx vitest run tests/services/sites_service.test.js tests/views/sites_verdict.test.js` then `npm test` and `npx playwright test tests/e2e/sites_flow.spec.js --project=chromium`; T027–T029 pass
+- [X] T031 [US2] In `js/services/sites_service.js`: `isForecastStale(siteId, now = Date.now())` with `STALE_AFTER_MS`; `fetchWeatherForSites({ force })` skips cache reads when `force`; failures return a French `reason` (offline, provider limit with remaining cooldown)
+- [X] T032 [US2] In `js/views/sites.js`: stale variant of the context line (class `forecast-context--stale`, age via `formatAge`, « Actualiser » button); register `SitesrefreshWeather` in `js/core/main.js` calling a view method that forces the fetch and shows « Actualisation impossible : {reason} » on failure; a 60 s `setInterval` started in `mount()` and cleared in `unmount()` calls `updateForecastAges(now)` (updates `data-fetched-at` elements in place)
+- [X] T033 [P] [US2] In `css/sites.css`: `.forecast-context--stale` warning style (icon + text, not colour alone), both themes
+- [X] T034 [US2] Run `npx vitest run tests/services/sites_service.test.js tests/views/sites_verdict.test.js` then `npm test` and `npx playwright test tests/e2e/sites_flow.spec.js --project=chromium`; T027–T029 pass
 
 **Checkpoint**: US4, US1, US2 complete.
 

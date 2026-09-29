@@ -236,4 +236,49 @@ test.describe('E2E - Sites Flow', () => {
         );
         await expect(refreshed.locator('.forecast-context')).not.toContainText('run');
     });
+
+    test('Spec 002 US2 : une prévision de plus de 3 h est signalée, « Actualiser » la rafraîchit', async ({ page }) => {
+        await page.clock.install();
+        let refuse = false;
+        await mockOpenMeteo(page, { complete: 6, empty: 0 });
+        await page.route('https://api.open-meteo.com/v1/**', async (route) => {
+            if (refuse)
+                return route.fulfill({
+                    status: 429,
+                    json: { error: true, reason: 'Hourly API request limit exceeded' },
+                });
+            return route.fallback();
+        });
+        const card = await openSitesAndSearch(page, 'AUTEUIL');
+        await expect(card.locator('.forecast-context')).not.toContainText('peut être dépassée');
+
+        await page.clock.fastForward('03:05:00');
+        const stale = page
+            .locator('.site-card:not(.minimized)', { hasText: 'AUTEUIL' })
+            .first()
+            .locator('.forecast-context');
+        await expect(stale).toContainText('peut être dépassée');
+        await stale.locator('[data-action="SitesrefreshWeather"]').click();
+        const fresh = page
+            .locator('.site-card:not(.minimized)', { hasText: 'AUTEUIL' })
+            .first()
+            .locator('.forecast-context');
+        await expect(fresh).not.toContainText('peut être dépassée');
+
+        await page.clock.fastForward('03:05:00');
+        refuse = true;
+        const again = page
+            .locator('.site-card:not(.minimized)', { hasText: 'AUTEUIL' })
+            .first()
+            .locator('.forecast-context');
+        await expect(again).toContainText('peut être dépassée');
+        await again.locator('[data-action="SitesrefreshWeather"]').click();
+        await page.clock.runFor(20000); // nouvelles tentatives après refus (3 s puis 12 s)
+        const failed = page
+            .locator('.site-card:not(.minimized)', { hasText: 'AUTEUIL' })
+            .first()
+            .locator('.forecast-context');
+        await expect(failed).toContainText('peut être dépassée');
+        await expect(failed).toContainText('Actualisation impossible');
+    });
 });

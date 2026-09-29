@@ -9,6 +9,7 @@ import {
     RADIUS,
     DEFAULT_LOCATION,
     WEATHER_MODEL_INFO,
+    STALE_AFTER_MS,
 } from '../data/weather_config.js';
 import { calculateDistance, getAngularDifference, degreesToCardinal } from '../utils/geo_utils.js';
 import { removeAccents } from '../utils/text_utils.js';
@@ -16,6 +17,7 @@ import { escapeHTML } from '../core/security.js';
 import AppRouter from '../core/router.js';
 import { evaluateSpotForecast, normalizeForecastValue, getSiteOrientations } from '../weatherScoring.js';
 import { toSorted } from '../utils/array_utils.js';
+import { t } from '../utils/i18n.js';
 
 const sitesView = () => AppRouter.getView('SITES');
 
@@ -452,7 +454,24 @@ class SitesService {
         return response;
     }
 
-    async fetchWeatherForSites() {
+    /** Prévision récupérée il y a plus de 3 h (spec 002, FR-005). */
+    isForecastStale(siteId, now = Date.now()) {
+        const p = this.state.forecastProvenance && this.state.forecastProvenance[siteId];
+        return !!p && now - p.fetchedAt > STALE_AFTER_MS;
+    }
+
+    /** Raison d'un échec de récupération, en français, pour l'afficher au pilote (FR-006). */
+    _failureReason() {
+        const cooldownMs = this.getWeatherCooldownRemainingMs();
+        if (cooldownMs > 0) return t('forecast.refreshQuota', { minutes: Math.max(1, Math.ceil(cooldownMs / 60000)) });
+        if (typeof navigator !== 'undefined' && navigator.onLine === false) return t('forecast.refreshOffline');
+        return t('forecast.refreshError');
+    }
+
+    /**
+     * @param {{force?: boolean}} [options] force : ignorer le cache (bouton « Actualiser »).
+     */
+    async fetchWeatherForSites({ force = false } = {}) {
         // Plusieurs déclencheurs (show(), changeWeatherModel(), scheduleWeatherRescopeIfNeeded())
         // peuvent chacun poser cet indicateur puis retourner tôt (cooldown, aucun site) ou
         // s'annuler mutuellement : sans ce nettoyage à chaque sortie, il reste bloqué à l'écran
@@ -474,6 +493,7 @@ class SitesService {
                 success: false,
                 error: { message: 'Service météo momentanément saturé' },
                 cooldownRemainingMs: cooldownRemaining,
+                reason: this._failureReason(),
             };
         }
 
@@ -532,7 +552,7 @@ class SitesService {
                 const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${chunkLats}&longitude=${chunkLons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,cape&daily=sunrise,sunset&timezone=Europe%2FParis&forecast_days=8${modelParam}`;
 
                 const cached = this._weatherCache.get(url);
-                if (cached && Date.now() - cached.timestamp < WEATHER_CACHE_TTL_MS) {
+                if (!force && cached && Date.now() - cached.timestamp < WEATHER_CACHE_TTL_MS) {
                     chunkResults.push(cached.results);
                     // Heure de la récupération d'origine, jamais celle de la relecture du cache
                     // (spec 002, FR-004).
@@ -568,7 +588,12 @@ class SitesService {
             }
             clearLoadingIndicator();
             console.error('Erreur lors de la récupération météo:', e);
-            return { success: false, error: e, cooldownRemainingMs: this.getWeatherCooldownRemainingMs() };
+            return {
+                success: false,
+                error: e,
+                cooldownRemainingMs: this.getWeatherCooldownRemainingMs(),
+                reason: this._failureReason(),
+            };
         }
 
         try {

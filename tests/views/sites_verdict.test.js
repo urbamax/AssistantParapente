@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import SitesView, { radiusLabel, formatForecastContext } from '../../js/views/sites.js';
+import SitesView, { radiusLabel, formatForecastContext, formatAge } from '../../js/views/sites.js';
 import SitesService from '../../js/services/sites_service.js';
 import { completeHourWith, SITE_SOUTH } from '../fixtures/forecasts.js';
 
@@ -144,5 +144,54 @@ describe('forecast context line (spec 002, US1)', () => {
         const table = document.getElementById('sites-list-container').innerHTML;
         expect(table.split('forecast-context').length - 1).toBe(1);
         vi.restoreAllMocks();
+    });
+});
+
+describe('stale forecast warning (spec 002, US2)', () => {
+    const HOUR = 3600 * 1000;
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+        document.body.innerHTML = '';
+    });
+
+    it('formats ages in hours/minutes and days/hours', () => {
+        expect(formatAge(45 * 60 * 1000)).toBe('45 min');
+        expect(formatAge(3 * HOUR + 20 * 60 * 1000)).toBe('3 h 20');
+        expect(formatAge(26 * HOUR)).toBe('1 j 2 h');
+    });
+
+    it('warns with the age and a refresh button on the popup and the comparison table', () => {
+        const now = Date.now();
+        vi.spyOn(SitesService, 'getForecastProvenance').mockReturnValue({
+            modelKey: 'meteofrance',
+            fetchedAt: now - 4 * HOUR,
+            runAt: null,
+        });
+        vi.spyOn(SitesService, 'isForecastStale').mockReturnValue(true);
+        const site = { id: 92, nom: 'Ancienne', ...SITE_SOUTH };
+        const popup = SitesView.buildWeatherPopupHtml(completeHourWith(), '#22c55e', site);
+        expect(popup).toContain('forecast-context--stale');
+        expect(popup).toContain('Prévision récupérée il y a 4 h 00 — peut être dépassée');
+        expect(popup).toContain('data-action="SitesrefreshWeather"');
+
+        document.body.innerHTML = '<div id="sites-list-container"></div>';
+        SitesService.state.userPreferences = { favoriteSites: [92] };
+        SitesService.state.weatherForecasts = { 92: [completeHourWith()] };
+        SitesView.renderComparator([site]);
+        expect(document.getElementById('sites-list-container').innerHTML).toContain('peut être dépassée');
+    });
+
+    it('updates the age of existing context lines in place, without re-rendering the list', () => {
+        const fetchedAt = 1_800_000_000_000;
+        document.body.innerHTML = `<div id="sites-list-container"><p class="forecast-context" data-fetched-at="${fetchedAt}" data-model-key="gfs" data-run-at="">x</p></div>`;
+        const render = vi.spyOn(SitesView, 'renderList');
+        SitesView.updateForecastAges(fetchedAt + 4 * HOUR);
+        const el = document.querySelector('.forecast-context');
+        expect(el.classList.contains('forecast-context--stale')).toBe(true);
+        expect(el.textContent).toContain('il y a 4 h 00');
+        SitesView.updateForecastAges(fetchedAt + 10 * 60 * 1000);
+        expect(el.classList.contains('forecast-context--stale')).toBe(false);
+        expect(render).not.toHaveBeenCalled();
     });
 });

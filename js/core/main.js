@@ -152,6 +152,7 @@ async function bootApplication() {
         'closeSpotairModal',
         'closeMoreMapsDropdown',
         'closeGpsMenu',
+        'refreshWeather',
     ].forEach((action) => {
         AppEvents.register('Sites' + action, (args, e, t) =>
             SitesView[action] ? SitesView[action](args, e, t) : null,
