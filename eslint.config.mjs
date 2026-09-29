@@ -44,6 +44,10 @@ export default [
             'test-results/**',
             '.claude/**',
             'js/data/*.json',
+            // Copies générées de js/ pour la Cloud Function (scripts/sync_functions_shared.mjs) :
+            // vérifiées via leurs sources, et par tests/functions/shared_copy.test.js.
+            'functions/shared/**',
+            'functions/node_modules/**',
         ],
     },
     {
@@ -102,6 +106,16 @@ export default [
                 afterAll: 'readonly',
                 vi: 'readonly',
             },
+        },
+        rules: baseRules,
+    },
+    {
+        // Aides ES de la Cloud Function et scripts Node en module ES.
+        files: ['functions/**/*.mjs', 'scripts/**/*.mjs'],
+        languageOptions: {
+            ecmaVersion: 2022,
+            sourceType: 'module',
+            globals: { ...globals.node },
         },
         rules: baseRules,
     },

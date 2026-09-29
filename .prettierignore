@@ -8,3 +8,4 @@ test-results/
 js/data/*.json
 js/data/*.csv
 package-lock.json
+functions/shared/
