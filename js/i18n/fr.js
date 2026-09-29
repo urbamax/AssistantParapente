@@ -74,6 +74,10 @@ export const FR = Object.freeze({
         searchOutsideRadiusOne:
             '1 site correspond hors du rayon de {km} km — élargissez le rayon ou changez de position.',
         loading: 'Chargement météo {model}...',
+        offlineSaved: 'Hors ligne — prévision enregistrée sur l’appareil, récupérée {when} ; elle peut être dépassée.',
+        serviceDownSaved:
+            'Service météo indisponible — prévision enregistrée sur l’appareil, récupérée {when} ; elle peut être dépassée.',
+        unavailableOffline: 'Prévision indisponible hors ligne',
     }),
     notification: Object.freeze({
         title: '{site} : conditions favorables annoncées',

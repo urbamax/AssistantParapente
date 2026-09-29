@@ -579,6 +579,15 @@ class SitesViewClass extends BaseView {
         const indicator = document.getElementById('weather-loading-indicator');
         if (indicator) indicator.remove();
 
+        // Échec du téléchargement mais dernière prévision restaurée depuis l'appareil (spec 007) :
+        // affichage normal, avec le message « hors ligne » et sans comparaison de modèles.
+        if (result && result.success === false && result.restored > 0) {
+            this.updateForecastLabel();
+            this.renderList();
+            this.updateMapMarkers();
+            return;
+        }
+
         if (result && result.success === false) {
             this.renderList();
             // Sans météo, le curseur d'heure reste désactivé : le dire au lieu de laisser
@@ -1886,6 +1895,25 @@ class SitesViewClass extends BaseView {
         notice.textContent = isDefault ? t('forecast.defaultLocationNotice') : '';
     }
 
+    /**
+     * Message affiché tant que la liste montre des prévisions restaurées depuis l'appareil
+     * (spec 007, FR-004) : hors ligne ou service indisponible, et date de récupération.
+     */
+    buildOfflineForecastNotice() {
+        if (SitesService.state.forecastSource !== 'saved') return '';
+        const times = Object.values(SitesService.state.forecastProvenance || {}).map((p) => p.fetchedAt);
+        if (times.length === 0) return '';
+        const oldest = new Date(Math.min(...times));
+        const now = new Date();
+        const sameDay = oldest.toDateString() === now.toDateString();
+        const time = `${String(oldest.getHours()).padStart(2, '0')} h ${String(oldest.getMinutes()).padStart(2, '0')}`;
+        const when = sameDay
+            ? `aujourd’hui à ${time}`
+            : `le ${oldest.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })} à ${time}`;
+        const key = navigator.onLine === false ? 'forecast.offlineSaved' : 'forecast.serviceDownSaved';
+        return `<p id="offline-forecast-notice" class="location-notice offline-forecast-notice" role="status"><i class="ri-wifi-off-line" aria-hidden="true"></i> ${escapeHTML(t(key, { when }))}</p>`;
+    }
+
     /** Sites trouvés par la recherche mais hors du rayon : signalés, jamais interrogés (FR-019). */
     buildSearchOutsideNotice() {
         const count = SitesService.countSearchMatchesOutsideRadius();
@@ -1914,6 +1942,7 @@ class SitesViewClass extends BaseView {
         if (activeSites.length === 0) {
             listDiv.style.display = 'block';
             listDiv.innerHTML =
+                this.buildOfflineForecastNotice() +
                 this.buildSearchOutsideNotice() +
                 '<div class="card" style="text-align: center; padding: 20px;">Aucun site trouvé pour ces critères</div>';
         } else {
@@ -1991,6 +2020,14 @@ class SitesViewClass extends BaseView {
                         ${status.status === 'incomplete' ? '' : modelAgreementHtml(site)}
                         ${forecastContextHtml(site.id)}
                         ${verdictReminderHtml(status)}
+                    `;
+                } else if (SitesService.state.forecastSource === 'saved') {
+                    // Hors ligne : ce site n'a pas de prévision enregistrée sur l'appareil (spec 007).
+                    weatherHtml = `
+                        <div class="weather-loading">
+                            <i class="ri-wifi-off-line"></i>
+                            <span>${escapeHTML(t('forecast.unavailableOffline'))}</span>
+                        </div>
                     `;
                 } else if (hasWeatherEntry) {
                     weatherHtml = `
@@ -2106,7 +2143,7 @@ class SitesViewClass extends BaseView {
                     ) +
                     `</div>`;
             }
-            listDiv.innerHTML = this.buildSearchOutsideNotice() + html;
+            listDiv.innerHTML = this.buildOfflineForecastNotice() + this.buildSearchOutsideNotice() + html;
         }
 
         this.updateBadges();

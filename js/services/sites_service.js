@@ -17,6 +17,7 @@ import { escapeHTML } from '../core/security.js';
 import AppRouter from '../core/router.js';
 import { evaluateSpotForecast, normalizeForecastValue, getSiteOrientations } from '../weatherScoring.js';
 import { toSorted } from '../utils/array_utils.js';
+import IDBStorage from './idb_storage.js';
 import { t } from '../utils/i18n.js';
 
 const sitesView = () => AppRouter.getView('SITES');
@@ -480,6 +481,98 @@ class SitesService {
         return response;
     }
 
+    // -----------------------------------------------------------------------------------------
+    // Dernière prévision disponible hors ligne (spec 007)
+    // -----------------------------------------------------------------------------------------
+
+    /** Active le curseur d'heure pour `hoursAvailable` heures de prévision. */
+    _setupForecastSlider(hoursAvailable) {
+        const slider = /** @type {HTMLInputElement} */ (document.getElementById('forecast-slider'));
+        if (!slider) return;
+        slider.disabled = false;
+        const maxVal = Math.max(0, hoursAvailable - 1);
+        const sliderMax = Math.min(maxVal, this.state.forecastMaxRange || 120);
+        slider.max = String(sliderMax);
+        // Adjust offset if it exceeds new max
+        if (this.state.forecastOffset > sliderMax) this.state.forecastOffset = sliderMax;
+        slider.value = String(this.state.forecastOffset);
+        const percentage = sliderMax > 0 ? (this.state.forecastOffset / sliderMax) * 100 : 0;
+        slider.style.background = `linear-gradient(to right, var(--accent-blue) 0%, var(--accent-blue) ${percentage}%, rgba(255,255,255,0.1) ${percentage}%, rgba(255,255,255,0.1) 100%)`;
+    }
+
+    /**
+     * Enregistre sur l'appareil la prévision de chaque site (modèle, heure de récupération, heures)
+     * après un chargement réussi (FR-001). Un échec du stockage est sans conséquence (FR-007).
+     */
+    async saveForecastSnapshot() {
+        if (this.state.forecastSource !== 'live') return;
+        const entries = Object.entries(this.state.weatherForecasts || {})
+            .filter(([siteId]) => this.state.forecastProvenance && this.state.forecastProvenance[siteId])
+            .map(([siteId, forecasts]) => {
+                const { modelKey, fetchedAt } = this.state.forecastProvenance[siteId];
+                return { key: `forecast:${siteId}`, value: { siteId, modelKey, fetchedAt, forecasts } };
+            });
+        if (entries.length === 0) return;
+        try {
+            await IDBStorage.setValues(entries);
+        } catch (e) {
+            console.warn('Prévision non enregistrée sur l’appareil :', e);
+        }
+    }
+
+    /**
+     * Restaure les prévisions enregistrées (FR-002/003/005/006) : heures passées retirées, modèle et
+     * heure de récupération d'origine conservés, enregistrements sans heure à venir supprimés,
+     * comparaison de modèles vidée (indisponible hors ligne).
+     * @returns {Promise<number>} nombre de sites restaurés
+     */
+    async restoreForecastSnapshot(now = Date.now()) {
+        let records;
+        try {
+            records = await IDBStorage.getValuesByPrefix('forecast:');
+        } catch (e) {
+            console.warn('Prévisions enregistrées illisibles :', e);
+            return 0;
+        }
+        // Heure courante au format des prévisions (« AAAA-MM-JJTHH:00 », heure locale).
+        const d = new Date(now);
+        const pad = (n) => String(n).padStart(2, '0');
+        const currentHour = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:00`;
+
+        const forecasts = {};
+        const provenance = {};
+        const expired = [];
+        for (const record of records) {
+            const value = record && record.value;
+            const future = (value?.forecasts || []).filter((hour) => String(hour.time) >= currentHour);
+            if (!value || future.length === 0) {
+                expired.push(record.key);
+                continue;
+            }
+            forecasts[value.siteId] = future;
+            provenance[value.siteId] = { modelKey: value.modelKey, fetchedAt: value.fetchedAt };
+        }
+        if (expired.length > 0) {
+            IDBStorage.deleteValues(expired).catch(() => {});
+        }
+        const count = Object.keys(forecasts).length;
+        if (count === 0) return 0;
+
+        this.state.weatherForecasts = forecasts;
+        this.state.forecastProvenance = provenance;
+        this.state.weatherForecastsSecondary = {};
+        this.state.forecastSource = 'saved';
+        this.state.forecastOffset = 0;
+        this._setupForecastSlider(Math.max(...Object.values(forecasts).map((f) => f.length)));
+        return count;
+    }
+
+    /** Résultat d'échec complété par la restauration des prévisions enregistrées, si rien n'est en mémoire. */
+    async _withSavedForecast(result) {
+        if (Object.keys(this.state.weatherForecasts || {}).length > 0) return result;
+        return { ...result, restored: await this.restoreForecastSnapshot() };
+    }
+
     /** Prévision récupérée il y a plus de 3 h (spec 002, FR-005). */
     isForecastStale(siteId, now = Date.now()) {
         const p = this.state.forecastProvenance && this.state.forecastProvenance[siteId];
@@ -515,12 +608,12 @@ class SitesService {
         const cooldownRemaining = this.getWeatherCooldownRemainingMs();
         if (cooldownRemaining > 0) {
             clearLoadingIndicator();
-            return {
+            return this._withSavedForecast({
                 success: false,
                 error: { message: 'Service météo momentanément saturé' },
                 cooldownRemainingMs: cooldownRemaining,
                 reason: this._failureReason(),
-            };
+            });
         }
 
         // On ne récupère la météo QUE pour les sites que les filtres actuels
@@ -614,12 +707,12 @@ class SitesService {
             }
             clearLoadingIndicator();
             console.error('Erreur lors de la récupération météo:', e);
-            return {
+            return this._withSavedForecast({
                 success: false,
                 error: e,
                 cooldownRemainingMs: this.getWeatherCooldownRemainingMs(),
                 reason: this._failureReason(),
-            };
+            });
         }
 
         try {
@@ -745,22 +838,10 @@ class SitesService {
                 }
             });
 
-            // Enable the forecast slider
-            const slider = /** @type {HTMLInputElement} */ (document.getElementById('forecast-slider'));
-            if (slider) {
-                slider.disabled = false;
-                const maxVal = Math.max(0, (results[0]?.hourly?.time?.length || 121) - currentHourIndex - 1);
-                const sliderMax = Math.min(maxVal, this.state.forecastMaxRange || 120);
-                slider.max = String(sliderMax);
-
-                // Adjust offset if it exceeds new max
-                if (this.state.forecastOffset > sliderMax) {
-                    this.state.forecastOffset = sliderMax;
-                }
-                slider.value = String(this.state.forecastOffset);
-                const percentage = sliderMax > 0 ? (this.state.forecastOffset / sliderMax) * 100 : 0;
-                slider.style.background = `linear-gradient(to right, var(--accent-blue) 0%, var(--accent-blue) ${percentage}%, rgba(255,255,255,0.1) ${percentage}%, rgba(255,255,255,0.1) 100%)`;
-            }
+            this._setupForecastSlider((results[0]?.hourly?.time?.length || 121) - currentHourIndex);
+            this.state.forecastSource = 'live';
+            // Enregistrée sur l'appareil pour le hors-ligne, sans retarder l'affichage (spec 007).
+            setTimeout(() => this.saveForecastSnapshot(), 0);
             clearLoadingIndicator();
             return { success: true };
         } catch (e) {

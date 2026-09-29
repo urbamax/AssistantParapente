@@ -1,6 +1,20 @@
 import { test, expect } from '@playwright/test';
 import { aromeTailResponse, nearestHourIso, metaJson } from '../fixtures/forecasts.js';
 
+/**
+ * Ferme la bannière RGPD si aucun consentement n'est enregistré. La bannière apparaît avec un léger
+ * retard : on attend qu'elle soit réellement active plutôt que de tester sa visibilité à l'instant T
+ * (source d'instabilité), et on ne la cherche pas du tout si le consentement existe déjà.
+ */
+async function acceptGdprIfAsked(page) {
+    const hasConsent = await page.evaluate(() => !!localStorage.getItem('parapente_gdpr_consent'));
+    if (hasConsent) return;
+    const banner = page.locator('#gdpr-banner.active');
+    await banner.waitFor({ state: 'visible', timeout: 5000 });
+    await page.locator('[data-action="acceptAll"]').click();
+    await expect(page.locator('#gdpr-banner')).not.toHaveClass(/active/);
+}
+
 /** Rayon enregistré de 200 km : AUTEUIL (~160 km de Boulogne-sur-Mer) reste dans la liste. */
 async function useRadius200(page) {
     await page.addInitScript(() => {
@@ -33,11 +47,7 @@ async function mockOpenMeteo(page, { complete, empty }) {
 async function openSitesAndSearch(page, name) {
     await useRadius200(page);
     await page.goto('/?bypassGdpr=true');
-    const gdprBanner = page.locator('#gdpr-banner');
-    if (await gdprBanner.isVisible()) {
-        await page.locator('[data-action="acceptAll"]').click();
-        await expect(gdprBanner).not.toHaveClass(/active/);
-    }
+    await acceptGdprIfAsked(page);
     await page.locator('.nav-menu-btn[data-target="SITES"]').click();
     const searchInput = page.locator('#site-search');
     await expect(searchInput).toBeVisible();
@@ -394,5 +404,31 @@ test.describe('E2E - Sites Flow', () => {
         expect(state.south45).toBe(true);
         expect(state.sorgia).toBe(false);
         await expect(page.locator('#radius-val-label')).toHaveText('50 km');
+    });
+
+    test('Spec 007 : la dernière prévision reste disponible quand Open-Meteo est injoignable', async ({ page }) => {
+        await mockOpenMeteo(page, { complete: 6, empty: 0 });
+        const card = await openSitesAndSearch(page, 'AUTEUIL');
+        const firstContext = await card.locator('.forecast-context').textContent();
+        // Attendre l'enregistrement sur l'appareil (IndexedDB réel du navigateur).
+        await expect
+            .poll(() =>
+                page.evaluate(async () => {
+                    const { default: IDB } = await import('/js/services/idb_storage.js');
+                    return (await IDB.getValuesByPrefix('forecast:')).length;
+                }),
+            )
+            .toBeGreaterThan(0);
+
+        // Rechargement sans accès à Open-Meteo.
+        await page.unroute('https://api.open-meteo.com/**');
+        await page.route('https://api.open-meteo.com/**', (route) => route.abort('internetdisconnected'));
+        const restored = await openSitesAndSearch(page, 'AUTEUIL');
+
+        await expect(page.locator('#offline-forecast-notice')).toBeVisible();
+        await expect(page.locator('#offline-forecast-notice')).toContainText('prévision enregistrée sur l’appareil');
+        await expect(restored.locator('.site-weather-row')).toBeVisible();
+        const match = /récupérée [^·]*/.exec(firstContext)[0].trim();
+        await expect(restored.locator('.forecast-context')).toContainText(match);
     });
 });

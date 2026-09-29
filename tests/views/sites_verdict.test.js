@@ -254,3 +254,70 @@ describe('model agreement on every verdict (spec 002, US3)', () => {
         expect(document.getElementById('sites-list-container').innerHTML).toContain('n’est pas d’accord');
     });
 });
+
+describe('restored forecasts offline (spec 007, US2)', () => {
+    const saved = {
+        id: 94,
+        nom: 'Enregistré',
+        latitude: 45.9,
+        longitude: 6.1,
+        orientations_vent: ['S'],
+        type: ['NATUREL'],
+    };
+    const missing = {
+        id: 95,
+        nom: 'Jamais téléchargé',
+        latitude: 45.91,
+        longitude: 6.11,
+        orientations_vent: ['S'],
+        type: ['NATUREL'],
+    };
+
+    beforeEach(() => {
+        document.body.innerHTML = '<div id="sites-list-container"></div>';
+        SitesService.setSites([saved, missing]);
+        SitesService.state.userLocation = { lat: 45.9, lng: 6.1 };
+        SitesService.state.radiusLimit = 50;
+        SitesService.state.searchQuery = '';
+        SitesService.state.userPreferences = { favoriteSites: [94, 95], minimizedSites: [] };
+        SitesService.state.weatherModel = 'meteofrance';
+        SitesService.state.forecastSource = 'saved';
+        SitesService.state.weatherForecasts = { 94: [completeHourWith()] };
+        SitesService.state.forecastProvenance = {
+            94: { modelKey: 'meteofrance', fetchedAt: Date.now() - 3600 * 1000 },
+        };
+        SitesService.state.weatherForecastsSecondary = {};
+        SitesService.state.forecastOffset = 0;
+        SitesView.state.showComparator = false;
+    });
+
+    afterEach(() => {
+        SitesService.state.forecastSource = 'live';
+        SitesService.state.userLocation = null;
+        SitesService.setSites([]);
+        vi.restoreAllMocks();
+        document.body.innerHTML = '';
+    });
+
+    const cardOf = (name) =>
+        [...document.querySelectorAll('#sites-list-container .site-card')].find((c) => c.textContent.includes(name));
+
+    it('says the forecast is unavailable offline for a site never downloaded', () => {
+        SitesView.renderList();
+        const card = cardOf('Jamais téléchargé');
+        expect(card.textContent).toContain('Prévision indisponible hors ligne');
+        expect(card.textContent).not.toContain('Chargement météo');
+    });
+
+    it('marks the model comparison unavailable for a restored site', () => {
+        SitesView.renderList();
+        expect(cardOf('Enregistré').textContent).toContain('Comparaison GFS (NOAA) indisponible');
+    });
+
+    it('shows the offline notice at the top of the list', () => {
+        SitesView.renderList();
+        expect(document.getElementById('offline-forecast-notice')?.textContent).toContain(
+            'prévision enregistrée sur l’appareil',
+        );
+    });
+});

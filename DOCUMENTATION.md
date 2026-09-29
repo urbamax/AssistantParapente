@@ -234,6 +234,9 @@ Weather is requested only for the sites within the search radius of the referenc
 - A name search matching sites outside the radius shows how many, without requesting them.
 - Saved preferences are migrated on load (`migrateSitePrefs`): radius 210/`> 200` → 50, `meteoblue` → `best_match`.
 
+#### Last forecast available offline (spec 007)
+After each successful download, each site's forecast (model, retrieval time, hours) is saved in IndexedDB (`keyval` store, key `forecast:{siteId}`, via `IDBStorage.setValues`), deferred so it never delays display. When a download fails (offline, Open-Meteo refusal or error) and nothing is in memory, `SitesService.restoreForecastSnapshot()` restores them: past hours dropped, original model and retrieval time kept (so the spec 002 context line and 3 h staleness flag apply), records without future hours deleted, model comparison unavailable. `state.forecastSource` is `'live'` or `'saved'`; while `'saved'`, the list shows « Hors ligne — prévision enregistrée sur l’appareil, récupérée … » (or « Service météo indisponible — … »), and sites never downloaded show « Prévision indisponible hors ligne ». Storage failures are harmless.
+
 #### Forecast context on every verdict (spec 002)
 The map popup, the site card and the favourites table show, next to each verdict:
 - **Context line**: model, retrieval time (the original network retrieval, unchanged when served from the 10-min cache) and model run time from Open-Meteo metadata (`/data/{model}/static/meta.json`, cached 30 min; not shown when unknown, e.g. `best_match`).

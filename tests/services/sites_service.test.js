@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import SitesService from '../../js/services/sites_service.js';
+import IDBStorage from '../../js/services/idb_storage.js';
 import {
     aromeTailResponse,
     COMPLETE_HOUR,
@@ -678,6 +679,98 @@ describe('SitesService', () => {
             expect(global.fetch).toHaveBeenCalledTimes(1);
             expect(res.success).toBe(false);
             SitesService._weatherCooldownUntil = 0;
+        });
+    });
+
+    describe('last forecast available offline (spec 007, US1)', () => {
+        const pad = (n) => String(n).padStart(2, '0');
+        const localHour = (offsetHours) => {
+            const d = new Date(nearestHourIso());
+            d.setHours(d.getHours() + offsetHours);
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:00`;
+        };
+        const savedRecord = (siteId, hours, fetchedAt = 1_790_000_000_000) => ({
+            key: `forecast:${siteId}`,
+            value: {
+                siteId,
+                modelKey: 'gfs',
+                fetchedAt,
+                forecasts: hours.map((h) => completeHourWith({ time: localHour(h) })),
+            },
+        });
+        const failNetwork = () => global.fetch.mockRejectedValue(new TypeError('Failed to fetch'));
+
+        it('saves each site forecast with its model and retrieval time after a successful download', async () => {
+            const set = vi.spyOn(IDBStorage, 'setValues').mockResolvedValue(true);
+            vi.spyOn(Date, 'now').mockReturnValue(1_800_000_000_000);
+            const one = aromeTailResponse(nearestHourIso(), { complete: 3, empty: 0 });
+            global.fetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue([one, one]) });
+            SitesService.state.weatherModel = 'meteofrance';
+            await SitesService.fetchWeatherForSites();
+            await SitesService.saveForecastSnapshot();
+            const entries = set.mock.calls.at(-1)[0];
+            expect(entries.map((e) => e.key).sort()).toEqual(['forecast:1', 'forecast:2']);
+            expect(entries[0].value).toMatchObject({ modelKey: 'meteofrance', fetchedAt: 1_800_000_000_000 });
+            expect(entries[0].value.forecasts.length).toBeGreaterThan(0);
+            expect(SitesService.state.forecastSource).toBe('live');
+        });
+
+        it('restores saved forecasts when the download fails, without past hours', async () => {
+            SitesService.state.weatherForecasts = {};
+            vi.spyOn(IDBStorage, 'getValuesByPrefix').mockResolvedValue([savedRecord(1, [-3, -1, 0, 1, 2])]);
+            vi.spyOn(IDBStorage, 'deleteValues').mockResolvedValue(true);
+            failNetwork();
+            const res = await SitesService.fetchWeatherForSites();
+            expect(res.success).toBe(false);
+            expect(res.restored).toBe(1);
+            expect(SitesService.state.forecastSource).toBe('saved');
+            expect(SitesService.state.weatherForecasts[1].map((h) => h.time)).toEqual([
+                localHour(0),
+                localHour(1),
+                localHour(2),
+            ]);
+            expect(SitesService.getForecastProvenance(1)).toMatchObject({
+                modelKey: 'gfs',
+                fetchedAt: 1_790_000_000_000,
+            });
+            expect(SitesService.state.forecastOffset).toBe(0);
+            expect(SitesService.state.weatherForecastsSecondary).toEqual({});
+        });
+
+        it('deletes saved forecasts that have no future hour', async () => {
+            SitesService.state.weatherForecasts = {};
+            vi.spyOn(IDBStorage, 'getValuesByPrefix').mockResolvedValue([
+                savedRecord(1, [1]),
+                savedRecord(2, [-5, -2]),
+            ]);
+            const del = vi.spyOn(IDBStorage, 'deleteValues').mockResolvedValue(true);
+            failNetwork();
+            const res = await SitesService.fetchWeatherForSites();
+            expect(res.restored).toBe(1);
+            expect(del).toHaveBeenCalledWith(['forecast:2']);
+            expect(SitesService.state.weatherForecasts[2]).toBeUndefined();
+        });
+
+        it('does not restore over forecasts already in memory', async () => {
+            SitesService.state.weatherForecasts = { 1: [COMPLETE_HOUR] };
+            const get = vi.spyOn(IDBStorage, 'getValuesByPrefix').mockResolvedValue([savedRecord(1, [0])]);
+            failNetwork();
+            const res = await SitesService.fetchWeatherForSites();
+            expect(get).not.toHaveBeenCalled();
+            expect(res.restored).toBeUndefined();
+        });
+
+        it('a storage failure never breaks the screen', async () => {
+            SitesService.state.weatherForecasts = {};
+            vi.spyOn(IDBStorage, 'getValuesByPrefix').mockRejectedValue(new Error('quota'));
+            failNetwork();
+            const res = await SitesService.fetchWeatherForSites();
+            expect(res.success).toBe(false);
+            expect(res.restored).toBe(0);
+            expect(SitesService.state.weatherForecasts).toEqual({});
+
+            vi.spyOn(IDBStorage, 'setValues').mockRejectedValue(new Error('quota'));
+            await expect(SitesService.saveForecastSnapshot()).resolves.toBeUndefined();
         });
     });
 });
