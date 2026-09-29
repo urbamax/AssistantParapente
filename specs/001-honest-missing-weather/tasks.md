@@ -160,11 +160,11 @@ on its own.
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
-- [ ] T051 [P] Update `DOCUMENTATION.md`: scoring section (evaluation order, incomplete state, unknown orientation, CAPE threshold with FFVL source), strings catalogue (`js/i18n/fr.js`, `t()`), shared copy for `functions/` and the sync script; also fix the outdated typecheck paragraph and the references to `js/data/sites_data.js`, `debug_sites.js`, `test_logbook.js`, `test_scoring.js` (audit C9, touched documentation)
-- [ ] T052 Run `npm run lint`, `npm run format:check`, `npm run typecheck` (config `eslint.config.mjs`, `.prettierrc.json`, `jsconfig.json`) and fix every reported issue in touched files
-- [ ] T053 Run the full suites `npm test` (`vitest.config.js`) and `npm run test:e2e` (`playwright.config.js`), then `npm run build` (`vite.config.mjs`); all green (Principle IV — e2e not in CI yet, record the local run in the PR)
-- [ ] T054 Follow `specs/001-honest-missing-weather/quickstart.md` §2 in the browser (AROME slider beyond +110 h, a site without orientation, reminder on each display, switch to GFS) in light and dark themes and at mobile width; attach screenshots to the PR
-- [ ] T055 Run `/speckit-analyze` on `specs/001-honest-missing-weather/` and resolve any inconsistency before opening the pull request
+- [X] T051 [P] Update `DOCUMENTATION.md`: scoring section (evaluation order, incomplete state, unknown orientation, CAPE threshold with FFVL source), strings catalogue (`js/i18n/fr.js`, `t()`), shared copy for `functions/` and the sync script; also fix the outdated typecheck paragraph and the references to `js/data/sites_data.js`, `debug_sites.js`, `test_logbook.js`, `test_scoring.js` (audit C9, touched documentation)
+- [X] T052 Run `npm run lint`, `npm run format:check`, `npm run typecheck` (config `eslint.config.mjs`, `.prettierrc.json`, `jsconfig.json`) and fix every reported issue in touched files
+- [X] T053 Run the full suites `npm test` (`vitest.config.js`) and `npm run test:e2e` (`playwright.config.js`), then `npm run build` (`vite.config.mjs`); all green (Principle IV — e2e not in CI yet, record the local run in the PR)
+- [X] T054 Follow `specs/001-honest-missing-weather/quickstart.md` §2 in the browser (AROME slider beyond +110 h, a site without orientation, reminder on each display, switch to GFS) in light and dark themes and at mobile width; attach screenshots to the PR
+- [X] T055 Run `/speckit-analyze` on `specs/001-honest-missing-weather/` and resolve any inconsistency before opening the pull request
 
 ---
 
