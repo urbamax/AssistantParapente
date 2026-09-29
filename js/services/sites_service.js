@@ -340,91 +340,117 @@ class SitesService {
     // ("modèles d'accord/en désaccord") dans le comparateur multi-sites. Volontairement léger
     // (2 jours, pas de chunking) puisque limité aux favoris, contrairement au fetch principal
     // qui couvre tous les sites actifs sur toute la fenêtre de prévision.
-    async fetchSecondaryModelForFavorites() {
-        this.state.weatherForecastsSecondary = this.state.weatherForecastsSecondary || {};
-        const allSites = this.getSites();
-        if (allSites.length === 0) return { success: false, error: 'Catalogue des sites indisponible' };
+    /** Second modèle de la comparaison : GFS, ou AROME quand GFS est le modèle principal. */
+    getSecondaryModelKey() {
+        return this.state.weatherModel === 'gfs' ? 'meteofrance' : 'gfs';
+    }
 
-        const favoriteIds = (this.state.userPreferences && this.state.userPreferences.favoriteSites) || [];
-        const favoriteSites = allSites.filter(
-            (s) =>
-                favoriteIds.includes(s.id) &&
-                !isNaN(parseFloat(s.latitude || s.lat)) &&
-                !isNaN(parseFloat(s.longitude || s.lon)),
+    /**
+     * Charge le second modèle pour les mêmes sites que le modèle principal (sites du rayon +
+     * favoris) et les mêmes heures, pour comparer l'heure affichée (spec 002, US3, FR-009/010).
+     * Mêmes lots de 400 sites, même cache de 10 min et même pause après un refus d'Open-Meteo
+     * que le modèle principal (FR-010a) : pendant cette pause, rien n'est demandé et la
+     * comparaison est simplement indisponible.
+     * `weatherForecastsSecondary[id]` est un tableau aligné sur `weatherForecasts[id]` (même
+     * index = même heure, appariées par leur date-heure).
+     */
+    async fetchSecondaryModel() {
+        const secondaryModelKey = this.getSecondaryModelKey();
+        if (secondaryModelKey === this.state.weatherModel) {
+            this.state.weatherForecastsSecondary = {};
+            return { success: true };
+        }
+        if (this.getWeatherCooldownRemainingMs() > 0) return { success: false, reason: this._failureReason() };
+
+        const sites = this.getGeoFilteredSites(this.getSites()).filter(
+            (site) => (this.state.weatherForecasts[site.id] || []).length > 0,
         );
-
-        if (favoriteSites.length === 0) {
+        if (sites.length === 0) {
             this.state.weatherForecastsSecondary = {};
             return { success: true };
         }
 
-        const secondaryModelKey = this.state.weatherModel === 'gfs' ? 'meteofrance' : 'gfs';
         const { apiEndpoint, modelParam } = this._resolveModelEndpoint(secondaryModelKey);
-
-        const lats = favoriteSites.map((s) => parseFloat(s.latitude || s.lat)).join(',');
-        const lons = favoriteSites.map((s) => parseFloat(s.longitude || s.lon)).join(',');
-        const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${lats}&longitude=${lons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,cape&timezone=Europe%2FParis&forecast_days=2${modelParam}`;
-
+        if (!this._weatherCache) this._weatherCache = new Map();
+        const CHUNK_SIZE = 400;
+        const secondary = {};
         try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Open-Meteo HTTP ${response.status}`);
-            const data = await response.json();
-            const dataArr = Array.isArray(data) ? data : [data];
+            for (let i = 0; i < sites.length; i += CHUNK_SIZE) {
+                const chunkSites = sites.slice(i, i + CHUNK_SIZE);
+                const lats = chunkSites.map((x) => parseFloat(x.latitude || x.lat)).join(',');
+                const lons = chunkSites.map((x) => parseFloat(x.longitude || x.lon)).join(',');
+                const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${lats}&longitude=${lons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,cape&timezone=Europe%2FParis&forecast_days=8${modelParam}`;
 
-            const now = Date.now();
-            this.state.weatherForecastsSecondary = {};
-            favoriteSites.forEach((site, index) => {
-                const hourly = dataArr[index]?.hourly;
-                if (!hourly || !hourly.time) return;
-
-                let idx = 0,
-                    minDiff = Infinity;
-                hourly.time.forEach((t, i) => {
-                    const diff = Math.abs(new Date(t).getTime() - now);
-                    if (diff < minDiff) {
-                        minDiff = diff;
-                        idx = i;
+                let results;
+                const cached = this._weatherCache.get(url);
+                if (cached && Date.now() - cached.timestamp < SitesService.WEATHER_CACHE_TTL_MS) {
+                    results = cached.results;
+                } else {
+                    const response = await this._fetchWithBackoff(url);
+                    if (response.status === 429) {
+                        this._weatherCooldownUntil = Date.now() + SitesService.WEATHER_COOLDOWN_MS;
                     }
-                });
+                    if (!response.ok) throw new Error(`Open-Meteo HTTP ${response.status} (modèle de comparaison)`);
+                    const data = await response.json();
+                    results = Array.isArray(data) ? data : [data];
+                    this._weatherCache.set(url, { timestamp: Date.now(), results });
+                }
 
-                // Valeurs validées : une donnée absente reste null, jamais 0 (spec 001, FR-005).
-                const dirDeg = normalizeForecastValue(hourly.wind_direction_10m?.[idx], 'windDir');
-                this.state.weatherForecastsSecondary[site.id] = {
-                    time: hourly.time[idx],
-                    windSpeed: normalizeForecastValue(hourly.wind_speed_10m?.[idx], 'windSpeed'),
-                    windGust: normalizeForecastValue(hourly.wind_gusts_10m?.[idx], 'windGust'),
-                    windDirDeg: dirDeg,
-                    windCard: dirDeg === null ? null : degreesToCardinal(dirDeg),
-                    precipitation: normalizeForecastValue(hourly.precipitation?.[idx], 'precipitation'),
-                    cape: normalizeForecastValue(hourly.cape?.[idx], 'cape'),
-                };
-            });
+                chunkSites.forEach((site, index) => {
+                    const hourly = results[index]?.hourly;
+                    if (!hourly || !Array.isArray(hourly.time)) return;
+                    const indexByTime = new Map(hourly.time.map((time, idx) => [time, idx]));
+                    secondary[site.id] = (this.state.weatherForecasts[site.id] || []).map((primaryHour) => {
+                        const idx = indexByTime.get(primaryHour.time);
+                        if (idx === undefined) return null;
+                        // Valeurs validées : une donnée absente reste null, jamais 0 (spec 001).
+                        const dirDeg = normalizeForecastValue(hourly.wind_direction_10m?.[idx], 'windDir');
+                        return {
+                            time: hourly.time[idx],
+                            windSpeed: normalizeForecastValue(hourly.wind_speed_10m?.[idx], 'windSpeed'),
+                            windGust: normalizeForecastValue(hourly.wind_gusts_10m?.[idx], 'windGust'),
+                            windDirDeg: dirDeg,
+                            windCard: dirDeg === null ? null : degreesToCardinal(dirDeg),
+                            precipitation: normalizeForecastValue(hourly.precipitation?.[idx], 'precipitation'),
+                            cape: normalizeForecastValue(hourly.cape?.[idx], 'cape'),
+                        };
+                    });
+                });
+            }
+            this.state.weatherForecastsSecondary = secondary;
+            this.state.secondaryModelKey = secondaryModelKey;
             return { success: true };
         } catch (e) {
-            console.error('Erreur météo (modèle secondaire, indice de confiance):', e);
-            return { success: false, error: e };
+            console.error('Erreur météo (modèle de comparaison):', e);
+            return { success: false, error: e, reason: this._failureReason() };
         }
     }
 
-    // Compare le statut volable/non-volable du modèle principal et du modèle secondaire pour un
-    // site donné, au créneau actuel. Retourne null tant que le modèle secondaire n'a pas été
-    // chargé (fetchSecondaryModelForFavorites), sinon un booléen "les modèles sont d'accord".
-    getModelAgreement(site) {
-        const secondaryForecast = this.state.weatherForecastsSecondary && this.state.weatherForecastsSecondary[site.id];
-        if (!secondaryForecast) return null;
+    /**
+     * Accord entre le modèle principal et le second modèle pour UNE heure (par défaut l'heure
+     * affichée) — les deux modèles à la même heure (spec 002, FR-009). N'altère jamais le
+     * verdict principal (FR-011).
+     * @returns {{state: 'agree'|'disagree'|'unavailable'|'not_compared', secondaryModelKey: string, secondaryOutcome: {reason: string, reasonCode: string}|null}}
+     */
+    getModelAgreement(site, offset = this.state.forecastOffset) {
+        const secondaryModelKey = this.getSecondaryModelKey();
+        const result = (state, secondaryOutcome = null) => ({ state, secondaryModelKey, secondaryOutcome });
+        if (secondaryModelKey === this.state.weatherModel) return result('not_compared');
 
-        const primaryForecasts = this.state.weatherForecasts[site.id] || [];
-        const primaryForecast = primaryForecasts[this.state.forecastOffset];
-        if (!primaryForecast) return null;
+        const primaryForecast = (this.state.weatherForecasts[site.id] || [])[offset];
+        const secondaryForecast = ((this.state.weatherForecastsSecondary || {})[site.id] || [])[offset];
+        if (!primaryForecast || !secondaryForecast) return result('unavailable');
 
-        // Le jour/la nuit ne dépend pas du modèle : la requête secondaire ne demande pas les
-        // heures de lever/coucher, on reprend celles du modèle principal.
+        // Le jour/la nuit ne dépend pas du modèle : la requête du second modèle ne demande pas les
+        // heures de lever/coucher, on reprend celles du modèle principal pour la même heure.
         const primary = this.isForecastFlyable(site, primaryForecast);
         const secondary = this.isForecastFlyable(site, { ...secondaryForecast, isDaytime: primaryForecast.isDaytime });
-        // Une prévision incomplète ne permet pas de comparer : indice indisponible (spec 001).
-        if (primary.status === 'incomplete' || secondary.status === 'incomplete') return null;
-        return primary.flyable === secondary.flyable;
+        // Une prévision incomplète ne permet pas de comparer : jamais présentée comme un accord.
+        if (primary.status === 'incomplete' || secondary.status === 'incomplete') return result('unavailable');
+        return result(primary.flyable === secondary.flyable ? 'agree' : 'disagree', secondary);
     }
+
+    static WEATHER_CACHE_TTL_MS = 10 * 60 * 1000;
 
     // Après un lot rejeté par Open-Meteo malgré les 3 tentatives ci-dessous, on arrête
     // d'appeler l'API pendant ce délai : réessayer plus vite ne fait que reproduire le même
@@ -523,7 +549,7 @@ class SitesService {
 
         // Cache court (10 min) : le vent ne change pas assez vite pour justifier un
         // re-fetch complet à chaque montage de vue ou changement rapide de modèle.
-        const WEATHER_CACHE_TTL_MS = 10 * 60 * 1000;
+        const WEATHER_CACHE_TTL_MS = SitesService.WEATHER_CACHE_TTL_MS;
         if (!this._weatherCache) this._weatherCache = new Map();
 
         if (this.abortController) {

@@ -105,6 +105,22 @@ export function formatForecastContext(provenance, now = Date.now()) {
     return text;
 }
 
+/**
+ * Accord du second modèle pour l'heure affichée (spec 002, US3) : texte + icône, jamais la
+ * couleur seule. Rien si les modèles n'ont pas été comparés.
+ */
+function modelAgreementHtml(site) {
+    const agreement = SitesService.getModelAgreement(site);
+    if (!agreement || agreement.state === 'not_compared') return '';
+    const model = modelLabel(agreement.secondaryModelKey);
+    let text;
+    if (agreement.state === 'agree') text = t('forecast.agree', { model });
+    else if (agreement.state === 'disagree')
+        text = t('forecast.disagree', { model, verdict: agreement.secondaryOutcome?.reason || '' });
+    else text = t('forecast.comparisonUnavailable', { model });
+    return `<p class="model-agreement model-agreement--${agreement.state}">${escapeHTML(text)}</p>`;
+}
+
 /** Âge d'une prévision : « 45 min », « 3 h 20 », « 1 j 2 h » (spec 002, US2). */
 export function formatAge(ms) {
     const minutes = Math.max(0, Math.floor(ms / 60000));
@@ -592,7 +608,21 @@ class SitesViewClass extends BaseView {
             SitesService.fetchModelRunTime(SitesService.state.weatherModel).then((runAt) => {
                 if (runAt) this.renderList();
             });
+            this.loadModelComparison();
         }
+    }
+
+    /**
+     * Charge le second modèle (même sites, mêmes heures) puis ré-affiche : sans lui, la
+     * comparaison est simplement indiquée comme indisponible (spec 002, US3).
+     */
+    loadModelComparison() {
+        SitesService.fetchSecondaryModel()
+            .then(() => {
+                this.renderList();
+                this.updateMapMarkers();
+            })
+            .catch(() => {});
     }
 
     initMap() {
@@ -782,6 +812,7 @@ class SitesViewClass extends BaseView {
             </div>
             <div style="opacity: 0.8; font-size: 0.8rem;">Rafales : ${escapeHTML(String(forecastValue(weather.windGust)))} km/h</div>
             ${missing ? `<div class="weather-missing-values" style="margin-top: 4px; font-size: 0.8rem;">${escapeHTML(missing)}</div>` : ''}
+            ${status.status === 'incomplete' ? '' : modelAgreementHtml(site)}
             ${forecastContextHtml(site.id)}
             ${verdictReminderHtml(status)}
         </div>`;
@@ -1717,14 +1748,6 @@ class SitesViewClass extends BaseView {
             }
         }
         this.renderList();
-
-        if (this.state.showComparator) {
-            // Fetch best-effort : si ça échoue, getModelAgreement renverra simplement null
-            // (colonne "Confiance" affichée comme indisponible) sans bloquer le reste du tableau.
-            SitesService.fetchSecondaryModelForFavorites()
-                .then(() => this.renderList())
-                .catch(() => {});
-        }
     }
 
     // Tableau côte-à-côte des sites favoris pour le créneau actuellement affiché (même offset
@@ -1779,20 +1802,8 @@ class SitesViewClass extends BaseView {
                     ? `${escapeHTML(bestSlot.dayLabel)} ${bestSlot.start}h-${bestSlot.end + 1}h`
                     : '<span style="color: var(--text-muted);">Aucun</span>';
 
-                const agreement = SitesService.getModelAgreement(site);
-                // Indice calculable seulement sur deux prévisions complètes (spec 001) : si les deux
-                // modèles sont chargés mais qu'il reste null, c'est qu'une prévision est incomplète.
-                const secondaryLoaded = !!SitesService.state.weatherForecastsSecondary?.[site.id];
-                const confidenceUnavailable =
-                    agreement === null && (status?.status === 'incomplete' || (secondaryLoaded && !!weather));
-                const confidenceHtml =
-                    agreement === null
-                        ? confidenceUnavailable
-                            ? `<span style="color: var(--text-muted);" title="${escapeHTML(t('weather.incomplete'))}">${escapeHTML(t('weather.confidenceUnavailable'))}</span>`
-                            : '<span style="color: var(--text-muted);">—</span>'
-                        : agreement
-                          ? '<span style="color: var(--accent-green);" title="Le modèle principal et le modèle de référence sont d\'accord sur la volabilité actuelle"><i class="ri-shield-check-line"></i> Fiable</span>'
-                          : '<span style="color: #f59e0b;" title="Les modèles météo divergent sur la volabilité actuelle : prudence"><i class="ri-error-warning-line"></i> Incertain</span>';
+                // Accord du second modèle pour l'heure affichée (spec 002, US3).
+                const confidenceHtml = modelAgreementHtml(site) || '<span style="color: var(--text-muted);">—</span>';
 
                 return `
                 <tr>
@@ -1838,6 +1849,7 @@ class SitesViewClass extends BaseView {
         this.updateForecastLabel();
         this.renderList();
         this.updateMapMarkers();
+        if (!lastRefreshFailure) this.loadModelComparison();
     }
 
     /**
@@ -1972,6 +1984,7 @@ class SitesViewClass extends BaseView {
                             </div>
                             ${missingValuesText(status) ? `<div class="weather-missing-values" style="font-size: 0.8rem;">${escapeHTML(missingValuesText(status))}</div>` : ''}
                         </div>
+                        ${status.status === 'incomplete' ? '' : modelAgreementHtml(site)}
                         ${forecastContextHtml(site.id)}
                         ${verdictReminderHtml(status)}
                     `;

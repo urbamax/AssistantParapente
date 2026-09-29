@@ -2696,3 +2696,31 @@ body.light-mode .back-to-top-btn {
 body.dark-mode .forecast-refresh-error {
     color: #fbbf24;
 }
+
+/* Spec 002 : accord du second modèle pour l'heure affichée (icône + texte). */
+.model-agreement {
+    margin: 6px 0 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.model-agreement--agree {
+    color: #15803d;
+}
+
+.model-agreement--disagree {
+    color: #b45309;
+}
+
+.model-agreement--unavailable {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+body.dark-mode .model-agreement--agree {
+    color: #4ade80;
+}
+
+body.dark-mode .model-agreement--disagree {
+    color: #fbbf24;
+}

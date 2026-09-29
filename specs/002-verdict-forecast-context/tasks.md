@@ -127,18 +127,18 @@ the provider quota that US3 uses more (plan.md, Implementation Phases).
 
 ### Tests for User Story 3 ⚠️ write first, see them fail
 
-- [ ] T035 [P] [US3] In `tests/services/sites_service.test.js`: `fetchSecondaryModel()` (renamed from `fetchSecondaryModelForFavorites`) requests the same site set as the primary fetch (geo-filtered + favourites), in chunks of 400, with the same `forecast_days=8` and hourly variables incl. `cape`, reuses the 10-min cache, and does nothing while the 429 cooldown is active; `weatherForecastsSecondary[id]` is an array aligned on the primary time axis; secondary model is `gfs`, or `meteofrance` when primary is `gfs`, and nothing is fetched when they are equal
-- [ ] T036 [P] [US3] In `tests/services/sites_service.test.js`: `getModelAgreement(site, offset)` over 48 offsets of `twoModelHours` returns `agree`/`disagree` for complete hours at that exact offset, `unavailable` when either hour is missing or incomplete, `not_compared` when models are equal; the primary outcome object is identical before and after
-- [ ] T037 [P] [US3] In `tests/views/sites_verdict.test.js`: popup, card and comparator show « GFS d'accord », « GFS n'est pas d'accord : {verdict} » or « Comparaison GFS indisponible » for the displayed offset; nothing when `not_compared`
-- [ ] T038 [US3] In `tests/e2e/sites_flow.spec.js`: mock two models with a disagreement at hour 2; clicking timeline dot 2 of the AUTEUIL card shows « n'est pas d'accord »; dot 0 shows « d'accord »
-- [ ] T039 [US3] Run `npx vitest run tests/services/sites_service.test.js tests/views/sites_verdict.test.js` and `npx playwright test tests/e2e/sites_flow.spec.js --project=chromium`; confirm T035–T038 fail
+- [X] T035 [P] [US3] In `tests/services/sites_service.test.js`: `fetchSecondaryModel()` (renamed from `fetchSecondaryModelForFavorites`) requests the same site set as the primary fetch (geo-filtered + favourites), in chunks of 400, with the same `forecast_days=8` and hourly variables incl. `cape`, reuses the 10-min cache, and does nothing while the 429 cooldown is active; `weatherForecastsSecondary[id]` is an array aligned on the primary time axis; secondary model is `gfs`, or `meteofrance` when primary is `gfs`, and nothing is fetched when they are equal
+- [X] T036 [P] [US3] In `tests/services/sites_service.test.js`: `getModelAgreement(site, offset)` over 48 offsets of `twoModelHours` returns `agree`/`disagree` for complete hours at that exact offset, `unavailable` when either hour is missing or incomplete, `not_compared` when models are equal; the primary outcome object is identical before and after
+- [X] T037 [P] [US3] In `tests/views/sites_verdict.test.js`: popup, card and comparator show « GFS d'accord », « GFS n'est pas d'accord : {verdict} » or « Comparaison GFS indisponible » for the displayed offset; nothing when `not_compared`
+- [X] T038 [US3] In `tests/e2e/sites_flow.spec.js`: mock two models with a disagreement at hour 2; clicking timeline dot 2 of the AUTEUIL card shows « n'est pas d'accord »; dot 0 shows « d'accord »
+- [X] T039 [US3] Run `npx vitest run tests/services/sites_service.test.js tests/views/sites_verdict.test.js` and `npx playwright test tests/e2e/sites_flow.spec.js --project=chromium`; confirm T035–T038 fail
 
 ### Implementation for User Story 3
 
-- [ ] T040 [US3] In `js/services/sites_service.js`: implement `fetchSecondaryModel()` reusing the primary chunking/cache/backoff/cooldown code (extract a shared `_fetchChunks(sites, modelKey, { force })`), parse with the same builder into arrays aligned with the primary `currentHourIndex`; `getModelAgreement(site, offset = this.state.forecastOffset)` returning `{ state, secondaryModelKey, secondaryOutcome }` per data-model.md (daylight taken from the primary hour)
-- [ ] T041 [US3] In `js/views/sites.js`: call `fetchSecondaryModel()` after each primary fetch (not only in the comparator, around line 1616); render the agreement line (class `model-agreement model-agreement--{state}`) in the popup, the card weather block and the comparator « Confiance » column, recomputed on slider changes; update the comparator to the new return shape
-- [ ] T042 [P] [US3] In `css/sites.css`: `.model-agreement--agree|--disagree|--unavailable` with icon + text, both themes
-- [ ] T043 [US3] Run `npm test` and `npx playwright test tests/e2e/sites_flow.spec.js --project=chromium`; T035–T038 pass
+- [X] T040 [US3] In `js/services/sites_service.js`: implement `fetchSecondaryModel()` reusing the primary chunking/cache/backoff/cooldown code (extract a shared `_fetchChunks(sites, modelKey, { force })`), parse with the same builder into arrays aligned with the primary `currentHourIndex`; `getModelAgreement(site, offset = this.state.forecastOffset)` returning `{ state, secondaryModelKey, secondaryOutcome }` per data-model.md (daylight taken from the primary hour)
+- [X] T041 [US3] In `js/views/sites.js`: call `fetchSecondaryModel()` after each primary fetch (not only in the comparator, around line 1616); render the agreement line (class `model-agreement model-agreement--{state}`) in the popup, the card weather block and the comparator « Confiance » column, recomputed on slider changes; update the comparator to the new return shape
+- [X] T042 [P] [US3] In `css/sites.css`: `.model-agreement--agree|--disagree|--unavailable` with icon + text, both themes
+- [X] T043 [US3] Run `npm test` and `npx playwright test tests/e2e/sites_flow.spec.js --project=chromium`; T035–T038 pass
 
 **Checkpoint**: all four stories complete.
 

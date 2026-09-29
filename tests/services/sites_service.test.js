@@ -7,6 +7,7 @@ import {
     nearestHourIso,
     SITES_AROUND_BOULOGNE,
     metaJson,
+    twoModelHours,
 } from '../fixtures/forecasts.js';
 import { DEFAULT_LOCATION } from '../../js/data/weather_config.js';
 
@@ -318,25 +319,33 @@ describe('SitesService', () => {
                 SitesService.state.filterMode = 'manual';
             });
 
-            it('is unavailable (null) when the primary hour is incomplete', () => {
+            // Spec 002 : le second modèle est un tableau d'heures aligné sur le modèle principal, et
+            // getModelAgreement renvoie un état ('unavailable' remplace l'ancien null).
+            it('is unavailable when the primary hour is incomplete', () => {
                 SitesService.state.weatherForecasts = { 7: [completeHourWith({ windGust: null })] };
-                SitesService.state.weatherForecastsSecondary = { 7: COMPLETE_HOUR };
-                expect(SitesService.getModelAgreement(site)).toBeNull();
+                SitesService.state.weatherForecastsSecondary = { 7: [COMPLETE_HOUR] };
+                expect(SitesService.getModelAgreement(site).state).toBe('unavailable');
             });
 
-            it('is unavailable (null) when the secondary hour is incomplete', () => {
+            it('is unavailable when the secondary hour is incomplete', () => {
                 SitesService.state.weatherForecasts = { 7: [COMPLETE_HOUR] };
-                SitesService.state.weatherForecastsSecondary = { 7: completeHourWith({ windSpeed: null }) };
-                expect(SitesService.getModelAgreement(site)).toBeNull();
+                SitesService.state.weatherForecastsSecondary = { 7: [completeHourWith({ windSpeed: null })] };
+                expect(SitesService.getModelAgreement(site).state).toBe('unavailable');
             });
 
             it('secondary fetch stores null for missing values', async () => {
-                SitesService.setSites([{ id: 7, nom: 'Fav', latitude: 45, longitude: 6, orientations_vent: ['S'] }]);
+                SitesService.setSites([
+                    { id: 7, nom: 'Fav', latitude: 45.9, longitude: 6.1, orientations_vent: ['S'] },
+                ]);
                 SitesService.state.userPreferences = { favoriteSites: [7] };
-                const payload = aromeTailResponse(currentHourIso(), { complete: 0, empty: 2 });
-                mockOnce(payload);
-                await SitesService.fetchSecondaryModelForFavorites();
-                const sec = SitesService.state.weatherForecastsSecondary[7];
+                const start = currentHourIso();
+                SitesService.state.weatherModel = 'meteofrance';
+                SitesService.state.weatherForecasts = {
+                    7: [completeHourWith({ time: aromeTailResponse(start).hourly.time[0] })],
+                };
+                mockOnce(aromeTailResponse(start, { complete: 0, empty: 2 }));
+                await SitesService.fetchSecondaryModel();
+                const sec = SitesService.state.weatherForecastsSecondary[7][0];
                 expect(sec.windSpeed).toBeNull();
                 expect(sec.windGust).toBeNull();
                 expect(sec.windCard).toBeNull();
@@ -389,14 +398,16 @@ describe('SitesService', () => {
         });
 
         it('requests CAPE for the secondary (confidence) model too', async () => {
-            SitesService.setSites([{ id: 7, nom: 'Fav', latitude: 45, longitude: 6, orientations_vent: ['S'] }]);
+            SitesService.setSites([{ id: 7, nom: 'Fav', latitude: 45.9, longitude: 6.1, orientations_vent: ['S'] }]);
             SitesService.state.userPreferences = { favoriteSites: [7] };
             const payload = aromeTailResponse(currentStart(), { complete: 1, empty: 0 });
+            SitesService.state.weatherModel = 'meteofrance';
+            SitesService.state.weatherForecasts = { 7: [completeHourWith({ time: payload.hourly.time[0] })] };
             global.fetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue(payload) });
-            await SitesService.fetchSecondaryModelForFavorites();
+            await SitesService.fetchSecondaryModel();
             const url = global.fetch.mock.calls[0][0];
             expect(new URL(url).searchParams.get('hourly').split(',')).toContain('cape');
-            expect(SitesService.state.weatherForecastsSecondary[7].cape).toBe(100);
+            expect(SitesService.state.weatherForecastsSecondary[7][0].cape).toBe(100);
         });
     });
 
@@ -577,6 +588,96 @@ describe('SitesService', () => {
             online.mockRestore();
             expect(res.reason).toBe('pas de connexion');
             expect(SitesService.getForecastProvenance(1).fetchedAt).toBe(T0);
+        });
+    });
+
+    describe('model agreement for the displayed hour (spec 002, US3)', () => {
+        const site = { id: 7, nom: 'Sud', latitude: 45.9, longitude: 6.1, orientations_vent: ['S'] };
+        beforeEach(() => {
+            SitesService.state.limitWindMin = 5;
+            SitesService.state.limitWindMax = 25;
+            SitesService.state.limitGustDelta = 15;
+            SitesService.state.filterMode = 'manual';
+            SitesService.state.weatherModel = 'meteofrance';
+        });
+
+        it('compares the same hour for both models over 48 hours', () => {
+            const { primary, secondary } = twoModelHours({ disagreeAt: [3, 20], incompleteAt: [7] });
+            SitesService.state.weatherForecasts = { 7: primary };
+            SitesService.state.weatherForecastsSecondary = { 7: secondary };
+            for (let offset = 0; offset < 48; offset++) {
+                const res = SitesService.getModelAgreement(site, offset);
+                const expected = [3, 20].includes(offset) ? 'disagree' : offset === 7 ? 'unavailable' : 'agree';
+                expect(res.state).toBe(expected);
+                expect(res.secondaryModelKey).toBe('gfs');
+            }
+            expect(SitesService.getModelAgreement(site, 3).secondaryOutcome.reasonCode).toBe('RAIN');
+        });
+
+        it('defaults to the displayed hour (forecastOffset)', () => {
+            const { primary, secondary } = twoModelHours({ disagreeAt: [5] });
+            SitesService.state.weatherForecasts = { 7: primary };
+            SitesService.state.weatherForecastsSecondary = { 7: secondary };
+            SitesService.state.forecastOffset = 5;
+            expect(SitesService.getModelAgreement(site).state).toBe('disagree');
+            SitesService.state.forecastOffset = 0;
+        });
+
+        it('is unavailable when the second model has no data for that hour or is not loaded', () => {
+            const { primary } = twoModelHours();
+            SitesService.state.weatherForecasts = { 7: primary };
+            SitesService.state.weatherForecastsSecondary = { 7: [] };
+            expect(SitesService.getModelAgreement(site, 2).state).toBe('unavailable');
+            SitesService.state.weatherForecastsSecondary = {};
+            expect(SitesService.getModelAgreement(site, 2).state).toBe('unavailable');
+        });
+
+        it('never changes the primary outcome', () => {
+            const { primary, secondary } = twoModelHours({ disagreeAt: [1] });
+            SitesService.state.weatherForecasts = { 7: primary };
+            SitesService.state.weatherForecastsSecondary = { 7: secondary };
+            const before = SitesService.isForecastFlyable(site, primary[1]);
+            SitesService.getModelAgreement(site, 1);
+            expect(SitesService.isForecastFlyable(site, primary[1])).toEqual(before);
+        });
+
+        it('uses GFS as second model, or AROME when GFS is the primary model', () => {
+            expect(SitesService.getSecondaryModelKey()).toBe('gfs');
+            SitesService.state.weatherModel = 'gfs';
+            expect(SitesService.getSecondaryModelKey()).toBe('meteofrance');
+        });
+
+        it('fetches the second model for the same sites as the primary one, with the same hours', async () => {
+            SitesService.state.userPreferences = { favoriteSites: [] };
+            const start = nearestHourIso();
+            const one = aromeTailResponse(start, { complete: 3, empty: 0 });
+            SitesService.state.weatherForecasts = {
+                1: one.hourly.time.map((time) => completeHourWith({ time })),
+                2: one.hourly.time.map((time) => completeHourWith({ time })),
+            };
+            global.fetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue([one, one]) });
+            await SitesService.fetchSecondaryModel();
+            const url = new URL(String(global.fetch.mock.calls[0][0]));
+            expect(url.pathname).toBe('/v1/gfs');
+            expect(url.searchParams.get('latitude').split(',')).toHaveLength(2);
+            expect(url.searchParams.get('forecast_days')).toBe('8');
+            expect(SitesService.state.weatherForecastsSecondary[1].map((h) => h.time)).toEqual(one.hourly.time);
+        });
+
+        it('reuses the cache and does nothing during the Open-Meteo cooldown', async () => {
+            const one = aromeTailResponse(nearestHourIso(), { complete: 2, empty: 0 });
+            SitesService.state.weatherForecasts = { 1: [completeHourWith({ time: one.hourly.time[0] })] };
+            global.fetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue([one, one]) });
+            await SitesService.fetchSecondaryModel();
+            await SitesService.fetchSecondaryModel();
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+
+            SitesService._weatherCache = new Map();
+            SitesService._weatherCooldownUntil = Date.now() + 60_000;
+            const res = await SitesService.fetchSecondaryModel();
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+            expect(res.success).toBe(false);
+            SitesService._weatherCooldownUntil = 0;
         });
     });
 });

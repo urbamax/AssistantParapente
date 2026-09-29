@@ -281,4 +281,31 @@ test.describe('E2E - Sites Flow', () => {
         await expect(failed).toContainText('peut être dépassée');
         await expect(failed).toContainText('Actualisation impossible');
     });
+
+    test('Spec 002 US3 : le désaccord du second modèle est affiché pour l’heure choisie', async ({ page }) => {
+        await mockOpenMeteo(page, { complete: 6, empty: 0 });
+        // AUTEUIL est orienté N : vent du nord pour que le modèle principal le juge volable, et
+        // second modèle (GFS) identique sauf de la pluie à l'heure 2.
+        const northWind = (rainAt) => async (route) => {
+            const url = new URL(route.request().url());
+            const count = (url.searchParams.get('latitude') || '').split(',').length;
+            const one = aromeTailResponse(nearestHourIso(), { complete: 6, empty: 0 });
+            one.hourly.wind_direction_10m = one.hourly.wind_direction_10m.map(() => 0);
+            if (rainAt !== null) one.hourly.precipitation[rainAt] = 2;
+            await route.fulfill({ json: count > 1 ? Array.from({ length: count }, () => one) : one });
+        };
+        await page.route('https://api.open-meteo.com/v1/meteofrance**', northWind(null));
+        await page.route('https://api.open-meteo.com/v1/gfs**', northWind(2));
+        const card = await openSitesAndSearch(page, 'AUTEUIL');
+        const current = () => page.locator('.site-card:not(.minimized)', { hasText: 'AUTEUIL' }).first();
+
+        await expect(current().locator('.model-agreement')).toContainText('d’accord');
+        await expect(current().locator('.model-agreement')).not.toContainText('n’est pas');
+
+        await card.locator('.timeline-hour-dot').nth(2).click();
+        await expect(current().locator('.model-agreement')).toContainText('GFS (NOAA) n’est pas d’accord');
+
+        await current().locator('.timeline-hour-dot').nth(0).click();
+        await expect(current().locator('.model-agreement')).not.toContainText('n’est pas');
+    });
 });

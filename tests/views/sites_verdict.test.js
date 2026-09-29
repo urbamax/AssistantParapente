@@ -195,3 +195,62 @@ describe('stale forecast warning (spec 002, US2)', () => {
         expect(render).not.toHaveBeenCalled();
     });
 });
+
+describe('model agreement on every verdict (spec 002, US3)', () => {
+    const site = { id: 93, nom: 'Comparé', ...SITE_SOUTH };
+
+    beforeEach(() => {
+        SitesService.state.limitWindMin = 5;
+        SitesService.state.limitWindMax = 25;
+        SitesService.state.limitGustDelta = 15;
+        SitesService.state.forecastOffset = 0;
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+        document.body.innerHTML = '';
+    });
+
+    const mockAgreement = (state, reason = 'Pluie (2.0 mm)') =>
+        vi.spyOn(SitesService, 'getModelAgreement').mockReturnValue({
+            state,
+            secondaryModelKey: 'gfs',
+            secondaryOutcome: state === 'disagree' ? { reason } : null,
+        });
+
+    it('says the second model agrees', () => {
+        mockAgreement('agree');
+        const html = SitesView.buildWeatherPopupHtml(completeHourWith(), '#22c55e', site);
+        expect(html).toContain('model-agreement--agree');
+        expect(html).toContain('✓ GFS (NOAA) d’accord');
+    });
+
+    it('names the second model and its verdict when it disagrees', () => {
+        mockAgreement('disagree');
+        const html = SitesView.buildWeatherPopupHtml(completeHourWith(), '#22c55e', site);
+        expect(html).toContain('model-agreement--disagree');
+        expect(html).toContain('⚠ GFS (NOAA) n’est pas d’accord : Pluie (2.0 mm)');
+    });
+
+    it('says the comparison is unavailable, never agreement', () => {
+        mockAgreement('unavailable');
+        const html = SitesView.buildWeatherPopupHtml(completeHourWith(), '#22c55e', site);
+        expect(html).toContain('Comparaison GFS (NOAA) indisponible');
+        expect(html).not.toContain('d’accord');
+    });
+
+    it('shows nothing when the models were not compared', () => {
+        mockAgreement('not_compared');
+        const html = SitesView.buildWeatherPopupHtml(completeHourWith(), '#22c55e', site);
+        expect(html).not.toContain('model-agreement');
+    });
+
+    it('fills the comparison table « Confiance » column for the displayed hour', () => {
+        mockAgreement('disagree');
+        document.body.innerHTML = '<div id="sites-list-container"></div>';
+        SitesService.state.userPreferences = { favoriteSites: [93] };
+        SitesService.state.weatherForecasts = { 93: [completeHourWith()] };
+        SitesView.renderComparator([site]);
+        expect(document.getElementById('sites-list-container').innerHTML).toContain('n’est pas d’accord');
+    });
+});
