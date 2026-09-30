@@ -1270,9 +1270,11 @@ class LogbookViewClass extends BaseView {
     // Bloc météo d'une carte de l'historique (données AROME + graphe de balise).
     renderSessionWeatherHtml(session) {
         if (session.meteo) {
-            const decollageRow = this.renderWeatherPointRow(session.meteo, 'Décollage');
+            // Une séance de gonflage n'a ni décollage ni atterrissage : on parle de début et de fin.
+            const isVol = session.type === 'vol';
+            const decollageRow = this.renderWeatherPointRow(session.meteo, isVol ? 'Décollage' : 'Début');
             const atterroRow = session.meteoAtterro
-                ? this.renderWeatherPointRow(session.meteoAtterro, 'Atterrissage')
+                ? this.renderWeatherPointRow(session.meteoAtterro, isVol ? 'Atterrissage' : 'Fin')
                 : '';
             const baliseHtml = this.renderBaliseHistoBlock(session);
 
@@ -1919,7 +1921,7 @@ class LogbookViewClass extends BaseView {
         return dirs[val % 16];
     }
 
-    // Une ligne "Décollage" ou "Atterrissage" du bloc météo (modèle Open-Meteo/AROME,
+    // Une ligne "Décollage"/"Atterrissage" (ou "Début"/"Fin" pour un gonflage) du bloc météo (modèle Open-Meteo/AROME,
     // valeur estimée au point GPS du site à l'heure donnée).
     renderWeatherPointRow(m, label) {
         if (!m) return '';
