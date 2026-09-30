@@ -17,6 +17,7 @@ import { formatDuration, formatDateOnly, formatDateTime, addMinutesToDatetimeLoc
 import { capitalizeFirstLetter } from '../utils/text_utils.js';
 import { toSorted } from '../utils/array_utils.js';
 import { getSpotairWidgetId } from '../data/spotair_widgets.js';
+import { t } from '../utils/i18n.js';
 
 import BaseView from '../core/base_view.js';
 
@@ -1272,9 +1273,12 @@ class LogbookViewClass extends BaseView {
         if (session.meteo) {
             // Une séance de gonflage n'a ni décollage ni atterrissage : on parle de début et de fin.
             const isVol = session.type === 'vol';
-            const decollageRow = this.renderWeatherPointRow(session.meteo, isVol ? 'Décollage' : 'Début');
+            const decollageRow = this.renderWeatherPointRow(
+                session.meteo,
+                t(isVol ? 'weather.rowTakeoff' : 'weather.rowStart'),
+            );
             const atterroRow = session.meteoAtterro
-                ? this.renderWeatherPointRow(session.meteoAtterro, isVol ? 'Atterrissage' : 'Fin')
+                ? this.renderWeatherPointRow(session.meteoAtterro, t(isVol ? 'weather.rowLanding' : 'weather.rowEnd'))
                 : '';
             const baliseHtml = this.renderBaliseHistoBlock(session);
 

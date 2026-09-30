@@ -5,14 +5,15 @@
 ## Summary
 
 In `renderSessionWeatherHtml` (`js/views/logbook.js`), pass « Début » / « Fin » instead of
-« Décollage » / « Atterrissage » when `session.type` is not `vol`.
+« Décollage » / « Atterrissage » when `session.type` is not `vol`; the four labels live in
+`js/i18n/fr.js`.
 
 ## Constitution Check
 
 | Principle | Status | Note |
 |-----------|--------|------|
 | IV. Test-first | PASS | Regression test in `tests/views/logbook_weather.test.js`, seen failing |
-| Language | Noted | The two labels stay inline like the existing ones of this block; they move to `js/i18n/fr.js` when the block is reworked |
+| Language | PASS | The four row labels move to `js/i18n/fr.js` (`weather.row*`) |
 
 ## Complexity Tracking
 
