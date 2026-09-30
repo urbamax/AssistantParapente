@@ -548,3 +548,112 @@ body.light-mode .qcm-option.missed {
 body.light-mode .bank-choice.correct {
     color: #15803d !important;
 }
+
+/* --- Mode vocal du QCM (spec 016) --- */
+.qcm-voice-bar {
+    margin: 12px 0 4px;
+}
+
+.qcm-voice-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.qcm-voice-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-main);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+        border-color: var(--accent-blue);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--accent-blue);
+        outline-offset: 2px;
+    }
+
+    &[aria-pressed='true'] {
+        background: var(--accent-blue);
+        border-color: var(--accent-blue);
+        color: #ffffff;
+    }
+
+    body.light-mode & {
+        background: #ffffff;
+    }
+
+    body.light-mode &[aria-pressed='true'] {
+        background: #0369a1;
+        border-color: #0369a1;
+    }
+}
+
+.qcm-voice-link {
+    background: none;
+    border: none;
+    padding: 8px 4px;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:focus-visible {
+        outline: 2px solid var(--accent-blue);
+        outline-offset: 2px;
+    }
+}
+
+.qcm-voice-notice {
+    margin-top: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(251, 191, 36, 0.35);
+    background: rgba(251, 191, 36, 0.08);
+    color: var(--text-main);
+    font-size: 0.85rem;
+    line-height: 1.45;
+
+    p {
+        margin: 6px 0;
+    }
+}
+
+.qcm-voice-notice-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.qcm-voice-status {
+    min-height: 1.2em;
+    margin: 6px 0 0;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.qcm-option-letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.6em;
+    height: 1.6em;
+    margin-right: 10px;
+    border-radius: 6px;
+    border: 1px solid currentColor;
+    font-size: 0.85em;
+    font-weight: 700;
+    opacity: 0.8;
+}
