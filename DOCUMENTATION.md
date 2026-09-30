@@ -267,6 +267,9 @@ Processes binary `.igc` GPS log files strictly on the client side without server
 ### 2. Wing & Equipment Hours Tracking (`js/services/logbook_service.js`)
 Every logged flight automatically increments the total airtime (hours & minutes) of the associated wing and harness, triggering visual alerts when equipment passes maintenance thresholds (e.g., 100h inspection alert).
 
+### 3. Coordinates of a Manually Entered Place (spec 011)
+A place typed in the add form that is not in the site database can be placed on an inline Leaflet map (« Placer sur la carte »: Esri satellite and topo layers from the host already cached by the service worker, created only when opened and released on re-render and in `unmount()`), or by pasting coordinates (decimal, degrees-minutes-seconds or a Google Maps `@lat,lon` link, parsed by `parseCoordinates` in `js/utils/geo_utils.js`). They are stored as `lat`/`lon` on the session and used for its weather; an imported IGC track overrides them. `LogbookService.findLastCoordsForPlace(name)` proposes the coordinates of the latest earlier session at the same place.
+
 ---
 
 ## 📚 FFVL Theory & QCM Engine

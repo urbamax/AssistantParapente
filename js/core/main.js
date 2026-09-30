@@ -122,6 +122,8 @@ async function bootApplication() {
         'deleteEquipment',
         'toggleEquipmentStatus',
         'triggerIgcUpload',
+        'toggleCoordsPicker',
+        'clearCoords',
     ].forEach((action) => {
         AppEvents.register('Logbook' + action, (args, e, t) =>
             LogbookView[action] ? LogbookView[action](args || e, e, t) : null,

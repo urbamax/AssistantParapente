@@ -167,6 +167,29 @@ class LogbookService {
         }
     }
 
+    /**
+     * Coordonnées de la dernière session (vol ou gonflage) faite au même lieu, pour un lieu absent
+     * de la base des sites (spec 011). Nom comparé sans casse ni espaces autour.
+     * @param {string} name
+     * @returns {{lat: number, lon: number}|null}
+     */
+    findLastCoordsForPlace(name) {
+        const key = (name || '').trim().toUpperCase();
+        if (!key) return null;
+        const match = this.flights
+            .filter(
+                (f) =>
+                    (f.site || f.lieu || '').trim().toUpperCase() === key &&
+                    Number.isFinite(f.lat) &&
+                    Number.isFinite(f.lon),
+            )
+            .reduce(
+                (latest, f) => (!latest || new Date(f.datetime) > new Date(latest.datetime) ? f : latest),
+                /** @type {any} */ (null),
+            );
+        return match ? { lat: match.lat, lon: match.lon } : null;
+    }
+
     deleteFlight(id) {
         this.flights = this.flights.filter((f) => f.id !== id);
         this.saveFlights();
