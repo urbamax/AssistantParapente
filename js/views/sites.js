@@ -16,6 +16,18 @@ import { FR } from '../i18n/fr.js';
 
 const FR_WEEKDAYS = FR.forecast.weekdays;
 
+// Textes de l'écran des sites (spec 015), tous dans js/i18n/fr.js (section sites). tt() : texte pour
+// du HTML, paramètres échappés ; th() : un paramètre est un fragment HTML construit ici ; tl() :
+// texte brut (textContent, attributs posés par setAttribute, boîtes de dialogue).
+const fillParams = (text, params, format) =>
+    text.replace(/\{(\w+)\}/g, (match, name) =>
+        Object.prototype.hasOwnProperty.call(params, name) ? format(params[name]) : match,
+    );
+const tt = (key, params = {}) =>
+    fillParams(escapeHTML(t(`sites.${key}`)), params, (value) => escapeHTML(String(value)));
+const th = (key, htmlParams) => fillParams(escapeHTML(t(`sites.${key}`)), htmlParams, String);
+const tl = (key, params) => t(`sites.${key}`, params);
+
 // ---------------------------------------------------------------------------------------------
 // Affichage des verdicts météo (spec 001, contracts/ui-states.md). Les couleurs et libellés sont
 // choisis à partir de `status` / `reasonCode`, jamais en comparant le texte affiché.
@@ -124,10 +136,10 @@ function modelAgreementHtml(site) {
 /** Âge d'une prévision : « 45 min », « 3 h 20 », « 1 j 2 h » (spec 002, US2). */
 export function formatAge(ms) {
     const minutes = Math.max(0, Math.floor(ms / 60000));
-    if (minutes < 60) return `${minutes} min`;
+    if (minutes < 60) return t('forecast.ageMinutes', { minutes });
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours} h ${pad2(minutes % 60)}`;
-    return `${Math.floor(hours / 24)} j ${hours % 24} h`;
+    if (hours < 24) return t('forecast.ageHours', { hours, minutes: pad2(minutes % 60) });
+    return t('forecast.ageDays', { days: Math.floor(hours / 24), hours: hours % 24 });
 }
 
 /** Dernier échec d'« Actualiser » (raison en français), affiché sur les prévisions anciennes. */
@@ -239,7 +251,7 @@ class SitesViewClass extends BaseView {
             btn.disabled = true;
             btn.style.opacity = '0.5';
             btn.style.cursor = 'not-allowed';
-            btn.textContent = `Réessayer dans ${mins} min`;
+            btn.textContent = tl('weather.retryIn', { minutes: mins });
         };
         label();
 
@@ -250,7 +262,7 @@ class SitesViewClass extends BaseView {
                 btn.disabled = false;
                 btn.style.opacity = '';
                 btn.style.cursor = '';
-                btn.textContent = 'Réessayer';
+                btn.textContent = tl('weather.retry');
                 return;
             }
             label();
@@ -418,20 +430,18 @@ class SitesViewClass extends BaseView {
 
         if (!GdprEngine.isConsentGranted('gps')) {
             if (!isInitialLoad) {
-                const openSettings = confirm(
-                    'Vous devez autoriser la géolocalisation dans vos options de confidentialité.',
-                );
+                const openSettings = confirm(tl('gps.consentConfirm'));
                 if (openSettings) GdprEngine.showModal('gdpr-settings-modal');
             }
             if (statusEl)
-                statusEl.innerHTML = `<i class="ri-shield-user-line" style="color: var(--text-muted);"></i> Géolocalisation désactivée. <a href="#" data-action="GdprshowModal" data-args="gdpr-settings-modal" data-prevent-default style="color: var(--accent-blue);">Gérer</a>`;
+                statusEl.innerHTML = `<i class="ri-shield-user-line" style="color: var(--text-muted);"></i> ${tt('gps.disabled')} <a href="#" data-action="GdprshowModal" data-args="gdpr-settings-modal" data-prevent-default style="color: var(--accent-blue);">${tt('gps.manage')}</a>`;
             return;
         }
 
         if (!navigator.geolocation) return;
 
         if (statusEl) {
-            statusEl.innerHTML = `<i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i> Récupération GPS...`;
+            statusEl.innerHTML = `<i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i> ${tt('gps.locating')}`;
             statusEl.style.color = 'var(--text-muted)';
         }
 
@@ -447,10 +457,10 @@ class SitesViewClass extends BaseView {
                 };
                 if (inputEl) {
                     inputEl.value = '';
-                    inputEl.placeholder = 'Ma position GPS';
+                    inputEl.placeholder = tl('gps.inputPlaceholder');
                 }
                 if (statusEl) {
-                    statusEl.innerHTML = `<i class="ri-checkbox-circle-line" style="color: var(--accent-green);"></i> Position GPS actuelle activée.`;
+                    statusEl.innerHTML = `<i class="ri-checkbox-circle-line" style="color: var(--accent-green);"></i> ${tt('gps.active')}`;
                     statusEl.style.color = 'var(--accent-green)';
                 }
                 if (gpsBtn) {
@@ -463,9 +473,9 @@ class SitesViewClass extends BaseView {
                 if (this.state.map) this.updateMapMarkers();
             },
             () => {
-                if (!isInitialLoad) alert("Impossible d'obtenir votre position GPS.");
+                if (!isInitialLoad) alert(tl('gps.failedAlert'));
                 if (statusEl) {
-                    statusEl.innerHTML = `<i class="ri-error-warning-line" style="color: var(--accent-red);"></i> Position GPS indisponible.`;
+                    statusEl.innerHTML = `<i class="ri-error-warning-line" style="color: var(--accent-red);"></i> ${tt('gps.unavailable')}`;
                     statusEl.style.color = 'var(--accent-red)';
                 }
             },
@@ -527,7 +537,7 @@ class SitesViewClass extends BaseView {
                 const loadingHtml = `
                 <div id="weather-loading-indicator" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px; margin-bottom: 16px; font-size: 1rem; color: var(--text-secondary); background: rgba(255,255,255,0.03); border-radius: 8px;">
                     <i class="ri-loader-4-line" style="animation: spin 1s linear infinite; font-size: 1.2rem;"></i>
-                    <span>Calcul météo en cours...</span>
+                    <span>${tt('weather.computing')}</span>
                 </div>
             `;
                 container.parentNode.insertBefore(
@@ -594,15 +604,15 @@ class SitesViewClass extends BaseView {
             // « Chargement des prévisions... » indéfiniment (sauf si une météo antérieure reste affichée).
             const timeLabel = document.getElementById('forecast-time-label');
             if (timeLabel && Object.keys(SitesService.state.weatherForecasts).length === 0) {
-                timeLabel.textContent = 'Météo indisponible';
+                timeLabel.textContent = tl('weather.unavailable');
             }
             const container = document.getElementById('sites-list-container');
             if (container) {
                 const errorHtml = `
                 <div style="color:var(--accent-red, #ef4444); font-size: 0.95rem; text-align: center; padding: 16px; margin-bottom: 16px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: var(--radius-lg); width: 100%;">
                     <i class="ri-error-warning-line" style="font-size: 1.2rem; vertical-align: middle; margin-right: 8px;"></i>
-                    <strong>Météo indisponible :</strong> ${result.error?.message || 'Erreur réseau'}
-                    <button id="weather-retry-btn" data-action="fetchWeatherForSites" class="action-btn-primary" style="margin-left: 12px; padding: 4px 12px; font-size: 0.8rem; border-radius: var(--radius-pill);">Réessayer</button>
+                    <strong>${tt('weather.unavailableTitle')}</strong> ${result.error?.message || tt('weather.networkError')}
+                    <button id="weather-retry-btn" data-action="fetchWeatherForSites" class="action-btn-primary" style="margin-left: 12px; padding: 4px 12px; font-size: 0.8rem; border-radius: var(--radius-pill);">${tt('weather.retry')}</button>
                 </div>
             `;
                 container.insertAdjacentHTML('afterbegin', errorHtml);
@@ -837,10 +847,10 @@ class SitesViewClass extends BaseView {
         const missing = missingValuesText(status);
         return `<div style="margin-top: 8px; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.1); border: 1px solid var(--border-color); font-size: 0.85rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; gap: 8px;">
-                <span style="font-weight: 700; white-space: nowrap;"><i class="ri-windy-line"></i> ${escapeHTML(String(forecastValue(weather.windCard)))} ${escapeHTML(String(forecastValue(weather.windSpeed)))} km/h</span>
+                <span style="font-weight: 700; white-space: nowrap;"><i class="ri-windy-line"></i> ${tt('popup.wind', { card: forecastValue(weather.windCard), speed: forecastValue(weather.windSpeed) })}</span>
                 <span style="color: ${status.status === 'incomplete' ? 'var(--text-muted)' : color}; font-weight: bold; font-size: 0.75rem;"><i class="${status.icon}"></i> ${escapeHTML(status.reason)}</span>
             </div>
-            <div style="opacity: 0.8; font-size: 0.8rem;">Rafales : ${escapeHTML(String(forecastValue(weather.windGust)))} km/h</div>
+            <div style="opacity: 0.8; font-size: 0.8rem;">${tt('popup.gusts', { gust: forecastValue(weather.windGust) })}</div>
             ${missing ? `<div class="weather-missing-values" style="margin-top: 4px; font-size: 0.8rem;">${escapeHTML(missing)}</div>` : ''}
             ${status.status === 'incomplete' ? '' : modelAgreementHtml(site)}
             ${forecastContextHtml(site.id)}
@@ -856,19 +866,19 @@ class SitesViewClass extends BaseView {
                 ${
                     safeHttpUrl(site.url)
                         ? `
-                <a class="action-btn-secondary ffvl-btn" href="${escapeHTML(safeHttpUrl(site.url))}" target="_blank" rel="noopener noreferrer" style="padding: 6px 8px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;" title="Fiche FFVL">
-                    <img src="img/logos/ffvl.png" alt="FFVL" style="width: 14px; height: 14px; border-radius: 2px;">
+                <a class="action-btn-secondary ffvl-btn" href="${escapeHTML(safeHttpUrl(site.url))}" target="_blank" rel="noopener noreferrer" style="padding: 6px 8px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;" title="${tt('popup.ffvlTitle')}">
+                    <img src="img/logos/ffvl.png" alt="${tt('card.ffvl')}" style="width: 14px; height: 14px; border-radius: 2px;">
                 </a>
                 `
                         : ''
                 }
                 <button class="action-btn-primary" data-action="openGpsMenu" data-args="'${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}'" style="flex: 1; padding: 6px 10px; font-size: 0.8rem; justify-content: center;">
-                    <i class="ri-navigation-line"></i> S'y rendre
+                    <i class="ri-navigation-line"></i> ${tt('card.goThere')}
                 </button>
-                <button class="action-btn-secondary windy-btn" data-action="focusSiteWindy" data-args="'${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}', '${escapeHTML(site.nom)}'" style="padding: 6px 8px;" title="Afficher le vent sur le radar">
+                <button class="action-btn-secondary windy-btn" data-action="focusSiteWindy" data-args="'${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}', '${escapeHTML(site.nom)}'" style="padding: 6px 8px;" title="${tt('popup.windyTitle')}">
                     <i class="ri-windy-line"></i>
                 </button>
-                <button class="action-btn-secondary paraglidable-btn" data-action="focusSiteMap" data-args="'paraglidable', '${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}', '${escapeHTML(site.nom)}'" style="padding: 6px 8px;" title="Afficher sur Paraglidable">
+                <button class="action-btn-secondary paraglidable-btn" data-action="focusSiteMap" data-args="'paraglidable', '${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}', '${escapeHTML(site.nom)}'" style="padding: 6px 8px;" title="${tt('popup.paraglidableTitle')}">
                     <i class="ri-flight-takeoff-line"></i>
                 </button>
             </div>
@@ -896,7 +906,10 @@ class SitesViewClass extends BaseView {
         if (!modal || !iframe) return;
 
         const site = SitesService.getSiteById(siteId);
-        if (titleEl) titleEl.textContent = site ? `Vent en direct — ${site.nom}` : 'Vent en direct — SpotAiR';
+        if (titleEl)
+            titleEl.textContent = site
+                ? tl('maps.spotairTitleSite', { name: site.nom })
+                : tl('maps.spotairTitleGeneric');
         iframe.src = `https://www.spotair.mobi/page/wind/ffvl/${spotairId}`;
 
         if (typeof modal.showModal === 'function' && !modal.open) {
@@ -1000,7 +1013,7 @@ class SitesViewClass extends BaseView {
             // Load default/current coordinates if not switching to Leaflet
             let lat = 46.5;
             let lon = 2.2;
-            let name = 'France';
+            let name = tl('maps.defaultName');
             let extraId = '';
             let isGeneric = true;
 
@@ -1032,7 +1045,7 @@ class SitesViewClass extends BaseView {
             paraglidable: document.getElementById('paraglidable-active-spot-name'),
         };
         if (nameLabels[mode]) {
-            nameLabels[mode].textContent = siteName ? siteName.toUpperCase() : 'Général';
+            nameLabels[mode].textContent = siteName ? siteName.toUpperCase() : tl('maps.generic');
         }
 
         const iframes = {
@@ -1138,7 +1151,7 @@ class SitesViewClass extends BaseView {
             document.body.appendChild(mapView);
             document.body.style.overflow = 'hidden';
             document.documentElement.style.overflow = 'hidden';
-            fsBtn.innerHTML = '<i class="ri-fullscreen-exit-line"></i> <span>Réduire</span>';
+            fsBtn.innerHTML = `<i class="ri-fullscreen-exit-line"></i> <span>${tt('maps.fullscreenExit')}</span>`;
             fsBtn.classList.add('active-fs');
             if (this.state.map && document.getElementById('sites-map-canvas').style.display !== 'none') {
                 setTimeout(() => {
@@ -1152,7 +1165,7 @@ class SitesViewClass extends BaseView {
             }
             document.body.style.overflow = '';
             document.documentElement.style.overflow = '';
-            fsBtn.innerHTML = '<i class="ri-fullscreen-line"></i> <span>Plein écran</span>';
+            fsBtn.innerHTML = `<i class="ri-fullscreen-line"></i> <span>${tt('maps.fullscreen')}</span>`;
             fsBtn.classList.remove('active-fs');
             if (this.state.map && document.getElementById('sites-map-canvas').style.display !== 'none') {
                 setTimeout(() => {
@@ -1203,8 +1216,7 @@ class SitesViewClass extends BaseView {
             toast.className = 'spot-it-toast';
             document.body.appendChild(toast);
         }
-        toast.innerHTML =
-            '<i class="ri-focus-3-line"></i> Cartes centrees sur <strong>' + escapeHTML(siteName) + '</strong>';
+        toast.innerHTML = `<i class="ri-focus-3-line"></i> ${th('maps.centeredOn', { name: `<strong>${escapeHTML(siteName)}</strong>` })}`;
         toast.classList.add('visible');
         clearTimeout(toast._hideTimer);
         toast._hideTimer = setTimeout(function () {
@@ -1244,19 +1256,19 @@ class SitesViewClass extends BaseView {
 
         const links = [
             {
-                label: 'Meteoblue',
+                label: tl('maps.labels.meteoblue'),
                 icon: 'ri-temp-hot-line',
                 cls: 'mb-btn',
                 url: mbUrl,
             },
             {
-                label: 'Windfinder',
+                label: tl('maps.labels.windfinder'),
                 icon: 'ri-compass-line',
                 cls: 'wf-btn',
                 url: lat ? 'https://fr.windfinder.com/#11/' + lat + '/' + lon : 'https://www.windfinder.com/',
             },
             {
-                label: 'Paragliding Map',
+                label: tl('maps.labels.paraglidingmap'),
                 icon: 'ri-map-pin-line',
                 cls: 'pm-btn',
                 url: lat
@@ -1267,7 +1279,7 @@ class SitesViewClass extends BaseView {
 
         if (extraId) {
             links.splice(2, 0, {
-                label: 'Spotair',
+                label: tl('maps.labels.spotair'),
                 icon: 'ri-radar-line',
                 cls: 'sa-btn',
                 url: 'https://www.spotair.mobi/spot/ffvl/' + extraId,
@@ -1275,34 +1287,34 @@ class SitesViewClass extends BaseView {
         }
 
         const togglableMaps = [
-            { id: 'leaflet', label: 'Cartographie', icon: 'ri-map-2-line', url: '#' },
+            { id: 'leaflet', label: tl('maps.labels.leaflet'), icon: 'ri-map-2-line', url: '#' },
             {
                 id: 'windy',
-                label: 'Windy',
+                label: tl('maps.labels.windy'),
                 icon: 'ri-windy-line',
                 url: lat ? 'https://www.windy.com/?' + lat + ',' + lon + ',12' : 'https://www.windy.com/',
             },
             {
                 id: 'meteoparapente',
-                label: 'Météo-P.',
+                label: tl('maps.labels.meteoparapenteShort'),
                 icon: 'ri-cloud-windy-line',
                 url: lat ? 'https://meteo-parapente.com/?lat=' + lat + '&lon=' + lon : 'https://meteo-parapente.com/',
             },
             {
                 id: 'paraglidingearth',
-                label: 'PG Earth',
+                label: tl('maps.labels.paraglidingearth'),
                 icon: 'ri-earth-line',
                 url: 'https://www.paraglidingearth.com/',
             },
             {
                 id: 'paraglidable',
-                label: 'Paraglidable',
+                label: tl('maps.labels.paraglidable'),
                 icon: 'ri-flight-takeoff-line',
                 url: lat ? 'https://paraglidable.com/?lat=' + lat + '&lon=' + lon : 'https://paraglidable.com/',
             },
             {
                 id: 'isofronts',
-                label: 'Fronts & Isobares',
+                label: tl('maps.labels.isofronts'),
                 icon: 'ri-cloud-line',
                 url: 'https://meteofrance.com/isofronts',
             },
@@ -1324,45 +1336,21 @@ class SitesViewClass extends BaseView {
             grid.innerHTML = links
                 .map(function (link) {
                     if (link.onclick) {
-                        return (
-                            '<a href="#" class="external-link-btn ' +
-                            link.cls +
-                            ' more-map-link" ' +
-                            link.onclick +
-                            '>' +
-                            '<i class="' +
-                            link.icon +
-                            '"></i> ' +
-                            link.label +
-                            '</a>'
-                        );
+                        return `<a href="#" class="external-link-btn ${link.cls} more-map-link" ${link.onclick}><i class="${link.icon}"></i> ${link.label}</a>`;
                     }
-                    return (
-                        '<a href="' +
-                        link.url +
-                        '" target="_blank" rel="noopener noreferrer" class="external-link-btn ' +
-                        link.cls +
-                        ' more-map-link" data-action="closeMoreMapsDropdown">' +
-                        '<i class="' +
-                        link.icon +
-                        '"></i> ' +
-                        link.label +
-                        '</a>'
-                    );
+                    return `<a href="${link.url}" target="_blank" rel="noopener noreferrer" class="external-link-btn ${link.cls} more-map-link" data-action="closeMoreMapsDropdown"><i class="${link.icon}"></i> ${link.label}</a>`;
                 })
                 .join('');
         }
 
         const title = document.getElementById('more-maps-title');
         if (title) {
-            title.textContent = siteName ? siteName.toUpperCase() : 'CARTES EXTERNES';
+            title.textContent = siteName ? siteName.toUpperCase() : tl('maps.externalTitle');
         }
 
         const subtitle = document.getElementById('more-maps-subtitle');
         if (subtitle) {
-            subtitle.textContent = siteName
-                ? 'Ouvrir dans un nouvel onglet sur ce spot'
-                : 'Sélectionnez une carte supplémentaire';
+            subtitle.textContent = tl(siteName ? 'maps.subtitleSpot' : 'maps.subtitleGeneric');
         }
 
         sheet.classList.add('active');
@@ -1384,13 +1372,10 @@ class SitesViewClass extends BaseView {
 
     renderDropdowns() {
         const winds = WIND_DIRECTIONS;
-        const types = [
-            { id: 'ATTERRO', label: 'Atterrissage' },
-            { id: 'NATUREL', label: 'Site Naturel' },
-            { id: 'DUNE', label: 'Dune' },
-            { id: 'TREUIL', label: 'Piste de Treuil' },
-            { id: 'GONFLAGE', label: 'Gonflage' },
-        ];
+        const types = ['ATTERRO', 'NATUREL', 'DUNE', 'TREUIL', 'GONFLAGE'].map((id) => ({
+            id,
+            label: tl(`filters.types.${id}`),
+        }));
 
         const windMenu = document.getElementById('menu-wind');
         if (windMenu) {
@@ -1433,12 +1418,12 @@ class SitesViewClass extends BaseView {
         const mapMenu = document.getElementById('menu-map-settings');
         if (mapMenu) {
             const maps = [
-                { id: 'leaflet', label: 'Cartographie', icon: 'ri-map-2-line' },
-                { id: 'windy', label: 'Windy', icon: 'ri-windy-line' },
-                { id: 'meteoparapente', label: 'Météo-Parapente', icon: 'ri-temp-hot-line' },
-                { id: 'paraglidingearth', label: 'PG Earth', icon: 'ri-earth-line' },
-                { id: 'paraglidable', label: 'Paraglidable', icon: 'ri-flight-takeoff-line' },
-                { id: 'isofronts', label: 'Fronts & Isobares', icon: 'ri-cloud-line' },
+                { id: 'leaflet', label: tl('maps.labels.leaflet'), icon: 'ri-map-2-line' },
+                { id: 'windy', label: tl('maps.labels.windy'), icon: 'ri-windy-line' },
+                { id: 'meteoparapente', label: tl('maps.labels.meteoparapente'), icon: 'ri-temp-hot-line' },
+                { id: 'paraglidingearth', label: tl('maps.labels.paraglidingearth'), icon: 'ri-earth-line' },
+                { id: 'paraglidable', label: tl('maps.labels.paraglidable'), icon: 'ri-flight-takeoff-line' },
+                { id: 'isofronts', label: tl('maps.labels.isofronts'), icon: 'ri-cloud-line' },
             ];
 
             mapMenu.innerHTML = maps
@@ -1557,7 +1542,7 @@ class SitesViewClass extends BaseView {
         const offset = SitesService.state.forecastOffset;
         let text = `+${offset}h`;
         if (offset === 0) {
-            text = 'Maintenant';
+            text = tl('list.now');
         } else {
             // N'importe quel site dont la météo est chargée donne l'heure de cette échéance
             // (toutes les séries horaires partent de la même heure).
@@ -1591,7 +1576,7 @@ class SitesViewClass extends BaseView {
             label.textContent = loc.name;
             label.setAttribute('role', 'button');
             label.setAttribute('tabindex', '0');
-            label.setAttribute('aria-label', `Charger le lieu : ${loc.name}`);
+            label.setAttribute('aria-label', tl('places.load', { name: loc.name }));
 
             const handleLoad = () => SitesService.loadSavedLocation(index);
             label.addEventListener('click', handleLoad);
@@ -1608,7 +1593,7 @@ class SitesViewClass extends BaseView {
             btnRemove.style.fontSize = '1rem';
             btnRemove.setAttribute('role', 'button');
             btnRemove.setAttribute('tabindex', '0');
-            btnRemove.setAttribute('aria-label', `Supprimer le lieu : ${loc.name}`);
+            btnRemove.setAttribute('aria-label', tl('places.remove', { name: loc.name }));
 
             const handleRemove = (e) => {
                 e.stopPropagation();
@@ -1752,12 +1737,12 @@ class SitesViewClass extends BaseView {
         if (btn) {
             if (this.state.showComparator) {
                 btn.classList.add('active');
-                btn.innerHTML = `<i class="ri-table-line" style="color: var(--accent-blue);"></i> Comparer`;
+                btn.innerHTML = `<i class="ri-table-line" style="color: var(--accent-blue);"></i> ${tt('comparator.button')}`;
                 btn.style.background = 'rgba(59, 130, 246, 0.15)';
                 btn.style.borderColor = 'rgba(59, 130, 246, 0.3)';
             } else {
                 btn.classList.remove('active');
-                btn.innerHTML = `<i class="ri-table-line"></i> Comparer`;
+                btn.innerHTML = `<i class="ri-table-line"></i> ${tt('comparator.button')}`;
                 btn.style.background = 'transparent';
                 btn.style.borderColor = 'var(--border-color)';
             }
@@ -1780,8 +1765,7 @@ class SitesViewClass extends BaseView {
         listDiv.style.display = 'block';
 
         if (favoriteSites.length === 0) {
-            listDiv.innerHTML =
-                '<div class="card" style="text-align: center; padding: 20px;">Aucun site favori à comparer. Ajoutez des favoris avec l\'étoile ⭐ sur une fiche site.</div>';
+            listDiv.innerHTML = `<div class="card" style="text-align: center; padding: 20px;">${tt('comparator.empty')}</div>`;
             return;
         }
 
@@ -1803,7 +1787,7 @@ class SitesViewClass extends BaseView {
                 const status = weather ? SitesService.isForecastFlyable(site, weather) : null;
                 const statusHtml = status
                     ? `<span class="${status.class}" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><i class="${status.icon}"></i> ${escapeHTML(verdictLabel(status))}</span>`
-                    : '<span style="color: var(--text-muted);">Chargement...</span>';
+                    : `<span style="color: var(--text-muted);">${tt('comparator.loading')}</span>`;
 
                 // Meilleur créneau à venir = le plus long slot volable de flyableSlots (déjà groupé
                 // par jour par getFilteredAndSortedSites) sur toute la fenêtre de prévision choisie
@@ -1814,8 +1798,8 @@ class SitesViewClass extends BaseView {
                     return !best || duration > best.end - best.start ? s : best;
                 }, null);
                 const bestSlotHtml = bestSlot
-                    ? `${escapeHTML(bestSlot.dayLabel)} ${bestSlot.start}h-${bestSlot.end + 1}h`
-                    : '<span style="color: var(--text-muted);">Aucun</span>';
+                    ? tt('comparator.slot', { day: bestSlot.dayLabel, start: bestSlot.start, end: bestSlot.end + 1 })
+                    : `<span style="color: var(--text-muted);">${tt('comparator.none')}</span>`;
 
                 // Accord du second modèle pour l'heure affichée (spec 002, US3).
                 const confidenceHtml = modelAgreementHtml(site) || '<span style="color: var(--text-muted);">—</span>';
@@ -1824,7 +1808,7 @@ class SitesViewClass extends BaseView {
                 <tr>
                     <td style="padding: 10px; font-weight: 700;">${escapeHTML(site.nom || site.name || '')}</td>
                     <td style="padding: 10px;">${statusHtml}${sharedContext ? '' : forecastContextHtml(site.id)}</td>
-                    <td style="padding: 10px; text-align: center;">${site.flyableHours || 0}h</td>
+                    <td style="padding: 10px; text-align: center;">${tt('comparator.hours', { hours: site.flyableHours || 0 })}</td>
                     <td style="padding: 10px; text-align: center;">${bestSlotHtml}</td>
                     <td style="padding: 10px;">${confidenceHtml}</td>
                 </tr>
@@ -1839,16 +1823,16 @@ class SitesViewClass extends BaseView {
                 <table style="width: 100%; border-collapse: collapse; min-width: 480px;">
                     <thead>
                         <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
-                            <th style="padding: 10px;">Site</th>
-                            <th style="padding: 10px;">Météo (créneau affiché)</th>
-                            <th style="padding: 10px; text-align: center;" title="Sur la fenêtre de prévision actuelle">Volable</th>
-                            <th style="padding: 10px;" title="Le créneau continu le plus long sur toute la fenêtre de prévision">Meilleur créneau</th>
-                            <th style="padding: 10px;" title="Accord entre le modèle principal et un modèle de référence sur le créneau actuel">Confiance</th>
+                            <th style="padding: 10px;">${tt('comparator.site')}</th>
+                            <th style="padding: 10px;">${tt('comparator.weather')}</th>
+                            <th style="padding: 10px; text-align: center;" title="${tt('comparator.flyableTitle')}">${tt('comparator.flyable')}</th>
+                            <th style="padding: 10px;" title="${tt('comparator.bestSlotTitle')}">${tt('comparator.bestSlot')}</th>
+                            <th style="padding: 10px;" title="${tt('comparator.confidenceTitle')}">${tt('comparator.confidence')}</th>
                         </tr>
                     </thead>
                     <tbody>${rows}</tbody>
                 </table>
-                <p style="margin: 12px 0 0; font-size: 0.8rem; color: var(--text-muted);">Astuce : choisis "7 Jours" dans les paramètres de calcul météo ci-dessus pour élargir la fenêtre du meilleur créneau.</p>
+                <p style="margin: 12px 0 0; font-size: 0.8rem; color: var(--text-muted);">${tt('comparator.tip')}</p>
             </div>
         `;
     }
@@ -1910,8 +1894,11 @@ class SitesViewClass extends BaseView {
         const sameDay = oldest.toDateString() === now.toDateString();
         const time = `${String(oldest.getHours()).padStart(2, '0')} h ${String(oldest.getMinutes()).padStart(2, '0')}`;
         const when = sameDay
-            ? `aujourd’hui à ${time}`
-            : `le ${oldest.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })} à ${time}`;
+            ? tl('notice.today', { time })
+            : tl('notice.otherDay', {
+                  date: oldest.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }),
+                  time,
+              });
         const key = navigator.onLine === false ? 'forecast.offlineSaved' : 'forecast.serviceDownSaved';
         return `<p id="offline-forecast-notice" class="location-notice offline-forecast-notice" role="status"><i class="ri-wifi-off-line" aria-hidden="true"></i> ${escapeHTML(t(key, { when }))}</p>`;
     }
@@ -1946,7 +1933,7 @@ class SitesViewClass extends BaseView {
             listDiv.innerHTML =
                 this.buildOfflineForecastNotice() +
                 this.buildSearchOutsideNotice() +
-                '<div class="card" style="text-align: center; padding: 20px;">Aucun site trouvé pour ces critères</div>';
+                `<div class="card" style="text-align: center; padding: 20px;">${tt('list.empty')}</div>`;
         } else {
             listDiv.style.display = 'flex';
             let html = '';
@@ -1962,15 +1949,15 @@ class SitesViewClass extends BaseView {
                 const windTags = orientations
                     .map(
                         (w) =>
-                            `<span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="${escapeHTML(w)}" title="Filtrer par vent ${w}">${w}</span>`,
+                            `<span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="${escapeHTML(w)}" title="${tt('filters.windTitle', { wind: w })}">${w}</span>`,
                     )
                     .join('');
 
-                const st = site.site_sous_type || site.type || 'Inconnu';
+                const st = site.site_sous_type || site.type || tl('list.unknownType');
                 const siteTypes = Array.isArray(st) ? st : [st];
                 const typeLabel = siteTypes
                     .map((t) => {
-                        return `<span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="${escapeHTML(t)}" style="cursor: pointer;" title="Filtrer par type ${t}">${t}</span>`;
+                        return `<span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="${escapeHTML(t)}" style="cursor: pointer;" title="${tt('filters.typeTitle', { type: t })}">${t}</span>`;
                     })
                     .join(' ');
 
@@ -1978,14 +1965,14 @@ class SitesViewClass extends BaseView {
                 if (site.distance !== undefined) {
                     distanceHtml = `
                         <span class="site-coords-badge site-dist-badge">
-                            <i class="ri-navigation-fill"></i> ${site.distance.toFixed(1)} km
+                            <i class="ri-navigation-fill"></i> ${tt('list.distance', { km: site.distance.toFixed(1) })}
                         </span>
                     `;
                 }
 
                 const flyableHoursHtml = `
                     <span class="site-coords-badge" style="background: ${site.flyableHours > 0 ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.03)'}; border-color: ${site.flyableHours > 0 ? 'rgba(34,197,94,0.3)' : 'var(--border-color)'}; color: ${site.flyableHours > 0 ? 'var(--accent-green)' : 'var(--text-muted)'}; font-weight: 700;">
-                        <i class="ri-time-line"></i> ${site.flyableHours || 0}h volables ${(site.maxConsecutiveHours || 0) > 0 ? `(${site.maxConsecutiveHours}h conséc.)` : ''}
+                        <i class="ri-time-line"></i> ${tt('list.flyableHours', { hours: site.flyableHours || 0 })} ${(site.maxConsecutiveHours || 0) > 0 ? tt('list.consecutive', { hours: site.maxConsecutiveHours }) : ''}
                     </span>
                 `;
 
@@ -2011,7 +1998,12 @@ class SitesViewClass extends BaseView {
                             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;">
                                 <span style="display: flex; align-items: center; gap: 6px;">
                                     <i class="ri-windy-line"></i>
-                                    <span>Vent <b>${escapeHTML(String(forecastValue(weather.windCard)))}</b> (${escapeHTML(String(forecastValue(weather.windDirDeg)))}°) : <b>${escapeHTML(String(forecastValue(weather.windSpeed)))} km/h</b> (raf. <b>${escapeHTML(String(forecastValue(weather.windGust)))}</b>)</span>
+                                    <span>${th('list.windRow', {
+                                        card: `<b>${escapeHTML(String(forecastValue(weather.windCard)))}</b>`,
+                                        deg: escapeHTML(String(forecastValue(weather.windDirDeg))),
+                                        speed: `<b>${tt('list.speed', { value: forecastValue(weather.windSpeed) })}</b>`,
+                                        gust: `<b>${escapeHTML(String(forecastValue(weather.windGust)))}</b>`,
+                                    })}</span>
                                 </span>
                                 <span style="display: flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; text-transform: uppercase;">
                                     <i class="${status.icon}"></i> ${escapeHTML(status.reason)}
@@ -2035,7 +2027,7 @@ class SitesViewClass extends BaseView {
                     weatherHtml = `
                         <div class="weather-loading">
                             <i class="ri-error-warning-line"></i>
-                            <span>Météo indisponible pour ce site</span>
+                            <span>${tt('weather.unavailableForSite')}</span>
                         </div>
                     `;
                 } else {
@@ -2052,7 +2044,7 @@ class SitesViewClass extends BaseView {
                     const groupedByDay = {};
                     site.flyableSlots.forEach((slot) => {
                         if (!groupedByDay[slot.dayLabel]) groupedByDay[slot.dayLabel] = [];
-                        groupedByDay[slot.dayLabel].push(`${slot.start}h - ${slot.end}h`);
+                        groupedByDay[slot.dayLabel].push(tl('list.slotRange', { start: slot.start, end: slot.end }));
                     });
                     const slotsDetails = Object.keys(groupedByDay)
                         .map((day) => {
@@ -2061,7 +2053,7 @@ class SitesViewClass extends BaseView {
                         .join(' | ');
                     slotsTextHtml = `
                         <div class="creneaux-list good">
-                            <i class="ri-calendar-todo-line"></i> Prochains créneaux : ${slotsDetails}
+                            <i class="ri-calendar-todo-line"></i> ${th('list.nextSlots', { slots: slotsDetails })}
                         </div>
                     `;
                 } else if (forecasts.length > 0 && site.completeHours === 0) {
@@ -2076,7 +2068,7 @@ class SitesViewClass extends BaseView {
                     const maxRange = SitesService.state.forecastMaxRange || 120;
                     slotsTextHtml = `
                         <div class="creneaux-list bad">
-                            <i class="ri-error-warning-line"></i> Aucun créneau favorable dans les prochaines ${maxRange} heures
+                            <i class="ri-error-warning-line"></i> ${tt('list.noSlot', { hours: maxRange })}
                         </div>
                     `;
                 }
@@ -2087,7 +2079,7 @@ class SitesViewClass extends BaseView {
                 for (let j = 0; j < maxRange; j++) {
                     const w = forecastsToUse[j];
                     let barColor = 'rgba(255,255,255,0.05)';
-                    let statusLabel = 'Inconnu';
+                    let statusLabel = tl('list.unknownStatus');
                     let timeStr = `+${j}h`;
                     let dotClass = 'timeline-hour-dot';
 
@@ -2096,7 +2088,7 @@ class SitesViewClass extends BaseView {
                         const date = new Date(w.time);
                         const h = String(date.getHours()).padStart(2, '0');
                         const m = String(date.getMinutes()).padStart(2, '0');
-                        const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+                        const days = FR.sites.list.weekdays;
                         timeStr = `${days[date.getDay()]} ${h}:${m}`;
                         barColor = verdictColor(status, { bar: true });
                         if (status.status === 'incomplete') {
@@ -2104,8 +2096,16 @@ class SitesViewClass extends BaseView {
                             statusLabel = verdictLabel(status);
                         } else if (status.flyable) {
                             statusLabel = status.warning
-                                ? `${forecastValue(w.windCard)} ${forecastValue(w.windSpeed)} km/h — ${status.reason}`
-                                : `Volable — ${forecastValue(w.windCard)} ${forecastValue(w.windSpeed)} km/h (raf. ${forecastValue(w.windGust)})`;
+                                ? tl('list.warningTooltip', {
+                                      card: forecastValue(w.windCard),
+                                      speed: forecastValue(w.windSpeed),
+                                      reason: status.reason,
+                                  })
+                                : tl('list.flyableTooltip', {
+                                      card: forecastValue(w.windCard),
+                                      speed: forecastValue(w.windSpeed),
+                                      gust: forecastValue(w.windGust),
+                                  });
                         } else {
                             statusLabel = status.reason;
                         }
@@ -2156,24 +2156,17 @@ class SitesViewClass extends BaseView {
     // compatible/incompatible fabriqué ici) et l'état du matériel du pilote, en réutilisant
     // LogbookService.computeEquipmentWear() (déjà utilisé pour le badge de révision du Carnet).
     buildPreFlightBriefHtml() {
-        const LEVEL_LABELS = {
-            ALL: 'Tous niveaux',
-            BI: 'Brevet Initial',
-            BP: 'Brevet Pilote',
-            BPC: 'Brevet Pilote Confirmé',
-            TREUIL: 'Treuil',
-        };
         const level = GlobalState.get('level') || 'ALL';
-        const levelLabel = LEVEL_LABELS[level] || level;
+        const levelLabel = FR.sites.brief.levels[level] || level;
 
-        let equipmentHtml = '<span style="color: var(--text-muted);">Aucun équipement enregistré</span>';
+        let equipmentHtml = `<span style="color: var(--text-muted);">${tt('brief.noEquipment')}</span>`;
         try {
             const wear = LogbookService.computeEquipmentWear();
             const alertCount = Object.values(wear).filter((s) => s.alerts.dateAlert || s.alerts.hoursAlert).length;
             if (alertCount > 0) {
-                equipmentHtml = `<span style="color: #f59e0b; font-weight: 600;">${alertCount} équipement${alertCount > 1 ? 's' : ''} à réviser</span>`;
+                equipmentHtml = `<span style="color: #f59e0b; font-weight: 600;">${tt(alertCount > 1 ? 'brief.toReviewMany' : 'brief.toReviewOne', { count: alertCount })}</span>`;
             } else if (Object.keys(wear).length > 0) {
-                equipmentHtml = '<span style="color: var(--accent-green); font-weight: 600;">Matériel à jour</span>';
+                equipmentHtml = `<span style="color: var(--accent-green); font-weight: 600;">${tt('brief.upToDate')}</span>`;
             }
         } catch {
             // Carnet non disponible : on garde le message par défaut plutôt que de faire planter la carte.
@@ -2183,9 +2176,9 @@ class SitesViewClass extends BaseView {
         <div class="rich-detail-item default" style="background: rgba(59, 130, 246, 0.06); border-radius: 8px;">
             <i class="ri-flight-takeoff-line rich-detail-icon blue"></i>
             <div>
-                <strong class="rich-detail-label muted">Brief pré-vol</strong>
-                <span class="rich-detail-value">Niveau sélectionné : <b>${escapeHTML(levelLabel)}</b> — à confronter à la praticabilité et aux dangers ci-dessous.</span>
-                <div style="margin-top: 4px; font-size: 0.9rem;">Matériel : ${equipmentHtml}</div>
+                <strong class="rich-detail-label muted">${tt('brief.title')}</strong>
+                <span class="rich-detail-value">${th('brief.level', { level: `<b>${escapeHTML(levelLabel)}</b>` })}</span>
+                <div style="margin-top: 4px; font-size: 0.9rem;">${th('brief.equipment', { equipment: equipmentHtml })}</div>
             </div>
         </div>
     `;
@@ -2217,8 +2210,8 @@ class SitesViewClass extends BaseView {
             ? `
         <button class="site-coords-badge site-spotair-badge" data-spotair-id="${spotairId}" data-site-id="${site.id}"
             data-action="SitesopenSpotairModal"
-            title="Voir le vent en direct (SpotAiR)">
-            <i class="ri-windy-line"></i> Balise
+            title="${tt('card.spotairTitle')}">
+            <i class="ri-windy-line"></i> ${tt('card.spotairBadge')}
         </button>
     `
             : '';
@@ -2227,10 +2220,10 @@ class SitesViewClass extends BaseView {
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
-                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'${site.id}'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: ${starColor}; cursor: pointer; padding: 0;">
+                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'${site.id}'" title="${tt('card.favorite')}" style="background: none; border: none; font-size: 1.4rem; color: ${starColor}; cursor: pointer; padding: 0;">
                             <i class="${starIcon}"></i>
                         </button>
-                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'${site.id}'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'${site.id}'" title="${tt('card.minimize')}" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="${minIcon}"></i>
                         </button>
                         <h3 class="site-card-title">${escapeHTML(site.nom)}</h3>
@@ -2239,8 +2232,8 @@ class SitesViewClass extends BaseView {
                         ${
                             site.alt
                                 ? `
-                        <span class="site-coords-badge site-altitude-badge" title="Altitude du site">
-                            <i class="ri-landscape-fill"></i> ${site.alt} m
+                        <span class="site-coords-badge site-altitude-badge" title="${tt('card.altitudeTitle')}">
+                            <i class="ri-landscape-fill"></i> ${tt('card.altitude', { alt: site.alt })}
                         </span>
                         `
                                 : ''
@@ -2248,7 +2241,7 @@ class SitesViewClass extends BaseView {
                         <div class="site-wind-tags site-wind-tags-row">${windTags}</div>
                         ${typeLabel}
                         ${spotairBadgeHtml}
-                        <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}'" title="Copier les coordonnées">
+                        <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}'" title="${tt('card.copyTitle')}">
                             <i class="ri-map-pin-2-line"></i> <span class="coords-text">${parseFloat(site.latitude || site.lat)}, ${parseFloat(site.longitude || site.lon)}</span>
                         </button>
                         ${distanceHtml}
@@ -2259,17 +2252,17 @@ class SitesViewClass extends BaseView {
                     ${
                         safeHttpUrl(site.url)
                             ? `
-                    <a class="action-btn-secondary ffvl-btn" href="${escapeHTML(safeHttpUrl(site.url))}" target="_blank" rel="noopener noreferrer" title="Fiche officielle FFVL">
-                        <img src="img/logos/ffvl.png" alt="FFVL"> FFVL
+                    <a class="action-btn-secondary ffvl-btn" href="${escapeHTML(safeHttpUrl(site.url))}" target="_blank" rel="noopener noreferrer" title="${tt('card.ffvlTitle')}">
+                        <img src="img/logos/ffvl.png" alt="${tt('card.ffvl')}"> ${tt('card.ffvl')}
                     </a>
                     `
                             : ''
                     }
-                    <button class="action-btn-spot spot-it-btn" data-action="spotSite" data-args="'${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}', '${escapeHTML(site.nom)}', '${site.id || ''}'" title="Spot It — Paramétrer toutes les cartes sur ce site">
-                        <i class="ri-focus-3-line"></i> Spot It
+                    <button class="action-btn-spot spot-it-btn" data-action="spotSite" data-args="'${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}', '${escapeHTML(site.nom)}', '${site.id || ''}'" title="${tt('card.spotItTitle')}">
+                        <i class="ri-focus-3-line"></i> ${tt('card.spotIt')}
                     </button>
                     <button class="action-btn-primary gps-btn" data-action="openGpsMenu" data-args="'${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}'">
-                        <i class="ri-navigation-line"></i> S'y rendre
+                        <i class="ri-navigation-line"></i> ${tt('card.goThere')}
                     </button>
                 </div>
             </div>
@@ -2280,18 +2273,18 @@ class SitesViewClass extends BaseView {
             ${weatherHtml}
             <div style="margin-top: 14px;">
                 <div class="timeline-labels">
-                    <span>Maintenant</span><span>Prévisions (${SitesService.state.forecastMaxRange || 120}h)</span><span>Dans ${(SitesService.state.forecastMaxRange || 120) / 24} jours</span>
+                    <span>${tt('list.now')}</span><span>${tt('list.forecasts', { hours: SitesService.state.forecastMaxRange || 120 })}</span><span>${tt('list.inDays', { days: (SitesService.state.forecastMaxRange || 120) / 24 })}</span>
                 </div>
                 <div class="ranking-timeline">
                     ${timelineBarsHtml}
                 </div>
                 <div class="timeline-legend">
-                    <span class="legend-item"><span class="legend-color" style="background:#22c55e;"></span> Volable</span>
-                    <span class="legend-item"><span class="legend-color" style="background:#eab308;"></span> Orientation inconnue</span>
-                    <span class="legend-item"><span class="legend-color" style="background:#ef4444;"></span> Vent / Rafales</span>
-                    <span class="legend-item"><span class="legend-color" style="background:#f97316;"></span> Mauvaise orientation</span>
-                    <span class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span> Pluie</span>
-                    <span class="legend-item"><span class="legend-color" style="background:rgba(100,100,120,0.5);"></span> Nuit</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#22c55e;"></span> ${tt('list.legend.flyable')}</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#eab308;"></span> ${tt('list.legend.unknownOrientation')}</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#ef4444;"></span> ${tt('list.legend.wind')}</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#f97316;"></span> ${tt('list.legend.wrongOrientation')}</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span> ${tt('list.legend.rain')}</span>
+                    <span class="legend-item"><span class="legend-color" style="background:rgba(100,100,120,0.5);"></span> ${tt('list.legend.night')}</span>
                     <span class="legend-item"><span class="legend-color legend-color--incomplete"></span> ${escapeHTML(t('weather.legendIncomplete'))}</span>
                 </div>
             </div>
@@ -2310,7 +2303,7 @@ class SitesViewClass extends BaseView {
                 const showReg = this.isFieldFilled(site.reglementation);
 
                 const isOpen = this.state.expandedSites[site.id] ? 'open' : '';
-                const toggleText = this.state.expandedSites[site.id] ? 'Masquer les détails' : "Voir plus d'infos";
+                const toggleText = tt(this.state.expandedSites[site.id] ? 'card.lessInfo' : 'card.moreInfo');
 
                 return `
                     <details class="site-details-toggle" ${isOpen} data-site-id="${site.id}">
@@ -2328,7 +2321,7 @@ class SitesViewClass extends BaseView {
                             <div class="rich-detail-item default">
                                 <i class="ri-shield-check-line rich-detail-icon blue"></i>
                                 <div>
-                                    <strong class="rich-detail-label muted">Conventionnement</strong>
+                                    <strong class="rich-detail-label muted">${tt('details.conventionnement')}</strong>
                                     <span class="rich-detail-value">${renderSiteText(site.conventionnement)}</span>
                                 </div>
                             </div>
@@ -2341,7 +2334,7 @@ class SitesViewClass extends BaseView {
                             <div class="rich-detail-item default">
                                 <i class="ri-checkbox-circle-line rich-detail-icon ${site.affiche ? 'green' : 'red'}"></i>
                                 <div>
-                                    <strong class="rich-detail-label muted">Praticabilité</strong>
+                                    <strong class="rich-detail-label muted">${tt('details.praticabilite')}</strong>
                                     <span class="rich-detail-value">${renderSiteText(site.praticabilite)}</span>
                                 </div>
                             </div>
@@ -2354,7 +2347,7 @@ class SitesViewClass extends BaseView {
                             <div class="rich-detail-item default">
                                 <i class="ri-group-line rich-detail-icon secondary"></i>
                                 <div>
-                                    <strong class="rich-detail-label muted">Structure Gestionnaire</strong>
+                                    <strong class="rich-detail-label muted">${tt('details.gestionnaire')}</strong>
                                     <span class="rich-detail-value">${renderSiteText(site.structure_gestionnaire)}</span>
                                 </div>
                             </div>
@@ -2367,7 +2360,7 @@ class SitesViewClass extends BaseView {
                             <div class="rich-detail-item default">
                                 <i class="ri-compass-3-line rich-detail-icon blue"></i>
                                 <div>
-                                    <strong class="rich-detail-label muted">Aérologie Idéale</strong>
+                                    <strong class="rich-detail-label muted">${tt('details.aerologie')}</strong>
                                     <span class="rich-detail-value">${renderSiteText(site.aerologie_ideale)}</span>
                                 </div>
                             </div>
@@ -2380,7 +2373,7 @@ class SitesViewClass extends BaseView {
                             <div class="rich-detail-item default">
                                 <i class="ri-first-aid-kit-line rich-detail-icon green"></i>
                                 <div>
-                                    <strong class="rich-detail-label muted">Accès Secours</strong>
+                                    <strong class="rich-detail-label muted">${tt('details.secours')}</strong>
                                     <span class="rich-detail-value">${renderSiteText(site.secours_acces)}</span>
                                 </div>
                             </div>
@@ -2393,7 +2386,7 @@ class SitesViewClass extends BaseView {
                             <div class="rich-detail-item danger">
                                 <i class="ri-error-warning-line rich-detail-icon red"></i>
                                 <div>
-                                    <strong class="rich-detail-label red">Dangers Signalés</strong>
+                                    <strong class="rich-detail-label red">${tt('details.dangers')}</strong>
                                     <span class="rich-detail-value">${renderSiteText(site.dangers)}</span>
                                 </div>
                             </div>
@@ -2406,7 +2399,7 @@ class SitesViewClass extends BaseView {
                             <div class="rich-detail-item default full-width">
                                 <i class="ri-walk-line rich-detail-icon secondary"></i>
                                 <div>
-                                    <strong class="rich-detail-label muted">Accès & Topo</strong>
+                                    <strong class="rich-detail-label muted">${tt('details.topo')}</strong>
                                     <span class="rich-detail-value">${renderSiteText(site.acces_topo)}</span>
                                 </div>
                             </div>
@@ -2419,7 +2412,7 @@ class SitesViewClass extends BaseView {
                             <div class="rich-detail-item obs">
                                 <i class="ri-information-line rich-detail-icon blue"></i>
                                 <div>
-                                    <strong class="rich-detail-label muted">Observations</strong>
+                                    <strong class="rich-detail-label muted">${tt('details.observations')}</strong>
                                     <span class="rich-detail-value">${renderSiteText(site.observations)}</span>
                                 </div>
                             </div>
@@ -2432,7 +2425,7 @@ class SitesViewClass extends BaseView {
                             <div class="rich-detail-item danger">
                                 <i class="ri-forbid-line rich-detail-icon red"></i>
                                 <div>
-                                    <strong class="rich-detail-label red">Restrictions</strong>
+                                    <strong class="rich-detail-label red">${tt('details.restrictions')}</strong>
                                     <span class="rich-detail-value">${renderSiteText(site.restrictions)}</span>
                                 </div>
                             </div>
@@ -2445,7 +2438,7 @@ class SitesViewClass extends BaseView {
                             <div class="rich-detail-item obs">
                                 <i class="ri-article-line rich-detail-icon blue"></i>
                                 <div>
-                                    <strong class="rich-detail-label muted">Réglementation</strong>
+                                    <strong class="rich-detail-label muted">${tt('details.reglementation')}</strong>
                                     <span class="rich-detail-value">${renderSiteText(site.reglementation)}</span>
                                 </div>
                             </div>
@@ -2468,8 +2461,7 @@ class SitesViewClass extends BaseView {
                 .writeText(coords)
                 .then(() => {
                     const originalHtml = btnRef.innerHTML;
-                    btnRef.innerHTML =
-                        '<i class="ri-check-line" style="color: var(--accent-green);"></i> <span style="color: var(--accent-green);">Copié !</span>';
+                    btnRef.innerHTML = `<i class="ri-check-line" style="color: var(--accent-green);"></i> <span style="color: var(--accent-green);">${tt('card.copied')}</span>`;
                     btnRef.style.borderColor = 'var(--accent-green)';
                     setTimeout(() => {
                         btnRef.innerHTML = originalHtml;
@@ -2488,8 +2480,7 @@ class SitesViewClass extends BaseView {
             try {
                 document.execCommand('copy');
                 const originalHtml = btnRef.innerHTML;
-                btnRef.innerHTML =
-                    '<i class="ri-check-line" style="color: var(--accent-green);"></i> <span style="color: var(--accent-green);">Copié !</span>';
+                btnRef.innerHTML = `<i class="ri-check-line" style="color: var(--accent-green);"></i> <span style="color: var(--accent-green);">${tt('card.copied')}</span>`;
                 btnRef.style.borderColor = 'var(--accent-green)';
                 setTimeout(() => {
                     btnRef.innerHTML = originalHtml;
@@ -2520,7 +2511,7 @@ class SitesViewClass extends BaseView {
         this.state.expandedSites[siteId] = detailsEl.open;
         const toggleTextEl = detailsEl.querySelector('.toggle-text');
         if (toggleTextEl) {
-            toggleTextEl.textContent = detailsEl.open ? 'Masquer les détails' : "Voir plus d'infos";
+            toggleTextEl.textContent = tl(detailsEl.open ? 'card.lessInfo' : 'card.moreInfo');
         }
     }
 }
