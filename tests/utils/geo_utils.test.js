@@ -7,6 +7,8 @@ import {
     formatDecimalDegrees,
     formatDegreesMinutes,
     formatDegreesMinutesSeconds,
+    parseCoordinates,
+    formatCoordinates,
 } from '../../js/utils/geo_utils.js';
 
 describe('Geo Utils', () => {
@@ -68,5 +70,46 @@ describe('Geo Utils', () => {
             expect(formatDegreesMinutes(45.9999999, 6.9999999)).toBe("46°00.000' N 007°00.000' E");
             expect(formatDegreesMinutesSeconds(45.9999999, 6.9999999)).toBe('46°00\'00.0" N 7°00\'00.0" E');
         });
+    });
+});
+
+describe('parseCoordinates', () => {
+    it('reads decimal coordinates separated by a comma, a space or a semicolon', () => {
+        expect(parseCoordinates('50.68123, 1.59234')).toEqual({ lat: 50.68123, lon: 1.59234 });
+        expect(parseCoordinates('  45.9   6.12 ')).toEqual({ lat: 45.9, lon: 6.12 });
+        expect(parseCoordinates('45,9; 6,12')).toEqual({ lat: 45.9, lon: 6.12 });
+        expect(parseCoordinates('-33.5, -70.25')).toEqual({ lat: -33.5, lon: -70.25 });
+    });
+
+    it('reads degrees-minutes-seconds with hemispheres, as shown by Google Maps', () => {
+        const c = parseCoordinates('50°40\'52.4"N 1°35\'32.4"E');
+        expect(c.lat).toBeCloseTo(50.68122, 4);
+        expect(c.lon).toBeCloseTo(1.59233, 4);
+        const s = parseCoordinates('33°30\'00"S 70°15\'00"W');
+        expect(s.lat).toBeCloseTo(-33.5, 6);
+        expect(s.lon).toBeCloseTo(-70.25, 6);
+    });
+
+    it('reads the @lat,lon part of a Google Maps link', () => {
+        expect(parseCoordinates('https://www.google.com/maps/@50.6812,1.5923,15z')).toEqual({
+            lat: 50.6812,
+            lon: 1.5923,
+        });
+    });
+
+    it('rejects empty, unreadable or out-of-range input', () => {
+        expect(parseCoordinates('')).toBeNull();
+        expect(parseCoordinates('   ')).toBeNull();
+        expect(parseCoordinates('Equihen')).toBeNull();
+        expect(parseCoordinates('50.6')).toBeNull();
+        expect(parseCoordinates('91, 2')).toBeNull();
+        expect(parseCoordinates('45, 181')).toBeNull();
+        expect(parseCoordinates(null)).toBeNull();
+    });
+});
+
+describe('formatCoordinates', () => {
+    it('writes « lat, lon » with 5 decimals', () => {
+        expect(formatCoordinates(50.681234567, 1.5)).toBe('50.68123, 1.50000');
     });
 });

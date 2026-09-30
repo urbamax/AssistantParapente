@@ -79,6 +79,26 @@ export const FR = Object.freeze({
             'Service météo indisponible — prévision enregistrée sur l’appareil, récupérée {when} ; elle peut être dépassée.',
         unavailableOffline: 'Prévision indisponible hors ligne',
     }),
+    logbook: Object.freeze({
+        coords: Object.freeze({
+            open: 'Placer sur la carte',
+            close: 'Masquer la carte',
+            label: 'Coordonnées GPS',
+            placeholder: 'Ex : 50.68123, 1.59234',
+            hint: 'Cliquez sur la carte ou déplacez le repère. Vous pouvez aussi coller des coordonnées copiées depuis Google Maps (clic droit sur le lieu).',
+            clear: 'Retirer le point',
+            invalid:
+                'Coordonnées illisibles. Formats acceptés : « 50.68123, 1.59234 », « 50°40\'52"N 1°35\'32"E » ou un lien Google Maps.',
+            statusChosen: 'Position choisie : {coords}',
+            statusFromHistory: 'Position reprise de votre dernière session à ce lieu : {coords}',
+            statusKnownSite: 'Site connu : sa position sert pour la météo.',
+            statusMissing: 'Lieu absent de la base : placez-le sur la carte pour obtenir la météo.',
+            layerSatellite: 'Satellite',
+            layerTopo: 'Carte',
+            mapLabel: 'Carte pour placer le lieu',
+            mapUnavailable: 'Carte indisponible : saisissez les coordonnées ci-dessus.',
+        }),
+    }),
     notification: Object.freeze({
         title: '{site} : conditions favorables annoncées',
         body: 'Prévision {hour} : vent {card} {speed} km/h (rafales {gust}), source {source}. {reminder}',

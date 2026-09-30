@@ -282,3 +282,23 @@ describe('LogbookService - fetchSessionWeather rate limiting', () => {
         expect(res.error).not.toContain('429');
     });
 });
+
+describe('LogbookService.findLastCoordsForPlace', () => {
+    beforeEach(() => {
+        LogbookService.flights = [
+            { id: 'a', type: 'gonflage', lieu: 'Equihen', datetime: '2026-09-29T15:00', lat: 50.68, lon: 1.59 },
+            { id: 'b', type: 'vol', site: 'EQUIHEN ', datetime: '2026-09-01T15:00', lat: 50.1, lon: 1.1 },
+            { id: 'c', type: 'vol', site: 'Escalles', datetime: '2026-09-20T15:00' },
+        ];
+    });
+
+    it('returns the coordinates of the latest session with the same name, ignoring case and spaces', () => {
+        expect(LogbookService.findLastCoordsForPlace(' equihen')).toEqual({ lat: 50.68, lon: 1.59 });
+    });
+
+    it('returns null when no session of that place has coordinates', () => {
+        expect(LogbookService.findLastCoordsForPlace('Escalles')).toBeNull();
+        expect(LogbookService.findLastCoordsForPlace('Inconnu')).toBeNull();
+        expect(LogbookService.findLastCoordsForPlace('')).toBeNull();
+    });
+});

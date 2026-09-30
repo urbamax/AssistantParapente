@@ -134,3 +134,63 @@ export function formatDegreesMinutesSeconds(lat, lon) {
 export function formatDecimalDegrees(lat, lon) {
     return `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
 }
+
+/**
+ * Lit des coordonnées GPS collées par l'utilisateur (spec 011) : décimales (« 50.68123, 1.59234 »,
+ * « 45,9; 6,12 »), degrés-minutes-secondes comme Google Maps (« 50°40'52.4"N 1°35'32.4"E »,
+ * O/W pour l'ouest) ou lien Google Maps contenant « @lat,lon ».
+ * @param {string|null|undefined} text
+ * @returns {{lat: number, lon: number}|null} null si illisible ou hors limites
+ */
+export function parseCoordinates(text) {
+    if (typeof text !== 'string') return null;
+    const s = text.trim();
+    if (!s) return null;
+    const num = (/** @type {string} */ v) => Number(v.replace(',', '.'));
+
+    const link = s.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
+    if (link) return checkedCoordinates(num(link[1]), num(link[2]));
+
+    const dms = [
+        ...s.matchAll(
+            /(\d+(?:[.,]\d+)?)\s*°\s*(?:(\d+(?:[.,]\d+)?)\s*['′]\s*)?(?:(\d+(?:[.,]\d+)?)\s*(?:"|″|''))?\s*([NSEWO])/gi,
+        ),
+    ];
+    if (dms.length === 2) {
+        let lat = null;
+        let lon = null;
+        for (const m of dms) {
+            const value = num(m[1]) + (m[2] ? num(m[2]) : 0) / 60 + (m[3] ? num(m[3]) : 0) / 3600;
+            const hemisphere = m[4].toUpperCase();
+            if (hemisphere === 'N' || hemisphere === 'S') lat = hemisphere === 'S' ? -value : value;
+            else lon = hemisphere === 'E' ? value : -value;
+        }
+        return lat === null || lon === null ? null : checkedCoordinates(lat, lon);
+    }
+
+    const decimal =
+        s.match(/^(-?\d+(?:\.\d+)?)\s*[,;\s]\s*(-?\d+(?:\.\d+)?)$/) ||
+        s.match(/^(-?\d+(?:,\d+)?)\s*;\s*(-?\d+(?:,\d+)?)$/);
+    return decimal ? checkedCoordinates(num(decimal[1]), num(decimal[2])) : null;
+}
+
+/**
+ * @param {number} lat
+ * @param {number} lon
+ * @returns {{lat: number, lon: number}|null}
+ */
+function checkedCoordinates(lat, lon) {
+    if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) return null;
+    const round = (/** @type {number} */ v) => Math.round(v * 1e6) / 1e6;
+    return { lat: round(lat), lon: round(lon) };
+}
+
+/**
+ * Écrit des coordonnées sous la forme « lat, lon » à 5 décimales (≈ 1 m), relisible par parseCoordinates.
+ * @param {number} lat
+ * @param {number} lon
+ * @returns {string}
+ */
+export function formatCoordinates(lat, lon) {
+    return `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+}
