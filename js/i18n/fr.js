@@ -30,8 +30,10 @@ export const FR = Object.freeze({
         missingPlaceholder: '—',
         // Lignes météo d'une séance du carnet : un gonflage n'a ni décollage ni atterrissage.
         rowTakeoff: 'Décollage',
+        rowTakeoffLanding: 'Décollage et atterrissage',
         rowLanding: 'Atterrissage',
         rowStart: 'Début',
+        rowStartEnd: 'Début et fin',
         rowEnd: 'Fin',
         reminder:
             'Avis basé sur des prévisions, risque d’orage estimé : la décision vous appartient, vérifiez sur place.',

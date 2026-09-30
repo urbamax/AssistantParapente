@@ -1640,9 +1640,15 @@ class LogbookViewClass extends BaseView {
         if (session.meteo) {
             // Une séance de gonflage n'a ni décollage ni atterrissage : on parle de début et de fin.
             const isVol = session.type === 'vol';
+            
+            let startLabel = isVol ? 'weather.rowTakeoff' : 'weather.rowStart';
+            if (session.duree && !session.meteoAtterro) {
+                startLabel = isVol ? 'weather.rowTakeoffLanding' : 'weather.rowStartEnd';
+            }
+            
             const decollageRow = this.renderWeatherPointRow(
                 session.meteo,
-                t(isVol ? 'weather.rowTakeoff' : 'weather.rowStart'),
+                t(startLabel),
             );
             const atterroRow = session.meteoAtterro
                 ? this.renderWeatherPointRow(session.meteoAtterro, t(isVol ? 'weather.rowLanding' : 'weather.rowEnd'))
