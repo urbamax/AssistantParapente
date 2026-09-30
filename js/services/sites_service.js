@@ -22,12 +22,18 @@ import { t } from '../utils/i18n.js';
 
 const sitesView = () => AppRouter.getView('SITES');
 
+// Values offered by the sort (#select-sort-mode) and weather model (#weather-model-select) menus.
+const SORT_MODES = ['CONDITIONS', 'DISTANCE', 'AZ'];
+const WEATHER_MODEL_KEYS = ['meteofrance', 'iconeu', 'icon', 'ecmwf', 'gfs', 'best_match'];
+
 /**
  * Convertit les préférences enregistrées vers les réglages actuels (spec 002, FR-018) :
  * - le rayon « Illimité » (ancienne valeur 210) et tout rayon au-dessus de 200 km → 50 km par
  *   défaut, en dessous de 10 km → 10 km : « Illimité » épuisait le quota Open-Meteo ;
  * - le modèle « meteoblue » → « best_match » : il n'a jamais utilisé Meteoblue, mais la
- *   sélection automatique multi-modèles d'Open-Meteo.
+ *   sélection automatique multi-modèles d'Open-Meteo ;
+ * - un tri ou un modèle inconnu (ex. le texte « this.value », enregistré à la simple ouverture de
+ *   ces menus — spec 019) est retiré : le réglage par défaut s'applique.
  * Ne modifie pas l'objet reçu.
  * @param {Object} prefs
  * @returns {Object}
@@ -39,6 +45,8 @@ export function migrateSitePrefs(prefs) {
         out.radiusLimit = RADIUS.DEFAULT;
     else if (radius < RADIUS.MIN) out.radiusLimit = RADIUS.MIN;
     if (out.weatherModel === 'meteoblue') out.weatherModel = 'best_match';
+    if ('sortMode' in out && !SORT_MODES.includes(out.sortMode)) delete out.sortMode;
+    if ('weatherModel' in out && !WEATHER_MODEL_KEYS.includes(out.weatherModel)) delete out.weatherModel;
     return out;
 }
 
