@@ -70,13 +70,24 @@ export function describeSelection(indexes, choices = []) {
 
 /** Minuscules, sans accents, apostrophes et ponctuation remplacées par des espaces. */
 function normalize(text) {
-    return String(text || '')
+    let normalized = String(text || '')
         .toLowerCase()
         .normalize('NFD')
         .replace(/[̀-ͯ]/g, '')
         .replace(/[’'`]/g, '')
         .replace(/[^a-z0-9]+/g, ' ')
         .trim();
+        
+    // Remplacements phonétiques pour les associations de lettres courantes
+    normalized = normalized
+        .replace(/\baider\b/g, 'a d')
+        .replace(/\bassez\b/g, 'a c')
+        .replace(/\babaisser\b/g, 'a b c')
+        .replace(/\bbaisser\b/g, 'b c')
+        .replace(/\bceder\b/g, 'c d')
+        .replace(/\bdeces\b/g, 'd c');
+        
+    return normalized;
 }
 
 const COMMANDS = {
@@ -91,7 +102,7 @@ const COMMANDS = {
 // Mots qui désignent sans ambiguïté une lettre.
 const STRONG_LETTERS = { a: 0, b: 1, be: 1, bee: 1, c: 2, d: 3, e: 4, f: 5, ef: 5, effe: 5 };
 // Homophones qui sont aussi des mots courants : acceptés seulement s'ils forment toute la phrase.
-const WEAK_LETTERS = { ah: 0, ha: 0, ce: 2, ces: 2, ses: 2, sait: 2, cest: 2, de: 3, des: 3, eu: 4, euh: 4 };
+const WEAK_LETTERS = { ah: 0, ha: 0, baie: 1, ce: 2, ces: 2, ses: 2, sait: 2, cest: 2, de: 3, des: 3, dees: 3, eu: 4, euh: 4 };
 const FILLERS = new Set(['reponse', 'reponses', 'et', 'la', 'le', 'les', 'lettre', 'lettres']);
 
 /**
