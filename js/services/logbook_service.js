@@ -275,6 +275,18 @@ class LogbookService {
         this.equipment = this.equipment.filter((e) => e.id !== id);
         this.saveEquipment();
 
+        // Tombstone : si la suppression cloud ci-dessous n'aboutit pas (hors ligne, connexion pas
+        // prête), la prochaine synchro la termine au lieu de re-télécharger l'équipement (spec 015).
+        let deleted = [];
+        try {
+            deleted = JSON.parse(localStorage.getItem('deleted_equipment') || '[]');
+        } catch {}
+        if (!Array.isArray(deleted)) deleted = [];
+        if (!deleted.includes(id)) {
+            deleted.push(id);
+            localStorage.setItem('deleted_equipment', JSON.stringify(deleted));
+        }
+
         if (
             window.FirebaseAuthEngine &&
             window.FirebaseAuthEngine.currentUser &&
