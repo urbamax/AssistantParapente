@@ -1,0 +1,152 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`library renders (spec 021: identical before and after moving the texts) > no result 1`] = `
+"
+                <div class="no-results" style="text-align:center; padding:64px; color:var(--text-secondary); opacity:0.6;">
+                    <i class="ri-search-eye-line" style="font-size:3rem; margin-bottom:16px; display:block;"></i>
+                    <p>Aucun résultat pour cette recherche...</p>
+                </div>
+            "
+`;
+
+exports[`library renders (spec 021: identical before and after moving the texts) > sorted by CATEGORY 1`] = `
+"<div class="library-section"><h3 class="library-section-header"><i class="ri-archive-line"></i> Général</h3><div class="library-list"><div class="library-list-item" role="button" tabindex="0" aria-label="Consulter le cours : Facteurs humains">
+            <div class="list-item-content">
+                <div class="list-item-title">Facteurs humains</div>
+            </div>
+            <div class="list-item-meta">
+                <span class="badge badge-GENERAL">GENERAL</span> 
+                <div class="list-item-action" aria-hidden="true">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </div>
+        </div></div></div><div class="library-section"><h3 class="library-section-header"><i class="ri-archive-line"></i> Météo</h3><div class="library-list"><div class="library-list-item" role="button" tabindex="0" aria-label="Consulter le cours : Aérologie">
+            <div class="list-item-content">
+                <div class="list-item-title">Aérologie</div>
+            </div>
+            <div class="list-item-meta">
+                <span class="badge badge-BI">BI</span> <span class="badge badge-BP">BP</span> 
+                <div class="list-item-action" aria-hidden="true">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </div>
+        </div></div></div><div class="library-section"><h3 class="library-section-header"><i class="ri-archive-line"></i> Pilotage</h3><div class="library-list"><div class="library-list-item" role="button" tabindex="0" aria-label="Consulter le cours : Pilotage">
+            <div class="list-item-content">
+                <div class="list-item-title">Pilotage</div>
+            </div>
+            <div class="list-item-meta">
+                <span class="badge badge-BPC">BPC</span> 
+                <div class="list-item-action" aria-hidden="true">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </div>
+        </div></div></div><div class="library-section"><h3 class="library-section-header"><i class="ri-archive-line"></i> Autre</h3><div class="library-list"><div class="library-list-item" role="button" tabindex="0" aria-label="Consulter le cours : Treuil">
+            <div class="list-item-content">
+                <div class="list-item-title">Treuil</div>
+            </div>
+            <div class="list-item-meta">
+                <span class="badge badge-TREUIL">TREUIL</span> 
+                <div class="list-item-action" aria-hidden="true">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </div>
+        </div></div></div>"
+`;
+
+exports[`library renders (spec 021: identical before and after moving the texts) > sorted by LEVEL 1`] = `
+"<div class="library-section"><h3 class="library-section-header level-header level-BI"><i class="ri-bookmark-3-fill"></i> BREVET INITIAL</h3><div class="library-list"><div class="library-list-item" role="button" tabindex="0" aria-label="Consulter le cours : Aérologie">
+            <div class="list-item-content">
+                <div class="list-item-title">Aérologie</div>
+            </div>
+            <div class="list-item-meta">
+                <span class="badge badge-BI">BI</span> <span class="badge badge-BP">BP</span> 
+                <div class="list-item-action" aria-hidden="true">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </div>
+        </div></div></div><div class="library-section"><h3 class="library-section-header level-header level-BP"><i class="ri-bookmark-3-fill"></i> BREVET DE PILOTE</h3><div class="library-list"><div class="library-list-item" role="button" tabindex="0" aria-label="Consulter le cours : Aérologie">
+            <div class="list-item-content">
+                <div class="list-item-title">Aérologie</div>
+            </div>
+            <div class="list-item-meta">
+                <span class="badge badge-BI">BI</span> <span class="badge badge-BP">BP</span> 
+                <div class="list-item-action" aria-hidden="true">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </div>
+        </div></div></div><div class="library-section"><h3 class="library-section-header level-header level-BPC"><i class="ri-bookmark-3-fill"></i> BREVET DE PILOTE CONFIRMÉ</h3><div class="library-list"><div class="library-list-item" role="button" tabindex="0" aria-label="Consulter le cours : Pilotage">
+            <div class="list-item-content">
+                <div class="list-item-title">Pilotage</div>
+            </div>
+            <div class="list-item-meta">
+                <span class="badge badge-BPC">BPC</span> 
+                <div class="list-item-action" aria-hidden="true">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </div>
+        </div></div></div><div class="library-section"><h3 class="library-section-header level-header level-TREUIL"><i class="ri-bookmark-3-fill"></i> TREUIL</h3><div class="library-list"><div class="library-list-item" role="button" tabindex="0" aria-label="Consulter le cours : Treuil">
+            <div class="list-item-content">
+                <div class="list-item-title">Treuil</div>
+            </div>
+            <div class="list-item-meta">
+                <span class="badge badge-TREUIL">TREUIL</span> 
+                <div class="list-item-action" aria-hidden="true">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </div>
+        </div></div></div><div class="library-section"><h3 class="library-section-header level-header level-GENERAL"><i class="ri-bookmark-3-fill"></i> GÉNÉRAL</h3><div class="library-list"><div class="library-list-item" role="button" tabindex="0" aria-label="Consulter le cours : Facteurs humains">
+            <div class="list-item-content">
+                <div class="list-item-title">Facteurs humains</div>
+            </div>
+            <div class="list-item-meta">
+                <span class="badge badge-GENERAL">GENERAL</span> 
+                <div class="list-item-action" aria-hidden="true">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </div>
+        </div></div></div>"
+`;
+
+exports[`library renders (spec 021: identical before and after moving the texts) > sorted by TITLE 1`] = `
+"<div class="library-list"><div class="library-list-item" role="button" tabindex="0" aria-label="Consulter le cours : Aérologie">
+            <div class="list-item-content">
+                <div class="list-item-title">Aérologie</div>
+            </div>
+            <div class="list-item-meta">
+                <span class="badge badge-BI">BI</span> <span class="badge badge-BP">BP</span> 
+                <div class="list-item-action" aria-hidden="true">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </div>
+        </div><div class="library-list-item" role="button" tabindex="0" aria-label="Consulter le cours : Facteurs humains">
+            <div class="list-item-content">
+                <div class="list-item-title">Facteurs humains</div>
+            </div>
+            <div class="list-item-meta">
+                <span class="badge badge-GENERAL">GENERAL</span> 
+                <div class="list-item-action" aria-hidden="true">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </div>
+        </div><div class="library-list-item" role="button" tabindex="0" aria-label="Consulter le cours : Pilotage">
+            <div class="list-item-content">
+                <div class="list-item-title">Pilotage</div>
+            </div>
+            <div class="list-item-meta">
+                <span class="badge badge-BPC">BPC</span> 
+                <div class="list-item-action" aria-hidden="true">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </div>
+        </div><div class="library-list-item" role="button" tabindex="0" aria-label="Consulter le cours : Treuil">
+            <div class="list-item-content">
+                <div class="list-item-title">Treuil</div>
+            </div>
+            <div class="list-item-meta">
+                <span class="badge badge-TREUIL">TREUIL</span> 
+                <div class="list-item-action" aria-hidden="true">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </div>
+        </div></div>"
+`;

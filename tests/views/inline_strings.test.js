@@ -6,13 +6,35 @@ import { stripDeveloperText, findInlineTexts, catalogueKeys } from '../helpers/i
 
 // Contrainte « Language » de la constitution (écart d'audit C8) : aucun texte affiché au pilote
 // n'est écrit en dur dans les écrans migrés ; tout passe par le catalogue js/i18n/fr.js.
-// Un écran s'ajoute ici quand ses textes ont été déplacés (specs 014, 015, 019…).
+// Un écran s'ajoute ici quand ses textes ont été déplacés (specs 014, 015, 019, 021…).
 const SCREENS = [
     // Valeurs enregistrées dans le carnet (données, pas textes d'interface).
     { file: 'js/views/logbook.js', spec: '014', prefix: 'logbook.', dataValues: ['Autre', 'Plouf'], minKeys: 100 },
     // Code de niveau enregistré dans les préférences.
     { file: 'js/views/sites.js', spec: '015', prefix: 'sites.', dataValues: ['ALL'], minKeys: 80 },
     { file: 'js/views/safety.js', spec: '019', prefix: 'safety.', dataValues: [], minKeys: 15 },
+    // Codes d'erreur renvoyés au code appelant (jamais affichés) et codes de niveau / catégorie.
+    {
+        file: 'js/services/firebase_service.js',
+        spec: '021',
+        prefix: 'account.',
+        dataValues: [
+            'Not logged in',
+            'Not enabled or logged in',
+            'Not enabled, syncing or not logged in',
+            'Missing VAPID key',
+            'Permission denied',
+            'No token',
+        ],
+        minKeys: 30,
+    },
+    {
+        file: 'js/views/manual.js',
+        spec: '021',
+        prefix: 'library.',
+        dataValues: ['ALL', 'GENERAL', 'Autre'],
+        minKeys: 2,
+    },
 ];
 
 const resolves = (key) => typeof key.split('.').reduce((node, part) => node?.[part], FR) === 'string';

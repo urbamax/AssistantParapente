@@ -685,6 +685,84 @@ export const FR = Object.freeze({
             summaryWeak: 'À renforcer en priorité : {plates}.',
         }),
     }),
+    // Spec 021 : messages du compte (connexion, synchronisation, alertes, sauvegarde) affichés par
+    // js/services/firebase_service.js. Les codes d'erreur renvoyés au code ('Not logged in'…) n'y sont pas.
+    account: Object.freeze({
+        syncDot: Object.freeze({
+            syncing: 'Synchronisation cloud en cours…',
+            pending: 'Modifications pas encore envoyées au cloud (hors ligne ou échec) : nouvel essai automatique.',
+        }),
+        header: Object.freeze({
+            signIn: "Se connecter / S'enregistrer",
+            disabled: 'Synchronisation désactivée (Cliquez pour configurer)',
+            connectedAs: 'Connecté ({email})',
+        }),
+        never: 'Jamais',
+        form: Object.freeze({
+            fillAll: 'Veuillez remplir tous les champs.',
+            passwordMismatch: 'Les mots de passe ne correspondent pas.',
+            invalidEmail: "Format d'adresse email invalide.",
+        }),
+        signUp: Object.freeze({
+            creating: 'Création du compte...',
+            success: 'Compte créé avec succès !',
+            error: 'Erreur lors de la création du compte.',
+            emailInUse: 'Cet email est déjà utilisé.',
+            weakPassword: 'Le mot de passe doit contenir au moins 6 caractères.',
+        }),
+        signIn: Object.freeze({
+            connecting: 'Connexion...',
+            error: 'Identifiants incorrects ou compte inexistant.',
+            wrongCredentials: 'Email ou mot de passe incorrect.',
+            tooManyRequests: 'Trop de tentatives. Veuillez réessayer plus tard ou réinitialisez votre mot de passe.',
+            disabled: 'Ce compte a été désactivé.',
+            network: 'Erreur réseau. Vérifiez votre connexion internet.',
+        }),
+        signedOut: 'Vous avez été déconnecté.',
+        reset: Object.freeze({
+            emailRequired: 'Saisissez votre adresse e-mail pour recevoir le lien de réinitialisation.',
+            sent: 'Email de réinitialisation envoyé !',
+            error: "Erreur lors de l'envoi de l'email.",
+        }),
+        sync: Object.freeze({
+            inProgress: 'Synchronisation en cours...',
+            done: 'Synchronisé avec le cloud !',
+            failed: 'La synchronisation a échoué{detail}. Les données restent stockées localement.',
+        }),
+        alerts: Object.freeze({
+            loginFirst: "Connectez-vous d'abord pour activer les alertes météo.",
+            missingVapid: "Clé VAPID non configurée (js/firebase_config.js). Voir le Mode d'emploi.",
+            unsupported: 'Les notifications ne sont pas supportées par ce navigateur.',
+            permissionDenied: 'Permission de notification refusée.',
+            noToken: "Impossible d'obtenir un token de notification.",
+            enabled: 'Alertes météo activées sur cet appareil !',
+            failed: "Échec de l'activation des alertes{detail}.",
+        }),
+        backup: Object.freeze({
+            noFile: 'Aucun fichier sélectionné.',
+            invalidFile: "Fichier invalide : ce n'est pas un backup AssistantParapente.",
+            restoring: 'Restauration en cours...',
+            restored: 'Données restaurées localement. Connectez-vous pour les synchroniser avec le cloud.',
+            readError: "Erreur de lecture du fichier. Vérifiez qu'il s'agit d'un fichier JSON valide.",
+            downloaded: 'Backup téléchargé : {filename}',
+            confirmImport:
+                'Importer le backup du {date} ?\n\nATTENTION : vos données locales actuelles seront remplacées par celles du backup.',
+        }),
+    }),
+    // Spec 021 : textes de la bibliothèque des cours (js/views/manual.js). Les codes de niveau (BI, BP…)
+    // et les catégories des cours (« Autre » par défaut) sont des données.
+    library: Object.freeze({
+        noResults: 'Aucun résultat pour cette recherche...',
+        openCourse: 'Consulter le cours : {title}',
+        loadError: 'Erreur de chargement de la bibliothèque',
+        levels: Object.freeze({
+            BI: 'BREVET INITIAL',
+            BP: 'BREVET DE PILOTE',
+            BPC: 'BREVET DE PILOTE CONFIRMÉ',
+            TREUIL: 'TREUIL',
+            GENERAL: 'GÉNÉRAL',
+        }),
+    }),
     notification: Object.freeze({
         title: '{site} : conditions favorables annoncées',
         body: 'Prévision {hour} : vent {card} {speed} km/h (rafales {gust}), source {source}. {reminder}',
