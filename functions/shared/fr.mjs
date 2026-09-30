@@ -29,6 +29,11 @@ export const FR = Object.freeze({
         confidenceUnavailable: 'Indisponible',
         legendIncomplete: 'Prévision incomplète',
         missingPlaceholder: '—',
+        // Lignes météo d'une séance du carnet : un gonflage n'a ni décollage ni atterrissage.
+        rowTakeoff: 'Décollage',
+        rowLanding: 'Atterrissage',
+        rowStart: 'Début',
+        rowEnd: 'Fin',
         reminder:
             'Avis basé sur des prévisions, risque d’orage estimé : la décision vous appartient, vérifiez sur place.',
         missing: Object.freeze({
