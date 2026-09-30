@@ -6,6 +6,8 @@ import GlobalState from '../core/app_state.js';
 import { escapeHTML } from '../core/security.js';
 import { COURSES_DATA } from '../data/courses_data.js';
 import { toSorted } from '../utils/array_utils.js';
+import { t } from '../utils/i18n.js';
+import { FR } from '../i18n/fr.js';
 
 /**
  * LIBRARY ENGINE
@@ -86,7 +88,7 @@ class LibraryViewClass extends BaseView {
             container.innerHTML = `
                 <div class="no-results" style="text-align:center; padding:64px; color:var(--text-secondary); opacity:0.6;">
                     <i class="ri-search-eye-line" style="font-size:3rem; margin-bottom:16px; display:block;"></i>
-                    <p>Aucun résultat pour cette recherche...</p>
+                    <p>${escapeHTML(t('library.noResults'))}</p>
                 </div>
             `;
             return;
@@ -187,7 +189,7 @@ class LibraryViewClass extends BaseView {
         btn.className = 'library-list-item';
         btn.setAttribute('role', 'button');
         btn.setAttribute('tabindex', '0');
-        btn.setAttribute('aria-label', `Consulter le cours : ${c.title || ''}`);
+        btn.setAttribute('aria-label', t('library.openCourse', { title: c.title || '' }));
 
         const handleOpen = () => this.openCourse(c.id);
         btn.addEventListener('click', handleOpen);
@@ -246,14 +248,7 @@ class LibraryViewClass extends BaseView {
     }
 
     getLevelName(l) {
-        const names = {
-            BI: 'BREVET INITIAL',
-            BP: 'BREVET DE PILOTE',
-            BPC: 'BREVET DE PILOTE CONFIRMÉ',
-            TREUIL: 'TREUIL',
-            GENERAL: 'GÉNÉRAL',
-        };
-        return names[l] || l;
+        return FR.library.levels[l] || l;
     }
 
     async mount(params) {
@@ -283,7 +278,7 @@ class LibraryViewClass extends BaseView {
             if (searchInput) searchInput.addEventListener('input', this._handleSearchInput);
         } catch (e) {
             console.error('Erreur de montage de LibraryView', e);
-            super.renderErrorState(e.message || 'Erreur de chargement de la bibliothèque', 'library-screen');
+            super.renderErrorState(e.message || t('library.loadError'), 'library-screen');
         }
     }
 

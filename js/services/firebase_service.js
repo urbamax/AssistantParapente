@@ -9,6 +9,7 @@ import GlobalState from '../core/app_state.js';
 import SitesService, { migrateSitePrefs } from './sites_service.js';
 import LogbookService from './logbook_service.js';
 import QuizView from '../views/quiz.js';
+import { t } from '../utils/i18n.js';
 
 // We inject the original code but export the Engine
 // --- FIREBASE AUTHENTICATION & SYNC ENGINE ---
@@ -49,8 +50,8 @@ const LAST_SYNC_STORAGE_KEY = 'firebase_last_sync';
 
 // We will expose this engine to the window object so it can be called from non-module scripts
 const SYNC_DOT_TITLES = {
-    syncing: 'Synchronisation cloud en cours…',
-    pending: 'Modifications pas encore envoyées au cloud (hors ligne ou échec) : nouvel essai automatique.',
+    syncing: t('account.syncDot.syncing'),
+    pending: t('account.syncDot.pending'),
     idle: '',
 };
 
@@ -265,12 +266,10 @@ export const FirebaseAuthEngine = {
         if (activeDot && authBtn) {
             if (this.currentUser) {
                 activeDot.classList.add('active');
-                authBtn.title = `Connecté (${this.currentUser.email})`;
+                authBtn.title = t('account.header.connectedAs', { email: this.currentUser.email });
             } else {
                 activeDot.classList.remove('active');
-                authBtn.title = this.enabled
-                    ? "Se connecter / S'enregistrer"
-                    : 'Synchronisation désactivée (Cliquez pour configurer)';
+                authBtn.title = this.enabled ? t('account.header.signIn') : t('account.header.disabled');
             }
         }
 
@@ -325,7 +324,7 @@ export const FirebaseAuthEngine = {
             // Affiche la dernière heure de synchro lue depuis le localStorage
             const syncTimeEl = document.getElementById('auth-sync-time');
             if (syncTimeEl) {
-                syncTimeEl.textContent = this.lastSyncTime || 'Jamais';
+                syncTimeEl.textContent = this.lastSyncTime || t('account.never');
             }
         } else if (hasConsent) {
             anonymousView.style.display = 'block';
@@ -352,12 +351,12 @@ export const FirebaseAuthEngine = {
         const confirmPassword = confirmEl ? confirmEl.value : '';
 
         if (!email || !password || !confirmPassword) {
-            this.showAlert('Veuillez remplir tous les champs.', 'error');
+            this.showAlert(t('account.form.fillAll'), 'error');
             return;
         }
 
         if (password !== confirmPassword) {
-            this.showAlert('Les mots de passe ne correspondent pas.', 'error');
+            this.showAlert(t('account.form.passwordMismatch'), 'error');
             return;
         }
 
@@ -368,7 +367,7 @@ export const FirebaseAuthEngine = {
                 indexedDBLocalPersistence,
                 browserSessionPersistence,
             } = await loadAuthModule();
-            this.showStatus('Création du compte...', 'info');
+            this.showStatus(t('account.signUp.creating'), 'info');
 
             // Set persistence dynamically
             const rememberMeEl = /** @type {HTMLInputElement} */ (document.getElementById('register-remember-me'));
@@ -376,16 +375,16 @@ export const FirebaseAuthEngine = {
             await setPersistence(auth, rememberMe ? indexedDBLocalPersistence : browserSessionPersistence);
 
             await createUserWithEmailAndPassword(auth, email, password);
-            this.showAlert('Compte créé avec succès !', 'success');
+            this.showAlert(t('account.signUp.success'), 'success');
         } catch (error) {
             console.error('Signup error:', error.code, error.message);
-            let message = 'Erreur lors de la création du compte.';
+            let message = t('account.signUp.error');
             if (error.code === 'auth/email-already-in-use') {
-                message = 'Cet email est déjà utilisé.';
+                message = t('account.signUp.emailInUse');
             } else if (error.code === 'auth/invalid-email') {
-                message = "Format d'adresse email invalide.";
+                message = t('account.form.invalidEmail');
             } else if (error.code === 'auth/weak-password') {
-                message = 'Le mot de passe doit contenir au moins 6 caractères.';
+                message = t('account.signUp.weakPassword');
             }
             this.showAlert(message, 'error');
         }
@@ -402,14 +401,14 @@ export const FirebaseAuthEngine = {
         const password = passwordEl ? passwordEl.value : '';
 
         if (!email || !password) {
-            this.showAlert('Veuillez remplir tous les champs.', 'error');
+            this.showAlert(t('account.form.fillAll'), 'error');
             return;
         }
 
         try {
             const { signInWithEmailAndPassword, setPersistence, indexedDBLocalPersistence, browserSessionPersistence } =
                 await loadAuthModule();
-            this.showStatus('Connexion...', 'info');
+            this.showStatus(t('account.signIn.connecting'), 'info');
 
             // Set persistence dynamically
             const rememberMeEl = /** @type {HTMLInputElement} */ (document.getElementById('login-remember-me'));
@@ -419,21 +418,21 @@ export const FirebaseAuthEngine = {
             await signInWithEmailAndPassword(auth, email, password);
         } catch (error) {
             console.error('Signin error:', error.code, error.message);
-            let message = 'Identifiants incorrects ou compte inexistant.';
+            let message = t('account.signIn.error');
             if (error.code === 'auth/invalid-email') {
-                message = "Format d'adresse email invalide.";
+                message = t('account.form.invalidEmail');
             } else if (
                 error.code === 'auth/user-not-found' ||
                 error.code === 'auth/wrong-password' ||
                 error.code === 'auth/invalid-credential'
             ) {
-                message = 'Email ou mot de passe incorrect.';
+                message = t('account.signIn.wrongCredentials');
             } else if (error.code === 'auth/too-many-requests') {
-                message = 'Trop de tentatives. Veuillez réessayer plus tard ou réinitialisez votre mot de passe.';
+                message = t('account.signIn.tooManyRequests');
             } else if (error.code === 'auth/user-disabled') {
-                message = 'Ce compte a été désactivé.';
+                message = t('account.signIn.disabled');
             } else if (error.code === 'auth/network-request-failed') {
-                message = 'Erreur réseau. Vérifiez votre connexion internet.';
+                message = t('account.signIn.network');
             }
             this.showAlert(message, 'error');
         }
@@ -445,7 +444,7 @@ export const FirebaseAuthEngine = {
             const { signOut } = await loadAuthModule();
             await signOut(auth);
             this.closeAuthModal();
-            alert('Vous avez été déconnecté.');
+            alert(t('account.signedOut'));
         } catch (error) {
             console.error('Signout error:', error);
         }
@@ -461,10 +460,10 @@ export const FirebaseAuthEngine = {
         try {
             const { sendPasswordResetEmail } = await loadAuthModule();
             await sendPasswordResetEmail(auth, email);
-            this.showAlert('Email de réinitialisation envoyé !', 'success');
+            this.showAlert(t('account.reset.sent'), 'success');
         } catch (error) {
             console.error('Forgot password error:', error);
-            this.showAlert("Erreur lors de l'envoi de l'email.", 'error');
+            this.showAlert(t('account.reset.error'), 'error');
         }
     },
 
@@ -480,7 +479,7 @@ export const FirebaseAuthEngine = {
         this._syncsInFlight++;
         this._updateSyncStatus();
         if (!silent) {
-            this.showStatus('Synchronisation en cours...', 'info');
+            this.showStatus(t('account.sync.inProgress'), 'info');
         }
 
         try {
@@ -761,7 +760,7 @@ export const FirebaseAuthEngine = {
             this.updateModalUI();
 
             if (!silent) {
-                this.showStatus('Synchronisé avec le cloud !', 'success');
+                this.showStatus(t('account.sync.done'), 'success');
             }
             this._syncsInFlight--;
             this._syncedSeq = Math.max(this._syncedSeq, seqAtStart);
@@ -771,10 +770,7 @@ export const FirebaseAuthEngine = {
             console.error('Synchronization failed:', error);
             if (!silent) {
                 const errorDetail = error.message ? ` : ${error.message}` : '';
-                this.showAlert(
-                    `La synchronisation a échoué${errorDetail}. Les données restent stockées localement.`,
-                    'error',
-                );
+                this.showAlert(t('account.sync.failed', { detail: errorDetail }), 'error');
             }
             this._syncsInFlight--;
             this._updateSyncStatus(); // les modifications restent « en attente » (orange)
@@ -1034,22 +1030,22 @@ export const FirebaseAuthEngine = {
      */
     enablePushNotifications: async function () {
         if (!this.currentUser || !this.enabled) {
-            this.showAlert("Connectez-vous d'abord pour activer les alertes météo.", 'error');
+            this.showAlert(t('account.alerts.loginFirst'), 'error');
             return { success: false, error: 'Not logged in' };
         }
         if (typeof FCM_VAPID_KEY === 'undefined' || !FCM_VAPID_KEY) {
-            this.showAlert("Clé VAPID non configurée (js/firebase_config.js). Voir le Mode d'emploi.", 'error');
+            this.showAlert(t('account.alerts.missingVapid'), 'error');
             return { success: false, error: 'Missing VAPID key' };
         }
         if (!('serviceWorker' in navigator) || !('Notification' in window)) {
-            this.showAlert('Les notifications ne sont pas supportées par ce navigateur.', 'error');
+            this.showAlert(t('account.alerts.unsupported'), 'error');
             return { success: false, error: 'Unsupported' };
         }
 
         try {
             const permission = await Notification.requestPermission();
             if (permission !== 'granted') {
-                this.showAlert('Permission de notification refusée.', 'error');
+                this.showAlert(t('account.alerts.permissionDenied'), 'error');
                 return { success: false, error: 'Permission denied' };
             }
 
@@ -1062,18 +1058,18 @@ export const FirebaseAuthEngine = {
             });
 
             if (!token) {
-                this.showAlert("Impossible d'obtenir un token de notification.", 'error');
+                this.showAlert(t('account.alerts.noToken'), 'error');
                 return { success: false, error: 'No token' };
             }
 
             const { doc, setDoc } = await loadFirestoreModule();
             await setDoc(doc(db, 'users', this.currentUser.uid), { fcmToken: token }, { merge: true });
 
-            this.showStatus('Alertes météo activées sur cet appareil !', 'success');
+            this.showStatus(t('account.alerts.enabled'), 'success');
             return { success: true, data: token, error: null };
         } catch (error) {
             console.error("Échec de l'activation des notifications push:", error);
-            this.showAlert(`Échec de l'activation des alertes${error.message ? ` : ${error.message}` : ''}.`, 'error');
+            this.showAlert(t('account.alerts.failed', { detail: error.message ? ` : ${error.message}` : '' }), 'error');
             return { success: false, data: null, error: error.message };
         }
     },
@@ -1132,7 +1128,7 @@ export const FirebaseAuthEngine = {
         URL.revokeObjectURL(url);
 
         console.log(`[Firebase] Export réussi : ${filename}`);
-        this.showAlert(`Backup téléchargé : ${filename}`, 'success');
+        this.showAlert(t('account.backup.downloaded', { filename }), 'success');
     },
 
     // -----------------------------------------------------------------------
@@ -1146,7 +1142,7 @@ export const FirebaseAuthEngine = {
      */
     importAllData: function (file) {
         if (!file) {
-            this.showAlert('Aucun fichier sélectionné.', 'error');
+            this.showAlert(t('account.backup.noFile'), 'error');
             return;
         }
 
@@ -1157,16 +1153,16 @@ export const FirebaseAuthEngine = {
 
                 // Validation minimale : vérifie la présence des méta-données
                 if (!data._meta || data._meta.appName !== 'AssistantParapente') {
-                    this.showAlert("Fichier invalide : ce n'est pas un backup AssistantParapente.", 'error');
+                    this.showAlert(t('account.backup.invalidFile'), 'error');
                     return;
                 }
 
                 const confirm = window.confirm(
-                    `Importer le backup du ${new Date(data._meta.exportedAt).toLocaleString()} ?\n\nATTENTION : vos données locales actuelles seront remplacées par celles du backup.`,
+                    t('account.backup.confirmImport', { date: new Date(data._meta.exportedAt).toLocaleString() }),
                 );
                 if (!confirm) return;
 
-                this.showStatus('Restauration en cours...', 'info');
+                this.showStatus(t('account.backup.restoring'), 'info');
 
                 // --- Restauration de toutes les clés StorageService.KEYS ---
                 const keysToRestore = [
@@ -1207,10 +1203,7 @@ export const FirebaseAuthEngine = {
                 if (this.currentUser && this.enabled) {
                     await this.syncDataWithCloud(false); // visible = non-silencieux
                 } else {
-                    this.showAlert(
-                        'Données restaurées localement. Connectez-vous pour les synchroniser avec le cloud.',
-                        'success',
-                    );
+                    this.showAlert(t('account.backup.restored'), 'success');
                 }
 
                 // Recharge l'UI pour refléter les nouvelles données
@@ -1225,10 +1218,7 @@ export const FirebaseAuthEngine = {
                 }
             } catch (parseError) {
                 console.error("[Firebase] Erreur lors de l'import :", parseError);
-                this.showAlert(
-                    "Erreur de lecture du fichier. Vérifiez qu'il s'agit d'un fichier JSON valide.",
-                    'error',
-                );
+                this.showAlert(t('account.backup.readError'), 'error');
             }
         };
         reader.readAsText(file);
