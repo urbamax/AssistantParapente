@@ -129,6 +129,10 @@ Principle IV.
 Principle VI. `firebase_service.js` loads the SDK with dynamic `import()` from `gstatic.com`,
 which does not support `integrity`. Options: self-host the SDK files, or amend the rule.
 
+**Status (2026-09-30): fixed by spec 013.** The SDK 12.19.0 is hosted under `vendor/firebase-12.19.0/`;
+`tests/core/firebase_sdk.test.js` checks every file against the official SHA-384. The same spec
+removed the service worker's pre-consent `importScripts` from `gstatic.com`.
+
 ### C2. Footer links without `noopener`
 Principle VI. 5 `target="_blank"` links in `components/footer.html` lack
 `rel="noopener noreferrer"`.

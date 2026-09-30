@@ -99,7 +99,8 @@ export default defineConfig({
         outDir: 'dist',
         emptyOutDir: true,
         rollupOptions: {
-            // Le SDK Firebase est importé dynamiquement depuis gstatic.com à l'exécution.
+            // Garde-fou : une adresse absolue importée n'est jamais regroupée dans le build.
+            // Le SDK Firebase est hébergé dans vendor/ (spec 013), recopié tel quel (STATIC_PATHS).
             external: [/^https:\/\//],
         },
     },
