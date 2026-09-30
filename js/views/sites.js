@@ -1406,7 +1406,7 @@ class SitesViewClass extends BaseView {
                         iconClass = 'ri-close-box-fill';
                     }
                     return `
-                    <label class="filter-option state-${stateName}" data-action="cycleFilterState" data-args="'wind', '${w}'">
+                    <label role="button" tabindex="0" class="filter-option state-${stateName}" data-action="cycleFilterState" data-args="'wind', '${w}'">
                         <span class="custom-filter-icon"><i class="${iconClass}"></i></span>
                         <span class="filter-label">${w}</span>
                     </label>
@@ -1421,7 +1421,7 @@ class SitesViewClass extends BaseView {
                 .map((t) => {
                     const isChecked = SitesService.state.filterTypeInclude.includes(t.id);
                     return `
-                    <label class="filter-option" data-action="cycleFilterState" data-args="'type', '${t.id}'" style="display:flex; align-items:center; cursor:pointer;">
+                    <label role="button" tabindex="0" class="filter-option" data-action="cycleFilterState" data-args="'type', '${t.id}'" style="display:flex; align-items:center; cursor:pointer;">
                         <input type="checkbox" ${isChecked ? 'checked' : ''} style="margin-right:8px; pointer-events:none;">
                         <span class="filter-label">${t.label}</span>
                     </label>
@@ -1446,7 +1446,7 @@ class SitesViewClass extends BaseView {
                     const isActive = SitesService.state.activeMapLayers.includes(m.id);
                     const iconClass = isActive ? 'ri-checkbox-fill' : 'ri-checkbox-blank-line';
                     return `
-                    <label class="filter-option" style="cursor:pointer;" data-action="toggleMapLayer" data-args="'${m.id}'">
+                    <label role="button" tabindex="0" class="filter-option" style="cursor:pointer;" data-action="toggleMapLayer" data-args="'${m.id}'">
                         <span class="custom-filter-icon"><i class="${iconClass}"></i></span>
                         <span class="filter-label" style="display:flex; align-items:center; gap:8px;"><i class="${m.icon}"></i> ${m.label}</span>
                     </label>
@@ -1962,7 +1962,7 @@ class SitesViewClass extends BaseView {
                 const windTags = orientations
                     .map(
                         (w) =>
-                            `<span class="wind-tag" data-action="SitesfilterByTag" data-args="${escapeHTML(w)}" title="Filtrer par vent ${w}">${w}</span>`,
+                            `<span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="${escapeHTML(w)}" title="Filtrer par vent ${w}">${w}</span>`,
                     )
                     .join('');
 
@@ -1970,7 +1970,7 @@ class SitesViewClass extends BaseView {
                 const siteTypes = Array.isArray(st) ? st : [st];
                 const typeLabel = siteTypes
                     .map((t) => {
-                        return `<span class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="${escapeHTML(t)}" style="cursor: pointer;" title="Filtrer par type ${t}">${t}</span>`;
+                        return `<span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="${escapeHTML(t)}" style="cursor: pointer;" title="Filtrer par type ${t}">${t}</span>`;
                     })
                     .join(' ');
 
@@ -2116,7 +2116,7 @@ class SitesViewClass extends BaseView {
                     if (j === SitesService.state.forecastOffset) {
                         dotStyle += ` outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);`;
                     }
-                    timelineBarsHtml += `<div class="${dotClass}" style="${dotStyle}" title="${escapeHTML(`${timeStr} : ${statusLabel}`)}" data-action="SitessetForecastOffset" data-args="${j}"></div>`;
+                    timelineBarsHtml += `<div role="button" tabindex="0" class="${dotClass}" style="${dotStyle}" title="${escapeHTML(`${timeStr} : ${statusLabel}`)}" data-action="SitessetForecastOffset" data-args="${j}"></div>`;
                 }
 
                 const isFav =
