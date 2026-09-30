@@ -23,15 +23,32 @@ describe('migrateSitePrefs (spec 002, FR-018)', () => {
         expect(migrateSitePrefs({ weatherModel: 'gfs' }).weatherModel).toBe('gfs');
     });
 
+    // Spec 019 : ouvrir le menu de tri ou de modèle enregistrait le texte « this.value ». Une valeur
+    // inconnue est retirée : le réglage par défaut s'applique.
+    it.each([
+        ['sortMode', 'this.value'],
+        ['weatherModel', 'this.value'],
+        ['sortMode', null],
+    ])('drops an unknown %s (%j)', (key, value) => {
+        expect(migrateSitePrefs({ [key]: value })).not.toHaveProperty(key);
+    });
+
+    it.each([
+        ['sortMode', ['CONDITIONS', 'DISTANCE', 'AZ']],
+        ['weatherModel', ['meteofrance', 'iconeu', 'icon', 'ecmwf', 'gfs', 'best_match']],
+    ])('keeps every valid %s', (key, values) => {
+        for (const value of values) expect(migrateSitePrefs({ [key]: value })[key]).toBe(value);
+    });
+
     it('leaves other keys untouched and does not mutate its input', () => {
         const input = Object.freeze({
             radiusLimit: 210,
             weatherModel: 'meteoblue',
             favoriteSites: [1, 2],
-            sortMode: 'X',
+            sortMode: 'AZ',
         });
         const out = migrateSitePrefs(input);
-        expect(out).toEqual({ radiusLimit: 50, weatherModel: 'best_match', favoriteSites: [1, 2], sortMode: 'X' });
+        expect(out).toEqual({ radiusLimit: 50, weatherModel: 'best_match', favoriteSites: [1, 2], sortMode: 'AZ' });
         expect(input.radiusLimit).toBe(210);
     });
 
