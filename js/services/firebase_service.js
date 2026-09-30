@@ -455,7 +455,7 @@ export const FirebaseAuthEngine = {
         const emailEl = /** @type {HTMLInputElement} */ (document.getElementById('login-email'));
         const email = emailEl ? emailEl.value.trim() : '';
         if (!email) {
-            this.showAlert('Saisissez votre adresse e-mail pour recevoir le lien de réinitialisation.', 'error');
+            this.showAlert(t('account.reset.emailRequired'), 'error');
             return;
         }
         await this.resetPassword(email);

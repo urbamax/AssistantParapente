@@ -719,6 +719,7 @@ export const FR = Object.freeze({
         }),
         signedOut: 'Vous avez été déconnecté.',
         reset: Object.freeze({
+            emailRequired: 'Saisissez votre adresse e-mail pour recevoir le lien de réinitialisation.',
             sent: 'Email de réinitialisation envoyé !',
             error: "Erreur lors de l'envoi de l'email.",
         }),
