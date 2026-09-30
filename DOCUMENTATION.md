@@ -149,6 +149,10 @@ The sites screen is the exception: `SitesView.setupEventListeners()` runs bare a
 
 The quiz screen follows the same rule: `QuizView.handleClick` (on `document.body`, active while the quiz is mounted) runs its own action names (`QuizsetThemeSort`, `toggle-option`, `quiz-voice-*`…) and calls `AppEvents.markHandled(e)` (spec 018). A name has one owner: `setQcmMode`, `setQcmCount`, `setMasteryTarget` and `goBack` are registered in `main.js` only, because a marked event still runs its registered handler. A screen that listens to a control directly (e.g. `#bank-theme-filter`, the equipment "Autre…" selects) must not also give it a `data-action` (specs 017, 018).
 
+Menus, fields and checkboxes (`SELECT`, `INPUT`, `TEXTAREA`) run their `data-action` on change only; the click delegation ignores them, so opening a menu changes nothing (spec 019). `data-args` holds values, never code (`this.value`, `document.getElementById(…)`): the chosen value is passed on change.
+
+`tests/core/action_wiring.test.js` enforces these rules (spec 020): every action name used in `index.html`, `components/` and view templates needs an owner (registered handler, fallback engine method, or the sites/quiz delegation); a used registered name must forward to a method that exists; quiz screen actions must not also be registered; arguments must not contain code; the sites and quiz delegations must call `AppEvents.markHandled(e)`. When it fails, it lists each offending control with its file and line.
+
 ### 4. Router & Screen Lifecycles (`js/core/router.js`)
 `AppRouter` manages SPA screen transitions and maintains browser history (`window.history.pushState`).
 
