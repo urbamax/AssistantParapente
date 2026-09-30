@@ -11,7 +11,7 @@ import { escapeHTML, renderSiteText, safeHttpUrl } from '../core/security.js';
 import GdprEngine from '../gdpr_engine.js';
 
 import BaseView from '../core/base_view.js';
-import AppEvents from '../core/events.js';
+import AppEvents, { FORM_FIELDS } from '../core/events.js';
 import { t } from '../utils/i18n.js';
 import { FR } from '../i18n/fr.js';
 
@@ -304,7 +304,8 @@ class SitesViewClass extends BaseView {
 
         this._clickHandler = (e) => {
             const btn = e.target.closest('[data-action]');
-            if (btn) {
+            // Menus act on change (_changeHandler): opening one must not run its action (spec 019).
+            if (btn && !FORM_FIELDS.includes(btn.tagName)) {
                 if (btn.tagName === 'A' && btn.getAttribute('href') === '#') e.preventDefault();
                 const action = btn.getAttribute('data-action');
                 const args = btn.getAttribute('data-args');

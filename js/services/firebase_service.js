@@ -451,6 +451,17 @@ export const FirebaseAuthEngine = {
         }
     },
 
+    // « Mot de passe oublié ? » : lit l'adresse saisie dans le formulaire de connexion (spec 019).
+    forgotPassword: async function () {
+        const emailEl = /** @type {HTMLInputElement} */ (document.getElementById('login-email'));
+        const email = emailEl ? emailEl.value.trim() : '';
+        if (!email) {
+            this.showAlert('Saisissez votre adresse e-mail pour recevoir le lien de réinitialisation.', 'error');
+            return;
+        }
+        await this.resetPassword(email);
+    },
+
     resetPassword: async function (email) {
         if (!isInitialized) return;
         if (!email) {
