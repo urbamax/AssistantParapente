@@ -6,6 +6,9 @@
 import AppRouter from './router.js';
 import GdprEngine from '../gdpr_engine.js';
 
+// Elements whose data-action runs on change, never on click (spec 019).
+export const FORM_FIELDS = ['SELECT', 'INPUT', 'TEXTAREA'];
+
 class EventDelegator {
     constructor() {
         this.handlers = new Map();
@@ -55,6 +58,9 @@ class EventDelegator {
                 /** @type {HTMLElement} */ (e.target).closest('[data-action]')
             );
             if (!target) return;
+            // Menus, fields and checkboxes act on change (see below): a click only opens or focuses
+            // them. Dispatching it too ran the action with no value (spec 019).
+            if (FORM_FIELDS.includes(target.tagName)) return;
             if (target.hasAttribute('data-prevent-default')) e.preventDefault();
 
             this.dispatch(
