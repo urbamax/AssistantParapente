@@ -145,6 +145,8 @@ Instead of binding inline listeners, interactive elements use HTML attributes:
 2. Parses `data-args` (JSON or string).
 3. Dispatches to registered handlers in `AppEvents` or falls back to view engine methods.
 
+The sites screen is the exception: `SitesView.setupEventListeners()` runs bare action names (`toggleDropdown`, `toggleFilterFavoritesOnly`…) itself in the capture phase and calls `AppEvents.markHandled(e)`. `dispatch()` then skips the engine fallback and the "Unregistered action triggered" warning for that event (spec 016). Do not also register those bare names in `AppEvents`: the action would run twice (a menu toggle would open and close on one click).
+
 ### 4. Router & Screen Lifecycles (`js/core/router.js`)
 `AppRouter` manages SPA screen transitions and maintains browser history (`window.history.pushState`).
 

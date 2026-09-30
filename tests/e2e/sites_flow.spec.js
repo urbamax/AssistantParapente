@@ -431,4 +431,36 @@ test.describe('E2E - Sites Flow', () => {
         const match = /récupérée [^·]*/.exec(firstContext)[0].trim();
         await expect(restored.locator('.forecast-context')).toContainText(match);
     });
+
+    test('Spec 016 : les commandes des sites agissent une seule fois, sans avertissement « Unregistered action »', async ({
+        page,
+    }) => {
+        const warnings = [];
+        page.on('console', (msg) => {
+            if (msg.text().startsWith('Unregistered action triggered')) warnings.push(msg.text());
+        });
+        await mockOpenMeteo(page, { complete: 6, empty: 0 });
+        await openSitesAndSearch(page, 'AUTEUIL');
+
+        // Une action de l'écran exécutée deux fois s'annulerait : le menu ne s'ouvrirait jamais.
+        const mapsButton = page.locator('[data-action="toggleDropdown"][data-args="\'map-settings\'"]');
+        const mapsMenu = page.locator('#menu-map-settings');
+        await mapsButton.click();
+        await expect(mapsMenu).toHaveClass(/\bshow\b/);
+        await mapsButton.click();
+        await expect(mapsMenu).not.toHaveClass(/\bshow\b/);
+
+        const favorites = page.locator('#btn-filter-favorites');
+        const wasActive = await favorites.evaluate((el) => el.classList.contains('active'));
+        await favorites.click();
+        await expect(favorites).toHaveClass(wasActive ? /^(?!.*\bactive\b)/ : /\bactive\b/);
+        await favorites.click();
+
+        await page.locator('[data-action="toggleAdvancedSettings"]').click();
+        const sortMode = page.locator('select[data-action="changeSortMode"]');
+        await sortMode.selectOption('AZ');
+        await expect(sortMode).toHaveValue('AZ');
+
+        expect(warnings).toEqual([]);
+    });
 });
