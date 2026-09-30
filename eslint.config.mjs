@@ -51,6 +51,8 @@ export default [
             // leur empreinte est contrôlée par tests/core/third_party.test.js.
             'vendor/**',
             'functions/node_modules/**',
+            // Sortie du build (copie de vendor/ comprise).
+            'dist/**',
         ],
     },
     {

@@ -13,11 +13,15 @@ import QuizView from '../views/quiz.js';
 // We inject the original code but export the Engine
 // --- FIREBASE AUTHENTICATION & SYNC ENGINE ---
 
-const FIREBASE_VERSION = '10.12.0';
-const FIREBASE_BASE_URL = `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}`;
+// SDK hébergé par l'application (spec 013), chargé seulement après consentement. Même version que
+// FIREBASE_SDK_DIR dans sw.js (vérifié par tests/core/firebase_sdk.test.js). Adresse résolue par
+// rapport à la page (index.html, à la racine en source comme dans dist/) et non par rapport à ce
+// module, que le build déplace dans assets/.
+const FIREBASE_VERSION = '12.19.0';
+const firebaseSdkUrl = (file) => new URL(`vendor/firebase-${FIREBASE_VERSION}/${file}`, document.baseURI).href;
 
 // Memoizes a dynamic import by specifier, but only the *resolved* promise: caching a rejected
-// one (e.g. a transient CDN blip) would permanently break sign-in/sync for the rest of the page
+// one (e.g. a transient network blip) would permanently break sign-in/sync for the rest of the page
 // session, since every later call would just replay the same rejection instead of retrying.
 function createModuleLoader(specifier) {
     let cached = null;
@@ -32,10 +36,10 @@ function createModuleLoader(specifier) {
     };
 }
 
-const loadAppModule = createModuleLoader(`${FIREBASE_BASE_URL}/firebase-app.js`);
-const loadAuthModule = createModuleLoader(`${FIREBASE_BASE_URL}/firebase-auth.js`);
-const loadFirestoreModule = createModuleLoader(`${FIREBASE_BASE_URL}/firebase-firestore.js`);
-const loadMessagingModule = createModuleLoader(`${FIREBASE_BASE_URL}/firebase-messaging.js`);
+const loadAppModule = createModuleLoader(firebaseSdkUrl('firebase-app.js'));
+const loadAuthModule = createModuleLoader(firebaseSdkUrl('firebase-auth.js'));
+const loadFirestoreModule = createModuleLoader(firebaseSdkUrl('firebase-firestore.js'));
+const loadMessagingModule = createModuleLoader(firebaseSdkUrl('firebase-messaging.js'));
 
 let app, auth, db;
 let isInitialized = false;

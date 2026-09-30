@@ -32,3 +32,48 @@ test('Spec 009 : l’accueil et la page des sites ne contactent aucun serveur ti
     });
     expect(logoLoaded).toBe(true);
 });
+
+// Spec 013 : le service worker non plus ne contacte aucun serveur Google avant consentement (il
+// chargeait le SDK Firebase depuis www.gstatic.com à son installation, pour chaque visiteur).
+test.describe('Spec 013 - page et service worker, sans consentement', () => {
+    test.use({ serviceWorkers: 'allow' });
+    const GOOGLE = /(^|\.)(gstatic\.com|googleapis\.com|google\.com)$/;
+
+    test('aucune requête vers Google, service worker compris', async ({ page, context, browserName }) => {
+        // Les requêtes du service worker ne sont remontées par Playwright que sous Chromium.
+        test.skip(browserName !== 'chromium', 'Requêtes du service worker visibles sous Chromium uniquement');
+        const contacted = [];
+        context.on('request', (request) => {
+            if (GOOGLE.test(new URL(request.url()).hostname)) {
+                contacted.push(`${request.serviceWorker() ? '[service worker] ' : ''}${request.url()}`);
+            }
+        });
+        await context.route('https://api.open-meteo.com/**', (route) => route.fulfill({ json: [] }));
+        await page.addInitScript(() => {
+            localStorage.setItem(
+                'parapente_gdpr_consent',
+                JSON.stringify({
+                    stats: false,
+                    firebase: false,
+                    gps: false,
+                    version: 2026,
+                    date: new Date().toISOString(),
+                }),
+            );
+        });
+
+        await page.goto('/');
+        await page.waitForFunction(async () => {
+            await navigator.serviceWorker.ready;
+            return !!navigator.serviceWorker.controller;
+        });
+        await page.goto('/?mode=SITES');
+        await expect(page.locator('#sites-map-canvas')).toBeVisible();
+        await page.waitForLoadState('networkidle');
+
+        expect(contacted).toEqual([]);
+        // Le SDK est bien chargé dans le service worker, depuis l'application (alertes en arrière-plan).
+        const [worker] = context.serviceWorkers();
+        expect(await worker.evaluate(() => typeof globalThis.firebase?.messaging)).toBe('function');
+    });
+});

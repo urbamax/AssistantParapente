@@ -26,13 +26,17 @@ const RUNTIME_CACHES = [COURSE_CACHE, TILE_CACHE];
 
 // --- Firebase Cloud Messaging : réception des alertes météo en arrière-plan (app fermée) ---
 // importScripts (et non `import`) car ce SW est un script classique, pas un module worker.
-// Volontairement protégé par try/catch : un échec de chargement (offline à l'installation,
-// FCM_VAPID_KEY absent côté client, etc.) ne doit jamais empêcher le reste du SW — cache
-// offline et navigation — de fonctionner.
+// Le SDK est hébergé par l'application (spec 013) : un service worker ne peut pas savoir si le
+// visiteur a consenti, et il chargeait auparavant le SDK depuis le CDN de Google pour tout le
+// monde. Depuis l'application, aucun serveur tiers n'est contacté ; le SDK n'appelle Google que
+// lorsque la page demande un jeton d'alerte, après consentement. Même version que
+// FIREBASE_VERSION dans js/services/firebase_service.js (vérifié par tests/core/firebase_sdk.test.js).
+// Volontairement protégé par try/catch : un échec de chargement ne doit jamais empêcher le reste
+// du SW — cache offline et navigation — de fonctionner.
+const FIREBASE_SDK_DIR = './vendor/firebase-12.19.0/';
 try {
     importScripts('./js/firebase_config.js');
-    importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
-    importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
+    importScripts(`${FIREBASE_SDK_DIR}firebase-app-compat.js`, `${FIREBASE_SDK_DIR}firebase-messaging-compat.js`);
 
     if (
         typeof firebase !== 'undefined' &&
@@ -69,6 +73,12 @@ const CRITICAL_ASSETS = [
     './vendor/remixicon-3.5.0/remixicon.woff2',
     './vendor/leaflet-1.9.4/leaflet.css',
     './vendor/leaflet-1.9.4/leaflet.js',
+    './vendor/firebase-12.19.0/firebase-app.js',
+    './vendor/firebase-12.19.0/firebase-auth.js',
+    './vendor/firebase-12.19.0/firebase-firestore.js',
+    './vendor/firebase-12.19.0/firebase-messaging.js',
+    './vendor/firebase-12.19.0/firebase-app-compat.js',
+    './vendor/firebase-12.19.0/firebase-messaging-compat.js',
     './img/logos/club-fil-ariane.png',
     './img/logos/ffvl.png',
     './css/base.css',
