@@ -1,0 +1,1754 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`sites renders (spec 015: identical before and after moving the texts) > GPS messages 1`] = `
+{
+  "dialogs": [
+    "confirm: Vous devez autoriser la géolocalisation dans vos options de confidentialité.",
+    "alert: Impossible d'obtenir votre position GPS.",
+  ],
+  "failed": "<i class="ri-error-warning-line" style="color: var(--accent-red);"></i> Position GPS indisponible.",
+  "found": {
+    "placeholder": "Ma position GPS",
+    "status": "<i class="ri-checkbox-circle-line" style="color: var(--accent-green);"></i> Position GPS actuelle activée.",
+  },
+  "refused": "<i class="ri-shield-user-line" style="color: var(--text-muted);"></i> Géolocalisation désactivée. <a href="#" data-action="GdprshowModal" data-args="gdpr-settings-modal" data-prevent-default="" style="color: var(--accent-blue);">Gérer</a>",
+  "searching": "<i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i> Récupération GPS...",
+}
+`;
+
+exports[`sites renders (spec 015: identical before and after moving the texts) > comparator button 1`] = `
+{
+  "off": "<i class="ri-table-line"></i> Comparer",
+  "on": "<i class="ri-table-line" style="color: var(--accent-blue);"></i> Comparer",
+}
+`;
+
+exports[`sites renders (spec 015: identical before and after moving the texts) > comparator, empty and with favourites 1`] = `
+{
+  "empty": "<div class="card" style="text-align: center; padding: 20px;">Aucun site favori à comparer. Ajoutez des favoris avec l'étoile ⭐ sur une fiche site.</div>",
+  "full": "
+            <div class="card" style="padding: 16px; overflow-x: auto;">
+                
+                <p class="verdict-reminder"><i class="ri-information-line" aria-hidden="true"></i> Avis basé sur des prévisions, risque d’orage estimé : la décision vous appartient, vérifiez sur place.</p>
+                <table style="width: 100%; border-collapse: collapse; min-width: 480px;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                            <th style="padding: 10px;">Site</th>
+                            <th style="padding: 10px;">Météo (créneau affiché)</th>
+                            <th style="padding: 10px; text-align: center;" title="Sur la fenêtre de prévision actuelle">Volable</th>
+                            <th style="padding: 10px;" title="Le créneau continu le plus long sur toute la fenêtre de prévision">Meilleur créneau</th>
+                            <th style="padding: 10px;" title="Accord entre le modèle principal et un modèle de référence sur le créneau actuel">Confiance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                <tr>
+                    <td style="padding: 10px; font-weight: 700;">Mont Lambert</td>
+                    <td style="padding: 10px;"><span class="weather-flyable" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><i class="ri-checkbox-circle-fill"></i> Excellent (100/100)</span></td>
+                    <td style="padding: 10px; text-align: center;">5h</td>
+                    <td style="padding: 10px; text-align: center;">Mar 14h-17h</td>
+                    <td style="padding: 10px;"><span style="color: var(--text-muted);">—</span></td>
+                </tr>
+            
+                <tr>
+                    <td style="padding: 10px; font-weight: 700;">Dune du Pyla</td>
+                    <td style="padding: 10px;"><span class="weather-incomplete" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><i class="ri-question-line"></i> Prévision incomplète — Indisponible : rafales</span></td>
+                    <td style="padding: 10px; text-align: center;">0h</td>
+                    <td style="padding: 10px; text-align: center;"><span style="color: var(--text-muted);">Aucun</span></td>
+                    <td style="padding: 10px;"><span style="color: var(--text-muted);">—</span></td>
+                </tr>
+            
+                <tr>
+                    <td style="padding: 10px; font-weight: 700;">Sans météo</td>
+                    <td style="padding: 10px;"><span style="color: var(--text-muted);">Chargement...</span></td>
+                    <td style="padding: 10px; text-align: center;">0h</td>
+                    <td style="padding: 10px; text-align: center;"><span style="color: var(--text-muted);">Aucun</span></td>
+                    <td style="padding: 10px;"><span style="color: var(--text-muted);">—</span></td>
+                </tr>
+            </tbody>
+                </table>
+                <p style="margin: 12px 0 0; font-size: 0.8rem; color: var(--text-muted);">Astuce : choisis "7 Jours" dans les paramètres de calcul météo ci-dessus pour élargir la fenêtre du meilleur créneau.</p>
+            </div>
+        ",
+}
+`;
+
+exports[`sites renders (spec 015: identical before and after moving the texts) > details toggle and copied coordinates 1`] = `
+{
+  "closed": "Voir plus d'infos",
+  "copied": "<i class="ri-check-line" style="color: var(--accent-green);"></i> <span style="color: var(--accent-green);">Copié !</span>",
+  "open": "Masquer les détails",
+}
+`;
+
+exports[`sites renders (spec 015: identical before and after moving the texts) > filter menus and saved places 1`] = `
+{
+  "maps": "
+                    <label role="button" tabindex="0" class="filter-option" style="cursor:pointer;" data-action="toggleMapLayer" data-args="'leaflet'">
+                        <span class="custom-filter-icon"><i class="ri-checkbox-fill"></i></span>
+                        <span class="filter-label" style="display:flex; align-items:center; gap:8px;"><i class="ri-map-2-line"></i> Cartographie</span>
+                    </label>
+                
+                    <label role="button" tabindex="0" class="filter-option" style="cursor:pointer;" data-action="toggleMapLayer" data-args="'windy'">
+                        <span class="custom-filter-icon"><i class="ri-checkbox-fill"></i></span>
+                        <span class="filter-label" style="display:flex; align-items:center; gap:8px;"><i class="ri-windy-line"></i> Windy</span>
+                    </label>
+                
+                    <label role="button" tabindex="0" class="filter-option" style="cursor:pointer;" data-action="toggleMapLayer" data-args="'meteoparapente'">
+                        <span class="custom-filter-icon"><i class="ri-checkbox-blank-line"></i></span>
+                        <span class="filter-label" style="display:flex; align-items:center; gap:8px;"><i class="ri-temp-hot-line"></i> Météo-Parapente</span>
+                    </label>
+                
+                    <label role="button" tabindex="0" class="filter-option" style="cursor:pointer;" data-action="toggleMapLayer" data-args="'paraglidingearth'">
+                        <span class="custom-filter-icon"><i class="ri-checkbox-blank-line"></i></span>
+                        <span class="filter-label" style="display:flex; align-items:center; gap:8px;"><i class="ri-earth-line"></i> PG Earth</span>
+                    </label>
+                
+                    <label role="button" tabindex="0" class="filter-option" style="cursor:pointer;" data-action="toggleMapLayer" data-args="'paraglidable'">
+                        <span class="custom-filter-icon"><i class="ri-checkbox-blank-line"></i></span>
+                        <span class="filter-label" style="display:flex; align-items:center; gap:8px;"><i class="ri-flight-takeoff-line"></i> Paraglidable</span>
+                    </label>
+                
+                    <label role="button" tabindex="0" class="filter-option" style="cursor:pointer;" data-action="toggleMapLayer" data-args="'isofronts'">
+                        <span class="custom-filter-icon"><i class="ri-checkbox-blank-line"></i></span>
+                        <span class="filter-label" style="display:flex; align-items:center; gap:8px;"><i class="ri-cloud-line"></i> Fronts &amp; Isobares</span>
+                    </label>
+                ",
+  "saved": "<div style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.3); color: var(--accent-blue); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; cursor: pointer;"><span role="button" tabindex="0" aria-label="Charger le lieu : Maison">Maison</span><i class="ri-close-line" style="cursor: pointer; font-size: 1rem;" role="button" tabindex="0" aria-label="Supprimer le lieu : Maison"></i></div>",
+  "type": "
+                    <label role="button" tabindex="0" class="filter-option" data-action="cycleFilterState" data-args="'type', 'ATTERRO'" style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="checkbox" style="margin-right:8px; pointer-events:none;">
+                        <span class="filter-label">Atterrissage</span>
+                    </label>
+                
+                    <label role="button" tabindex="0" class="filter-option" data-action="cycleFilterState" data-args="'type', 'NATUREL'" style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="checkbox" style="margin-right:8px; pointer-events:none;">
+                        <span class="filter-label">Site Naturel</span>
+                    </label>
+                
+                    <label role="button" tabindex="0" class="filter-option" data-action="cycleFilterState" data-args="'type', 'DUNE'" style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="checkbox" checked="" style="margin-right:8px; pointer-events:none;">
+                        <span class="filter-label">Dune</span>
+                    </label>
+                
+                    <label role="button" tabindex="0" class="filter-option" data-action="cycleFilterState" data-args="'type', 'TREUIL'" style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="checkbox" style="margin-right:8px; pointer-events:none;">
+                        <span class="filter-label">Piste de Treuil</span>
+                    </label>
+                
+                    <label role="button" tabindex="0" class="filter-option" data-action="cycleFilterState" data-args="'type', 'GONFLAGE'" style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="checkbox" style="margin-right:8px; pointer-events:none;">
+                        <span class="filter-label">Gonflage</span>
+                    </label>
+                ",
+  "wind": "
+                    <label role="button" tabindex="0" class="filter-option state-exclude" data-action="cycleFilterState" data-args="'wind', 'N'">
+                        <span class="custom-filter-icon"><i class="ri-close-box-fill"></i></span>
+                        <span class="filter-label">N</span>
+                    </label>
+                
+                    <label role="button" tabindex="0" class="filter-option state-neutral" data-action="cycleFilterState" data-args="'wind', 'NE'">
+                        <span class="custom-filter-icon"><i class="ri-checkbox-blank-line"></i></span>
+                        <span class="filter-label">NE</span>
+                    </label>
+                
+                    <label role="button" tabindex="0" class="filter-option state-neutral" data-action="cycleFilterState" data-args="'wind', 'E'">
+                        <span class="custom-filter-icon"><i class="ri-checkbox-blank-line"></i></span>
+                        <span class="filter-label">E</span>
+                    </label>
+                
+                    <label role="button" tabindex="0" class="filter-option state-neutral" data-action="cycleFilterState" data-args="'wind', 'SE'">
+                        <span class="custom-filter-icon"><i class="ri-checkbox-blank-line"></i></span>
+                        <span class="filter-label">SE</span>
+                    </label>
+                
+                    <label role="button" tabindex="0" class="filter-option state-include" data-action="cycleFilterState" data-args="'wind', 'S'">
+                        <span class="custom-filter-icon"><i class="ri-checkbox-fill"></i></span>
+                        <span class="filter-label">S</span>
+                    </label>
+                
+                    <label role="button" tabindex="0" class="filter-option state-neutral" data-action="cycleFilterState" data-args="'wind', 'SO'">
+                        <span class="custom-filter-icon"><i class="ri-checkbox-blank-line"></i></span>
+                        <span class="filter-label">SO</span>
+                    </label>
+                
+                    <label role="button" tabindex="0" class="filter-option state-neutral" data-action="cycleFilterState" data-args="'wind', 'O'">
+                        <span class="custom-filter-icon"><i class="ri-checkbox-blank-line"></i></span>
+                        <span class="filter-label">O</span>
+                    </label>
+                
+                    <label role="button" tabindex="0" class="filter-option state-neutral" data-action="cycleFilterState" data-args="'wind', 'NO'">
+                        <span class="custom-filter-icon"><i class="ri-checkbox-blank-line"></i></span>
+                        <span class="filter-label">NO</span>
+                    </label>
+                ",
+}
+`;
+
+exports[`sites renders (spec 015: identical before and after moving the texts) > forecast time label 1`] = `
+{
+  "aria": "Mer. 16:00 (+2h)",
+  "later": "Mer. 16:00 (+2h)",
+  "now": "Maintenant",
+}
+`;
+
+exports[`sites renders (spec 015: identical before and after moving the texts) > fullscreen button, toast, SpotAiR title, embedded map label 1`] = `
+{
+  "full": "<i class="ri-fullscreen-line"></i> <span>Plein écran</span>",
+  "generic": "Vent en direct — SpotAiR",
+  "reduce": "<i class="ri-fullscreen-exit-line"></i> <span>Réduire</span>",
+  "titled": "Vent en direct — Mont Lambert",
+  "toast": "<i class="ri-focus-3-line"></i> Cartes centrées sur <strong>Mont Lambert</strong>",
+  "windy": "Général",
+}
+`;
+
+exports[`sites renders (spec 015: identical before and after moving the texts) > map popup 1`] = `
+"<div class="map-popup-card" style="font-family: var(--font-main); color: var(--text-main); width: 220px;">
+            <h4 style="margin: 0 0 4px 0; font-size: 1rem; font-weight: 700;">Mont Lambert</h4>
+            <div style="margin-top: 8px; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.1); border: 1px solid var(--border-color); font-size: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; gap: 8px;">
+                <span style="font-weight: 700; white-space: nowrap;"><i class="ri-windy-line"></i> S 15 km/h</span>
+                <span style="color: #22c55e; font-weight: bold; font-size: 0.75rem;"><i class="ri-checkbox-circle-fill"></i> Excellent (100/100)</span>
+            </div>
+            <div style="opacity: 0.8; font-size: 0.8rem;">Rafales : 20 km/h</div>
+            
+            
+            
+            <p class="verdict-reminder"><i class="ri-information-line" aria-hidden="true"></i> Avis basé sur des prévisions, risque d’orage estimé : la décision vous appartient, vérifiez sur place.</p>
+        </div>
+            <div style="display: flex; gap: 6px; margin-top: 10px;">
+                
+                <a class="action-btn-secondary ffvl-btn" href="https://federation.ffvl.fr/terrain/1" target="_blank" rel="noopener noreferrer" style="padding: 6px 8px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;" title="Fiche FFVL">
+                    <img src="img/logos/ffvl.png" alt="FFVL" style="width: 14px; height: 14px; border-radius: 2px;">
+                </a>
+                
+                <button class="action-btn-primary" data-action="openGpsMenu" data-args="'50.7', '1.65'" style="flex: 1; padding: 6px 10px; font-size: 0.8rem; justify-content: center;">
+                    <i class="ri-navigation-line"></i> S'y rendre
+                </button>
+                <button class="action-btn-secondary windy-btn" data-action="focusSiteWindy" data-args="'50.7', '1.65', 'Mont Lambert'" style="padding: 6px 8px;" title="Afficher le vent sur le radar">
+                    <i class="ri-windy-line"></i>
+                </button>
+                <button class="action-btn-secondary paraglidable-btn" data-action="focusSiteMap" data-args="'paraglidable', '50.7', '1.65', 'Mont Lambert'" style="padding: 6px 8px;" title="Afficher sur Paraglidable">
+                    <i class="ri-flight-takeoff-line"></i>
+                </button>
+            </div>
+        </div>"
+`;
+
+exports[`sites renders (spec 015: identical before and after moving the texts) > more maps sheet, with and without a spotted site 1`] = `
+{
+  "generic": {
+    "grid": "<a href="https://www.meteoblue.com/" target="_blank" rel="noopener noreferrer" class="external-link-btn mb-btn more-map-link" data-action="closeMoreMapsDropdown"><i class="ri-temp-hot-line"></i> Meteoblue</a><a href="https://www.windfinder.com/" target="_blank" rel="noopener noreferrer" class="external-link-btn wf-btn more-map-link" data-action="closeMoreMapsDropdown"><i class="ri-compass-line"></i> Windfinder</a><a href="https://www.paraglidingmap.com/" target="_blank" rel="noopener noreferrer" class="external-link-btn pm-btn more-map-link" data-action="closeMoreMapsDropdown"><i class="ri-map-pin-line"></i> Paragliding Map</a><a href="https://meteo-parapente.com/" target="_blank" rel="noopener noreferrer" class="external-link-btn internal-map-btn more-map-link" data-action="closeMoreMapsDropdown"><i class="ri-cloud-windy-line"></i> Météo-P.</a><a href="https://www.paraglidingearth.com/" target="_blank" rel="noopener noreferrer" class="external-link-btn internal-map-btn more-map-link" data-action="closeMoreMapsDropdown"><i class="ri-earth-line"></i> PG Earth</a><a href="https://paraglidable.com/" target="_blank" rel="noopener noreferrer" class="external-link-btn internal-map-btn more-map-link" data-action="closeMoreMapsDropdown"><i class="ri-flight-takeoff-line"></i> Paraglidable</a><a href="https://meteofrance.com/isofronts" target="_blank" rel="noopener noreferrer" class="external-link-btn internal-map-btn more-map-link" data-action="closeMoreMapsDropdown"><i class="ri-cloud-line"></i> Fronts &amp; Isobares</a>",
+    "sub": "Sélectionnez une carte supplémentaire",
+    "title": "CARTES EXTERNES",
+  },
+  "spotted": {
+    "grid": "<a href="https://www.meteoblue.com/fr/meteo/semaine/50.7N1.65E" target="_blank" rel="noopener noreferrer" class="external-link-btn mb-btn more-map-link" data-action="closeMoreMapsDropdown"><i class="ri-temp-hot-line"></i> Meteoblue</a><a href="https://fr.windfinder.com/#11/50.7/1.65" target="_blank" rel="noopener noreferrer" class="external-link-btn wf-btn more-map-link" data-action="closeMoreMapsDropdown"><i class="ri-compass-line"></i> Windfinder</a><a href="https://www.spotair.mobi/spot/ffvl/1" target="_blank" rel="noopener noreferrer" class="external-link-btn sa-btn more-map-link" data-action="closeMoreMapsDropdown"><i class="ri-radar-line"></i> Spotair</a><a href="https://www.paraglidingmap.com/app/?lat=50.7&amp;lng=1.65&amp;zoom=11" target="_blank" rel="noopener noreferrer" class="external-link-btn pm-btn more-map-link" data-action="closeMoreMapsDropdown"><i class="ri-map-pin-line"></i> Paragliding Map</a><a href="https://meteo-parapente.com/?lat=50.7&amp;lon=1.65" target="_blank" rel="noopener noreferrer" class="external-link-btn internal-map-btn more-map-link" data-action="closeMoreMapsDropdown"><i class="ri-cloud-windy-line"></i> Météo-P.</a><a href="https://www.paraglidingearth.com/" target="_blank" rel="noopener noreferrer" class="external-link-btn internal-map-btn more-map-link" data-action="closeMoreMapsDropdown"><i class="ri-earth-line"></i> PG Earth</a><a href="https://paraglidable.com/?lat=50.7&amp;lon=1.65" target="_blank" rel="noopener noreferrer" class="external-link-btn internal-map-btn more-map-link" data-action="closeMoreMapsDropdown"><i class="ri-flight-takeoff-line"></i> Paraglidable</a><a href="https://meteofrance.com/isofronts" target="_blank" rel="noopener noreferrer" class="external-link-btn internal-map-btn more-map-link" data-action="closeMoreMapsDropdown"><i class="ri-cloud-line"></i> Fronts &amp; Isobares</a>",
+    "sub": "Ouvrir dans un nouvel onglet sur ce spot",
+    "title": "MONT LAMBERT",
+  },
+}
+`;
+
+exports[`sites renders (spec 015: identical before and after moving the texts) > pre-flight brief 1`] = `
+{
+  "none": "
+        <div class="rich-detail-item default" style="background: rgba(59, 130, 246, 0.06); border-radius: 8px;">
+            <i class="ri-flight-takeoff-line rich-detail-icon blue"></i>
+            <div>
+                <strong class="rich-detail-label muted">Brief pré-vol</strong>
+                <span class="rich-detail-value">Niveau sélectionné : <b>Brevet Pilote</b> — à confronter à la praticabilité et aux dangers ci-dessous.</span>
+                <div style="margin-top: 4px; font-size: 0.9rem;">Matériel : <span style="color: var(--text-muted);">Aucun équipement enregistré</span></div>
+            </div>
+        </div>
+    ",
+  "ok": "
+        <div class="rich-detail-item default" style="background: rgba(59, 130, 246, 0.06); border-radius: 8px;">
+            <i class="ri-flight-takeoff-line rich-detail-icon blue"></i>
+            <div>
+                <strong class="rich-detail-label muted">Brief pré-vol</strong>
+                <span class="rich-detail-value">Niveau sélectionné : <b>Brevet Pilote</b> — à confronter à la praticabilité et aux dangers ci-dessous.</span>
+                <div style="margin-top: 4px; font-size: 0.9rem;">Matériel : <span style="color: var(--accent-green); font-weight: 600;">Matériel à jour</span></div>
+            </div>
+        </div>
+    ",
+  "one": "
+        <div class="rich-detail-item default" style="background: rgba(59, 130, 246, 0.06); border-radius: 8px;">
+            <i class="ri-flight-takeoff-line rich-detail-icon blue"></i>
+            <div>
+                <strong class="rich-detail-label muted">Brief pré-vol</strong>
+                <span class="rich-detail-value">Niveau sélectionné : <b>Tous niveaux</b> — à confronter à la praticabilité et aux dangers ci-dessous.</span>
+                <div style="margin-top: 4px; font-size: 0.9rem;">Matériel : <span style="color: #f59e0b; font-weight: 600;">1 équipement à réviser</span></div>
+            </div>
+        </div>
+    ",
+  "two": "
+        <div class="rich-detail-item default" style="background: rgba(59, 130, 246, 0.06); border-radius: 8px;">
+            <i class="ri-flight-takeoff-line rich-detail-icon blue"></i>
+            <div>
+                <strong class="rich-detail-label muted">Brief pré-vol</strong>
+                <span class="rich-detail-value">Niveau sélectionné : <b>Brevet Pilote</b> — à confronter à la praticabilité et aux dangers ci-dessous.</span>
+                <div style="margin-top: 4px; font-size: 0.9rem;">Matériel : <span style="color: #f59e0b; font-weight: 600;">2 équipements à réviser</span></div>
+            </div>
+        </div>
+    ",
+}
+`;
+
+exports[`sites renders (spec 015: identical before and after moving the texts) > site list 1`] = `
+"<div class="site-card ">
+            <div class="site-card-header site-card-header-row">
+                <div class="site-info site-info-row">
+                    <div class="site-title-row">
+                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'arbas-665'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: #fbbf24; cursor: pointer; padding: 0;">
+                            <i class="ri-star-fill"></i>
+                        </button>
+                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'arbas-665'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-subtract-line"></i>
+                        </button>
+                        <h3 class="site-card-title">Mont Lambert</h3>
+                    </div>
+                    <div class="site-badges-row">
+                        
+                        <span class="site-coords-badge site-altitude-badge" title="Altitude du site">
+                            <i class="ri-landscape-fill"></i> 180 m
+                        </span>
+                        
+                        <div class="site-wind-tags site-wind-tags-row"><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="S" title="Filtrer par vent S">S</span><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="SO" title="Filtrer par vent SO">SO</span></div>
+                        <span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="NATUREL" style="cursor: pointer;" title="Filtrer par type NATUREL">NATUREL</span>
+                        
+        <button class="site-coords-badge site-spotair-badge" data-spotair-id="3374" data-site-id="arbas-665" data-action="SitesopenSpotairModal" title="Voir le vent en direct (SpotAiR)">
+            <i class="ri-windy-line"></i> Balise
+        </button>
+    
+                        <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'50.7', '1.65'" title="Copier les coordonnées">
+                            <i class="ri-map-pin-2-line"></i> <span class="coords-text">50.7, 1.65</span>
+                        </button>
+                        
+                        <span class="site-coords-badge site-dist-badge">
+                            <i class="ri-navigation-fill"></i> 3.2 km
+                        </span>
+                    
+                        
+                    <span class="site-coords-badge" style="background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: var(--accent-green); font-weight: 700;">
+                        <i class="ri-time-line"></i> 5h volables (3h conséc.)
+                    </span>
+                
+                    </div>
+                </div>
+                <div class="site-actions-container">
+                    
+                    <a class="action-btn-secondary ffvl-btn" href="https://federation.ffvl.fr/terrain/1" target="_blank" rel="noopener noreferrer" title="Fiche officielle FFVL">
+                        <img src="img/logos/ffvl.png" alt="FFVL"> FFVL
+                    </a>
+                    
+                    <button class="action-btn-spot spot-it-btn" data-action="spotSite" data-args="'50.7', '1.65', 'Mont Lambert', 'arbas-665'" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                        <i class="ri-focus-3-line"></i> Spot It
+                    </button>
+                    <button class="action-btn-primary gps-btn" data-action="openGpsMenu" data-args="'50.7', '1.65'">
+                        <i class="ri-navigation-line"></i> S'y rendre
+                    </button>
+                </div>
+            </div>
+            
+            
+                        <div class="site-weather-row weather-flyable" style="display: flex; flex-direction: column; gap: 6px; margin-top: 12px; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 500;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;">
+                                <span style="display: flex; align-items: center; gap: 6px;">
+                                    <i class="ri-windy-line"></i>
+                                    <span>Vent <b>S</b> (180°) : <b>15 km/h</b> (raf. <b>20</b>)</span>
+                                </span>
+                                <span style="display: flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; text-transform: uppercase;">
+                                    <i class="ri-checkbox-circle-fill"></i> Excellent (100/100)
+                                </span>
+                            </div>
+                            
+                        </div>
+                        
+                        
+                        <p class="verdict-reminder"><i class="ri-information-line" aria-hidden="true"></i> Avis basé sur des prévisions, risque d’orage estimé : la décision vous appartient, vérifiez sur place.</p>
+                    
+            <div style="margin-top: 14px;">
+                <div class="timeline-labels">
+                    <span>Maintenant</span><span>Prévisions (6h)</span><span>Dans 0.25 jours</span>
+                </div>
+                <div class="ranking-timeline">
+                    <div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: var(--accent-green); transition: all 0.2s; cursor: pointer; outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);" title="Mer 14:00 : Volable — S 15 km/h (raf. 20)" data-action="SitessetForecastOffset" data-args="0"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: #3b82f6; transition: all 0.2s; cursor: pointer;" title="Mer 15:00 : Pluie (3.0 mm)" data-action="SitessetForecastOffset" data-args="1"></div><div role="button" tabindex="0" class="timeline-hour-dot timeline-hour-dot--incomplete" style="flex: 1; height: 100%; transition: all 0.2s; cursor: pointer;" title="Mer 16:00 : Prévision incomplète — Indisponible : rafales" data-action="SitessetForecastOffset" data-args="2"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: #f97316; transition: all 0.2s; cursor: pointer;" title="Mer 17:00 : Mauvaise orientation" data-action="SitessetForecastOffset" data-args="3"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+4h : Inconnu" data-action="SitessetForecastOffset" data-args="4"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+5h : Inconnu" data-action="SitessetForecastOffset" data-args="5"></div>
+                </div>
+                <div class="timeline-legend">
+                    <span class="legend-item"><span class="legend-color" style="background:#22c55e;"></span> Volable</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#eab308;"></span> Orientation inconnue</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#ef4444;"></span> Vent / Rafales</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#f97316;"></span> Mauvaise orientation</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span> Pluie</span>
+                    <span class="legend-item"><span class="legend-color" style="background:rgba(100,100,120,0.5);"></span> Nuit</span>
+                    <span class="legend-item"><span class="legend-color legend-color--incomplete"></span> Prévision incomplète</span>
+                </div>
+            </div>
+            
+                        <div class="creneaux-list good">
+                            <i class="ri-calendar-todo-line"></i> Prochains créneaux : <span><b>Mar</b> (14h - 16h)</span> | <span><b>Mer</b> (11h - 12h)</span>
+                        </div>
+                    
+            
+                    <details class="site-details-toggle" open="" data-site-id="arbas-665">
+                        <summary>
+                            <span class="toggle-text">Masquer les détails</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </summary>
+                        <div class="site-rich-details">
+
+                            
+        <div class="rich-detail-item default" style="background: rgba(59, 130, 246, 0.06); border-radius: 8px;">
+            <i class="ri-flight-takeoff-line rich-detail-icon blue"></i>
+            <div>
+                <strong class="rich-detail-label muted">Brief pré-vol</strong>
+                <span class="rich-detail-value">Niveau sélectionné : <b>Brevet Pilote</b> — à confronter à la praticabilité et aux dangers ci-dessous.</span>
+                <div style="margin-top: 4px; font-size: 0.9rem;">Matériel : <span style="color: var(--text-muted);">Aucun équipement enregistré</span></div>
+            </div>
+        </div>
+    
+
+                            
+                            <div class="rich-detail-item default">
+                                <i class="ri-shield-check-line rich-detail-icon blue"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Conventionnement</strong>
+                                    <span class="rich-detail-value">Conventionné FFVL</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item default">
+                                <i class="ri-checkbox-circle-line rich-detail-icon green"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Praticabilité</strong>
+                                    <span class="rich-detail-value">Pratiquable</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item default">
+                                <i class="ri-group-line rich-detail-icon secondary"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Structure Gestionnaire</strong>
+                                    <span class="rich-detail-value">Club local</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item default">
+                                <i class="ri-compass-3-line rich-detail-icon blue"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Aérologie Idéale</strong>
+                                    <span class="rich-detail-value">Brise de mer</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item default">
+                                <i class="ri-first-aid-kit-line rich-detail-icon green"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Accès Secours</strong>
+                                    <span class="rich-detail-value">Accès pompiers par la route</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item danger">
+                                <i class="ri-error-warning-line rich-detail-icon red"></i>
+                                <div>
+                                    <strong class="rich-detail-label red">Dangers Signalés</strong>
+                                    <span class="rich-detail-value">Lignes électriques</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item default full-width">
+                                <i class="ri-walk-line rich-detail-icon secondary"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Accès &amp; Topo</strong>
+                                    <span class="rich-detail-value">Parking au sommet</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item obs">
+                                <i class="ri-information-line rich-detail-icon blue"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Observations</strong>
+                                    <span class="rich-detail-value">Site école</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item danger">
+                                <i class="ri-forbid-line rich-detail-icon red"></i>
+                                <div>
+                                    <strong class="rich-detail-label red">Restrictions</strong>
+                                    <span class="rich-detail-value">Pas de vol le dimanche matin</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item obs">
+                                <i class="ri-article-line rich-detail-icon blue"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Réglementation</strong>
+                                    <span class="rich-detail-value">Zone R 45</span>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </details>
+                
+            
+        </div><div class="site-card ">
+            <div class="site-card-header site-card-header-row">
+                <div class="site-info site-info-row">
+                    <div class="site-title-row">
+                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'2'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-star-line"></i>
+                        </button>
+                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'2'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-subtract-line"></i>
+                        </button>
+                        <h3 class="site-card-title">Dune du Pyla</h3>
+                    </div>
+                    <div class="site-badges-row">
+                        
+                        <div class="site-wind-tags site-wind-tags-row"><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="O" title="Filtrer par vent O">O</span></div>
+                        <span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="DUNE" style="cursor: pointer;" title="Filtrer par type DUNE">DUNE</span>
+                        
+                        <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'44.6', '-1.2'" title="Copier les coordonnées">
+                            <i class="ri-map-pin-2-line"></i> <span class="coords-text">44.6, -1.2</span>
+                        </button>
+                        
+                        
+                    <span class="site-coords-badge" style="background: rgba(255,255,255,0.03); border-color: var(--border-color); color: var(--text-muted); font-weight: 700;">
+                        <i class="ri-time-line"></i> 0h volables 
+                    </span>
+                
+                    </div>
+                </div>
+                <div class="site-actions-container">
+                    
+                    <button class="action-btn-spot spot-it-btn" data-action="spotSite" data-args="'44.6', '-1.2', 'Dune du Pyla', '2'" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                        <i class="ri-focus-3-line"></i> Spot It
+                    </button>
+                    <button class="action-btn-primary gps-btn" data-action="openGpsMenu" data-args="'44.6', '-1.2'">
+                        <i class="ri-navigation-line"></i> S'y rendre
+                    </button>
+                </div>
+            </div>
+            
+            
+                        <div class="site-weather-row weather-incomplete" style="display: flex; flex-direction: column; gap: 6px; margin-top: 12px; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 500;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;">
+                                <span style="display: flex; align-items: center; gap: 6px;">
+                                    <i class="ri-windy-line"></i>
+                                    <span>Vent <b>S</b> (180°) : <b>15 km/h</b> (raf. <b>—</b>)</span>
+                                </span>
+                                <span style="display: flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; text-transform: uppercase;">
+                                    <i class="ri-question-line"></i> Prévision incomplète
+                                </span>
+                            </div>
+                            <div class="weather-missing-values" style="font-size: 0.8rem;">Indisponible : rafales</div>
+                        </div>
+                        
+                        
+                        
+                    
+            <div style="margin-top: 14px;">
+                <div class="timeline-labels">
+                    <span>Maintenant</span><span>Prévisions (6h)</span><span>Dans 0.25 jours</span>
+                </div>
+                <div class="ranking-timeline">
+                    <div role="button" tabindex="0" class="timeline-hour-dot timeline-hour-dot--incomplete" style="flex: 1; height: 100%; transition: all 0.2s; cursor: pointer; outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);" title="Mer 14:00 : Prévision incomplète — Indisponible : rafales" data-action="SitessetForecastOffset" data-args="0"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+1h : Inconnu" data-action="SitessetForecastOffset" data-args="1"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+2h : Inconnu" data-action="SitessetForecastOffset" data-args="2"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+3h : Inconnu" data-action="SitessetForecastOffset" data-args="3"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+4h : Inconnu" data-action="SitessetForecastOffset" data-args="4"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+5h : Inconnu" data-action="SitessetForecastOffset" data-args="5"></div>
+                </div>
+                <div class="timeline-legend">
+                    <span class="legend-item"><span class="legend-color" style="background:#22c55e;"></span> Volable</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#eab308;"></span> Orientation inconnue</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#ef4444;"></span> Vent / Rafales</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#f97316;"></span> Mauvaise orientation</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span> Pluie</span>
+                    <span class="legend-item"><span class="legend-color" style="background:rgba(100,100,120,0.5);"></span> Nuit</span>
+                    <span class="legend-item"><span class="legend-color legend-color--incomplete"></span> Prévision incomplète</span>
+                </div>
+            </div>
+            
+                        <div class="creneaux-list incomplete">
+                            <i class="ri-question-line"></i> Aucune prévision fiable pour ce site
+                        </div>
+                    
+            
+                    <details class="site-details-toggle" data-site-id="2">
+                        <summary>
+                            <span class="toggle-text">Voir plus d'infos</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </summary>
+                        <div class="site-rich-details">
+
+                            
+        <div class="rich-detail-item default" style="background: rgba(59, 130, 246, 0.06); border-radius: 8px;">
+            <i class="ri-flight-takeoff-line rich-detail-icon blue"></i>
+            <div>
+                <strong class="rich-detail-label muted">Brief pré-vol</strong>
+                <span class="rich-detail-value">Niveau sélectionné : <b>Brevet Pilote</b> — à confronter à la praticabilité et aux dangers ci-dessous.</span>
+                <div style="margin-top: 4px; font-size: 0.9rem;">Matériel : <span style="color: var(--text-muted);">Aucun équipement enregistré</span></div>
+            </div>
+        </div>
+    
+
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                        </div>
+                    </details>
+                
+            
+        </div><div class="site-card minimized">
+            <div class="site-card-header site-card-header-row">
+                <div class="site-info site-info-row">
+                    <div class="site-title-row">
+                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'3'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-star-line"></i>
+                        </button>
+                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'3'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-add-line"></i>
+                        </button>
+                        <h3 class="site-card-title">Sans météo</h3>
+                    </div>
+                    <div class="site-badges-row">
+                        
+                        <div class="site-wind-tags site-wind-tags-row"><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="N" title="Filtrer par vent N">N</span></div>
+                        <span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="Inconnu" style="cursor: pointer;" title="Filtrer par type Inconnu">Inconnu</span>
+                        
+                        <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'45', '5'" title="Copier les coordonnées">
+                            <i class="ri-map-pin-2-line"></i> <span class="coords-text">45, 5</span>
+                        </button>
+                        
+                        
+                    <span class="site-coords-badge" style="background: rgba(255,255,255,0.03); border-color: var(--border-color); color: var(--text-muted); font-weight: 700;">
+                        <i class="ri-time-line"></i> 0h volables 
+                    </span>
+                
+                    </div>
+                </div>
+                <div class="site-actions-container">
+                    
+                    <button class="action-btn-spot spot-it-btn" data-action="spotSite" data-args="'45', '5', 'Sans météo', '3'" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                        <i class="ri-focus-3-line"></i> Spot It
+                    </button>
+                    <button class="action-btn-primary gps-btn" data-action="openGpsMenu" data-args="'45', '5'">
+                        <i class="ri-navigation-line"></i> S'y rendre
+                    </button>
+                </div>
+            </div>
+            
+        </div><div class="site-card ">
+            <div class="site-card-header site-card-header-row">
+                <div class="site-info site-info-row">
+                    <div class="site-title-row">
+                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'4'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-star-line"></i>
+                        </button>
+                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'4'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-subtract-line"></i>
+                        </button>
+                        <h3 class="site-card-title">Hors couverture</h3>
+                    </div>
+                    <div class="site-badges-row">
+                        
+                        <div class="site-wind-tags site-wind-tags-row"><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="N" title="Filtrer par vent N">N</span></div>
+                        <span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="Inconnu" style="cursor: pointer;" title="Filtrer par type Inconnu">Inconnu</span>
+                        
+                        <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'45', '5'" title="Copier les coordonnées">
+                            <i class="ri-map-pin-2-line"></i> <span class="coords-text">45, 5</span>
+                        </button>
+                        
+                        
+                    <span class="site-coords-badge" style="background: rgba(255,255,255,0.03); border-color: var(--border-color); color: var(--text-muted); font-weight: 700;">
+                        <i class="ri-time-line"></i> 0h volables 
+                    </span>
+                
+                    </div>
+                </div>
+                <div class="site-actions-container">
+                    
+                    <button class="action-btn-spot spot-it-btn" data-action="spotSite" data-args="'45', '5', 'Hors couverture', '4'" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                        <i class="ri-focus-3-line"></i> Spot It
+                    </button>
+                    <button class="action-btn-primary gps-btn" data-action="openGpsMenu" data-args="'45', '5'">
+                        <i class="ri-navigation-line"></i> S'y rendre
+                    </button>
+                </div>
+            </div>
+            
+            
+                        <div class="weather-loading">
+                            <i class="ri-error-warning-line"></i>
+                            <span>Météo indisponible pour ce site</span>
+                        </div>
+                    
+            <div style="margin-top: 14px;">
+                <div class="timeline-labels">
+                    <span>Maintenant</span><span>Prévisions (6h)</span><span>Dans 0.25 jours</span>
+                </div>
+                <div class="ranking-timeline">
+                    <div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer; outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);" title="+0h : Inconnu" data-action="SitessetForecastOffset" data-args="0"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+1h : Inconnu" data-action="SitessetForecastOffset" data-args="1"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+2h : Inconnu" data-action="SitessetForecastOffset" data-args="2"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+3h : Inconnu" data-action="SitessetForecastOffset" data-args="3"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+4h : Inconnu" data-action="SitessetForecastOffset" data-args="4"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+5h : Inconnu" data-action="SitessetForecastOffset" data-args="5"></div>
+                </div>
+                <div class="timeline-legend">
+                    <span class="legend-item"><span class="legend-color" style="background:#22c55e;"></span> Volable</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#eab308;"></span> Orientation inconnue</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#ef4444;"></span> Vent / Rafales</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#f97316;"></span> Mauvaise orientation</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span> Pluie</span>
+                    <span class="legend-item"><span class="legend-color" style="background:rgba(100,100,120,0.5);"></span> Nuit</span>
+                    <span class="legend-item"><span class="legend-color legend-color--incomplete"></span> Prévision incomplète</span>
+                </div>
+            </div>
+            
+                        <div class="creneaux-list bad">
+                            <i class="ri-error-warning-line"></i> Aucun créneau favorable dans les prochaines 6 heures
+                        </div>
+                    
+            
+                    <details class="site-details-toggle" data-site-id="4">
+                        <summary>
+                            <span class="toggle-text">Voir plus d'infos</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </summary>
+                        <div class="site-rich-details">
+
+                            
+        <div class="rich-detail-item default" style="background: rgba(59, 130, 246, 0.06); border-radius: 8px;">
+            <i class="ri-flight-takeoff-line rich-detail-icon blue"></i>
+            <div>
+                <strong class="rich-detail-label muted">Brief pré-vol</strong>
+                <span class="rich-detail-value">Niveau sélectionné : <b>Brevet Pilote</b> — à confronter à la praticabilité et aux dangers ci-dessous.</span>
+                <div style="margin-top: 4px; font-size: 0.9rem;">Matériel : <span style="color: var(--text-muted);">Aucun équipement enregistré</span></div>
+            </div>
+        </div>
+    
+
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                        </div>
+                    </details>
+                
+            
+        </div>"
+`;
+
+exports[`sites renders (spec 015: identical before and after moving the texts) > site list offline, card without saved forecast 1`] = `
+"<div class="site-card ">
+            <div class="site-card-header site-card-header-row">
+                <div class="site-info site-info-row">
+                    <div class="site-title-row">
+                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'3'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-star-line"></i>
+                        </button>
+                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'3'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-subtract-line"></i>
+                        </button>
+                        <h3 class="site-card-title">Sans météo</h3>
+                    </div>
+                    <div class="site-badges-row">
+                        
+                        <div class="site-wind-tags site-wind-tags-row"><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="N" title="Filtrer par vent N">N</span></div>
+                        <span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="Inconnu" style="cursor: pointer;" title="Filtrer par type Inconnu">Inconnu</span>
+                        
+                        <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'45', '5'" title="Copier les coordonnées">
+                            <i class="ri-map-pin-2-line"></i> <span class="coords-text">45, 5</span>
+                        </button>
+                        
+                        
+                    <span class="site-coords-badge" style="background: rgba(255,255,255,0.03); border-color: var(--border-color); color: var(--text-muted); font-weight: 700;">
+                        <i class="ri-time-line"></i> 0h volables 
+                    </span>
+                
+                    </div>
+                </div>
+                <div class="site-actions-container">
+                    
+                    <button class="action-btn-spot spot-it-btn" data-action="spotSite" data-args="'45', '5', 'Sans météo', '3'" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                        <i class="ri-focus-3-line"></i> Spot It
+                    </button>
+                    <button class="action-btn-primary gps-btn" data-action="openGpsMenu" data-args="'45', '5'">
+                        <i class="ri-navigation-line"></i> S'y rendre
+                    </button>
+                </div>
+            </div>
+            
+            
+                        <div class="weather-loading">
+                            <i class="ri-wifi-off-line"></i>
+                            <span>Prévision indisponible hors ligne</span>
+                        </div>
+                    
+            <div style="margin-top: 14px;">
+                <div class="timeline-labels">
+                    <span>Maintenant</span><span>Prévisions (6h)</span><span>Dans 0.25 jours</span>
+                </div>
+                <div class="ranking-timeline">
+                    <div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer; outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);" title="+0h : Inconnu" data-action="SitessetForecastOffset" data-args="0"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+1h : Inconnu" data-action="SitessetForecastOffset" data-args="1"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+2h : Inconnu" data-action="SitessetForecastOffset" data-args="2"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+3h : Inconnu" data-action="SitessetForecastOffset" data-args="3"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+4h : Inconnu" data-action="SitessetForecastOffset" data-args="4"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+5h : Inconnu" data-action="SitessetForecastOffset" data-args="5"></div>
+                </div>
+                <div class="timeline-legend">
+                    <span class="legend-item"><span class="legend-color" style="background:#22c55e;"></span> Volable</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#eab308;"></span> Orientation inconnue</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#ef4444;"></span> Vent / Rafales</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#f97316;"></span> Mauvaise orientation</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span> Pluie</span>
+                    <span class="legend-item"><span class="legend-color" style="background:rgba(100,100,120,0.5);"></span> Nuit</span>
+                    <span class="legend-item"><span class="legend-color legend-color--incomplete"></span> Prévision incomplète</span>
+                </div>
+            </div>
+            
+                        <div class="creneaux-list bad">
+                            <i class="ri-error-warning-line"></i> Aucun créneau favorable dans les prochaines 6 heures
+                        </div>
+                    
+            
+                    <details class="site-details-toggle" data-site-id="3">
+                        <summary>
+                            <span class="toggle-text">Voir plus d'infos</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </summary>
+                        <div class="site-rich-details">
+
+                            
+        <div class="rich-detail-item default" style="background: rgba(59, 130, 246, 0.06); border-radius: 8px;">
+            <i class="ri-flight-takeoff-line rich-detail-icon blue"></i>
+            <div>
+                <strong class="rich-detail-label muted">Brief pré-vol</strong>
+                <span class="rich-detail-value">Niveau sélectionné : <b>Brevet Pilote</b> — à confronter à la praticabilité et aux dangers ci-dessous.</span>
+                <div style="margin-top: 4px; font-size: 0.9rem;">Matériel : <span style="color: var(--text-muted);">Aucun équipement enregistré</span></div>
+            </div>
+        </div>
+    
+
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                        </div>
+                    </details>
+                
+            
+        </div>"
+`;
+
+exports[`sites renders (spec 015: identical before and after moving the texts) > site list, nothing found and offline notice 1`] = `
+{
+  "otherDay": "<p id="offline-forecast-notice" class="location-notice offline-forecast-notice" role="status"><i class="ri-wifi-off-line" aria-hidden="true"></i> Service météo indisponible — prévision enregistrée sur l’appareil, récupérée le lundi 28 septembre à 08 h 05 ; elle peut être dépassée.</p><div class="card" style="text-align: center; padding: 20px;">Aucun site trouvé pour ces critères</div>",
+  "sameDay": "<p id="offline-forecast-notice" class="location-notice offline-forecast-notice" role="status"><i class="ri-wifi-off-line" aria-hidden="true"></i> Service météo indisponible — prévision enregistrée sur l’appareil, récupérée aujourd’hui à 08 h 05 ; elle peut être dépassée.</p><div class="card" style="text-align: center; padding: 20px;">Aucun site trouvé pour ces critères</div>",
+}
+`;
+
+exports[`sites renders (spec 015: identical before and after moving the texts) > weather download failure and retry countdown 1`] = `
+{
+  "noReason": "
+            <div style="color:var(--accent-red, #ef4444); font-size: 0.95rem; text-align: center; padding: 16px; margin-bottom: 16px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: var(--radius-lg); width: 100%;">
+                    <i class="ri-error-warning-line" style="font-size: 1.2rem; vertical-align: middle; margin-right: 8px;"></i>
+                    <strong>Météo indisponible :</strong> Erreur réseau
+                    <button id="weather-retry-btn" data-action="fetchWeatherForSites" class="action-btn-primary" style="margin-left: 12px; padding: 4px 12px; font-size: 0.8rem; border-radius: var(--radius-pill);">Réessayer</button>
+                </div>
+                <div class="site-card ">
+            <div class="site-card-header site-card-header-row">
+                <div class="site-info site-info-row">
+                    <div class="site-title-row">
+                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'arbas-665'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: #fbbf24; cursor: pointer; padding: 0;">
+                            <i class="ri-star-fill"></i>
+                        </button>
+                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'arbas-665'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-subtract-line"></i>
+                        </button>
+                        <h3 class="site-card-title">Mont Lambert</h3>
+                    </div>
+                    <div class="site-badges-row">
+                        
+                        <span class="site-coords-badge site-altitude-badge" title="Altitude du site">
+                            <i class="ri-landscape-fill"></i> 180 m
+                        </span>
+                        
+                        <div class="site-wind-tags site-wind-tags-row"><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="S" title="Filtrer par vent S">S</span><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="SO" title="Filtrer par vent SO">SO</span></div>
+                        <span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="NATUREL" style="cursor: pointer;" title="Filtrer par type NATUREL">NATUREL</span>
+                        
+        <button class="site-coords-badge site-spotair-badge" data-spotair-id="3374" data-site-id="arbas-665" data-action="SitesopenSpotairModal" title="Voir le vent en direct (SpotAiR)">
+            <i class="ri-windy-line"></i> Balise
+        </button>
+    
+                        <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'50.7', '1.65'" title="Copier les coordonnées">
+                            <i class="ri-map-pin-2-line"></i> <span class="coords-text">50.7, 1.65</span>
+                        </button>
+                        
+                        
+                    <span class="site-coords-badge" style="background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: var(--accent-green); font-weight: 700;">
+                        <i class="ri-time-line"></i> 5h volables (3h conséc.)
+                    </span>
+                
+                    </div>
+                </div>
+                <div class="site-actions-container">
+                    
+                    <a class="action-btn-secondary ffvl-btn" href="https://federation.ffvl.fr/terrain/1" target="_blank" rel="noopener noreferrer" title="Fiche officielle FFVL">
+                        <img src="img/logos/ffvl.png" alt="FFVL"> FFVL
+                    </a>
+                    
+                    <button class="action-btn-spot spot-it-btn" data-action="spotSite" data-args="'50.7', '1.65', 'Mont Lambert', 'arbas-665'" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                        <i class="ri-focus-3-line"></i> Spot It
+                    </button>
+                    <button class="action-btn-primary gps-btn" data-action="openGpsMenu" data-args="'50.7', '1.65'">
+                        <i class="ri-navigation-line"></i> S'y rendre
+                    </button>
+                </div>
+            </div>
+            
+            
+                        <div class="weather-loading">
+                            <i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i>
+                            <span>Chargement météo AROME (Météo-France)...</span>
+                        </div>
+                    
+            <div style="margin-top: 14px;">
+                <div class="timeline-labels">
+                    <span>Maintenant</span><span>Prévisions (6h)</span><span>Dans 0.25 jours</span>
+                </div>
+                <div class="ranking-timeline">
+                    <div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer; outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);" title="+0h : Inconnu" data-action="SitessetForecastOffset" data-args="0"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+1h : Inconnu" data-action="SitessetForecastOffset" data-args="1"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+2h : Inconnu" data-action="SitessetForecastOffset" data-args="2"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+3h : Inconnu" data-action="SitessetForecastOffset" data-args="3"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+4h : Inconnu" data-action="SitessetForecastOffset" data-args="4"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+5h : Inconnu" data-action="SitessetForecastOffset" data-args="5"></div>
+                </div>
+                <div class="timeline-legend">
+                    <span class="legend-item"><span class="legend-color" style="background:#22c55e;"></span> Volable</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#eab308;"></span> Orientation inconnue</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#ef4444;"></span> Vent / Rafales</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#f97316;"></span> Mauvaise orientation</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span> Pluie</span>
+                    <span class="legend-item"><span class="legend-color" style="background:rgba(100,100,120,0.5);"></span> Nuit</span>
+                    <span class="legend-item"><span class="legend-color legend-color--incomplete"></span> Prévision incomplète</span>
+                </div>
+            </div>
+            
+                        <div class="creneaux-list good">
+                            <i class="ri-calendar-todo-line"></i> Prochains créneaux : <span><b>Mar</b> (14h - 16h)</span> | <span><b>Mer</b> (11h - 12h)</span>
+                        </div>
+                    
+            
+                    <details class="site-details-toggle" open="" data-site-id="arbas-665">
+                        <summary>
+                            <span class="toggle-text">Masquer les détails</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </summary>
+                        <div class="site-rich-details">
+
+                            
+        <div class="rich-detail-item default" style="background: rgba(59, 130, 246, 0.06); border-radius: 8px;">
+            <i class="ri-flight-takeoff-line rich-detail-icon blue"></i>
+            <div>
+                <strong class="rich-detail-label muted">Brief pré-vol</strong>
+                <span class="rich-detail-value">Niveau sélectionné : <b>Brevet Pilote</b> — à confronter à la praticabilité et aux dangers ci-dessous.</span>
+                <div style="margin-top: 4px; font-size: 0.9rem;">Matériel : <span style="color: var(--text-muted);">Aucun équipement enregistré</span></div>
+            </div>
+        </div>
+    
+
+                            
+                            <div class="rich-detail-item default">
+                                <i class="ri-shield-check-line rich-detail-icon blue"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Conventionnement</strong>
+                                    <span class="rich-detail-value">Conventionné FFVL</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item default">
+                                <i class="ri-checkbox-circle-line rich-detail-icon green"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Praticabilité</strong>
+                                    <span class="rich-detail-value">Pratiquable</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item default">
+                                <i class="ri-group-line rich-detail-icon secondary"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Structure Gestionnaire</strong>
+                                    <span class="rich-detail-value">Club local</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item default">
+                                <i class="ri-compass-3-line rich-detail-icon blue"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Aérologie Idéale</strong>
+                                    <span class="rich-detail-value">Brise de mer</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item default">
+                                <i class="ri-first-aid-kit-line rich-detail-icon green"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Accès Secours</strong>
+                                    <span class="rich-detail-value">Accès pompiers par la route</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item danger">
+                                <i class="ri-error-warning-line rich-detail-icon red"></i>
+                                <div>
+                                    <strong class="rich-detail-label red">Dangers Signalés</strong>
+                                    <span class="rich-detail-value">Lignes électriques</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item default full-width">
+                                <i class="ri-walk-line rich-detail-icon secondary"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Accès &amp; Topo</strong>
+                                    <span class="rich-detail-value">Parking au sommet</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item obs">
+                                <i class="ri-information-line rich-detail-icon blue"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Observations</strong>
+                                    <span class="rich-detail-value">Site école</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item danger">
+                                <i class="ri-forbid-line rich-detail-icon red"></i>
+                                <div>
+                                    <strong class="rich-detail-label red">Restrictions</strong>
+                                    <span class="rich-detail-value">Pas de vol le dimanche matin</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item obs">
+                                <i class="ri-article-line rich-detail-icon blue"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Réglementation</strong>
+                                    <span class="rich-detail-value">Zone R 45</span>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </details>
+                
+            
+        </div><div class="site-card ">
+            <div class="site-card-header site-card-header-row">
+                <div class="site-info site-info-row">
+                    <div class="site-title-row">
+                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'2'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-star-line"></i>
+                        </button>
+                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'2'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-subtract-line"></i>
+                        </button>
+                        <h3 class="site-card-title">Dune du Pyla</h3>
+                    </div>
+                    <div class="site-badges-row">
+                        
+                        <div class="site-wind-tags site-wind-tags-row"><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="O" title="Filtrer par vent O">O</span></div>
+                        <span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="DUNE" style="cursor: pointer;" title="Filtrer par type DUNE">DUNE</span>
+                        
+                        <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'44.6', '-1.2'" title="Copier les coordonnées">
+                            <i class="ri-map-pin-2-line"></i> <span class="coords-text">44.6, -1.2</span>
+                        </button>
+                        
+                        
+                    <span class="site-coords-badge" style="background: rgba(255,255,255,0.03); border-color: var(--border-color); color: var(--text-muted); font-weight: 700;">
+                        <i class="ri-time-line"></i> 0h volables 
+                    </span>
+                
+                    </div>
+                </div>
+                <div class="site-actions-container">
+                    
+                    <button class="action-btn-spot spot-it-btn" data-action="spotSite" data-args="'44.6', '-1.2', 'Dune du Pyla', '2'" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                        <i class="ri-focus-3-line"></i> Spot It
+                    </button>
+                    <button class="action-btn-primary gps-btn" data-action="openGpsMenu" data-args="'44.6', '-1.2'">
+                        <i class="ri-navigation-line"></i> S'y rendre
+                    </button>
+                </div>
+            </div>
+            
+            
+                        <div class="weather-loading">
+                            <i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i>
+                            <span>Chargement météo AROME (Météo-France)...</span>
+                        </div>
+                    
+            <div style="margin-top: 14px;">
+                <div class="timeline-labels">
+                    <span>Maintenant</span><span>Prévisions (6h)</span><span>Dans 0.25 jours</span>
+                </div>
+                <div class="ranking-timeline">
+                    <div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer; outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);" title="+0h : Inconnu" data-action="SitessetForecastOffset" data-args="0"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+1h : Inconnu" data-action="SitessetForecastOffset" data-args="1"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+2h : Inconnu" data-action="SitessetForecastOffset" data-args="2"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+3h : Inconnu" data-action="SitessetForecastOffset" data-args="3"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+4h : Inconnu" data-action="SitessetForecastOffset" data-args="4"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+5h : Inconnu" data-action="SitessetForecastOffset" data-args="5"></div>
+                </div>
+                <div class="timeline-legend">
+                    <span class="legend-item"><span class="legend-color" style="background:#22c55e;"></span> Volable</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#eab308;"></span> Orientation inconnue</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#ef4444;"></span> Vent / Rafales</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#f97316;"></span> Mauvaise orientation</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span> Pluie</span>
+                    <span class="legend-item"><span class="legend-color" style="background:rgba(100,100,120,0.5);"></span> Nuit</span>
+                    <span class="legend-item"><span class="legend-color legend-color--incomplete"></span> Prévision incomplète</span>
+                </div>
+            </div>
+            
+                        <div class="creneaux-list bad">
+                            <i class="ri-error-warning-line"></i> Aucun créneau favorable dans les prochaines 6 heures
+                        </div>
+                    
+            
+                    <details class="site-details-toggle" data-site-id="2">
+                        <summary>
+                            <span class="toggle-text">Voir plus d'infos</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </summary>
+                        <div class="site-rich-details">
+
+                            
+        <div class="rich-detail-item default" style="background: rgba(59, 130, 246, 0.06); border-radius: 8px;">
+            <i class="ri-flight-takeoff-line rich-detail-icon blue"></i>
+            <div>
+                <strong class="rich-detail-label muted">Brief pré-vol</strong>
+                <span class="rich-detail-value">Niveau sélectionné : <b>Brevet Pilote</b> — à confronter à la praticabilité et aux dangers ci-dessous.</span>
+                <div style="margin-top: 4px; font-size: 0.9rem;">Matériel : <span style="color: var(--text-muted);">Aucun équipement enregistré</span></div>
+            </div>
+        </div>
+    
+
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                        </div>
+                    </details>
+                
+            
+        </div><div class="site-card minimized">
+            <div class="site-card-header site-card-header-row">
+                <div class="site-info site-info-row">
+                    <div class="site-title-row">
+                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'3'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-star-line"></i>
+                        </button>
+                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'3'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-add-line"></i>
+                        </button>
+                        <h3 class="site-card-title">Sans météo</h3>
+                    </div>
+                    <div class="site-badges-row">
+                        
+                        <div class="site-wind-tags site-wind-tags-row"><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="N" title="Filtrer par vent N">N</span></div>
+                        <span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="Inconnu" style="cursor: pointer;" title="Filtrer par type Inconnu">Inconnu</span>
+                        
+                        <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'45', '5'" title="Copier les coordonnées">
+                            <i class="ri-map-pin-2-line"></i> <span class="coords-text">45, 5</span>
+                        </button>
+                        
+                        
+                    <span class="site-coords-badge" style="background: rgba(255,255,255,0.03); border-color: var(--border-color); color: var(--text-muted); font-weight: 700;">
+                        <i class="ri-time-line"></i> 0h volables 
+                    </span>
+                
+                    </div>
+                </div>
+                <div class="site-actions-container">
+                    
+                    <button class="action-btn-spot spot-it-btn" data-action="spotSite" data-args="'45', '5', 'Sans météo', '3'" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                        <i class="ri-focus-3-line"></i> Spot It
+                    </button>
+                    <button class="action-btn-primary gps-btn" data-action="openGpsMenu" data-args="'45', '5'">
+                        <i class="ri-navigation-line"></i> S'y rendre
+                    </button>
+                </div>
+            </div>
+            
+        </div><div class="site-card ">
+            <div class="site-card-header site-card-header-row">
+                <div class="site-info site-info-row">
+                    <div class="site-title-row">
+                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'4'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-star-line"></i>
+                        </button>
+                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'4'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-subtract-line"></i>
+                        </button>
+                        <h3 class="site-card-title">Hors couverture</h3>
+                    </div>
+                    <div class="site-badges-row">
+                        
+                        <div class="site-wind-tags site-wind-tags-row"><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="N" title="Filtrer par vent N">N</span></div>
+                        <span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="Inconnu" style="cursor: pointer;" title="Filtrer par type Inconnu">Inconnu</span>
+                        
+                        <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'45', '5'" title="Copier les coordonnées">
+                            <i class="ri-map-pin-2-line"></i> <span class="coords-text">45, 5</span>
+                        </button>
+                        
+                        
+                    <span class="site-coords-badge" style="background: rgba(255,255,255,0.03); border-color: var(--border-color); color: var(--text-muted); font-weight: 700;">
+                        <i class="ri-time-line"></i> 0h volables 
+                    </span>
+                
+                    </div>
+                </div>
+                <div class="site-actions-container">
+                    
+                    <button class="action-btn-spot spot-it-btn" data-action="spotSite" data-args="'45', '5', 'Hors couverture', '4'" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                        <i class="ri-focus-3-line"></i> Spot It
+                    </button>
+                    <button class="action-btn-primary gps-btn" data-action="openGpsMenu" data-args="'45', '5'">
+                        <i class="ri-navigation-line"></i> S'y rendre
+                    </button>
+                </div>
+            </div>
+            
+            
+                        <div class="weather-loading">
+                            <i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i>
+                            <span>Chargement météo AROME (Météo-France)...</span>
+                        </div>
+                    
+            <div style="margin-top: 14px;">
+                <div class="timeline-labels">
+                    <span>Maintenant</span><span>Prévisions (6h)</span><span>Dans 0.25 jours</span>
+                </div>
+                <div class="ranking-timeline">
+                    <div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer; outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);" title="+0h : Inconnu" data-action="SitessetForecastOffset" data-args="0"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+1h : Inconnu" data-action="SitessetForecastOffset" data-args="1"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+2h : Inconnu" data-action="SitessetForecastOffset" data-args="2"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+3h : Inconnu" data-action="SitessetForecastOffset" data-args="3"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+4h : Inconnu" data-action="SitessetForecastOffset" data-args="4"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+5h : Inconnu" data-action="SitessetForecastOffset" data-args="5"></div>
+                </div>
+                <div class="timeline-legend">
+                    <span class="legend-item"><span class="legend-color" style="background:#22c55e;"></span> Volable</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#eab308;"></span> Orientation inconnue</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#ef4444;"></span> Vent / Rafales</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#f97316;"></span> Mauvaise orientation</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span> Pluie</span>
+                    <span class="legend-item"><span class="legend-color" style="background:rgba(100,100,120,0.5);"></span> Nuit</span>
+                    <span class="legend-item"><span class="legend-color legend-color--incomplete"></span> Prévision incomplète</span>
+                </div>
+            </div>
+            
+                        <div class="creneaux-list bad">
+                            <i class="ri-error-warning-line"></i> Aucun créneau favorable dans les prochaines 6 heures
+                        </div>
+                    
+            
+                    <details class="site-details-toggle" data-site-id="4">
+                        <summary>
+                            <span class="toggle-text">Voir plus d'infos</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </summary>
+                        <div class="site-rich-details">
+
+                            
+        <div class="rich-detail-item default" style="background: rgba(59, 130, 246, 0.06); border-radius: 8px;">
+            <i class="ri-flight-takeoff-line rich-detail-icon blue"></i>
+            <div>
+                <strong class="rich-detail-label muted">Brief pré-vol</strong>
+                <span class="rich-detail-value">Niveau sélectionné : <b>Brevet Pilote</b> — à confronter à la praticabilité et aux dangers ci-dessous.</span>
+                <div style="margin-top: 4px; font-size: 0.9rem;">Matériel : <span style="color: var(--text-muted);">Aucun équipement enregistré</span></div>
+            </div>
+        </div>
+    
+
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                        </div>
+                    </details>
+                
+            
+        </div>",
+  "ready": "Réessayer",
+  "withReason": {
+    "list": "
+            <div style="color:var(--accent-red, #ef4444); font-size: 0.95rem; text-align: center; padding: 16px; margin-bottom: 16px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: var(--radius-lg); width: 100%;">
+                    <i class="ri-error-warning-line" style="font-size: 1.2rem; vertical-align: middle; margin-right: 8px;"></i>
+                    <strong>Météo indisponible :</strong> 429
+                    <button id="weather-retry-btn" data-action="fetchWeatherForSites" class="action-btn-primary" style="margin-left: 12px; padding: 4px 12px; font-size: 0.8rem; border-radius: var(--radius-pill); opacity: 0.5; cursor: not-allowed;" disabled="">Réessayer dans 2 min</button>
+                </div>
+                <div class="site-card ">
+            <div class="site-card-header site-card-header-row">
+                <div class="site-info site-info-row">
+                    <div class="site-title-row">
+                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'arbas-665'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: #fbbf24; cursor: pointer; padding: 0;">
+                            <i class="ri-star-fill"></i>
+                        </button>
+                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'arbas-665'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-subtract-line"></i>
+                        </button>
+                        <h3 class="site-card-title">Mont Lambert</h3>
+                    </div>
+                    <div class="site-badges-row">
+                        
+                        <span class="site-coords-badge site-altitude-badge" title="Altitude du site">
+                            <i class="ri-landscape-fill"></i> 180 m
+                        </span>
+                        
+                        <div class="site-wind-tags site-wind-tags-row"><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="S" title="Filtrer par vent S">S</span><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="SO" title="Filtrer par vent SO">SO</span></div>
+                        <span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="NATUREL" style="cursor: pointer;" title="Filtrer par type NATUREL">NATUREL</span>
+                        
+        <button class="site-coords-badge site-spotair-badge" data-spotair-id="3374" data-site-id="arbas-665" data-action="SitesopenSpotairModal" title="Voir le vent en direct (SpotAiR)">
+            <i class="ri-windy-line"></i> Balise
+        </button>
+    
+                        <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'50.7', '1.65'" title="Copier les coordonnées">
+                            <i class="ri-map-pin-2-line"></i> <span class="coords-text">50.7, 1.65</span>
+                        </button>
+                        
+                        
+                    <span class="site-coords-badge" style="background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: var(--accent-green); font-weight: 700;">
+                        <i class="ri-time-line"></i> 5h volables (3h conséc.)
+                    </span>
+                
+                    </div>
+                </div>
+                <div class="site-actions-container">
+                    
+                    <a class="action-btn-secondary ffvl-btn" href="https://federation.ffvl.fr/terrain/1" target="_blank" rel="noopener noreferrer" title="Fiche officielle FFVL">
+                        <img src="img/logos/ffvl.png" alt="FFVL"> FFVL
+                    </a>
+                    
+                    <button class="action-btn-spot spot-it-btn" data-action="spotSite" data-args="'50.7', '1.65', 'Mont Lambert', 'arbas-665'" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                        <i class="ri-focus-3-line"></i> Spot It
+                    </button>
+                    <button class="action-btn-primary gps-btn" data-action="openGpsMenu" data-args="'50.7', '1.65'">
+                        <i class="ri-navigation-line"></i> S'y rendre
+                    </button>
+                </div>
+            </div>
+            
+            
+                        <div class="weather-loading">
+                            <i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i>
+                            <span>Chargement météo AROME (Météo-France)...</span>
+                        </div>
+                    
+            <div style="margin-top: 14px;">
+                <div class="timeline-labels">
+                    <span>Maintenant</span><span>Prévisions (6h)</span><span>Dans 0.25 jours</span>
+                </div>
+                <div class="ranking-timeline">
+                    <div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer; outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);" title="+0h : Inconnu" data-action="SitessetForecastOffset" data-args="0"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+1h : Inconnu" data-action="SitessetForecastOffset" data-args="1"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+2h : Inconnu" data-action="SitessetForecastOffset" data-args="2"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+3h : Inconnu" data-action="SitessetForecastOffset" data-args="3"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+4h : Inconnu" data-action="SitessetForecastOffset" data-args="4"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+5h : Inconnu" data-action="SitessetForecastOffset" data-args="5"></div>
+                </div>
+                <div class="timeline-legend">
+                    <span class="legend-item"><span class="legend-color" style="background:#22c55e;"></span> Volable</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#eab308;"></span> Orientation inconnue</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#ef4444;"></span> Vent / Rafales</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#f97316;"></span> Mauvaise orientation</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span> Pluie</span>
+                    <span class="legend-item"><span class="legend-color" style="background:rgba(100,100,120,0.5);"></span> Nuit</span>
+                    <span class="legend-item"><span class="legend-color legend-color--incomplete"></span> Prévision incomplète</span>
+                </div>
+            </div>
+            
+                        <div class="creneaux-list good">
+                            <i class="ri-calendar-todo-line"></i> Prochains créneaux : <span><b>Mar</b> (14h - 16h)</span> | <span><b>Mer</b> (11h - 12h)</span>
+                        </div>
+                    
+            
+                    <details class="site-details-toggle" open="" data-site-id="arbas-665">
+                        <summary>
+                            <span class="toggle-text">Masquer les détails</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </summary>
+                        <div class="site-rich-details">
+
+                            
+        <div class="rich-detail-item default" style="background: rgba(59, 130, 246, 0.06); border-radius: 8px;">
+            <i class="ri-flight-takeoff-line rich-detail-icon blue"></i>
+            <div>
+                <strong class="rich-detail-label muted">Brief pré-vol</strong>
+                <span class="rich-detail-value">Niveau sélectionné : <b>Brevet Pilote</b> — à confronter à la praticabilité et aux dangers ci-dessous.</span>
+                <div style="margin-top: 4px; font-size: 0.9rem;">Matériel : <span style="color: var(--text-muted);">Aucun équipement enregistré</span></div>
+            </div>
+        </div>
+    
+
+                            
+                            <div class="rich-detail-item default">
+                                <i class="ri-shield-check-line rich-detail-icon blue"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Conventionnement</strong>
+                                    <span class="rich-detail-value">Conventionné FFVL</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item default">
+                                <i class="ri-checkbox-circle-line rich-detail-icon green"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Praticabilité</strong>
+                                    <span class="rich-detail-value">Pratiquable</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item default">
+                                <i class="ri-group-line rich-detail-icon secondary"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Structure Gestionnaire</strong>
+                                    <span class="rich-detail-value">Club local</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item default">
+                                <i class="ri-compass-3-line rich-detail-icon blue"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Aérologie Idéale</strong>
+                                    <span class="rich-detail-value">Brise de mer</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item default">
+                                <i class="ri-first-aid-kit-line rich-detail-icon green"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Accès Secours</strong>
+                                    <span class="rich-detail-value">Accès pompiers par la route</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item danger">
+                                <i class="ri-error-warning-line rich-detail-icon red"></i>
+                                <div>
+                                    <strong class="rich-detail-label red">Dangers Signalés</strong>
+                                    <span class="rich-detail-value">Lignes électriques</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item default full-width">
+                                <i class="ri-walk-line rich-detail-icon secondary"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Accès &amp; Topo</strong>
+                                    <span class="rich-detail-value">Parking au sommet</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item obs">
+                                <i class="ri-information-line rich-detail-icon blue"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Observations</strong>
+                                    <span class="rich-detail-value">Site école</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item danger">
+                                <i class="ri-forbid-line rich-detail-icon red"></i>
+                                <div>
+                                    <strong class="rich-detail-label red">Restrictions</strong>
+                                    <span class="rich-detail-value">Pas de vol le dimanche matin</span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="rich-detail-item obs">
+                                <i class="ri-article-line rich-detail-icon blue"></i>
+                                <div>
+                                    <strong class="rich-detail-label muted">Réglementation</strong>
+                                    <span class="rich-detail-value">Zone R 45</span>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </details>
+                
+            
+        </div><div class="site-card ">
+            <div class="site-card-header site-card-header-row">
+                <div class="site-info site-info-row">
+                    <div class="site-title-row">
+                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'2'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-star-line"></i>
+                        </button>
+                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'2'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-subtract-line"></i>
+                        </button>
+                        <h3 class="site-card-title">Dune du Pyla</h3>
+                    </div>
+                    <div class="site-badges-row">
+                        
+                        <div class="site-wind-tags site-wind-tags-row"><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="O" title="Filtrer par vent O">O</span></div>
+                        <span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="DUNE" style="cursor: pointer;" title="Filtrer par type DUNE">DUNE</span>
+                        
+                        <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'44.6', '-1.2'" title="Copier les coordonnées">
+                            <i class="ri-map-pin-2-line"></i> <span class="coords-text">44.6, -1.2</span>
+                        </button>
+                        
+                        
+                    <span class="site-coords-badge" style="background: rgba(255,255,255,0.03); border-color: var(--border-color); color: var(--text-muted); font-weight: 700;">
+                        <i class="ri-time-line"></i> 0h volables 
+                    </span>
+                
+                    </div>
+                </div>
+                <div class="site-actions-container">
+                    
+                    <button class="action-btn-spot spot-it-btn" data-action="spotSite" data-args="'44.6', '-1.2', 'Dune du Pyla', '2'" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                        <i class="ri-focus-3-line"></i> Spot It
+                    </button>
+                    <button class="action-btn-primary gps-btn" data-action="openGpsMenu" data-args="'44.6', '-1.2'">
+                        <i class="ri-navigation-line"></i> S'y rendre
+                    </button>
+                </div>
+            </div>
+            
+            
+                        <div class="weather-loading">
+                            <i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i>
+                            <span>Chargement météo AROME (Météo-France)...</span>
+                        </div>
+                    
+            <div style="margin-top: 14px;">
+                <div class="timeline-labels">
+                    <span>Maintenant</span><span>Prévisions (6h)</span><span>Dans 0.25 jours</span>
+                </div>
+                <div class="ranking-timeline">
+                    <div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer; outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);" title="+0h : Inconnu" data-action="SitessetForecastOffset" data-args="0"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+1h : Inconnu" data-action="SitessetForecastOffset" data-args="1"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+2h : Inconnu" data-action="SitessetForecastOffset" data-args="2"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+3h : Inconnu" data-action="SitessetForecastOffset" data-args="3"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+4h : Inconnu" data-action="SitessetForecastOffset" data-args="4"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+5h : Inconnu" data-action="SitessetForecastOffset" data-args="5"></div>
+                </div>
+                <div class="timeline-legend">
+                    <span class="legend-item"><span class="legend-color" style="background:#22c55e;"></span> Volable</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#eab308;"></span> Orientation inconnue</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#ef4444;"></span> Vent / Rafales</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#f97316;"></span> Mauvaise orientation</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span> Pluie</span>
+                    <span class="legend-item"><span class="legend-color" style="background:rgba(100,100,120,0.5);"></span> Nuit</span>
+                    <span class="legend-item"><span class="legend-color legend-color--incomplete"></span> Prévision incomplète</span>
+                </div>
+            </div>
+            
+                        <div class="creneaux-list bad">
+                            <i class="ri-error-warning-line"></i> Aucun créneau favorable dans les prochaines 6 heures
+                        </div>
+                    
+            
+                    <details class="site-details-toggle" data-site-id="2">
+                        <summary>
+                            <span class="toggle-text">Voir plus d'infos</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </summary>
+                        <div class="site-rich-details">
+
+                            
+        <div class="rich-detail-item default" style="background: rgba(59, 130, 246, 0.06); border-radius: 8px;">
+            <i class="ri-flight-takeoff-line rich-detail-icon blue"></i>
+            <div>
+                <strong class="rich-detail-label muted">Brief pré-vol</strong>
+                <span class="rich-detail-value">Niveau sélectionné : <b>Brevet Pilote</b> — à confronter à la praticabilité et aux dangers ci-dessous.</span>
+                <div style="margin-top: 4px; font-size: 0.9rem;">Matériel : <span style="color: var(--text-muted);">Aucun équipement enregistré</span></div>
+            </div>
+        </div>
+    
+
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                        </div>
+                    </details>
+                
+            
+        </div><div class="site-card minimized">
+            <div class="site-card-header site-card-header-row">
+                <div class="site-info site-info-row">
+                    <div class="site-title-row">
+                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'3'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-star-line"></i>
+                        </button>
+                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'3'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-add-line"></i>
+                        </button>
+                        <h3 class="site-card-title">Sans météo</h3>
+                    </div>
+                    <div class="site-badges-row">
+                        
+                        <div class="site-wind-tags site-wind-tags-row"><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="N" title="Filtrer par vent N">N</span></div>
+                        <span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="Inconnu" style="cursor: pointer;" title="Filtrer par type Inconnu">Inconnu</span>
+                        
+                        <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'45', '5'" title="Copier les coordonnées">
+                            <i class="ri-map-pin-2-line"></i> <span class="coords-text">45, 5</span>
+                        </button>
+                        
+                        
+                    <span class="site-coords-badge" style="background: rgba(255,255,255,0.03); border-color: var(--border-color); color: var(--text-muted); font-weight: 700;">
+                        <i class="ri-time-line"></i> 0h volables 
+                    </span>
+                
+                    </div>
+                </div>
+                <div class="site-actions-container">
+                    
+                    <button class="action-btn-spot spot-it-btn" data-action="spotSite" data-args="'45', '5', 'Sans météo', '3'" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                        <i class="ri-focus-3-line"></i> Spot It
+                    </button>
+                    <button class="action-btn-primary gps-btn" data-action="openGpsMenu" data-args="'45', '5'">
+                        <i class="ri-navigation-line"></i> S'y rendre
+                    </button>
+                </div>
+            </div>
+            
+        </div><div class="site-card ">
+            <div class="site-card-header site-card-header-row">
+                <div class="site-info site-info-row">
+                    <div class="site-title-row">
+                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'4'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-star-line"></i>
+                        </button>
+                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'4'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                            <i class="ri-subtract-line"></i>
+                        </button>
+                        <h3 class="site-card-title">Hors couverture</h3>
+                    </div>
+                    <div class="site-badges-row">
+                        
+                        <div class="site-wind-tags site-wind-tags-row"><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="N" title="Filtrer par vent N">N</span></div>
+                        <span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="Inconnu" style="cursor: pointer;" title="Filtrer par type Inconnu">Inconnu</span>
+                        
+                        <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'45', '5'" title="Copier les coordonnées">
+                            <i class="ri-map-pin-2-line"></i> <span class="coords-text">45, 5</span>
+                        </button>
+                        
+                        
+                    <span class="site-coords-badge" style="background: rgba(255,255,255,0.03); border-color: var(--border-color); color: var(--text-muted); font-weight: 700;">
+                        <i class="ri-time-line"></i> 0h volables 
+                    </span>
+                
+                    </div>
+                </div>
+                <div class="site-actions-container">
+                    
+                    <button class="action-btn-spot spot-it-btn" data-action="spotSite" data-args="'45', '5', 'Hors couverture', '4'" title="Spot It — Paramétrer toutes les cartes sur ce site">
+                        <i class="ri-focus-3-line"></i> Spot It
+                    </button>
+                    <button class="action-btn-primary gps-btn" data-action="openGpsMenu" data-args="'45', '5'">
+                        <i class="ri-navigation-line"></i> S'y rendre
+                    </button>
+                </div>
+            </div>
+            
+            
+                        <div class="weather-loading">
+                            <i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i>
+                            <span>Chargement météo AROME (Météo-France)...</span>
+                        </div>
+                    
+            <div style="margin-top: 14px;">
+                <div class="timeline-labels">
+                    <span>Maintenant</span><span>Prévisions (6h)</span><span>Dans 0.25 jours</span>
+                </div>
+                <div class="ranking-timeline">
+                    <div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer; outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);" title="+0h : Inconnu" data-action="SitessetForecastOffset" data-args="0"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+1h : Inconnu" data-action="SitessetForecastOffset" data-args="1"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+2h : Inconnu" data-action="SitessetForecastOffset" data-args="2"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+3h : Inconnu" data-action="SitessetForecastOffset" data-args="3"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+4h : Inconnu" data-action="SitessetForecastOffset" data-args="4"></div><div role="button" tabindex="0" class="timeline-hour-dot" style="flex: 1; height: 100%; background: rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;" title="+5h : Inconnu" data-action="SitessetForecastOffset" data-args="5"></div>
+                </div>
+                <div class="timeline-legend">
+                    <span class="legend-item"><span class="legend-color" style="background:#22c55e;"></span> Volable</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#eab308;"></span> Orientation inconnue</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#ef4444;"></span> Vent / Rafales</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#f97316;"></span> Mauvaise orientation</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span> Pluie</span>
+                    <span class="legend-item"><span class="legend-color" style="background:rgba(100,100,120,0.5);"></span> Nuit</span>
+                    <span class="legend-item"><span class="legend-color legend-color--incomplete"></span> Prévision incomplète</span>
+                </div>
+            </div>
+            
+                        <div class="creneaux-list bad">
+                            <i class="ri-error-warning-line"></i> Aucun créneau favorable dans les prochaines 6 heures
+                        </div>
+                    
+            
+                    <details class="site-details-toggle" data-site-id="4">
+                        <summary>
+                            <span class="toggle-text">Voir plus d'infos</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </summary>
+                        <div class="site-rich-details">
+
+                            
+        <div class="rich-detail-item default" style="background: rgba(59, 130, 246, 0.06); border-radius: 8px;">
+            <i class="ri-flight-takeoff-line rich-detail-icon blue"></i>
+            <div>
+                <strong class="rich-detail-label muted">Brief pré-vol</strong>
+                <span class="rich-detail-value">Niveau sélectionné : <b>Brevet Pilote</b> — à confronter à la praticabilité et aux dangers ci-dessous.</span>
+                <div style="margin-top: 4px; font-size: 0.9rem;">Matériel : <span style="color: var(--text-muted);">Aucun équipement enregistré</span></div>
+            </div>
+        </div>
+    
+
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                        </div>
+                    </details>
+                
+            
+        </div>",
+    "time": "Météo indisponible",
+  },
+}
+`;
