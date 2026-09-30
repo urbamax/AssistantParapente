@@ -5,4 +5,4 @@
 - [X] T003 [US1] Mark handled events in `SitesView._clickHandler` and `_changeHandler`; T001 passes
 - [X] T004 Check in the browser: no warning, "Active maps" menu opens and closes
 - [X] T005 Add a Playwright check (`tests/e2e/sites_flow.spec.js`, Spec 016), seen failing without the fix; run lint, format check, typecheck, `npm test`, `npm run test:e2e`, `npm run build`
-- [ ] T006 After merge: delete the local branch `worktree-fix-sites-action-delegation` (not checked out in any worktree)
+- [X] T006 After merge: delete the local branch `worktree-fix-sites-action-delegation` (not checked out in any worktree)

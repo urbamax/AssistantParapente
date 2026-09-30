@@ -8,6 +8,7 @@ import { truncate } from '../utils/text_utils.js';
 import { toSorted } from '../utils/array_utils.js';
 import { COURSES_DATA } from '../data/courses_data.js';
 import GdprEngine from '../gdpr_engine.js';
+import AppEvents from '../core/events.js';
 import VoiceService from '../services/voice_service.js';
 import {
     optionLetter,
@@ -197,8 +198,8 @@ class QuizViewClass extends BaseView {
             }
         }
 
-        const value = args[0] || null;
-
+        // setQcmMode, setQcmCount, setMasteryTarget and goBack are registered in js/core/main.js:
+        // handling them here too would run them twice per click (spec 018).
         switch (action) {
             case 'QuizsetThemeSort':
                 this.setThemeSort(args[0]);
@@ -230,22 +231,7 @@ class QuizViewClass extends BaseView {
             case 'QuizimportData':
                 if (this.importData) this.importData();
                 break;
-            case 'setQcmMode':
-            case 'set-mode':
-                QuizService.setMode(value);
-                this.updateModeUI(value, target);
-                break;
-            case 'setQcmCount':
-            case 'set-count':
-                QuizService.setCount(value === 'ALL' ? 'ALL' : parseInt(value));
-                this.updateCountUI(value, target);
-                break;
-            case 'setMasteryTarget':
-                QuizService.setMasteryTarget(parseInt(value));
-                this.updateMasteryTargetUI(value, target);
-                break;
             case 'back-to-setup':
-            case 'goBack':
                 this.showSetupScreen();
                 break;
             case 'show-stats':
@@ -286,7 +272,12 @@ class QuizViewClass extends BaseView {
             case 'quiz-voice-revoke':
                 this.revokeVoiceConsent();
                 break;
+            default:
+                return;
         }
+        // The app-wide delegation (AppEvents) runs after this listener: tell it the action was
+        // handled, so it neither warns "Unregistered action" nor tries a fallback (spec 018).
+        AppEvents.markHandled(e);
     }
 
     handleChange(e) {

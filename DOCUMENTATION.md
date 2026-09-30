@@ -147,6 +147,8 @@ Instead of binding inline listeners, interactive elements use HTML attributes:
 
 The sites screen is the exception: `SitesView.setupEventListeners()` runs bare action names (`toggleDropdown`, `toggleFilterFavoritesOnly`…) itself in the capture phase and calls `AppEvents.markHandled(e)`. `dispatch()` then skips the engine fallback and the "Unregistered action triggered" warning for that event (spec 016). Do not also register those bare names in `AppEvents`: the action would run twice (a menu toggle would open and close on one click).
 
+The quiz screen follows the same rule: `QuizView.handleClick` (on `document.body`, active while the quiz is mounted) runs its own action names (`QuizsetThemeSort`, `toggle-option`, `quiz-voice-*`…) and calls `AppEvents.markHandled(e)` (spec 018). A name has one owner: `setQcmMode`, `setQcmCount`, `setMasteryTarget` and `goBack` are registered in `main.js` only, because a marked event still runs its registered handler. A screen that listens to a control directly (e.g. `#bank-theme-filter`, the equipment "Autre…" selects) must not also give it a `data-action` (specs 017, 018).
+
 ### 4. Router & Screen Lifecycles (`js/core/router.js`)
 `AppRouter` manages SPA screen transitions and maintains browser history (`window.history.pushState`).
 
