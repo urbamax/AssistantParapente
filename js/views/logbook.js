@@ -925,14 +925,16 @@ class LogbookViewClass extends BaseView {
                         <select id="lb-voile" required>
                             <option value="">${tt('form.select')}</option>
                         </select>
-                        <input type="text" id="lb-voile-autre" placeholder="${tt('form.modelPlaceholder')}" style="display:none; margin-top: 5px; width: 100%;">
+                        <input type="text" id="lb-voile-autre" list="voiles-autre-list" placeholder="${tt('form.modelPlaceholder')}" autocomplete="off" style="display:none; margin-top: 5px; width: 100%;">
+                        <datalist id="voiles-autre-list"></datalist>
                     </div>
                     <div class="form-group">
                         <label>${tt('form.harness')}</label>
                         <select id="lb-sellette">
                             <option value="">${tt('form.select')}</option>
                         </select>
-                        <input type="text" id="lb-sellette-autre" placeholder="${tt('form.modelPlaceholder')}" style="display:none; margin-top: 5px; width: 100%;">
+                        <input type="text" id="lb-sellette-autre" list="sellettes-autre-list" placeholder="${tt('form.modelPlaceholder')}" autocomplete="off" style="display:none; margin-top: 5px; width: 100%;">
+                        <datalist id="sellettes-autre-list"></datalist>
                     </div>
                 </div>
                 <div class="form-row">
@@ -1003,12 +1005,16 @@ class LogbookViewClass extends BaseView {
                         <select id="lb-voile" required>
                             <option value="">${tt('form.select')}</option>
                         </select>
+                        <input type="text" id="lb-voile-autre" list="voiles-autre-list" placeholder="${tt('form.modelPlaceholder')}" autocomplete="off" style="display:none; margin-top: 5px; width: 100%;">
+                        <datalist id="voiles-autre-list"></datalist>
                     </div>
                     <div class="form-group">
                         <label>${tt('form.harness')}</label>
                         <select id="lb-sellette">
                             <option value="">${tt('form.select')}</option>
                         </select>
+                        <input type="text" id="lb-sellette-autre" list="sellettes-autre-list" placeholder="${tt('form.modelPlaceholder')}" autocomplete="off" style="display:none; margin-top: 5px; width: 100%;">
+                        <datalist id="sellettes-autre-list"></datalist>
                     </div>
                 </div>
                 <div class="form-row">
@@ -1120,12 +1126,31 @@ class LogbookViewClass extends BaseView {
                 .join('');
         }
 
+        // Populate Equipment Datalists (Historique)
+        const voilesList = document.getElementById('voiles-autre-list');
+        if (voilesList) {
+            const voiles = toSorted(
+                [...new Set(LogbookService.getFlights().map((s) => (typeof s.voile === 'string' ? s.voile.trim() : '')).filter(Boolean))],
+                (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' })
+            );
+            voilesList.innerHTML = voiles.map((name) => `<option value="${escapeHTML(name)}">`).join('');
+        }
+
+        const sellettesList = document.getElementById('sellettes-autre-list');
+        if (sellettesList) {
+            const sellettes = toSorted(
+                [...new Set(LogbookService.getFlights().map((s) => (typeof s.sellette === 'string' ? s.sellette.trim() : '')).filter(Boolean))],
+                (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' })
+            );
+            sellettesList.innerHTML = sellettes.map((name) => `<option value="${escapeHTML(name)}">`).join('');
+        }
+
         // Populate Equipment
         const voilesSelect = document.getElementById('lb-voile');
         const sellettesSelect = document.getElementById('lb-sellette');
 
-        let voilesHtml = `<option value="">${tt('form.freeEntry')}</option>`;
-        let sellettesHtml = `<option value="">${tt('form.freeEntry')}</option>`;
+        let voilesHtml = `<option value="">${tt('form.select')}</option>`;
+        let sellettesHtml = `<option value="">${tt('form.select')}</option>`;
 
         LogbookService.getEquipment()
             .filter((e) => e.statut !== 'archive')
@@ -1524,6 +1549,12 @@ class LogbookViewClass extends BaseView {
             const selectEl = /** @type {HTMLSelectElement} */ (document.getElementById(selectId));
             const autreEl = /** @type {HTMLInputElement} */ (document.getElementById(autreId));
             if (!selectEl || !value) return;
+
+            if (value === 'Autre') {
+                selectEl.value = 'Autre';
+                if (autreEl) autreEl.style.display = 'block';
+                return;
+            }
 
             // On regarde si la valeur existe dans les options
             const options = Array.from(selectEl.options).map((o) => o.value);
@@ -2440,6 +2471,12 @@ class LogbookViewClass extends BaseView {
                 const target = LogbookService.getFlights()[sessionIndex];
                 target.meteo = decollageResult.data;
                 target.meteoAtterro = atterroResult.success ? atterroResult.data : null;
+                
+                // Ne pas afficher la ligne d'atterrissage si la météo est rigoureusement identique
+                if (target.meteoAtterro && JSON.stringify(target.meteo) === JSON.stringify(target.meteoAtterro)) {
+                    target.meteoAtterro = null;
+                }
+                
                 target.baliseId = baliseId || null;
                 LogbookService.saveFlights(); // Persiste en localStorage et déclenche la synchro Firestore
 
