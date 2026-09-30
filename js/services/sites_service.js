@@ -248,6 +248,16 @@ class SitesService {
         if (forecastRangeSelect) forecastRangeSelect.value = String(this.state.forecastMaxRange);
         if (filterModeSelect && this.state.filterMode) filterModeSelect.value = this.state.filterMode;
 
+        const durationSpan = document.getElementById('hide-unflyable-duration');
+        if (durationSpan) {
+            const range = this.state.forecastMaxRange || 120;
+            if (range >= 120) {
+                durationSpan.textContent = `${range / 24} jours`;
+            } else {
+                durationSpan.textContent = `${range} h`;
+            }
+        }
+
         // UI logic moved to sites.js
         if (this.updateMapTogglesVisibility) {
             this.updateMapTogglesVisibility();
@@ -1100,7 +1110,7 @@ class SitesService {
                 // Sans ça, un échec ou un chargement en cours vidait toute la liste.
                 if (forecasts.length === 0) return true;
                 let hours = 0;
-                for (let i = 0; i < Math.min(forecasts.length, 48); i++) {
+                for (let i = 0; i < Math.min(forecasts.length, this.state.forecastMaxRange); i++) {
                     if (this.isForecastFlyable(site, forecasts[i]).flyable) hours++;
                 }
                 return hours > 0;
@@ -1227,6 +1237,16 @@ class SitesService {
                 }
                 this.setForecastOffset(currentOffset);
             }
+            
+            const durationSpan = document.getElementById('hide-unflyable-duration');
+            if (durationSpan) {
+                if (range >= 120) {
+                    durationSpan.textContent = `${range / 24} jours`;
+                } else {
+                    durationSpan.textContent = `${range} h`;
+                }
+            }
+
             this.savePreferences();
         }
     }
