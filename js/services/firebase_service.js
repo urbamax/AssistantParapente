@@ -554,9 +554,23 @@ export const FirebaseAuthEngine = {
             });
 
             // 2. Smart Merge: Compare updatedAt
+            // Re-read tombstones here in case a deletion happened concurrently while this sync
+            // was running (race condition: deleteLogbookEntry fires async, sync reads cloud
+            // before the delete completes → cloud still has the doc → merge would re-add it).
+            let deletedFlightsAtMerge = [];
+            try {
+                deletedFlightsAtMerge = JSON.parse(localStorage.getItem('deleted_flights') || '[]');
+            } catch {}
+            const deletedFlightsSet = new Set(
+                Array.isArray(deletedFlightsAtMerge) ? deletedFlightsAtMerge.filter((id) => typeof id === 'string') : [],
+            );
+
             const mergedLogbookMap = new Map();
             localLogbook.forEach((session) => mergedLogbookMap.set(session.id, session));
             cloudLogbook.forEach((cloudSession) => {
+                // Never re-insert a flight the user just deleted (tombstone guard)
+                if (deletedFlightsSet.has(cloudSession.id)) return;
+
                 const localSession = mergedLogbookMap.get(cloudSession.id);
                 if (localSession) {
                     const localTime = localSession.updatedAt || 0;
@@ -646,9 +660,23 @@ export const FirebaseAuthEngine = {
             });
 
             // 2. Smart Merge: Compare updatedAt
+            // Re-read tombstones (same race-condition guard as logbook above).
+            let deletedEquipAtMerge = [];
+            try {
+                deletedEquipAtMerge = JSON.parse(localStorage.getItem('deleted_equipment') || '[]');
+            } catch {}
+            const deletedEquipSet = new Set(
+                Array.isArray(deletedEquipAtMerge)
+                    ? deletedEquipAtMerge.filter((id) => typeof id === 'string')
+                    : [],
+            );
+
             const mergedEquipMap = new Map();
             localEquip.forEach((item) => mergedEquipMap.set(item.id, item));
             cloudEquip.forEach((cloudItem) => {
+                // Never re-insert equipment the user just deleted (tombstone guard)
+                if (deletedEquipSet.has(cloudItem.id)) return;
+
                 const localItem = mergedEquipMap.get(cloudItem.id);
                 if (localItem) {
                     const localTime = localItem.updatedAt || 0;
