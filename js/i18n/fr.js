@@ -91,7 +91,7 @@ export const FR = Object.freeze({
                 'Coordonnées illisibles. Formats acceptés : « 50.68123, 1.59234 », « 50°40\'52"N 1°35\'32"E » ou un lien Google Maps.',
             statusChosen: 'Position choisie : {coords}',
             statusFromHistory: 'Position reprise de votre dernière session à ce lieu : {coords}',
-            statusKnownSite: 'Site connu : sa position sert pour la météo.',
+            statusKnownSite: 'Site de la base reconnu : {name}. Pas le bon lieu ? Placez-le sur la carte.',
             statusMissing: 'Lieu absent de la base : placez-le sur la carte pour obtenir la météo.',
             layerSatellite: 'Satellite',
             layerTopo: 'Carte',

@@ -74,4 +74,21 @@ test.describe('E2E - Logbook site coordinates picker', () => {
         await expect(page.locator('#logbook-tab-add')).toBeVisible();
         expect(await savedSession(page)).toBeNull();
     });
+
+    test('choosing a place already placed fills its coordinates, and another place clears them', async ({ page }) => {
+        await page.locator('[data-action="toggleCoordsPicker"]').first().click();
+        await page.fill('#lb-coords', '50.68122, 1.59233');
+        await submit(page);
+        await expect(page.locator('.logbook-card').filter({ hasText: 'PENTE TEST CARTE' }).first()).toBeVisible();
+
+        await page.locator('[data-action="LogbookswitchTab"][data-args="\'add\'"]').first().click();
+        await page.locator('#btn-type-gonflage').first().click();
+        await page.fill('#lb-lieu', 'PENTE TEST CARTE');
+        await expect(page.locator('#lb-coords')).toHaveValue('50.68122, 1.59233');
+        await expect(page.locator('#lb-coords-status')).toContainText('dernière session');
+
+        await page.fill('#lb-lieu', 'Zqxv Wkjy');
+        await expect(page.locator('#lb-coords')).toHaveValue('');
+        await expect(page.locator('#lb-coords-status')).toContainText('absent de la base');
+    });
 });

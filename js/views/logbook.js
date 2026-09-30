@@ -641,13 +641,14 @@ class LogbookViewClass extends BaseView {
         return el ? el.value.trim() : '';
     }
 
-    // Coordonnées du site de la base correspondant au lieu saisi, s'il y en a un.
+    // Site de la base rapproché du lieu saisi (recherche approximative par mots), s'il y en a un.
     getKnownSiteCoords() {
         const name = this.getPlaceName();
         if (!name) return null;
-        const coords = this.getSiteCoords(this.findSiteByName(name));
+        const site = this.findSiteByName(name);
+        const coords = this.getSiteCoords(site);
         return Number.isFinite(Number(coords.lat)) && Number.isFinite(Number(coords.lon)) && coords.lat && coords.lon
-            ? { lat: Number(coords.lat), lon: Number(coords.lon) }
+            ? { name: site.nom || site.name || '', lat: Number(coords.lat), lon: Number(coords.lon) }
             : null;
     }
 
@@ -664,12 +665,16 @@ class LogbookViewClass extends BaseView {
                     ? t('logbook.coords.statusFromHistory', { coords: formatted })
                     : t('logbook.coords.statusChosen', { coords: formatted });
         } else if (!input.value.trim() && this.getPlaceName()) {
-            text = this.getKnownSiteCoords() ? t('logbook.coords.statusKnownSite') : t('logbook.coords.statusMissing');
+            const known = this.getKnownSiteCoords();
+            text = known
+                ? t('logbook.coords.statusKnownSite', { name: known.name })
+                : t('logbook.coords.statusMissing');
         }
         status.textContent = text;
     }
 
-    // Lieu modifié : un lieu hors base déjà utilisé reprend les coordonnées de sa dernière session.
+    // Lieu modifié : un lieu déjà utilisé reprend les coordonnées de sa dernière session. Elles passent
+    // avant la base des sites, dont la recherche par mots peut rapprocher « Equihen terrain » d'un autre site.
     onPlaceChanged() {
         const input = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'));
         if (!input) return;
@@ -677,7 +682,7 @@ class LogbookViewClass extends BaseView {
             input.value = '';
             this.coordsAutoFilled = null;
         }
-        if (!input.value.trim() && !this.getKnownSiteCoords()) {
+        if (!input.value.trim()) {
             const previous = LogbookService.findLastCoordsForPlace(this.getPlaceName());
             if (previous) {
                 input.value = formatCoordinates(previous.lat, previous.lon);

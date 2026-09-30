@@ -23,7 +23,8 @@ In the « Ajouter » tab (flight or ground handling), the pilot types a place th
 3. **Given** coordinates copied from Google Maps or elsewhere (« 50.68123, 1.59234 », degrees-minutes-seconds such as « 50°40'52.4"N 1°35'32.4"E », or a Google Maps link containing `@lat,lon`), **When** they are pasted in the coordinates field, **Then** the pin moves there (keyboard equivalent of the map).
 4. **Given** chosen coordinates, **When** the session is saved, **Then** it stores them and its weather uses them (a GPS track still takes precedence for a flight).
 5. **Given** a session with coordinates being edited, **When** the form opens, **Then** the field shows them; **When** the pilot removes the point and saves, **Then** the coordinates are removed.
-6. **Given** a place already saved with coordinates in an earlier session and absent from the database, **When** the pilot types it again, **Then** its coordinates are proposed automatically.
+6. **Given** a place already saved with coordinates in an earlier session, **When** the pilot types or picks the same name again, **Then** its coordinates are filled automatically, even if the approximate word search also matches a database site.
+7. **Given** a place matched to a database site, **When** no coordinates are chosen, **Then** the status names the matched site so the pilot can spot a wrong match and place the point instead.
 
 ### Edge Cases
 
@@ -38,7 +39,7 @@ In the « Ajouter » tab (flight or ground handling), the pilot types a place th
 - **FR-002**: Clicking the map or dragging the pin MUST set the coordinates; the coordinates field MUST accept decimal, degrees-minutes-seconds and Google Maps link formats.
 - **FR-003**: Saved coordinates MUST be stored as `lat`/`lon` on the session and used for its weather; an imported GPS track overrides them.
 - **FR-004**: Editing MUST show existing coordinates; emptying them MUST remove them on save; invalid text MUST block the save with a message.
-- **FR-005**: For a place absent from the site database, the coordinates of the latest earlier session with the same name MUST be proposed.
+- **FR-005**: The coordinates of the latest earlier session with the same name (case and surrounding spaces ignored) MUST be filled automatically, taking precedence over a database match; the status MUST name the database site matched by the approximate search.
 - **FR-006**: The map MUST be created only on demand and released when the form is reset, re-rendered or the view unmounted.
 - **FR-007**: User-facing texts MUST live in `js/i18n/fr.js`.
 
