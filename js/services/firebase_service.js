@@ -58,6 +58,10 @@ export const FirebaseAuthEngine = {
     enabled: false,
     currentUser: null,
 
+    // Chargeur du SDK Firestore utilisé par la synchro complète ; remplaçable en test, où
+    // l'import dynamique de l'URL du SDK hébergé n'est pas résoluble.
+    _loadFirestore: loadFirestoreModule,
+
     // --- État du voyant de synchronisation (point dans le header) ---
     // _changeSeq augmente à chaque modification locale à envoyer ; _syncedSeq retient la
     // dernière modification confirmée par une synchro complète réussie. Tant que
@@ -480,7 +484,7 @@ export const FirebaseAuthEngine = {
         }
 
         try {
-            const { doc, getDoc, setDoc, collection, getDocs, deleteDoc } = await loadFirestoreModule();
+            const { doc, getDoc, setDoc, collection, getDocs, deleteDoc } = await this._loadFirestore();
             const uid = this.currentUser.uid;
 
             // --- Sync Logbook ---
@@ -572,16 +576,38 @@ export const FirebaseAuthEngine = {
             }
 
             // --- Sync Equipment ---
+            // 0. Process Tombstones (Deleted items) FIRST, comme pour les vols (spec 015)
+            let deletedEquip = [];
+            try {
+                deletedEquip = JSON.parse(localStorage.getItem('deleted_equipment') || '[]');
+            } catch {}
+            if (!Array.isArray(deletedEquip)) deletedEquip = [];
+
+            if (deletedEquip.length > 0) {
+                for (const delId of deletedEquip) {
+                    // Guard : l'ID doit être une string non-vide pour Firestore
+                    if (!delId || typeof delId !== 'string') {
+                        console.warn('[Sync] Tombstone équipement ignoré : ID invalide', delId);
+                        continue;
+                    }
+                    const eRef = doc(db, 'users', uid, 'equipment', delId);
+                    await deleteDoc(eRef);
+                }
+                localStorage.setItem('deleted_equipment', '[]');
+                console.log(`Removed ${deletedEquip.length} deleted equipment items from Cloud.`);
+            }
+
             let localEquip = StorageService.get(StorageService.KEYS.EQUIPMENT_DATA) || [];
             if (!Array.isArray(localEquip)) localEquip = [];
 
-            // Sanitation : on retire tout élément sans ID valide
+            // Sanitation : on retire tout élément sans ID valide, ainsi que les équipements supprimés
+            // (ils ne doivent pas être renvoyés vers le cloud)
             localEquip = localEquip.filter((e) => {
                 if (!e || !e.id || typeof e.id !== 'string') {
                     console.warn('[Sync] Équipement ignoré : ID invalide ou manquant', e);
                     return false;
                 }
-                return true;
+                return !deletedEquip.includes(e.id);
             });
 
             // 1. Process Pending Queue (Local -> Cloud)
@@ -1082,6 +1108,7 @@ export const FirebaseAuthEngine = {
             [StorageService.KEYS.PENDING_QUIZ]: StorageService.get(StorageService.KEYS.PENDING_QUIZ),
             // --- Clés système supplémentaires ---
             deleted_flights: JSON.parse(localStorage.getItem('deleted_flights') || '[]'),
+            deleted_equipment: JSON.parse(localStorage.getItem('deleted_equipment') || '[]'),
             LAST_ACTIVE_ROUTE: localStorage.getItem('LAST_ACTIVE_ROUTE'),
             firebase_last_sync: localStorage.getItem(LAST_SYNC_STORAGE_KEY),
         };
@@ -1163,6 +1190,9 @@ export const FirebaseAuthEngine = {
                 // --- Restauration des clés système ---
                 if (Array.isArray(data.deleted_flights)) {
                     localStorage.setItem('deleted_flights', JSON.stringify(data.deleted_flights));
+                }
+                if (Array.isArray(data.deleted_equipment)) {
+                    localStorage.setItem('deleted_equipment', JSON.stringify(data.deleted_equipment));
                 }
                 if (data.LAST_ACTIVE_ROUTE) {
                     localStorage.setItem('LAST_ACTIVE_ROUTE', data.LAST_ACTIVE_ROUTE);
