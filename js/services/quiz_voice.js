@@ -42,15 +42,30 @@ export function buildQuestionSpeech(q) {
  * @param {{ isCorrect: boolean, question: { explication?: string } }} result
  */
 export function buildFeedbackSpeech(result) {
-    const verdict = t(result.isCorrect ? 'quiz.voice.speech.correct' : 'quiz.voice.speech.incorrect');
+    let verdictKey = 'quiz.voice.speech.incorrect';
+    if (result.isCorrect) {
+        verdictKey = 'quiz.voice.speech.correct';
+    } else if (result.userPoints > 0 && result.selected && !result.selected.some(c => c.pts < 0)) {
+        verdictKey = 'quiz.voice.speech.incomplete';
+    }
+    
+    const verdict = t(verdictKey);
     const explanation = String(result.question?.explication || '').trim();
     return explanation ? `${verdict} ${withFinalStop(explanation)}` : verdict;
 }
 
-/** @param {number[]} indexes */
-export function describeSelection(indexes) {
+/** 
+ * @param {number[]} indexes 
+ * @param {{text: string}[]} [choices]
+ */
+export function describeSelection(indexes, choices = []) {
     if (!indexes.length) return t('quiz.voice.speech.cleared');
-    return t('quiz.voice.speech.selection', { letters: indexes.map(optionLetter).join(', ') });
+    const spokenOptions = indexes.map(i => {
+        const letter = optionLetter(i);
+        const text = choices && choices[i] ? choices[i].text : '';
+        return text ? `${letter}, ${text}` : letter;
+    });
+    return t('quiz.voice.speech.selection', { letters: spokenOptions.join('. ') });
 }
 
 /** Minuscules, sans accents, apostrophes et ponctuation remplacées par des espaces. */

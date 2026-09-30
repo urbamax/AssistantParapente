@@ -478,6 +478,7 @@ export const FR = Object.freeze({
                 option: 'Réponse {letter} : {text}.',
                 correct: 'Bonne réponse.',
                 incorrect: 'Mauvaise réponse.',
+                incomplete: 'Réponse incomplète.',
                 selection: 'Sélection : {letters}.',
                 cleared: 'Sélection effacée.',
             }),

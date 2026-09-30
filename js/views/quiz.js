@@ -1778,7 +1778,7 @@ class QuizViewClass extends BaseView {
                 if (isSelected !== wanted.has(idx)) this.toggleOptionSelection(btn);
             },
         );
-        if (VoiceService.canSpeak()) VoiceService.speak(describeSelection(indexes));
+        if (VoiceService.canSpeak()) VoiceService.speak(describeSelection(indexes, this._currentChoices));
     }
 
     renderVoiceBar() {
