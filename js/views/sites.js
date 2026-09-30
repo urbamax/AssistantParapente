@@ -11,6 +11,7 @@ import { escapeHTML, renderSiteText, safeHttpUrl } from '../core/security.js';
 import GdprEngine from '../gdpr_engine.js';
 
 import BaseView from '../core/base_view.js';
+import AppEvents from '../core/events.js';
 import { t } from '../utils/i18n.js';
 import { FR } from '../i18n/fr.js';
 
@@ -309,6 +310,7 @@ class SitesViewClass extends BaseView {
                 const args = btn.getAttribute('data-args');
 
                 if (typeof SitesService[action] === 'function') {
+                    AppEvents.markHandled(e);
                     let result;
                     if (args !== null)
                         result = SitesService[action](...args.split(',').map((a) => a.trim().replace(/'/g, '')));
@@ -339,6 +341,7 @@ class SitesViewClass extends BaseView {
                         updateUI();
                     }
                 } else if (typeof this[action] === 'function') {
+                    AppEvents.markHandled(e);
                     if (args !== null) this[action](...args.split(',').map((a) => a.trim().replace(/'/g, '')), btn);
                     else this[action](btn);
                 }
@@ -349,6 +352,7 @@ class SitesViewClass extends BaseView {
             const el = e.target;
             const action = el.getAttribute('data-action');
             if (action && typeof SitesService[action] === 'function') {
+                AppEvents.markHandled(e);
                 let result;
                 if (el.type === 'checkbox') result = SitesService[action](el.checked);
                 else result = SitesService[action](el.value);
@@ -370,6 +374,7 @@ class SitesViewClass extends BaseView {
                     updateUI();
                 }
             } else if (action && typeof this[action] === 'function') {
+                AppEvents.markHandled(e);
                 this[action](el.value);
             }
         };
