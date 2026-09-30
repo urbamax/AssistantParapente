@@ -33,3 +33,21 @@ describe('LogbookView.refreshSessionWeather', () => {
         expect(() => LogbookView.refreshSessionWeather('42')).not.toThrow();
     });
 });
+
+describe('LogbookView.renderSessionWeatherHtml labels', () => {
+    const meteo = { temperature: 28, ventVitesse: 18, ventRafales: 47, ventDirection: 185, weatherCode: 2 };
+
+    it('labels a flight with take-off and landing', () => {
+        const html = LogbookView.renderSessionWeatherHtml({ id: '1', type: 'vol', meteo, meteoAtterro: meteo });
+        expect(html).toContain('Décollage');
+        expect(html).toContain('Atterrissage');
+    });
+
+    it('labels a ground handling session with start and end, never take-off or landing', () => {
+        const html = LogbookView.renderSessionWeatherHtml({ id: '2', type: 'gonflage', meteo, meteoAtterro: meteo });
+        expect(html).toContain('Début :');
+        expect(html).toContain('Fin :');
+        expect(html).not.toContain('Décollage');
+        expect(html).not.toContain('Atterrissage');
+    });
+});
