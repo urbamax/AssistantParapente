@@ -1858,7 +1858,7 @@ class LogbookViewClass extends BaseView {
             for (const [voile, st] of Object.entries(equipStats)) {
                 html += `
                     <div class="equip-card">
-                        <div class="equip-name">${voile}</div>
+                        <div class="equip-name">${escapeHTML(voile)}</div>
                         <div class="equip-details">
                             <span style="color: var(--accent-blue)">Vols: ${st.vols} (${formatDuration(st.timeVols)})</span>
                             <span style="color: #f59e0b">Gonflage: ${st.gonflages} (${formatDuration(st.timeGonflages)})</span>
@@ -1892,7 +1892,7 @@ class LogbookViewClass extends BaseView {
                 const percent = (count / maxVal) * 100;
                 html += `
                     <div class="bar-row">
-                        <div class="bar-label">${site}</div>
+                        <div class="bar-label">${escapeHTML(site)}</div>
                         <div class="bar-track">
                             <div class="bar-fill" style="width: ${percent}%; background: var(--accent-green)"></div>
                         </div>
@@ -1910,7 +1910,7 @@ class LogbookViewClass extends BaseView {
                 const percent = (count / totalVols) * 100;
                 html += `
                     <div class="bar-row">
-                        <div class="bar-label">${type}</div>
+                        <div class="bar-label">${escapeHTML(type)}</div>
                         <div class="bar-track">
                             <div class="bar-fill" style="width: ${percent}%; background: var(--accent-blue)"></div>
                         </div>
@@ -1929,7 +1929,7 @@ class LogbookViewClass extends BaseView {
                 const percent = (count / totalDeco) * 100;
                 html += `
                     <div class="bar-row">
-                        <div class="bar-label" title="${type}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${type}</div>
+                        <div class="bar-label" title="${escapeHTML(type)}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(type)}</div>
                         <div class="bar-track">
                             <div class="bar-fill" style="width: ${percent}%; background: #8b5cf6"></div>
                         </div>
@@ -1947,7 +1947,7 @@ class LogbookViewClass extends BaseView {
                 const percent = (count / totalGonflages) * 100;
                 html += `
                     <div class="bar-row">
-                        <div class="bar-label">${type}</div>
+                        <div class="bar-label">${escapeHTML(type)}</div>
                         <div class="bar-track">
                             <div class="bar-fill" style="width: ${percent}%; background: #f59e0b"></div>
                         </div>

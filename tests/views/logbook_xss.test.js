@@ -43,3 +43,52 @@ describe('LogbookView equipment dropdowns escape stored free-text values', () =>
         expect(html).toContain(ESCAPED_OPEN);
     });
 });
+
+// renderStats() used to insert the wing name, places, flight types, take-off techniques and
+// ground handling exercises raw into the statistics page. Those values can come from cloud sync
+// or a JSON import, so each one must be escaped (spec 014).
+describe('LogbookView statistics escape pilot-entered values', () => {
+    const payload = (field) => `"><img src=x onerror=window.__xss=1 data-field=${field}>`;
+
+    beforeEach(() => {
+        delete window.__xss;
+        document.body.innerHTML = '<div id="logbook-stats-container"></div>';
+        LogbookService.equipment = [];
+        LogbookService.flights = [
+            {
+                id: 'f1',
+                type: 'vol',
+                duree: 30,
+                site: payload('site'),
+                typeVol: payload('typeVol'),
+                techDecollage: payload('techDecollage'),
+                voile: payload('voile'),
+            },
+            {
+                id: 'g1',
+                type: 'gonflage',
+                duree: 20,
+                lieu: payload('lieu'),
+                typeExercice: [payload('exercice')],
+            },
+        ];
+    });
+
+    it('renders every value as text without injecting elements or attributes', () => {
+        LogbookView.renderStats();
+
+        const container = document.getElementById('logbook-stats-container');
+        expect(container.querySelector('img')).toBeNull();
+        expect(container.querySelector('[onerror]')).toBeNull();
+
+        const texts = [...container.querySelectorAll('.equip-name, .bar-label')].map((el) => el.textContent.trim());
+        for (const field of ['voile', 'site', 'lieu', 'typeVol', 'techDecollage', 'exercice']) {
+            expect(texts).toContain(payload(field));
+        }
+
+        const decoLabel = [...container.querySelectorAll('.bar-label[title]')].find((el) =>
+            el.textContent.includes('techDecollage'),
+        );
+        expect(decoLabel.getAttribute('title')).toBe(payload('techDecollage'));
+    });
+});
