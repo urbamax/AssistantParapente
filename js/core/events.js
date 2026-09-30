@@ -81,6 +81,26 @@ class EventDelegator {
             if (target) this.dispatch(target.getAttribute('data-input-action'), target.value, e, target);
         });
 
+        // Clavier (spec 010) : Entrée ou Espace sur un « bouton » non natif (div/span… avec
+        // role="button") déclenche son action comme un clic. Les boutons, liens et champs natifs
+        // gèrent déjà le clavier eux-mêmes : on ne les traite pas ici (pas de double action).
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            const target = /** @type {HTMLElement | null} */ (
+                /** @type {HTMLElement} */ (e.target).closest('[data-action][role="button"]')
+            );
+            if (!target || target !== e.target) return;
+            if (['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName)) return;
+            if (target.tagName === 'A' && target.hasAttribute('href')) return;
+            e.preventDefault(); // Espace ne fait pas défiler la page
+            this.dispatch(
+                target.getAttribute('data-action'),
+                this._parseArgs(target.getAttribute('data-args')),
+                e,
+                target,
+            );
+        });
+
         // Enter key on a text field
         document.addEventListener('keydown', (e) => {
             if (e.key !== 'Enter') return;

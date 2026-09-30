@@ -711,37 +711,37 @@ class QuizViewClass extends BaseView {
 
             const distributionHtml = `
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
-                <div data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="${getCardStyle(cGreen, 'PERFECT')}">
+                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="${getCardStyle(cGreen, 'PERFECT')}">
                     <div style="font-size:2rem; font-weight:900; color:#4ade80;">${perfect}</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Maîtrisées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(100%)</div>
                 </div>
-                <div data-action="QuizsetMasteryFilter" data-args="['EXCELLENT']" style="${getCardStyle('134, 239, 172', 'EXCELLENT')}">
+                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['EXCELLENT']" style="${getCardStyle('134, 239, 172', 'EXCELLENT')}">
                     <div style="font-size:2rem; font-weight:900; color:#86efac;">${excellent}</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Excellentes</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(90-99%)</div>
                 </div>
-                <div data-action="QuizsetMasteryFilter" data-args="['VERY_GOOD']" style="${getCardStyle('56, 189, 248', 'VERY_GOOD')}">
+                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['VERY_GOOD']" style="${getCardStyle('56, 189, 248', 'VERY_GOOD')}">
                     <div style="font-size:2rem; font-weight:900; color:#38bdf8;">${veryGood}</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Très Bonnes</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(75-89%)</div>
                 </div>
-                <div data-action="QuizsetMasteryFilter" data-args="['GOOD']" style="${getCardStyle(cYellow, 'GOOD')}">
+                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['GOOD']" style="${getCardStyle(cYellow, 'GOOD')}">
                     <div style="font-size:2rem; font-weight:900; color:#facc15;">${good}</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Satisfaisantes</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(50-74%)</div>
                 </div>
-                <div data-action="QuizsetMasteryFilter" data-args="['POOR']" style="${getCardStyle(cOrange, 'POOR')}">
+                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="${getCardStyle(cOrange, 'POOR')}">
                     <div style="font-size:2rem; font-weight:900; color:#fb923c;">${poor}</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
-                <div data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="${getCardStyle(cRed, 'FAILED')}">
+                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="${getCardStyle(cRed, 'FAILED')}">
                     <div style="font-size:2rem; font-weight:900; color:#f87171;">${failed}</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Échecs</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(0%)</div>
                 </div>
-                <div data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="${getCardStyle(cGray, 'NOT_ATTEMPTED')}">
+                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="${getCardStyle(cGray, 'NOT_ATTEMPTED')}">
                     <div style="font-size:2rem; font-weight:900; color:var(--text-muted);">${notAttempted}</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Non tentées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(sur ${totalLevelQuestions})</div>
@@ -848,7 +848,7 @@ class QuizViewClass extends BaseView {
                 const barWidth = totalQ > 0 ? pct : 0;
 
                 themesHtml += `
-                <div class="theme-card" data-action="QuizsetThemeFilter" data-args="['${name}']" style="cursor:pointer; padding:16px 18px; border-radius:16px; ${cardBorder} ${cardBg} color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['${name}']" style="cursor:pointer; padding:16px 18px; border-radius:16px; ${cardBorder} ${cardBg} color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden;">
                     <!-- Subtle background glow for active -->
                     ${isActive ? `<div style="position:absolute;inset:0;background:radial-gradient(ellipse at top left, rgba(${tColorRgb},0.08) 0%, transparent 70%);pointer-events:none;"></div>` : ''}
 
@@ -969,7 +969,7 @@ class QuizViewClass extends BaseView {
                     <div style="font-size:0.9rem; opacity:0.7;">
                         <span style="font-weight:700; color:var(--text-main);">${visibleQuestions.length}</span> questions 
                         <span style="opacity:0.6;">(${displayLabel})</span>
-                        ${QuizView.state.masteryFilter !== 'ALL' || QuizView.state.themeFilter ? '<a data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">Tout effacer</a>' : ''}
+                        ${QuizView.state.masteryFilter !== 'ALL' || QuizView.state.themeFilter ? '<a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">Tout effacer</a>' : ''}
                     </div>
                     <div style="display:flex; gap:8px;">
                         <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
@@ -1054,7 +1054,7 @@ class QuizViewClass extends BaseView {
                     const hasAnswers = qObj && qObj.choices;
 
                     allQuestionsHtml += `
-                    <div class="question-stat-item" data-code="${code}" data-pct="${pct}" data-total="${data.total}" data-streak="${streak}" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:${hasAnswers ? 'pointer' : 'default'};" ${hasAnswers ? `data-action="QuiztoggleQuestionDetails" data-args="['${code}']"` : ''}>
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="${code}" data-pct="${pct}" data-total="${data.total}" data-streak="${streak}" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:${hasAnswers ? 'pointer' : 'default'};" ${hasAnswers ? `data-action="QuiztoggleQuestionDetails" data-args="['${code}']"` : ''}>
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -1289,7 +1289,7 @@ class QuizViewClass extends BaseView {
             questionsHtml += '</div></div>';
 
             html += `
-    <div data-exam-id="${exam.id}" style="background:var(--bg-card); padding:16px; border-radius:12px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleExamDetails" data-args="['${exam.id}']" >
+    <div role="button" tabindex="0" data-exam-id="${exam.id}" style="background:var(--bg-card); padding:16px; border-radius:12px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleExamDetails" data-args="['${exam.id}']" >
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div style="flex:1;">
                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
