@@ -8,6 +8,18 @@ import { truncate } from '../utils/text_utils.js';
 import { toSorted } from '../utils/array_utils.js';
 import { COURSES_DATA } from '../data/courses_data.js';
 import GdprEngine from '../gdpr_engine.js';
+import VoiceService from '../services/voice_service.js';
+import {
+    optionLetter,
+    buildQuestionSpeech,
+    buildFeedbackSpeech,
+    describeSelection,
+    parseVoiceCommand,
+} from '../services/quiz_voice.js';
+import { t } from '../utils/i18n.js';
+
+/** Texte du mode vocal (spec 016), échappé pour le HTML. */
+const tv = (key, params = {}) => escapeHTML(t(`quiz.voice.${key}`, params));
 
 /**
  * PURE VIEW - QuizView
@@ -135,6 +147,7 @@ class QuizViewClass extends BaseView {
 
     async unmount() {
         await super.unmount();
+        this.stopVoice();
         if (this._handleClick) document.body.removeEventListener('click', this._handleClick);
 
         if (this._unsubscribeLevel) {
@@ -253,6 +266,25 @@ class QuizViewClass extends BaseView {
                 break;
             case 'finish-session':
                 AppRouter.navigate('QCM');
+                break;
+            case 'quiz-voice-read':
+                this.toggleReadAloud();
+                break;
+            case 'quiz-voice-auto':
+                this.toggleAutoRead();
+                break;
+            case 'quiz-voice-mic':
+                this.toggleVoiceAnswers();
+                break;
+            case 'quiz-voice-consent':
+                this.acceptVoiceConsent();
+                break;
+            case 'quiz-voice-cancel':
+                this._voiceNoticeOpen = false;
+                this.renderVoiceBar();
+                break;
+            case 'quiz-voice-revoke':
+                this.revokeVoiceConsent();
                 break;
         }
     }
@@ -1386,6 +1418,10 @@ class QuizViewClass extends BaseView {
     }
 
     renderQuestion(q) {
+        VoiceService.stopSpeaking();
+        this._voiceQuestion = q || null;
+        this._voiceFeedback = null;
+
         const feedbackDiv = document.getElementById('qcm-feedback');
         feedbackDiv.style.display = 'none';
 
@@ -1395,6 +1431,8 @@ class QuizViewClass extends BaseView {
 
         if (!q) {
             // End of quiz
+            this.stopVoice();
+            this.renderVoiceBar();
             this.renderExamResults();
             return;
         }
@@ -1477,12 +1515,13 @@ class QuizViewClass extends BaseView {
             <div class="quiz-question-text">${escapeHTML(q.question)}</div>
         `;
 
-        // Render choices
+        // Render choices (spec 016 : lettres affichées dès que le mode vocal est disponible)
+        const withLetters = this.isVoiceAvailable();
         choicesDiv.innerHTML = q.choices
             .map(
                 (opt, idx) => `
             <button class="qcm-option" data-action="toggle-option" data-idx="${idx}">
-                ${escapeHTML(opt.text)}
+                ${withLetters ? `<span class="qcm-option-letter">${optionLetter(idx)}</span>` : ''}${escapeHTML(opt.text)}
             </button>
         `,
             )
@@ -1505,6 +1544,9 @@ class QuizViewClass extends BaseView {
         if (existingResult && !isExam) {
             this.showAnswerFeedback(existingResult, qIdx > 1);
         }
+
+        this.renderVoiceBar();
+        if (VoiceService.getPrefs().autoRead) this.readAloud();
     }
 
     toggleOptionSelection(btnElement) {
@@ -1529,6 +1571,7 @@ class QuizViewClass extends BaseView {
             this.renderQuestion(QuizService.nextQuestion());
         } else {
             this.showAnswerFeedback(result, QuizService.state.qcmIndex > 0);
+            if (VoiceService.getPrefs().autoRead) this.readAloud();
         }
     }
 
@@ -1573,6 +1616,255 @@ class QuizViewClass extends BaseView {
                 ${courseUrl ? `<button data-action="openUrl" data-url="${escapeHTML(courseUrl)}" style="margin-top:10px; background:var(--accent-blue); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR DANS LE COURS</button>` : ''}
             </div>
         `;
+
+        this._voiceFeedback = result;
+        this.renderVoiceBar();
+    }
+
+    // ------------------------------------------------------------------ mode vocal (spec 016)
+
+    isVoiceAvailable() {
+        return VoiceService.canSpeak() || VoiceService.canListen();
+    }
+
+    /** Ce que « Lire » dit : la correction si la question est validée, sinon la question. */
+    currentSpeech() {
+        if (this._voiceFeedback) return buildFeedbackSpeech(this._voiceFeedback);
+        return this._voiceQuestion ? buildQuestionSpeech(this._voiceQuestion) : '';
+    }
+
+    readAloud() {
+        const text = this.currentSpeech();
+        if (!text || !VoiceService.canSpeak()) return;
+        VoiceService.speak(text, { onEnd: () => this.renderVoiceBar() });
+        this.renderVoiceBar();
+    }
+
+    toggleReadAloud() {
+        if (VoiceService.isSpeaking()) {
+            VoiceService.stopSpeaking();
+            this.renderVoiceBar();
+        } else {
+            this.readAloud();
+        }
+    }
+
+    toggleAutoRead() {
+        VoiceService.setPrefs({ autoRead: !VoiceService.getPrefs().autoRead });
+        this.renderVoiceBar();
+    }
+
+    toggleVoiceAnswers() {
+        if (VoiceService.isListening()) {
+            VoiceService.stopListening();
+            this._voiceStatus = t('quiz.voice.stopped');
+        } else if (!VoiceService.getPrefs().voiceConsent) {
+            this._voiceNoticeOpen = true;
+        } else {
+            this.startVoiceAnswers();
+        }
+        this.renderVoiceBar();
+    }
+
+    acceptVoiceConsent() {
+        VoiceService.setPrefs({ voiceConsent: true });
+        this._voiceNoticeOpen = false;
+        this.startVoiceAnswers();
+        this.renderVoiceBar();
+    }
+
+    revokeVoiceConsent() {
+        VoiceService.stopListening();
+        VoiceService.setPrefs({ voiceConsent: false });
+        this._voiceNoticeOpen = false;
+        this._voiceStatus = t('quiz.voice.revoked');
+        this.renderVoiceBar();
+    }
+
+    startVoiceAnswers() {
+        const started = VoiceService.startListening({
+            onResult: (alternatives) => this.handleVoiceResult(alternatives),
+            onError: (code) => this.handleVoiceError(code),
+        });
+        if (started) this._voiceStatus = t('quiz.voice.listening');
+    }
+
+    /** Arrête lecture et écoute (changement d'écran, fin de session). */
+    stopVoice() {
+        VoiceService.stopSpeaking();
+        VoiceService.stopListening();
+        this._voiceNoticeOpen = false;
+        this._voiceStatus = '';
+    }
+
+    handleVoiceError(code) {
+        const keys = {
+            'not-allowed': 'errorNotAllowed',
+            network: 'errorNetwork',
+            offline: 'errorOffline',
+            unsupported: 'errorUnsupported',
+        };
+        this._voiceStatus = keys[code] ? t(`quiz.voice.${keys[code]}`) : t('quiz.voice.errorOther', { code });
+        this.renderVoiceBar();
+    }
+
+    /** @param {string[]} alternatives transcriptions proposées, de la plus probable à la moins probable */
+    handleVoiceResult(alternatives) {
+        const q = this._voiceQuestion;
+        if (!q) return;
+        let heard = alternatives[0] || '';
+        let command = /** @type {import('../services/quiz_voice.js').VoiceCommand} */ ({ type: 'unknown' });
+        for (const alt of alternatives) {
+            const parsed = parseVoiceCommand(alt, q.choices.length);
+            if (parsed.type !== 'unknown') {
+                heard = alt;
+                command = parsed;
+                break;
+            }
+        }
+
+        if (command.type === 'unknown') {
+            this._voiceStatus = t('quiz.voice.notUnderstood', { text: heard.trim() });
+            this.renderVoiceBar();
+            return;
+        }
+
+        this._voiceStatus = t('quiz.voice.heard', { text: heard.trim() });
+        const isExam = QuizService.state.qcmConfig.mode === 'EXAM';
+        const answered = !isExam && !!QuizService.state.examResults[QuizService.state.qcmIndex];
+
+        if (command.type === 'letters') {
+            if (answered) this._voiceStatus = t('quiz.voice.frozen');
+            else this.selectOptionsByVoice(command.indexes);
+            this.renderVoiceBar();
+            return;
+        }
+
+        switch (command.name) {
+            case 'validate':
+                if (answered) {
+                    this._voiceStatus = t('quiz.voice.frozen');
+                    this.renderVoiceBar();
+                } else {
+                    this.validateQuestion();
+                }
+                break;
+            case 'next':
+                if (answered) {
+                    this.renderQuestion(QuizService.nextQuestion());
+                } else {
+                    this._voiceStatus = t('quiz.voice.validateFirst');
+                    this.renderVoiceBar();
+                }
+                break;
+            case 'prev':
+                if (QuizService.state.qcmIndex > 0) this.renderQuestion(QuizService.prevQuestion());
+                else this.renderVoiceBar();
+                break;
+            case 'repeat':
+                this.readAloud();
+                break;
+            case 'clear':
+                if (answered) this._voiceStatus = t('quiz.voice.frozen');
+                else this.selectOptionsByVoice([]);
+                this.renderVoiceBar();
+                break;
+            case 'stop':
+                VoiceService.stopListening();
+                this._voiceStatus = t('quiz.voice.stopped');
+                this.renderVoiceBar();
+                break;
+        }
+    }
+
+    /** Remplace la sélection par exactement ces réponses, comme si on les touchait. */
+    selectOptionsByVoice(indexes) {
+        const wanted = new Set(indexes);
+        /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('#qcm-choices .qcm-option')).forEach(
+            (btn) => {
+                const idx = parseInt(btn.getAttribute('data-idx'));
+                const isSelected = QuizService.state.currentQcmSelection.has(this._currentChoices[idx]);
+                if (isSelected !== wanted.has(idx)) this.toggleOptionSelection(btn);
+            },
+        );
+        if (VoiceService.canSpeak()) VoiceService.speak(describeSelection(indexes));
+    }
+
+    renderVoiceBar() {
+        const bar = document.getElementById('qcm-voice-bar');
+        if (!bar) return;
+        if (!this._voiceQuestion || !this.isVoiceAvailable()) {
+            bar.hidden = true;
+            bar.innerHTML = '';
+            return;
+        }
+
+        const focusedAction =
+            document.activeElement && bar.contains(document.activeElement)
+                ? document.activeElement.getAttribute('data-action')
+                : null;
+
+        const canSpeak = VoiceService.canSpeak();
+        const canListen = VoiceService.canListen();
+        const { autoRead, voiceConsent } = VoiceService.getPrefs();
+        const speaking = VoiceService.isSpeaking();
+        const listening = VoiceService.isListening();
+        const readLabel = speaking ? 'stopLabel' : this._voiceFeedback ? 'readFeedbackLabel' : 'readLabel';
+
+        bar.hidden = false;
+        // La zone d'état reste le même élément pour que les lecteurs d'écran annoncent ses changements.
+        let main = bar.querySelector('.qcm-voice-main');
+        let statusEl = bar.querySelector('#qcm-voice-status');
+        if (!main || !statusEl) {
+            bar.innerHTML = `<div class="qcm-voice-main"></div><p id="qcm-voice-status" class="qcm-voice-status" aria-live="polite"></p>`;
+            main = bar.querySelector('.qcm-voice-main');
+            statusEl = bar.querySelector('#qcm-voice-status');
+        }
+        main.innerHTML = `
+            <div class="qcm-voice-controls">
+                ${
+                    canSpeak
+                        ? `<button type="button" class="qcm-voice-btn" data-action="quiz-voice-read" aria-pressed="${speaking}" aria-label="${tv(readLabel)}">
+                    <i class="${speaking ? 'ri-stop-circle-line' : 'ri-volume-up-line'}" aria-hidden="true"></i> ${tv('read')}
+                </button>
+                <button type="button" class="qcm-voice-btn" data-action="quiz-voice-auto" aria-pressed="${autoRead}" aria-label="${tv('autoLabel')}">
+                    <i class="ri-play-list-line" aria-hidden="true"></i> ${tv('auto')}
+                </button>`
+                        : ''
+                }
+                ${
+                    canListen
+                        ? `<button type="button" class="qcm-voice-btn" data-action="quiz-voice-mic" aria-pressed="${listening}"${listening ? ` aria-label="${tv('micStopLabel')}"` : ''}>
+                    <i class="${listening ? 'ri-mic-fill' : 'ri-mic-line'}" aria-hidden="true"></i> ${tv('mic')}
+                </button>`
+                        : ''
+                }
+                ${canListen && voiceConsent ? `<button type="button" class="qcm-voice-link" data-action="quiz-voice-revoke">${tv('revoke')}</button>` : ''}
+            </div>
+            ${
+                this._voiceNoticeOpen && canListen
+                    ? `<div class="qcm-voice-notice" role="region" aria-label="${tv('noticeTitle')}">
+                <strong>${tv('noticeTitle')}</strong>
+                <p>${tv('noticeBody')}</p>
+                <p>${tv('noticeHelp')}</p>
+                <div class="qcm-voice-notice-actions">
+                    <button type="button" class="qcm-voice-btn qcm-voice-accept" data-action="quiz-voice-consent">${tv('accept')}</button>
+                    <button type="button" class="qcm-voice-btn" data-action="quiz-voice-cancel">${tv('cancel')}</button>
+                </div>
+            </div>`
+                    : ''
+            }
+        `;
+        if (statusEl.textContent !== (this._voiceStatus || '')) statusEl.textContent = this._voiceStatus || '';
+
+        if (focusedAction) {
+            // Le bouton pressé est recréé : on lui rend le focus (ou au micro si l'avis vient de se fermer).
+            const again = /** @type {HTMLElement | null} */ (
+                bar.querySelector(`[data-action="${focusedAction}"]`) ||
+                    bar.querySelector('[data-action="quiz-voice-mic"]')
+            );
+            if (again) again.focus();
+        }
     }
 
     renderExamResults() {
