@@ -22,6 +22,18 @@ import { t } from '../utils/i18n.js';
 
 import BaseView from '../core/base_view.js';
 
+// Textes du carnet (spec 014), tous dans js/i18n/fr.js (section logbook). tt() : texte pour du HTML,
+// paramètres échappés ; th() : un paramètre est un fragment HTML construit ici (nombres en gras) ;
+// tl() : texte brut (innerText, champs, boîtes de dialogue).
+const fillParams = (text, params, format) =>
+    text.replace(/\{(\w+)\}/g, (match, name) =>
+        Object.prototype.hasOwnProperty.call(params, name) ? format(params[name]) : match,
+    );
+const tt = (key, params = {}) =>
+    fillParams(escapeHTML(t(`logbook.${key}`)), params, (value) => escapeHTML(String(value)));
+const th = (key, htmlParams) => fillParams(escapeHTML(t(`logbook.${key}`)), htmlParams, String);
+const tl = (key, params) => t(`logbook.${key}`, params);
+
 class LogbookViewClass extends BaseView {
     constructor() {
         super();
@@ -431,11 +443,11 @@ class LogbookViewClass extends BaseView {
             const newCustomVals = sortedVals.filter((v) => !defaultList.includes(v));
             StorageService.set(storedKey, newCustomVals);
 
-            let html = '<option value="">-- Choisir ou Saisie Libre --</option>';
+            let html = `<option value="">${tt('form.chooseOrType')}</option>`;
             sortedVals.forEach((val) => {
                 html += `<option value="${escapeHTML(val)}">${escapeHTML(val)}</option>`;
             });
-            html += '<option value="Autre">Autre...</option>';
+            html += `<option value="Autre">${tt('form.other')}</option>`;
             selectEl.innerHTML = html;
         };
 
@@ -536,7 +548,7 @@ class LogbookViewClass extends BaseView {
         const coordsText = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'))?.value || '';
         const coordsPanelOpen = document.getElementById('lb-coords-panel')?.hidden === false;
 
-        const submitText = document.getElementById('lb-submit-btn')?.innerText || 'Enregistrer';
+        const submitText = document.getElementById('lb-submit-btn')?.innerText || tl('form.save');
         const cancelBtnVisible = document.getElementById('lb-cancel-btn')?.style.display || 'none';
 
         this.currentFormType = type;
@@ -851,65 +863,65 @@ class LogbookViewClass extends BaseView {
             html = `
                 <div role="button" tabindex="0" class="form-group igc-upload-container" data-action="triggerIgcUpload" style="border: 2px dashed var(--border-light, #ccc); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 15px; cursor: pointer; background: var(--bg-card, #f9f9f9);">
                     <i class="ri-upload-cloud-line" style="font-size: 2rem; color: var(--accent-blue, #007bc4);"></i>
-                    <div style="font-weight: bold; margin-top: 10px;">Importer une trace GPS (.igc)</div>
-                    <div style="font-size: 0.85rem; color: var(--text-secondary, #666); margin-top: 5px;" id="igc-upload-filename">Cliquez ou glissez-déposez le fichier</div>
+                    <div style="font-weight: bold; margin-top: 10px;">${tt('form.igcTitle')}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary, #666); margin-top: 5px;" id="igc-upload-filename">${tt('form.igcHint')}</div>
                 </div>
                 <div class="form-group" id="igc-alt-check" style="display:none; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-light, #ccc); margin-bottom: 15px;">
                     <div id="igc-alt-info" style="font-size: 0.85rem; margin-bottom: 8px;"></div>
                     <div style="display:flex; gap: 16px; margin-bottom: 6px; font-size: 0.9rem;">
-                        <label style="display:flex; align-items:center; gap:4px;"><input type="radio" name="lb-alt-ref" value="landing" checked> Je connais l'altitude de l'atterrissage</label>
-                        <label style="display:flex; align-items:center; gap:4px;"><input type="radio" name="lb-alt-ref" value="takeoff"> du décollage</label>
+                        <label style="display:flex; align-items:center; gap:4px;"><input type="radio" name="lb-alt-ref" value="landing" checked> ${tt('form.altKnowLanding')}</label>
+                        <label style="display:flex; align-items:center; gap:4px;"><input type="radio" name="lb-alt-ref" value="takeoff"> ${tt('form.altKnowTakeoff')}</label>
                     </div>
-                    <label for="lb-real-alt">Altitude réelle (m) <small>(optionnel)</small></label>
-                    <input type="number" id="lb-real-alt" style="width: 100%;" placeholder="Laisser vide pour garder l'altitude du vario">
+                    <label for="lb-real-alt">${tt('form.realAltitude')} <small>${tt('form.optional')}</small></label>
+                    <input type="number" id="lb-real-alt" style="width: 100%;" placeholder="${tt('form.realAltitudePlaceholder')}">
                 </div>
                 <div class="form-group">
-                    <label>Date & Heure <span class="required">*</span></label>
+                    <label>${tt('form.datetime')} <span class="required">*</span></label>
                     <input type="datetime-local" id="lb-datetime" required value="${defaultDateTime}">
                 </div>
                 <div class="form-group">
-                    <label>Site de vol <span class="required">*</span></label>
-                    <input type="text" id="lb-site" list="sites-list" placeholder="Ex: Planfait, Forclaz..." required autocomplete="off">
+                    <label>${tt('form.site')} <span class="required">*</span></label>
+                    <input type="text" id="lb-site" list="sites-list" placeholder="${tt('form.sitePlaceholder')}" required autocomplete="off">
                     <datalist id="sites-list"></datalist>
                     ${this.renderCoordsBlock()}
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Voile <span class="required">*</span></label>
+                        <label>${tt('form.wing')} <span class="required">*</span></label>
                         <select id="lb-voile" required>
-                            <option value="">-- Sélectionner --</option>
+                            <option value="">${tt('form.select')}</option>
                         </select>
-                        <input type="text" id="lb-voile-autre" placeholder="Spécifiez le modèle..." style="display:none; margin-top: 5px; width: 100%;">
+                        <input type="text" id="lb-voile-autre" placeholder="${tt('form.modelPlaceholder')}" style="display:none; margin-top: 5px; width: 100%;">
                     </div>
                     <div class="form-group">
-                        <label>Sellette</label>
+                        <label>${tt('form.harness')}</label>
                         <select id="lb-sellette">
-                            <option value="">-- Sélectionner --</option>
+                            <option value="">${tt('form.select')}</option>
                         </select>
-                        <input type="text" id="lb-sellette-autre" placeholder="Spécifiez le modèle..." style="display:none; margin-top: 5px; width: 100%;">
+                        <input type="text" id="lb-sellette-autre" placeholder="${tt('form.modelPlaceholder')}" style="display:none; margin-top: 5px; width: 100%;">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Durée (minutes) <span class="required">*</span></label>
-                        <input type="number" id="lb-duree" min="1" placeholder="Ex: 45" required>
+                        <label>${tt('form.duration')} <span class="required">*</span></label>
+                        <input type="number" id="lb-duree" min="1" placeholder="${tt('form.durationPlaceholderFlight')}" required>
                     </div>
                     <div class="form-group">
-                        <label>Type de vol</label>
+                        <label>${tt('form.flightType')}</label>
                         <select id="lb-typeVol">
-                            <option value="Plouf">Plouf</option>
-                            <option value="Thermique">Thermique</option>
-                            <option value="Soaring">Soaring</option>
-                            <option value="Restit">Restit</option>
-                            <option value="Cross">Cross</option>
+                            <option value="Plouf">${tt('form.flightTypes.Plouf')}</option>
+                            <option value="Thermique">${tt('form.flightTypes.Thermique')}</option>
+                            <option value="Soaring">${tt('form.flightTypes.Soaring')}</option>
+                            <option value="Restit">${tt('form.flightTypes.Restit')}</option>
+                            <option value="Cross">${tt('form.flightTypes.Cross')}</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom: 10px;">
-                    <label for="lb-tech-decollage" style="display:block; margin-bottom:5px;">Technique de décollage :</label>
+                    <label for="lb-tech-decollage" style="display:block; margin-bottom:5px;">${tt('form.takeoffTechnique')}</label>
                     <select id="lb-tech-decollage" style="width:100%; padding:8px;" required data-change-action="toggleOtherField" data-toggle-id="lb-tech-decollage-autre">
-                        <option value="Face voile">Face voile</option>
-                        <option value="Dos voile">Dos voile</option>
+                        <option value="Face voile">${tt('form.takeoffTechniques.Face voile')}</option>
+                        <option value="Dos voile">${tt('form.takeoffTechniques.Dos voile')}</option>
                         ${(() => {
                             const parsed = StorageService.get('customDecollageTechniques');
                             if (Array.isArray(parsed))
@@ -918,72 +930,72 @@ class LogbookViewClass extends BaseView {
                                     .join('');
                             return '';
                         })()}
-                        <option value="Autre">Autre...</option>
+                        <option value="Autre">${tt('form.other')}</option>
                     </select>
-                    <input type="text" id="lb-tech-decollage-autre" placeholder="Spécifiez la technique..." style="display:none; margin-top: 5px; width: 100%;">
+                    <input type="text" id="lb-tech-decollage-autre" placeholder="${tt('form.techniquePlaceholder')}" style="display:none; margin-top: 5px; width: 100%;">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Altitude Max (m)</label>
-                        <input type="number" id="lb-altMax" placeholder="Ex: 2100">
+                        <label>${tt('form.maxAltitude')}</label>
+                        <input type="number" id="lb-altMax" placeholder="${tt('form.maxAltitudePlaceholder')}">
                     </div>
                     <div class="form-group">
-                        <label>Gain (m)</label>
-                        <input type="number" id="lb-gain" placeholder="Ex: 800">
+                        <label>${tt('form.gain')}</label>
+                        <input type="number" id="lb-gain" placeholder="${tt('form.gainPlaceholder')}">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Commentaire</label>
-                    <textarea id="lb-commentaire" rows="3" placeholder="Sensations, conditions météo..."></textarea>
+                    <label>${tt('form.comment')}</label>
+                    <textarea id="lb-commentaire" rows="3" placeholder="${tt('form.commentPlaceholderFlight')}"></textarea>
                 </div>
             `;
         } else {
             // Gonflage form
             html = `
                 <div class="form-group">
-                    <label>Date & Heure <span class="required">*</span></label>
+                    <label>${tt('form.datetime')} <span class="required">*</span></label>
                     <input type="datetime-local" id="lb-datetime" required value="${defaultDateTime}">
                 </div>
                 <div class="form-group">
-                    <label>Lieu <span class="required">*</span></label>
-                    <input type="text" id="lb-lieu" list="sites-list" placeholder="Ex: Pente école, atterro..." required autocomplete="off">
+                    <label>${tt('form.place')} <span class="required">*</span></label>
+                    <input type="text" id="lb-lieu" list="sites-list" placeholder="${tt('form.placePlaceholder')}" required autocomplete="off">
                     <datalist id="sites-list"></datalist>
                     ${this.renderCoordsBlock()}
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Voile <span class="required">*</span></label>
+                        <label>${tt('form.wing')} <span class="required">*</span></label>
                         <select id="lb-voile" required>
-                            <option value="">-- Sélectionner --</option>
+                            <option value="">${tt('form.select')}</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Sellette</label>
+                        <label>${tt('form.harness')}</label>
                         <select id="lb-sellette">
-                            <option value="">-- Sélectionner --</option>
+                            <option value="">${tt('form.select')}</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Durée (minutes) <span class="required">*</span></label>
-                        <input type="number" id="lb-duree" min="1" placeholder="Ex: 60" required>
+                        <label>${tt('form.duration')} <span class="required">*</span></label>
+                        <input type="number" id="lb-duree" min="1" placeholder="${tt('form.durationPlaceholderGround')}" required>
                     </div>
                     <div class="form-group">
-                        <label>Exercices travaillés</label>
+                        <label>${tt('form.exercises')}</label>
                         <div id="lb-typeExercice-group" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
-                            <label><input type="checkbox" name="lb-typeExercice" value="Face voile"> Face voile</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Dos voile"> Dos voile</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Tangage/Roulis"> Tangage/Roulis</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Affalage"> Affalage</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Vent fort"> Vent fort</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Prégonflage / Démêlage"> Prégonflage / Démêlage</label>
+                            <label><input type="checkbox" name="lb-typeExercice" value="Face voile"> ${tt('form.exerciseTypes.Face voile')}</label>
+                            <label><input type="checkbox" name="lb-typeExercice" value="Dos voile"> ${tt('form.exerciseTypes.Dos voile')}</label>
+                            <label><input type="checkbox" name="lb-typeExercice" value="Tangage/Roulis"> ${tt('form.exerciseTypes.Tangage/Roulis')}</label>
+                            <label><input type="checkbox" name="lb-typeExercice" value="Affalage"> ${tt('form.exerciseTypes.Affalage')}</label>
+                            <label><input type="checkbox" name="lb-typeExercice" value="Vent fort"> ${tt('form.exerciseTypes.Vent fort')}</label>
+                            <label><input type="checkbox" name="lb-typeExercice" value="Prégonflage / Démêlage"> ${tt('form.exerciseTypes.Prégonflage / Démêlage')}</label>
                         </div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Commentaire</label>
-                    <textarea id="lb-commentaire" rows="3" placeholder="Points à travailler..."></textarea>
+                    <label>${tt('form.comment')}</label>
+                    <textarea id="lb-commentaire" rows="3" placeholder="${tt('form.commentPlaceholderGround')}"></textarea>
                 </div>
             `;
         }
@@ -1060,8 +1072,8 @@ class LogbookViewClass extends BaseView {
         const voilesSelect = document.getElementById('lb-voile');
         const sellettesSelect = document.getElementById('lb-sellette');
 
-        let voilesHtml = '<option value="">-- Saisie libre (ou choisir) --</option>';
-        let sellettesHtml = '<option value="">-- Saisie libre (ou choisir) --</option>';
+        let voilesHtml = `<option value="">${tt('form.freeEntry')}</option>`;
+        let sellettesHtml = `<option value="">${tt('form.freeEntry')}</option>`;
 
         LogbookService.getEquipment()
             .filter((e) => e.statut !== 'archive')
@@ -1075,11 +1087,11 @@ class LogbookViewClass extends BaseView {
 
         if (voilesSelect) {
             voilesSelect.innerHTML = voilesHtml;
-            voilesSelect.innerHTML += '<option value="Autre">Autre...</option>';
+            voilesSelect.innerHTML += `<option value="Autre">${tt('form.other')}</option>`;
         }
         if (sellettesSelect) {
             sellettesSelect.innerHTML = sellettesHtml;
-            sellettesSelect.innerHTML += '<option value="Autre">Autre...</option>';
+            sellettesSelect.innerHTML += `<option value="Autre">${tt('form.other')}</option>`;
         }
     }
 
@@ -1117,7 +1129,7 @@ class LogbookViewClass extends BaseView {
     // (site géolocalisé inclus) au lieu de dupliquer la logique.
     _processIgcFile(file) {
         const filenameLabel = document.getElementById('igc-upload-filename');
-        if (filenameLabel) filenameLabel.textContent = `Fichier chargé : ${file.name}`;
+        if (filenameLabel) filenameLabel.textContent = tl('igc.fileLoaded', { name: file.name });
 
         const reader = new FileReader();
         reader.onload = async (e) => {
@@ -1171,13 +1183,13 @@ class LogbookViewClass extends BaseView {
                         siteInput.value = nearestSite.nom || nearestSite.name;
                     } else {
                         // 2. Sinon, reverse-geocoding vers la ville/lieu-dit le plus proche.
-                        siteInput.value = 'Recherche du lieu...';
+                        siteInput.value = tl('igc.searchingPlace');
                         LogbookService.reverseGeocode(takeoff.lat, takeoff.lon).then((res) => {
                             if (res.success && res.data.city) {
-                                siteInput.value = `${res.data.city} (Import GPS)`;
+                                siteInput.value = tl('igc.placeFound', { city: res.data.city });
                             } else {
                                 if (!res.success) console.error('[Geocoding] Erreur:', res.error);
-                                siteInput.value = res.success ? 'Lieu inconnu (Import GPS)' : 'Décollage importé (GPS)';
+                                siteInput.value = tl(res.success ? 'igc.placeUnknown' : 'igc.takeoffImported');
                             }
                         });
                     }
@@ -1185,7 +1197,7 @@ class LogbookViewClass extends BaseView {
                 this._setupAltitudeCheck(parsed);
                 console.log('[IGC] Trace parsée :', parsed.points.length, 'points, durée :', parsed.duration, 'min');
             } else {
-                alert('Erreur lors du parsing IGC : ' + flightStats.error);
+                alert(tl('igc.parseError', { error: flightStats.error }));
                 this.currentTraceData = null;
                 this.currentRawIgc = null;
                 this.currentIgcStats = null;
@@ -1211,10 +1223,13 @@ class LogbookViewClass extends BaseView {
 
         box.style.display = 'block';
         box.style.borderColor = suspicious ? 'var(--accent-orange, #e67e22)' : 'var(--border-light, #ccc)';
-        const altitudes = `Altitudes de la trace : décollage <strong>${takeoff} m</strong>, atterrissage <strong>${landing} m</strong>.`;
+        const altitudes = th('igc.altitudes', {
+            takeoff: `<strong>${takeoff} m</strong>`,
+            landing: `<strong>${landing} m</strong>`,
+        });
         info.innerHTML = suspicious
-            ? `⚠️ <strong>Attention, c'est bizarre :</strong> altitude d'atterrissage négative (vario probablement mal calé au décollage). ${altitudes} Tu veux corriger ?`
-            : `${altitudes} Tu peux les corriger si ton vario était mal calé.`;
+            ? `⚠️ <strong>${tt('igc.suspiciousTitle')}</strong> ${th('igc.suspicious', { altitudes })}`
+            : th('igc.normal', { altitudes });
         // Le point de référence (atterro ou décollage) dont l'utilisateur connaît l'altitude réelle
         const radios = /** @type {NodeListOf<HTMLInputElement>} */ (box.querySelectorAll('input[name="lb-alt-ref"]'));
         const refAlt = () =>
@@ -1423,14 +1438,14 @@ class LogbookViewClass extends BaseView {
         const idEditField = /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit'));
         if (idEditField) idEditField.value = '';
         const submitBtn = document.getElementById('lb-submit-btn');
-        if (submitBtn) submitBtn.innerText = 'Enregistrer';
+        if (submitBtn) submitBtn.innerText = tl('form.save');
         const cancelBtn = document.getElementById('lb-cancel-btn');
         if (cancelBtn) cancelBtn.style.display = 'none';
         this.currentTraceData = null;
         this.currentIgcStats = null;
         this.currentIgcAltOffset = null;
         const filenameLabel = document.getElementById('igc-upload-filename');
-        if (filenameLabel) filenameLabel.textContent = 'Cliquez ou glissez-déposez le fichier';
+        if (filenameLabel) filenameLabel.textContent = tl('form.igcHint');
         this.renderForm();
     }
 
@@ -1493,7 +1508,7 @@ class LogbookViewClass extends BaseView {
 
             if (session.traceGps && session.traceGps.length > 0) {
                 const filenameLabel = document.getElementById('igc-upload-filename');
-                if (filenameLabel) filenameLabel.textContent = 'Trace GPS (existante)';
+                if (filenameLabel) filenameLabel.textContent = tl('igc.existingTrace');
             }
         } else {
             /** @type {HTMLInputElement} */ (document.getElementById('lb-lieu')).value = session.lieu || '';
@@ -1516,7 +1531,7 @@ class LogbookViewClass extends BaseView {
 
         // Update UI buttons
         const submitBtn = document.getElementById('lb-submit-btn');
-        if (submitBtn) submitBtn.innerText = 'Modifier la session';
+        if (submitBtn) submitBtn.innerText = tl('form.update');
         const cancelBtn = document.getElementById('lb-cancel-btn');
         if (cancelBtn) cancelBtn.style.display = 'inline-block';
 
@@ -1525,7 +1540,7 @@ class LogbookViewClass extends BaseView {
     }
 
     deleteEntry(id) {
-        if (confirm('Voulez-vous vraiment supprimer cette session ?')) {
+        if (confirm(tl('history.deleteConfirm'))) {
             LogbookService.deleteFlight(id);
             this.renderHistory();
         }
@@ -1549,8 +1564,8 @@ class LogbookViewClass extends BaseView {
             <div class="logbook-card-weather" style="margin-top: 10px; padding: 10px; background: rgba(14,165,233,0.06); border-radius: var(--radius-sm); border: 1px solid rgba(14,165,233,0.15); font-size: 0.85rem; color: var(--text-secondary);">
                 ${decollageRow}
                 ${atterroRow}
-                <button data-action="forceWeatherRefresh" data-args="${session.id}" title="Rafraîchir la météo" style="margin-top: 6px; color: var(--text-muted); cursor: pointer; border: none; background: none; padding: 2px 4px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px;">
-                    <i class="ri-refresh-line"></i> Actualiser
+                <button data-action="forceWeatherRefresh" data-args="${session.id}" title="${tt('weather.refreshTitle')}" style="margin-top: 6px; color: var(--text-muted); cursor: pointer; border: none; background: none; padding: 2px 4px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px;">
+                    <i class="ri-refresh-line"></i> ${tt('weather.refresh')}
                 </button>
             </div>
             ${baliseHtml}`;
@@ -1558,7 +1573,7 @@ class LogbookViewClass extends BaseView {
             return `
             <div id="weather-container-${session.id}" class="logbook-card-weather-empty" style="margin-top: 10px; font-size: 0.85rem;">
                 <button id="refresh-weather-btn-${session.id}" class="action-btn-text" data-action="forceWeatherRefresh" data-args="${session.id}" style="color: var(--text-muted); cursor: pointer; border: none; background: rgba(0,0,0,0.03); border-radius: var(--radius-sm); padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
-                    <i class="ri-refresh-line"></i> Récupérer la météo
+                    <i class="ri-refresh-line"></i> ${tt('weather.fetch')}
                 </button>
             </div>`;
         }
@@ -1582,8 +1597,8 @@ class LogbookViewClass extends BaseView {
             container.innerHTML = `
                 <div class="empty-state">
                     <i class="ri-history-line"></i>
-                    <p>Votre carnet est vide.</p>
-                    <button class="action-btn-primary" data-action="switchTab" data-args="'add'">Ajouter une session</button>
+                    <p>${tt('history.empty')}</p>
+                    <button class="action-btn-primary" data-action="switchTab" data-args="'add'">${tt('history.addSession')}</button>
                 </div>
             `;
             return;
@@ -1612,23 +1627,23 @@ class LogbookViewClass extends BaseView {
                     const badgeStyle =
                         'background: var(--bg-card-hover, rgba(0,0,0,0.05)); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-light, rgba(0,0,0,0.05)); font-weight: 500; display: inline-flex; align-items: center; gap: 4px;';
                     const decoInfo = session.techDecollage
-                        ? `<span style="${badgeStyle}" title="Décollage"><i class="ri-takeaway-line"></i> Décollage : ${escapeHTML(session.techDecollage)}</span>`
+                        ? `<span style="${badgeStyle}" title="${tt('history.takeoffTitle')}"><i class="ri-takeaway-line"></i> ${tt('history.takeoff', { technique: session.techDecollage })}</span>`
                         : '';
                     const altInfo = session.altitudeMax
-                        ? `<span style="${badgeStyle}" title="Alt Max">⛰️ Alt Max : ${session.altitudeMax}m</span>`
+                        ? `<span style="${badgeStyle}" title="${tt('history.altMaxTitle')}">${tt('history.altMax', { value: session.altitudeMax })}</span>`
                         : '';
                     const gainInfo =
                         session.gain !== undefined && session.gain !== null && session.gain !== ''
-                            ? `<span style="${badgeStyle}" title="Gain">📈 Gain : ${session.gain}m</span>`
+                            ? `<span style="${badgeStyle}" title="${tt('history.gainTitle')}">${tt('history.gain', { value: session.gain })}</span>`
                             : '';
                     const distanceInfo = session.distanceKm
-                        ? `<span style="${badgeStyle}" title="Distance parcourue">📏 Distance : ${session.distanceKm}km</span>`
+                        ? `<span style="${badgeStyle}" title="${tt('history.distanceTitle')}">${tt('history.distance', { value: session.distanceKm })}</span>`
                         : '';
                     const climbInfo = session.maxClimbRate
-                        ? `<span style="${badgeStyle}" title="Vario max">🔼 Vario max : +${session.maxClimbRate}m/s</span>`
+                        ? `<span style="${badgeStyle}" title="${tt('history.climbTitle')}">${tt('history.climb', { value: session.maxClimbRate })}</span>`
                         : '';
                     const speedInfo = session.maxSpeedKmh
-                        ? `<span style="${badgeStyle}" title="Vitesse max / moyenne">💨 Vitesse : ${session.maxSpeedKmh}km/h max (${session.avgSpeedKmh}km/h moy.)</span>`
+                        ? `<span style="${badgeStyle}" title="${tt('history.speedTitle')}">${tt('history.speed', { max: session.maxSpeedKmh, avg: session.avgSpeedKmh })}</span>`
                         : '';
 
                     if (decoInfo || altInfo || gainInfo || distanceInfo || climbInfo || speedInfo) {
@@ -1649,14 +1664,14 @@ class LogbookViewClass extends BaseView {
                 <div class="logbook-card">
                     <div class="logbook-card-header">
                         <div class="session-badge" style="background-color: ${typeColor}22; color: ${typeColor};">
-                            <i class="${icon}"></i> ${isVol ? 'VOL' : 'GONFLAGE'}
+                            <i class="${icon}"></i> ${tt(isVol ? 'history.badgeFlight' : 'history.badgeGround')}
                         </div>
                         <div class="session-date">${formatDateTime(session.datetime)}</div>
                         <div style="display: flex; gap: 8px;">
-                            <button class="edit-btn" data-action="editEntry" data-args="${session.id}" title="Modifier" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
+                            <button class="edit-btn" data-action="editEntry" data-args="${session.id}" title="${tt('history.edit')}" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
                                 <i class="ri-edit-line"></i>
                             </button>
-                            <button class="delete-btn" data-action="deleteEntry" data-args="${session.id}" title="Supprimer" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
+                            <button class="delete-btn" data-action="deleteEntry" data-args="${session.id}" title="${tt('history.delete')}" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
                                 <i class="ri-delete-bin-line"></i>
                             </button>
                         </div>
@@ -1669,11 +1684,11 @@ class LogbookViewClass extends BaseView {
                         </div>
                         ${extraInfo}
                         <div class="session-equip">
-                            ${session.voile ? `<div><strong>Voile :</strong> ${escapeHTML(session.voile)}</div>` : ''}
-                            ${session.sellette ? `<div><strong>Sellette :</strong> ${escapeHTML(session.sellette)}</div>` : ''}
+                            ${session.voile ? `<div><strong>${tt('history.wing')}</strong> ${escapeHTML(session.voile)}</div>` : ''}
+                            ${session.sellette ? `<div><strong>${tt('history.harness')}</strong> ${escapeHTML(session.sellette)}</div>` : ''}
                         </div>
                         ${session.commentaire ? `<div class="session-comment">"${escapeHTML(session.commentaire)}"</div>` : ''}
-                        ${session.rawIgc || (session.traceGps && session.traceGps.length > 0) ? `<button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="${session.id}"><i class="ri-route-line"></i> Voir la trace 🗺️</button><div id="trace-container-${session.id}" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>` : ''}
+                        ${session.rawIgc || (session.traceGps && session.traceGps.length > 0) ? `<button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="${session.id}"><i class="ri-route-line"></i> ${tt('history.showTrace')}</button><div id="trace-container-${session.id}" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>` : ''}
                         <div data-session-weather="${session.id}">${meteoHtml}</div>
                     </div>
                 </div>
@@ -1725,7 +1740,7 @@ class LogbookViewClass extends BaseView {
             await Map3DComponent.showTrace(sessionId, points, container);
         } catch (error) {
             console.error('Map3DComponent Error: Erreur lors du dessin de la trace.', error);
-            container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-secondary);">Impossible d'afficher la carte 3D. (${error.message})</div>`;
+            container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-secondary);">${tt('history.trace3dError', { error: error.message })}</div>`;
         }
     }
 
@@ -1736,7 +1751,7 @@ class LogbookViewClass extends BaseView {
         if (LogbookService.getFlights().length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
-                    <p>Aucune donnée pour afficher des statistiques.</p>
+                    <p>${tt('stats.empty')}</p>
                 </div>
             `;
             return;
@@ -1821,16 +1836,16 @@ class LogbookViewClass extends BaseView {
                 <div class="kpi-card">
                     <div class="kpi-icon" style="background: var(--accent-blue); color: white;"><i class="ri-windy-line"></i></div>
                     <div class="kpi-info">
-                        <div class="kpi-value">${totalVols} vols</div>
-                        <div class="kpi-label">${formatDuration(totalTimeVols)} cumulé</div>
+                        <div class="kpi-value">${tt('stats.flights', { count: totalVols })}</div>
+                        <div class="kpi-label">${tt('stats.flightTime', { duration: formatDuration(totalTimeVols) })}</div>
                     </div>
                 </div>
                 <!-- KPI: Gonflages -->
                 <div class="kpi-card">
                     <div class="kpi-icon" style="background: #f59e0b; color: white;"><i class="ri-footprint-line"></i></div>
                     <div class="kpi-info">
-                        <div class="kpi-value">${totalGonflages} sessions</div>
-                        <div class="kpi-label">${formatDuration(totalTimeGonflages)} gonflage</div>
+                        <div class="kpi-value">${tt('stats.groundSessions', { count: totalGonflages })}</div>
+                        <div class="kpi-label">${tt('stats.groundTime', { duration: formatDuration(totalTimeGonflages) })}</div>
                     </div>
                 </div>
                 <!-- KPI: Alt Max -->
@@ -1838,7 +1853,7 @@ class LogbookViewClass extends BaseView {
                     <div class="kpi-icon" style="background: #8b5cf6; color: white;"><i class="ri-mist-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">${maxAltitudeReached} m</div>
-                        <div class="kpi-label">Alt max atteinte</div>
+                        <div class="kpi-label">${tt('stats.maxAltitude')}</div>
                     </div>
                 </div>
                 <!-- KPI: Gain -->
@@ -1846,7 +1861,7 @@ class LogbookViewClass extends BaseView {
                     <div class="kpi-icon" style="background: #10b981; color: white;"><i class="ri-arrow-up-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">${totalGain} m</div>
-                        <div class="kpi-label">Gain cumulé total</div>
+                        <div class="kpi-label">${tt('stats.totalGain')}</div>
                     </div>
                 </div>
             </div>
@@ -1854,14 +1869,14 @@ class LogbookViewClass extends BaseView {
 
         // Equipment Stats
         if (Object.keys(equipStats).length > 0) {
-            html += `<h3 class="stats-section-title">Matériel (Voiles)</h3><div class="equip-list">`;
+            html += `<h3 class="stats-section-title">${tt('stats.wings')}</h3><div class="equip-list">`;
             for (const [voile, st] of Object.entries(equipStats)) {
                 html += `
                     <div class="equip-card">
                         <div class="equip-name">${voile}</div>
                         <div class="equip-details">
-                            <span style="color: var(--accent-blue)">Vols: ${st.vols} (${formatDuration(st.timeVols)})</span>
-                            <span style="color: #f59e0b">Gonflage: ${st.gonflages} (${formatDuration(st.timeGonflages)})</span>
+                            <span style="color: var(--accent-blue)">${tt('stats.wingFlights', { count: st.vols, duration: formatDuration(st.timeVols) })}</span>
+                            <span style="color: #f59e0b">${tt('stats.wingGround', { count: st.gonflages, duration: formatDuration(st.timeGonflages) })}</span>
                         </div>
                         ${(() => {
                             const equipObj = LogbookService.getEquipment().find(
@@ -1872,9 +1887,9 @@ class LogbookViewClass extends BaseView {
                                 const hoursRemaining = equipObj.periodiciteHeures - totalHours;
                                 const hoursText =
                                     hoursRemaining <= 0
-                                        ? `<span style="color:#ef4444; font-weight:bold;">Dépassé de ${Math.abs(Math.round(hoursRemaining * 10) / 10)}h</span>`
-                                        : `${Math.round(hoursRemaining * 10) / 10}h restantes`;
-                                return `<div style="font-size: 0.8rem; margin-top: 6px; color: var(--text-secondary);"><strong>Avant révision:</strong> ${hoursText} (sur ${equipObj.periodiciteHeures}h)</div>`;
+                                        ? `<span style="color:#ef4444; font-weight:bold;">${tt('equipment.overdueBy', { hours: Math.abs(Math.round(hoursRemaining * 10) / 10) })}</span>`
+                                        : tt('stats.hoursLeft', { hours: Math.round(hoursRemaining * 10) / 10 });
+                                return `<div style="font-size: 0.8rem; margin-top: 6px; color: var(--text-secondary);"><strong>${tt('stats.beforeRevision')}</strong> ${hoursText} ${tt('equipment.ofPeriod', { period: equipObj.periodiciteHeures })}</div>`;
                             }
                             return '';
                         })()}
@@ -1886,7 +1901,7 @@ class LogbookViewClass extends BaseView {
 
         // Top Sites Bar Chart
         if (topSites.length > 0) {
-            html += `<h3 class="stats-section-title">Top Lieux fréquentés</h3><div class="chart-container">`;
+            html += `<h3 class="stats-section-title">${tt('stats.topPlaces')}</h3><div class="chart-container">`;
             const maxVal = topSites[0][1];
             topSites.forEach(([site, count]) => {
                 const percent = (count / maxVal) * 100;
@@ -1905,7 +1920,7 @@ class LogbookViewClass extends BaseView {
 
         // Types de Vol
         if (Object.keys(volTypes).length > 0) {
-            html += `<h3 class="stats-section-title">Types de vols</h3><div class="chart-container">`;
+            html += `<h3 class="stats-section-title">${tt('stats.flightTypes')}</h3><div class="chart-container">`;
             for (const [type, count] of Object.entries(volTypes)) {
                 const percent = (count / totalVols) * 100;
                 html += `
@@ -1923,7 +1938,7 @@ class LogbookViewClass extends BaseView {
 
         // Techniques de déco
         if (Object.keys(decoTypes).length > 0) {
-            html += `<h3 class="stats-section-title">Techniques de décollage</h3><div class="chart-container">`;
+            html += `<h3 class="stats-section-title">${tt('stats.takeoffTechniques')}</h3><div class="chart-container">`;
             const totalDeco = Object.values(decoTypes).reduce((a, b) => a + b, 0);
             for (const [type, count] of Object.entries(decoTypes)) {
                 const percent = (count / totalDeco) * 100;
@@ -1942,7 +1957,7 @@ class LogbookViewClass extends BaseView {
 
         // Types Exercice
         if (Object.keys(exoTypes).length > 0) {
-            html += `<h3 class="stats-section-title">Exercices de gonflage</h3><div class="chart-container">`;
+            html += `<h3 class="stats-section-title">${tt('stats.groundExercises')}</h3><div class="chart-container">`;
             for (const [type, count] of Object.entries(exoTypes)) {
                 const percent = (count / totalGonflages) * 100;
                 html += `
@@ -1974,10 +1989,10 @@ class LogbookViewClass extends BaseView {
 
         const equipStats = LogbookService.computeEquipmentWear();
 
-        let html = `<h3 class="stats-section-title">Mon Inventaire</h3>`;
+        let html = `<h3 class="stats-section-title">${tt('equipment.inventory')}</h3>`;
 
         if (sortedEquip.length === 0) {
-            html += `<div class="empty-state"><p>Aucun équipement enregistré.</p></div>`;
+            html += `<div class="empty-state"><p>${tt('equipment.empty')}</p></div>`;
         } else {
             html += `<div class="equip-list">`;
             sortedEquip.forEach((equip) => {
@@ -1991,21 +2006,26 @@ class LogbookViewClass extends BaseView {
                     if (stats && (stats.alerts.dateAlert === 'red' || stats.alerts.hoursAlert === 'red')) {
                         statusClass = 'status-danger';
                         const reason = [];
-                        if (stats.alerts.dateAlert === 'red') reason.push(`Date dépassée (${stats.revisionDateStr})`);
+                        if (stats.alerts.dateAlert === 'red')
+                            reason.push(tl('equipment.dateOverdue', { date: stats.revisionDateStr }));
                         if (stats.alerts.hoursAlert === 'red')
                             reason.push(
-                                `Heures dépassées (${Math.round(stats.totalTime / 60)}h / ${equip.periodiciteHeures}h)`,
+                                tl('equipment.hoursOverdue', {
+                                    used: Math.round(stats.totalTime / 60),
+                                    period: equip.periodiciteHeures,
+                                }),
                             );
 
-                        alertHtml = `<div class="equip-alert text-danger" style="color:#ef4444; font-weight:bold; margin-bottom:8px;"><i class="ri-tools-line"></i> ⚠️ ATTENTION : Révision requise - ${reason.join(' ET ')}</div>`;
+                        alertHtml = `<div class="equip-alert text-danger" style="color:#ef4444; font-weight:bold; margin-bottom:8px;"><i class="ri-tools-line"></i> ${tt('equipment.revisionRequired', { reasons: reason.join(tl('equipment.and')) })}</div>`;
                     } else if (stats && (stats.alerts.dateAlert === 'orange' || stats.alerts.hoursAlert === 'orange')) {
                         statusClass = 'status-warning';
                         const reason = [];
-                        if (stats.alerts.dateAlert === 'orange') reason.push(`Dans ${stats.diffDays} jours`);
+                        if (stats.alerts.dateAlert === 'orange')
+                            reason.push(tl('equipment.inDays', { days: stats.diffDays }));
                         if (stats.alerts.hoursAlert === 'orange')
-                            reason.push(`Dans ${Math.round(stats.hoursRemaining)}h`);
+                            reason.push(tl('equipment.inHours', { hours: Math.round(stats.hoursRemaining) }));
 
-                        alertHtml = `<div class="equip-alert text-warning" style="color:#f59e0b; font-weight:bold; margin-bottom:8px;"><i class="ri-tools-line"></i> ⚠️ À réviser bientôt : ${reason.join(' OU ')}</div>`;
+                        alertHtml = `<div class="equip-alert text-warning" style="color:#f59e0b; font-weight:bold; margin-bottom:8px;"><i class="ri-tools-line"></i> ${tt('equipment.revisionSoon', { reasons: reason.join(tl('equipment.or')) })}</div>`;
                     }
 
                     const typeBadgeColors = {
@@ -2026,29 +2046,29 @@ class LogbookViewClass extends BaseView {
                                 <div class="equip-name" style="font-size:1.1rem; font-weight:600;">
                                     ${escapeHTML(equip.nom)}
                                     <span class="session-badge" style="margin-left: 8px; font-size:0.75rem; padding:2px 6px; border-radius:4px; ${typeBadgeColors[equip.type] || ''}">${(equip.type || '').toUpperCase()}</span>
-                                    ${isArchive ? '<span class="session-badge" style="margin-left: 4px; background: #333; color: white; font-size:0.75rem; padding:2px 6px; border-radius:4px;">ARCHIVÉ</span>' : ''}
+                                    ${isArchive ? `<span class="session-badge" style="margin-left: 4px; background: #333; color: white; font-size:0.75rem; padding:2px 6px; border-radius:4px;">${tt('equipment.archived')}</span>` : ''}
                                 </div>
                             </div>
                             <div class="session-details" style="font-size: 0.85rem; display:flex; gap:15px; margin-bottom: 6px;">
-                                <span class="detail-item"><i class="ri-windy-line"></i> ${stats ? stats.totalSessions : 0} sessions</span>
+                                <span class="detail-item"><i class="ri-windy-line"></i> ${tt('equipment.sessions', { count: stats ? stats.totalSessions : 0 })}</span>
                                 <span class="detail-item"><i class="ri-time-line"></i> ${stats ? formatDuration(stats.totalTime) : '0h 00m'}</span>
                             </div>
                             <div class="equipment-secondary-details" style="font-size: 0.8rem; opacity: 0.8; display:flex; gap:15px; flex-wrap:wrap; margin-bottom: 12px;">
-                                ${equip.dateAchat ? `<span class="detail-item"><strong>Achat:</strong> ${formatDateOnly(equip.dateAchat)}</span>` : ''}
-                                ${equip.derniereRevision ? `<span class="detail-item"><strong>Dernière révision:</strong> ${formatDateOnly(equip.derniereRevision)}</span>` : ''}
-                                ${stats && stats.nextRevisionDate ? `<span class="detail-item"><strong>Prochaine révision:</strong> ${stats.revisionDateStr}</span>` : ''}
-                                ${stats && stats.hoursRemaining !== null ? `<span class="detail-item"><strong>Heures avant révision:</strong> ${stats.hoursRemaining <= 0 ? `<span style="color:#ef4444; font-weight:bold;">Dépassé de ${Math.abs(Math.round(stats.hoursRemaining * 10) / 10)}h</span>` : `${Math.round(stats.hoursRemaining * 10) / 10}h`} (sur ${equip.periodiciteHeures}h)</span>` : ''}
-                                ${equip.type === 'voile' && equip.ventMin !== undefined ? `<span class="detail-item"><strong>Plage de Vent:</strong> ${equip.ventMin} - ${equip.ventMax} km/h</span>` : ''}
+                                ${equip.dateAchat ? `<span class="detail-item"><strong>${tt('equipment.purchase')}</strong> ${formatDateOnly(equip.dateAchat)}</span>` : ''}
+                                ${equip.derniereRevision ? `<span class="detail-item"><strong>${tt('equipment.lastRevision')}</strong> ${formatDateOnly(equip.derniereRevision)}</span>` : ''}
+                                ${stats && stats.nextRevisionDate ? `<span class="detail-item"><strong>${tt('equipment.nextRevision')}</strong> ${stats.revisionDateStr}</span>` : ''}
+                                ${stats && stats.hoursRemaining !== null ? `<span class="detail-item"><strong>${tt('equipment.hoursBeforeRevision')}</strong> ${stats.hoursRemaining <= 0 ? `<span style="color:#ef4444; font-weight:bold;">${tt('equipment.overdueBy', { hours: Math.abs(Math.round(stats.hoursRemaining * 10) / 10) })}</span>` : tt('equipment.hours', { hours: Math.round(stats.hoursRemaining * 10) / 10 })} ${tt('equipment.ofPeriod', { period: equip.periodiciteHeures })}</span>` : ''}
+                                ${equip.type === 'voile' && equip.ventMin !== undefined ? `<span class="detail-item"><strong>${tt('equipment.windRange')}</strong> ${tt('equipment.windRangeValue', { min: equip.ventMin, max: equip.ventMax })}</span>` : ''}
                             </div>
                         </div>
                         <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid rgba(0,0,0,0.05); padding-top:8px; margin-top: auto;">
-                            <button class="action-btn" data-action="editEquipment" data-args="'${equip.id}'" title="Modifier" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-blue);">
+                            <button class="action-btn" data-action="editEquipment" data-args="'${equip.id}'" title="${tt('equipment.edit')}" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-blue);">
                                 ✏️
                             </button>
-                            <button class="action-btn" data-action="toggleEquipmentStatus" data-args="'${equip.id}'" title="${isArchive ? 'Désarchiver' : 'Archiver'}" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#6b7280;">
+                            <button class="action-btn" data-action="toggleEquipmentStatus" data-args="'${equip.id}'" title="${tt(isArchive ? 'equipment.unarchive' : 'equipment.archive')}" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#6b7280;">
                                 <i class="${isArchive ? 'ri-arrow-go-back-line' : 'ri-archive-line'}"></i>
                             </button>
-                            <button class="action-btn" data-action="deleteEquipment" data-args="'${equip.id}'" title="Supprimer définitivement" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#ef4444;">
+                            <button class="action-btn" data-action="deleteEquipment" data-args="'${equip.id}'" title="${tt('equipment.deleteForever')}" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#ef4444;">
                                 🗑️
                             </button>
                         </div>
@@ -2116,16 +2136,16 @@ class LogbookViewClass extends BaseView {
             }
         }
 
-        document.getElementById('eq-submit-btn').innerText = "Modifier l'équipement";
+        document.getElementById('eq-submit-btn').innerText = tl('equipment.submitEdit');
         document.getElementById('eq-cancel-btn').style.display = 'inline-block';
-        document.getElementById('eq-form-title').innerText = "Modifier l'Équipement";
+        document.getElementById('eq-form-title').innerText = tl('equipment.titleEdit');
 
         // Scroll vers le formulaire
         document.getElementById('equip-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     deleteEquipment(id) {
-        if (confirm('Voulez-vous vraiment supprimer cet équipement ?')) {
+        if (confirm(tl('equipment.deleteConfirm'))) {
             LogbookService.deleteEquipment(id);
             this.renderEquipment();
             this.populateEquipmentDropdowns();
@@ -2152,13 +2172,13 @@ class LogbookViewClass extends BaseView {
         if (idEditField) idEditField.value = '';
 
         const submitBtn = document.getElementById('eq-submit-btn');
-        if (submitBtn) submitBtn.innerText = "Enregistrer l'équipement";
+        if (submitBtn) submitBtn.innerText = tl('equipment.submitAdd');
 
         const cancelBtn = document.getElementById('eq-cancel-btn');
         if (cancelBtn) cancelBtn.style.display = 'none';
 
         const formTitle = document.getElementById('eq-form-title');
-        if (formTitle) formTitle.innerText = 'Ajouter un Équipement';
+        if (formTitle) formTitle.innerText = tl('equipment.titleAdd');
 
         // Refresh dropdown lists
         this.populateEquipmentDropdowns();
@@ -2202,14 +2222,14 @@ class LogbookViewClass extends BaseView {
         return `
         <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 4px 0;">
             <span style="font-weight: 600; min-width: 90px;">${escapeHTML(label)} :</span>
-            <span title="Température"><strong>${weatherIcon} ${m.temperature}°C</strong></span>
+            <span title="${tt('weather.temperatureTitle')}"><strong>${weatherIcon} ${tt('weather.temperature', { value: m.temperature })}</strong></span>
             <span style="color: rgba(0,0,0,0.2);">|</span>
-            <span title="Vent"><i class="ri-windy-line" style="color: var(--accent-blue);"></i> <strong>Vent :</strong> ${m.ventVitesse} km/h ${m.ventRafales ? `(Rafales : ${m.ventRafales} km/h)` : ''}</span>
+            <span title="${tt('weather.windTitle')}"><i class="ri-windy-line" style="color: var(--accent-blue);"></i> <strong>${tt('weather.wind')}</strong> ${tt('weather.windSpeed', { value: m.ventVitesse })} ${m.ventRafales ? tt('weather.gusts', { value: m.ventRafales }) : ''}</span>
             ${
                 m.ventDirection !== null && m.ventDirection !== undefined
                     ? `
             <span style="color: rgba(0,0,0,0.2);">|</span>
-            <span title="Direction"><i class="ri-arrow-up-fill" style="color: #10b981; font-size: 1.05em; display:inline-block; transform: rotate(${m.ventDirection}deg);"></i> <strong>Dir :</strong> ${dirStr} (${m.ventDirection}°)</span>
+            <span title="${tt('weather.directionTitle')}"><i class="ri-arrow-up-fill" style="color: #10b981; font-size: 1.05em; display:inline-block; transform: rotate(${m.ventDirection}deg);"></i> <strong>${tt('weather.direction')}</strong> ${dirStr} (${m.ventDirection}°)</span>
             `
                     : ''
             }
@@ -2232,14 +2252,14 @@ class LogbookViewClass extends BaseView {
         return `
         <details class="logbook-card-balise" style="margin-top: 8px; padding: 10px; background: var(--bg-card-hover, rgba(0,0,0,0.03)); border-radius: var(--radius-sm); border: 1px solid var(--border-light, rgba(0,0,0,0.06)); font-size: 0.82rem; color: var(--text-secondary);">
             <summary style="cursor: pointer; display: flex; align-items: center; gap: 6px; list-style: revert;">
-                <i class="ri-broadcast-line" style="color: var(--accent-blue);"></i> <strong>Vent réel (balise FFVL, ${escapeHTML(dateStr.split('-').reverse().join('/'))})</strong>
+                <i class="ri-broadcast-line" style="color: var(--accent-blue);"></i> <strong>${tt('weather.beacon', { date: dateStr.split('-').reverse().join('/') })}</strong>
             </summary>
             <div style="margin-top: 8px;">
                 <a href="${histoPageUrl}" target="_blank" rel="noopener noreferrer">
-                    <img src="${graphUrl}" alt="Historique du vent - balise FFVL" loading="lazy" style="width: 100%; max-width: 500px; height: auto; border-radius: 4px; display: block;">
+                    <img src="${graphUrl}" alt="${tt('weather.beaconAlt')}" loading="lazy" style="width: 100%; max-width: 500px; height: auto; border-radius: 4px; display: block;">
                 </a>
                 <a href="${histoPageUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; margin-top: 6px; color: var(--accent-blue); text-decoration: none; font-size: 0.78rem;">
-                    Voir l'historique complet <i class="ri-external-link-line"></i>
+                    ${tt('weather.beaconHistory')} <i class="ri-external-link-line"></i>
                 </a>
             </div>
         </details>`;
@@ -2252,8 +2272,7 @@ class LogbookViewClass extends BaseView {
         // 1. Immediately show loading state in the UI to remove any error banner
         const container = document.getElementById('weather-container-' + sessionId);
         if (container) {
-            container.innerHTML =
-                '<div style="color: var(--accent-blue); font-size: 0.85rem; padding: 8px 12px; background: rgba(14,165,233,0.08); border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 6px;"><i class="ri-loader-4-line ri-spin"></i> <strong>Récupération AROME en cours...</strong></div>';
+            container.innerHTML = `<div style="color: var(--accent-blue); font-size: 0.85rem; padding: 8px 12px; background: rgba(14,165,233,0.08); border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 6px;"><i class="ri-loader-4-line ri-spin"></i> <strong>${tt('weather.loading')}</strong></div>`;
         }
 
         let lat = null,
@@ -2290,7 +2309,7 @@ class LogbookViewClass extends BaseView {
             this.fetchWeatherForSession(lat, lon, session.datetime, session.id, session.duree, baliseId);
         } else {
             if (container) {
-                const searchedString = this.normalizeString(siteName || 'VIDE');
+                const searchedString = this.normalizeString(siteName || tl('weather.emptyInput'));
                 const sites = SitesService.getSites();
                 const availableNamesSample =
                     sites.length > 0
@@ -2298,8 +2317,8 @@ class LogbookViewClass extends BaseView {
                               .slice(0, 3)
                               .map((s) => this.normalizeString(s.nom))
                               .join(' | ')
-                        : 'BASE SITES VIDE';
-                container.innerHTML = `<div style="color: #ef4444; font-size: 0.85rem; padding: 8px 12px; background: rgba(239,68,68,0.08); border-radius: var(--radius-sm); line-height: 1.4;"><i class="ri-error-warning-line"></i> <strong>Erreur Météo :</strong> Saisie [${escapeHTML(searchedString)}] non trouvée dans la base des sites.<br><span style="font-size: 0.75rem; opacity: 0.8; word-break: break-all;">Échantillon base : [${availableNamesSample}]</span></div>`;
+                        : tl('weather.emptyBase');
+                container.innerHTML = `<div style="color: #ef4444; font-size: 0.85rem; padding: 8px 12px; background: rgba(239,68,68,0.08); border-radius: var(--radius-sm); line-height: 1.4;"><i class="ri-error-warning-line"></i> <strong>${tt('weather.errorTitle')}</strong> ${tt('weather.notFound', { input: searchedString })}<br><span style="font-size: 0.75rem; opacity: 0.8; word-break: break-all;">${tt('weather.sample', { sample: availableNamesSample })}</span></div>`;
             }
         }
     }
@@ -2332,7 +2351,7 @@ class LogbookViewClass extends BaseView {
             console.error('Error fetching weather for session:', decollageResult.error);
             const container = document.getElementById('weather-container-' + sessionId);
             if (container) {
-                container.innerHTML = `<div style="color: #f59e0b; font-size: 0.85rem; padding: 8px 12px; background: rgba(245,158,11,0.08); border-radius: var(--radius-sm);"><i class="ri-alert-line"></i> Météo indisponible : ${escapeHTML(decollageResult.error)}</div>`;
+                container.innerHTML = `<div style="color: #f59e0b; font-size: 0.85rem; padding: 8px 12px; background: rgba(245,158,11,0.08); border-radius: var(--radius-sm);"><i class="ri-alert-line"></i> ${tt('weather.unavailable', { error: decollageResult.error })}</div>`;
             }
         }
     } // Ends fetchWeather method
@@ -2351,7 +2370,7 @@ class LogbookViewClass extends BaseView {
             }
         } catch (e) {
             console.error('Erreur de montage de LogbookView', e);
-            super.renderErrorState(e.message || 'Erreur critique du carnet', 'logbook-screen');
+            super.renderErrorState(e.message || tl('history.mountError'), 'logbook-screen');
         }
     }
 
