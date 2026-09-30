@@ -57,6 +57,8 @@ function rules(dataValues) {
         },
         // Boîtes de dialogue.
         { name: 'dialog', re: /\b(?:alert|confirm)\(\s*(['"`])/g, test: () => true },
+        // Messages affichés par l'écran du compte (showAlert / showStatus).
+        { name: 'message', re: /\b(?:showAlert|showStatus|showToast)\(\s*(['"`])/g, test: () => true },
         // Texte affecté à un bouton, un libellé ou un champ.
         {
             name: 'assigned text',

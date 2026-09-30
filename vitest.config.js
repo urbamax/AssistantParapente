@@ -5,6 +5,7 @@ export default defineConfig({
         environment: 'happy-dom',
         setupFiles: ['./tests/setupTests.js'],
         globals: true,
-        exclude: ['**/node_modules/**', '**/dist/**', '**/tests/e2e/**'],
+        // .claude/ : copies de travail des autres sessions (worktrees), jamais les tests de ce dépôt.
+        exclude: ['**/node_modules/**', '**/dist/**', '**/tests/e2e/**', '.claude/**'],
     },
 });
