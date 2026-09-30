@@ -9,6 +9,15 @@ import GdprEngine from '../gdpr_engine.js';
 class EventDelegator {
     constructor() {
         this.handlers = new Map();
+        this._handledByView = new WeakSet();
+    }
+
+    // A view with its own capture-phase delegation (SitesView) runs bare data-action names itself
+    // and marks the event: dispatch() then neither warns nor runs a fallback engine for it (spec 016).
+    // Registering those names here instead would run view actions twice (a menu toggle would
+    // open and close on the same click).
+    markHandled(event) {
+        if (event) this._handledByView.add(event);
     }
 
     // data-args: JSON-ish ("['a']", "3") or a bare string. IDs (e.g. Date.now().toString()) look
@@ -125,6 +134,8 @@ class EventDelegator {
         if (this.handlers.has(action)) {
             const handler = this.handlers.get(action);
             handler(args, event, target);
+        } else if (event && this._handledByView.has(event)) {
+            return;
         } else {
             // Fallback for Engine methods
             let handled = false;
