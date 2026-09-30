@@ -62,6 +62,8 @@ class LogbookViewClass extends BaseView {
                 const target = /** @type {HTMLInputElement} */ (e.target);
                 if (target.id === 'lb-coords' && target.value.trim() && !parseCoordinates(target.value)) {
                     LogbookView.showCoordsError();
+                } else if (target.id === 'lb-ecole-check') {
+                    LogbookView.setSchoolField(target.checked);
                 } else if (target.id === 'lb-voile' || target.id === 'lb-sellette') {
                     LogbookView.setSelectOrAutre(target.id, target.id + '-autre', target.value);
                 } else if (
@@ -544,6 +546,8 @@ class LogbookViewClass extends BaseView {
 
         const duree = /** @type {HTMLInputElement} */ (document.getElementById('lb-duree'))?.value || '';
         const commentaire = /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire'))?.value || '';
+        const ecoleChecked = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole-check'))?.checked;
+        const ecole = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole'))?.value || '';
 
         const coordsText = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'))?.value || '';
         const coordsPanelOpen = document.getElementById('lb-coords-panel')?.hidden === false;
@@ -607,6 +611,7 @@ class LogbookViewClass extends BaseView {
             const el = /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire'));
             if (el) el.value = commentaire;
         }
+        if (ecoleChecked) this.setSchoolField(true, ecole);
 
         if (coordsText) {
             const el = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'));
@@ -620,6 +625,35 @@ class LogbookViewClass extends BaseView {
         if (submitBtn) submitBtn.innerText = submitText;
         const cancelBtn = document.getElementById('lb-cancel-btn');
         if (cancelBtn) cancelBtn.style.display = cancelBtnVisible;
+    }
+
+    // --- SESSION EN ÉCOLE ---
+
+    renderSchoolBlock() {
+        return `
+                <div class="form-group">
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                        <input type="checkbox" id="lb-ecole-check" aria-controls="lb-ecole-group"> ${tt('form.schoolSession')}
+                    </label>
+                    <div id="lb-ecole-group" hidden style="margin-top: 6px;">
+                        <label for="lb-ecole">${tt('form.schoolName')} <span class="required">*</span></label>
+                        <input type="text" id="lb-ecole" list="ecoles-list" placeholder="${tt('form.schoolPlaceholder')}" autocomplete="off" style="width: 100%;">
+                        <datalist id="ecoles-list"></datalist>
+                    </div>
+                </div>`;
+    }
+
+    // Le nom de l'école n'est demandé (et obligatoire) que si la case est cochée.
+    setSchoolField(checked, name = '') {
+        const check = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole-check'));
+        const group = document.getElementById('lb-ecole-group');
+        const input = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole'));
+        if (!check || !group || !input) return;
+        check.checked = checked;
+        group.hidden = !checked;
+        input.required = checked;
+        if (name) input.value = name;
+        if (checked && !name) input.focus();
     }
 
     // --- COORDONNÉES GPS D'UN LIEU SAISI À LA MAIN (spec 011) ---
@@ -944,6 +978,7 @@ class LogbookViewClass extends BaseView {
                         <input type="number" id="lb-gain" placeholder="${tt('form.gainPlaceholder')}">
                     </div>
                 </div>
+                ${this.renderSchoolBlock()}
                 <div class="form-group">
                     <label>${tt('form.comment')}</label>
                     <textarea id="lb-commentaire" rows="3" placeholder="${tt('form.commentPlaceholderFlight')}"></textarea>
@@ -993,6 +1028,7 @@ class LogbookViewClass extends BaseView {
                         </div>
                     </div>
                 </div>
+                ${this.renderSchoolBlock()}
                 <div class="form-group">
                     <label>${tt('form.comment')}</label>
                     <textarea id="lb-commentaire" rows="3" placeholder="${tt('form.commentPlaceholderGround')}"></textarea>
@@ -1039,6 +1075,22 @@ class LogbookViewClass extends BaseView {
     }
 
     populateDropdowns() {
+        // Écoles déjà saisies dans le carnet
+        const schoolList = document.getElementById('ecoles-list');
+        if (schoolList) {
+            const schools = toSorted(
+                [
+                    ...new Set(
+                        LogbookService.getFlights()
+                            .map((session) => (typeof session.ecole === 'string' ? session.ecole.trim() : ''))
+                            .filter(Boolean),
+                    ),
+                ],
+                (a, b) => a.localeCompare(b),
+            );
+            schoolList.innerHTML = schools.map((name) => `<option value="${escapeHTML(name)}">`).join('');
+        }
+
         // Populate Sites
         const datalist = document.getElementById('sites-list');
         if (datalist) {
@@ -1282,6 +1334,10 @@ class LogbookViewClass extends BaseView {
         }
         const duree = parseInt(/** @type {HTMLInputElement} */ (document.getElementById('lb-duree')).value, 10);
         const commentaire = /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire')).value.trim();
+        const ecoleCheck = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole-check'));
+        const ecoleInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole'));
+        // Vide hors école : en modification, la valeur vide efface l'école enregistrée.
+        const ecole = ecoleCheck?.checked && ecoleInput ? ecoleInput.value.trim() : '';
 
         const editId = document.getElementById('lb-id-edit')
             ? /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit')).value
@@ -1299,6 +1355,7 @@ class LogbookViewClass extends BaseView {
             sellette: sellette,
             duree: duree,
             commentaire: commentaire,
+            ecole: ecole,
         };
 
         // Une trace IGC importée remplace ces coordonnées plus bas ; vidées en modification, elles sont retirées.
@@ -1488,6 +1545,7 @@ class LogbookViewClass extends BaseView {
         /** @type {HTMLInputElement} */ (document.getElementById('lb-duree')).value = session.duree;
         /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire')).value =
             session.commentaire || '';
+        if (session.ecole) this.setSchoolField(true, session.ecole);
 
         // Populate specific fields
         if (session.type === 'vol') {
@@ -1686,6 +1744,7 @@ class LogbookViewClass extends BaseView {
                         <div class="session-equip">
                             ${session.voile ? `<div><strong>${tt('history.wing')}</strong> ${escapeHTML(session.voile)}</div>` : ''}
                             ${session.sellette ? `<div><strong>${tt('history.harness')}</strong> ${escapeHTML(session.sellette)}</div>` : ''}
+                            ${session.ecole ? `<div><strong>${tt('history.school')}</strong> ${escapeHTML(session.ecole)}</div>` : ''}
                         </div>
                         ${session.commentaire ? `<div class="session-comment">"${escapeHTML(session.commentaire)}"</div>` : ''}
                         ${session.rawIgc || (session.traceGps && session.traceGps.length > 0) ? `<button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="${session.id}"><i class="ri-route-line"></i> ${tt('history.showTrace')}</button><div id="trace-container-${session.id}" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>` : ''}
@@ -1768,6 +1827,7 @@ class LogbookViewClass extends BaseView {
         const volTypes = {}; // { typeName: count }
         const exoTypes = {}; // { typeName: count }
         const decoTypes = {}; // { typeName: count }
+        const schoolStats = {}; // { schoolName: { vols: 0, timeVols: 0, gonflages: 0, timeGonflages: 0 } }
 
         let maxAltitudeReached = 0;
         let totalGain = 0;
@@ -1807,6 +1867,21 @@ class LogbookViewClass extends BaseView {
                     } else {
                         exoTypes[s.typeExercice] = (exoTypes[s.typeExercice] || 0) + 1;
                     }
+                }
+            }
+
+            // Sessions encadrées par une école
+            const school = typeof s.ecole === 'string' ? s.ecole.trim() : '';
+            if (school) {
+                if (!schoolStats[school]) {
+                    schoolStats[school] = { vols: 0, timeVols: 0, gonflages: 0, timeGonflages: 0 };
+                }
+                if (s.type === 'vol') {
+                    schoolStats[school].vols++;
+                    schoolStats[school].timeVols += s.duree;
+                } else {
+                    schoolStats[school].gonflages++;
+                    schoolStats[school].timeGonflages += s.duree;
                 }
             }
 
@@ -1915,6 +1990,30 @@ class LogbookViewClass extends BaseView {
                     </div>
                 `;
             });
+            html += `</div>`;
+        }
+
+        // Sessions en école, de la plus fréquentée à la moins fréquentée
+        const schools = toSorted(
+            Object.entries(schoolStats),
+            (a, b) => b[1].vols + b[1].gonflages - (a[1].vols + a[1].gonflages),
+        );
+        if (schools.length > 0) {
+            const schoolSessions = schools.reduce((sum, [, st]) => sum + st.vols + st.gonflages, 0);
+            html += `<h3 class="stats-section-title">${tt('stats.schools')}</h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 8px;">${tt('stats.schoolShare', { count: schoolSessions, total: totalVols + totalGonflages })}</p>
+                <div class="equip-list">`;
+            for (const [school, st] of schools) {
+                html += `
+                    <div class="equip-card">
+                        <div class="equip-name">${escapeHTML(school)}</div>
+                        <div class="equip-details">
+                            <span style="color: var(--accent-blue)">${tt('stats.wingFlights', { count: st.vols, duration: formatDuration(st.timeVols) })}</span>
+                            <span style="color: #f59e0b">${tt('stats.wingGround', { count: st.gonflages, duration: formatDuration(st.timeGonflages) })}</span>
+                        </div>
+                    </div>
+                `;
+            }
             html += `</div>`;
         }
 

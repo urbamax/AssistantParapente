@@ -335,7 +335,7 @@
                         <input type="search" id="bank-search" placeholder="Rechercher par mot-clé (ex: cumulus)..." />
                     </search>
                     <div class="sort-controls">
-                        <select id="bank-theme-filter" data-action="renderQcmBank" class="sort-btn">
+                        <select id="bank-theme-filter" class="sort-btn">
                             <option value="ALL">Tous les thèmes</option>
                             <option value="Météo">Météo</option>
                             <option value="Mécavol">Mécavol</option>
@@ -1211,7 +1211,6 @@
                             <select
                                 id="weather-model-select"
                                 data-action="changeWeatherModel"
-                                data-args="this.value"
                                 style="
                                     background: transparent;
                                     border: 1px solid var(--border-color);
@@ -1242,7 +1241,6 @@
                             <select
                                 id="forecast-range-select"
                                 data-action="changeForecastMaxRange"
-                                data-args="this.value"
                                 style="
                                     background: transparent;
                                     border: 1px solid var(--border-color);
@@ -1391,7 +1389,6 @@
                             <select
                                 id="select-sort-mode"
                                 data-action="changeSortMode"
-                                data-args="this.value"
                                 style="
                                     background: transparent;
                                     border: 1px solid var(--border-color);
@@ -1759,8 +1756,6 @@
                                 <select
                                     id="eq-marque"
                                     style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc"
-                                    data-action="document_getElementById"
-                                    data-args="&#39;eq-marque-autre&#39;"
                                 >
                                     <option value="">-- Choisir ou Saisie Libre --</option>
                                     <option value="Autre">Autre...</option>
@@ -1787,8 +1782,6 @@
                                 <select
                                     id="eq-modele"
                                     style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc"
-                                    data-action="document_getElementById"
-                                    data-args="&#39;eq-modele-autre&#39;"
                                 >
                                     <option value="">-- Choisir ou Saisie Libre --</option>
                                     <option value="Autre">Autre...</option>
@@ -1813,8 +1806,6 @@
                                 <select
                                     id="eq-taille"
                                     style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc"
-                                    data-action="document_getElementById"
-                                    data-args="&#39;eq-taille-autre&#39;"
                                 >
                                     <option value="">-- Choisir ou Saisie Libre --</option>
                                     <option value="Autre">Autre...</option>
@@ -1841,8 +1832,6 @@
                                 <select
                                     id="eq-couleur"
                                     style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc"
-                                    data-action="document_getElementById"
-                                    data-args="&#39;eq-couleur-autre&#39;"
                                 >
                                     <option value="">-- Choisir ou Saisie Libre --</option>
                                     <option value="Autre">Autre...</option>
@@ -2191,7 +2180,6 @@
                                 class="auth-forgot-link"
                                 style="margin: 0; align-self: center"
                                 data-action="FirebaseAuthforgotPassword"
-                                data-args="document.getElementById(&#39;login-email&#39;"
                             >
                                 Mot de passe oublié ?
                             </div>
@@ -2199,7 +2187,6 @@
                         <button
                             class="auth-submit-btn"
                             data-action="FirebaseAuthsignIn"
-                            data-args="document.getElementById(&#39;login-email&#39;"
                         >
                             Se connecter
                         </button>
@@ -2277,7 +2264,6 @@
                         <button
                             class="auth-submit-btn"
                             data-action="FirebaseAuthsignUp"
-                            data-args="document.getElementById(&#39;register-email&#39;"
                         >
                             S'inscrire gratuitement
                         </button>

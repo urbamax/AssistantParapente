@@ -278,6 +278,17 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <input type="number" id="lb-gain" placeholder="Ex: 800">
                     </div>
                 </div>
+                
+                <div class="form-group">
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                        <input type="checkbox" id="lb-ecole-check" aria-controls="lb-ecole-group"> Session encadrée par une école
+                    </label>
+                    <div id="lb-ecole-group" hidden="" style="margin-top: 6px;">
+                        <label for="lb-ecole">Nom de l'école <span class="required">*</span></label>
+                        <input type="text" id="lb-ecole" list="ecoles-list" placeholder="Choisir ou saisir le nom" autocomplete="off" style="width: 100%;">
+                        <datalist id="ecoles-list"></datalist>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label>Commentaire</label>
                     <textarea id="lb-commentaire" rows="3" placeholder="Sensations, conditions météo..."></textarea>
@@ -339,6 +350,17 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                     </div>
                 </div>
+                
+                <div class="form-group">
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                        <input type="checkbox" id="lb-ecole-check" aria-controls="lb-ecole-group"> Session encadrée par une école
+                    </label>
+                    <div id="lb-ecole-group" hidden="" style="margin-top: 6px;">
+                        <label for="lb-ecole">Nom de l'école <span class="required">*</span></label>
+                        <input type="text" id="lb-ecole" list="ecoles-list" placeholder="Choisir ou saisir le nom" autocomplete="off" style="width: 100%;">
+                        <datalist id="ecoles-list"></datalist>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label>Commentaire</label>
                     <textarea id="lb-commentaire" rows="3" placeholder="Points à travailler..."></textarea>
@@ -381,6 +403,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <div class="session-equip">
                             <div><strong>Voile :</strong> OZONE | RUSH 6 | BLEU | M</div>
                             <div><strong>Sellette :</strong> SUPAIR | ACCESS</div>
+                            
                         </div>
                         <div class="session-comment">"Belle journée"</div>
                         <button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="f1"><i class="ri-route-line"></i> Voir la trace 🗺️</button><div id="trace-container-f1" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>
@@ -454,6 +477,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <div class="session-equip">
                             <div><strong>Voile :</strong> OZONE | RUSH 6 | BLEU | M</div>
                             
+                            
                         </div>
                         
                         
@@ -489,6 +513,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                         
                         <div class="session-equip">
+                            
                             
                             
                         </div>
