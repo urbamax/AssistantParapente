@@ -88,6 +88,7 @@ function rules(dataValues) {
                 !/[;<]/.test(g[2]) &&
                 !/^(ri-|var\(|rgba?\(|#|https?:)/.test(g[2]) &&
                 !/\.(pdf|png|jpe?g|svg|js|json|csv)(#|$)/.test(g[2]) &&
+                !/\d(px|rem|em|%)\b|rgba?\(/.test(g[2]) &&
                 !dataValues.includes(g[2]),
         },
     ];

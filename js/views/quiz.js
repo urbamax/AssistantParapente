@@ -24,6 +24,17 @@ import { t } from '../utils/i18n.js';
 /** Texte du mode vocal (spec 016), échappé pour le HTML. */
 const tv = (key, params = {}) => escapeHTML(t(`quiz.voice.${key}`, params));
 
+// Textes du quiz (spec 024), dans js/i18n/fr.js (section quiz). tq() : texte pour du HTML,
+// paramètres échappés ; tqh() : un paramètre est un fragment HTML construit ici ; tql() : texte
+// brut (innerText, boîtes de dialogue). Les noms de thèmes et codes de niveau sont des données.
+const fillParams = (text, params, format) =>
+    text.replace(/\{(\w+)\}/g, (match, name) =>
+        Object.prototype.hasOwnProperty.call(params, name) ? format(params[name]) : match,
+    );
+const tq = (key, params = {}) => fillParams(escapeHTML(t(`quiz.${key}`)), params, (value) => escapeHTML(String(value)));
+const tqh = (key, htmlParams) => fillParams(escapeHTML(t(`quiz.${key}`)), htmlParams, String);
+const tql = (key, params) => t(`quiz.${key}`, params);
+
 /**
  * PURE VIEW - QuizView
  * S'occupe uniquement du rendu HTML et de l'écoute des événements (Event Delegation)
@@ -71,7 +82,7 @@ class QuizViewClass extends BaseView {
     }
 
     invalidateExam() {
-        alert('Examen invalidé : Vous avez quitté la page. Le mode examen requiert toute votre attention.');
+        alert(tql('dialogs.examInvalidated'));
         QuizService.state.invalidated = true;
         this.renderExamResults();
     }
@@ -142,9 +153,7 @@ class QuizViewClass extends BaseView {
             });
         } catch (e) {
             console.error('QuizView: Error in mount', e);
-            this.renderErrorState(
-                'Impossible de charger la base de données théorique : ' + (e.message || 'Erreur inconnue'),
-            );
+            this.renderErrorState(tql('dialogs.loadFailed', { error: e.message || tql('dialogs.unknownError') }));
         }
     }
 
@@ -343,8 +352,7 @@ class QuizViewClass extends BaseView {
         sourceData = sourceData.filter((q) => !excludedPrefixes.includes(q.code.charAt(0)));
 
         if (sourceData.length === 0) {
-            container.innerHTML =
-                '<p style="text-align:center; opacity:0.6; padding: 2rem;">Aucune question trouvée.</p>';
+            container.innerHTML = `<p style="text-align:center; opacity:0.6; padding: 2rem;">${tq('bank.empty')}</p>`;
             return;
         }
 
@@ -419,17 +427,13 @@ class QuizViewClass extends BaseView {
         const descEl = document.getElementById('mode-description');
         if (descEl) {
             if (mode === 'EXAM') {
-                descEl.innerText =
-                    "Mode Examen : Simulation dans les conditions réelles d'examen (volume et thèmes imposés).";
+                descEl.innerText = tql('modes.examDescription');
             } else if (mode === 'REVISION') {
-                descEl.innerText =
-                    'Mode Révision : Retravaillez vos points faibles et découvrez les questions jamais tentées.';
+                descEl.innerText = tql('modes.revisionDescription');
             } else if (mode === 'MASTERY') {
-                descEl.innerText =
-                    "Mode Perfectionnement : Choisissez un niveau ou un thème et un palier cible. La série pioche vos questions non maîtrisées et se rallonge automatiquement si besoin, jusqu'à atteindre l'objectif.";
+                descEl.innerText = tql('modes.masteryDescription');
             } else {
-                descEl.innerText =
-                    'Mode Entraînement : Choisissez votre thème et volume. Correction immédiate après chaque question.';
+                descEl.innerText = tql('modes.trainingDescription');
             }
         }
 
@@ -449,7 +453,7 @@ class QuizViewClass extends BaseView {
 
         const themeLabel = document.getElementById('qcm-theme-label');
         if (themeLabel) {
-            themeLabel.innerText = mode === 'MASTERY' ? 'NIVEAU (TOUT) OU THÈME CIBLÉ' : 'THÈME SPÉCIFIQUE (OPTIONNEL)';
+            themeLabel.innerText = tql(mode === 'MASTERY' ? 'modes.themeLabelMastery' : 'modes.themeLabel');
         }
 
         const masteryOptions = document.getElementById('mastery-options');
@@ -514,12 +518,12 @@ class QuizViewClass extends BaseView {
             container.innerHTML = `
                 <div style="padding:40px; text-align:center; color:var(--text-main); max-width: 500px; margin: 0 auto; display:flex; flex-direction:column; align-items:center; justify-content:center;">
                     <i class="ri-shield-user-line" style="font-size:3.5rem; color:var(--accent-blue); display:block; margin-bottom:20px;"></i>
-                    <h2 style="margin-bottom:12px; font-weight: 800; font-size: 1.4rem;">Statistiques désactivées</h2>
+                    <h2 style="margin-bottom:12px; font-weight: 800; font-size: 1.4rem;">${tq('stats.disabledTitle')}</h2>
                     <p style="opacity:0.7; font-size:0.9rem; line-height: 1.6; margin-bottom: 24px;">
-                        Vous avez désactivé le stockage de vos statistiques d'entraînement dans vos préférences de confidentialité. Pour suivre votre progression et voir votre historique, veuillez activer cette option.
+                        ${tq('stats.disabledText')}
                     </p>
                     <button data-action="GdprshowModal" data-args="gdpr-settings-modal" style="background:var(--accent-blue); color:white; border:none; padding:12px 24px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; font-size:0.9rem;">
-                        Activer le suivi de progression
+                        ${tq('stats.enable')}
                     </button>
                 </div>
             `;
@@ -530,7 +534,7 @@ class QuizViewClass extends BaseView {
             container.innerHTML = `
                 <div style="padding:40px; text-align:center; color:var(--text-main); opacity:0.7;">
                     <i class="ri-loader-4-line ri-spin" style="font-size:3rem; margin-bottom:20px; display:block;"></i>
-                    <p>Chargement des données QCM...</p>
+                    <p>${tq('stats.loading')}</p>
                 </div>
             `;
             return;
@@ -540,8 +544,8 @@ class QuizViewClass extends BaseView {
             container.innerHTML = `
                 <div style="padding:40px; text-align:center; color:var(--text-main); max-width: 500px; margin: 0 auto;">
                     <i class="ri-error-warning-line" style="font-size:3rem; color:#b91c1c; display:block; margin-bottom:20px;"></i>
-                    <h2 style="margin-bottom:12px; font-weight: 800; font-size: 1.4rem;">Erreur de chargement</h2>
-                    <p style="opacity:0.7;">Impossible de charger les fichiers de données (CORS/Fichier manquant).<br>Détail: ${QuizService.state.loadingError}</p>
+                    <h2 style="margin-bottom:12px; font-weight: 800; font-size: 1.4rem;">${tq('stats.loadErrorTitle')}</h2>
+                    <p style="opacity:0.7;">${tq('stats.loadErrorText')}<br>${tq('stats.loadErrorDetail', { detail: QuizService.state.loadingError })}</p>
                 </div>
             `;
             return;
@@ -552,8 +556,8 @@ class QuizViewClass extends BaseView {
             container.innerHTML = `
                 <div style="padding:40px; text-align:center; color:white;">
                     <i class="ri-error-warning-line" style="font-size:3rem; color:#b91c1c; display:block; margin-bottom:20px;"></i>
-                    <h2 style="margin-bottom:10px;">Données QCM Introuvables</h2>
-                    <p style="opacity:0.7;">Le fichier de questions (qcm_ffvl.csv) semble manquant ou corrompu.</p>
+                    <h2 style="margin-bottom:10px;">${tq('stats.noDataTitle')}</h2>
+                    <p style="opacity:0.7;">${tq('stats.noDataText')}</p>
                 </div>
             `;
             return;
@@ -738,38 +742,38 @@ class QuizViewClass extends BaseView {
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="${getCardStyle(cGreen, 'PERFECT')}">
                     <div style="font-size:2rem; font-weight:900; color:#4ade80;">${perfect}</div>
-                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Maîtrisées</div>
+                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">${tq('stats.mastery.perfect')}</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(100%)</div>
                 </div>
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['EXCELLENT']" style="${getCardStyle('134, 239, 172', 'EXCELLENT')}">
                     <div style="font-size:2rem; font-weight:900; color:#86efac;">${excellent}</div>
-                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Excellentes</div>
+                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">${tq('stats.mastery.excellent')}</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(90-99%)</div>
                 </div>
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['VERY_GOOD']" style="${getCardStyle('56, 189, 248', 'VERY_GOOD')}">
                     <div style="font-size:2rem; font-weight:900; color:#38bdf8;">${veryGood}</div>
-                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Très Bonnes</div>
+                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">${tq('stats.mastery.veryGood')}</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(75-89%)</div>
                 </div>
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['GOOD']" style="${getCardStyle(cYellow, 'GOOD')}">
                     <div style="font-size:2rem; font-weight:900; color:#facc15;">${good}</div>
-                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Satisfaisantes</div>
+                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">${tq('stats.mastery.good')}</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(50-74%)</div>
                 </div>
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="${getCardStyle(cOrange, 'POOR')}">
                     <div style="font-size:2rem; font-weight:900; color:#fb923c;">${poor}</div>
-                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
+                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">${tq('stats.mastery.poor')}</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="${getCardStyle(cRed, 'FAILED')}">
                     <div style="font-size:2rem; font-weight:900; color:#f87171;">${failed}</div>
-                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Échecs</div>
+                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">${tq('stats.mastery.failed')}</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(0%)</div>
                 </div>
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="${getCardStyle(cGray, 'NOT_ATTEMPTED')}">
                     <div style="font-size:2rem; font-weight:900; color:var(--text-muted);">${notAttempted}</div>
-                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Non tentées</div>
-                    <div style="font-size:0.65rem; opacity:0.4;">(sur ${totalLevelQuestions})</div>
+                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">${tq('stats.mastery.notAttempted')}</div>
+                    <div style="font-size:0.65rem; opacity:0.4;">${tq('stats.outOf', { total: totalLevelQuestions })}</div>
                 </div>
             </div>
         `;
@@ -810,10 +814,10 @@ class QuizViewClass extends BaseView {
                 <div style="display:flex; align-items:center; justify-content:flex-end; margin-bottom:16px;">
                     <div style="display:flex; background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:3px; gap:2px;">
                         <button data-action="QuizsetThemeSort" data-args="['alpha']" style="${sortBtnStyle('alpha')}">
-                            ${getSortIcon('alpha')} Alphabétique
+                            ${getSortIcon('alpha')} ${tq('stats.sortAlpha')}
                         </button>
                         <button data-action="QuizsetThemeSort" data-args="['rate']" style="${sortBtnStyle('rate')}">
-                            ${getSortIcon('rate')} Taux
+                            ${getSortIcon('rate')} ${tq('stats.sortRate')}
                         </button>
                     </div>
                 </div>
@@ -895,8 +899,8 @@ class QuizViewClass extends BaseView {
 
                     <!-- Footer: question count -->
                     <div style="font-size:0.72rem; opacity:0.5; display:flex; justify-content:space-between; align-items:center;">
-                        <span>${attemptedUnique} tentées / ${totalQ} questions${notAttemptedQ > 0 ? ` <span style="opacity:0.7;">(${notAttemptedQ} non tentée${notAttemptedQ > 1 ? 's' : ''})</span>` : ''}</span>
-                        ${isActive ? '<span style="font-size:0.68rem; font-weight:700; opacity:0.8;">✕ Retirer filtre</span>' : ''}
+                        <span>${tq('stats.themeCount', { attempted: attemptedUnique, total: totalQ })}${notAttemptedQ > 0 ? ` <span style="opacity:0.7;">${tq(notAttemptedQ > 1 ? 'stats.themeNotAttemptedMany' : 'stats.themeNotAttemptedOne', { count: notAttemptedQ })}</span>` : ''}</span>
+                        ${isActive ? `<span style="font-size:0.68rem; font-weight:700; opacity:0.8;">${tq('stats.removeFilter')}</span>` : ''}
                     </div>
                 </div>
             `;
@@ -942,21 +946,12 @@ class QuizViewClass extends BaseView {
                     });
                 }
 
-                const filterLabel = {
-                    ALL: 'Toutes les questions tentées',
-                    PERFECT: 'Questions Maîtrisées (100%)',
-                    EXCELLENT: 'Questions Excellentes (90-99%)',
-                    VERY_GOOD: 'Questions Très Bonnes (75-89%)',
-                    GOOD: 'Questions Satisfaisantes (50-74%)',
-                    POOR: 'Questions À travailler (1-49%)',
-                    FAILED: 'Questions Échouées (0%)',
-                    NOT_ATTEMPTED: 'Questions Non Tentées',
-                }[QuizView.state.masteryFilter];
+                const filterLabel = tql(`stats.filters.${QuizView.state.masteryFilter}`);
 
                 // Append theme filter label if active
                 let displayLabel = filterLabel;
                 if (QuizView.state.themeFilter) {
-                    displayLabel += ` • Thème: ${QuizView.state.themeFilter}`;
+                    displayLabel += tql('stats.themeSuffix', { theme: QuizView.state.themeFilter });
                     // Filter sortedQuestions again by theme
                     visibleQuestions = visibleQuestions.filter(([code]) => {
                         const qObj = QuizView.getQuestionByCode(code);
@@ -992,19 +987,19 @@ class QuizViewClass extends BaseView {
                 allQuestionsHtml = `
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
-                        <span style="font-weight:700; color:var(--text-main);">${visibleQuestions.length}</span> questions 
+                        ${tqh('stats.questionCount', { count: `<span style="font-weight:700; color:var(--text-main);">${visibleQuestions.length}</span>` })} 
                         <span style="opacity:0.6;">(${displayLabel})</span>
-                        ${QuizView.state.masteryFilter !== 'ALL' || QuizView.state.themeFilter ? '<a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">Tout effacer</a>' : ''}
+                        ${QuizView.state.masteryFilter !== 'ALL' || QuizView.state.themeFilter ? `<a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">${tq('stats.clearFilters')}</a>` : ''}
                     </div>
                     <div style="display:flex; gap:8px;">
                         <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
-                            Par taux
+                            ${tq('stats.sortByRate')}
                         </button>
                         <button data-action="QuizsortQuestions" data-args="['attempts']" id="sort-attempts-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par tentatives
+                            ${tq('stats.sortByAttempts')}
                         </button>
                         <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par série
+                            ${tq('stats.sortByStreak')}
                         </button>
                     </div>
                 </div>
@@ -1066,7 +1061,7 @@ class QuizViewClass extends BaseView {
                         if (qObj.explication) {
                             answersHtml += `
                                 <div style="margin-top:12px; padding:12px; background:rgba(251, 146, 60, 0.15); border-left:3px solid #fb923c; font-size:0.9rem; color:var(--text-main); border-radius:8px;">
-                                    <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">Explication</div>
+                                    <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">${tq('explanation')}</div>
                                     ${escapeHTML(qObj.explication)}
                                 </div>
                             `;
@@ -1074,7 +1069,7 @@ class QuizViewClass extends BaseView {
                         answersHtml += '</div>';
                     }
 
-                    const qText = qObj ? qObj.question : 'Question inconnue';
+                    const qText = qObj ? qObj.question : tql('stats.unknownQuestion');
                     const displayText = truncate(qText, 80);
                     const hasAnswers = qObj && qObj.choices;
 
@@ -1084,14 +1079,14 @@ class QuizViewClass extends BaseView {
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#${code}</span>
-                                    ${QuizView.getCourseUrl(code) ? `<button data-action="openUrl" data-url="${escapeHTML(QuizView.getCourseUrl(code))}" style="background:var(--accent-blue); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>` : ''}
+                                    ${QuizView.getCourseUrl(code) ? `<button data-action="openUrl" data-url="${escapeHTML(QuizView.getCourseUrl(code))}" style="background:var(--accent-blue); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> ${tq('stats.course')}</button>` : ''}
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">${theme}</span>
                                     ${streak >= 3 ? `<span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 ${streak}</span>` : ''}
                                     ${hasAnswers ? '<i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-' + code + '"></i>' : ''}
                                 </div>
                                 <div style="font-size:0.9rem; line-height:1.4;">${escapeHTML(displayText)}</div>
                                 <div style="font-size:0.75rem; opacity:0.6; margin-top:4px;">
-                                    ${data.correct}/${data.total} corrects • ${data.total} tentative${data.total > 1 ? 's' : ''} • Série en cours : ${streak}
+                                    ${tq(data.total > 1 ? 'stats.questionLineMany' : 'stats.questionLineOne', { correct: data.correct, total: data.total, streak })}
                                 </div>
                                 ${answersHtml}
                             </div>
@@ -1105,8 +1100,7 @@ class QuizViewClass extends BaseView {
 
                 allQuestionsHtml += '</div>';
             } else {
-                allQuestionsHtml =
-                    '<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">Aucune question tentée pour le moment.</div>';
+                allQuestionsHtml = `<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">${tq('stats.noAttempt')}</div>`;
             }
 
             // Premium Circular Gauge Calculation
@@ -1137,15 +1131,15 @@ class QuizViewClass extends BaseView {
                             ${globalPct}<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
                         </div>
                         <div style="font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; margin-top:8px; line-height:1.2;">
-                            RÉUSSITE<br>GLOBALE
+                            ${tq('stats.globalLine1')}<br>${tq('stats.globalLine2')}
                         </div>
                     </div>
                 </div>
                 
                 <div style="text-align:center; margin-top:24px;">
-                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : ${currentLevel === 'ALL' ? 'TOUS LES NIVEAUX' : currentLevel}</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : ${stats.totalQuestions} réponses enregistrées</div>
-                    <div style="font-size:0.7rem; opacity:0.3; margin-top:4px; font-style:italic;">(Moyenne cumulée de tous vos scores)</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">${tq('stats.level', { level: currentLevel === 'ALL' ? tql('stats.allLevels') : currentLevel })}</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">${tq('stats.activity', { count: stats.totalQuestions })}</div>
+                    <div style="font-size:0.7rem; opacity:0.3; margin-top:4px; font-style:italic;">${tq('stats.averageNote')}</div>
                 </div>
             </div>
         `;
@@ -1154,28 +1148,28 @@ class QuizViewClass extends BaseView {
             ${successGaugeHtml}
 
             <div style="margin-top:48px;">
-                <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
+                <h3 class="library-section-header" style="border:none; margin-bottom:24px;">${tq('stats.distributionTitle')}</h3>
                 ${distributionHtml}
             </div>
 
                 <div style="margin-top:48px;">
-                    <h3 class="library-section-header" style="border:none; margin-bottom:20px;">STATISTIQUES PAR THÈME</h3>
+                    <h3 class="library-section-header" style="border:none; margin-bottom:20px;">${tq('stats.themesTitle')}</h3>
                     ${sortControlsHtml}
                     <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px;">
-                        ${themesHtml || '<div style="opacity:0.5;">Aucune donnée.</div>'}
+                        ${themesHtml || `<div style="opacity:0.5;">${tq('stats.noData')}</div>`}
                     </div>
                 </div>
             </div>
 
             <div style="margin-top:64px;">
-                <h3 class="library-section-header" style="border:none; margin-bottom:24px;">HISTORIQUE DES EXAMENS</h3>
+                <h3 class="library-section-header" style="border:none; margin-bottom:24px;">${tq('stats.historyTitle')}</h3>
                 <div style="background:var(--bg-card); padding:24px; border-radius:24px; border:1px solid var(--border-color);">
                     ${QuizView.renderExamHistory()}
                 </div>
             </div>
 
             <div style="margin-top:64px;">
-                <h3 class="library-section-header" style="border:none; margin-bottom:24px;">LISTE DÉTAILLÉE DES QUESTIONS</h3>
+                <h3 class="library-section-header" style="border:none; margin-bottom:24px;">${tq('stats.questionsTitle')}</h3>
                 <div style="background:var(--bg-card); padding:24px; border-radius:24px; border:1px solid var(--border-color);">
                     ${allQuestionsHtml}
                 </div>
@@ -1183,20 +1177,20 @@ class QuizViewClass extends BaseView {
 
             <div style="text-align:center; margin-top:64px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; padding-bottom:40px;">
                 <button data-action="QuizexportData" data-args="[]" style="background:rgba(74, 222, 128, 0.1); color:#4ade80; border:1px solid rgba(74, 222, 128, 0.3); padding:12px 28px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; display:flex; align-items:center; gap:8px;">
-                    <i class="ri-download-cloud-line" style="font-size:1.2rem;"></i> Exporter
+                    <i class="ri-download-cloud-line" style="font-size:1.2rem;"></i> ${tq('stats.export')}
                 </button>
                 <button data-action="QuizimportData" data-args="[]" style="background:rgba(59, 130, 246, 0.1); color:#3b82f6; border:1px solid rgba(59, 130, 246, 0.3); padding:12px 28px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; display:flex; align-items:center; gap:8px;">
-                    <i class="ri-upload-cloud-line" style="font-size:1.2rem;"></i> Importer
+                    <i class="ri-upload-cloud-line" style="font-size:1.2rem;"></i> ${tq('stats.import')}
                 </button>
                 <button data-action="QuizresetStats" data-args="[]" style="background:rgba(248, 113, 113, 0.05); color:#f87171; border:1px solid rgba(248, 113, 113, 0.2); padding:12px 28px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; display:flex; align-items:center; gap:8px;">
-                    <i class="ri-delete-bin-7-line" style="font-size:1.2rem;"></i> Réinitialiser
+                    <i class="ri-delete-bin-7-line" style="font-size:1.2rem;"></i> ${tq('stats.reset')}
                 </button>
             </div>
         `;
         } catch (e) {
             console.error('Critical Error in renderStats:', e);
             if (container) {
-                container.innerHTML = `<div style="padding:20px; color:#f87171; background:rgba(255,0,0,0.1); border-radius:12px;">Erreur d'affichage des statistiques: ${e.message}</div>`;
+                container.innerHTML = `<div style="padding:20px; color:#f87171; background:rgba(255,0,0,0.1); border-radius:12px;">${tq('stats.renderError', { error: e.message })}</div>`;
             }
         }
     }
@@ -1213,7 +1207,7 @@ class QuizViewClass extends BaseView {
         }
 
         if (exams.length === 0) {
-            return '<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">Aucun examen complété pour le moment pour ce niveau.</div>';
+            return `<div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">${tq('history.empty')}</div>`;
         }
 
         let html = '<div style="display:flex; flex-direction:column; gap:12px;">';
@@ -1227,14 +1221,9 @@ class QuizViewClass extends BaseView {
                       ? Math.round((exam.score / exam.total) * 100)
                       : 0;
             const color = exam.invalidated ? '#f87171' : pct >= 75 ? '#4ade80' : pct >= 50 ? '#facc15' : '#f87171';
-            const levelLabel =
-                exam.level === 'BI'
-                    ? 'Brevet Initial'
-                    : exam.level === 'BP'
-                      ? 'Brevet de Pilote'
-                      : exam.level === 'BPC'
-                        ? 'Brevet de Pilote Confirmé'
-                        : 'Treuil';
+            const levelLabel = tql(
+                `history.levels.${['BI', 'BP', 'BPC'].includes(exam.level) ? exam.level : 'TREUIL'}`,
+            );
 
             // Build questions HTML
 
@@ -1287,7 +1276,7 @@ class QuizViewClass extends BaseView {
 
                 questionsHtml += `
     <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; ${!r.isCorrect ? 'border:1px solid #f87171;' : ''}" >
-                        <div style="font-size:0.75rem; opacity:0.6; margin-bottom:6px;">Question ${idx + 1}</div>
+                        <div style="font-size:0.75rem; opacity:0.6; margin-bottom:6px;">${tq('history.questionNumber', { n: idx + 1 })}</div>
                         <div style="font-weight:600; margin-bottom:12px;">${escapeHTML(q.question)}</div>
                         <div style="display:flex; flex-direction:column; gap:6px;">
                             ${optionsHtml}
@@ -1302,7 +1291,7 @@ class QuizViewClass extends BaseView {
 
                             if (expl) {
                                 return `<div style="margin-top:12px; padding:8px; background:rgba(251, 146, 60, 0.15); border-left:3px solid #fb923c; font-size:0.85rem; color:var(--text-main); border-radius:8px;">
-                                    <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">Explication</div>
+                                    <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">${tq('explanation')}</div>
                                     ${escapeHTML(expl)}</div>`;
                             }
                             return '';
@@ -1320,7 +1309,7 @@ class QuizViewClass extends BaseView {
                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                     <span style="font-size:0.75rem; opacity:0.6;">${dateStr}</span>
                     <span style="background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:4px; font-size:0.7rem;">${levelLabel}</span>
-                    ${exam.invalidated ? '<span style="background:rgba(248, 113, 113, 0.1); color:#f87171; border:1px solid #f87171; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:bold;">INVALIDÉ</span>' : ''}
+                    ${exam.invalidated ? `<span style="background:rgba(248, 113, 113, 0.1); color:#f87171; border:1px solid #f87171; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:bold;">${tq('results.invalidated')}</span>` : ''}
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
@@ -1354,15 +1343,15 @@ class QuizViewClass extends BaseView {
 
         const date = formatDateTime(exam.date);
 
-        let html = `<h2>Revue de l'examen du ${date}</h2>`;
-        html += `<button class="action-btn-secondary" data-action="QuizshowStatsScreen" style="margin-bottom: 20px;">&larr; Retour aux statistiques</button>`;
+        let html = `<h2>${tq('review.title', { date })}</h2>`;
+        html += `<button class="action-btn-secondary" data-action="QuizshowStatsScreen" style="margin-bottom: 20px;">&larr; ${tq('review.back')}</button>`;
 
         const errors = exam.results.filter((r) => !r.isCorrect);
 
         if (errors.length === 0) {
-            html += `<p class="success-text">Félicitations, aucune erreur !</p>`;
+            html += `<p class="success-text">${tq('review.noError')}</p>`;
         } else {
-            html += `<h3>Erreurs (${errors.length})</h3>`;
+            html += `<h3>${tq('review.errors', { count: errors.length })}</h3>`;
             html += `<div style="display: flex; flex-direction: column; gap: 15px;">`;
 
             errors.forEach((err) => {
@@ -1387,7 +1376,7 @@ class QuizViewClass extends BaseView {
                         </div>
                     `;
                 } else {
-                    html += `<div class="card error-card" style="border-left: 3px solid #ef4444; padding: 15px; border-radius: 8px;">Question ${err.code} introuvable</div>`;
+                    html += `<div class="card error-card" style="border-left: 3px solid #ef4444; padding: 15px; border-radius: 8px;">${tq('review.missing', { code: err.code })}</div>`;
                 }
             });
             html += `</div>`;
@@ -1435,13 +1424,10 @@ class QuizViewClass extends BaseView {
 
         const modeLabelEl = document.getElementById('qcm-mode-label');
         if (modeLabelEl) {
-            const modeLabels = {
-                EXAM: 'MODE EXAMEN',
-                REVISION: 'MODE RÉVISION',
-                MASTERY: 'MODE PERFECTIONNEMENT',
-                TRAINING: 'MODE ENTRAÎNEMENT',
-            };
-            modeLabelEl.innerText = modeLabels[QuizService.state.qcmConfig.mode] || 'MODE ENTRAÎNEMENT';
+            const mode = QuizService.state.qcmConfig.mode;
+            modeLabelEl.innerText = tql(
+                `modes.labels.${['EXAM', 'REVISION', 'MASTERY'].includes(mode) ? mode : 'TRAINING'}`,
+            );
         }
 
         const masteryProgressEl = document.getElementById('qcm-mastery-progress');
@@ -1450,7 +1436,10 @@ class QuizViewClass extends BaseView {
                 const progress = QuizService.getMasteryProgress();
                 masteryProgressEl.style.display = progress ? 'block' : 'none';
                 if (progress) {
-                    masteryProgressEl.innerText = `Objectif : ${progress.target}% — Progression actuelle : ${progress.current}%`;
+                    masteryProgressEl.innerText = tql('question.masteryProgress', {
+                        target: progress.target,
+                        current: progress.current,
+                    });
                 }
             } else {
                 masteryProgressEl.style.display = 'none';
@@ -1462,9 +1451,9 @@ class QuizViewClass extends BaseView {
             const stats = QuizService.getPersistentStats();
             const s = stats.questions[q.code];
             if (!s || s.total === 0) {
-                badgeHtml = `<div class="quiz-theme-tag" style="background:var(--accent-blue, #3b82f6); color:#fff; border-color:var(--accent-blue, #3b82f6); margin-left: 8px;"><i class="ri-sparkling-line"></i> Nouveau</div>`;
+                badgeHtml = `<div class="quiz-theme-tag" style="background:var(--accent-blue, #3b82f6); color:#fff; border-color:var(--accent-blue, #3b82f6); margin-left: 8px;"><i class="ri-sparkling-line"></i> ${tq('question.new')}</div>`;
             } else {
-                badgeHtml = `<div class="quiz-theme-tag" style="background:#f87171; color:#fff; border-color:#f87171; margin-left: 8px;"><i class="ri-refresh-line"></i> À revoir</div>`;
+                badgeHtml = `<div class="quiz-theme-tag" style="background:#f87171; color:#fff; border-color:#f87171; margin-left: 8px;"><i class="ri-refresh-line"></i> ${tq('question.toReview')}</div>`;
             }
         }
 
@@ -1502,7 +1491,7 @@ class QuizViewClass extends BaseView {
                     <span class="bank-item-code" style="margin-right: 8px; ${colorStyle}">${escapeHTML(q.code)}</span>
                     <div class="quiz-theme-tag">${escapeHTML(q.theme)}</div>
                     ${badgeHtml}
-                    <div class="quiz-progress" style="margin-left: auto;">Question ${qIdx} / ${total}</div>
+                    <div class="quiz-progress" style="margin-left: auto;">${tq('question.progress', { index: qIdx, total })}</div>
                 </div>
             </div>
             <div class="quiz-question-text">${escapeHTML(q.question)}</div>
@@ -1526,7 +1515,7 @@ class QuizViewClass extends BaseView {
         // Render Actions
         actionsDiv.innerHTML = `
             ${qIdx > 1 ? '<button class="next-btn" data-action="prev-question" style="flex:0 0 60px;"><i class="ri-arrow-left-line"></i></button>' : ''}
-            <button class="next-btn" id="qcm-validate-btn" data-action="validate-question" style="flex:1;">VALIDER</button>
+            <button class="next-btn" id="qcm-validate-btn" data-action="validate-question" style="flex:1;">${tq('question.validate')}</button>
         `;
 
         // Si on revient sur une question déjà validée (bouton "retour"), on réaffiche son état
@@ -1596,7 +1585,7 @@ class QuizViewClass extends BaseView {
         const actionsDiv = document.getElementById('qcm-actions-container');
         actionsDiv.innerHTML = `
             ${showBackButton ? '<button class="next-btn" data-action="prev-question" style="flex:0 0 60px;"><i class="ri-arrow-left-line"></i></button>' : ''}
-            <button class="next-btn" data-action="next-question" style="flex:1;">QUESTION SUIVANTE <i class="ri-arrow-right-line"></i></button>
+            <button class="next-btn" data-action="next-question" style="flex:1;">${tq('question.next')} <i class="ri-arrow-right-line"></i></button>
         `;
 
         const courseUrl = this.getCourseUrl(result.question.code);
@@ -1606,7 +1595,7 @@ class QuizViewClass extends BaseView {
         feedbackDiv.innerHTML = `
             <div class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}">
                 <div>${escapeHTML(result.question.explication)}</div>
-                ${courseUrl ? `<button data-action="openUrl" data-url="${escapeHTML(courseUrl)}" style="margin-top:10px; background:var(--accent-blue); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR DANS LE COURS</button>` : ''}
+                ${courseUrl ? `<button data-action="openUrl" data-url="${escapeHTML(courseUrl)}" style="margin-top:10px; background:var(--accent-blue); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> ${tq('question.seeCourse')}</button>` : ''}
             </div>
         `;
 
@@ -1875,13 +1864,10 @@ class QuizViewClass extends BaseView {
 
     renderExamResults() {
         const isExam = QuizService.state.qcmConfig.mode === 'EXAM';
-        const modeTitle = isExam
-            ? 'MODE EXAMEN'
-            : QuizService.state.qcmConfig.mode === 'REVISION'
-              ? 'MODE RÉVISION'
-              : QuizService.state.qcmConfig.mode === 'MASTERY'
-                ? 'MODE PERFECTIONNEMENT'
-                : 'MODE ENTRAÎNEMENT';
+        const sessionMode = QuizService.state.qcmConfig.mode;
+        const modeTitle = tql(
+            `modes.labels.${['EXAM', 'REVISION', 'MASTERY'].includes(sessionMode) ? sessionMode : 'TRAINING'}`,
+        );
 
         if (isExam) {
             const level = typeof GlobalState !== 'undefined' ? GlobalState.get('level') : 'BI';
@@ -1910,14 +1896,14 @@ class QuizViewClass extends BaseView {
         const isInvalidated = QuizService.state.invalidated === true;
 
         const badgeHtml = isInvalidated
-            ? `<span style="background:rgba(248,113,113,0.1); color:#f87171; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #f87171;">INVALIDÉ</span>`
+            ? `<span style="background:rgba(248,113,113,0.1); color:#f87171; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #f87171;">${tq('results.invalidated')}</span>`
             : passed
-              ? `<span style="background:rgba(74,222,128,0.1); color:#16a34a; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #4ade80;">RÉUSSI</span>`
-              : `<span style="background:rgba(248,113,113,0.1); color:#dc2626; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #f87171;">ÉCHOUÉ</span>`;
+              ? `<span style="background:rgba(74,222,128,0.1); color:#16a34a; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #4ade80;">${tq('results.passed')}</span>`
+              : `<span style="background:rgba(248,113,113,0.1); color:#dc2626; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #f87171;">${tq('results.failed')}</span>`;
 
         container.innerHTML = `
             <div class="stats-circle-container" style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom: 32px;">
-                <h2 style="margin:0;">RÉSULTATS</h2>
+                <h2 style="margin:0;">${tq('results.title')}</h2>
                 <div style="display:flex; align-items:center; justify-content:center; gap:32px; background:var(--bg-card); padding:24px 32px; border-radius:16px; border:1px solid var(--border-color); box-shadow:0 4px 6px rgba(0,0,0,0.05);">
                     <div class="stats-circle" style="margin:0;">${score}/${total}</div>
                     <div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
@@ -1928,7 +1914,7 @@ class QuizViewClass extends BaseView {
             </div>
             
             <div style="margin-top: 32px; font-weight: 600; font-size: 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px; color:var(--text-main);">
-                Récapitulatif des questions
+                ${tq('results.summary')}
             </div>
             
             <div class="bank-container" style="display: flex; flex-direction: column; gap: 20px;">
@@ -1936,7 +1922,7 @@ class QuizViewClass extends BaseView {
                     results.filter((r) => !r.isCorrect).length === 0
                         ? `<div style="text-align: center; padding: 32px; background: rgba(74, 222, 128, 0.1); border-radius: var(--radius-md); border:1px solid #4ade80; color: #16a34a;">
                         <i class="ri-trophy-line" style="font-size: 3rem; margin-bottom:16px; display:block;"></i>
-                        <span style="font-size:1.2rem; font-weight:bold;">Félicitations, vous n'avez fait aucune erreur !</span>
+                        <span style="font-size:1.2rem; font-weight:bold;">${tq('results.noError')}</span>
                     </div>`
                         : results
                               .filter((r) => !r.isCorrect)
@@ -1945,7 +1931,7 @@ class QuizViewClass extends BaseView {
                     <div class="bank-item" style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; background: var(--bg-card); box-shadow:0 2px 4px rgba(0,0,0,0.02);">
                         <div class="bank-item-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items:center;">
                             <span class="bank-item-code" style="font-family:monospace; font-size:0.85rem; color:var(--text-secondary); background:rgba(0,0,0,0.05); padding:4px 8px; border-radius:4px;">#${r.question.code}</span>
-                            <span class="badge" style="background:rgba(248,113,113,0.1); color:#dc2626; border:1px solid #f87171; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">FAUX</span>
+                            <span class="badge" style="background:rgba(248,113,113,0.1); color:#dc2626; border:1px solid #f87171; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">${tq('results.wrong')}</span>
                         </div>
                         <div class="bank-item-question" style="font-weight: 600; font-size:1.1rem; margin-bottom: 16px; color:var(--text-main); line-height:1.4;">${r.question.question}</div>
                         <div class="bank-item-choices" style="display: flex; flex-direction: column; gap: 10px;">
@@ -1983,13 +1969,13 @@ class QuizViewClass extends BaseView {
                                     return `
                                 <div class="bank-choice" style="${bgStyle} border: ${borderStyle}; padding: 12px 16px; border-radius: 8px; font-size: 0.95rem; display: flex; justify-content: space-between; align-items:center;">
                                     <span style="display:flex; align-items:center; flex:1;">${icon} <span style="flex:1;">${escapeHTML(c.text)}</span></span>
-                                    <span style="font-weight:bold; margin-left:12px; color:var(--text-secondary);">${isUserSelected ? '<i class="ri-user-line" style="margin-right: 4px;" title="Votre réponse"></i>' : ''}${c.pts > 0 ? '+' + c.pts : c.pts < 0 ? c.pts : ''}</span>
+                                    <span style="font-weight:bold; margin-left:12px; color:var(--text-secondary);">${isUserSelected ? `<i class="ri-user-line" style="margin-right: 4px;" title="${tq('results.yourAnswer')}"></i>` : ''}${c.pts > 0 ? '+' + c.pts : c.pts < 0 ? c.pts : ''}</span>
                                 </div>
                                 `;
                                 })
                                 .join('')}
                         </div>
-                        ${r.question.explication ? `<div class="bank-item-explication" style="margin-top: 20px; font-size: 0.95rem; color: var(--text-main); background: rgba(251, 146, 60, 0.1); border-left:4px solid #fb923c; padding: 16px; border-radius: 0 8px 8px 0;"><div style="font-weight:bold; color:#ea580c; margin-bottom:4px; font-size:0.8rem; text-transform:uppercase;"><i class="ri-information-fill" style="margin-right: 4px;"></i>Explication</div>${r.question.explication}</div>` : ''}
+                        ${r.question.explication ? `<div class="bank-item-explication" style="margin-top: 20px; font-size: 0.95rem; color: var(--text-main); background: rgba(251, 146, 60, 0.1); border-left:4px solid #fb923c; padding: 16px; border-radius: 0 8px 8px 0;"><div style="font-weight:bold; color:#ea580c; margin-bottom:4px; font-size:0.8rem; text-transform:uppercase;"><i class="ri-information-fill" style="margin-right: 4px;"></i>${tq('explanation')}</div>${r.question.explication}</div>` : ''}
                     </div>
                 `,
                               )
@@ -1999,7 +1985,7 @@ class QuizViewClass extends BaseView {
         `;
 
         choicesDiv.innerHTML = '';
-        actionsDiv.innerHTML = `<button class="next-btn" data-action="finish-session" style="width:100%;">TERMINER</button>`;
+        actionsDiv.innerHTML = `<button class="next-btn" data-action="finish-session" style="width:100%;">${tq('results.finish')}</button>`;
     }
 
     sortQuestions(sortBy) {
@@ -2027,9 +2013,9 @@ class QuizViewClass extends BaseView {
 
             btn.style.background = 'transparent';
             // Reset text (remove arrows)
-            let baseText = 'Par taux';
-            if (id === 'sort-attempts-btn') baseText = 'Par tentatives';
-            if (id === 'sort-streak-btn') baseText = 'Par série';
+            let baseText = tq('stats.sortByRate');
+            if (id === 'sort-attempts-btn') baseText = tq('stats.sortByAttempts');
+            if (id === 'sort-streak-btn') baseText = tq('stats.sortByStreak');
             btn.innerHTML = baseText;
         });
 
@@ -2122,12 +2108,12 @@ class QuizViewClass extends BaseView {
     // --- STATISTICS MANAGEMENT ---
 
     resetStats() {
-        if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes vos statistiques ?')) {
+        if (confirm(tql('dialogs.resetConfirm'))) {
             StorageService.remove(StorageService.KEYS.QCM_STATS);
             if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
                 window.FirebaseAuthEngine.saveStatsToCloud();
             }
-            alert('Statistiques réinitialisées !');
+            alert(tql('dialogs.resetDone'));
             QuizView.renderStats();
         }
     }
@@ -2182,11 +2168,11 @@ class QuizViewClass extends BaseView {
 
                 // Basic validation of the file structure
                 if (!data.stats || !data.examHistory) {
-                    alert('❌ Fichier invalide: Format de données incorrect');
+                    alert(tql('dialogs.importInvalid'));
                     return;
                 }
 
-                if (confirm('⚠️ Cela va remplacer toutes vos statistiques et historiques actuels. Continuer ?')) {
+                if (confirm(tql('dialogs.importConfirm'))) {
                     // Save directly to localStorage
                     StorageService.set(StorageService.KEYS.QCM_STATS, data.stats);
                     StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: data.examHistory });
@@ -2194,21 +2180,19 @@ class QuizViewClass extends BaseView {
                     // Force update of current runtime stats if needed?
                     // Actually getPersistentStats reads from localStorage so it's fine.
 
-                    alert('✅ Données importées avec succès !');
+                    alert(tql('dialogs.importDone'));
 
                     try {
                         // Refresh stats display
                         QuizView.renderStats();
                     } catch (renderError) {
                         console.error('Render failed after import', renderError);
-                        alert(
-                            "Données importées, mais une erreur est survenue lors de l'affichage. Veuillez recharger la page.",
-                        );
+                        alert(tql('dialogs.importRenderError'));
                     }
                 }
             } catch (e) {
                 console.error('Import failed', e);
-                alert("❌ Erreur lors de l'import : " + e.message);
+                alert(tql('dialogs.importError', { error: e.message }));
             }
         });
 
@@ -2262,10 +2246,10 @@ class QuizViewClass extends BaseView {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            alert('✅ Données exportées avec succès !');
+            alert(tql('dialogs.exportDone'));
         } catch (e) {
             console.error('Export failed', e);
-            alert("❌ Erreur lors de l'export");
+            alert(tql('dialogs.exportError'));
         }
     }
 
