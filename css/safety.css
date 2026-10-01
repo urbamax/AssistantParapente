@@ -294,7 +294,7 @@
 }
 
 .safety-answer {
-    --level: var(--text-secondary);
+    --level: var(--border-color);
     padding: 8px 14px;
     font: inherit;
     font-size: 0.85rem;
@@ -306,26 +306,35 @@
     border-radius: 12px;
     cursor: pointer;
 
-    &.safety-answer-green {
-        --level: #22c55e;
-    }
-
-    &.safety-answer-yellow {
-        --level: #eab308;
-    }
-
-    &.safety-answer-red {
-        --level: #ef4444;
-    }
-
+    /* Couleur neutre tant que la check-list n'est pas complète (pas d'indice vert / rouge). */
     &[aria-pressed='true'] {
-        color: #fff;
-        background: var(--level);
-        border-color: var(--level);
+        color: var(--bg-surface);
+        background: var(--text-main);
+        border-color: var(--text-main);
     }
 
-    &.safety-answer-yellow[aria-pressed='true'] {
-        color: #1f2937;
+    .safety-ready-complete & {
+        &.safety-answer-green {
+            --level: #22c55e;
+        }
+
+        &.safety-answer-yellow {
+            --level: #eab308;
+        }
+
+        &.safety-answer-red {
+            --level: #ef4444;
+        }
+
+        &[aria-pressed='true'] {
+            color: #fff;
+            background: var(--level);
+            border-color: var(--level);
+        }
+
+        &.safety-answer-yellow[aria-pressed='true'] {
+            color: #1f2937;
+        }
     }
 }
 

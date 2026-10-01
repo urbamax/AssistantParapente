@@ -29,6 +29,9 @@ beforeEach(async () => {
             }
         }
     );
+    // Réponses du « Prêt pour le déco ? » mélangées à l'affichage : un tirage proche de 1 garde
+    // l'ordre du livret, pour un instantané stable.
+    vi.spyOn(Math, 'random').mockReturnValue(0.9999);
     await mountFresh();
 });
 

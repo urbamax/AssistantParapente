@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import SafetyView, {
     PREFLIGHT_CHECKLIST,
     READY_CHECKLIST,
@@ -98,6 +98,44 @@ describe('SafetyView', () => {
 
         SafetyView.resetReady();
         expect(verdict.hidden).toBe(true);
+    });
+
+    describe('ready check-list answer bias', () => {
+        afterEach(() => vi.restoreAllMocks());
+
+        const order = (id) =>
+            [...document.querySelectorAll(`[data-question="${id}"]`)].map((b) => b.dataset.answer).join('');
+
+        it('shuffles the answers instead of always listing green first', async () => {
+            vi.spyOn(Math, 'random').mockReturnValue(0);
+            await mountFresh();
+            expect(order('vie')).toBe('120');
+            // Chaque bouton garde l'index (donc la couleur) de sa réponse.
+            const btn = document.querySelector('[data-question="vie"][data-answer="2"]');
+            expect(btn.textContent).toBe(questions.find((q) => q.id === 'vie').answers[2][0]);
+            expect(btn.classList.contains('safety-answer-red')).toBe(true);
+        });
+
+        it('reshuffles the answers on reset', async () => {
+            vi.spyOn(Math, 'random').mockReturnValue(0.9999);
+            await mountFresh();
+            expect(order('vie')).toBe('012');
+            vi.spyOn(Math, 'random').mockReturnValue(0);
+            SafetyView.resetReady();
+            expect(order('vie')).toBe('120');
+        });
+
+        it('only reveals the answer colours once the check-list is complete', () => {
+            const card = document.getElementById('safety-ready-verdict').closest('.safety-card');
+            questions.forEach((q, n) => {
+                expect(card.classList.contains('safety-ready-complete')).toBe(false);
+                const btn = document.querySelector(`[data-question="${q.id}"][data-answer="0"]`);
+                SafetyView.answerReady(null, null, btn);
+                expect(card.classList.contains('safety-ready-complete')).toBe(n === questions.length - 1);
+            });
+            SafetyView.resetReady();
+            expect(card.classList.contains('safety-ready-complete')).toBe(false);
+        });
     });
 
     it('persists SIGR ratings and toggles a rating off on second press', () => {
