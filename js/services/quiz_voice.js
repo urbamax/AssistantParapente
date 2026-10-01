@@ -39,7 +39,7 @@ export function buildQuestionSpeech(q) {
 
 /**
  * Verdict puis explication.
- * @param {{ isCorrect: boolean, question: { explication?: string } }} result
+ * @param {{ isCorrect: boolean, userPoints: number, selected?: { pts: number }[], question: { explication?: string } }} result
  */
 export function buildFeedbackSpeech(result) {
     let verdictKey = 'quiz.voice.speech.incorrect';
