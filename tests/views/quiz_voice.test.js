@@ -293,7 +293,7 @@ describe('US3 - answer by voice (spec 016)', () => {
         expect(selectedLetters()).toEqual(['B', 'D']);
         expect([...QuizService.state.currentQcmSelection].map((o) => o.text)).toEqual(['Vent latéral', 'Aucun vent']);
         expect(status()).toBe('Entendu : B et D');
-        expect(speech.texts.at(-1)).toBe('Sélection : B, D.');
+        expect(speech.texts.at(-1)).toBe('Sélection : B, Vent latéral. D, Aucun vent.');
     });
 
     it('uses the first alternative that is understood', () => {

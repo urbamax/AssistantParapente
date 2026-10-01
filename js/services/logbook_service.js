@@ -1,6 +1,7 @@
 import StorageService from './storage.js';
 import IDBStorage from './idb_storage.js';
 import IGCParser from './igc_parser.js';
+import { t } from '../utils/i18n.js';
 
 // Garantit que les champs consommés directement par un rendu (ex: subtitle.toLowerCase()
 // dans LogbookView) ne sont jamais undefined/null, quelle que soit la provenance de
@@ -508,7 +509,10 @@ class LogbookService {
                 error: null,
             };
         } catch (e) {
-            let msg = e.message || 'Erreur réseau'; if (msg === 'Load failed' || msg === 'Failed to fetch') msg = 'Requête bloquée (extension, Safari Tracking Prevention ou CSP)'; return { success: false, data: null, error: msg };
+            // « Load failed » (Safari) / « Failed to fetch » (Chrome) : requête bloquée avant le réseau.
+            const blocked = e.message === 'Load failed' || e.message === 'Failed to fetch';
+            const msg = blocked ? t('logbook.weather.blocked') : e.message || t('logbook.weather.networkError');
+            return { success: false, data: null, error: msg };
         }
     }
 }

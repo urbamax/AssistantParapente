@@ -48,6 +48,25 @@ describe('spoken texts (spec 016, FR-001, FR-002)', () => {
         expect(describeSelection([1, 3])).toBe('Sélection : B, D.');
         expect(describeSelection([])).toBe('Sélection effacée.');
     });
+
+    it('reads the selected answers with their text when known', () => {
+        const choices = [
+            { text: 'Vent de face' },
+            { text: 'Vent latéral' },
+            { text: 'Vent arrière' },
+            { text: 'Aucun vent' },
+        ];
+        expect(describeSelection([1, 3], choices)).toBe('Sélection : B, Vent latéral. D, Aucun vent.');
+    });
+
+    it('says « incomplète » when points were earned without any wrong answer', () => {
+        const base = { isCorrect: false, question: { explication: '' } };
+        expect(buildFeedbackSpeech({ ...base, userPoints: 2, selected: [{ pts: 2 }] })).toBe('Réponse incomplète.');
+        expect(buildFeedbackSpeech({ ...base, userPoints: 1, selected: [{ pts: 2 }, { pts: -1 }] })).toBe(
+            'Mauvaise réponse.',
+        );
+        expect(buildFeedbackSpeech({ ...base, userPoints: 0, selected: [] })).toBe('Mauvaise réponse.');
+    });
 });
 
 describe('parseVoiceCommand (spec 016, FR-007, FR-008)', () => {
@@ -70,6 +89,14 @@ describe('parseVoiceCommand (spec 016, FR-007, FR-008)', () => {
         ['D et B', [1, 3]],
         ['a et a', [0]],
         ['lettre B', [1]],
+        // Homophones de suites de lettres (reconnaissance vocale française).
+        ['aider', [0, 3]],
+        ['assez', [0, 2]],
+        ['abaisser', [0, 1, 2]],
+        ['baisser', [1, 2]],
+        ['céder', [2, 3]],
+        ['décès', [2, 3]],
+        ['baie', [1]],
     ])('« %s » selects %j', (text, indexes) => {
         expect(letters(text)).toEqual({ type: 'letters', indexes });
     });

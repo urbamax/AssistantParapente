@@ -248,15 +248,7 @@ class SitesService {
         if (forecastRangeSelect) forecastRangeSelect.value = String(this.state.forecastMaxRange);
         if (filterModeSelect && this.state.filterMode) filterModeSelect.value = this.state.filterMode;
 
-        const durationSpan = document.getElementById('hide-unflyable-duration');
-        if (durationSpan) {
-            const range = this.state.forecastMaxRange || 120;
-            if (range >= 120) {
-                durationSpan.textContent = `${range / 24} jours`;
-            } else {
-                durationSpan.textContent = `${range} h`;
-            }
-        }
+        this.updateHideUnflyableDuration();
 
         // UI logic moved to sites.js
         if (this.updateMapTogglesVisibility) {
@@ -1110,7 +1102,7 @@ class SitesService {
                 // Sans ça, un échec ou un chargement en cours vidait toute la liste.
                 if (forecasts.length === 0) return true;
                 let hours = 0;
-                for (let i = 0; i < Math.min(forecasts.length, this.state.forecastMaxRange); i++) {
+                for (let i = 0; i < Math.min(forecasts.length, this.state.forecastMaxRange || 120); i++) {
                     if (this.isForecastFlyable(site, forecasts[i]).flyable) hours++;
                 }
                 return hours > 0;
@@ -1237,16 +1229,8 @@ class SitesService {
                 }
                 this.setForecastOffset(currentOffset);
             }
-            
-            const durationSpan = document.getElementById('hide-unflyable-duration');
-            if (durationSpan) {
-                if (range >= 120) {
-                    durationSpan.textContent = `${range / 24} jours`;
-                } else {
-                    durationSpan.textContent = `${range} h`;
-                }
-            }
 
+            this.updateHideUnflyableDuration();
             this.savePreferences();
         }
     }
@@ -1467,6 +1451,17 @@ class SitesService {
         if (sitesView()?.state?.map) {
             this.updateMapMarkers();
         }
+    }
+
+    /** Durée du filtre « Masquer les sites sans créneau volable » : celle des prévisions affichées. */
+    updateHideUnflyableDuration() {
+        const durationSpan = document.getElementById('hide-unflyable-duration');
+        if (!durationSpan) return;
+        const range = this.state.forecastMaxRange || 120;
+        durationSpan.textContent =
+            range >= 120
+                ? t('sites.filters.rangeDays', { days: range / 24 })
+                : t('sites.filters.rangeHours', { hours: range });
     }
 
     setForecastOffset(value) {

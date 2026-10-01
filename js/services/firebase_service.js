@@ -562,7 +562,9 @@ export const FirebaseAuthEngine = {
                 deletedFlightsAtMerge = JSON.parse(localStorage.getItem('deleted_flights') || '[]');
             } catch {}
             const deletedFlightsSet = new Set(
-                Array.isArray(deletedFlightsAtMerge) ? deletedFlightsAtMerge.filter((id) => typeof id === 'string') : [],
+                Array.isArray(deletedFlightsAtMerge)
+                    ? deletedFlightsAtMerge.filter((id) => typeof id === 'string')
+                    : [],
             );
 
             const mergedLogbookMap = new Map();
@@ -666,9 +668,7 @@ export const FirebaseAuthEngine = {
                 deletedEquipAtMerge = JSON.parse(localStorage.getItem('deleted_equipment') || '[]');
             } catch {}
             const deletedEquipSet = new Set(
-                Array.isArray(deletedEquipAtMerge)
-                    ? deletedEquipAtMerge.filter((id) => typeof id === 'string')
-                    : [],
+                Array.isArray(deletedEquipAtMerge) ? deletedEquipAtMerge.filter((id) => typeof id === 'string') : [],
             );
 
             const mergedEquipMap = new Map();
