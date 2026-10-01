@@ -39,7 +39,8 @@ export function buildQuestionSpeech(q) {
 
 /**
  * Verdict puis explication.
- * @param {{ isCorrect: boolean, userPoints: number, selected?: { pts: number }[], question: { explication?: string } }} result
+ * Verdict « incomplète » : des points gagnés, aucune réponse fausse cochée, mais pas toutes les bonnes.
+ * @param {{ isCorrect: boolean, question: { explication?: string }, userPoints?: number, selected?: { pts: number }[] }} result
  */
 export function buildFeedbackSpeech(result) {
     let verdictKey = 'quiz.voice.speech.incorrect';
@@ -60,12 +61,14 @@ export function buildFeedbackSpeech(result) {
  */
 export function describeSelection(indexes, choices = []) {
     if (!indexes.length) return t('quiz.voice.speech.cleared');
+    // Avec le texte des réponses : « B, Vent latéral. D, Aucun vent » ; sinon « B, D ».
+    const withText = indexes.some((i) => choices && choices[i] && choices[i].text);
     const spokenOptions = indexes.map((i) => {
         const letter = optionLetter(i);
         const text = choices && choices[i] ? choices[i].text : '';
         return text ? `${letter}, ${text}` : letter;
     });
-    return t('quiz.voice.speech.selection', { letters: spokenOptions.join('. ') });
+    return t('quiz.voice.speech.selection', { letters: spokenOptions.join(withText ? '. ' : ', ') });
 }
 
 /** Minuscules, sans accents, apostrophes et ponctuation remplacées par des espaces. */

@@ -1654,7 +1654,7 @@ class LogbookViewClass extends BaseView {
             const isVol = session.type === 'vol';
 
             let startLabel = isVol ? 'weather.rowTakeoff' : 'weather.rowStart';
-            if (session.duree && !session.meteoAtterro) {
+            if (session.meteoAtterroSame) {
                 startLabel = isVol ? 'weather.rowTakeoffLanding' : 'weather.rowStartEnd';
             }
 
@@ -2487,10 +2487,12 @@ class LogbookViewClass extends BaseView {
                 target.meteo = decollageResult.data;
                 target.meteoAtterro = atterroResult.success ? atterroResult.data : null;
 
-                // Ne pas afficher la ligne d'atterrissage si la météo est rigoureusement identique
-                if (target.meteoAtterro && JSON.stringify(target.meteo) === JSON.stringify(target.meteoAtterro)) {
-                    target.meteoAtterro = null;
-                }
+                // Météo rigoureusement identique au décollage et à l'atterrissage : une seule ligne,
+                // « Décollage et atterrissage ». L'indicateur est explicite : une météo d'atterrissage
+                // absente (échec, séance ancienne) ne doit jamais être présentée comme identique.
+                target.meteoAtterroSame =
+                    !!target.meteoAtterro && JSON.stringify(target.meteo) === JSON.stringify(target.meteoAtterro);
+                if (target.meteoAtterroSame) target.meteoAtterro = null;
 
                 target.baliseId = baliseId || null;
                 LogbookService.saveFlights(); // Persiste en localStorage et déclenche la synchro Firestore
