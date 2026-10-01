@@ -213,6 +213,7 @@ class UIManager {
                 const id = activeScreen.id;
                 if (id.includes('sites')) section = 'sites';
                 else if (id.includes('logbook')) section = 'logbook';
+                else if (id.includes('safety')) section = 'safety';
                 else if (id.includes('library') || id.includes('course')) section = 'library';
                 else if (id.includes('qcm')) section = 'qcm';
                 else if (id.includes('stats')) section = 'stats';

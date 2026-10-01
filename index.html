@@ -100,19 +100,19 @@
         <link rel="stylesheet" href="vendor/remixicon-3.5.0/remixicon.css" />
         <link rel="stylesheet" href="vendor/leaflet-1.9.4/leaflet.css" />
         <script src="vendor/leaflet-1.9.4/leaflet.js" defer></script>
-        <link rel="stylesheet" href="css/base.css?v=2026.09.30_v14" />
-        <link rel="stylesheet" href="css/components.css?v=2026.09.30_v14" />
-        <link rel="stylesheet" href="css/header.css?v=2026.09.30_v14" />
-        <link rel="stylesheet" href="css/footer.css?v=2026.09.30_v14" />
+        <link rel="stylesheet" href="css/base.css?v=2026.10.01_v15" />
+        <link rel="stylesheet" href="css/components.css?v=2026.10.01_v15" />
+        <link rel="stylesheet" href="css/header.css?v=2026.10.01_v15" />
+        <link rel="stylesheet" href="css/footer.css?v=2026.10.01_v15" />
 
-        <link rel="stylesheet" href="css/quiz.css?v=2026.09.30_v14" />
-        <link rel="stylesheet" href="css/library.css?v=2026.09.30_v14" />
-        <link rel="stylesheet" href="css/sites.css?v=2026.09.30_v14" />
-        <link rel="stylesheet" href="css/auth.css?v=2026.09.30_v14" />
-        <link rel="stylesheet" href="css/gdpr.css?v=2026.09.30_v14" />
-        <link rel="stylesheet" href="css/logbook.css?v=2026.09.30_v14" />
-        <link rel="stylesheet" href="css/welcome.css?v=2026.09.30_v14" />
-        <link rel="stylesheet" href="css/safety.css?v=2026.09.30_v14" />
+        <link rel="stylesheet" href="css/quiz.css?v=2026.10.01_v15" />
+        <link rel="stylesheet" href="css/library.css?v=2026.10.01_v15" />
+        <link rel="stylesheet" href="css/sites.css?v=2026.10.01_v15" />
+        <link rel="stylesheet" href="css/auth.css?v=2026.10.01_v15" />
+        <link rel="stylesheet" href="css/gdpr.css?v=2026.10.01_v15" />
+        <link rel="stylesheet" href="css/logbook.css?v=2026.10.01_v15" />
+        <link rel="stylesheet" href="css/welcome.css?v=2026.10.01_v15" />
+        <link rel="stylesheet" href="css/safety.css?v=2026.10.01_v15" />
     </head>
 
     <body>
@@ -2001,7 +2001,7 @@
         <!-- Services -->
 
         <!-- Firebase Sync Config & Engine -->
-        <script src="js/firebase_config.js?v=2026.09.30_v14"></script>
+        <script src="js/firebase_config.js?v=2026.10.01_v15"></script>
         <!-- Quiz Engine Version 4.8 (Theme Fix & Button Alignment) -->
         <!-- Logbook Engine -->
         <!-- Engine v4.70 (Level Persistence Fix) -->
@@ -2810,6 +2810,14 @@
                         <button
                             class="manual-tab-btn"
                             data-action="showManualSection"
+                            data-args="'safety'"
+                            id="manual-tab-safety"
+                        >
+                            Sécurité
+                        </button>
+                        <button
+                            class="manual-tab-btn"
+                            data-action="showManualSection"
                             data-args="'qcm'"
                             id="manual-tab-qcm"
                         >
@@ -2968,6 +2976,14 @@
                                     pilote dans une bibliothèque consultable et téléchargeable.
                                 </li>
                                 <li style="margin-bottom: 6px">
+                                    Elle tient votre <strong>carnet de vol</strong> (import de traces .igc, météo du
+                                    jour enregistrée automatiquement) et suit l'<strong>usure de votre matériel</strong>.
+                                </li>
+                                <li style="margin-bottom: 6px">
+                                    Elle rassemble sur un écran <strong>Sécurité</strong> la conduite à tenir en cas
+                                    d'accident, votre position GPS et les check-lists avant le décollage.
+                                </li>
+                                <li style="margin-bottom: 6px">
                                     Elle suit votre <strong>progression dans le temps</strong> et identifie précisément
                                     les thèmes où vous avez le plus de lacunes, pour orienter vos révisions
                                     efficacement.
@@ -3042,11 +3058,13 @@
                                 "
                             >
                                 En haut de l'écran, un menu déroulant vous permet de sélectionner votre niveau actuel
-                                (Brevet Initial, Brevet de Pilote, Brevet de Pilote Confirmé). Ce réglage est
-                                fondamental car il adapte automatiquement le contenu de l'application : les questions
-                                des QCM seront filtrées selon votre niveau, le temps imparti pour les examens sera
-                                ajusté, et la couleur dominante de l'interface changera pour refléter votre progression
-                                (Vert pour BI, Bleu pour BP, Marron pour BPC).
+                                (Brevet Initial, Brevet Pilote, Brevet Pilote Confirmé, Treuil, ou Tous les niveaux).
+                                Il est proposé dès votre première visite sur l'écran d'accueil, et vous pouvez le
+                                changer à tout moment. Ce réglage adapte automatiquement le contenu de l'application :
+                                les questions des QCM et les cours de la bibliothèque sont filtrés selon votre niveau,
+                                le nombre de questions de l'examen blanc est ajusté, et la couleur dominante de
+                                l'interface change pour refléter votre progression (Vert pour BI, Bleu pour BP, Marron
+                                pour BPC).
                             </p>
 
                             <h5 style="margin-top: 16px; margin-bottom: 8px">2. Thème Visuel (Clair / Sombre)</h5>
@@ -3183,19 +3201,48 @@
                                 partagées ni vendues. Vous pouvez les supprimer à tout moment depuis l'Espace Synchro ou
                                 en contactant l'éditeur.
                             </p>
+                            <p style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem">
+                                Une fois connecté, un petit point dans l'en-tête indique qu'une synchronisation
+                                est en cours ou que des modifications n'ont pas encore pu être envoyées (hors ligne) :
+                                l'application réessaie automatiquement. Les boutons <strong>Exporter</strong> et
+                                <strong>Importer</strong> de l'Espace Synchro permettent aussi de garder une copie de
+                                vos données dans un fichier.
+                            </p>
+
+                            <h5 style="margin-top: 16px; margin-bottom: 8px">4. Hors ligne et mises à jour</h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.7;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 8px;
+                                "
+                            >
+                                <li style="margin-bottom: 6px">
+                                    <strong>Sans réseau :</strong> les QCM, le carnet de vol et l'écran Sécurité
+                                    fonctionnent hors ligne. La dernière prévision météo chargée, les cours déjà ouverts
+                                    et les zones de carte déjà consultées restent disponibles sur l'appareil.
+                                </li>
+                                <li style="margin-bottom: 6px">
+                                    <strong>Nouvelle version :</strong> lorsqu'une mise à jour de l'application est
+                                    disponible, un message vous le signale pour que vous puissiez recharger la page.
+                                </li>
+                            </ul>
                         </div>
 
                         <div id="manual-section-sites" class="manual-section" style="display: none">
                             <h4 style="margin-top: 0; color: var(--accent-blue)">
-                                Préparation des Vols (Sites & Météo)
+                                Préparation des Vols (Sites &amp; Météo)
                             </h4>
                             <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
-                                Ce module est un puissant outil d'analyse aérologique croisant les données géographiques
-                                des sites de vol libre (fournies par la FFVL) avec de multiples modèles météorologiques.
+                                Ce module croise les données géographiques des sites de vol libre (fournies par la FFVL)
+                                avec les prévisions de plusieurs modèles météorologiques, pour indiquer quels sites sont
+                                potentiellement volables autour de vous et à quelle heure.
                             </p>
 
                             <h5 style="margin-top: 16px; margin-bottom: 8px">
-                                1. Géolocalisation et Rayon de Recherche
+                                1. Point de Référence et Rayon de Recherche
                             </h5>
                             <ul
                                 style="
@@ -3206,17 +3253,28 @@
                                 "
                             >
                                 <li style="margin-bottom: 8px">
-                                    <strong>Le GPS ou la Recherche Manuelle :</strong> Vous pouvez autoriser le GPS
-                                    (bouton "GPS") pour centrer la recherche sur vous, ou taper manuellement le nom
-                                    d'une ville/adresse (ex: Annecy) et cliquer sur "Valider".
+                                    <strong>Le GPS ou une adresse :</strong> Autorisez le GPS (bouton "GPS") pour
+                                    centrer la recherche sur vous, ou tapez le nom d'une ville ou d'une adresse (ex :
+                                    Annecy) puis cliquez sur "Valider". Sans GPS ni adresse, la recherche est centrée
+                                    sur Boulogne-sur-Mer et un message vous le rappelle.
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Lieux enregistrés :</strong> L'étoile à côté du champ d'adresse mémorise le
+                                    lieu courant pour le recharger en un clic plus tard.
                                 </li>
                                 <li style="margin-bottom: 8px">
                                     <strong>Le Rayon :</strong> Le curseur "Rayon maximal" définit la zone de recherche
-                                    autour de ce point de référence (de 10 km à Illimité).
+                                    autour de ce point, de 10 à 200 km (50 km par défaut). La météo n'est demandée que
+                                    pour les sites de cette zone (et vos favoris) ; la carte suit le rayon choisi.
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Recherche et filtres :</strong> La barre de recherche trouve un site par son
+                                    nom, sa ville ou son code postal. Les menus "Orientation" et "Type" (site naturel,
+                                    atterrissage, dune, piste de treuil, gonflage…) affinent la liste.
                                 </li>
                             </ul>
 
-                            <h5 style="margin-top: 16px; margin-bottom: 8px">2. Modèles Météo et Limites de Vent</h5>
+                            <h5 style="margin-top: 16px; margin-bottom: 8px">2. Paramètres de Calcul Météo</h5>
                             <ul
                                 style="
                                     color: var(--text-secondary);
@@ -3226,21 +3284,29 @@
                                 "
                             >
                                 <li style="margin-bottom: 8px">
-                                    <strong>Choix du Modèle :</strong> AROME (Haute définition, très précis sur 2 jours
-                                    en France), ICON (Bon compromis Europe), GFS (Long terme mondial). Changer de modèle
-                                    recalcule instantanément les prévisions.
+                                    <strong>Modèle Météo :</strong> AROME (Météo-France, haute définition, très précis
+                                    à courte échéance en France), ICON-EU et ICON (DWD), ECMWF (IFS), GFS (NOAA, long
+                                    terme mondial), ou une sélection automatique multi-modèles d'Open-Meteo. Changer de
+                                    modèle recalcule les prévisions.
                                 </li>
                                 <li style="margin-bottom: 8px">
-                                    <strong>Vos Limites :</strong> Définissez votre plage de vent idéal (ex: Min 5 km/h,
-                                    Max 20 km/h) et la rafale maximale tolérée. Si les prévisions dépassent ces limites,
-                                    le site sera marqué en rouge (non volable pour vous).
+                                    <strong>Durée des prévisions :</strong> De 24 heures à 7 jours. Elle fixe la fenêtre
+                                    sur laquelle les créneaux volables sont recherchés.
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Mode de calcul du vent :</strong> En "Filtres Personnels", vous définissez
+                                    votre plage de vent (Vent Min, Vent Max) et l'écart maximal toléré entre rafales et
+                                    vent moyen (Rafales Max). En "Mon Matériel", ce sont les plages de vent des voiles
+                                    enregistrées dans votre carnet qui servent de limites : un site est volable si au
+                                    moins une de vos voiles accepte le vent prévu.
                                 </li>
                             </ul>
 
-                            <h5 style="margin-top: 16px; margin-bottom: 8px">3. Score de "Flyability" et Stratégies</h5>
+                            <h5 style="margin-top: 16px; margin-bottom: 8px">3. Tri et Définition des Meilleures Conditions</h5>
                             <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
-                                L'application calcule un score pour chaque site, vérifiant si l'orientation du vent est
-                                compatible avec les décollages du site, et si la force du vent respecte vos limites.
+                                La liste peut être triée par meilleures conditions, par distance (GPS) ou par nom. Vos
+                                sites favoris (étoile ⭐ sur une fiche) restent toujours en tête. En tri "Meilleures
+                                conditions", quatre stratégies sont proposées :
                             </p>
                             <ul
                                 style="
@@ -3251,30 +3317,79 @@
                                 "
                             >
                                 <li style="margin-bottom: 8px">
-                                    <strong>Créneau Continu :</strong> Cherche la plus longue période d'heures
+                                    <strong>Créneau continu :</strong> Cherche la plus longue période d'heures
                                     consécutives volables (idéal pour un long vol).
                                 </li>
                                 <li style="margin-bottom: 8px">
-                                    <strong>Demi-journée active :</strong> Se concentre sur une fenêtre de quelques
-                                    heures l'après-midi ou le matin.
+                                    <strong>Demi-journée :</strong> Compte les heures volables de l'après-midi (de 12 h
+                                    à 18 h).
                                 </li>
                                 <li style="margin-bottom: 8px">
-                                    <strong>Volume Total :</strong> Cumule toutes les heures potentiellement volables
-                                    sur les 48 prochaines heures, même si elles sont hachées.
+                                    <strong>Journée complète :</strong> Vérifie que le site est volable le matin, en
+                                    début d'après-midi et en fin de journée (10 h, 14 h et 18 h).
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Volume total :</strong> Cumule toutes les heures volables sur la durée des
+                                    prévisions, même si elles sont hachées.
                                 </li>
                             </ul>
 
-                            <h5 style="margin-top: 16px; margin-bottom: 8px">
-                                4. Cartographie Embarquée 2D/3D &amp; Relief
-                            </h5>
+                            <h5 style="margin-top: 16px; margin-bottom: 8px">4. Heure de Vol et Fiabilité des Prévisions</h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                "
+                            >
+                                <li style="margin-bottom: 8px">
+                                    <strong>Heure de vol :</strong> Le curseur "Heure de vol" choisit l'heure
+                                    affichée pour tous les sites. La case "Masquer les sites sans créneau volable"
+                                    retire ceux qui n'ont aucune heure volable sur la durée des prévisions.
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Contexte de la prévision :</strong> Chaque avis indique le modèle utilisé,
+                                    l'heure à laquelle la prévision a été récupérée et l'heure de calcul du modèle (run).
+                                    Au-delà de 3 heures, la prévision est signalée comme ancienne, avec un bouton
+                                    "Actualiser".
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Second avis :</strong> Pour l'heure affichée, l'application compare avec un
+                                    second modèle (GFS, ou AROME si GFS est déjà choisi) et indique s'il est d'accord
+                                    ou non.
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Prévision incomplète :</strong> Si une donnée manque (vent, rafales,
+                                    pluie, risque d'orage…), aucun avis n'est donné pour cette heure plutôt que
+                                    d'inventer une valeur, et les données manquantes sont listées.
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Hors ligne :</strong> La dernière prévision chargée reste consultable sans
+                                    réseau, avec la date de récupération pour rappeler qu'elle peut être dépassée.
+                                </li>
+                            </ul>
+
+                            <h5 style="margin-top: 16px; margin-bottom: 8px">5. Fiche Site, Favoris et Comparateur</h5>
                             <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
-                                Au-dessus de la liste des sites, la carte interactive 2D/3D (propulsée par
-                                <strong>MapLibre GL</strong>) permet d'afficher les décollages et les reliefs en trois
-                                dimensions, mais aussi d'incruster des services météo externes en un clic :
-                                <strong>Windy</strong> (vent animé), <strong>Météo-Parapente</strong> (émagrammes &amp;
-                                thermiques), <strong>Paragliding Earth</strong> (balises),
-                                <strong>Paraglidable</strong> (modèle de vent dynamique) ou les cartes de fronts
-                                Isobares (<strong>Isofronts</strong>).
+                                Chaque fiche site affiche l'altitude, les prochains créneaux volables, et donne accès à
+                                la fiche officielle FFVL, au vent en direct de la balise la plus proche (SpotAiR), à
+                                l'itinéraire ("S'y rendre" avec Waze, Google Maps ou Apple Plans) et aux détails du
+                                site (praticabilité, dangers signalés, réglementation…). Un <strong>brief
+                                pré-vol</strong> rappelle votre niveau et l'état de révision de votre matériel. Le
+                                bouton <strong>Comparer</strong> met vos sites favoris côte à côte : météo de l'heure
+                                affichée, heures volables, meilleur créneau et accord entre les deux modèles.
+                            </p>
+
+                            <h5 style="margin-top: 16px; margin-bottom: 8px">6. Cartographie &amp; Cartes Externes</h5>
+                            <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Au-dessus de la liste, la carte interactive affiche les sites autour de vous avec les
+                                icônes officielles FFVL. Des onglets permettent d'afficher en un clic des services
+                                météo externes : <strong>Windy</strong> (vent animé), <strong>Météo-Parapente</strong>
+                                (émagrammes &amp; thermiques), <strong>Paragliding Earth</strong>,
+                                <strong>Paraglidable</strong>, les cartes <strong>Fronts &amp; Isobares</strong> de
+                                Météo-France, et d'autres cartes via le bouton "Plus". Le bouton
+                                <strong>Spot It</strong> d'une fiche site centre toutes ces cartes sur ce site.
                             </p>
                         </div>
 
@@ -3286,6 +3401,12 @@
                                 L'application évalue en temps réel la "volabilité" de chaque spot de parapente selon un
                                 algorithme qui croise les prévisions météo avec vos filtres personnels. Ce calcul
                                 s'effectue en deux étapes successives.
+                            </p>
+                            <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Au préalable, chaque heure doit disposer de toutes les données nécessaires (vent moyen,
+                                rafales, direction du vent, précipitations, risque d'orage, heures de jour). S'il en
+                                manque une, l'heure est marquée <strong>"Prévision incomplète"</strong> : aucun avis
+                                n'est donné et aucune valeur par défaut n'est inventée.
                             </p>
 
                             <h5 style="margin-top: 16px; margin-bottom: 8px">
@@ -3315,7 +3436,8 @@
                                 </li>
                                 <li style="margin-bottom: 6px">
                                     <strong>💨 Vent moyen hors limites :</strong> Bloqué si le vent moyen est inférieur
-                                    à votre limite minimale (vMin) ou supérieur à votre limite maximale (vMax).
+                                    à votre limite minimale (vMin) ou supérieur à votre limite maximale (vMax). En mode
+                                    "Mon Matériel", bloqué si aucune de vos voiles n'accepte ce vent.
                                 </li>
                                 <li style="margin-bottom: 6px">
                                     <strong>🌪️ Rafales excessives :</strong> Bloqué si l'écart entre les rafales et le
@@ -3331,6 +3453,11 @@
                                     vent ne correspond pas à l'orientation de décollage enregistrée pour ce site.
                                 </li>
                             </ul>
+                            <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Si l'orientation du décollage n'est pas connue, l'application ne la suppose jamais
+                                idéale : les autres verrous s'appliquent, mais le site est affiché
+                                <strong>"Orientation du décollage inconnue : à vérifier"</strong>, sans score.
+                            </p>
 
                             <h5 style="margin-top: 16px; margin-bottom: 8px">
                                 2. Calcul du Score Continu (de 0 à 100)
@@ -3385,9 +3512,21 @@
                                 💡 Score Final = (Note Vent * 0.5) + (Note Orientation * 0.5).
                                 <br /><span style="font-size: 0.82rem; font-weight: 400; color: var(--text-secondary)"
                                     >Un spot jugé sécuritaire (volable) aura son score global pondéré de manière fluide
-                                    selon la force du vent et son alignement.</span
+                                    selon la force du vent et son alignement : Excellent à partir de 80/100, Bon de 50
+                                    à 79/100, Passable en dessous de 50/100.</span
                                 >
                             </div>
+                            <p
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.5;
+                                    font-size: 0.9rem;
+                                    margin-top: 16px;
+                                "
+                            >
+                                ⚠️ Cet avis repose sur des prévisions et le risque d'orage n'est qu'une estimation : la
+                                décision de voler vous appartient, vérifiez toujours les conditions sur place.
+                            </p>
                         </div>
 
                         <!-- CARNET DE VOL -->
@@ -3397,13 +3536,12 @@
                             </h4>
                             <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
                                 Ce module vous permet d'enregistrer et de conserver l'historique complet de vos
-                                activités en vol libre et au sol (vols et sessions de gonflage).
+                                activités en vol libre et au sol (vols et sessions de gonflage). Il est organisé en
+                                quatre onglets : <strong>Historique</strong>, <strong>Ajouter</strong>,
+                                <strong>Statistiques</strong> et <strong>Matériel</strong>.
                             </p>
 
                             <h5 style="margin-top: 16px; margin-bottom: 8px">1. Ajouter un Vol</h5>
-                            <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
-                                Pour enregistrer un nouveau vol :
-                            </p>
                             <ul
                                 style="
                                     color: var(--text-secondary);
@@ -3415,29 +3553,38 @@
                             >
                                 <li style="margin-bottom: 8px">
                                     <strong>Importer une trace GPS (.igc) :</strong> Glissez-déposez ou sélectionnez un
-                                    fichier de trace IGC. L'application calcule automatiquement la durée du vol,
-                                    l'altitude max/min et la trajectoire. Une fois enregistré, un
-                                    <strong>lecteur interactif 3D</strong> (propulsé par
-                                    <strong>MapLibre GL JS</strong>) vous permettra de revoir le vol en trois dimensions
-                                    sur une carte dynamique avec le profil d'altitude, la vitesse et le vario.
+                                    fichier IGC. L'application repère le vrai décollage et le vrai atterrissage (et non
+                                    le premier point enregistré au parking), puis calcule la date, la durée, l'altitude
+                                    max, le gain, la distance, le vario max et les vitesses. Si votre vario était mal
+                                    calé (par exemple une altitude d'atterrissage négative), elle vous le signale et
+                                    vous pouvez corriger les altitudes en saisissant l'altitude réelle du décollage ou
+                                    de l'atterrissage.
                                 </li>
                                 <li style="margin-bottom: 8px">
-                                    <strong>Sélection du site :</strong> Saisissez le nom du site. Le système propose
-                                    une <strong>autocomplétion intelligente</strong> basée sur la base de données
-                                    officielle des sites de la FFVL.
+                                    <strong>Site de vol :</strong> Une <strong>autocomplétion</strong> propose les
+                                    sites de la base officielle FFVL. Pour un lieu absent de la base, le bouton
+                                    <strong>"Placer sur la carte"</strong> permet de le pointer sur une carte (vue
+                                    carte ou satellite) ou de coller des coordonnées, y compris un lien Google Maps.
+                                    La position est ensuite reprise automatiquement lors de vos prochaines sessions à
+                                    ce lieu.
                                 </li>
                                 <li style="margin-bottom: 8px">
-                                    <strong>Choix du matériel :</strong> Associez la voile et la sellette utilisées pour
-                                    ce vol (choix parmi vos équipements enregistrés).
+                                    <strong>Matériel :</strong> Associez la voile et la sellette utilisées, choisies
+                                    parmi vos équipements enregistrés ou saisies librement (les saisies précédentes
+                                    sont proposées).
                                 </li>
                                 <li style="margin-bottom: 8px">
-                                    <strong>Technique de décollage (Obligatoire) :</strong> Indiquez si le décollage a
-                                    été effectué en technique <strong>"Face"</strong> (idéal par vent faible à modéré)
-                                    ou <strong>"Dos"</strong> à la voile (technique classique par vent soutenu).
+                                    <strong>Type de vol et décollage :</strong> Indiquez le type de vol (Plouf,
+                                    Thermique, Soaring, Restit, Cross) et la technique de décollage, obligatoire :
+                                    <strong>"Face voile"</strong>, <strong>"Dos voile"</strong> ou une autre technique.
                                 </li>
                                 <li style="margin-bottom: 8px">
-                                    <strong>Commentaires &amp; Observations :</strong> Notez vos impressions, conditions
-                                    aérologiques locales, ou faits marquants de votre vol.
+                                    <strong>Session encadrée par une école :</strong> Cochez cette case et indiquez le
+                                    nom de l'école lorsque la séance a eu lieu en stage.
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Commentaire :</strong> Notez vos impressions, conditions aérologiques
+                                    locales, ou faits marquants de votre vol.
                                 </li>
                             </ul>
 
@@ -3457,18 +3604,17 @@
                                 "
                             >
                                 <li style="margin-bottom: 6px">
-                                    <strong>Lieu &amp; Autocomplétion :</strong> Saisissez le lieu ou le décollage où
-                                    vous avez gonflé, également assisté par l'autocomplétion des sites.
+                                    <strong>Lieu &amp; Autocomplétion :</strong> Saisissez le lieu où vous avez gonflé,
+                                    assisté par l'autocomplétion des sites, ou placez-le sur la carte.
                                 </li>
                                 <li style="margin-bottom: 6px">
-                                    <strong>Exercices travaillés (Multi-sélection) :</strong> Cochez tous les thèmes
-                                    travaillés au cours de la session (ex: montée de voile, affalement, pilotage sans
-                                    suspentes, contrôle visuel, tempo, etc.) pour garder une trace précise de votre
-                                    progression technique.
+                                    <strong>Exercices travaillés (Multi-sélection) :</strong> Cochez les exercices de
+                                    la séance (face voile, dos voile, tangage/roulis, affalage, vent fort,
+                                    prégonflage/démêlage) pour garder une trace précise de votre progression technique.
                                 </li>
                             </ul>
 
-                            <h5 style="margin-top: 16px; margin-bottom: 8px">3. Fonctionnement de l'Historique</h5>
+                            <h5 style="margin-top: 16px; margin-bottom: 8px">3. Historique</h5>
                             <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
                                 Toutes vos sessions sont répertoriées chronologiquement avec un code couleur clair :
                             </p>
@@ -3510,13 +3656,24 @@
                                     ><strong>Orange (Gonflages) :</strong> Séances d'entraînement au sol.
                                 </li>
                                 <li style="margin-bottom: 6px">
-                                    <strong>Édition et Suppression :</strong> Chaque entrée peut être supprimée
-                                    définitivement (icône poubelle) ou modifiée (icône crayon). Lors d'une modification,
-                                    le formulaire d'ajout se préremplit automatiquement et permet d'ajuster les données
-                                    ou d'annuler via le bouton **Annuler**. Les heures d'usure de votre matériel seront
-                                    automatiquement ajustées.
+                                    <strong>Trace 3D :</strong> Pour un vol importé, le bouton
+                                    <strong>"Voir la trace"</strong> ouvre un lecteur 3D (propulsé par
+                                    <strong>MapLibre GL JS</strong>) qui rejoue le vol sur le relief réel.
+                                </li>
+                                <li style="margin-bottom: 6px">
+                                    <strong>Modification et Suppression :</strong> Chaque entrée peut être modifiée
+                                    (le formulaire se préremplit, avec un bouton <strong>Annuler</strong>) ou
+                                    supprimée. Les heures d'usure de votre matériel sont ajustées automatiquement.
                                 </li>
                             </ul>
+
+                            <h5 style="margin-top: 16px; margin-bottom: 8px">4. Statistiques du Carnet</h5>
+                            <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                L'onglet Statistiques résume votre activité : nombre et temps de vol, sessions de
+                                gonflage, altitude maximale et gain cumulé, utilisation de chaque voile et heures
+                                restantes avant révision, lieux les plus fréquentés, part des sessions en école,
+                                types de vols, techniques de décollage et exercices de gonflage.
+                            </p>
 
                             <!-- CAPTURE METEO AUTOMATIQUE -->
                             <div
@@ -3554,15 +3711,19 @@
                                             line-height: 1.5;
                                         "
                                     >
-                                        Lors de la validation d'un vol ou d'une session de gonflage, l'application
-                                        interroge automatiquement en arrière-plan le service météorologique
-                                        <strong>Open-Meteo</strong>. En se basant sur les coordonnées géographiques du
-                                        site choisi et l'heure de votre activité, elle récupère et enregistre
-                                        automatiquement les conditions météo exactes :
+                                        Lors de l'enregistrement d'un vol ou d'une session de gonflage, l'application
+                                        interroge automatiquement le service météorologique <strong>Open-Meteo</strong>
+                                        (modèles de Météo-France pour les dates récentes, archives pour les plus anciennes). À
+                                        partir des coordonnées du site et de l'heure de votre activité, elle enregistre
+                                        les conditions au <strong>décollage et à l'atterrissage</strong> (ou au début
+                                        et à la fin d'un gonflage) :
                                         <strong
                                             >vitesse du vent, rafales, direction (en degrés et cardinal), température,
-                                            et état du ciel (nuageux, ensoleillé...)</strong
-                                        >. Pas besoin de saisie manuelle !
+                                            et état du ciel</strong
+                                        >. Lorsque les deux relevés sont identiques, une seule ligne est affichée. Si
+                                        le site dispose d'une balise FFVL, le graphique du <strong>vent réellement
+                                        mesuré</strong> ce jour-là est aussi consultable. Pas besoin de saisie
+                                        manuelle !
                                     </p>
                                 </div>
                             </div>
@@ -3581,9 +3742,12 @@
 
                             <h5 style="margin-top: 16px; margin-bottom: 8px">1. Enregistrer son Équipement</h5>
                             <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
-                                Pour chaque matériel, vous pouvez définir : le type (Voile, Sellette, Secours,
-                                Accessoire), la marque et le modèle, la date d'achat, ainsi que la date de sa dernière
-                                révision en atelier certifié.
+                                Pour chaque matériel (onglet Matériel du carnet), vous pouvez définir : le type (Voile,
+                                Sellette, Parachute de Secours, Accessoire), la marque, le modèle, la taille et la
+                                couleur (choisis dans une liste ou saisis librement, le nom du matériel est composé
+                                automatiquement), la date d'achat, ainsi que la date de sa dernière révision en atelier
+                                certifié. Pour une voile, renseignez aussi sa <strong>plage de vent</strong> (vent min
+                                et max) : elle sert au mode de calcul "Mon Matériel" de l'écran Sites de vol.
                             </p>
 
                             <h5 style="margin-top: 16px; margin-bottom: 8px">
@@ -3592,10 +3756,12 @@
                             <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
                                 Sélectionnez l'intervalle temporel recommandé par le constructeur (<strong
                                     >6 mois</strong
-                                >, <strong>12 mois</strong>, ou <strong>24 mois</strong>) ET la limite d'heures de vol
-                                (ex: <strong>50h</strong>, <strong>100h</strong>, <strong>150h</strong> ou
-                                <strong>200h</strong>). L'application surveillera les deux compteurs en temps réel grâce
-                                au logbook, et déclenchera une alerte au premier des deux termes échu.
+                                >, <strong>12 mois</strong>, <strong>24 mois</strong>, ou aucun contrôle requis) ET la
+                                limite d'heures de vol (<strong>50h</strong>, <strong>100h</strong>,
+                                <strong>150h</strong>, <strong>200h</strong>, ou non applicable). L'application
+                                surveillera les deux compteurs en temps réel grâce au carnet de vol, et déclenchera une
+                                alerte au premier des deux termes échu. Un badge sur le bouton
+                                <strong>Carnet</strong> de la barre de navigation signale le matériel à réviser.
                             </p>
 
                             <h5 style="margin-top: 16px; margin-bottom: 8px">
@@ -3767,6 +3933,75 @@
                             </div>
                         </div>
 
+                        <!-- SECURITE -->
+                        <div id="manual-section-safety" class="manual-section" style="display: none">
+                            <h4 style="margin-top: 0; color: var(--accent-blue)">L'Écran Sécurité</h4>
+                            <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Accessible depuis le bouton <strong>Sécurité</strong> de la barre de navigation, cet
+                                écran reprend des contenus officiels de la FFVL (source indiquée sur chaque rubrique). Il
+                                est organisé en trois onglets.
+                            </p>
+
+                            <h5 style="margin-top: 16px; margin-bottom: 8px">1. Urgence</h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 16px;
+                                "
+                            >
+                                <li style="margin-bottom: 8px">
+                                    <strong>Appeler le 112</strong> en un geste, et la fréquence radio sécurité vol
+                                    libre de la FFVL (143,9875 MHz).
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Ma position GPS :</strong> Elle utilise le GPS du téléphone et fonctionne
+                                    donc sans réseau mobile. Les coordonnées sont affichées en degrés minutes (format
+                                    utilisé par les secours aériens), en degrés décimaux et en degrés minutes secondes,
+                                    avec l'altitude et la précision. Elles peuvent être copiées ou partagées par
+                                    message.
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Conduite à tenir :</strong> Les étapes de l'alerte, que faire si vous êtes
+                                    posé dans un arbre ou bloqué en falaise, les signes YES / NO à faire à
+                                    l'hélicoptère, les règles lorsqu'un hélicoptère intervient et le contenu du kit de
+                                    secours personnel.
+                                </li>
+                            </ul>
+
+                            <h5 style="margin-top: 16px; margin-bottom: 8px">2. Check-lists</h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 16px;
+                                "
+                            >
+                                <li style="margin-bottom: 8px">
+                                    <strong>Visite prévol :</strong> Les 7 points à vérifier avant chaque décollage, à
+                                    cocher un par un, avec une lecture à voix haute possible.
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Prêt pour le déco ? :</strong> Un court questionnaire sur votre forme, votre
+                                    matériel et les conditions, à remplir franchement avant de vous équiper. Chaque
+                                    domaine passe au vert, au jaune ou au rouge ; un rouge invite à renoncer ou à
+                                    différer.
+                                </li>
+                            </ul>
+
+                            <h5 style="margin-top: 16px; margin-bottom: 8px">3. Ma SIGR</h5>
+                            <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                La Stratégie Individuelle de Gestion des Risques vous fait évaluer honnêtement sept
+                                "plaques" de protection (pilotage, aérologie, accidentologie, matériel, condition
+                                physique, rapport à la communauté, mental) comme solides ou à renforcer. L'application
+                                résume celles à travailler en priorité. Votre bilan reste sur cet appareil.
+                            </p>
+                        </div>
+
                         <div id="manual-section-qcm" class="manual-section" style="display: none">
                             <h4 style="margin-top: 0; color: var(--accent-blue)">Entraînement aux QCM Officiels</h4>
                             <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
@@ -3790,10 +4025,11 @@
                                     meilleur mode pour apprendre.
                                 </li>
                                 <li style="margin-bottom: 8px">
-                                    <strong>Mode Examen :</strong> Une simulation réaliste. Vous êtes chronométré (30
-                                    minutes pour le BI, 60 minutes pour le BP, etc.). Vous ne savez pas si votre réponse
-                                    est juste avant d'avoir terminé la totalité des questions. Un rapport détaillé est
-                                    fourni à la fin.
+                                    <strong>Mode Examen :</strong> Une simulation de l'examen théorique, avec un volume
+                                    et des thèmes imposés : 30 questions tirées dans tous les thèmes (60 pour le BP).
+                                    Vous ne savez pas si votre réponse est juste avant d'avoir terminé la totalité des
+                                    questions. Un rapport détaillé est fourni à la fin et l'examen rejoint votre
+                                    historique.
                                 </li>
                                 <li style="margin-bottom: 8px">
                                     <strong>Mode Révision :</strong> Révision espacée. Une question ratée revient dès la
@@ -3825,10 +4061,38 @@
                                 30, 40 ou TOUTES) et forcer le QCM sur un thème précis (ex: uniquement la Météo, ou
                                 uniquement la Réglementation). En mode Perfectionnement, ce nombre est calculé
                                 automatiquement : vous choisissez uniquement le périmètre (niveau ou thème) et le palier
-                                objectif.
+                                objectif. Dans tous les modes, l'ordre des réponses est mélangé à chaque session, pour
+                                retenir la théorie plutôt que la position de la bonne réponse.
                             </p>
 
-                            <h5 style="margin-top: 16px; margin-bottom: 8px">3. La Banque de Questions</h5>
+                            <h5 style="margin-top: 16px; margin-bottom: 8px">3. Lecture et Réponses à la Voix</h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 8px;
+                                "
+                            >
+                                <li style="margin-bottom: 8px">
+                                    <strong>Lecture à voix haute :</strong> Le bouton <strong>Lire</strong> lit la
+                                    question et ses réponses, et <strong>Lecture auto</strong> lit chaque nouvelle
+                                    question. Après validation, la correction est lue : le verdict seul pour une bonne
+                                    réponse, le verdict et l'explication après une erreur ou une réponse incomplète.
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Répondre à la voix (expérimental) :</strong> Dites les lettres des réponses
+                                    (« A », « B et D »), puis « valider », « suivante », « précédente », « répète »,
+                                    « effacer » ou « stop ». Vous pouvez répondre pendant la lecture. Une connexion
+                                    internet est nécessaire : votre navigateur envoie votre voix à son service de
+                                    reconnaissance vocale (Google pour Chrome et Edge, Apple pour Safari).
+                                    L'application ne conserve aucun enregistrement et vous pouvez retirer votre accord à
+                                    tout moment.
+                                </li>
+                            </ul>
+
+                            <h5 style="margin-top: 16px; margin-bottom: 8px">4. La Banque de Questions</h5>
                             <p
                                 style="
                                     color: var(--text-secondary);
@@ -3840,7 +4104,7 @@
                                 Accessible depuis le menu QCM, ce répertoire permet de consulter librement l'intégralité
                                 des questions existantes. Une barre de recherche vous permet de taper un mot-clé (ex:
                                 "Cumulonimbus", "Finesse") pour retrouver instantanément la question officielle
-                                correspondante et son explication.
+                                correspondante et son explication, et un menu filtre les questions par thème.
                             </p>
                         </div>
 
@@ -3863,15 +4127,16 @@
                                 <li style="margin-bottom: 8px">
                                     <strong>Catégorisation :</strong> Les documents sont classés de manière logique
                                     (Mécanique de vol, Météorologie, Matériel, Réglementation...). Utilisez les boutons
-                                    de tri pour regrouper les documents par catégorie ou par ordre alphabétique.
+                                    "Par catégorie" ou "A-Z" pour les regrouper par catégorie ou par ordre alphabétique.
+                                    Seuls les cours de votre niveau (et les cours généraux) sont affichés.
                                 </li>
                                 <li style="margin-bottom: 8px">
                                     <strong>Recherche Rapide :</strong> La barre de recherche filtre instantanément les
-                                    documents selon leur titre ou leur description.
+                                    documents selon leur titre ou leur catégorie.
                                 </li>
                             </ul>
 
-                            <h5 style="margin-top: 16px; margin-bottom: 8px">2. Visionneuse Intégrée</h5>
+                            <h5 style="margin-top: 16px; margin-bottom: 8px">2. Lecture des Cours</h5>
                             <p
                                 style="
                                     color: var(--text-secondary);
@@ -3880,18 +4145,19 @@
                                     margin-bottom: 8px;
                                 "
                             >
-                                En cliquant sur un cours, celui-ci s'ouvre dans une visionneuse PDF directement intégrée
-                                à l'application. Si vous préférez lire le document en plein écran ou l'imprimer, un
-                                bouton dans la barre supérieure permet d'ouvrir le fichier original dans un nouvel
-                                onglet de votre navigateur.
+                                En cliquant sur un cours, le document PDF original s'ouvre dans un nouvel onglet de
+                                votre navigateur, où vous pouvez le lire en plein écran, le télécharger ou l'imprimer.
+                                Un cours déjà ouvert reste ensuite consultable hors ligne.
                             </p>
                         </div>
 
                         <div id="manual-section-stats" class="manual-section" style="display: none">
                             <h4 style="margin-top: 0; color: var(--accent-blue)">Suivi et Statistiques</h4>
                             <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
-                                Ce tableau de bord personnel agrège l'ensemble de vos résultats aux QCM pour vous aider
-                                à cibler vos révisions.
+                                Ce tableau de bord personnel agrège l'ensemble de vos résultats aux QCM du niveau
+                                sélectionné pour vous aider à cibler vos révisions. En haut, une jauge affiche votre
+                                taux de réussite global, suivie de la répartition de vos questions par degré de
+                                maîtrise (maîtrisées, excellentes, très bonnes, satisfaisantes…).
                             </p>
 
                             <h5 style="margin-top: 16px; margin-bottom: 8px">1. Analyse par Thème</h5>
@@ -3908,7 +4174,7 @@
                                 coup d'œil où se situent vos lacunes (en orange ou rouge) et vos points forts (en vert).
                             </p>
 
-                            <h5 style="margin-top: 16px; margin-bottom: 8px">2. Historique des Sessions</h5>
+                            <h5 style="margin-top: 16px; margin-bottom: 8px">2. Historique des Examens</h5>
                             <p
                                 style="
                                     color: var(--text-secondary);
@@ -3917,8 +4183,9 @@
                                     margin-bottom: 8px;
                                 "
                             >
-                                En bas de l'écran des statistiques, vous retrouverez le journal de bord de vos derniers
-                                examens et entraînements, avec la date, le score obtenu et la durée de l'épreuve.
+                                Vous retrouverez l'historique de vos examens blancs pour le niveau sélectionné, avec la
+                                date et le score obtenu, ainsi qu'une liste détaillée de toutes les questions déjà
+                                tentées.
                             </p>
 
                             <h5 style="margin-top: 16px; margin-bottom: 8px">3. Réinitialisation</h5>
@@ -3940,7 +4207,7 @@
             </div>
         </dialog>
 
-        <script type="module" src="js/core/main.js?v=2026.09.30_v14"></script>
+        <script type="module" src="js/core/main.js?v=2026.10.01_v15"></script>
         <!-- Floating Main Navigation -->
         <nav class="desktop-main-nav" id="desktop-main-nav">
             <div class="theory-nav-group nav-dropdown" style="position: relative; display: flex; align-items: center">
