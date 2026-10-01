@@ -480,7 +480,7 @@ export const FR = Object.freeze({
             loading: 'Chargement des données QCM...',
             loadErrorTitle: 'Erreur de chargement',
             loadErrorText: 'Impossible de charger les fichiers de données (CORS/Fichier manquant).',
-            loadErrorDetail: 'Détail: {detail}',
+            loadErrorDetail: 'Détail : {detail}',
             noDataTitle: 'Données QCM Introuvables',
             noDataText: 'Le fichier de questions (qcm_ffvl.csv) semble manquant ou corrompu.',
             mastery: Object.freeze({
@@ -509,7 +509,7 @@ export const FR = Object.freeze({
                 FAILED: 'Questions Échouées (0%)',
                 NOT_ATTEMPTED: 'Questions Non Tentées',
             }),
-            themeSuffix: ' • Thème: {theme}',
+            themeSuffix: ' • Thème : {theme}',
             questionCount: '{count} questions',
             clearFilters: 'Tout effacer',
             sortByRate: 'Par taux',

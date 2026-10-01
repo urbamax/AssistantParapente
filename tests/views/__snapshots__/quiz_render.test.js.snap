@@ -4286,7 +4286,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
                         <span style="font-weight:700; color:var(--text-main);">1</span> questions 
-                        <span style="opacity:0.6;">(Toutes les questions tentées • Thème: Météo)</span>
+                        <span style="opacity:0.6;">(Toutes les questions tentées • Thème : Météo)</span>
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">Tout effacer</a>
                     </div>
                     <div style="display:flex; gap:8px;">
@@ -4376,7 +4376,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="padding:40px; text-align:center; color:var(--text-main); max-width: 500px; margin: 0 auto;">
                     <i class="ri-error-warning-line" style="font-size:3rem; color:#b91c1c; display:block; margin-bottom:20px;"></i>
                     <h2 style="margin-bottom:12px; font-weight: 800; font-size: 1.4rem;">Erreur de chargement</h2>
-                    <p style="opacity:0.7;">Impossible de charger les fichiers de données (CORS/Fichier manquant).<br>Détail: CORS</p>
+                    <p style="opacity:0.7;">Impossible de charger les fichiers de données (CORS/Fichier manquant).<br>Détail : CORS</p>
                 </div>
             ",
   "loading": "
