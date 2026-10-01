@@ -370,6 +370,8 @@ class SafetyViewClass extends BaseView {
         `;
     }
 
+    // Comme pour « Prêt pour le déco ? » : ordre des deux notes mélangé et couleur révélée seulement
+    // une fois les 7 plaques évaluées, pour ne pas pousser vers « Solide » sans réfléchir.
     renderSigr() {
         const plates = SIGR_PLATES.map(
             (plate) => `<li class="safety-plate" data-plate="${plate.id}">
@@ -378,10 +380,14 @@ class SafetyViewClass extends BaseView {
                     <small>${esc(plate.detail)}</small>
                 </div>
                 <div class="safety-plate-rating" role="group" aria-label="${esc(plate.title)}">
-                    <button type="button" class="safety-rate safety-rate-solid" aria-pressed="false"
-                        data-action="SafetyratePlate" data-plate="${plate.id}" data-rating="solid">${esc(S.sigr.solid)}</button>
-                    <button type="button" class="safety-rate safety-rate-weak" aria-pressed="false"
-                        data-action="SafetyratePlate" data-plate="${plate.id}" data-rating="weak">${esc(S.sigr.weak)}</button>
+                    ${shuffled(SIGR_RATINGS)
+                        .map(
+                            (
+                                rating,
+                            ) => `<button type="button" class="safety-rate safety-rate-${rating}" aria-pressed="false"
+                        data-action="SafetyratePlate" data-plate="${plate.id}" data-rating="${rating}">${esc(S.sigr[rating])}</button>`,
+                        )
+                        .join('')}
                 </div>
             </li>`,
         ).join('');
@@ -624,6 +630,7 @@ class SafetyViewClass extends BaseView {
         if (!summary) return;
         const weak = SIGR_PLATES.filter((p) => ratings[p.id] === 'weak').map((p) => p.title);
         const rated = SIGR_PLATES.filter((p) => ratings[p.id]).length;
+        summary.closest('.safety-card')?.classList.toggle('safety-sigr-complete', rated === SIGR_PLATES.length);
         if (rated === 0) summary.textContent = '';
         else if (weak.length === 0) summary.textContent = tl('sigr.summaryNone', { rated, total: SIGR_PLATES.length });
         else summary.textContent = tl('sigr.summaryWeak', { plates: weak.join(', ') });

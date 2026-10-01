@@ -9,7 +9,7 @@
 //   2. CACHE_NAME est versionné (synchronisé par bump.py avec le ?v= du reste du site) et
 //      activate() supprime systématiquement tout cache dont le nom ne correspond pas à la
 //      version courante.
-const CACHE_NAME = 'parapente-app-v2026.10.01_v16';
+const CACHE_NAME = 'parapente-app-v2026.10.01_v18';
 
 // La météo ne doit jamais être servie depuis le cache : une donnée de vent vieille de
 // plusieurs heures mais présentée comme "en direct" est un vrai risque sécurité pour un
@@ -261,11 +261,14 @@ self.addEventListener('fetch', (event) => {
     }
 
     // Sur localhost / 127.0.0.1 (développement local) : toujours network-first pour éviter tout
-    // déphasage de cache entre modules ES lors des modifications locales.
+    // déphasage de cache entre modules ES lors des modifications locales. `cache: 'no-cache'` force
+    // aussi la revalidation auprès du serveur : sans lui, le cache HTTP du navigateur (Safari, avec
+    // un serveur local sans Cache-Control) pouvait resservir un ancien module importé par un module
+    // à jour (« Importing binding name 'shuffled' is not found »).
     const isDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
     if (isDev) {
         event.respondWith(
-            fetch(request)
+            fetch(request, { cache: 'no-cache' })
                 .then((response) => {
                     if (response.ok) {
                         const copy = response.clone();

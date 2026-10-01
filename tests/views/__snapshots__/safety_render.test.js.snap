@@ -318,8 +318,7 @@ exports[`safety renders (spec 019: identical before and after moving the texts) 
                     <small>Compétences de pilotage</small>
                 </div>
                 <div class="safety-plate-rating" role="group" aria-label="Pilotage">
-                    <button type="button" class="safety-rate safety-rate-solid" aria-pressed="false" data-action="SafetyratePlate" data-plate="pilotage" data-rating="solid">Solide</button>
-                    <button type="button" class="safety-rate safety-rate-weak" aria-pressed="false" data-action="SafetyratePlate" data-plate="pilotage" data-rating="weak">À renforcer</button>
+                    <button type="button" class="safety-rate safety-rate-solid" aria-pressed="false" data-action="SafetyratePlate" data-plate="pilotage" data-rating="solid">Solide</button><button type="button" class="safety-rate safety-rate-weak" aria-pressed="false" data-action="SafetyratePlate" data-plate="pilotage" data-rating="weak">À renforcer</button>
                 </div>
             </li><li class="safety-plate" data-plate="aerologie">
                 <div class="safety-plate-text">
@@ -327,8 +326,7 @@ exports[`safety renders (spec 019: identical before and after moving the texts) 
                     <small>Analyse, placement…</small>
                 </div>
                 <div class="safety-plate-rating" role="group" aria-label="Aérologie">
-                    <button type="button" class="safety-rate safety-rate-solid" aria-pressed="false" data-action="SafetyratePlate" data-plate="aerologie" data-rating="solid">Solide</button>
-                    <button type="button" class="safety-rate safety-rate-weak" aria-pressed="false" data-action="SafetyratePlate" data-plate="aerologie" data-rating="weak">À renforcer</button>
+                    <button type="button" class="safety-rate safety-rate-solid" aria-pressed="false" data-action="SafetyratePlate" data-plate="aerologie" data-rating="solid">Solide</button><button type="button" class="safety-rate safety-rate-weak" aria-pressed="false" data-action="SafetyratePlate" data-plate="aerologie" data-rating="weak">À renforcer</button>
                 </div>
             </li><li class="safety-plate" data-plate="accidentologie">
                 <div class="safety-plate-text">
@@ -336,8 +334,7 @@ exports[`safety renders (spec 019: identical before and after moving the texts) 
                     <small>Connaître les accidents types, avoir une culture aéronautique</small>
                 </div>
                 <div class="safety-plate-rating" role="group" aria-label="Accidentologie">
-                    <button type="button" class="safety-rate safety-rate-solid" aria-pressed="false" data-action="SafetyratePlate" data-plate="accidentologie" data-rating="solid">Solide</button>
-                    <button type="button" class="safety-rate safety-rate-weak" aria-pressed="false" data-action="SafetyratePlate" data-plate="accidentologie" data-rating="weak">À renforcer</button>
+                    <button type="button" class="safety-rate safety-rate-solid" aria-pressed="false" data-action="SafetyratePlate" data-plate="accidentologie" data-rating="solid">Solide</button><button type="button" class="safety-rate safety-rate-weak" aria-pressed="false" data-action="SafetyratePlate" data-plate="accidentologie" data-rating="weak">À renforcer</button>
                 </div>
             </li><li class="safety-plate" data-plate="materiel">
                 <div class="safety-plate-text">
@@ -345,8 +342,7 @@ exports[`safety renders (spec 019: identical before and after moving the texts) 
                     <small>Choix, entretien, réglage, ergonomie</small>
                 </div>
                 <div class="safety-plate-rating" role="group" aria-label="Matériel">
-                    <button type="button" class="safety-rate safety-rate-solid" aria-pressed="false" data-action="SafetyratePlate" data-plate="materiel" data-rating="solid">Solide</button>
-                    <button type="button" class="safety-rate safety-rate-weak" aria-pressed="false" data-action="SafetyratePlate" data-plate="materiel" data-rating="weak">À renforcer</button>
+                    <button type="button" class="safety-rate safety-rate-solid" aria-pressed="false" data-action="SafetyratePlate" data-plate="materiel" data-rating="solid">Solide</button><button type="button" class="safety-rate safety-rate-weak" aria-pressed="false" data-action="SafetyratePlate" data-plate="materiel" data-rating="weak">À renforcer</button>
                 </div>
             </li><li class="safety-plate" data-plate="physique">
                 <div class="safety-plate-text">
@@ -354,8 +350,7 @@ exports[`safety renders (spec 019: identical before and after moving the texts) 
                     <small>Vue, fatigue, réflexes, maladie, gestion du froid</small>
                 </div>
                 <div class="safety-plate-rating" role="group" aria-label="Condition physique">
-                    <button type="button" class="safety-rate safety-rate-solid" aria-pressed="false" data-action="SafetyratePlate" data-plate="physique" data-rating="solid">Solide</button>
-                    <button type="button" class="safety-rate safety-rate-weak" aria-pressed="false" data-action="SafetyratePlate" data-plate="physique" data-rating="weak">À renforcer</button>
+                    <button type="button" class="safety-rate safety-rate-solid" aria-pressed="false" data-action="SafetyratePlate" data-plate="physique" data-rating="solid">Solide</button><button type="button" class="safety-rate safety-rate-weak" aria-pressed="false" data-action="SafetyratePlate" data-plate="physique" data-rating="weak">À renforcer</button>
                 </div>
             </li><li class="safety-plate" data-plate="communaute">
                 <div class="safety-plate-text">
@@ -363,8 +358,7 @@ exports[`safety renders (spec 019: identical before and after moving the texts) 
                     <small>Partager / demander des infos, s'intégrer dans un groupe de pilotes qui s'entraident</small>
                 </div>
                 <div class="safety-plate-rating" role="group" aria-label="Rapport à la communauté">
-                    <button type="button" class="safety-rate safety-rate-solid" aria-pressed="false" data-action="SafetyratePlate" data-plate="communaute" data-rating="solid">Solide</button>
-                    <button type="button" class="safety-rate safety-rate-weak" aria-pressed="false" data-action="SafetyratePlate" data-plate="communaute" data-rating="weak">À renforcer</button>
+                    <button type="button" class="safety-rate safety-rate-solid" aria-pressed="false" data-action="SafetyratePlate" data-plate="communaute" data-rating="solid">Solide</button><button type="button" class="safety-rate safety-rate-weak" aria-pressed="false" data-action="SafetyratePlate" data-plate="communaute" data-rating="weak">À renforcer</button>
                 </div>
             </li><li class="safety-plate" data-plate="mental">
                 <div class="safety-plate-text">
@@ -372,8 +366,7 @@ exports[`safety renders (spec 019: identical before and after moving the texts) 
                     <small>Gestion du stress, de l'attention, capacité à renoncer, résister aux effets de groupe</small>
                 </div>
                 <div class="safety-plate-rating" role="group" aria-label="Mental">
-                    <button type="button" class="safety-rate safety-rate-solid" aria-pressed="false" data-action="SafetyratePlate" data-plate="mental" data-rating="solid">Solide</button>
-                    <button type="button" class="safety-rate safety-rate-weak" aria-pressed="false" data-action="SafetyratePlate" data-plate="mental" data-rating="weak">À renforcer</button>
+                    <button type="button" class="safety-rate safety-rate-solid" aria-pressed="false" data-action="SafetyratePlate" data-plate="mental" data-rating="solid">Solide</button><button type="button" class="safety-rate safety-rate-weak" aria-pressed="false" data-action="SafetyratePlate" data-plate="mental" data-rating="weak">À renforcer</button>
                 </div>
             </li></ul>
                 <p id="safety-sigr-summary" class="safety-sigr-summary" aria-live="polite"></p>

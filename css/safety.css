@@ -445,16 +445,25 @@
     border-radius: var(--radius-pill);
     cursor: pointer;
 
-    &.safety-rate-solid[aria-pressed='true'] {
-        color: #fff;
-        background: #16a34a;
-        border-color: #16a34a;
+    /* Couleur neutre tant que toutes les plaques ne sont pas évaluées. */
+    &[aria-pressed='true'] {
+        color: var(--bg-surface);
+        background: var(--text-main);
+        border-color: var(--text-main);
     }
 
-    &.safety-rate-weak[aria-pressed='true'] {
-        color: #1f2937;
-        background: #eab308;
-        border-color: #eab308;
+    .safety-sigr-complete & {
+        &.safety-rate-solid[aria-pressed='true'] {
+            color: #fff;
+            background: #16a34a;
+            border-color: #16a34a;
+        }
+
+        &.safety-rate-weak[aria-pressed='true'] {
+            color: #1f2937;
+            background: #eab308;
+            border-color: #eab308;
+        }
     }
 }
 
