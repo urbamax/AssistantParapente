@@ -946,12 +946,12 @@ class QuizViewClass extends BaseView {
                     });
                 }
 
-                const filterLabel = tql(`stats.filters.${QuizView.state.masteryFilter}`);
+                const filterLabel = tq(`stats.filters.${QuizView.state.masteryFilter}`);
 
                 // Append theme filter label if active
                 let displayLabel = filterLabel;
                 if (QuizView.state.themeFilter) {
-                    displayLabel += tql('stats.themeSuffix', { theme: QuizView.state.themeFilter });
+                    displayLabel += tq('stats.themeSuffix', { theme: QuizView.state.themeFilter }); // inserted as HTML: escaped (spec 025)
                     // Filter sortedQuestions again by theme
                     visibleQuestions = visibleQuestions.filter(([code]) => {
                         const qObj = QuizView.getQuestionByCode(code);

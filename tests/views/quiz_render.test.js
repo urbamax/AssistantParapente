@@ -271,3 +271,26 @@ describe('quiz renders (spec 024: identical before and after moving the texts)',
         expect(dialogs).toMatchSnapshot();
     });
 });
+
+// Spec 025 : le nom du thème filtré est affiché comme du texte, et la ponctuation suit l'usage
+// français (espace avant les deux-points).
+describe('statistics filter label (spec 025)', () => {
+    it('shows a theme name with markup as text', () => {
+        QuizView.state.themeFilter = '<img src=x onerror="window.__spec025=1">';
+        QuizView.renderStats();
+        const content = document.getElementById('stats-content');
+        expect(content.querySelector('img')).toBeNull();
+        expect(content.textContent).toContain(
+            '(Toutes les questions tentées • Thème : <img src=x onerror="window.__spec025=1">)',
+        );
+    });
+
+    it('puts a space before the colon in « Thème : » and « Détail : »', () => {
+        QuizView.state.themeFilter = 'Météo';
+        QuizView.renderStats();
+        expect(text('stats-content')).toContain('(Toutes les questions tentées • Thème : Météo)');
+        QuizService.state.loadingError = 'CORS';
+        QuizView.renderStats();
+        expect(text('stats-content')).toContain('Détail : CORS');
+    });
+});
