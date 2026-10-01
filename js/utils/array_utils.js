@@ -14,3 +14,17 @@
 export function toSorted(arr, compareFn) {
     return typeof arr.toSorted === 'function' ? arr.toSorted(compareFn) : [...arr].sort(compareFn);
 }
+
+/**
+ * Copie mélangée de `arr` (Fisher-Yates), sans muter l'original.
+ * @param {Array} arr
+ * @returns {Array}
+ */
+export function shuffled(arr) {
+    const out = [...arr];
+    for (let i = out.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [out[i], out[j]] = [out[j], out[i]];
+    }
+    return out;
+}

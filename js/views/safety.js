@@ -16,6 +16,7 @@
 import BaseView from '../core/base_view.js';
 import StorageService from '../services/storage.js';
 import { formatDecimalDegrees, formatDegreesMinutes, formatDegreesMinutesSeconds } from '../utils/geo_utils.js';
+import { shuffled } from '../utils/array_utils.js';
 import { escapeHTML } from '../core/security.js';
 import { t } from '../utils/i18n.js';
 import { FR } from '../i18n/fr.js';
@@ -342,6 +343,9 @@ class SafetyViewClass extends BaseView {
         `;
     }
 
+    // Les réponses sont mélangées à chaque affichage (et à « Recommencer ») et leur couleur n'apparaît
+    // qu'une fois la check-list complète : un ordre fixe vert / jaune / rouge pousse à cliquer la
+    // première réponse sans lire et à ne jamais choisir le rouge.
     renderReady() {
         const domains = READY_CHECKLIST.map((domain) => {
             const questions = domain.questions
@@ -349,9 +353,9 @@ class SafetyViewClass extends BaseView {
                     (q) => `<fieldset class="safety-question">
                         <legend>${esc(q.label)}</legend>
                         <div class="safety-answers">
-                            ${q.answers
+                            ${shuffled(q.answers.map((answer, i) => [...answer, i]))
                                 .map(
-                                    ([label, level], i) => `<button type="button" aria-pressed="false"
+                                    ([label, level, i]) => `<button type="button" aria-pressed="false"
                                         class="safety-answer safety-answer-${level}" data-action="SafetyanswerReady"
                                         data-question="${q.id}" data-answer="${i}">${esc(label)}</button>`,
                                 )
@@ -582,6 +586,9 @@ class SafetyViewClass extends BaseView {
 
     resetReady() {
         this.readyAnswers = {};
+        document.querySelectorAll('#safety-panel-prevol .safety-answers').forEach((list) => {
+            list.append(...shuffled([...list.children]));
+        });
         this.renderReadyState();
     }
 
@@ -598,6 +605,7 @@ class SafetyViewClass extends BaseView {
         if (!verdictEl) return;
         const verdict = readyVerdict(this.readyAnswers);
         verdictEl.hidden = verdict === 'incomplete';
+        verdictEl.closest('.safety-card')?.classList.toggle('safety-ready-complete', !verdictEl.hidden);
         verdictEl.className = `safety-verdict safety-verdict-${verdict}`;
         verdictEl.textContent = READY_VERDICT_TEXT[verdict] || '';
     }
