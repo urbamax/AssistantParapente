@@ -9,3 +9,7 @@ test-results/
 
 TODO_claude.md
 dist/
+
+# Notes personnelles (jamais dans le dépôt ni sur le site servi par le Raspberry Pi)
+BRIEF_*.md
+RAPPORT_*.md
