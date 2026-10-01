@@ -103,7 +103,7 @@ test('Spec 016 : la lecture auto lit chaque nouvelle question et reste activée'
     await page.locator('[data-action="validate-question"]').click();
     await expect
         .poll(() => page.evaluate(() => /** @type {any} */ (window).__spoken.at(-1)))
-        .toMatch(/^(Bonne|Mauvaise) réponse\./);
+        .toMatch(/^(Bonne réponse|Mauvaise réponse|Réponse incomplète)\./);
 
     await page.locator('[data-action="next-question"]').click();
     const question = (await page.locator('.quiz-question-text').textContent()).trim();
@@ -128,8 +128,17 @@ test('Spec 016 : répondre à la voix après avoir accepté l’avertissement', 
     await expect(page.locator('#qcm-voice-status')).toHaveText('Entendu : B et A');
     await expect(page.locator('#qcm-choices .qcm-option.selected')).toHaveCount(2);
 
-    await expect.poll(() => page.evaluate(() => /** @type {any} */ (window).__hear('pas sûr'))).toBe(true);
-    await expect(page.locator('#qcm-voice-status')).toHaveText('Pas compris : pas sûr');
+    // Spec 022 : juste après la confirmation vocale, une phrase incomprise est prise pour un écho et
+    // ignorée ; une fois ce court délai passé, elle est signalée.
+    await expect
+        .poll(
+            async () => {
+                await page.evaluate(() => /** @type {any} */ (window).__hear('pas sûr'));
+                return page.locator('#qcm-voice-status').textContent();
+            },
+            { timeout: 5000, intervals: [300] },
+        )
+        .toBe('Pas compris : pas sûr');
     await expect(page.locator('#qcm-choices .qcm-option.selected')).toHaveCount(2);
 
     await expect.poll(() => page.evaluate(() => /** @type {any} */ (window).__hear('valider'))).toBe(true);

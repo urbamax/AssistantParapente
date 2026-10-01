@@ -80,6 +80,7 @@ describe('VoiceService (spec 016)', () => {
         recognizers = [];
         localStorage.clear();
         setOnline(true);
+        VoiceService._lastSpeechEnd = -Infinity;
     });
 
     afterEach(() => {
@@ -198,24 +199,42 @@ describe('VoiceService (spec 016)', () => {
             expect(recognizers[0].started).toBe(1);
         });
 
-        it('does not listen while speaking, and resumes after', () => {
+        // Spec 022 : on peut répondre sans attendre la fin de la lecture.
+        it('keeps listening while speaking (spec 022, FR-005)', () => {
             const synth = installSynthesis();
-            VoiceService.startListening({ onResult: vi.fn(), onError: vi.fn() });
+            const onResult = vi.fn();
+            VoiceService.startListening({ onResult, onError: vi.fn() });
             const rec = recognizers[0];
             VoiceService.speak('Réponse A : oui.');
-            expect(rec.active).toBe(false);
-            expect(rec.aborted).toBe(1);
+            expect(rec.active).toBe(true);
+            expect(rec.aborted).toBe(0);
+            rec.hear('B');
+            expect(onResult).toHaveBeenCalledWith(['B']);
+            expect(rec.active).toBe(true);
             synth.finish();
             expect(rec.active).toBe(true);
-            expect(rec.started).toBe(2);
         });
 
-        it('stopSpeaking resumes listening', () => {
+        it('reports an echo window while speaking and shortly after (spec 022, FR-006)', () => {
+            const synth = installSynthesis();
+            const now = vi.spyOn(Date, 'now').mockReturnValue(10_000);
+            expect(VoiceService.isEchoWindow()).toBe(false);
+            VoiceService.speak('Texte');
+            expect(VoiceService.isEchoWindow()).toBe(true);
+            synth.finish();
+            now.mockReturnValue(11_000);
+            expect(VoiceService.isEchoWindow()).toBe(true);
+            now.mockReturnValue(12_000);
+            expect(VoiceService.isEchoWindow()).toBe(false);
+        });
+
+        it('stopSpeaking also opens the echo window', () => {
             installSynthesis();
-            VoiceService.startListening({ onResult: vi.fn(), onError: vi.fn() });
+            const now = vi.spyOn(Date, 'now').mockReturnValue(50_000);
             VoiceService.speak('Texte');
             VoiceService.stopSpeaking();
-            expect(recognizers[0].active).toBe(true);
+            now.mockReturnValue(50_500);
+            expect(VoiceService.isEchoWindow()).toBe(true);
         });
 
         it('stopListening releases the microphone and does not restart', () => {

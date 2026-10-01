@@ -56,6 +56,15 @@ export function buildFeedbackSpeech(result) {
 }
 
 /**
+ * Lecture automatique après validation (spec 022) : le verdict seul pour une bonne réponse,
+ * le verdict et l'explication après une erreur ou une réponse incomplète.
+ * @param {{ isCorrect: boolean, question: { explication?: string } }} result
+ */
+export function buildAutoFeedbackSpeech(result) {
+    return result.isCorrect ? t('quiz.voice.speech.correct') : buildFeedbackSpeech(result);
+}
+
+/**
  * @param {number[]} indexes
  * @param {{text: string}[]} [choices]
  */
@@ -97,7 +106,7 @@ const COMMANDS = {
     validate: ['valider', 'valide', 'validez', 'validation', 'je valide'],
     next: ['suivante', 'suivant', 'question suivante', 'la suivante', 'suite'],
     prev: ['precedente', 'precedent', 'question precedente', 'la precedente', 'retour'],
-    repeat: ['repete', 'repeter', 'repetez', 'relis', 'relire', 'lire'],
+    repeat: ['repete', 'repeter', 'repetez', 'relis', 'relire', 'lire', 'explication', 'explique', 'explique moi'],
     clear: ['effacer', 'efface', 'effacez'],
     stop: ['stop', 'arrete', 'arreter', 'arretez'],
 };
@@ -120,7 +129,20 @@ const WEAK_LETTERS = {
     eu: 4,
     euh: 4,
 };
+const ECHO_WORDS = new Set(['reponse', 'reponses', 'selection']);
 const FILLERS = new Set(['reponse', 'reponses', 'et', 'la', 'le', 'les', 'lettre', 'lettres']);
+
+/**
+ * Vrai si la phrase reprend des mots que l'application prononce (« Réponse A : … »,
+ * « Sélection : … ») : pendant une lecture, c'est sans doute l'écho de sa propre voix (spec 022).
+ * Le pilote, lui, dit seulement les lettres.
+ * @param {string} transcript
+ */
+export function looksLikeEcho(transcript) {
+    return normalize(transcript)
+        .split(' ')
+        .some((w) => ECHO_WORDS.has(w));
+}
 
 /**
  * Interprète une phrase entendue.
@@ -143,10 +165,14 @@ export function parseVoiceCommand(transcript, optionCount) {
     if (!words.length) return { type: 'unknown' };
 
     const indexes = new Set();
-    for (const word of words) {
+    // Un homophone (« dé », « c'est »…) compte comme lettre s'il forme toute la phrase, ou s'il
+    // suit « et » (« A et dé ») : « c'est la B » reste ainsi « pas compris ».
+    const afterEt = new Set(tokens.flatMap((w, i) => (i > 0 && tokens[i - 1] === 'et' ? [i] : [])));
+    for (const [i, word] of tokens.entries()) {
+        if (FILLERS.has(word)) continue;
         if (word in STRONG_LETTERS) {
             indexes.add(STRONG_LETTERS[word]);
-        } else if (word in WEAK_LETTERS && tokens.length === 1) {
+        } else if (word in WEAK_LETTERS && (tokens.length === 1 || afterEt.has(i))) {
             indexes.add(WEAK_LETTERS[word]);
         } else if (!(word in WEAK_LETTERS) && /^[a-f]{2,6}$/.test(word)) {
             // Lettres collées par la reconnaissance : « BD ».
