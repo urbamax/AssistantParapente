@@ -1,14 +1,18 @@
 /**
  * SERVICE - Voice (spec 016)
  * Enveloppe des API vocales du navigateur : lecture à voix haute (hors ligne, sur l'appareil) et
- * reconnaissance vocale (service du navigateur, avec réseau). L'écoute est suspendue pendant la
- * lecture pour que l'application ne prenne pas sa propre voix pour une réponse.
+ * reconnaissance vocale (service du navigateur, avec réseau). L'écoute continue pendant la lecture
+ * pour qu'on puisse répondre sans attendre la fin (spec 022) : isEchoWindow() permet à l'écran
+ * d'écarter l'écho de la voix de l'application.
  */
 import StorageService from './storage.js';
 
 const PREFS_KEY = 'parapente_voice_prefs';
 // Erreurs sans gravité : on relance l'écoute sans rien signaler.
 const SILENT_ERRORS = new Set(['no-speech', 'aborted']);
+// Délai après la fin d'une lecture pendant lequel une phrase entendue peut encore en être l'écho
+// (la reconnaissance rend son résultat un peu après la fin du son).
+const ECHO_DELAY_MS = 1500;
 
 /** @returns {any} */
 function recognitionClass() {
@@ -22,6 +26,7 @@ const VoiceService = {
 
     _speechId: 0,
     _speaking: false,
+    _lastSpeechEnd: -Infinity,
     /** @type {any} */
     _recognizer: null,
     _recognizerActive: false,
@@ -39,6 +44,14 @@ const VoiceService = {
         return this._speaking;
     },
 
+    /**
+     * Vrai pendant une lecture et peu après : une phrase entendue peut être l'écho de l'application.
+     * @param {number} [now]
+     */
+    isEchoWindow(now = Date.now()) {
+        return this._speaking || now - this._lastSpeechEnd < ECHO_DELAY_MS;
+    },
+
     isListening() {
         return this._wantListen;
     },
@@ -52,7 +65,6 @@ const VoiceService = {
         if (!this.canSpeak()) return;
         const id = ++this._speechId;
         this._speaking = true;
-        this._pauseRecognizer();
         window.speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(text);
@@ -61,8 +73,8 @@ const VoiceService = {
         const finish = () => {
             if (id !== this._speechId) return; // lecture remplacée ou arrêtée
             this._speaking = false;
+            this._lastSpeechEnd = Date.now();
             if (onEnd) onEnd();
-            this._resumeRecognizer();
         };
         utterance.onend = finish;
         utterance.onerror = finish;
@@ -71,10 +83,9 @@ const VoiceService = {
 
     stopSpeaking() {
         this._speechId += 1;
-        const wasSpeaking = this._speaking;
+        if (this._speaking) this._lastSpeechEnd = Date.now();
         this._speaking = false;
         if (this.canSpeak()) window.speechSynthesis.cancel();
-        if (wasSpeaking) this._resumeRecognizer();
     },
 
     /**
@@ -135,19 +146,8 @@ const VoiceService = {
         }
     },
 
-    _pauseRecognizer() {
-        if (this._recognizer && this._recognizerActive) {
-            this._recognizerActive = false;
-            try {
-                this._recognizer.abort();
-            } catch {
-                // déjà arrêtée
-            }
-        }
-    },
-
     _resumeRecognizer() {
-        if (!this._wantListen || this._speaking || !this._recognizer || this._recognizerActive) return;
+        if (!this._wantListen || !this._recognizer || this._recognizerActive) return;
         try {
             this._recognizer.start();
             this._recognizerActive = true;

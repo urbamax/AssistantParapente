@@ -39,33 +39,45 @@ export function buildQuestionSpeech(q) {
 
 /**
  * Verdict puis explication.
- * @param {{ isCorrect: boolean, question: { explication?: string } }} result
+ * Verdict « incomplète » : des points gagnés, aucune réponse fausse cochée, mais pas toutes les bonnes.
+ * @param {{ isCorrect: boolean, question: { explication?: string }, userPoints?: number, selected?: { pts: number }[] }} result
  */
 export function buildFeedbackSpeech(result) {
     let verdictKey = 'quiz.voice.speech.incorrect';
     if (result.isCorrect) {
         verdictKey = 'quiz.voice.speech.correct';
-    } else if (result.userPoints > 0 && result.selected && !result.selected.some(c => c.pts < 0)) {
+    } else if (result.userPoints > 0 && result.selected && !result.selected.some((c) => c.pts < 0)) {
         verdictKey = 'quiz.voice.speech.incomplete';
     }
-    
+
     const verdict = t(verdictKey);
     const explanation = String(result.question?.explication || '').trim();
     return explanation ? `${verdict} ${withFinalStop(explanation)}` : verdict;
 }
 
-/** 
- * @param {number[]} indexes 
+/**
+ * Lecture automatique après validation (spec 022) : le verdict seul pour une bonne réponse,
+ * le verdict et l'explication après une erreur ou une réponse incomplète.
+ * @param {{ isCorrect: boolean, question: { explication?: string } }} result
+ */
+export function buildAutoFeedbackSpeech(result) {
+    return result.isCorrect ? t('quiz.voice.speech.correct') : buildFeedbackSpeech(result);
+}
+
+/**
+ * @param {number[]} indexes
  * @param {{text: string}[]} [choices]
  */
 export function describeSelection(indexes, choices = []) {
     if (!indexes.length) return t('quiz.voice.speech.cleared');
-    const spokenOptions = indexes.map(i => {
+    // Avec le texte des réponses : « B, Vent latéral. D, Aucun vent » ; sinon « B, D ».
+    const withText = indexes.some((i) => choices && choices[i] && choices[i].text);
+    const spokenOptions = indexes.map((i) => {
         const letter = optionLetter(i);
         const text = choices && choices[i] ? choices[i].text : '';
         return text ? `${letter}, ${text}` : letter;
     });
-    return t('quiz.voice.speech.selection', { letters: spokenOptions.join('. ') });
+    return t('quiz.voice.speech.selection', { letters: spokenOptions.join(withText ? '. ' : ', ') });
 }
 
 /** Minuscules, sans accents, apostrophes et ponctuation remplacées par des espaces. */
@@ -77,7 +89,7 @@ function normalize(text) {
         .replace(/[’'`]/g, '')
         .replace(/[^a-z0-9]+/g, ' ')
         .trim();
-        
+
     // Remplacements phonétiques pour les associations de lettres courantes
     normalized = normalized
         .replace(/\baider\b/g, 'a d')
@@ -86,7 +98,7 @@ function normalize(text) {
         .replace(/\bbaisser\b/g, 'b c')
         .replace(/\bceder\b/g, 'c d')
         .replace(/\bdeces\b/g, 'd c');
-        
+
     return normalized;
 }
 
@@ -94,7 +106,7 @@ const COMMANDS = {
     validate: ['valider', 'valide', 'validez', 'validation', 'je valide'],
     next: ['suivante', 'suivant', 'question suivante', 'la suivante', 'suite'],
     prev: ['precedente', 'precedent', 'question precedente', 'la precedente', 'retour'],
-    repeat: ['repete', 'repeter', 'repetez', 'relis', 'relire', 'lire'],
+    repeat: ['repete', 'repeter', 'repetez', 'relis', 'relire', 'lire', 'explication', 'explique', 'explique moi'],
     clear: ['effacer', 'efface', 'effacez'],
     stop: ['stop', 'arrete', 'arreter', 'arretez'],
 };
@@ -102,8 +114,35 @@ const COMMANDS = {
 // Mots qui désignent sans ambiguïté une lettre.
 const STRONG_LETTERS = { a: 0, b: 1, be: 1, bee: 1, c: 2, d: 3, e: 4, f: 5, ef: 5, effe: 5 };
 // Homophones qui sont aussi des mots courants : acceptés seulement s'ils forment toute la phrase.
-const WEAK_LETTERS = { ah: 0, ha: 0, baie: 1, ce: 2, ces: 2, ses: 2, sait: 2, cest: 2, de: 3, des: 3, dees: 3, eu: 4, euh: 4 };
+const WEAK_LETTERS = {
+    ah: 0,
+    ha: 0,
+    baie: 1,
+    ce: 2,
+    ces: 2,
+    ses: 2,
+    sait: 2,
+    cest: 2,
+    de: 3,
+    des: 3,
+    dees: 3,
+    eu: 4,
+    euh: 4,
+};
+const ECHO_WORDS = new Set(['reponse', 'reponses', 'selection']);
 const FILLERS = new Set(['reponse', 'reponses', 'et', 'la', 'le', 'les', 'lettre', 'lettres']);
+
+/**
+ * Vrai si la phrase reprend des mots que l'application prononce (« Réponse A : … »,
+ * « Sélection : … ») : pendant une lecture, c'est sans doute l'écho de sa propre voix (spec 022).
+ * Le pilote, lui, dit seulement les lettres.
+ * @param {string} transcript
+ */
+export function looksLikeEcho(transcript) {
+    return normalize(transcript)
+        .split(' ')
+        .some((w) => ECHO_WORDS.has(w));
+}
 
 /**
  * Interprète une phrase entendue.
@@ -126,10 +165,14 @@ export function parseVoiceCommand(transcript, optionCount) {
     if (!words.length) return { type: 'unknown' };
 
     const indexes = new Set();
-    for (const word of words) {
+    // Un homophone (« dé », « c'est »…) compte comme lettre s'il forme toute la phrase, ou s'il
+    // suit « et » (« A et dé ») : « c'est la B » reste ainsi « pas compris ».
+    const afterEt = new Set(tokens.flatMap((w, i) => (i > 0 && tokens[i - 1] === 'et' ? [i] : [])));
+    for (const [i, word] of tokens.entries()) {
+        if (FILLERS.has(word)) continue;
         if (word in STRONG_LETTERS) {
             indexes.add(STRONG_LETTERS[word]);
-        } else if (word in WEAK_LETTERS && tokens.length === 1) {
+        } else if (word in WEAK_LETTERS && (tokens.length === 1 || afterEt.has(i))) {
             indexes.add(WEAK_LETTERS[word]);
         } else if (!(word in WEAK_LETTERS) && /^[a-f]{2,6}$/.test(word)) {
             // Lettres collées par la reconnaissance : « BD ».

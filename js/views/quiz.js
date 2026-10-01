@@ -14,8 +14,10 @@ import {
     optionLetter,
     buildQuestionSpeech,
     buildFeedbackSpeech,
+    buildAutoFeedbackSpeech,
     describeSelection,
     parseVoiceCommand,
+    looksLikeEcho,
 } from '../services/quiz_voice.js';
 import { t } from '../utils/i18n.js';
 
@@ -1562,7 +1564,7 @@ class QuizViewClass extends BaseView {
             this.renderQuestion(QuizService.nextQuestion());
         } else {
             this.showAnswerFeedback(result, QuizService.state.qcmIndex > 0);
-            if (VoiceService.getPrefs().autoRead) this.readAloud();
+            if (VoiceService.getPrefs().autoRead) this.readAloud({ auto: true });
         }
     }
 
@@ -1618,14 +1620,19 @@ class QuizViewClass extends BaseView {
         return VoiceService.canSpeak() || VoiceService.canListen();
     }
 
-    /** Ce que « Lire » dit : la correction si la question est validée, sinon la question. */
-    currentSpeech() {
-        if (this._voiceFeedback) return buildFeedbackSpeech(this._voiceFeedback);
+    /**
+     * Ce que « Lire » dit : la correction si la question est validée, sinon la question.
+     * En lecture automatique, l'explication n'est lue qu'après une erreur (spec 022).
+     */
+    currentSpeech({ auto = false } = {}) {
+        if (this._voiceFeedback) {
+            return auto ? buildAutoFeedbackSpeech(this._voiceFeedback) : buildFeedbackSpeech(this._voiceFeedback);
+        }
         return this._voiceQuestion ? buildQuestionSpeech(this._voiceQuestion) : '';
     }
 
-    readAloud() {
-        const text = this.currentSpeech();
+    readAloud({ auto = false } = {}) {
+        const text = this.currentSpeech({ auto });
         if (!text || !VoiceService.canSpeak()) return;
         VoiceService.speak(text, { onEnd: () => this.renderVoiceBar() });
         this.renderVoiceBar();
@@ -1703,9 +1710,13 @@ class QuizViewClass extends BaseView {
     handleVoiceResult(alternatives) {
         const q = this._voiceQuestion;
         if (!q) return;
+        // Spec 022 : l'écoute continue pendant la lecture. Pendant (et juste après) une lecture, une
+        // phrase non comprise ou qui reprend « Réponse A : … » est l'écho de l'application : ignorée.
+        const echoWindow = VoiceService.isEchoWindow();
         let heard = alternatives[0] || '';
         let command = /** @type {import('../services/quiz_voice.js').VoiceCommand} */ ({ type: 'unknown' });
         for (const alt of alternatives) {
+            if (echoWindow && looksLikeEcho(alt)) continue;
             const parsed = parseVoiceCommand(alt, q.choices.length);
             if (parsed.type !== 'unknown') {
                 heard = alt;
@@ -1715,10 +1726,14 @@ class QuizViewClass extends BaseView {
         }
 
         if (command.type === 'unknown') {
+            if (echoWindow) return;
             this._voiceStatus = t('quiz.voice.notUnderstood', { text: heard.trim() });
             this.renderVoiceBar();
             return;
         }
+
+        // Le pilote répond sans attendre la fin de la lecture : on se tait.
+        if (VoiceService.isSpeaking()) VoiceService.stopSpeaking();
 
         this._voiceStatus = t('quiz.voice.heard', { text: heard.trim() });
         const isExam = QuizService.state.qcmConfig.mode === 'EXAM';

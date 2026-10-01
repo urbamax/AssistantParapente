@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import QuizView from '../../js/views/quiz.js';
 import QuizService from '../../js/services/quiz_service.js';
 import VoiceService from '../../js/services/voice_service.js';
-import { buildQuestionSpeech, buildFeedbackSpeech } from '../../js/services/quiz_voice.js';
+import { buildQuestionSpeech, buildFeedbackSpeech, buildAutoFeedbackSpeech } from '../../js/services/quiz_voice.js';
 
 // Spec 016 : mode vocal de l'écran de question du QCM.
 
@@ -37,7 +37,7 @@ let listening;
 let listenHandlers;
 
 function mockVoice({ speak = true, listen = true } = {}) {
-    speech = { speaking: false, texts: [], onEnd: null };
+    speech = { speaking: false, echo: false, texts: [], onEnd: null };
     listening = false;
     listenHandlers = null;
     vi.spyOn(VoiceService, 'canSpeak').mockReturnValue(speak);
@@ -51,6 +51,7 @@ function mockVoice({ speak = true, listen = true } = {}) {
         speech.speaking = false;
     });
     vi.spyOn(VoiceService, 'isSpeaking').mockImplementation(() => speech.speaking);
+    vi.spyOn(VoiceService, 'isEchoWindow').mockImplementation(() => speech.speaking || speech.echo);
     vi.spyOn(VoiceService, 'startListening').mockImplementation((handlers) => {
         listening = true;
         listenHandlers = handlers;
@@ -213,10 +214,59 @@ describe('US2 - automatic reading (spec 016)', () => {
         expect(VoiceService.getPrefs().autoRead).toBe(true);
 
         QuizView.validateQuestion();
-        expect(speech.texts.at(-1)).toBe(buildFeedbackSpeech(QuizService.state.examResults[0]));
+        expect(speech.texts.at(-1)).toBe(buildAutoFeedbackSpeech(QuizService.state.examResults[0]));
 
         QuizView.renderQuestion(QuizService.nextQuestion());
         expect(speech.texts.at(-1)).toBe(buildQuestionSpeech(QuizService.getCurrentQuestion()));
+    });
+
+    // Spec 022 : l'explication n'est lue d'office qu'après une erreur.
+    function answer(indexes) {
+        indexes.forEach((i) =>
+            QuizView.handleClick({ target: document.querySelector(`.qcm-option[data-idx="${i}"]`) }),
+        );
+        QuizView.validateQuestion();
+        return QuizService.state.examResults[QuizService.state.qcmIndex];
+    }
+
+    it('after a right answer, reads only the verdict (spec 022, FR-001)', () => {
+        mockVoice();
+        VoiceService.setPrefs({ autoRead: true });
+        startSession();
+        const result = answer([0, 3]);
+        expect(result.isCorrect).toBe(true);
+        expect(speech.texts.at(-1)).toBe('Bonne réponse.');
+        expect(document.getElementById('qcm-feedback').textContent).toContain('Explication du cours.');
+    });
+
+    it('after a wrong answer, reads the verdict and the explanation (spec 022, FR-002)', () => {
+        mockVoice();
+        VoiceService.setPrefs({ autoRead: true });
+        startSession();
+        const result = answer([1]);
+        expect(result.isCorrect).toBe(false);
+        expect(speech.texts.at(-1)).toBe(buildFeedbackSpeech(result));
+        expect(speech.texts.at(-1)).toContain('Explication du cours.');
+    });
+
+    it('after an incomplete answer, reads the explanation too (spec 022, FR-002)', () => {
+        mockVoice();
+        VoiceService.setPrefs({ autoRead: true });
+        startSession();
+        const result = answer([0]);
+        expect(result.isCorrect).toBe(false);
+        expect(speech.texts.at(-1)).toContain('Explication du cours.');
+    });
+
+    it('on request, reads the explanation even after a right answer (spec 022, FR-003)', () => {
+        mockVoice();
+        VoiceService.setPrefs({ autoRead: true });
+        startSession();
+        const result = answer([0, 3]);
+        finishSpeech();
+        click('quiz-voice-read');
+        expect(speech.texts.at(-1)).toBe(buildFeedbackSpeech(result));
+        expect(speech.texts.at(-1)).toContain('Explication du cours.');
     });
 
     it('turning it off stops auto reading', () => {
@@ -293,7 +343,7 @@ describe('US3 - answer by voice (spec 016)', () => {
         expect(selectedLetters()).toEqual(['B', 'D']);
         expect([...QuizService.state.currentQcmSelection].map((o) => o.text)).toEqual(['Vent latéral', 'Aucun vent']);
         expect(status()).toBe('Entendu : B et D');
-        expect(speech.texts.at(-1)).toBe('Sélection : B, D.');
+        expect(speech.texts.at(-1)).toBe('Sélection : B, Vent latéral. D, Aucun vent.');
     });
 
     it('uses the first alternative that is understood', () => {
@@ -310,6 +360,7 @@ describe('US3 - answer by voice (spec 016)', () => {
         startSession();
         agreeAndListen();
         hear('A');
+        finishSpeech(); // fin de la confirmation « Sélection : A… » et du délai d'écho
         hear('je ne sais pas');
         expect(selectedLetters()).toEqual(['A']);
         expect(QuizService.state.examResults.length).toBe(0);
@@ -338,6 +389,10 @@ describe('US3 - answer by voice (spec 016)', () => {
 
         hear('répète');
         expect(speech.texts.at(-1)).toBe(buildFeedbackSpeech(QuizService.state.examResults[0]));
+        speech.texts.length = 0;
+        hear('explication');
+        expect(speech.texts.at(-1)).toBe(buildFeedbackSpeech(QuizService.state.examResults[0]));
+        expect(speech.texts.at(-1)).toContain('Explication du cours.');
 
         hear('suivante');
         expect(QuizService.state.qcmIndex).toBe(1);
@@ -347,6 +402,58 @@ describe('US3 - answer by voice (spec 016)', () => {
         hear('stop');
         expect(VoiceService.stopListening).toHaveBeenCalled();
         expect(btn('quiz-voice-mic').getAttribute('aria-pressed')).toBe('false');
+    });
+
+    // Spec 022 : répondre sans attendre la fin de la lecture, sans prendre l'écho pour une réponse.
+    it('can answer while the question is being read (spec 022, FR-005)', () => {
+        mockVoice();
+        startSession();
+        agreeAndListen();
+        click('quiz-voice-read');
+        expect(speech.speaking).toBe(true);
+        VoiceService.stopSpeaking.mockClear();
+        hear('B et D');
+        expect(VoiceService.stopSpeaking).toHaveBeenCalled();
+        expect(selectedLetters()).toEqual(['B', 'D']);
+        expect(status()).toBe('Entendu : B et D');
+    });
+
+    it('a command interrupts the reading too', () => {
+        mockVoice();
+        startSession();
+        agreeAndListen();
+        hear('A');
+        click('quiz-voice-read');
+        hear('valider');
+        expect(QuizService.state.examResults[0]).toBeTruthy();
+    });
+
+    it('ignores its own voice while reading (spec 022, FR-006)', () => {
+        mockVoice();
+        startSession();
+        agreeAndListen();
+        const before = status();
+        click('quiz-voice-read');
+        hear('Réponse A : Vent de face');
+        hear('réponse A');
+        hear('Que signifie un vent de travers');
+        expect(selectedLetters()).toEqual([]);
+        expect(status()).toBe(before);
+        expect(speech.speaking).toBe(true);
+    });
+
+    it('ignores an echo that arrives just after the reading ended', () => {
+        mockVoice();
+        startSession();
+        agreeAndListen();
+        const before = status();
+        speech.echo = true;
+        hear('réponse D aucun vent');
+        hear('réponse D');
+        expect(selectedLetters()).toEqual([]);
+        expect(status()).toBe(before);
+        hear('D');
+        expect(selectedLetters()).toEqual(['D']);
     });
 
     it('in exam mode « valider » moves to the next question', () => {
