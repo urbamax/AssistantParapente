@@ -1237,7 +1237,7 @@ class SitesService {
                 }
                 this.setForecastOffset(currentOffset);
             }
-            
+
             const durationSpan = document.getElementById('hide-unflyable-duration');
             if (durationSpan) {
                 if (range >= 120) {

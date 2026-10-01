@@ -508,7 +508,10 @@ class LogbookService {
                 error: null,
             };
         } catch (e) {
-            let msg = e.message || 'Erreur réseau'; if (msg === 'Load failed' || msg === 'Failed to fetch') msg = 'Requête bloquée (extension, Safari Tracking Prevention ou CSP)'; return { success: false, data: null, error: msg };
+            let msg = e.message || 'Erreur réseau';
+            if (msg === 'Load failed' || msg === 'Failed to fetch')
+                msg = 'Requête bloquée (extension, Safari Tracking Prevention ou CSP)';
+            return { success: false, data: null, error: msg };
         }
     }
 }

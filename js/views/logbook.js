@@ -1130,8 +1130,14 @@ class LogbookViewClass extends BaseView {
         const voilesList = document.getElementById('voiles-autre-list');
         if (voilesList) {
             const voiles = toSorted(
-                [...new Set(LogbookService.getFlights().map((s) => (typeof s.voile === 'string' ? s.voile.trim() : '')).filter(Boolean))],
-                (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' })
+                [
+                    ...new Set(
+                        LogbookService.getFlights()
+                            .map((s) => (typeof s.voile === 'string' ? s.voile.trim() : ''))
+                            .filter(Boolean),
+                    ),
+                ],
+                (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }),
             );
             voilesList.innerHTML = voiles.map((name) => `<option value="${escapeHTML(name)}">`).join('');
         }
@@ -1139,8 +1145,14 @@ class LogbookViewClass extends BaseView {
         const sellettesList = document.getElementById('sellettes-autre-list');
         if (sellettesList) {
             const sellettes = toSorted(
-                [...new Set(LogbookService.getFlights().map((s) => (typeof s.sellette === 'string' ? s.sellette.trim() : '')).filter(Boolean))],
-                (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' })
+                [
+                    ...new Set(
+                        LogbookService.getFlights()
+                            .map((s) => (typeof s.sellette === 'string' ? s.sellette.trim() : ''))
+                            .filter(Boolean),
+                    ),
+                ],
+                (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }),
             );
             sellettesList.innerHTML = sellettes.map((name) => `<option value="${escapeHTML(name)}">`).join('');
         }
@@ -1640,16 +1652,13 @@ class LogbookViewClass extends BaseView {
         if (session.meteo) {
             // Une séance de gonflage n'a ni décollage ni atterrissage : on parle de début et de fin.
             const isVol = session.type === 'vol';
-            
+
             let startLabel = isVol ? 'weather.rowTakeoff' : 'weather.rowStart';
             if (session.duree && !session.meteoAtterro) {
                 startLabel = isVol ? 'weather.rowTakeoffLanding' : 'weather.rowStartEnd';
             }
-            
-            const decollageRow = this.renderWeatherPointRow(
-                session.meteo,
-                t(startLabel),
-            );
+
+            const decollageRow = this.renderWeatherPointRow(session.meteo, t(startLabel));
             const atterroRow = session.meteoAtterro
                 ? this.renderWeatherPointRow(session.meteoAtterro, t(isVol ? 'weather.rowLanding' : 'weather.rowEnd'))
                 : '';
@@ -2477,12 +2486,12 @@ class LogbookViewClass extends BaseView {
                 const target = LogbookService.getFlights()[sessionIndex];
                 target.meteo = decollageResult.data;
                 target.meteoAtterro = atterroResult.success ? atterroResult.data : null;
-                
+
                 // Ne pas afficher la ligne d'atterrissage si la météo est rigoureusement identique
                 if (target.meteoAtterro && JSON.stringify(target.meteo) === JSON.stringify(target.meteoAtterro)) {
                     target.meteoAtterro = null;
                 }
-                
+
                 target.baliseId = baliseId || null;
                 LogbookService.saveFlights(); // Persiste en localStorage et déclenche la synchro Firestore
 
