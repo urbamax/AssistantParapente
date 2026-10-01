@@ -124,6 +124,7 @@ async function bootApplication() {
         'triggerIgcUpload',
         'toggleCoordsPicker',
         'clearCoords',
+        'closeSessionModal',
     ].forEach((action) => {
         AppEvents.register('Logbook' + action, (args, e, t) =>
             LogbookView[action] ? LogbookView[action](args || e, e, t) : null,
@@ -207,12 +208,40 @@ async function bootApplication() {
         const other = document.getElementById(target.dataset.toggleId);
         if (other) other.style.display = value === 'Autre' ? 'block' : 'none';
     });
-    AppEvents.register('toggleTheorySubBar', () =>
-        document.getElementById('theory-sub-bar')?.classList.toggle('active'),
-    );
-    document
-        .getElementById('theory-sub-bar')
-        ?.addEventListener('click', (e) => /** @type {HTMLElement} */ (e.currentTarget).classList.remove('active'));
+    // Sous-menus de la barre de navigation (Théorie, Carnet, Sécurité) : un seul ouvert à la fois,
+    // refermé par un choix, un clic ailleurs ou Échap.
+    const closeNavSubMenus = () => {
+        document.querySelectorAll('.nav-dropdown-menu.active').forEach((menu) => menu.classList.remove('active'));
+        document
+            .querySelectorAll('[data-action="toggleNavSubMenu"]')
+            .forEach((btn) => btn.setAttribute('aria-expanded', 'false'));
+    };
+    AppEvents.register('toggleNavSubMenu', (menuId, _e, target) => {
+        const menu = document.getElementById(menuId);
+        if (!menu) return;
+        const willOpen = !menu.classList.contains('active');
+        closeNavSubMenus();
+        if (willOpen) {
+            menu.classList.add('active');
+            target?.setAttribute('aria-expanded', 'true');
+        }
+    });
+    document.addEventListener('click', (e) => {
+        const target = /** @type {HTMLElement} */ (e.target);
+        if (target.closest('.nav-dropdown-menu') || !target.closest('.nav-dropdown')) closeNavSubMenus();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeNavSubMenus();
+    });
+    AppEvents.register('openLogbookSection', async (section) => {
+        LogbookView.currentTab = section;
+        if (GlobalState.get('mode') !== 'LOGBOOK') await AppRouter.navigate('LOGBOOK');
+        else LogbookView.switchTab(section);
+    });
+    AppEvents.register('openSafetySection', async (section) => {
+        if (GlobalState.get('mode') !== 'SAFETY') await AppRouter.navigate('SAFETY');
+        SafetyView.switchTab(section);
+    });
     AppEvents.register('importDataFile', (_value, _e, target) => {
         const file = target.files[0];
         if (!file || !window.FirebaseAuthEngine) return;

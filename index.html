@@ -1636,82 +1636,20 @@
             <div class="library-container">
                 <h2 class="page-title">CARNET DE VOL</h2>
 
-                <div class="logbook-tabs">
-                    <button class="logbook-tab-btn active" data-action="LogbookswitchTab" data-args="&#39;history&#39;">
-                        Historique
-                    </button>
-                    <button class="logbook-tab-btn" data-action="LogbookswitchTab" data-args="&#39;add&#39;">
-                        Ajouter
-                    </button>
-                    <button class="logbook-tab-btn" data-action="LogbookswitchTab" data-args="&#39;stats&#39;">
-                        Statistiques
-                    </button>
-                    <button
-                        class="logbook-tab-btn"
-                        data-tab="equip"
-                        data-action="LogbookswitchTab"
-                        data-args="&#39;equip&#39;"
-                    >
-                        Matériel
-                    </button>
-                </div>
-
                 <!-- Tab: History -->
                 <div id="logbook-tab-history" class="logbook-tab-content active">
+                    <div class="logbook-history-actions">
+                        <button
+                            id="logbook-add-btn"
+                            class="action-btn-primary"
+                            data-action="LogbookswitchTab"
+                            data-args="&#39;add&#39;"
+                        >
+                            <i class="ri-add-line"></i> Ajouter une session
+                        </button>
+                    </div>
                     <div id="logbook-history-list" class="logbook-list">
                         <!-- Injected by JS -->
-                    </div>
-                </div>
-
-                <!-- Tab: Add -->
-                <div id="logbook-tab-add" class="logbook-tab-content">
-                    <div class="logbook-form-container">
-                        <div class="logbook-type-toggle">
-                            <button
-                                id="btn-type-vol"
-                                class="type-btn active"
-                                data-action="LogbooksetFormType"
-                                data-args="&#39;vol&#39;"
-                            >
-                                Vol
-                            </button>
-                            <button
-                                id="btn-type-gonflage"
-                                class="type-btn"
-                                data-action="LogbooksetFormType"
-                                data-args="&#39;gonflage&#39;"
-                            >
-                                Gonflage
-                            </button>
-                        </div>
-                        <form id="logbook-add-form">
-                            <input type="hidden" id="lb-id-edit" />
-                            <div id="form-fields-container">
-                                <!-- Injected by JS based on type -->
-                            </div>
-                            <div style="display: flex; gap: 10px; margin-top: 16px">
-                                <button type="submit" id="lb-submit-btn" class="action-btn-primary" style="flex: 1">
-                                    Enregistrer
-                                </button>
-                                <button
-                                    type="button"
-                                    id="lb-cancel-btn"
-                                    style="
-                                        padding: 10px 15px;
-                                        background-color: #6b7280;
-                                        color: white;
-                                        border: none;
-                                        border-radius: 4px;
-                                        cursor: pointer;
-                                        font-weight: bold;
-                                        display: none;
-                                    "
-                                    data-action="LogbookresetForm"
-                                >
-                                    Annuler
-                                </button>
-                            </div>
-                        </form>
                     </div>
                 </div>
 
@@ -2746,6 +2684,74 @@
         </dialog>
 
         <!-- MANUAL MODAL -->
+        <dialog
+            id="logbook-session-modal"
+            class="gdpr-modal-overlay"
+            aria-labelledby="logbook-session-modal-title"
+            style="display: none"
+        >
+            <div class="gdpr-modal" style="max-width: 640px; max-height: 90vh; display: flex; flex-direction: column">
+                <div class="gdpr-modal-header">
+                    <div class="gdpr-modal-title">
+                        <i class="ri-add-circle-line"></i>
+                        <span id="logbook-session-modal-title">Nouvelle session</span>
+                    </div>
+                    <button class="gdpr-modal-close-btn" data-action="LogbookcloseSessionModal" aria-label="Fermer">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+                <div class="gdpr-modal-body" style="padding-top: 16px; overflow-y: auto; flex: 1">
+                    <div class="logbook-form-container">
+                        <div class="logbook-type-toggle">
+                            <button
+                                id="btn-type-vol"
+                                class="type-btn active"
+                                data-action="LogbooksetFormType"
+                                data-args="&#39;vol&#39;"
+                            >
+                                Vol
+                            </button>
+                            <button
+                                id="btn-type-gonflage"
+                                class="type-btn"
+                                data-action="LogbooksetFormType"
+                                data-args="&#39;gonflage&#39;"
+                            >
+                                Gonflage
+                            </button>
+                        </div>
+                        <form id="logbook-add-form">
+                            <input type="hidden" id="lb-id-edit" />
+                            <div id="form-fields-container">
+                                <!-- Injected by JS based on type -->
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 16px">
+                                <button type="submit" id="lb-submit-btn" class="action-btn-primary" style="flex: 1">
+                                    Enregistrer
+                                </button>
+                                <button
+                                    type="button"
+                                    id="lb-cancel-btn"
+                                    style="
+                                        padding: 10px 15px;
+                                        background-color: #6b7280;
+                                        color: white;
+                                        border: none;
+                                        border-radius: 4px;
+                                        cursor: pointer;
+                                        font-weight: bold;
+                                    "
+                                    data-action="LogbookcloseSessionModal"
+                                >
+                                    Annuler
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </dialog>
+
         <dialog id="manual-modal" class="gdpr-modal-overlay" data-backdrop-action="hideManual" style="display: none">
             <div class="gdpr-modal" style="max-width: 800px; max-height: 90vh; display: flex; flex-direction: column">
                 <div class="gdpr-modal-header">
@@ -3536,9 +3542,12 @@
                             </h4>
                             <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
                                 Ce module vous permet d'enregistrer et de conserver l'historique complet de vos
-                                activités en vol libre et au sol (vols et sessions de gonflage). Il est organisé en
-                                quatre onglets : <strong>Historique</strong>, <strong>Ajouter</strong>,
-                                <strong>Statistiques</strong> et <strong>Matériel</strong>.
+                                activités en vol libre et au sol (vols et sessions de gonflage). Le bouton
+                                <strong>Carnet</strong> de la barre de navigation ouvre un sous-menu :
+                                <strong>Historique</strong>, <strong>Statistiques</strong> et
+                                <strong>Matériel</strong>. Le bouton <strong>Ajouter une session</strong>, en haut de
+                                l'historique, ouvre une fenêtre de saisie ; la modification d'une session se fait dans
+                                la même fenêtre, fermée par <strong>Annuler</strong>, la croix ou la touche Échap.
                             </p>
 
                             <h5 style="margin-top: 16px; margin-bottom: 8px">1. Ajouter un Vol</h5>
@@ -3669,7 +3678,7 @@
 
                             <h5 style="margin-top: 16px; margin-bottom: 8px">4. Statistiques du Carnet</h5>
                             <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
-                                L'onglet Statistiques résume votre activité : nombre et temps de vol, sessions de
+                                La partie Statistiques résume votre activité : nombre et temps de vol, sessions de
                                 gonflage, altitude maximale et gain cumulé, utilisation de chaque voile et heures
                                 restantes avant révision, lieux les plus fréquentés, part des sessions en école,
                                 types de vols, techniques de décollage et exercices de gonflage.
@@ -3742,7 +3751,7 @@
 
                             <h5 style="margin-top: 16px; margin-bottom: 8px">1. Enregistrer son Équipement</h5>
                             <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
-                                Pour chaque matériel (onglet Matériel du carnet), vous pouvez définir : le type (Voile,
+                                Pour chaque matériel (Carnet &gt; Matériel), vous pouvez définir : le type (Voile,
                                 Sellette, Parachute de Secours, Accessoire), la marque, le modèle, la taille et la
                                 couleur (choisis dans une liste ou saisis librement, le nom du matériel est composé
                                 automatiquement), la date d'achat, ainsi que la date de sa dernière révision en atelier
@@ -3937,9 +3946,9 @@
                         <div id="manual-section-safety" class="manual-section" style="display: none">
                             <h4 style="margin-top: 0; color: var(--accent-blue)">L'Écran Sécurité</h4>
                             <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
-                                Accessible depuis le bouton <strong>Sécurité</strong> de la barre de navigation, cet
-                                écran reprend des contenus officiels de la FFVL (source indiquée sur chaque rubrique). Il
-                                est organisé en trois onglets.
+                                Cet écran reprend des contenus officiels de la FFVL (source indiquée sur chaque
+                                rubrique). Le bouton <strong>Sécurité</strong> de la barre de navigation ouvre un
+                                sous-menu donnant accès à ses trois rubriques.
                             </p>
 
                             <h5 style="margin-top: 16px; margin-bottom: 8px">1. Urgence</h5>
@@ -4210,73 +4219,112 @@
         <script type="module" src="js/core/main.js?v=2026.10.01_v16"></script>
         <!-- Floating Main Navigation -->
         <nav class="desktop-main-nav" id="desktop-main-nav">
-            <div class="theory-nav-group nav-dropdown" style="position: relative; display: flex; align-items: center">
-                <button class="nav-menu-btn" data-target="THEORY" data-action="toggleTheorySubBar">
+            <div class="nav-dropdown">
+                <button
+                    class="nav-menu-btn"
+                    data-target="THEORY"
+                    data-action="toggleNavSubMenu"
+                    data-args="'theory-sub-bar'"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    aria-controls="theory-sub-bar"
+                >
                     <i class="ri-graduation-cap-line"></i> <span class="nav-text">Théorie</span>
                 </button>
-                <div
-                    id="theory-sub-bar"
-                    class="sub-bar nav-dropdown-menu"
-                    style="
-                        display: none;
-                        position: absolute;
-                        top: auto;
-                        bottom: calc(100% + 15px);
-                        left: 0;
-                        background: var(--bg-card, #fff);
-                        border: 1px solid var(--border-color, #eee);
-                        border-radius: 12px;
-                        padding: 8px;
-                        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-                        z-index: 1000;
-                        flex-direction: column;
-                        min-width: 140px;
-                    "
-                >
-                    <button
-                        class="nav-menu-btn"
-                        data-target="QCM"
-                        data-action="navigate"
-                        data-args="QCM"
-                        style="width: 100%; flex-direction: row; justify-content: flex-start; padding: 10px"
-                    >
-                        <i class="ri-file-list-3-line"></i> <span class="nav-text" style="display: inline">QCM</span>
+                <div id="theory-sub-bar" class="sub-bar nav-dropdown-menu">
+                    <button class="nav-menu-btn" data-target="QCM" data-action="navigate" data-args="QCM">
+                        <i class="ri-file-list-3-line"></i> <span class="nav-text">QCM</span>
                     </button>
-                    <button
-                        class="nav-menu-btn"
-                        data-target="LIBRARY"
-                        data-action="navigate"
-                        data-args="LIBRARY"
-                        style="width: 100%; flex-direction: row; justify-content: flex-start; padding: 10px"
-                    >
-                        <i class="ri-book-open-line"></i> <span class="nav-text" style="display: inline">Biblio</span>
+                    <button class="nav-menu-btn" data-target="LIBRARY" data-action="navigate" data-args="LIBRARY">
+                        <i class="ri-book-open-line"></i> <span class="nav-text">Biblio</span>
                     </button>
-                    <button
-                        class="nav-menu-btn"
-                        data-target="STATS"
-                        data-action="navigate"
-                        data-args="STATS"
-                        style="width: 100%; flex-direction: row; justify-content: flex-start; padding: 10px"
-                    >
-                        <i class="ri-bar-chart-2-line"></i> <span class="nav-text" style="display: inline">Stats</span>
+                    <button class="nav-menu-btn" data-target="STATS" data-action="navigate" data-args="STATS">
+                        <i class="ri-bar-chart-2-line"></i> <span class="nav-text">Stats</span>
                     </button>
                 </div>
             </div>
             <button class="nav-menu-btn" data-target="SITES" data-action="navigate" data-args="SITES">
                 <i class="ri-map-pin-line"></i> <span class="nav-text">Sites</span>
             </button>
-            <button class="nav-menu-btn" data-target="LOGBOOK" data-action="navigate" data-args="LOGBOOK">
-                <i class="ri-booklet-line"></i> <span class="nav-text">Carnet</span>
-                <span id="logbook-nav-badge" class="nav-badge" title="Matériel à réviser"></span>
-            </button>
-            <button
-                class="nav-menu-btn nav-menu-btn-safety"
-                data-target="SAFETY"
-                data-action="navigate"
-                data-args="SAFETY"
-            >
-                <i class="ri-alarm-warning-line"></i> <span class="nav-text">Sécurité</span>
-            </button>
+            <div class="nav-dropdown">
+                <button
+                    class="nav-menu-btn"
+                    data-target="LOGBOOK"
+                    data-action="toggleNavSubMenu"
+                    data-args="'logbook-sub-bar'"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    aria-controls="logbook-sub-bar"
+                >
+                    <i class="ri-booklet-line"></i> <span class="nav-text">Carnet</span>
+                    <span id="logbook-nav-badge" class="nav-badge" title="Matériel à réviser"></span>
+                </button>
+                <div id="logbook-sub-bar" class="sub-bar nav-dropdown-menu">
+                    <button
+                        class="nav-menu-btn"
+                        data-action="openLogbookSection"
+                        data-args="'history'"
+                        data-logbook-tab="history"
+                    >
+                        <i class="ri-history-line"></i> <span class="nav-text">Historique</span>
+                    </button>
+                    <button
+                        class="nav-menu-btn"
+                        data-action="openLogbookSection"
+                        data-args="'stats'"
+                        data-logbook-tab="stats"
+                    >
+                        <i class="ri-bar-chart-box-line"></i> <span class="nav-text">Statistiques</span>
+                    </button>
+                    <button
+                        class="nav-menu-btn"
+                        data-action="openLogbookSection"
+                        data-args="'equip'"
+                        data-logbook-tab="equip"
+                    >
+                        <i class="ri-tools-line"></i> <span class="nav-text">Matériel</span>
+                    </button>
+                </div>
+            </div>
+            <div class="nav-dropdown">
+                <button
+                    class="nav-menu-btn nav-menu-btn-safety"
+                    data-target="SAFETY"
+                    data-action="toggleNavSubMenu"
+                    data-args="'safety-sub-bar'"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    aria-controls="safety-sub-bar"
+                >
+                    <i class="ri-alarm-warning-line"></i> <span class="nav-text">Sécurité</span>
+                </button>
+                <div id="safety-sub-bar" class="sub-bar nav-dropdown-menu nav-dropdown-menu-end">
+                    <button
+                        class="nav-menu-btn nav-menu-btn-urgent"
+                        data-action="openSafetySection"
+                        data-args="urgence"
+                        data-safety-tab="urgence"
+                    >
+                        <i class="ri-alarm-warning-line"></i> <span class="nav-text">Urgence</span>
+                    </button>
+                    <button
+                        class="nav-menu-btn"
+                        data-action="openSafetySection"
+                        data-args="prevol"
+                        data-safety-tab="prevol"
+                    >
+                        <i class="ri-checkbox-multiple-line"></i> <span class="nav-text">Check-lists</span>
+                    </button>
+                    <button
+                        class="nav-menu-btn"
+                        data-action="openSafetySection"
+                        data-args="sigr"
+                        data-safety-tab="sigr"
+                    >
+                        <i class="ri-shield-check-line"></i> <span class="nav-text">Ma SIGR</span>
+                    </button>
+                </div>
+            </div>
             <button class="nav-menu-btn" data-target="MANUAL" data-action="showManual" data-args="'contextual'">
                 <i class="ri-information-line"></i> <span class="nav-text">Manuel</span>
             </button>

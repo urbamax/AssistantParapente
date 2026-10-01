@@ -492,17 +492,17 @@ class LogbookViewClass extends BaseView {
     }
 
     switchTab(tabName) {
+        // L'ajout et la modification d'une session se font dans une fenêtre, plus dans un onglet.
+        if (tabName === 'add') {
+            this.openSessionModal();
+            return;
+        }
         this.currentTab = tabName;
 
-        // Update Buttons
-        document.querySelectorAll('.logbook-tab-btn').forEach((btn) => {
-            btn.classList.remove('active');
+        // Sous-partie affichée, signalée dans le sous-menu « Carnet » de la barre de navigation
+        document.querySelectorAll('[data-logbook-tab]').forEach((btn) => {
+            btn.setAttribute('aria-current', String(btn.getAttribute('data-logbook-tab') === tabName));
         });
-        const activeBtn = Array.from(document.querySelectorAll('.logbook-tab-btn')).find(
-            (btn) =>
-                (btn.getAttribute('data-args') || '').includes(tabName) || btn.getAttribute('data-tab') === tabName,
-        );
-        if (activeBtn) activeBtn.classList.add('active');
 
         // Update Content
         document.querySelectorAll('.logbook-tab-content').forEach((content) => {
@@ -514,14 +514,53 @@ class LogbookViewClass extends BaseView {
         // Trigger Render
         if (tabName === 'history') {
             this.renderHistory();
-        } else if (tabName === 'add') {
-            this.renderForm();
         } else if (tabName === 'stats') {
             this.renderStats();
         } else if (tabName === 'equip') {
             this.renderEquipment();
         }
         this.updateEquipmentAlertBadge();
+    }
+
+    // --- FENÊTRE D'AJOUT / MODIFICATION D'UNE SESSION ---
+
+    openSessionModal() {
+        const modal = /** @type {HTMLDialogElement & { _cancelBound?: boolean }} */ (
+            document.getElementById('logbook-session-modal')
+        );
+        if (!modal) return;
+        this.renderForm();
+        this.setSessionModalTitle(false);
+        if (!modal._cancelBound) {
+            modal._cancelBound = true;
+            // Échap : même effet que « Annuler ». Un clic à côté de la fenêtre ne la ferme pas,
+            // pour ne pas perdre une saisie en cours.
+            modal.addEventListener('cancel', (e) => {
+                e.preventDefault();
+                this.closeSessionModal();
+            });
+        }
+        modal.style.display = 'flex';
+        if (typeof modal.showModal === 'function' && !modal.open) modal.showModal();
+        void modal.offsetWidth; // fait jouer le fondu d'ouverture
+        modal.classList.add('active');
+        const body = modal.querySelector('.gdpr-modal-body');
+        if (body) body.scrollTop = 0;
+    }
+
+    closeSessionModal() {
+        const modal = /** @type {HTMLDialogElement} */ (document.getElementById('logbook-session-modal'));
+        this.releaseCoordsMap();
+        this.resetForm();
+        if (!modal) return;
+        modal.classList.remove('active');
+        if (typeof modal.close === 'function' && modal.open) modal.close();
+        modal.style.display = 'none';
+    }
+
+    setSessionModalTitle(isEdit) {
+        const title = document.getElementById('logbook-session-modal-title');
+        if (title) title.textContent = tl(isEdit ? 'modal.titleEdit' : 'modal.titleAdd');
     }
 
     setFormType(type) {
@@ -553,7 +592,6 @@ class LogbookViewClass extends BaseView {
         const coordsPanelOpen = document.getElementById('lb-coords-panel')?.hidden === false;
 
         const submitText = document.getElementById('lb-submit-btn')?.innerText || tl('form.save');
-        const cancelBtnVisible = document.getElementById('lb-cancel-btn')?.style.display || 'none';
 
         this.currentFormType = type;
 
@@ -623,8 +661,6 @@ class LogbookViewClass extends BaseView {
         // Restaurer l'état des boutons de soumission / annulation (pour l'édition)
         const submitBtn = document.getElementById('lb-submit-btn');
         if (submitBtn) submitBtn.innerText = submitText;
-        const cancelBtn = document.getElementById('lb-cancel-btn');
-        if (cancelBtn) cancelBtn.style.display = cancelBtnVisible;
     }
 
     // --- SESSION EN ÉCOLE ---
@@ -1480,7 +1516,7 @@ class LogbookViewClass extends BaseView {
             LogbookService.addFlight(session);
         }
 
-        this.resetForm();
+        this.closeSessionModal();
         this.switchTab('history');
 
         // Extract coordinates and fetch weather asynchronously
@@ -1533,8 +1569,6 @@ class LogbookViewClass extends BaseView {
         if (idEditField) idEditField.value = '';
         const submitBtn = document.getElementById('lb-submit-btn');
         if (submitBtn) submitBtn.innerText = tl('form.save');
-        const cancelBtn = document.getElementById('lb-cancel-btn');
-        if (cancelBtn) cancelBtn.style.display = 'none';
         this.currentTraceData = null;
         this.currentIgcStats = null;
         this.currentIgcAltOffset = null;
@@ -1549,7 +1583,7 @@ class LogbookViewClass extends BaseView {
 
         this.currentFormType = session.type;
 
-        // Change la vue en premier pour générer les champs HTML
+        // Ouvre la fenêtre en premier pour générer les champs HTML
         this.switchTab('add');
 
         // Populate common fields
@@ -1633,11 +1667,7 @@ class LogbookViewClass extends BaseView {
         // Update UI buttons
         const submitBtn = document.getElementById('lb-submit-btn');
         if (submitBtn) submitBtn.innerText = tl('form.update');
-        const cancelBtn = document.getElementById('lb-cancel-btn');
-        if (cancelBtn) cancelBtn.style.display = 'inline-block';
-
-        const formEl = document.getElementById('logbook-add-form');
-        if (formEl) formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        this.setSessionModalTitle(true);
     }
 
     deleteEntry(id) {
@@ -1702,7 +1732,6 @@ class LogbookViewClass extends BaseView {
                 <div class="empty-state">
                     <i class="ri-history-line"></i>
                     <p>${tt('history.empty')}</p>
-                    <button class="action-btn-primary" data-action="switchTab" data-args="'add'">${tt('history.addSession')}</button>
                 </div>
             `;
             return;
@@ -2530,7 +2559,7 @@ class LogbookViewClass extends BaseView {
     async unmount() {
         await super.unmount();
         console.log('Unmounting LogbookView');
-        this.releaseCoordsMap();
+        this.closeSessionModal();
         // Le Carnet n'utilise aucune librairie de Chart externe (graphiques générés en HTML pur).
         // Les écouteurs d'événements sont attachés à des éléments du DOM
         // recréés par innerHTML, et sont donc automatiquement garbage collected.

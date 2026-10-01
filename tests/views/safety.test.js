@@ -41,7 +41,7 @@ describe('SafetyView', () => {
     it('switches tabs and ignores unknown tab names', () => {
         SafetyView.switchTab('prevol');
         expect(document.getElementById('safety-panel-prevol').hidden).toBe(false);
-        expect(document.getElementById('safety-tab-prevol').getAttribute('aria-selected')).toBe('true');
+        expect(document.getElementById('safety-panel-urgence').hidden).toBe(true);
         SafetyView.switchTab('nope');
         expect(document.getElementById('safety-panel-prevol').hidden).toBe(false);
     });

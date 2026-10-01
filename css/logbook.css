@@ -1,32 +1,10 @@
 /* --- LOGBOOK SCREENS --- */
 
-/* Tabs */
-.logbook-tabs {
+/* Sous-parties (Historique, Statistiques, Matériel), choisies depuis la barre de navigation */
+.logbook-history-actions {
     display: flex;
-    gap: 8px;
-    margin-bottom: 24px;
-    background: var(--bg-card);
-    padding: 6px;
-    border-radius: var(--radius-md);
-    border: var(--border-glass);
-}
-
-.logbook-tab-btn {
-    flex: 1;
-    padding: 10px 16px;
-    border: none;
-    background: transparent;
-    color: var(--text-secondary);
-    border-radius: var(--radius-sm);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &.active {
-        background: var(--bg-surface);
-        color: var(--text-main);
-        box-shadow: var(--shadow-sm);
-    }
+    justify-content: flex-end;
+    margin-bottom: 16px;
 }
 
 .logbook-tab-content {
@@ -471,23 +449,6 @@
    ============================================= */
 @media (max-width: 768px) {
 
-    /* Onglets : compacts, sans dÃ©bordement */
-    .logbook-tabs {
-        gap: 4px;
-        padding: 4px;
-        margin-bottom: 16px;
-        overflow-x: auto;
-        flex-wrap: nowrap;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .logbook-tab-btn {
-        padding: 8px 10px;
-        font-size: 0.78rem;
-        white-space: nowrap;
-        flex: 1 0 auto;
-    }
-
     /* Cards historique */
     .logbook-card {
         padding: 12px;
@@ -586,11 +547,6 @@
 }
 
 @media (max-width: 400px) {
-    .logbook-tab-btn {
-        padding: 7px 8px;
-        font-size: 0.72rem;
-    }
-
     .logbook-form-container {
         padding: 10px;
     }

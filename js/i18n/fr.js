@@ -166,6 +166,11 @@ export const FR = Object.freeze({
             save: 'Enregistrer',
             update: 'Modifier la session',
         }),
+        // Fenêtre d'ajout / modification d'une session (vol ou gonflage).
+        modal: Object.freeze({
+            titleAdd: 'Nouvelle session',
+            titleEdit: 'Modifier la session',
+        }),
         igc: Object.freeze({
             fileLoaded: 'Fichier chargé : {name}',
             searchingPlace: 'Recherche du lieu...',
@@ -182,7 +187,6 @@ export const FR = Object.freeze({
         }),
         history: Object.freeze({
             empty: 'Votre carnet est vide.',
-            addSession: 'Ajouter une session',
             badgeFlight: 'VOL',
             badgeGround: 'GONFLAGE',
             edit: 'Modifier',
@@ -495,7 +499,6 @@ export const FR = Object.freeze({
     // dans ces textes : <strong> (gras de l'affiche ou du livret), tout le reste est échappé.
     safety: Object.freeze({
         title: 'SÉCURITÉ',
-        tabsLabel: 'Rubriques sécurité',
         tabs: Object.freeze({ urgence: 'Urgence', prevol: 'Check-lists', sigr: 'Ma SIGR' }),
         source: 'Source : {label}',
         sources: Object.freeze({

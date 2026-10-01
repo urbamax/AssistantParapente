@@ -45,7 +45,8 @@ test('Spec 018 : « Autre… » dans la marque du matériel affiche le champ lib
     page,
 }) => {
     await page.goto('/?mode=LOGBOOK');
-    await page.locator('[data-action="LogbookswitchTab"][data-tab="equip"]').click();
+    await page.locator('.nav-menu-btn[data-target="LOGBOOK"]').first().click();
+    await page.locator('[data-action="openLogbookSection"][data-args="\'equip\'"]').click();
 
     const other = page.locator('#eq-marque-autre');
     await expect(other).toBeHidden();

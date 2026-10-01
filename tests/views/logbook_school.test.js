@@ -6,11 +6,14 @@ import LogbookView from '../../js/views/logbook.js';
 
 // A logbook session can be marked as taught by a school, with the school's name.
 const INDEX = readFileSync('index.html', 'utf8');
-const LOGBOOK_SCREEN = (() => {
-    const tpl = document.createElement('template');
-    tpl.innerHTML = INDEX.slice(INDEX.indexOf('<div id="logbook-screen"'));
-    return tpl.content.getElementById('logbook-screen').outerHTML;
-})();
+// Le formulaire d'ajout / modification vit dans sa fenêtre (#logbook-session-modal), hors de l'écran.
+const LOGBOOK_SCREEN = ['logbook-screen', 'logbook-session-modal']
+    .map((id) => {
+        const tpl = document.createElement('template');
+        tpl.innerHTML = INDEX.slice(INDEX.search(new RegExp(`<(div|dialog)\\s[^>]*id="${id}"`)));
+        return tpl.content.getElementById(id).outerHTML;
+    })
+    .join('');
 
 const GROUND = {
     id: 'g1',

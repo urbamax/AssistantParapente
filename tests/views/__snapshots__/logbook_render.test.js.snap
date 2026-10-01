@@ -541,7 +541,6 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                 <div class="empty-state">
                     <i class="ri-history-line"></i>
                     <p>Votre carnet est vide.</p>
-                    <button class="action-btn-primary" data-action="switchTab" data-args="'add'">Ajouter une session</button>
                 </div>
             "
 `;

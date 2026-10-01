@@ -5,44 +5,6 @@
    ci-dessous) sont mises en carte. Lui donner sa propre carte pleine page produisait un
    effet « carte dans la carte » incohérent avec le reste de l'app. */
 
-.safety-tabs {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 20px;
-}
-
-.safety-tab {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 12px 8px;
-    font: inherit;
-    font-weight: 700;
-    color: var(--text-secondary);
-    background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    cursor: pointer;
-
-    &.active {
-        color: #fff;
-        background: var(--grad-primary);
-        border-color: transparent;
-    }
-
-    &.safety-tab-urgent.active {
-        background: var(--accent-red);
-        border-color: var(--accent-red);
-    }
-
-    &:focus-visible {
-        outline: 2px solid var(--accent-blue);
-        outline-offset: 2px;
-    }
-}
-
 .safety-panel[hidden] {
     display: none;
 }
@@ -525,12 +487,6 @@
        css/library.css) — inutile de le dupliquer ici. */
     .safety-alert-actions {
         grid-template-columns: 1fr;
-    }
-
-    .safety-tab {
-        flex-direction: column;
-        gap: 2px;
-        font-size: 0.8rem;
     }
 
     .safety-card {
