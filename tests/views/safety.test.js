@@ -138,6 +138,35 @@ describe('SafetyView', () => {
         });
     });
 
+    describe('SIGR rating bias', () => {
+        afterEach(() => vi.restoreAllMocks());
+
+        const order = (plate) =>
+            [...document.querySelectorAll(`[data-plate="${plate}"][data-rating]`)].map((b) => b.dataset.rating);
+
+        it('shuffles the two ratings instead of always listing « Solide » first', async () => {
+            vi.spyOn(Math, 'random').mockReturnValue(0);
+            await mountFresh();
+            expect(order('mental')).toEqual(['weak', 'solid']);
+            const weak = document.querySelector('[data-plate="mental"][data-rating="weak"]');
+            expect(weak.classList.contains('safety-rate-weak')).toBe(true);
+            expect(weak.textContent).toBe('À renforcer');
+        });
+
+        it('only reveals the rating colours once every plate is rated', () => {
+            const card = document.getElementById('safety-sigr-summary').closest('.safety-card');
+            SIGR_PLATES.forEach((p, n) => {
+                expect(card.classList.contains('safety-sigr-complete')).toBe(false);
+                const btn = document.querySelector(`[data-plate="${p.id}"][data-rating="solid"]`);
+                SafetyView.ratePlate(null, null, btn);
+                expect(card.classList.contains('safety-sigr-complete')).toBe(n === SIGR_PLATES.length - 1);
+            });
+            // Effacer une note masque de nouveau les couleurs.
+            SafetyView.ratePlate(null, null, document.querySelector('[data-plate="mental"][data-rating="solid"]'));
+            expect(card.classList.contains('safety-sigr-complete')).toBe(false);
+        });
+    });
+
     it('persists SIGR ratings and toggles a rating off on second press', () => {
         const btn = document.querySelector('[data-plate="mental"][data-rating="weak"]');
         SafetyView.ratePlate(null, null, btn);
