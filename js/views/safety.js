@@ -285,17 +285,20 @@ class SafetyViewClass extends BaseView {
         </svg>`;
     }
 
+    // Points mélangés à l'intérieur de chaque étape (l'ordre des étapes reste chronologique) à
+    // chaque affichage et à « Recommencer » : un ordre toujours identique se coche par automatisme,
+    // sans lire. Chaque case garde l'index de son point ; le numéro affiché suit l'ordre à l'écran.
     renderPreflight() {
         let index = 0;
+        let position = 0;
         const groups = PREFLIGHT_CHECKLIST.map((group) => {
-            const items = group.items
-                .map((label) => {
-                    const i = index++;
+            const items = shuffled(group.items.map((label) => [label, index++]))
+                .map(([label, i]) => {
                     return `<li>
                         <button type="button" role="checkbox" aria-checked="false" class="safety-check"
                             data-check-index="${i}" data-action="SafetytoggleCheck" data-args="${i}">
                             <span class="safety-check-box" aria-hidden="true"><i class="ri-check-line"></i></span>
-                            <span class="safety-check-num">${i + 1}</span>
+                            <span class="safety-check-num">${++position}</span>
                             <span class="safety-check-label">${esc(label)}</span>
                         </button>
                     </li>`;
@@ -528,6 +531,12 @@ class SafetyViewClass extends BaseView {
 
     resetChecklist() {
         this.checked.clear();
+        document.querySelectorAll('#safety-panel-prevol .safety-checklist').forEach((list) => {
+            list.append(...shuffled([...list.children]));
+        });
+        document.querySelectorAll('#safety-panel-prevol .safety-check-num').forEach((num, n) => {
+            num.textContent = String(n + 1);
+        });
         if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
         this.renderChecklistState();
     }
@@ -549,12 +558,18 @@ class SafetyViewClass extends BaseView {
     /** Lit à voix haute les points pas encore cochés (mains libres pendant l'équipement). */
     readChecklist() {
         if (typeof window === 'undefined' || !window.speechSynthesis) return;
-        const remaining = PREFLIGHT_CHECKLIST.flatMap((g) => g.items)
-            .map((label, i) => ({ label, i }))
+        // Dans l'ordre et avec les numéros affichés à l'écran (les points y sont mélangés).
+        const labels = PREFLIGHT_CHECKLIST.flatMap((g) => g.items);
+        const shown = [...document.querySelectorAll('#safety-panel-prevol [data-check-index]')].map((btn) =>
+            Number(/** @type {HTMLElement} */ (btn).dataset.checkIndex),
+        );
+        const order = shown.length === labels.length ? shown : labels.map((_, i) => i);
+        const remaining = order
+            .map((i, pos) => ({ label: labels[i], i, n: pos + 1 }))
             .filter(({ i }) => !this.checked.has(i));
         const text = remaining.length
             ? tl('preflight.spoken', {
-                  points: remaining.map(({ label, i }) => tl('preflight.spokenPoint', { n: i + 1, label })).join(' '),
+                  points: remaining.map(({ label, n }) => tl('preflight.spokenPoint', { n, label })).join(' '),
               })
             : tl('preflight.done');
         window.speechSynthesis.cancel();
