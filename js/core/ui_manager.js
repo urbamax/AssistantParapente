@@ -179,6 +179,16 @@ class UIManager {
                 }
             });
 
+            // Sous-partie courante d'un sous-menu (Carnet, Sécurité) : effacée dès qu'on quitte son
+            // écran, pour ne pas rester signalée ailleurs. L'écran la remet à son affichage.
+            [
+                ['LOGBOOK', '[data-logbook-tab]'],
+                ['SAFETY', '[data-safety-tab]'],
+            ].forEach(([mode, selector]) => {
+                if (currentMode === mode) return;
+                document.querySelectorAll(selector).forEach((btn) => btn.setAttribute('aria-current', 'false'));
+            });
+
             // Handle sub-modes that map to parent modes
             if (['QCM', 'QCM_BANK', 'LIBRARY', 'COURSE', 'STATS', 'ADVENTURE'].includes(currentMode)) {
                 const theoryBtn = document.querySelector('.desktop-main-nav .nav-menu-btn[data-target="THEORY"]');

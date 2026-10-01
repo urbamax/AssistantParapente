@@ -180,8 +180,10 @@ body.dark-theme .level-select-container:hover {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    display: flex;
-    justify-content: space-around;
+    /* Colonnes de même largeur : chaque bouton occupe une part égale de la barre. */
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
     align-items: center;
     width: max-content;
     min-width: 320px;
@@ -301,10 +303,16 @@ body {
     }
 }
 
-/* --- THEORY HEADER DROPDOWN --- */
+/* --- SOUS-MENUS DE LA BARRE (Théorie, Carnet, Sécurité) --- */
 .nav-dropdown {
     position: relative;
-    display: inline-block;
+    display: flex;
+    justify-content: center;
+}
+
+.desktop-main-nav > .nav-menu-btn,
+.nav-dropdown > .nav-menu-btn {
+    width: 100%;
 }
 
 
@@ -334,3 +342,46 @@ body {
     display: flex !important;
 }
 
+
+/* Panneau d'un sous-menu, ouvert au-dessus de son bouton. */
+.nav-dropdown > .nav-dropdown-menu {
+    position: absolute;
+    bottom: calc(100% + 15px);
+    left: 0;
+    flex-direction: column;
+    min-width: 160px;
+    padding: 8px;
+    background: var(--bg-card, #fff);
+    border: 1px solid var(--border-color, #eee);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+/* Sous-menu d'un bouton proche du bord droit : il s'ouvre vers la gauche. */
+.nav-dropdown > .nav-dropdown-menu-end {
+    left: auto;
+    right: 0;
+}
+
+.desktop-main-nav .nav-dropdown-menu .nav-menu-btn {
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 10px;
+    white-space: nowrap;
+}
+
+.desktop-main-nav .nav-dropdown-menu .nav-menu-btn i {
+    font-size: 1.2rem;
+}
+
+/* Sous-partie affichée (Historique, Urgence…) dans le sous-menu de son écran. */
+.desktop-main-nav .nav-dropdown-menu .nav-menu-btn[aria-current='true'] {
+    color: var(--primary-color);
+}
+
+.desktop-main-nav .nav-dropdown-menu .nav-menu-btn-urgent {
+    color: var(--accent-red);
+}

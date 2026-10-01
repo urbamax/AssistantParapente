@@ -25,11 +25,12 @@ test.describe('E2E - Logbook Offline Flow', () => {
     test('Ajout de vol hors-ligne puis synchronisation', async ({ page, context }) => {
         page.on('console', (msg) => console.log('BROWSER:', msg.text()));
         page.on('pageerror', (err) => console.log('PAGE_ERROR:', err.message));
-        // 1. Accéder au carnet de vol
+        // 1. Accéder au carnet de vol (sous-menu « Carnet » de la barre de navigation)
         const navLink = page.locator('.nav-menu-btn[data-target="LOGBOOK"]').first();
         // On attend que la navigation soit visible
         await navLink.waitFor({ state: 'visible' });
         await navLink.click();
+        await page.locator('[data-action="openLogbookSection"][data-args="\'history\'"]').click();
 
         // S'assurer qu'on est sur la vue Carnet
         await expect(page.locator('#logbook-screen')).toHaveClass(/active/);
@@ -37,12 +38,11 @@ test.describe('E2E - Logbook Offline Flow', () => {
         // 2. Simuler une déconnexion (Hors-ligne)
         await context.setOffline(true);
 
-        // 3. Ouvrir le formulaire d'ajout
-        // Il y a un bouton switchTab 'add'
-        await page.locator('[data-action="switchTab"][data-args="\'add\'"]').first().click();
+        // 3. Ouvrir la fenêtre d'ajout depuis le sous-menu « Carnet »
+        await page.locator('#logbook-add-btn').click();
 
         // Attendre que le formulaire s'affiche
-        await expect(page.locator('#logbook-tab-add')).toBeVisible();
+        await expect(page.locator('#logbook-session-modal')).toBeVisible();
 
         // 4. Remplir le formulaire
         await page.fill('#lb-site', 'Montagne Test Offline');

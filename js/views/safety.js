@@ -157,28 +157,14 @@ class SafetyViewClass extends BaseView {
     renderPage() {
         return `
             <h2 class="page-title">${esc(S.title)}</h2>
-            <div class="safety-tabs" role="tablist" aria-label="${esc(S.tabsLabel)}">
-                <button type="button" role="tab" id="safety-tab-urgence" aria-controls="safety-panel-urgence"
-                    class="safety-tab safety-tab-urgent" data-action="SafetyswitchTab" data-args="urgence">
-                    <i class="ri-alarm-warning-line" aria-hidden="true"></i> ${esc(S.tabs.urgence)}
-                </button>
-                <button type="button" role="tab" id="safety-tab-prevol" aria-controls="safety-panel-prevol"
-                    class="safety-tab" data-action="SafetyswitchTab" data-args="prevol">
-                    <i class="ri-checkbox-multiple-line" aria-hidden="true"></i> ${esc(S.tabs.prevol)}
-                </button>
-                <button type="button" role="tab" id="safety-tab-sigr" aria-controls="safety-panel-sigr"
-                    class="safety-tab" data-action="SafetyswitchTab" data-args="sigr">
-                    <i class="ri-shield-check-line" aria-hidden="true"></i> ${esc(S.tabs.sigr)}
-                </button>
-            </div>
-            <section id="safety-panel-urgence" role="tabpanel" aria-labelledby="safety-tab-urgence" class="safety-panel">
+            <section id="safety-panel-urgence" aria-label="${esc(S.tabs.urgence)}" class="safety-panel">
                 ${this.renderEmergency()}
             </section>
-            <section id="safety-panel-prevol" role="tabpanel" aria-labelledby="safety-tab-prevol" class="safety-panel">
+            <section id="safety-panel-prevol" aria-label="${esc(S.tabs.prevol)}" class="safety-panel">
                 ${this.renderReady()}
                 ${this.renderPreflight()}
             </section>
-            <section id="safety-panel-sigr" role="tabpanel" aria-labelledby="safety-tab-sigr" class="safety-panel">
+            <section id="safety-panel-sigr" aria-label="${esc(S.tabs.sigr)}" class="safety-panel">
                 ${this.renderSigr()}
             </section>
         `;
@@ -430,14 +416,12 @@ class SafetyViewClass extends BaseView {
 
     applyTab() {
         TABS.forEach((tab) => {
-            const btn = /** @type {HTMLElement} */ (document.getElementById(`safety-tab-${tab}`));
             const panel = document.getElementById(`safety-panel-${tab}`);
-            const active = tab === this.activeTab;
-            if (btn) {
-                btn.setAttribute('aria-selected', String(active));
-                btn.classList.toggle('active', active);
-            }
-            if (panel) panel.hidden = !active;
+            if (panel) panel.hidden = tab !== this.activeTab;
+        });
+        // Rubrique affichée, signalée dans le sous-menu « Sécurité » de la barre de navigation
+        document.querySelectorAll('[data-safety-tab]').forEach((btn) => {
+            btn.setAttribute('aria-current', String(btn.getAttribute('data-safety-tab') === this.activeTab));
         });
     }
 

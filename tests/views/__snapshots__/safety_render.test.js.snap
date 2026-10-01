@@ -66,18 +66,7 @@ exports[`safety renders (spec 019: identical before and after moving the texts) 
 exports[`safety renders (spec 019: identical before and after moving the texts) > whole page 1`] = `
 "
             <h2 class="page-title">SÉCURITÉ</h2>
-            <div class="safety-tabs" role="tablist" aria-label="Rubriques sécurité">
-                <button type="button" role="tab" id="safety-tab-urgence" aria-controls="safety-panel-urgence" class="safety-tab safety-tab-urgent active" data-action="SafetyswitchTab" data-args="urgence" aria-selected="true">
-                    <i class="ri-alarm-warning-line" aria-hidden="true"></i> Urgence
-                </button>
-                <button type="button" role="tab" id="safety-tab-prevol" aria-controls="safety-panel-prevol" class="safety-tab" data-action="SafetyswitchTab" data-args="prevol" aria-selected="false">
-                    <i class="ri-checkbox-multiple-line" aria-hidden="true"></i> Check-lists
-                </button>
-                <button type="button" role="tab" id="safety-tab-sigr" aria-controls="safety-panel-sigr" class="safety-tab" data-action="SafetyswitchTab" data-args="sigr" aria-selected="false">
-                    <i class="ri-shield-check-line" aria-hidden="true"></i> Ma SIGR
-                </button>
-            </div>
-            <section id="safety-panel-urgence" role="tabpanel" aria-labelledby="safety-tab-urgence" class="safety-panel">
+            <section id="safety-panel-urgence" aria-label="Urgence" class="safety-panel">
                 
             <div class="safety-alert-actions">
                 <a class="safety-call-btn" href="tel:112">
@@ -190,7 +179,7 @@ exports[`safety renders (spec 019: identical before and after moving the texts) 
     </button>
         
             </section>
-            <section id="safety-panel-prevol" role="tabpanel" aria-labelledby="safety-tab-prevol" class="safety-panel" hidden="">
+            <section id="safety-panel-prevol" aria-label="Check-lists" class="safety-panel" hidden="">
                 
             <div class="safety-card">
                 <h3><i class="ri-traffic-light-line" aria-hidden="true"></i> Prêt pour le déco ?</h3>
@@ -316,7 +305,7 @@ exports[`safety renders (spec 019: identical before and after moving the texts) 
     </button>
         
             </section>
-            <section id="safety-panel-sigr" role="tabpanel" aria-labelledby="safety-tab-sigr" class="safety-panel" hidden="">
+            <section id="safety-panel-sigr" aria-label="Ma SIGR" class="safety-panel" hidden="">
                 
             <div class="safety-card">
                 <h3><i class="ri-shield-check-line" aria-hidden="true"></i> Stratégie individuelle de gestion des risques</h3>

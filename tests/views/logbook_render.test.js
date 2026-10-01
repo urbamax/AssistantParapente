@@ -9,11 +9,14 @@ import LogbookView from '../../js/views/logbook.js';
 // instantanés ont été enregistrés AVANT le déplacement des textes ; ils doivent rester identiques.
 const INDEX = readFileSync('index.html', 'utf8');
 // Seul l'écran du carnet est repris (un <template> ne charge ni styles ni scripts).
-const LOGBOOK_SCREEN = (() => {
-    const tpl = document.createElement('template');
-    tpl.innerHTML = INDEX.slice(INDEX.indexOf('<div id="logbook-screen"'));
-    return tpl.content.getElementById('logbook-screen').outerHTML;
-})();
+// Le formulaire d'ajout / modification vit dans sa fenêtre (#logbook-session-modal), hors de l'écran.
+const LOGBOOK_SCREEN = ['logbook-screen', 'logbook-session-modal']
+    .map((id) => {
+        const tpl = document.createElement('template');
+        tpl.innerHTML = INDEX.slice(INDEX.search(new RegExp(`<(div|dialog)\\s[^>]*id="${id}"`)));
+        return tpl.content.getElementById(id).outerHTML;
+    })
+    .join('');
 
 const METEO = { temperature: 21, ventVitesse: 14, ventRafales: 22, ventDirection: 250, weatherCode: 2 };
 const FLIGHT = {

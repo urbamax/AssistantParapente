@@ -20,9 +20,10 @@ test.describe('E2E - Logbook site coordinates picker', () => {
         await page.route('https://api.open-meteo.com/**', (route) => route.abort());
         await page.goto('/');
         await page.locator('.nav-menu-btn[data-target="LOGBOOK"]').first().click();
+        await page.locator('[data-action="openLogbookSection"][data-args="\'history\'"]').click();
         await expect(page.locator('#logbook-screen')).toHaveClass(/active/);
-        await page.locator('[data-action="switchTab"][data-args="\'add\'"]').first().click();
-        await expect(page.locator('#logbook-tab-add')).toBeVisible();
+        await page.locator('#logbook-add-btn').click();
+        await expect(page.locator('#logbook-session-modal')).toBeVisible();
         await page.locator('#btn-type-gonflage').first().click();
         await page.fill('#lb-lieu', 'Pente Test Carte');
         await page.fill('#lb-duree', '60');
@@ -71,7 +72,7 @@ test.describe('E2E - Logbook site coordinates picker', () => {
         await page.fill('#lb-coords', 'pas des coordonnées');
         await submit(page);
         await expect(page.locator('#lb-coords-error')).toBeVisible();
-        await expect(page.locator('#logbook-tab-add')).toBeVisible();
+        await expect(page.locator('#logbook-session-modal')).toBeVisible();
         expect(await savedSession(page)).toBeNull();
     });
 
@@ -81,7 +82,7 @@ test.describe('E2E - Logbook site coordinates picker', () => {
         await submit(page);
         await expect(page.locator('.logbook-card').filter({ hasText: 'PENTE TEST CARTE' }).first()).toBeVisible();
 
-        await page.locator('[data-action="LogbookswitchTab"][data-args="\'add\'"]').first().click();
+        await page.locator('#logbook-add-btn').click();
         await page.locator('#btn-type-gonflage').first().click();
         await page.fill('#lb-lieu', 'PENTE TEST CARTE');
         await expect(page.locator('#lb-coords')).toHaveValue('50.68122, 1.59233');
