@@ -138,6 +138,61 @@ describe('SafetyView', () => {
         });
     });
 
+    describe('pre-flight order bias', () => {
+        afterEach(() => vi.restoreAllMocks());
+
+        const shown = () =>
+            [...document.querySelectorAll('[data-check-index]')].map((b) => ({
+                i: Number(b.dataset.checkIndex),
+                num: b.querySelector('.safety-check-num').textContent,
+            }));
+
+        it('shuffles the points within each phase and numbers them in display order', async () => {
+            vi.spyOn(Math, 'random').mockReturnValue(0);
+            await mountFresh();
+            const items = shown();
+            // Les étapes restent dans l'ordre : 2 points, puis 4, puis 1.
+            expect(items.map((x) => x.i)).toEqual([1, 0, 3, 4, 5, 2, 6]);
+            expect(items.map((x) => x.num)).toEqual(['1', '2', '3', '4', '5', '6', '7']);
+            const labels = PREFLIGHT_CHECKLIST.flatMap((g) => g.items);
+            const first = document.querySelector('[data-check-index]');
+            expect(first.textContent).toContain(labels[1]);
+        });
+
+        it('reshuffles on reset and keeps the numbering in display order', async () => {
+            vi.spyOn(Math, 'random').mockReturnValue(0.9999);
+            await mountFresh();
+            expect(shown().map((x) => x.i)).toEqual([0, 1, 2, 3, 4, 5, 6]);
+            SafetyView.toggleCheck(0);
+            vi.spyOn(Math, 'random').mockReturnValue(0);
+            SafetyView.resetChecklist();
+            expect(shown().map((x) => x.i)).toEqual([1, 0, 3, 4, 5, 2, 6]);
+            expect(shown().map((x) => x.num)).toEqual(['1', '2', '3', '4', '5', '6', '7']);
+            expect(document.querySelectorAll('[aria-checked="true"]')).toHaveLength(0);
+        });
+
+        it('reads the remaining points aloud in display order with the displayed numbers', async () => {
+            vi.spyOn(Math, 'random').mockReturnValue(0);
+            await mountFresh();
+            const spoken = [];
+            window.speechSynthesis = /** @type {any} */ ({ cancel() {}, speak: (u) => spoken.push(u.text) });
+            window.SpeechSynthesisUtterance = /** @type {any} */ (
+                class {
+                    constructor(t) {
+                        this.text = t;
+                    }
+                }
+            );
+            const labels = PREFLIGHT_CHECKLIST.flatMap((g) => g.items);
+            SafetyView.toggleCheck(1); // affiché en n° 1
+            SafetyView.readChecklist();
+            expect(spoken[0]).not.toContain(labels[1]);
+            expect(spoken[0]).toContain(`Point 2 : ${labels[0]}.`);
+            expect(spoken[0].indexOf(labels[0])).toBeLessThan(spoken[0].indexOf(labels[3]));
+            delete window.speechSynthesis;
+        });
+    });
+
     describe('SIGR rating bias', () => {
         afterEach(() => vi.restoreAllMocks());
 
