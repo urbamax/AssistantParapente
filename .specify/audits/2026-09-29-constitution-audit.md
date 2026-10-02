@@ -165,7 +165,7 @@ a keyboard.
 ### C8. No centralised UI strings module
 Language constraint. Required for new or reworked features; does not exist yet.
 
-**Status (2026-09-30): in progress.** The module exists (`js/i18n/fr.js`, `t()`, since spec 001). Screens migrate one per feature: logbook done (spec 014), sites done (spec 015), safety done (spec 019), account messages and library done (spec 021), quiz done (spec 024), with a shared guard test; next: static `index.html`.
+**Status (2026-10-02): fixed.** Every screen's texts live in `js/i18n/fr.js`: logbook (spec 014), sites (015), safety (019), account and library (021), quiz (024), static HTML with keys (026); guard tests: `tests/views/inline_strings.test.js` and `tests/views/static_texts.test.js`.
 
 ### C9. Outdated `DOCUMENTATION.md`
 Governance. It says `npm run typecheck` is not in CI and cannot reach 0 errors (false since
