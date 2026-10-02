@@ -48,6 +48,24 @@ let isInitialized = false;
 // Clé localStorage pour persister la date de dernière synchro entre sessions
 const LAST_SYNC_STORAGE_KEY = 'firebase_last_sync';
 
+/**
+ * Lit une liste de suppressions en attente (tombstones : `deleted_flights`, `deleted_equipment`).
+ * Une valeur illisible ou qui n'est pas une liste compte comme vide, et seuls les identifiants
+ * texte non vides sont gardés : une liste abîmée ne doit ni faire planter la sauvegarde, ni faire
+ * supprimer dans le cloud des identifiants inventés (spec 024).
+ * @param {string} key
+ * @returns {string[]}
+ */
+function readTombstoneIds(key) {
+    let value;
+    try {
+        value = JSON.parse(localStorage.getItem(key) || '[]');
+    } catch {
+        return [];
+    }
+    return Array.isArray(value) ? value.filter((id) => typeof id === 'string' && id !== '') : [];
+}
+
 // We will expose this engine to the window object so it can be called from non-module scripts
 const SYNC_DOT_TITLES = {
     syncing: t('account.syncDot.syncing'),
@@ -499,10 +517,7 @@ export const FirebaseAuthEngine = {
 
             // --- Sync Logbook ---
             // 0. Process Tombstones (Deleted items) FIRST
-            let deletedFlights = [];
-            try {
-                deletedFlights = JSON.parse(localStorage.getItem('deleted_flights') || '[]');
-            } catch {}
+            const deletedFlights = readTombstoneIds('deleted_flights');
 
             if (deletedFlights.length > 0) {
                 for (const delId of deletedFlights) {
@@ -557,15 +572,7 @@ export const FirebaseAuthEngine = {
             // Re-read tombstones here in case a deletion happened concurrently while this sync
             // was running (race condition: deleteLogbookEntry fires async, sync reads cloud
             // before the delete completes → cloud still has the doc → merge would re-add it).
-            let deletedFlightsAtMerge = [];
-            try {
-                deletedFlightsAtMerge = JSON.parse(localStorage.getItem('deleted_flights') || '[]');
-            } catch {}
-            const deletedFlightsSet = new Set(
-                Array.isArray(deletedFlightsAtMerge)
-                    ? deletedFlightsAtMerge.filter((id) => typeof id === 'string')
-                    : [],
-            );
+            const deletedFlightsSet = new Set(readTombstoneIds('deleted_flights'));
 
             const mergedLogbookMap = new Map();
             localLogbook.forEach((session) => mergedLogbookMap.set(session.id, session));
@@ -603,11 +610,7 @@ export const FirebaseAuthEngine = {
 
             // --- Sync Equipment ---
             // 0. Process Tombstones (Deleted items) FIRST, comme pour les vols (spec 015)
-            let deletedEquip = [];
-            try {
-                deletedEquip = JSON.parse(localStorage.getItem('deleted_equipment') || '[]');
-            } catch {}
-            if (!Array.isArray(deletedEquip)) deletedEquip = [];
+            const deletedEquip = readTombstoneIds('deleted_equipment');
 
             if (deletedEquip.length > 0) {
                 for (const delId of deletedEquip) {
@@ -663,13 +666,7 @@ export const FirebaseAuthEngine = {
 
             // 2. Smart Merge: Compare updatedAt
             // Re-read tombstones (same race-condition guard as logbook above).
-            let deletedEquipAtMerge = [];
-            try {
-                deletedEquipAtMerge = JSON.parse(localStorage.getItem('deleted_equipment') || '[]');
-            } catch {}
-            const deletedEquipSet = new Set(
-                Array.isArray(deletedEquipAtMerge) ? deletedEquipAtMerge.filter((id) => typeof id === 'string') : [],
-            );
+            const deletedEquipSet = new Set(readTombstoneIds('deleted_equipment'));
 
             const mergedEquipMap = new Map();
             localEquip.forEach((item) => mergedEquipMap.set(item.id, item));
@@ -1142,8 +1139,8 @@ export const FirebaseAuthEngine = {
             [StorageService.KEYS.EXAM_HISTORY]: StorageService.get(StorageService.KEYS.EXAM_HISTORY),
             [StorageService.KEYS.PENDING_QUIZ]: StorageService.get(StorageService.KEYS.PENDING_QUIZ),
             // --- Clés système supplémentaires ---
-            deleted_flights: JSON.parse(localStorage.getItem('deleted_flights') || '[]'),
-            deleted_equipment: JSON.parse(localStorage.getItem('deleted_equipment') || '[]'),
+            deleted_flights: readTombstoneIds('deleted_flights'),
+            deleted_equipment: readTombstoneIds('deleted_equipment'),
             LAST_ACTIVE_ROUTE: localStorage.getItem('LAST_ACTIVE_ROUTE'),
             firebase_last_sync: localStorage.getItem(LAST_SYNC_STORAGE_KEY),
         };
