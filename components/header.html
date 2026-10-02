@@ -1,19 +1,19 @@
 <div role="button" tabindex="0" class="floating-logo" data-action="showManual" data-args="about" style="cursor:pointer; pointer-events: auto;">
-    <img src="img/logo.png?v=2026.10.01_v20" alt="Assistant Parapente" class="logo-image" />
+    <img data-i18n-alt="header.altAssistantParapente" src="img/logo.png?v=2026.10.01_v20" alt="Assistant Parapente" class="logo-image" />
 </div>
 
 <div class="floating-user-menu" style="pointer-events: auto;">
     <div class="level-select-container">
         <select id="global-level-select" data-action="changeLevel" autocomplete="off">
-            <option value="ALL">Tous les niveaux</option>
-            <option value="BI">Brevet Initial</option>
-            <option value="BP">Brevet Pilote</option>
-            <option value="BPC">Brevet Pilote Confirmé</option>
-            <option value="TREUIL">Treuil</option>
+            <option data-i18n="header.tousLesNiveaux" value="ALL">Tous les niveaux</option>
+            <option data-i18n="header.brevetInitial" value="BI">Brevet Initial</option>
+            <option data-i18n="header.brevetPilote" value="BP">Brevet Pilote</option>
+            <option data-i18n="header.brevetPiloteConfirme" value="BPC">Brevet Pilote Confirmé</option>
+            <option data-i18n="header.treuil" value="TREUIL">Treuil</option>
         </select>
     </div>
     
-    <button id="theme-toggle" class="icon-btn" data-action="toggleTheme" title="Mode: Auto (Système)">
+    <button data-i18n-title="header.titleModeAutoSysteme" id="theme-toggle" class="icon-btn" data-action="toggleTheme" title="Mode: Auto (Système)">
         <div class="auto-icon-composite">
             <i class="ri-sun-line"></i>
             <i class="ri-moon-line"></i>
@@ -21,7 +21,7 @@
     </button>
     
     <div class="auth-btn-wrapper">
-        <button id="auth-btn" class="icon-btn" data-action="FirebaseAuthopenAuthModal" title="Espace Personnel / Connexion">
+        <button data-i18n-title="header.titleEspacePersonnel" id="auth-btn" class="icon-btn" data-action="FirebaseAuthopenAuthModal" title="Espace Personnel / Connexion">
             <i class="ri-user-line"></i>
         </button>
         <div id="auth-active-dot" class="auth-active-dot"></div>
