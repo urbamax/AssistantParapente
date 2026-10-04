@@ -197,6 +197,20 @@ const IGCParser = {
             if (d < -180) d += 360;
             dh[k] = d;
         }
+        // Facteur de charge estimé en virage : accélération centripète v·ω, lissée sur 3 points
+        // (vitesse sol : sans le vent réel, c'est une estimation ; un capteur fait mieux).
+        let estimatedMaxG = 1;
+        for (let k = 2; k < n - 2; k++) {
+            const dtS = (S[k + 2].timestamp - S[k - 2].timestamp) / 1000;
+            if (dtS <= 0) continue;
+            const omega = (((dh[k - 1] + dh[k] + dh[k + 1]) / 3) * Math.PI) / 180 / (dtS / 4);
+            let pathM = 0;
+            for (let m = k - 1; m <= k + 2; m++) pathM += dist(S[m - 1], S[m]) * 1000;
+            const v = pathM / dtS;
+            const gLoad = Math.sqrt(1 + ((v * omega) / 9.81) ** 2);
+            if (gLoad > estimatedMaxG) estimatedMaxG = gLoad;
+        }
+
         const prefix = [0];
         for (let k = 0; k < n; k++) prefix.push(prefix[k] + dh[k]);
         const circling = new Array(n).fill(false);
@@ -325,6 +339,7 @@ const IGCParser = {
             straightDistanceKm: round1(straightKm),
             maxFromTakeoffKm: round1(maxFromTakeoffKm),
             freeDistanceKm: round1(freeDistanceKm),
+            estimatedMaxG: round1(estimatedMaxG),
         };
     },
 

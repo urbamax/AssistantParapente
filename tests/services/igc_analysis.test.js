@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
 import IGCParser from '../../js/services/igc_parser.js';
 
 const M_PER_DEG_LAT = 111320;
@@ -108,8 +109,34 @@ describe('IGCParser.analyzeFlight', () => {
         expect(a.thermalCount).toBe(0);
     });
 
+    it('estimates the load factor in turns (v x turn rate)', () => {
+        // Spirale à 60 km/h sur 20 m de rayon : v²/r = 13,9 m/s², soit ~1,7 g
+        const spiral = { seconds: 40, circle: { speedKmh: 60, radiusM: 20, verticalMs: -8, direction: 1 } };
+        const a = IGCParser.analyzeFlight(buildFlight([glide(60), spiral, glide(60)]));
+        expect(a.estimatedMaxG).toBeGreaterThan(1.5);
+        expect(a.estimatedMaxG).toBeLessThan(1.9);
+        expect(IGCParser.analyzeFlight(buildFlight([glide(300)])).estimatedMaxG).toBe(1);
+    });
+
     it('returns null for too short a track', () => {
         expect(IGCParser.analyzeFlight([])).toBeNull();
         expect(IGCParser.analyzeFlight(buildFlight([glide(1)]))).toBeNull();
+    });
+});
+
+describe('IGCParser on a real Syride track (winch launch, 8s on approach)', () => {
+    const parsed = IGCParser.parse(readFileSync('tests/fixtures/syride-2026-10-03.igc', 'utf8'));
+
+    it('matches what Syride shows', () => {
+        const takeoff = parsed.points[parsed.takeoffIndex];
+        const landing = parsed.points[parsed.landingIndex];
+        expect(takeoff.alt).toBe(166);
+        expect(landing.alt).toBeLessThanOrEqual(168); // Syride : 166 m
+        expect(parsed.maxAltitude).toBe(425);
+        expect(parsed.gain).toBe(259);
+        expect(parsed.duration).toBeGreaterThanOrEqual(4);
+        expect(parsed.analysis.freeDistanceKm).toBeCloseTo(2, 0); // Syride : 2 km
+        expect(parsed.analysis.thermalCount).toBe(0);
+        expect(parsed.analysis.estimatedMaxG).toBeLessThan(1.4); // capteur Syride : 1,3 g max (largage)
     });
 });

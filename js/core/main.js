@@ -44,12 +44,12 @@ async function bootApplication() {
     const globalInput = document.getElementById('global-igc-input');
     if (globalInput) {
         globalInput.addEventListener('change', (e) => {
-            const file = /** @type {HTMLInputElement} */ (e.target).files[0];
-            if (!file) return;
+            const files = /** @type {HTMLInputElement} */ (e.target).files;
+            if (!files || !files.length) return;
             // Réutilise le traitement de logbook.js (parsing + remplissage + géolocalisation
             // du site par reverse-geocoding) plutôt qu'une copie qui en divergeait et
             // laissait le site à "Lieu détecté (GPS)" sans jamais le résoudre.
-            LogbookView._processIgcFile(file);
+            LogbookView._processFiles(files);
             /** @type {HTMLInputElement} */ (e.target).value = ''; // Reset indispensable
         });
     }

@@ -3,6 +3,7 @@
  * Wrapped from logbook_engine.js
  */
 import LogbookService from '../services/logbook_service.js';
+import SdfParser from '../services/sdf_parser.js';
 import Map3DComponent from '../components/map_3d.js';
 import StorageService from '../services/storage.js'; // Retained just for custom select lists
 import SitesService from '../services/sites_service.js';
@@ -1260,9 +1261,7 @@ class LogbookViewClass extends BaseView {
                 uploadContainer.style.borderColor = 'var(--border-light, #ccc)';
                 uploadContainer.style.background = 'var(--bg-card, #f9f9f9)';
                 if (e.dataTransfer && e.dataTransfer.files.length > 0) {
-                    const file = e.dataTransfer.files[0];
-                    if (!file) return;
-                    this._processIgcFile(file);
+                    this._processFiles(e.dataTransfer.files);
                 }
             });
         }
@@ -1389,11 +1388,16 @@ class LogbookViewClass extends BaseView {
     // null = correction d'altitude non touchée dans ce formulaire (on ne réécrit pas altOffset)
     currentIgcAltOffset = null;
 
-    handleIgcUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+    // Capteurs du vario (facteur de charge, température) lus dans le .sdf Syride
+    currentSensorStats = null;
+    // Trace du formulaire en cours (import ou vol modifié), pour caler le .sdf dessus
+    currentTraceInfo = null;
 
-        this._processIgcFile(file);
+    handleIgcUpload(event) {
+        const files = event.target.files;
+        if (!files || !files.length) return;
+
+        this._processFiles(files);
 
         // Permettre de re-sélectionner le même fichier si besoin
         if (event.target && event.target.type === 'file') {
@@ -1404,11 +1408,64 @@ class LogbookViewClass extends BaseView {
     // Partagé par la sélection de fichier (handleIgcUpload) et le drag-and-drop sur la
     // zone d'import, pour que les deux voies remplissent le formulaire à l'identique
     // (site géolocalisé inclus) au lieu de dupliquer la logique.
+    // Un ou plusieurs fichiers choisis ou déposés : la trace .igc d'abord, puis le .sdf Syride
+    // (même vol) qui s'y cale pour le facteur de charge et la température.
+    async _processFiles(fileList) {
+        const files = Array.from(fileList || []);
+        const isSdf = (f) => /\.sdf$/i.test(f.name);
+        const trace = files.find((f) => !isSdf(f));
+        const sdf = files.find(isSdf);
+        if (trace) await this._processIgcFile(trace);
+        if (sdf) await this._processSdfFile(sdf);
+    }
+
+    async _processSdfFile(file) {
+        const filenameLabel = document.getElementById('igc-upload-filename');
+        const records = SdfParser.parse(await file.arrayBuffer());
+        if (!records) {
+            alert(tl('igc.sdfInvalid', { name: file.name }));
+            return;
+        }
+        // Trace de référence : celle qu'on vient d'importer, sinon celle du vol modifié
+        let info = this.currentTraceInfo;
+        const editId = /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit'))?.value;
+        if (!info && editId) {
+            const raw = await LogbookService.getFlightTrace(editId);
+            const parsed = raw ? LogbookService.parseIGC(raw) : null;
+            if (parsed && parsed.success) info = parsed.data;
+        }
+        let from = 0;
+        let to = records.length - 1;
+        if (info) {
+            const offset = SdfParser.alignToTrace(records, info.points);
+            if (offset < 0) {
+                alert(tl('igc.sdfMismatch'));
+                return;
+            }
+            // Un enregistrement par seconde, à partir du premier point de la trace
+            const t0 = info.points[0].timestamp;
+            const at = (i) => offset + Math.round((info.points[i].timestamp - t0) / 1000);
+            from = at(info.takeoffIndex || 0);
+            to = at(info.landingIndex ?? info.points.length - 1);
+        }
+        this.currentSensorStats = { ...SdfParser.summarize(records, from, to), source: 'sdf' };
+        if (filenameLabel) {
+            filenameLabel.textContent = tl('igc.sdfLoaded', {
+                name: file.name,
+                gMax: this.currentSensorStats.gMax,
+                temp: this.currentSensorStats.tempTakeoff,
+            });
+        }
+    }
+
     _processIgcFile(file) {
         const filenameLabel = document.getElementById('igc-upload-filename');
         if (filenameLabel) filenameLabel.textContent = tl('igc.fileLoaded', { name: file.name });
 
+        let done;
+        const finished = new Promise((resolve) => (done = resolve));
         const reader = new FileReader();
+        reader.onerror = () => done();
         reader.onload = async (e) => {
             const text = e.target.result;
             this.currentRawIgc = text;
@@ -1450,15 +1507,21 @@ class LogbookViewClass extends BaseView {
                     }
                 }
                 this._setupAltitudeCheck(parsed);
+                this.currentTraceInfo = parsed;
+                // Nouvelle trace : un .sdf d'un autre vol ne s'applique plus
+                this.currentSensorStats = null;
                 console.log('[IGC] Trace parsée :', parsed.points.length, 'points, durée :', parsed.duration, 'min');
             } else {
                 alert(tl('igc.parseError', { error: flightStats.error }));
                 this.currentTraceData = null;
                 this.currentRawIgc = null;
                 this.currentIgcStats = null;
+                this.currentTraceInfo = null;
             }
+            done();
         };
         reader.readAsText(file);
+        return finished;
     }
 
     // Champs du formulaire déduits de la trace : date du décollage, durée, altitude max
@@ -1699,6 +1762,11 @@ class LogbookViewClass extends BaseView {
                 Object.assign(session, this.currentIgcStats);
                 this.currentIgcStats = null; // reset
             }
+            if (this.currentSensorStats) {
+                session.sensorStats = this.currentSensorStats;
+                this.currentSensorStats = null;
+            }
+            this.currentTraceInfo = null;
             if (this.currentRawIgc) {
                 session.rawIgc = this.currentRawIgc;
                 this.currentRawIgc = null; // reset
@@ -1782,6 +1850,8 @@ class LogbookViewClass extends BaseView {
         this.currentTraceData = null;
         this.currentIgcStats = null;
         this.currentIgcAltOffset = null;
+        this.currentSensorStats = null;
+        this.currentTraceInfo = null;
         const filenameLabel = document.getElementById('igc-upload-filename');
         if (filenameLabel) filenameLabel.textContent = tl('form.igcHint');
         this.renderForm();
@@ -2093,8 +2163,9 @@ class LogbookViewClass extends BaseView {
     // Statistiques détaillées d'un vol calculées depuis sa trace (IGCParser.analyzeFlight),
     // repliées sous la carte. Les altitudes absolues reçoivent la correction du pilote.
     renderFlightAnalysis(session) {
-        const a = session.igcStats;
-        if (!a || typeof a !== 'object') return '';
+        const sensors = session.sensorStats && typeof session.sensorStats === 'object' ? session.sensorStats : null;
+        const a = session.igcStats && typeof session.igcStats === 'object' ? session.igcStats : sensors ? {} : null;
+        if (!a) return '';
         const offset = Number(session.altOffset) || 0;
         const num = (v) => typeof v === 'number' && Number.isFinite(v);
         const row = (key, value, cond = true) =>
@@ -2134,6 +2205,14 @@ class LogbookViewClass extends BaseView {
             row('maxFromTakeoff', `${a.maxFromTakeoffKm} km`, num(a.maxFromTakeoffKm)) +
             row('straightDistance', `${a.straightDistanceKm} km`, num(a.straightDistanceKm));
 
+        // Facteur de charge : mesuré par l'accéléromètre (.sdf Syride), sinon estimé depuis
+        // les virages de la trace.
+        const loads = sensors
+            ? row('gMax', `${sensors.gMax} g`, num(sensors.gMax)) +
+              row('gMin', `${sensors.gMin} g`, num(sensors.gMin)) +
+              row('temperature', tt('analysis.temperatureValue', sensors), num(sensors.tempTakeoff))
+            : row('gEstimated', `≈ ${a.estimatedMaxG} g`, num(a.estimatedMaxG));
+
         return `
                     <details class="flight-analysis">
                         <summary><i class="ri-bar-chart-2-line"></i> ${tt('analysis.title')}</summary>
@@ -2143,6 +2222,7 @@ class LogbookViewClass extends BaseView {
                             ${group('thermals', thermals)}
                             ${group('glides', glides)}
                             ${group('distances', distances)}
+                            ${group(sensors ? 'sensors' : 'loads', loads)}
                         </div>
                     </details>`;
     }
@@ -2162,6 +2242,7 @@ class LogbookViewClass extends BaseView {
             ['maxClimb', 'maxClimbRate', (v) => `+${v} m/s`],
             ['bestGlide', 'igcStats.bestGlideRatio', (v) => v],
             ['maxSpeed', 'maxSpeedKmh', (v) => `${v} km/h`],
+            ['gMax', 'sensorStats.gMax', (v) => `${v} g`],
         ];
         let rows = '';
         for (const [key, path, format] of records) {
