@@ -105,3 +105,36 @@ describe('LogbookService.recomputeAllTraceStats', () => {
         expect(LogbookService.saveFlights).toHaveBeenCalledTimes(1);
     });
 });
+
+describe('instrument that recorded the flight', () => {
+    const instrument = {
+        manufacturer: 'XSR',
+        brand: 'Syride',
+        model: "SYS'Nav",
+        firmware: '3.42',
+        hardware: '1.0',
+        serial: '1234567890',
+    };
+
+    it('shows brand, model, serial number and firmware in the detailed stats', () => {
+        const html = LogbookView.renderFlightAnalysis(flight('f1', { igcStats: STATS, instrument }));
+        expect(html).toContain('Marque</span><strong>Syride');
+        expect(html).toContain('Modèle</span><strong>SYS&#39;Nav');
+        expect(html).toContain('Numéro de série</span><strong>1234567890');
+        expect(html).toContain('Version du logiciel</span><strong>3.42');
+    });
+
+    it('is shown even on a flight without detailed stats, without fake zero values', () => {
+        const html = LogbookView.renderFlightAnalysis(flight('f2', { instrument }));
+        expect(html).toContain('Numéro de série');
+        expect(html).not.toContain('Thermiques');
+    });
+
+    it('is saved with the stats when all traces are recomputed', async () => {
+        LogbookService.flights = [flight('f3')];
+        vi.spyOn(LogbookService, 'getFlightTrace').mockResolvedValue('IGC');
+        vi.spyOn(LogbookService, 'parseIGC').mockReturnValue({ success: true, data: { analysis: STATS, instrument } });
+        await LogbookService.recomputeAllTraceStats();
+        expect(LogbookService.getFlightById('f3').instrument).toEqual(instrument);
+    });
+});

@@ -69,6 +69,7 @@ describe('logbook: Syride .sdf with the .igc', () => {
         expect(saved.igcStats.estimatedMaxG).toBeGreaterThanOrEqual(1);
 
         expect(saved.typeVol).toBe('Treuil'); // départ au treuil reconnu dans la trace
+        expect(saved.instrument).toMatchObject({ brand: 'Syride', model: "SYS'Nav", firmware: '3.42' });
         expect(saved.sensorStats.gRelease).toBe(1.3); // pic de G au largage
 
         const html = LogbookView.renderFlightAnalysis(saved);

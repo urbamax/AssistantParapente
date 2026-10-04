@@ -117,7 +117,68 @@ const IGCParser = {
             maxSpeedKmh: maxSpeedKmh,
             avgSpeedKmh: avgSpeedKmh,
             analysis: analysis,
+            instrument: this.parseInstrument(lines),
         };
+    },
+
+    /**
+     * Instrument qui a enregistré la trace, lu dans l'en-tête de l'IGC (enregistrement A et
+     * lignes H). Syride ne met pas son numéro de série dans l'enregistrement A mais dans le champ
+     * « classe de compétition » (HFCCL) : on le prend là quand c'est un numéro.
+     * @param {string[]} lines lignes du fichier IGC
+     * @returns {{manufacturer?:string, brand?:string, model?:string, firmware?:string,
+     *   hardware?:string, gps?:string, pressureSensor?:string, serial?:string}|null}
+     */
+    // Codes fabricant (enregistrement A) les plus courants en vol libre
+    IGC_MANUFACTURERS: {
+        XSR: 'Syride',
+        FLY: 'Flymaster',
+        XCT: 'XC Tracer',
+        XCS: 'XCSoar',
+        FLA: 'FLARM',
+        LXN: 'LX Navigation',
+        NKL: 'Naviter',
+        XGD: 'Gpsdump',
+        XSK: 'Skytraxx',
+        XFH: 'Flytec',
+        XBR: 'Bräuniger',
+    },
+
+    parseInstrument: function (lines) {
+        const header = {};
+        let aRecord = '';
+        for (const raw of lines || []) {
+            const line = raw.trim();
+            if (line.startsWith('B')) break; // fin de l'en-tête
+            if (line.startsWith('A') && !aRecord) aRecord = line.slice(1);
+            const h = line.match(/^H[FOP]([A-Z]{3})(.*)$/);
+            if (!h || header[h[1]] !== undefined) continue;
+            // Format « HFRFWFIRMWAREVERSION: 3.42 » (avec libellé) ou ancien format « HFRFW3.42 »
+            const rest = h[2];
+            const value = rest.includes(':') ? rest.slice(rest.indexOf(':') + 1) : rest;
+            header[h[1]] = value.trim();
+        }
+        const clean = (v) => (v && !/^(not set|unknown|-|0)$/i.test(v) ? v.replace(/\s*,\s*/g, ', ') : undefined);
+        const manufacturer = aRecord.slice(0, 3) || undefined;
+        const aSerial = aRecord.slice(3).replace(/[^A-Za-z0-9]/g, '');
+        const cclSerial = /^\d{6,}$/.test(header.CCL || '') ? header.CCL : '';
+        // « Syride, SYS'Nav » : marque puis modèle ; sinon marque d'après le code fabricant
+        const type = clean(header.FTY) || '';
+        const comma = type.indexOf(',');
+        const brand = comma > 0 ? type.slice(0, comma).trim() : this.IGC_MANUFACTURERS[manufacturer];
+        const model = comma > 0 ? type.slice(comma + 1).trim() : type;
+        const instrument = {
+            manufacturer,
+            brand: brand || undefined,
+            model: model || undefined,
+            firmware: clean(header.RFW),
+            hardware: clean(header.RHW),
+            gps: clean(header.GPS),
+            pressureSensor: clean(header.PRS),
+            serial: aSerial || cclSerial || undefined,
+        };
+        Object.keys(instrument).forEach((k) => instrument[k] === undefined && delete instrument[k]);
+        return Object.keys(instrument).length ? instrument : null;
     },
 
     /** Cap en degrés (0 = nord, sens horaire) de a vers b. */

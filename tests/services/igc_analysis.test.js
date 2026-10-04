@@ -167,3 +167,70 @@ describe('IGCParser on a real Syride track (winch launch, 8s on approach)', () =
         expect(parsed.analysis.winch.towDistanceKm).toBeCloseTo(0.75, 1);
     });
 });
+
+describe('IGCParser.parseInstrument', () => {
+    const header = (...lines) => [...lines, 'B1006055025600N00223844EA000020016601517'];
+
+    it('reads a Syride header, its serial number being in the competition class field', () => {
+        const instrument = IGCParser.parseInstrument(
+            header(
+                'AXSR',
+                'HFDTE010726',
+                'HFRFWFIRMWAREVERSION: 3.42',
+                'HFRHWHARDWAREVERSION: 1.0',
+                "HFFTYFRTYPE: Syride, SYS'Nav",
+                'HFGPS: Quectel,L76-M33,99ch,10000m',
+                'HFPRSPRESSALTSENSOR: TE,MS5607,11000m',
+                'HFCIDCOMPETITIONID: ',
+                'HFCCLCOMPETITIONCLASS: 1234567890',
+            ),
+        );
+        expect(instrument).toEqual({
+            manufacturer: 'XSR',
+            brand: 'Syride',
+            model: "SYS'Nav",
+            firmware: '3.42',
+            hardware: '1.0',
+            gps: 'Quectel, L76-M33, 99ch, 10000m',
+            pressureSensor: 'TE, MS5607, 11000m',
+            serial: '1234567890',
+        });
+    });
+
+    it('takes the serial number of the A record, and reads the old header format', () => {
+        const instrument = IGCParser.parseInstrument(
+            header(
+                'AXCTABC123 FLIGHT:1',
+                'HFFTYFR TYPE:XCTRACER,XC TRACER II',
+                'HFRFW1.7',
+                'HFCCLCOMPETITIONCLASS:Sport',
+            ),
+        );
+        expect(instrument).toMatchObject({
+            manufacturer: 'XCT',
+            brand: 'XCTRACER',
+            model: 'XC TRACER II',
+            serial: 'ABC123FLIGHT1',
+            firmware: '1.7',
+        });
+        // Sans marque dans le type, celle du code fabricant
+        expect(IGCParser.parseInstrument(header('AFLY01234', 'HFFTYFRTYPE:Flymaster GPS'))).toMatchObject({
+            brand: 'Flymaster',
+            model: 'Flymaster GPS',
+            serial: '01234',
+        });
+    });
+
+    it('ignores empty or "not set" fields, and the lines after the header', () => {
+        expect(
+            IGCParser.parseInstrument(['HFGTYGLIDERTYPE: not set', 'B1006055025600N00223844EA0000200166']),
+        ).toBeNull();
+        expect(IGCParser.parseInstrument(header('HFRFWFIRMWAREVERSION: not set'))).toBeNull();
+    });
+
+    it('is returned by parse() with the flight (anonymised fixture: no serial number)', () => {
+        const parsed = IGCParser.parse(readFileSync('tests/fixtures/syride-winch-flight.igc', 'utf8'));
+        expect(parsed.instrument).toMatchObject({ brand: 'Syride', model: "SYS'Nav", firmware: '3.42' });
+        expect(parsed.instrument.serial).toBeUndefined();
+    });
+});
