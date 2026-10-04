@@ -35,8 +35,8 @@ function buildIgc() {
 const FLIGHT = {
     id: 'f1',
     type: 'vol',
-    datetime: '2026-10-03T12:00',
-    site: 'FERME D’ANTIN | TREUIL',
+    datetime: '2026-07-01T12:00',
+    site: 'FERME TEST | TREUIL',
     voile: 'Ma voile',
     duree: 3, // ancien calcul, faux
     typeVol: 'Plouf',
@@ -44,7 +44,7 @@ const FLIGHT = {
     altitudeMax: 999,
     gain: 0,
     commentaire: 'Travail des 8 en approche.',
-    ecole: 'FIL D’ARIANE',
+    ecole: 'ÉCOLE TEST',
     lat: 50.1,
     lon: 2.1,
     altOffset: 5,
@@ -89,8 +89,8 @@ describe('logbook: recalculate a flight from its stored IGC trace', () => {
     });
 
     it('updates the trace-derived fields and keeps everything else', async () => {
-        const antin = { nom: 'ANTIN', latitude: 50.3, longitude: 2.5, type: ['TREUIL'], affiche: true };
-        SitesService.getSites.mockReturnValue([antin]);
+        const plaine = { nom: 'PLAINE', latitude: 50.3, longitude: 2.5, type: ['TREUIL'], affiche: true };
+        SitesService.getSites.mockReturnValue([plaine]);
         LogbookView.editEntry('f1');
         await flush();
         const wing = /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile'));
@@ -107,7 +107,7 @@ describe('logbook: recalculate a flight from its stored IGC trace', () => {
         expect(saved).toMatchObject({
             duree: 10,
             altitudeMax: 605,
-            site: 'ANTIN', // site connu le plus proche du décollage
+            site: 'PLAINE', // site connu le plus proche du décollage
             voile: FLIGHT.voile,
             typeVol: FLIGHT.typeVol,
             techDecollage: FLIGHT.techDecollage,
@@ -124,21 +124,21 @@ describe('logbook: recalculate a flight from its stored IGC trace', () => {
     it('offers every known site near the takeoff, and keeps the one already chosen', async () => {
         const site = (nom, lat) => ({ nom, latitude: lat, longitude: 2.5, type: ['NATUREL'], affiche: true });
         // Le site choisi est le plus éloigné (~220 m), l'autre est à ~110 m.
-        LogbookService.flights[0].site = 'ANTIN TREUIL';
-        SitesService.getSites.mockReturnValue([site('ANTIN PENTE', 50.301), site('ANTIN TREUIL', 50.302)]);
+        LogbookService.flights[0].site = 'PLAINE TREUIL';
+        SitesService.getSites.mockReturnValue([site('PLAINE PENTE', 50.301), site('PLAINE TREUIL', 50.302)]);
         LogbookView.editEntry('f1');
         await flush();
         await LogbookView.recalculateFromTrace();
 
-        expect($('lb-site').value).toBe('ANTIN TREUIL');
+        expect($('lb-site').value).toBe('PLAINE TREUIL');
         const choices = /** @type {HTMLElement} */ (document.getElementById('lb-site-choices'));
         expect(choices.hidden).toBe(false);
         const buttons = Array.from(choices.querySelectorAll('button'));
-        expect(buttons.map((b) => b.textContent)).toEqual(['ANTIN PENTE', 'ANTIN TREUIL']);
+        expect(buttons.map((b) => b.textContent)).toEqual(['PLAINE PENTE', 'PLAINE TREUIL']);
         expect(buttons[1].getAttribute('aria-pressed')).toBe('true');
 
         LogbookView.pickSiteChoice('0');
-        expect($('lb-site').value).toBe('ANTIN PENTE');
+        expect($('lb-site').value).toBe('PLAINE PENTE');
         expect(choices.querySelectorAll('button')[0].getAttribute('aria-pressed')).toBe('true');
     });
 

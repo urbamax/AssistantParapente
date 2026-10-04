@@ -30,8 +30,8 @@ const STATS = {
 const flight = (id, extra = {}) => ({
     id,
     type: 'vol',
-    datetime: '2026-10-03T12:06',
-    site: 'ANTIN <b>',
+    datetime: '2026-07-01T12:06',
+    site: 'PLAINE <b>',
     voile: 'V',
     duree: 10,
     maxClimbRate: 2.5,
@@ -78,7 +78,7 @@ describe('LogbookView.renderRecords', () => {
         expect(html).toContain('Plus long vol</span>\n                        <strong class="record-value">1h 35min');
         expect(html).toContain('12.3 km');
         expect(html).toContain('+3.4 m/s');
-        expect(html).toContain('ANTIN &lt;b&gt;');
+        expect(html).toContain('PLAINE &lt;b&gt;');
         expect(html).toContain('Sur 2 vols avec trace : 8.4 km parcourus');
     });
 
@@ -101,7 +101,40 @@ describe('LogbookService.recomputeAllTraceStats', () => {
         expect(await LogbookService.recomputeAllTraceStats()).toBe(1);
         const f = LogbookService.getFlightById('f1');
         expect(f).toMatchObject({ distanceKm: 4.9, maxClimbRate: 3, igcStats: STATS, syncPending: true });
-        expect(f).toMatchObject({ duree: 10, altitudeMax: 999, gain: 7, commentaire: 'garder', site: 'ANTIN <b>' });
+        expect(f).toMatchObject({ duree: 10, altitudeMax: 999, gain: 7, commentaire: 'garder', site: 'PLAINE <b>' });
         expect(LogbookService.saveFlights).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('instrument that recorded the flight', () => {
+    const instrument = {
+        manufacturer: 'XSR',
+        brand: 'Syride',
+        model: "SYS'Nav",
+        firmware: '3.42',
+        hardware: '1.0',
+        serial: '1234567890',
+    };
+
+    it('shows brand, model, serial number and firmware in the detailed stats', () => {
+        const html = LogbookView.renderFlightAnalysis(flight('f1', { igcStats: STATS, instrument }));
+        expect(html).toContain('Marque</span><strong>Syride');
+        expect(html).toContain('Modèle</span><strong>SYS&#39;Nav');
+        expect(html).toContain('Numéro de série</span><strong>1234567890');
+        expect(html).toContain('Version du logiciel</span><strong>3.42');
+    });
+
+    it('is shown even on a flight without detailed stats, without fake zero values', () => {
+        const html = LogbookView.renderFlightAnalysis(flight('f2', { instrument }));
+        expect(html).toContain('Numéro de série');
+        expect(html).not.toContain('Thermiques');
+    });
+
+    it('is saved with the stats when all traces are recomputed', async () => {
+        LogbookService.flights = [flight('f3')];
+        vi.spyOn(LogbookService, 'getFlightTrace').mockResolvedValue('IGC');
+        vi.spyOn(LogbookService, 'parseIGC').mockReturnValue({ success: true, data: { analysis: STATS, instrument } });
+        await LogbookService.recomputeAllTraceStats();
+        expect(LogbookService.getFlightById('f3').instrument).toEqual(instrument);
     });
 });

@@ -3,9 +3,9 @@ import { readFileSync } from 'node:fs';
 import SdfParser from '../../js/services/sdf_parser.js';
 import IGCParser from '../../js/services/igc_parser.js';
 
-// Vol réel du 03/10/2026 (Syride SYS'Nav V3) : le .sdf et le .igc exportés ensemble.
-const sdf = readFileSync('tests/fixtures/syride-2026-10-03.sdf');
-const igc = IGCParser.parse(readFileSync('tests/fixtures/syride-2026-10-03.igc', 'utf8'));
+// Vol réel Syride SYS'Nav V3, anonymisé (position décalée, date changée) : le .sdf et le .igc exportés ensemble.
+const sdf = readFileSync('tests/fixtures/syride-winch-flight.sdf');
+const igc = IGCParser.parse(readFileSync('tests/fixtures/syride-winch-flight.igc', 'utf8'));
 
 describe('SdfParser', () => {
     const records = SdfParser.parse(sdf);

@@ -266,17 +266,18 @@ self.addEventListener('fetch', (event) => {
     // un serveur local sans Cache-Control) pouvait resservir un ancien module importé par un module
     // à jour (« Importing binding name 'shuffled' is not found »).
     const isDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    const key = dataKey(request, url);
     if (isDev) {
         event.respondWith(
             fetch(request, { cache: 'no-cache' })
                 .then((response) => {
                     if (response.ok) {
                         const copy = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                        caches.open(CACHE_NAME).then((cache) => cache.put(key, copy));
                     }
                     return response;
                 })
-                .catch(() => caches.match(request)),
+                .catch(() => caches.match(key)),
         );
         return;
     }
@@ -287,12 +288,12 @@ self.addEventListener('fetch', (event) => {
     // du CSS/JS critique — c'est ce qui a cassé la mise en page en local) : on retombe sur un
     // second essai réseau direct pour laisser passer la vraie erreur si celle-ci persiste.
     event.respondWith(
-        caches.match(request).then((cached) => {
+        caches.match(key).then((cached) => {
             const networkFetch = fetch(request)
                 .then((response) => {
                     if (response.ok) {
                         const copy = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                        caches.open(CACHE_NAME).then((cache) => cache.put(key, copy));
                     }
                     return response;
                 })
@@ -301,6 +302,18 @@ self.addEventListener('fetch', (event) => {
         }),
     );
 });
+
+/**
+ * Clé de cache d'une requête du site. Les fichiers de données (questions du QCM, sites…) sont
+ * demandés avec « ?v=<heure> » pour contourner le cache HTTP du navigateur : chaque visite a une
+ * adresse différente, que le cache ne retrouvait jamais hors ligne (QCM vide sans réseau). Pour
+ * eux, la clé est l'adresse sans cette suite, celle sous laquelle l'installation les a rangés.
+ */
+function dataKey(request, url) {
+    return url.origin === location.origin && url.pathname.includes('/js/data/')
+        ? `${url.origin}${url.pathname}`
+        : request;
+}
 
 /** Clé de cache d'un cours : l'adresse sans l'ancre (#page=N), commune aux ouvertures complètes et partielles. */
 function courseKey(url) {

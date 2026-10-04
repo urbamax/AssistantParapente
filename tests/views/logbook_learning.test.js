@@ -29,7 +29,7 @@ const vol = (site, extra = {}) => ({
     ...extra,
 });
 const winch = () =>
-    vol('ANTIN', { typeVol: 'Treuil', techDecollage: 'Dos voile', voile: 'Voile école', ecole: 'FIL D’ARIANE' });
+    vol('PLAINE', { typeVol: 'Treuil', techDecollage: 'Dos voile', voile: 'Voile école', ecole: 'ÉCOLE TEST' });
 const $ = (id) => /** @type {HTMLInputElement} */ (document.getElementById(id));
 const change = (id, value) => {
     $(id).value = value;
@@ -66,44 +66,44 @@ afterEach(() => {
 });
 
 describe('logbook: the form learns from the pilot', () => {
-    const history = () => [winch(), winch(), ...Array.from({ length: 10 }, () => vol('WISSANT'))];
+    const history = () => [winch(), winch(), ...Array.from({ length: 10 }, () => vol('DUNE'))];
 
     it('applies the habits of the site the pilot types', () => {
         setup(history());
-        change('lb-site', 'Antin');
+        change('lb-site', 'Plaine');
         expect($('lb-typeVol').value).toBe('Treuil');
         expect($('lb-tech-decollage').value).toBe('Dos voile');
         expect($('lb-voile').value).toBe('Voile école');
         expect($('lb-ecole-check').checked).toBe(true);
-        expect($('lb-ecole').value).toBe('FIL D’ARIANE');
+        expect($('lb-ecole').value).toBe('ÉCOLE TEST');
         expect($('lb-learned-summary').textContent).toContain('voile (utilisée la dernière fois ici)');
 
-        change('lb-site', 'Wissant');
+        change('lb-site', 'Dune');
         expect($('lb-typeVol').value).toBe('Soaring');
         expect($('lb-tech-decollage').value).toBe('Face voile');
         expect($('lb-voile').value).toBe('Voile côte');
-        expect($('lb-ecole-check').checked).toBe(false); // l'école proposée pour Antin est retirée
+        expect($('lb-ecole-check').checked).toBe(false); // l'école proposée pour Plaine est retirée
     });
 
     it('never overrides what the pilot chose', () => {
         setup(history());
         change('lb-tech-decollage', 'Face voile');
-        change('lb-site', 'Antin');
+        change('lb-site', 'Plaine');
         expect($('lb-typeVol').value).toBe('Treuil');
         expect($('lb-tech-decollage').value).toBe('Face voile');
         expect($('lb-learned-summary').textContent).not.toContain('technique');
     });
 
     it('at the winch, suggests back-facing for a pilot who always launches forward elsewhere', () => {
-        setup(Array.from({ length: 10 }, () => vol('WISSANT')));
+        setup(Array.from({ length: 10 }, () => vol('DUNE')));
         change('lb-typeVol', 'Treuil');
         expect($('lb-tech-decollage').value).toBe('Dos voile');
         expect($('lb-learned-summary').textContent).toContain('au treuil, on décolle presque toujours dos voile');
     });
 
     it('a winch launch found in the trace wins over the habits, and brings back-facing with it', async () => {
-        setup(Array.from({ length: 10 }, () => vol('WISSANT')));
-        const igc = new File([readFileSync('tests/fixtures/syride-2026-10-03.igc', 'utf8')], 'f.igc');
+        setup(Array.from({ length: 10 }, () => vol('DUNE')));
+        const igc = new File([readFileSync('tests/fixtures/syride-winch-flight.igc', 'utf8')], 'f.igc');
         await LogbookView._processFiles([igc]);
         expect($('lb-typeVol').value).toBe('Treuil');
         expect($('lb-tech-decollage').value).toBe('Dos voile');
@@ -111,7 +111,7 @@ describe('logbook: the form learns from the pilot', () => {
     });
 
     it('never fills the empty fields of a session being edited', () => {
-        setup([...history(), vol('ANTIN', { id: 'old', voile: '', sellette: '', techDecollage: '', ecole: '' })]);
+        setup([...history(), vol('PLAINE', { id: 'old', voile: '', sellette: '', techDecollage: '', ecole: '' })]);
         LogbookView.editEntry('old');
         expect($('lb-voile').value).toBe('');
         expect($('lb-ecole-check').checked).toBe(false);
@@ -124,7 +124,7 @@ describe('logbook: the form learns from the pilot', () => {
         const options = Array.from(document.querySelectorAll('#sites-list option')).map(
             (o) => /** @type {HTMLOptionElement} */ (o).value,
         );
-        expect(options).toEqual(['WISSANT', 'ANTIN', 'AAA PREMIER ALPHABÉTIQUE']);
+        expect(options).toEqual(['DUNE', 'PLAINE', 'AAA PREMIER ALPHABÉTIQUE']);
     });
 
     it('fills the usual ground handling place', () => {

@@ -249,6 +249,8 @@ export const FR = Object.freeze({
             wing: 'Voile :',
             harness: 'Sellette :',
             school: 'École :',
+            instrument: 'Instrument :',
+            firmware: '(logiciel {version})',
             exercises: 'Exercices :',
             pilots: 'Pilotes :',
             showTrace: 'Voir la trace 🗺️',
@@ -297,6 +299,14 @@ export const FR = Object.freeze({
             towDistance: 'Distance remorquée',
             gRelease: 'Facteur de charge au largage',
             loads: 'Facteur de charge',
+            instrument: 'Instrument',
+            instrumentBrand: 'Marque',
+            instrumentModel: 'Modèle',
+            instrumentSerial: 'Numéro de série',
+            instrumentFirmware: 'Version du logiciel',
+            instrumentHardware: 'Version du matériel',
+            instrumentGps: 'GPS',
+            instrumentPressure: 'Capteur de pression',
             gEstimated: 'Facteur de charge max (estimé)',
             sensors: 'Capteurs du vario',
             gMax: 'Facteur de charge max',
@@ -1664,7 +1674,7 @@ export const FR = Object.freeze({
             pourUnVolImporte:
                 '<strong>Trace 3D :</strong> Pour un vol importé, le bouton <strong>"Voir la trace"</strong> ouvre un lecteur 3D (propulsé par <strong>MapLibre GL JS</strong>) qui rejoue le vol sur le relief réel.',
             statsDetaillees:
-                "<strong>Statistiques détaillées :</strong> Sous chaque vol avec une trace, un bloc repliable détaille le remorquage au treuil (durée, hauteur de largage, montée), les altitudes et le dénivelé cumulé, le vario et le taux de chute, les thermiques enroulés (nombre, montée moyenne, meilleur thermique, tours à gauche et à droite), la finesse en transition, les distances (dont la distance libre à 3 points), ainsi que le facteur de charge mesuré si le .sdf a été ajouté (sinon un facteur de charge estimé d'après les virages).",
+                "<strong>Statistiques détaillées :</strong> Sous chaque vol avec une trace, un bloc repliable détaille le remorquage au treuil (durée, hauteur de largage, montée), les altitudes et le dénivelé cumulé, le vario et le taux de chute, les thermiques enroulés (nombre, montée moyenne, meilleur thermique, tours à gauche et à droite), la finesse en transition, les distances (dont la distance libre à 3 points), ainsi que le facteur de charge mesuré si le .sdf a été ajouté (sinon un facteur de charge estimé d'après les virages), et l'instrument qui a enregistré le vol : marque, modèle, numéro de série et version du logiciel, lus dans le fichier IGC.",
             chaqueEntreePeutEtre:
                 "<strong>Modification et Suppression :</strong> Chaque entrée peut être modifiée (le formulaire se préremplit, avec un bouton <strong>Annuler</strong>) ou supprimée. Les heures d'usure de votre matériel sont ajustées automatiquement. En modification, le bouton <strong>Recalculer depuis la trace IGC</strong> refait les calculs à partir de la trace enregistrée (date, durée, altitudes, statistiques, site, et type Treuil si besoin) sans toucher au reste.",
             n4StatistiquesDuCarnet: '4. Statistiques du Carnet',

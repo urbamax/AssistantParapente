@@ -41,7 +41,7 @@ function addItem(name, value, { enter = false } = {}) {
 function checkSchool() {
     $('lb-ecole-check').checked = true;
     $('lb-ecole-check').dispatchEvent(new Event('change', { bubbles: true }));
-    $('lb-ecole').value = 'FIL D’ARIANE';
+    $('lb-ecole').value = 'ÉCOLE TEST';
 }
 
 beforeEach(() => {
@@ -113,8 +113,8 @@ describe('logbook: pilots flown with', () => {
             {
                 id: 'f1',
                 type: 'vol',
-                datetime: '2026-10-03T12:06',
-                site: 'Antin',
+                datetime: '2026-07-01T12:06',
+                site: 'Plaine',
                 voile: 'V',
                 duree: 5,
                 pilotes: ['Léa <b>'],

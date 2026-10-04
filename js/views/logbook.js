@@ -1671,6 +1671,7 @@ class LogbookViewClass extends BaseView {
             maxSpeedKmh: parsed.maxSpeedKmh,
             avgSpeedKmh: parsed.avgSpeedKmh,
             igcStats: parsed.analysis || null,
+            ...(parsed.instrument ? { instrument: parsed.instrument } : {}),
         };
 
         const durationInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-duree'));
@@ -2264,6 +2265,7 @@ class LogbookViewClass extends BaseView {
                             ${session.voile ? `<div><strong>${tt('history.wing')}</strong> ${escapeHTML(session.voile)}</div>` : ''}
                             ${session.sellette ? `<div><strong>${tt('history.harness')}</strong> ${escapeHTML(session.sellette)}</div>` : ''}
                             ${session.ecole ? `<div><strong>${tt('history.school')}</strong> ${escapeHTML(session.ecole)}</div>` : ''}
+                            ${session.instrument && (session.instrument.brand || session.instrument.model) ? `<div><strong>${tt('history.instrument')}</strong> ${escapeHTML([session.instrument.brand, session.instrument.model].filter(Boolean).join(' '))}${session.instrument.firmware ? ` ${tt('history.firmware', { version: session.instrument.firmware })}` : ''}</div>` : ''}
                             ${isVol && Array.isArray(session.typeExercice) && session.typeExercice.length > 0 ? `<div><strong>${tt('history.exercises')}</strong> ${escapeHTML(session.typeExercice.join(', '))}</div>` : ''}
                             ${Array.isArray(session.pilotes) && session.pilotes.length > 0 ? `<div><strong>${tt('history.pilots')}</strong> ${escapeHTML(session.pilotes.join(', '))}</div>` : ''}
                         </div>
@@ -2328,7 +2330,9 @@ class LogbookViewClass extends BaseView {
     // repliées sous la carte. Les altitudes absolues reçoivent la correction du pilote.
     renderFlightAnalysis(session) {
         const sensors = session.sensorStats && typeof session.sensorStats === 'object' ? session.sensorStats : null;
-        const a = session.igcStats && typeof session.igcStats === 'object' ? session.igcStats : sensors ? {} : null;
+        const device = session.instrument && typeof session.instrument === 'object' ? session.instrument : null;
+        const a =
+            session.igcStats && typeof session.igcStats === 'object' ? session.igcStats : sensors || device ? {} : null;
         if (!a) return '';
         const offset = Number(session.altOffset) || 0;
         const num = (v) => typeof v === 'number' && Number.isFinite(v);
@@ -2349,14 +2353,16 @@ class LogbookViewClass extends BaseView {
             row('maxClimb', `+${session.maxClimbRate} m/s`, num(session.maxClimbRate)) +
             row('maxSink', `${a.maxSinkRate} m/s`, num(a.maxSinkRate)) +
             row('avgVario', `${a.avgVario > 0 ? '+' : ''}${a.avgVario} m/s`, num(a.avgVario));
-        const thermals = a.thermalCount
-            ? row('thermalCount', a.thermalCount) +
-              row('thermalTime', `${a.thermalMinutes} min (${a.thermalPercent} %)`) +
-              row('avgThermalClimb', `+${a.avgThermalClimb} m/s`) +
-              row('bestThermalClimb', `+${a.bestThermalClimb} m/s`) +
-              row('maxThermalGain', `${a.maxThermalGain} m`) +
-              row('turns', tt('analysis.turnsValue', { left: a.turnsLeft, right: a.turnsRight }))
-            : row('thermalCount', '0');
+        const thermals = !num(a.thermalCount)
+            ? ''
+            : a.thermalCount
+              ? row('thermalCount', a.thermalCount) +
+                row('thermalTime', `${a.thermalMinutes} min (${a.thermalPercent} %)`) +
+                row('avgThermalClimb', `+${a.avgThermalClimb} m/s`) +
+                row('bestThermalClimb', `+${a.bestThermalClimb} m/s`) +
+                row('maxThermalGain', `${a.maxThermalGain} m`) +
+                row('turns', tt('analysis.turnsValue', { left: a.turnsLeft, right: a.turnsRight }))
+              : row('thermalCount', '0');
         const glides =
             row('glideRatio', a.glideRatio, num(a.glideRatio)) +
             row('bestGlideRatio', a.bestGlideRatio, num(a.bestGlideRatio)) +
@@ -2384,6 +2390,18 @@ class LogbookViewClass extends BaseView {
             ? row('gMax', `${sensors.gMax} g`, num(sensors.gMax)) + row('gMin', `${sensors.gMin} g`, num(sensors.gMin))
             : row('gEstimated', `≈ ${a.estimatedMaxG} g`, num(a.estimatedMaxG));
 
+        // Instrument qui a enregistré la trace (en-tête de l'IGC)
+        const text = (v) => escapeHTML(String(v));
+        const instrument = device
+            ? row('instrumentBrand', text(device.brand), Boolean(device.brand)) +
+              row('instrumentModel', text(device.model), Boolean(device.model)) +
+              row('instrumentSerial', text(device.serial), Boolean(device.serial)) +
+              row('instrumentFirmware', text(device.firmware), Boolean(device.firmware)) +
+              row('instrumentHardware', text(device.hardware), Boolean(device.hardware)) +
+              row('instrumentGps', text(device.gps), Boolean(device.gps)) +
+              row('instrumentPressure', text(device.pressureSensor), Boolean(device.pressureSensor))
+            : '';
+
         return `
                     <details class="flight-analysis">
                         <summary><i class="ri-bar-chart-2-line"></i> ${tt('analysis.title')}</summary>
@@ -2395,6 +2413,7 @@ class LogbookViewClass extends BaseView {
                             ${group('glides', glides)}
                             ${group('distances', distances)}
                             ${group(sensors ? 'sensors' : 'loads', loads)}
+                            ${group('instrument', instrument)}
                         </div>
                     </details>`;
     }

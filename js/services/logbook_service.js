@@ -241,6 +241,7 @@ class LogbookService {
                 maxSpeedKmh: d.maxSpeedKmh,
                 avgSpeedKmh: d.avgSpeedKmh,
                 igcStats: d.analysis,
+                ...(d.instrument ? { instrument: d.instrument } : {}),
                 updatedAt: Date.now(),
                 syncPending: true,
             });
@@ -448,6 +449,7 @@ class LogbookService {
                         maxSpeedKmh: parsed.maxSpeedKmh,
                         avgSpeedKmh: parsed.avgSpeedKmh,
                         analysis: parsed.analysis || null,
+                        instrument: parsed.instrument || null,
                         points,
                         takeoffIndex: parsed.takeoffIndex || 0,
                         // Altitudes au vrai décollage / atterrissage (pas au parking)
