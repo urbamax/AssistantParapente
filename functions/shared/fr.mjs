@@ -117,7 +117,7 @@ export const FR = Object.freeze({
             select: '-- Sélectionner --',
             freeEntry: '-- Saisie libre (ou choisir) --',
             igcTitle: 'Importer une trace GPS (.igc)',
-            igcHint: 'Cliquez ou glissez-déposez le fichier (avec le .sdf Syride pour les G et la température)',
+            igcHint: 'Cliquez ou glissez-déposez le fichier (avec le .sdf Syride pour le facteur de charge)',
             altKnowLanding: "Je connais l'altitude de l'atterrissage",
             altKnowTakeoff: 'du décollage',
             realAltitude: 'Altitude réelle (m)',
@@ -213,7 +213,7 @@ export const FR = Object.freeze({
             takeoffImported: 'Décollage importé (GPS)',
             parseError: 'Erreur lors du parsing IGC : {error}',
             existingTrace: 'Trace GPS (existante)',
-            sdfLoaded: 'Capteurs Syride chargés ({name}) : {gMax} g max, {temp} °C au déco',
+            sdfLoaded: 'Capteurs Syride chargés ({name}) : {gMax} g max',
             sdfInvalid: "{name} n'est pas un fichier .sdf Syride lisible.",
             sdfMismatch:
                 "Ce fichier .sdf n'est pas celui de ce vol : sa trace ne correspond pas à la trace GPS enregistrée (positions, altitudes ou durée différentes).",
@@ -301,8 +301,8 @@ export const FR = Object.freeze({
             sensors: 'Capteurs du vario',
             gMax: 'Facteur de charge max',
             gMin: 'Facteur de charge min',
-            temperature: 'Température',
-            temperatureValue: '{tempTakeoff} °C au déco ({tempMin} à {tempMax} °C)',
+            temperature: 'Température du vario (boîtier)',
+            temperatureValue: "{tempTakeoff} °C au déco ({tempMin} à {tempMax} °C), pas celle de l'air",
         }),
         records: Object.freeze({
             title: 'Records personnels',
@@ -1635,7 +1635,7 @@ export const FR = Object.freeze({
             importerTraceIgc:
                 "<strong>Importer une trace GPS (.igc) :</strong> Glissez-déposez ou sélectionnez le fichier IGC de votre vario. L'application repère le vrai décollage et le vrai atterrissage (ni le parking, ni la marche du retour, même avec des virages serrés en approche), puis calcule la date, la durée, l'altitude max, le gain, la distance, le vario max et les vitesses. Un <strong>départ au treuil</strong> est reconnu tout seul (montée régulière en ligne droite dès le décollage) : le type de vol passe alors à <strong>Treuil</strong>. Si votre vario était mal calé (par exemple une altitude d'atterrissage négative), elle vous le signale et vous pouvez corriger les altitudes en saisissant l'altitude réelle du décollage ou de l'atterrissage.",
             capteursSyride:
-                "<strong>Capteurs Syride (.sdf) :</strong> Avec un vario Syride, ajoutez le fichier <strong>.sdf</strong> exporté avec le .igc (sélectionnez ou glissez les deux fichiers ensemble). Il apporte ce que l'IGC ne contient pas : le <strong>facteur de charge</strong> (G) mesuré par l'accéléromètre, y compris au largage du treuil, et la <strong>température</strong>. Vous pouvez aussi l'ajouter plus tard en modifiant le vol. L'application vérifie qu'il s'agit bien du même vol : sa trace doit suivre celle du .igc sur toute sa longueur, sinon il est refusé.",
+                "<strong>Capteurs Syride (.sdf) :</strong> Avec un vario Syride, ajoutez le fichier <strong>.sdf</strong> exporté avec le .igc (sélectionnez ou glissez les deux fichiers ensemble). Il apporte ce que l'IGC ne contient pas : le <strong>facteur de charge</strong> (G) mesuré par l'accéléromètre, y compris au largage du treuil, et la température du boîtier du vario (chauffé par le soleil, le pilote et son électronique : ce n'est pas la température de l'air, que donne la météo enregistrée avec le vol). Vous pouvez aussi l'ajouter plus tard en modifiant le vol. L'application vérifie qu'il s'agit bien du même vol : sa trace doit suivre celle du .igc sur toute sa longueur, sinon il est refusé.",
             uneProposeLesSites:
                 "<strong>Site de vol :</strong> Une <strong>autocomplétion</strong> propose les sites de la base officielle FFVL, vos sites habituels en tête. À l'import d'une trace, l'application choisit le site connu le plus proche du décollage, dans un rayon de 500 m ; si plusieurs sites sont possibles, ils s'affichent en boutons sous le champ pour changer d'un clic. Pour un lieu absent de la base, le bouton <strong>\"Placer sur la carte\"</strong> permet de le pointer sur une carte (vue carte ou satellite) ou de coller des coordonnées, y compris un lien Google Maps. La position est ensuite reprise automatiquement lors de vos prochaines sessions à ce lieu.",
             materielSession:
@@ -1666,7 +1666,7 @@ export const FR = Object.freeze({
             pourUnVolImporte:
                 '<strong>Trace 3D :</strong> Pour un vol importé, le bouton <strong>"Voir la trace"</strong> ouvre un lecteur 3D (propulsé par <strong>MapLibre GL JS</strong>) qui rejoue le vol sur le relief réel.',
             statsDetaillees:
-                "<strong>Statistiques détaillées :</strong> Sous chaque vol avec une trace, un bloc repliable détaille le remorquage au treuil (durée, hauteur de largage, montée), les altitudes et le dénivelé cumulé, le vario et le taux de chute, les thermiques enroulés (nombre, montée moyenne, meilleur thermique, tours à gauche et à droite), la finesse en transition, les distances (dont la distance libre à 3 points), ainsi que le facteur de charge et la température si le .sdf a été ajouté (sinon un facteur de charge estimé d'après les virages).",
+                "<strong>Statistiques détaillées :</strong> Sous chaque vol avec une trace, un bloc repliable détaille le remorquage au treuil (durée, hauteur de largage, montée), les altitudes et le dénivelé cumulé, le vario et le taux de chute, les thermiques enroulés (nombre, montée moyenne, meilleur thermique, tours à gauche et à droite), la finesse en transition, les distances (dont la distance libre à 3 points), ainsi que le facteur de charge et la température du boîtier du vario si le .sdf a été ajouté (sinon un facteur de charge estimé d'après les virages).",
             chaqueEntreePeutEtre:
                 "<strong>Modification et Suppression :</strong> Chaque entrée peut être modifiée (le formulaire se préremplit, avec un bouton <strong>Annuler</strong>) ou supprimée. Les heures d'usure de votre matériel sont ajustées automatiquement. En modification, le bouton <strong>Recalculer depuis la trace IGC</strong> refait les calculs à partir de la trace enregistrée (date, durée, altitudes, statistiques, site, et type Treuil si besoin) sans toucher au reste.",
             n4StatistiquesDuCarnet: '4. Statistiques du Carnet',

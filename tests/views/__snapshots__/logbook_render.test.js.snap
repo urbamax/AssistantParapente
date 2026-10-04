@@ -54,7 +54,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
     "submit": "Modifier la session",
   },
   "reset": {
-    "file": "Cliquez ou glissez-déposez le fichier (avec le .sdf Syride pour les G et la température)",
+    "file": "Cliquez ou glissez-déposez le fichier (avec le .sdf Syride pour le facteur de charge)",
     "submit": "Enregistrer",
   },
 }
@@ -191,7 +191,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                 <div role="button" tabindex="0" class="form-group igc-upload-container" data-action="triggerIgcUpload" style="border: 2px dashed var(--border-light, #ccc); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 15px; cursor: pointer; background: var(--bg-card, #f9f9f9);">
                     <i class="ri-upload-cloud-line" style="font-size: 2rem; color: var(--accent-blue, #007bc4);"></i>
                     <div style="font-weight: bold; margin-top: 10px;">Importer une trace GPS (.igc)</div>
-                    <div style="font-size: 0.85rem; color: var(--text-secondary, #666); margin-top: 5px;" id="igc-upload-filename">Cliquez ou glissez-déposez le fichier (avec le .sdf Syride pour les G et la température)</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary, #666); margin-top: 5px;" id="igc-upload-filename">Cliquez ou glissez-déposez le fichier (avec le .sdf Syride pour le facteur de charge)</div>
                 </div>
                 <button type="button" id="lb-igc-recalc" data-action="recalculateFromTrace" style="display:none; width: 100%; margin: -5px 0 15px; padding: 8px; border-radius: 6px; border: 1px solid var(--accent-blue, #007bc4); color: var(--accent-blue, #007bc4); background: transparent; cursor: pointer;"><i class="ri-refresh-line"></i> Recalculer depuis la trace IGC</button>
                 <div class="form-group" id="igc-alt-check" style="display:none; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-light, #ccc); margin-bottom: 15px;">

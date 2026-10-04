@@ -1591,11 +1591,7 @@ class LogbookViewClass extends BaseView {
             if (around) this.currentSensorStats.gRelease = around.gMax;
         }
         if (filenameLabel) {
-            filenameLabel.textContent = tl('igc.sdfLoaded', {
-                name: file.name,
-                gMax: this.currentSensorStats.gMax,
-                temp: this.currentSensorStats.tempTakeoff,
-            });
+            filenameLabel.textContent = tl('igc.sdfLoaded', { name: file.name, gMax: this.currentSensorStats.gMax });
         }
     }
 

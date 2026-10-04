@@ -6,11 +6,12 @@
  *
  *   0-3   latitude  (int32, 1e-7 degré)      12  vitesse sol (km/h)
  *   4-7   longitude (int32, 1e-7 degré)      13  satellites
- *   8-9   altitude GPS (int16, m)            14  température (°C, signé)
+ *   8-9   altitude GPS (int16, m)            14  température du boîtier (°C, signé)
  *   10-11 altitude baro relative (int16, m)  15  vario (signé, 0,1 m/s)
  *                                            16-20 facteur de charge, 5 mesures (0,1 g)
  *
- * L'IGC ne contient pas l'accéléromètre ni la température : c'est ce fichier qui les apporte.
+ * L'IGC ne contient pas l'accéléromètre : c'est ce fichier qui l'apporte. La température est celle
+ * du capteur dans le boîtier (soleil, chaleur du pilote, électronique) : pas celle de l'air.
  */
 const SdfParser = {
     HEADER_BYTES: 8,
