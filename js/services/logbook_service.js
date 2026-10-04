@@ -221,9 +221,11 @@ class LogbookService {
     }
 
     /**
-     * Recalcule les statistiques de trace (distance, vario, vitesses, analyse détaillée) de
-     * tous les vols qui ont une trace IGC. Ne touche qu'à ces statistiques : date, durée,
-     * altitudes saisies, site et le reste du vol restent tels quels.
+     * Recalcule depuis leur trace IGC tous les vols qui en ont une, comme le bouton « Recalculer »
+     * d'une session : date et durée du vol, altitude max (avec la correction d'altitude du vol),
+     * gain, position du décollage, distance, vario, vitesses, analyse détaillée et instrument.
+     * Ce que le pilote a saisi reste tel quel : site, type de vol, matériel, école, pilotes,
+     * commentaire et correction d'altitude.
      * @returns {Promise<number>} nombre de vols mis à jour
      */
     async recomputeAllTraceStats() {
@@ -232,10 +234,16 @@ class LogbookService {
             if (flight.type !== 'vol') continue;
             const raw = await this.getFlightTrace(flight.id);
             if (!raw) continue;
-            const result = this.parseIGC(raw);
+            const result = this.parseIGC(raw, Number(flight.altOffset) || 0);
             if (!result.success) continue;
             const d = result.data;
+            const takeoff = Array.isArray(d.points) ? d.points[d.takeoffIndex || 0] || d.points[0] : null;
             Object.assign(flight, {
+                ...(d.dateStr ? { datetime: d.dateStr } : {}),
+                ...(d.duration > 0 ? { duree: d.duration } : {}),
+                ...(typeof d.maxAltitude === 'number' ? { altitudeMax: d.maxAltitude } : {}),
+                ...(typeof d.gain === 'number' ? { gain: d.gain } : {}),
+                ...(takeoff ? { lat: takeoff.lat, lon: takeoff.lon } : {}),
                 distanceKm: d.distanceKm,
                 maxClimbRate: d.maxClimbRate,
                 maxSpeedKmh: d.maxSpeedKmh,

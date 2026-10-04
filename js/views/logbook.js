@@ -2710,9 +2710,13 @@ class LogbookViewClass extends BaseView {
             </button>`;
     }
 
+    // « Tout recalculer » (à côté d'« Ajouter une session », et dans les records) : chaque vol avec
+    // trace est recalculé comme avec son bouton « Recalculer », après confirmation.
     async recomputeAllTraceStats(_args, _event, button) {
+        if (!confirm(tl('records.recomputeConfirm'))) return;
         if (button && button.disabled !== undefined) button.disabled = true;
         const count = await LogbookService.recomputeAllTraceStats();
+        if (button && button.disabled !== undefined) button.disabled = false;
         alert(tl('records.recomputed', { count }));
         this.renderStats();
         this.renderHistory();

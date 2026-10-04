@@ -343,7 +343,9 @@ export const FR = Object.freeze({
             gMax: 'Facteur de charge max (capteur)',
             highestRelease: 'Plus haut largage au treuil',
             totals: 'Sur {flights} vols avec trace : {distance} km parcourus, {climb} m de dénivelé positif, {thermals} thermiques enroulés ({thermalTime}).',
-            recompute: 'Recalculer les stats de toutes les traces',
+            recompute: 'Tout recalculer depuis les traces',
+            recomputeConfirm:
+                'Recalculer tous les vols depuis leur trace IGC ? Date, durée, altitude max, gain, position du décollage et statistiques seront mis à jour. Le site, le type de vol, le matériel, l’école, les pilotes, le commentaire et ta correction d’altitude sont gardés.',
             recomputeMissing: 'Calculer les stats détaillées des vols avec trace (à mettre à jour : {count})',
             recomputed: '{count} vols mis à jour depuis leur trace IGC.',
         }),
@@ -1227,6 +1229,7 @@ export const FR = Object.freeze({
         logbookScreen: Object.freeze({
             carnetDeVol: 'CARNET DE VOL',
             ajouterUneSession: 'Ajouter une session',
+            toutRecalculer: 'Tout recalculer',
             ajouterUnEquipement: 'Ajouter un Équipement',
             type: 'Type :',
             voile: 'Voile',
@@ -1695,7 +1698,7 @@ export const FR = Object.freeze({
                 "<strong>Modification et Suppression :</strong> Chaque entrée peut être modifiée (le formulaire se préremplit, avec un bouton <strong>Annuler</strong>) ou supprimée. Les heures d'usure de votre matériel sont ajustées automatiquement. En modification, le bouton <strong>Recalculer depuis la trace IGC</strong> refait les calculs à partir de la trace enregistrée (date, durée, altitudes, statistiques, site, et type Treuil si besoin) sans toucher au reste.",
             n4StatistiquesDuCarnet: '4. Statistiques du Carnet',
             statistiquesEtRecords:
-                'La partie Statistiques résume votre activité : nombre et temps de vol, sessions de gonflage, altitude maximale et gain cumulé, utilisation de chaque voile et heures restantes avant révision, lieux les plus fréquentés, part des sessions en école, types de vols, techniques de décollage et exercices de gonflage. La section <strong>Records personnels</strong> donne vos meilleurs vols (plus long, plus haut, distance libre, meilleur thermique, meilleure finesse, plus haut largage au treuil, facteur de charge…) avec leur date et leur site, et les cumuls de vos vols avec trace. Le bouton <strong>Recalculer les stats de toutes les traces</strong> met à jour les statistiques de vos vols déjà importés.',
+                'La partie Statistiques résume votre activité : nombre et temps de vol, sessions de gonflage, altitude maximale et gain cumulé, utilisation de chaque voile et heures restantes avant révision, lieux les plus fréquentés, part des sessions en école, types de vols, techniques de décollage et exercices de gonflage. La section <strong>Records personnels</strong> donne vos meilleurs vols (plus long, plus haut, distance libre, meilleur thermique, meilleure finesse, plus haut largage au treuil, facteur de charge…) avec leur date et leur site, et les cumuls de vos vols avec trace. Le bouton <strong>Tout recalculer</strong>, à côté d’<strong>Ajouter une session</strong> (ou sous les records), recalcule tous vos vols depuis leur trace : date, durée, altitude max, gain, position du décollage et statistiques. Vos saisies sont gardées : site, type de vol, matériel, école, pilotes, commentaire et correction d’altitude.',
             captureMeteoAutomatiqueOpenMeteo: 'Capture Météo Automatique (Open-Meteo)',
             lorsDeLEnregistrementDUn:
                 "Lors de l'enregistrement d'un vol ou d'une session de gonflage, l'application interroge automatiquement le service météorologique <strong>Open-Meteo</strong> (modèles de Météo-France pour les dates récentes, archives pour les plus anciennes). À partir des coordonnées du site et de l'heure de votre activité, elle enregistre les conditions au <strong>décollage et à l'atterrissage</strong> (ou au début et à la fin d'un gonflage) : <strong >vitesse du vent, rafales, direction (en degrés et cardinal), température, et état du ciel</strong >. Lorsque les deux relevés sont identiques, une seule ligne est affichée. Si le site dispose d'une balise FFVL, le graphique du <strong>vent réellement mesuré</strong> ce jour-là est aussi consultable. Pas besoin de saisie manuelle !",
