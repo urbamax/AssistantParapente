@@ -188,6 +188,12 @@ self.addEventListener('fetch', (event) => {
 
     const url = new URL(request.url);
 
+    // Numéro de version du site (bannière « Mettre à jour ») : toujours le réseau, jamais le cache
+    if (url.origin === location.origin && url.pathname.endsWith('/version.json')) {
+        event.respondWith(fetch(request, { cache: 'no-store' }));
+        return;
+    }
+
     if (url.hostname === WEATHER_API_HOSTNAME) {
         event.respondWith(fetch(request));
         return;
