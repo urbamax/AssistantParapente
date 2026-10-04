@@ -1647,6 +1647,13 @@
                         >
                             <i class="ri-add-line"></i> Ajouter une session
                         </button>
+                        <button data-i18n="logbookScreen.toutRecalculer"
+                            id="logbook-recompute-btn"
+                            class="action-btn-secondary"
+                            data-action="recomputeAllTraceStats"
+                        >
+                            <i class="ri-refresh-line"></i> Tout recalculer
+                        </button>
                     </div>
                     <div id="logbook-history-list" class="logbook-list">
                         <!-- Injected by JS -->
@@ -3641,7 +3648,7 @@
                             </ul>
 
                             <h5 data-i18n="manualModal.n4StatistiquesDuCarnet" style="margin-top: 16px; margin-bottom: 8px">4. Statistiques du Carnet</h5>
-                            <p data-i18n-html="manualModal.statistiquesEtRecords" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">La partie Statistiques résume votre activité : nombre et temps de vol, sessions de gonflage, altitude maximale et gain cumulé, utilisation de chaque voile et heures restantes avant révision, lieux les plus fréquentés, part des sessions en école, types de vols, techniques de décollage et exercices de gonflage. La section <strong>Records personnels</strong> donne vos meilleurs vols (plus long, plus haut, distance libre, meilleur thermique, meilleure finesse, plus haut largage au treuil, facteur de charge…) avec leur date et leur site, et les cumuls de vos vols avec trace. Le bouton <strong>Recalculer les stats de toutes les traces</strong> met à jour les statistiques de vos vols déjà importés.</p>
+                            <p data-i18n-html="manualModal.statistiquesEtRecords" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">La partie Statistiques résume votre activité : nombre et temps de vol, sessions de gonflage, altitude maximale et gain cumulé, utilisation de chaque voile et heures restantes avant révision, lieux les plus fréquentés, part des sessions en école, types de vols, techniques de décollage et exercices de gonflage. La section <strong>Records personnels</strong> donne vos meilleurs vols (plus long, plus haut, distance libre, meilleur thermique, meilleure finesse, plus haut largage au treuil, facteur de charge…) avec leur date et leur site, et les cumuls de vos vols avec trace. Le bouton <strong>Tout recalculer</strong>, à côté d’<strong>Ajouter une session</strong> (ou sous les records), recalcule tous vos vols depuis leur trace : date, durée, altitude max, gain, position du décollage et statistiques. Vos saisies sont gardées : site, type de vol, matériel, école, pilotes, commentaire et correction d’altitude.</p>
 
                             <!-- CAPTURE METEO AUTOMATIQUE -->
                             <div

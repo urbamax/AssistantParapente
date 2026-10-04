@@ -89,20 +89,83 @@ describe('LogbookView.renderRecords', () => {
 });
 
 describe('LogbookService.recomputeAllTraceStats', () => {
-    it('only refreshes the trace stats, never the rest of the flight', async () => {
-        const original = flight('f1', { altitudeMax: 999, gain: 7, commentaire: 'garder', distanceKm: 0 });
+    const data = {
+        dateStr: '2026-07-01T12:10',
+        duration: 17,
+        maxAltitude: 171,
+        gain: 150,
+        points: [
+            { lat: 50.1, lon: 1.6, alt: 21 },
+            { lat: 50.2, lon: 1.7, alt: 171 },
+        ],
+        takeoffIndex: 0,
+        distanceKm: 4.9,
+        maxClimbRate: 3,
+        maxSpeedKmh: 50,
+        avgSpeedKmh: 31,
+        analysis: STATS,
+    };
+
+    it('recomputes what comes from the trace, like the Recalculer button of a session', async () => {
+        const original = flight('f1', { altitudeMax: 999, gain: 7, duree: 10, altOffset: 7 });
         LogbookService.flights = [original, { id: 'g1', type: 'gonflage', datetime: '2026-10-01T10:00' }];
         vi.spyOn(LogbookService, 'getFlightTrace').mockResolvedValue('IGC');
-        vi.spyOn(LogbookService, 'parseIGC').mockReturnValue({
-            success: true,
-            data: { distanceKm: 4.9, maxClimbRate: 3, maxSpeedKmh: 50, avgSpeedKmh: 31, analysis: STATS, duration: 99 },
-        });
+        const parse = vi.spyOn(LogbookService, 'parseIGC').mockReturnValue({ success: true, data });
 
         expect(await LogbookService.recomputeAllTraceStats()).toBe(1);
-        const f = LogbookService.getFlightById('f1');
-        expect(f).toMatchObject({ distanceKm: 4.9, maxClimbRate: 3, igcStats: STATS, syncPending: true });
-        expect(f).toMatchObject({ duree: 10, altitudeMax: 999, gain: 7, commentaire: 'garder', site: 'PLAINE <b>' });
+        // La correction d'altitude du vol est appliquée
+        expect(parse).toHaveBeenCalledWith('IGC', 7);
+        expect(LogbookService.getFlightById('f1')).toMatchObject({
+            datetime: '2026-07-01T12:10',
+            duree: 17,
+            altitudeMax: 171,
+            gain: 150,
+            lat: 50.1,
+            lon: 1.6,
+            distanceKm: 4.9,
+            maxClimbRate: 3,
+            igcStats: STATS,
+            syncPending: true,
+        });
         expect(LogbookService.saveFlights).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps what the pilot entered', async () => {
+        LogbookService.flights = [
+            flight('f1', { commentaire: 'garder', typeVol: 'Soaring', ecole: 'ÉCOLE', pilotes: ['A'], altOffset: 7 }),
+        ];
+        vi.spyOn(LogbookService, 'getFlightTrace').mockResolvedValue('IGC');
+        vi.spyOn(LogbookService, 'parseIGC').mockReturnValue({ success: true, data });
+        await LogbookService.recomputeAllTraceStats();
+        expect(LogbookService.getFlightById('f1')).toMatchObject({
+            site: 'PLAINE <b>',
+            voile: 'V',
+            commentaire: 'garder',
+            typeVol: 'Soaring',
+            ecole: 'ÉCOLE',
+            pilotes: ['A'],
+            altOffset: 7,
+        });
+    });
+
+    it('asks first, and does nothing when the pilot cancels', async () => {
+        const recompute = vi.spyOn(LogbookService, 'recomputeAllTraceStats').mockResolvedValue(2);
+        vi.stubGlobal('alert', vi.fn());
+        vi.stubGlobal(
+            'confirm',
+            vi.fn(() => false),
+        );
+        await LogbookView.recomputeAllTraceStats();
+        expect(recompute).not.toHaveBeenCalled();
+
+        vi.stubGlobal(
+            'confirm',
+            vi.fn(() => true),
+        );
+        await LogbookView.recomputeAllTraceStats();
+        expect(recompute).toHaveBeenCalledTimes(1);
+        expect(alert).toHaveBeenCalledWith('2 vols mis à jour depuis leur trace IGC.');
+        vi.unstubAllGlobals();
     });
 });
 
