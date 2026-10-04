@@ -69,6 +69,10 @@ class LogbookViewClass extends BaseView {
                 // autres (un autre site ou type de vol change les habitudes à appliquer).
                 const learnedField = LogbookViewClass.LEARNED_FIELD_IDS[target.id];
                 if (learnedField) LogbookView.onLearnedFieldChanged(learnedField);
+                // Autre heure : les pilotes d'une session proche ne sont peut-être plus les mêmes
+                if (target.id === 'lb-datetime') LogbookView.applyLearnedDefaults();
+                // Treuilleur affiché seulement pour un vol au treuil (y compris en modification)
+                if (target.id === 'lb-typeVol') LogbookView.updateWinchOperatorField();
 
                 if (target.id === 'lb-coords') {
                     // traité plus haut
@@ -88,6 +92,23 @@ class LogbookViewClass extends BaseView {
                     if (windLimitsDiv) {
                         windLimitsDiv.style.display = target.value === 'voile' ? 'flex' : 'none';
                     }
+                }
+            });
+
+            // Croix d'une étiquette (exercice, pilote) : retire la valeur
+            container.addEventListener('click', (e) => {
+                const button = /** @type {HTMLElement} */ (e.target).closest('[data-checklist-remove]');
+                if (button) LogbookView.removeChecklistItem(button);
+            });
+
+            // Valeur choisie dans la liste déroulante d'un champ « Ajouter » : ajoutée tout de suite
+            container.addEventListener('input', (e) => {
+                const target = /** @type {HTMLInputElement} */ (e.target);
+                const name = target.dataset && target.dataset.checklist;
+                if (!name) return;
+                const picked = !(e instanceof InputEvent) || e.inputType === 'insertReplacementText';
+                if (picked && LogbookView.getChecklistOptions(name).includes(target.value)) {
+                    LogbookView.addChecklistItem(name);
                 }
             });
 
@@ -638,6 +659,7 @@ class LogbookViewClass extends BaseView {
         const commentaire = /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire'))?.value || '';
         const ecoleChecked = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole-check'))?.checked;
         const ecole = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole'))?.value || '';
+        const moniteur = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'))?.value || '';
         const pilotes = this.getChecklistValues('pilotes');
 
         const coordsText = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'))?.value || '';
@@ -702,6 +724,8 @@ class LogbookViewClass extends BaseView {
             if (el) el.value = commentaire;
         }
         if (ecoleChecked) this.setSchoolField(true, ecole);
+        const instructorField = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
+        if (instructorField && moniteur) instructorField.value = moniteur;
         this.setChecklistValues('pilotes', pilotes);
 
         if (coordsText) {
@@ -735,7 +759,10 @@ class LogbookViewClass extends BaseView {
                     <div id="lb-ecole-group" hidden style="margin-top: 6px;">
                         <label for="lb-ecole">${tt('form.schoolName')} <span class="required">*</span></label>
                         <input type="text" id="lb-ecole" list="ecoles-list" placeholder="${tt('form.schoolPlaceholder')}" autocomplete="off" style="width: 100%;">
-                        <datalist id="ecoles-list"></datalist>${exercises}
+                        <datalist id="ecoles-list"></datalist>
+                        <label for="lb-moniteur" style="display:block; margin-top: 10px;">${tt('form.instructor')}</label>
+                        <input type="text" id="lb-moniteur" list="moniteurs-list" placeholder="${tt('form.instructorPlaceholder')}" autocomplete="off" style="width: 100%;">
+                        <datalist id="moniteurs-list"></datalist>${exercises}
                     </div>
                 </div>`;
     }
@@ -785,63 +812,93 @@ class LogbookViewClass extends BaseView {
         return [...seen.values()].sort((a, b) => a.localeCompare(b, 'fr'));
     }
 
-    _renderChecklistItem(name, value, checked = false) {
-        // Les valeurs par défaut ont un libellé traduit ; les autres sont affichées telles quelles.
+    /** Libellé d'une valeur : traduit pour les exercices par défaut, tel quel sinon. */
+    _checklistLabel(name, value) {
         const isDefault =
             name === 'typeExercice' &&
             (LogbookViewClass.FLIGHT_EXERCISES.includes(value) || LogbookViewClass.GROUND_EXERCISES.includes(value));
-        const label = isDefault ? tt(`form.exerciseTypes.${value}`) : escapeHTML(value);
-        return `<label><input type="checkbox" name="lb-${name}" value="${escapeHTML(value)}"${checked ? ' checked' : ''}> ${label}</label>`;
+        return isDefault ? tt(`form.exerciseTypes.${value}`) : escapeHTML(value);
     }
 
+    // Valeur choisie : une étiquette avec sa croix ; la case cochée cachée porte la valeur lue à
+    // l'enregistrement (getChecklistValues).
+    _renderChecklistItem(name, value) {
+        return `<span class="lb-chip"><input type="checkbox" name="lb-${name}" value="${escapeHTML(value)}" checked hidden>${this._checklistLabel(name, value)}<button type="button" class="lb-chip-remove" data-checklist-remove="${name}" aria-label="${tt('form.remove')}"><i class="ri-close-line"></i></button></span>`;
+    }
+
+    // Liste extensible (exercices, pilotes) : les valeurs choisies en étiquettes, et un champ avec
+    // liste déroulante des valeurs connues (par défaut + déjà utilisées dans le carnet) pour en
+    // ajouter une, ou en saisir une nouvelle.
     renderChecklist(name, defaults, used, placeholder) {
         const lower = defaults.map((v) => v.toLowerCase());
         const items = [...defaults, ...used.filter((v) => !lower.includes(v.toLowerCase()))];
         return `
-                        <div id="lb-${name}-group" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
-                            ${items.map((v) => this._renderChecklistItem(name, v)).join('')}
-                        </div>
+                        <div id="lb-${name}-group" class="lb-chips"></div>
+                        <datalist id="lb-${name}-options">${items.map((v) => `<option value="${escapeHTML(v)}"></option>`).join('')}</datalist>
                         <div style="display:flex; gap:6px; margin-top:8px;">
-                            <input type="text" id="lb-${name}-new" data-checklist="${name}" placeholder="${placeholder}" autocomplete="off" style="flex:1; min-width:0;">
+                            <input type="text" id="lb-${name}-new" list="lb-${name}-options" data-checklist="${name}" placeholder="${placeholder}" autocomplete="off" style="flex:1; min-width:0;">
                             <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'${name}'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> ${tt('form.add')}</button>
                         </div>`;
     }
 
-    /** Valeurs cochées d'une liste du formulaire. */
+    /** Valeurs connues d'une liste (celles de sa liste déroulante). */
+    getChecklistOptions(name) {
+        return Array.from(document.querySelectorAll(`#lb-${name}-options option`)).map(
+            (o) => /** @type {HTMLOptionElement} */ (o).value,
+        );
+    }
+
+    /** Valeurs choisies d'une liste du formulaire. */
     getChecklistValues(name) {
         return Array.from(
             /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll(`input[name="lb-${name}"]:checked`)),
         ).map((cb) => cb.value);
     }
 
-    /** Coche les valeurs données, en ajoutant à la liste celles qui n'y sont pas encore. */
+    /** Remplace les valeurs choisies (pré-remplissage, session modifiée). */
     setChecklistValues(name, values) {
         const group = document.getElementById(`lb-${name}-group`);
         if (!group) return;
         const wanted = (Array.isArray(values) ? values : [values]).filter((v) => typeof v === 'string' && v.trim());
-        const boxes = /** @type {NodeListOf<HTMLInputElement>} */ (group.querySelectorAll(`input[name="lb-${name}"]`));
-        boxes.forEach((cb) => (cb.checked = wanted.includes(cb.value)));
-        wanted.forEach((value) => {
-            if (!Array.from(boxes).some((cb) => cb.value === value)) {
-                group.insertAdjacentHTML('beforeend', this._renderChecklistItem(name, value, true));
-            }
-        });
+        group.innerHTML = [...new Set(wanted)].map((v) => this._renderChecklistItem(name, v)).join('');
     }
 
-    /** Bouton « Ajouter » (ou Entrée) : coche la valeur saisie, en l'ajoutant si elle est nouvelle. */
+    /** Bouton « Ajouter », Entrée ou choix dans la liste déroulante : ajoute la valeur saisie. */
     addChecklistItem(name) {
         const input = /** @type {HTMLInputElement} */ (document.getElementById(`lb-${name}-new`));
         const group = document.getElementById(`lb-${name}-group`);
         if (!input || !group) return;
-        const value = input.value.trim();
-        if (!value) return;
-        const existing = Array.from(
-            /** @type {NodeListOf<HTMLInputElement>} */ (group.querySelectorAll(`input[name="lb-${name}"]`)),
-        ).find((cb) => cb.value.toLowerCase() === value.toLowerCase());
-        if (existing) existing.checked = true;
-        else group.insertAdjacentHTML('beforeend', this._renderChecklistItem(name, value, true));
+        const typed = input.value.trim();
+        if (!typed) return;
+        // Une valeur connue garde son écriture d'origine (« oreilles » → « Oreilles »)
+        const known = this.getChecklistOptions(name).find((v) => v.toLowerCase() === typed.toLowerCase());
+        const value = known || typed;
+        if (!this.getChecklistValues(name).some((v) => v.toLowerCase() === value.toLowerCase())) {
+            group.insertAdjacentHTML('beforeend', this._renderChecklistItem(name, value));
+        }
+        if (!known) {
+            const list = document.getElementById(`lb-${name}-options`);
+            if (list) list.insertAdjacentHTML('beforeend', `<option value="${escapeHTML(value)}"></option>`);
+        }
         input.value = '';
         input.focus();
+        this.onChecklistEdited(name);
+    }
+
+    removeChecklistItem(button) {
+        const chip = button.closest('.lb-chip');
+        const name = button.getAttribute('data-checklist-remove');
+        if (chip) chip.remove();
+        if (name) this.onChecklistEdited(name);
+    }
+
+    // Liste modifiée par le pilote : elle n'est plus pré-remplie (pilotes d'une session proche).
+    onChecklistEdited(name) {
+        if (!this.touchedFields.has(name)) {
+            this.touchedFields.add(name);
+            this.learnedFields.delete(name);
+            this.renderLearnedSummary();
+        }
     }
 
     // Le nom de l'école n'est demandé (et obligatoire) que si la case est cochée.
@@ -1174,6 +1231,11 @@ class LogbookViewClass extends BaseView {
                     </select>
                     <input type="text" id="lb-tech-decollage-autre" placeholder="${tt('form.techniquePlaceholder')}" style="display:none; margin-top: 5px; width: 100%;">
                 </div>
+                <div class="form-group" id="lb-treuilleur-group" hidden>
+                    <label for="lb-treuilleur">${tt('form.winchOperator')}</label>
+                    <input type="text" id="lb-treuilleur" list="treuilleurs-list" placeholder="${tt('form.winchOperatorPlaceholder')}" autocomplete="off" style="width: 100%;">
+                    <datalist id="treuilleurs-list"></datalist>
+                </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>${tt('form.maxAltitude')}</label>
@@ -1298,6 +1360,24 @@ class LogbookViewClass extends BaseView {
             schoolList.innerHTML = schools.map((name) => `<option value="${escapeHTML(name)}">`).join('');
         }
 
+        // Treuilleurs déjà saisis, les plus fréquents d'abord
+        const winchList = document.getElementById('treuilleurs-list');
+        if (winchList) {
+            const operators = PilotHabits.rankByUse(LogbookService.getFlights(), (session) =>
+                typeof session.treuilleur === 'string' ? session.treuilleur.trim() : '',
+            );
+            winchList.innerHTML = operators.map((name) => `<option value="${escapeHTML(name)}">`).join('');
+        }
+
+        // Moniteurs déjà saisis, les plus fréquents d'abord
+        const instructorList = document.getElementById('moniteurs-list');
+        if (instructorList) {
+            const instructors = PilotHabits.rankByUse(LogbookService.getFlights(), (session) =>
+                typeof session.moniteur === 'string' ? session.moniteur.trim() : '',
+            );
+            instructorList.innerHTML = instructors.map((name) => `<option value="${escapeHTML(name)}">`).join('');
+        }
+
         // Populate Sites
         const datalist = document.getElementById('sites-list');
         if (datalist) {
@@ -1405,6 +1485,8 @@ class LogbookViewClass extends BaseView {
         'lb-sellette': 'sellette',
         'lb-ecole-check': 'ecole',
         'lb-ecole': 'ecole',
+        'lb-moniteur': 'moniteur',
+        'lb-treuilleur': 'treuilleur',
         'lb-site': 'site',
         'lb-lieu': 'lieu',
     };
@@ -1502,7 +1584,93 @@ class LogbookViewClass extends BaseView {
                 this.learnedFields.delete('ecole');
             }
         }
+        // Moniteur : le dernier de cette école sur ce site, sinon le dernier de cette école
+        const instructorInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
+        const school = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole-check'))?.checked
+            ? value('lb-ecole').trim().toLowerCase()
+            : '';
+        if (instructorInput && can('moniteur')) {
+            const instructor = school
+                ? PilotHabits.latest(
+                      sessions.filter((s) => typeof s.ecole === 'string' && s.ecole.trim().toLowerCase() === school),
+                      'moniteur',
+                      { place },
+                  )
+                : null;
+            if (instructor) {
+                instructorInput.value = instructor.value;
+                this.learnedFields.set(
+                    'moniteur',
+                    instructor.reason === 'place' ? 'instructorPlace' : 'instructorLatest',
+                );
+            } else if (this.learnedFields.has('moniteur')) {
+                instructorInput.value = '';
+                this.learnedFields.delete('moniteur');
+            }
+        }
+        // Treuilleur (vol au treuil) : celui d'une session de moins de 3 h ici, sinon le dernier ici
+        this.updateWinchOperatorField();
+        const winchInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-treuilleur'));
+        if (isVol && winchInput && can('treuilleur')) {
+            const atWinch = value('lb-typeVol') === 'Treuil';
+            const withOperator = sessions.filter((s) => typeof s.treuilleur === 'string' && s.treuilleur.trim());
+            const close = atWinch
+                ? this.findNearbySession(withOperator, place, value('lb-datetime'), 'treuilleur')
+                : null;
+            const last = atWinch && !close ? PilotHabits.latest(withOperator, 'treuilleur', { place }) : null;
+            if (close) {
+                winchInput.value = close.treuilleur;
+                this.learnedFields.set('treuilleur', 'nearbySession');
+            } else if (last && last.reason === 'place') {
+                winchInput.value = last.value;
+                this.learnedFields.set('treuilleur', 'winchOperatorPlace');
+            } else if (this.learnedFields.has('treuilleur')) {
+                winchInput.value = '';
+                this.learnedFields.delete('treuilleur');
+            }
+        }
+
+        // Pilotes : ceux d'une session au même endroit à moins de 3 h (plusieurs vols d'affilée)
+        if (can('pilotes')) {
+            const nearby = this.findNearbySession(sessions, place, value('lb-datetime'));
+            if (nearby) {
+                this.setChecklistValues('pilotes', nearby.pilotes);
+                this.learnedFields.set('pilotes', 'nearbySession');
+            } else if (this.learnedFields.has('pilotes')) {
+                this.setChecklistValues('pilotes', []);
+                this.learnedFields.delete('pilotes');
+            }
+        }
         this.renderLearnedSummary();
+    }
+
+    /**
+     * Session la plus proche dans le temps, au même endroit, à moins de 3 h de `datetime`, et qui
+     * a des pilotes : un vol de la même série (treuil, plusieurs ploufs dans la journée…).
+     */
+    findNearbySession(sessions, place, datetime, field = 'pilotes') {
+        const key = (place || '').trim().toLowerCase();
+        const t = new Date(datetime).getTime();
+        if (!key || !Number.isFinite(t)) return null;
+        let best = null;
+        let bestGap = 3 * 3600 * 1000;
+        for (const s of sessions) {
+            const v = s[field];
+            if (!v || (Array.isArray(v) && !v.length) || PilotHabits.placeOf(s) !== key) continue;
+            const gap = Math.abs(new Date(s.datetime).getTime() - t);
+            if (gap <= bestGap) {
+                best = s;
+                bestGap = gap;
+            }
+        }
+        return best;
+    }
+
+    // Le treuilleur n'est demandé que pour un vol au treuil
+    updateWinchOperatorField() {
+        const group = document.getElementById('lb-treuilleur-group');
+        const typeVol = /** @type {HTMLSelectElement} */ (document.getElementById('lb-typeVol'));
+        if (group) group.hidden = !typeVol || typeVol.value !== 'Treuil';
     }
 
     renderLearnedSummary() {
@@ -1836,6 +2004,8 @@ class LogbookViewClass extends BaseView {
         const ecoleInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole'));
         // Vide hors école : en modification, la valeur vide efface l'école enregistrée.
         const ecole = ecoleCheck?.checked && ecoleInput ? ecoleInput.value.trim() : '';
+        const moniteurInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
+        const moniteur = ecole && moniteurInput ? moniteurInput.value.trim() : '';
 
         const editId = document.getElementById('lb-id-edit')
             ? /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit')).value
@@ -1854,6 +2024,7 @@ class LogbookViewClass extends BaseView {
             duree: duree,
             commentaire: commentaire,
             ecole: ecole,
+            moniteur: moniteur,
             pilotes: this.getChecklistValues('pilotes'),
         };
 
@@ -1869,6 +2040,8 @@ class LogbookViewClass extends BaseView {
         if (this.currentFormType === 'vol') {
             session.site = /** @type {HTMLInputElement} */ (document.getElementById('lb-site')).value.trim();
             session.typeVol = /** @type {HTMLSelectElement} */ (document.getElementById('lb-typeVol')).value;
+            const winchOperator = /** @type {HTMLInputElement} */ (document.getElementById('lb-treuilleur'));
+            session.treuilleur = session.typeVol === 'Treuil' && winchOperator ? winchOperator.value.trim() : '';
 
             const techDecoEl = /** @type {HTMLSelectElement} */ (document.getElementById('lb-tech-decollage'));
             if (techDecoEl) {
@@ -2033,6 +2206,8 @@ class LogbookViewClass extends BaseView {
         const techSelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-tech-decollage'));
         if (techSelect) techSelect.selectedIndex = 0;
         this.setSchoolField(false);
+        const instructorEdit = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
+        if (instructorEdit) instructorEdit.value = session.moniteur || '';
         /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime')).value = session.datetime;
 
         // Helper pour "Autre..."
@@ -2075,6 +2250,9 @@ class LogbookViewClass extends BaseView {
         if (session.type === 'vol') {
             /** @type {HTMLInputElement} */ (document.getElementById('lb-site')).value = session.site || '';
             /** @type {HTMLSelectElement} */ (document.getElementById('lb-typeVol')).value = session.typeVol || 'Plouf';
+            const winchOperatorEdit = /** @type {HTMLInputElement} */ (document.getElementById('lb-treuilleur'));
+            if (winchOperatorEdit) winchOperatorEdit.value = session.treuilleur || '';
+            this.updateWinchOperatorField();
 
             setSelectOrAutre('lb-tech-decollage', 'lb-tech-decollage-autre', session.techDecollage);
 
@@ -2265,6 +2443,8 @@ class LogbookViewClass extends BaseView {
                             ${session.voile ? `<div><strong>${tt('history.wing')}</strong> ${escapeHTML(session.voile)}</div>` : ''}
                             ${session.sellette ? `<div><strong>${tt('history.harness')}</strong> ${escapeHTML(session.sellette)}</div>` : ''}
                             ${session.ecole ? `<div><strong>${tt('history.school')}</strong> ${escapeHTML(session.ecole)}</div>` : ''}
+                            ${isVol && session.typeVol === 'Treuil' && session.treuilleur ? `<div><strong>${tt('history.winchOperator')}</strong> ${escapeHTML(session.treuilleur)}</div>` : ''}
+                            ${session.ecole && session.moniteur ? `<div><strong>${tt('history.instructor')}</strong> ${escapeHTML(session.moniteur)}</div>` : ''}
                             ${session.instrument && (session.instrument.brand || session.instrument.model) ? `<div><strong>${tt('history.instrument')}</strong> ${escapeHTML([session.instrument.brand, session.instrument.model].filter(Boolean).join(' '))}${session.instrument.firmware ? ` ${tt('history.firmware', { version: session.instrument.firmware })}` : ''}</div>` : ''}
                             ${isVol && Array.isArray(session.typeExercice) && session.typeExercice.length > 0 ? `<div><strong>${tt('history.exercises')}</strong> ${escapeHTML(session.typeExercice.join(', '))}</div>` : ''}
                             ${Array.isArray(session.pilotes) && session.pilotes.length > 0 ? `<div><strong>${tt('history.pilots')}</strong> ${escapeHTML(session.pilotes.join(', '))}</div>` : ''}

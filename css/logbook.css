@@ -623,3 +623,38 @@
     font-size: 0.78rem;
     color: var(--text-secondary);
 }
+
+/* Valeurs choisies d'une liste (exercices, pilotes) : étiquettes avec une croix */
+.lb-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+.lb-chips:empty {
+    display: none;
+}
+.lb-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 4px 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
+    background: var(--bg-card-hover, rgba(0, 0, 0, 0.04));
+    color: var(--text-main);
+    font-size: 0.9rem;
+}
+.lb-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    color: var(--text-secondary);
+}
+.lb-chip-remove:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--text-main);
+}
