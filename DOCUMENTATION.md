@@ -62,7 +62,9 @@ AssistantParapente/
 │   │   ├── logbook_service.js  # Flight records CRUD & wing maintenance calculations
 │   │   ├── quiz_service.js     # Question randomization, scoring & streak tracking
 │   │   ├── firebase_service.js # Authentication & Cloud Firestore synchronization
-│   │   ├── igc_parser.js       # Native IGC GPS file parser (B-records, vario, stats)
+│   │   ├── igc_parser.js       # Native IGC GPS file parser (B-records, flight detection, analysis, winch)
+│   │   ├── sdf_parser.js       # Syride .sdf sensor file (load factor, temperature)
+│   │   ├── pilot_habits.js     # What the add form learns from the pilot's logbook
 │   │   ├── storage.js          # LocalStorage wrapper & fallback keys
 │   │   └── idb_storage.js      # Native IndexedDB wrapper for heavy flights & IGC traces
 │   ├── components/
@@ -264,18 +266,24 @@ The map popup, the site card and the favourites table show, next to each verdict
 ## 🪂 Flight Logbook & IGC Parser
 
 ### 1. Native IGC GPS Parser (`js/services/igc_parser.js`)
-Processes binary `.igc` GPS log files strictly on the client side without server uploading.
+Parses `.igc` GPS log files strictly on the client side, without server uploading.
 
-**Extracted Parameters**:
-- `date` & `flightDuration`: Date and start/end time.
-- `maxAltitude` & `minAltitude`: Extracted from B-records (`B1102324545678N00612345EA0123401450`).
-- `maxVario` & `minVario`: Calculated via temporal derivative of pressure altitude ($\frac{\Delta z}{\Delta t}$).
-- `gpsTrack`: Normalized array of `{ lat, lon, alt, timestamp, vario }` for 2D/3D map playback.
+- **Flight only**: `detectTakeoffIndex` / `detectLandingIndex` cut the walk up, the wait on takeoff and the walk back. A pilot is airborne when the path speed over 20 s windows (points at least 5 s apart, so tight approach turns still count) exceeds 15 km/h, or the vertical speed exceeds 1.5 m/s, for at least a minute. The full track stays in `points` for the 3D replay.
+- **Basic stats**: date of takeoff, duration, max altitude, gain, distance, max climb, max and average ground speed.
+- **`analyzeFlight`** (stored as `igcStats` on the flight): altitudes (takeoff, landing, min, max above takeoff, cumulative climb), max sink and average vario, thermals (circling detected from ≥ 200° turned in 20 s, ≥ 20 s and climbing: count, time and share, average and best climb, biggest gain, 360s left/right), glides (straight phases actually descending: average and best glide ratio, speed), distances (free distance with 3 turnpoints by dynamic programming, max from takeoff, takeoff to landing) and a load factor estimated from ground speed × turn rate.
+- **`parseInstrument`** (stored as `instrument`): brand, model, firmware and hardware versions, GPS and pressure sensor, serial number, read from the A record and H lines of the header (Syride puts its serial number in the competition class field `HFCCL`).
+- **`detectWinchTow`**: within 30 s of takeoff, a sustained climb (≥ 1.5 m/s, ≥ 30 s, ≥ 80 m) in a nearly straight line; the release is the highest point up to 10 s after the climb stops. Sets the flight type `Treuil` on import.
 
-### 2. Wing & Equipment Hours Tracking (`js/services/logbook_service.js`)
+### 2. Syride sensors (`js/services/sdf_parser.js`)
+The IGC has no accelerometer. Syride varios export a binary `.sdf` next to the `.igc`: an 8-byte header, then one 21-byte big-endian record per second (lat/lon int32 1e-7°, GPS and relative baro altitude int16, ground speed, satellites, device (case) temperature, not the air, vario 0.1 m/s, five load-factor samples 0.1 g). The file is accepted only if it follows the stored IGC track (`matchesTrace`: 90 % of points sampled every 5 s within 30 m and 15 m, duration within 2 min); its flight window is summed up as `sensorStats` (G max/min, G at the winch release; the device temperatures are kept but not shown).
+
+### 3. Pre-filling learned from the pilot (`js/services/pilot_habits.js`)
+For a new session, `LogbookView.applyLearnedDefaults()` fills the fields the pilot has not touched from the logbook: every past session is evidence weighted by recency (half-life of 15 sessions) and by similarity (same site, same launch mode). General rules are priors worth a couple of sessions (back-facing launch at the winch). Flight type, takeoff technique, school and ground handling place use `suggest`; wing and harness use `latest` (last used on this site, otherwise last used); site suggestions are ordered by `rankByUse`. A field changed by the pilot is never overridden and an edited session is never filled in.
+
+### 4. Wing & Equipment Hours Tracking (`js/services/logbook_service.js`)
 Every logged flight automatically increments the total airtime (hours & minutes) of the associated wing and harness, triggering visual alerts when equipment passes maintenance thresholds (e.g., 100h inspection alert).
 
-### 3. Coordinates of a Manually Entered Place (spec 011)
+### 5. Coordinates of a Manually Entered Place (spec 011)
 A place typed in the add form that is not in the site database can be placed on an inline Leaflet map (« Placer sur la carte »: Esri satellite and topo layers from the host already cached by the service worker, created only when opened and released on re-render and in `unmount()`), or by pasting coordinates (decimal, degrees-minutes-seconds or a Google Maps `@lat,lon` link, parsed by `parseCoordinates` in `js/utils/geo_utils.js`). They are stored as `lat`/`lon` on the session and used for its weather; an imported IGC track overrides them. `LogbookService.findLastCoordsForPlace(name)` proposes the coordinates of the latest earlier session at the same place.
 
 ---

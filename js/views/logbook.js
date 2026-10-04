@@ -3,6 +3,8 @@
  * Wrapped from logbook_engine.js
  */
 import LogbookService from '../services/logbook_service.js';
+import SdfParser from '../services/sdf_parser.js';
+import PilotHabits from '../services/pilot_habits.js';
 import Map3DComponent from '../components/map_3d.js';
 import StorageService from '../services/storage.js'; // Retained just for custom select lists
 import SitesService from '../services/sites_service.js';
@@ -62,6 +64,14 @@ class LogbookViewClass extends BaseView {
                 const target = /** @type {HTMLInputElement} */ (e.target);
                 if (target.id === 'lb-coords' && target.value.trim() && !parseCoordinates(target.value)) {
                     LogbookView.showCoordsError();
+                }
+                // Champ choisi par le pilote : l'app ne le pré-remplit plus, et réévalue les
+                // autres (un autre site ou type de vol change les habitudes à appliquer).
+                const learnedField = LogbookViewClass.LEARNED_FIELD_IDS[target.id];
+                if (learnedField) LogbookView.onLearnedFieldChanged(learnedField);
+
+                if (target.id === 'lb-coords') {
+                    // traité plus haut
                 } else if (target.id === 'lb-ecole-check') {
                     LogbookView.setSchoolField(target.checked);
                 } else if (target.id === 'lb-voile' || target.id === 'lb-sellette') {
@@ -79,6 +89,15 @@ class LogbookViewClass extends BaseView {
                         windLimitsDiv.style.display = target.value === 'voile' ? 'flex' : 'none';
                     }
                 }
+            });
+
+            // Entrée dans « Ajouter un exercice / un pilote » : ajoute à la liste au lieu
+            // d'envoyer le formulaire.
+            container.addEventListener('keydown', (e) => {
+                const target = /** @type {HTMLInputElement} */ (e.target);
+                if (e.key !== 'Enter' || !target.dataset || !target.dataset.checklist) return;
+                e.preventDefault();
+                LogbookView.addChecklistItem(target.dataset.checklist);
             });
 
             // Logbook form submit
@@ -188,22 +207,54 @@ class LogbookViewClass extends BaseView {
         return types.some((t) => LogbookViewClass.TAKEOFF_SITE_TYPES.includes(t));
     }
 
-    findNearestSite(lat, lon, maxDistanceKm = 2) {
-        if (lat === null || lon === null) return null;
-
-        let nearest = null;
-        let nearestDist = Infinity;
+    // Rayon de 500 m : au-delà, le site connu le plus proche est souvent un autre décollage
+    // que celui d'où l'on est parti.
+    /** Sites de décollage connus dans le rayon, du plus proche au plus éloigné. */
+    findNearbySites(lat, lon, maxDistanceKm = 0.5) {
+        if (lat === null || lon === null) return [];
+        const nearby = [];
         SitesService.getSites().forEach((site) => {
             if (!this.isTakeoffSite(site)) return;
             const coords = this.getSiteCoords(site);
             if (coords.lat === null || coords.lon === null) return;
             const dist = this.haversineDistanceKm(lat, lon, coords.lat, coords.lon);
-            if (dist < nearestDist) {
-                nearestDist = dist;
-                nearest = site;
-            }
+            if (dist <= maxDistanceKm) nearby.push({ site, dist });
         });
-        return nearest && nearestDist <= maxDistanceKm ? nearest : null;
+        return nearby.sort((a, b) => a.dist - b.dist).map((n) => n.site);
+    }
+
+    findNearestSite(lat, lon, maxDistanceKm = 0.5) {
+        return this.findNearbySites(lat, lon, maxDistanceKm)[0] || null;
+    }
+
+    // Plusieurs sites connus près du décollage d'une trace (deux décos voisins, treuil et
+    // pente…) : le plus proche est pré-rempli, les autres sont proposés en boutons.
+    _siteChoices = [];
+
+    showSiteChoices(sites) {
+        const box = document.getElementById('lb-site-choices');
+        if (!box) return;
+        this._siteChoices = sites.length > 1 ? sites : [];
+        box.hidden = this._siteChoices.length === 0;
+        const current = /** @type {HTMLInputElement} */ (document.getElementById('lb-site'))?.value || '';
+        box.innerHTML = this._siteChoices.length
+            ? `<span>${tt('form.siteChoices')}</span> ` +
+              this._siteChoices
+                  .map((site, i) => {
+                      const name = site.nom || site.name;
+                      const active = name === current;
+                      return `<button type="button" data-action="pickSiteChoice" data-args="${i}" aria-pressed="${active}" style="margin: 4px 4px 0 0; padding: 2px 8px; border-radius: 12px; cursor: pointer; border: 1px solid var(--accent-blue, #007bc4); background: ${active ? 'var(--accent-blue, #007bc4)' : 'transparent'}; color: ${active ? '#fff' : 'var(--accent-blue, #007bc4)'};">${escapeHTML(name)}</button>`;
+                  })
+                  .join('')
+            : '';
+    }
+
+    pickSiteChoice(index) {
+        const site = this._siteChoices[parseInt(index, 10)];
+        const input = /** @type {HTMLInputElement} */ (document.getElementById('lb-site'));
+        if (!site || !input) return;
+        input.value = site.nom || site.name;
+        this.showSiteChoices(this._siteChoices);
     }
 
     show() {
@@ -587,6 +638,7 @@ class LogbookViewClass extends BaseView {
         const commentaire = /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire'))?.value || '';
         const ecoleChecked = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole-check'))?.checked;
         const ecole = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole'))?.value || '';
+        const pilotes = this.getChecklistValues('pilotes');
 
         const coordsText = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'))?.value || '';
         const coordsPanelOpen = document.getElementById('lb-coords-panel')?.hidden === false;
@@ -650,6 +702,7 @@ class LogbookViewClass extends BaseView {
             if (el) el.value = commentaire;
         }
         if (ecoleChecked) this.setSchoolField(true, ecole);
+        this.setChecklistValues('pilotes', pilotes);
 
         if (coordsText) {
             const el = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'));
@@ -665,7 +718,15 @@ class LogbookViewClass extends BaseView {
 
     // --- SESSION EN ÉCOLE ---
 
-    renderSchoolBlock() {
+    // En vol, les exercices travaillés ne sont demandés que pour une session en école (au sol,
+    // ils font déjà partie du formulaire).
+    renderSchoolBlock(type = 'gonflage') {
+        const exercises =
+            type === 'vol'
+                ? `
+                        <label style="display:block; margin-top: 10px;">${tt('form.exercises')}</label>
+                        ${this.renderChecklist('typeExercice', LogbookViewClass.FLIGHT_EXERCISES, this.getUsedValues('typeExercice', 'vol'), tt('form.addExercisePlaceholder'))}`
+                : '';
         return `
                 <div class="form-group">
                     <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
@@ -674,9 +735,113 @@ class LogbookViewClass extends BaseView {
                     <div id="lb-ecole-group" hidden style="margin-top: 6px;">
                         <label for="lb-ecole">${tt('form.schoolName')} <span class="required">*</span></label>
                         <input type="text" id="lb-ecole" list="ecoles-list" placeholder="${tt('form.schoolPlaceholder')}" autocomplete="off" style="width: 100%;">
-                        <datalist id="ecoles-list"></datalist>
+                        <datalist id="ecoles-list"></datalist>${exercises}
                     </div>
                 </div>`;
+    }
+
+    // Pilotes avec qui on a volé / gonflé, pour toute session (école ou pas).
+    renderPilotsBlock() {
+        return `
+                <div class="form-group">
+                    <label>${tt('form.pilots')}</label>
+                    ${this.renderChecklist('pilotes', [], this.getUsedValues('pilotes'), tt('form.addPilotPlaceholder'))}
+                </div>`;
+    }
+
+    // --- LISTES À COCHER EXTENSIBLES (exercices, pilotes) ---
+    // La liste proposée = valeurs par défaut + toutes celles déjà enregistrées dans le carnet :
+    // une valeur ajoutée à la main sur une session est donc reproposée sur les suivantes.
+
+    static FLIGHT_EXERCISES = [
+        'Virages',
+        'Tangage/Roulis',
+        'Oreilles',
+        'Accélérateur',
+        'Approche en 8',
+        'Approche en U',
+        "Précision d'atterrissage",
+    ];
+    static GROUND_EXERCISES = [
+        'Face voile',
+        'Dos voile',
+        'Tangage/Roulis',
+        'Affalage',
+        'Vent fort',
+        'Prégonflage / Démêlage',
+    ];
+
+    /** Valeurs distinctes d'un champ liste (`typeExercice`, `pilotes`) dans le carnet, triées. */
+    getUsedValues(field, type = null) {
+        const seen = new Map();
+        LogbookService.getFlights().forEach((session) => {
+            if (type && session.type !== type) return;
+            const values = Array.isArray(session[field]) ? session[field] : [session[field]];
+            values.forEach((value) => {
+                const v = typeof value === 'string' ? value.trim() : '';
+                if (v && !seen.has(v.toLowerCase())) seen.set(v.toLowerCase(), v);
+            });
+        });
+        return [...seen.values()].sort((a, b) => a.localeCompare(b, 'fr'));
+    }
+
+    _renderChecklistItem(name, value, checked = false) {
+        // Les valeurs par défaut ont un libellé traduit ; les autres sont affichées telles quelles.
+        const isDefault =
+            name === 'typeExercice' &&
+            (LogbookViewClass.FLIGHT_EXERCISES.includes(value) || LogbookViewClass.GROUND_EXERCISES.includes(value));
+        const label = isDefault ? tt(`form.exerciseTypes.${value}`) : escapeHTML(value);
+        return `<label><input type="checkbox" name="lb-${name}" value="${escapeHTML(value)}"${checked ? ' checked' : ''}> ${label}</label>`;
+    }
+
+    renderChecklist(name, defaults, used, placeholder) {
+        const lower = defaults.map((v) => v.toLowerCase());
+        const items = [...defaults, ...used.filter((v) => !lower.includes(v.toLowerCase()))];
+        return `
+                        <div id="lb-${name}-group" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                            ${items.map((v) => this._renderChecklistItem(name, v)).join('')}
+                        </div>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <input type="text" id="lb-${name}-new" data-checklist="${name}" placeholder="${placeholder}" autocomplete="off" style="flex:1; min-width:0;">
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'${name}'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> ${tt('form.add')}</button>
+                        </div>`;
+    }
+
+    /** Valeurs cochées d'une liste du formulaire. */
+    getChecklistValues(name) {
+        return Array.from(
+            /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll(`input[name="lb-${name}"]:checked`)),
+        ).map((cb) => cb.value);
+    }
+
+    /** Coche les valeurs données, en ajoutant à la liste celles qui n'y sont pas encore. */
+    setChecklistValues(name, values) {
+        const group = document.getElementById(`lb-${name}-group`);
+        if (!group) return;
+        const wanted = (Array.isArray(values) ? values : [values]).filter((v) => typeof v === 'string' && v.trim());
+        const boxes = /** @type {NodeListOf<HTMLInputElement>} */ (group.querySelectorAll(`input[name="lb-${name}"]`));
+        boxes.forEach((cb) => (cb.checked = wanted.includes(cb.value)));
+        wanted.forEach((value) => {
+            if (!Array.from(boxes).some((cb) => cb.value === value)) {
+                group.insertAdjacentHTML('beforeend', this._renderChecklistItem(name, value, true));
+            }
+        });
+    }
+
+    /** Bouton « Ajouter » (ou Entrée) : coche la valeur saisie, en l'ajoutant si elle est nouvelle. */
+    addChecklistItem(name) {
+        const input = /** @type {HTMLInputElement} */ (document.getElementById(`lb-${name}-new`));
+        const group = document.getElementById(`lb-${name}-group`);
+        if (!input || !group) return;
+        const value = input.value.trim();
+        if (!value) return;
+        const existing = Array.from(
+            /** @type {NodeListOf<HTMLInputElement>} */ (group.querySelectorAll(`input[name="lb-${name}"]`)),
+        ).find((cb) => cb.value.toLowerCase() === value.toLowerCase());
+        if (existing) existing.checked = true;
+        else group.insertAdjacentHTML('beforeend', this._renderChecklistItem(name, value, true));
+        input.value = '';
+        input.focus();
     }
 
     // Le nom de l'école n'est demandé (et obligatoire) que si la case est cochée.
@@ -936,6 +1101,7 @@ class LogbookViewClass extends BaseView {
                     <div style="font-weight: bold; margin-top: 10px;">${tt('form.igcTitle')}</div>
                     <div style="font-size: 0.85rem; color: var(--text-secondary, #666); margin-top: 5px;" id="igc-upload-filename">${tt('form.igcHint')}</div>
                 </div>
+                <button type="button" id="lb-igc-recalc" data-action="recalculateFromTrace" style="display:none; width: 100%; margin: -5px 0 15px; padding: 8px; border-radius: 6px; border: 1px solid var(--accent-blue, #007bc4); color: var(--accent-blue, #007bc4); background: transparent; cursor: pointer;"><i class="ri-refresh-line"></i> ${tt('igc.recalculate')}</button>
                 <div class="form-group" id="igc-alt-check" style="display:none; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-light, #ccc); margin-bottom: 15px;">
                     <div id="igc-alt-info" style="font-size: 0.85rem; margin-bottom: 8px;"></div>
                     <div style="display:flex; gap: 16px; margin-bottom: 6px; font-size: 0.9rem;">
@@ -953,6 +1119,7 @@ class LogbookViewClass extends BaseView {
                     <label>${tt('form.site')} <span class="required">*</span></label>
                     <input type="text" id="lb-site" list="sites-list" placeholder="${tt('form.sitePlaceholder')}" required autocomplete="off">
                     <datalist id="sites-list"></datalist>
+                    <div id="lb-site-choices" hidden style="font-size: 0.82rem; margin-top: 4px;"></div>
                     ${this.renderCoordsBlock()}
                 </div>
                 <div class="form-row">
@@ -986,6 +1153,7 @@ class LogbookViewClass extends BaseView {
                             <option value="Soaring">${tt('form.flightTypes.Soaring')}</option>
                             <option value="Restit">${tt('form.flightTypes.Restit')}</option>
                             <option value="Cross">${tt('form.flightTypes.Cross')}</option>
+                            <option value="Treuil">${tt('form.flightTypes.Treuil')}</option>
                         </select>
                     </div>
                 </div>
@@ -1016,7 +1184,8 @@ class LogbookViewClass extends BaseView {
                         <input type="number" id="lb-gain" placeholder="${tt('form.gainPlaceholder')}">
                     </div>
                 </div>
-                ${this.renderSchoolBlock()}
+                ${this.renderSchoolBlock('vol')}
+                ${this.renderPilotsBlock()}
                 <div class="form-group">
                     <label>${tt('form.comment')}</label>
                     <textarea id="lb-commentaire" rows="3" placeholder="${tt('form.commentPlaceholderFlight')}"></textarea>
@@ -1060,17 +1229,11 @@ class LogbookViewClass extends BaseView {
                     </div>
                     <div class="form-group">
                         <label>${tt('form.exercises')}</label>
-                        <div id="lb-typeExercice-group" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
-                            <label><input type="checkbox" name="lb-typeExercice" value="Face voile"> ${tt('form.exerciseTypes.Face voile')}</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Dos voile"> ${tt('form.exerciseTypes.Dos voile')}</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Tangage/Roulis"> ${tt('form.exerciseTypes.Tangage/Roulis')}</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Affalage"> ${tt('form.exerciseTypes.Affalage')}</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Vent fort"> ${tt('form.exerciseTypes.Vent fort')}</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Prégonflage / Démêlage"> ${tt('form.exerciseTypes.Prégonflage / Démêlage')}</label>
-                        </div>
+                        ${this.renderChecklist('typeExercice', LogbookViewClass.GROUND_EXERCISES, this.getUsedValues('typeExercice', 'gonflage'), tt('form.addExercisePlaceholder'))}
                     </div>
                 </div>
                 ${this.renderSchoolBlock()}
+                ${this.renderPilotsBlock()}
                 <div class="form-group">
                     <label>${tt('form.comment')}</label>
                     <textarea id="lb-commentaire" rows="3" placeholder="${tt('form.commentPlaceholderGround')}"></textarea>
@@ -1079,9 +1242,13 @@ class LogbookViewClass extends BaseView {
         }
 
         this.releaseCoordsMap();
+        // Ce que l'app a pré-rempli d'après les habitudes du pilote
+        html += `<div id="lb-learned-summary" hidden style="margin-top: 4px; font-size: 0.8rem; color: var(--text-secondary);"></div>`;
         container.innerHTML = html;
         this.populateDropdowns();
-        this.fillLastEquipment();
+        this.touchedFields = new Set();
+        this.learnedFields = new Map();
+        this.applyLearnedDefaults();
         this.updateCoordsStatus();
 
         const uploadContainer = /** @type {HTMLElement} */ (document.querySelector('.igc-upload-container'));
@@ -1108,9 +1275,7 @@ class LogbookViewClass extends BaseView {
                 uploadContainer.style.borderColor = 'var(--border-light, #ccc)';
                 uploadContainer.style.background = 'var(--bg-card, #f9f9f9)';
                 if (e.dataTransfer && e.dataTransfer.files.length > 0) {
-                    const file = e.dataTransfer.files[0];
-                    if (!file) return;
-                    this._processIgcFile(file);
+                    this._processFiles(e.dataTransfer.files);
                 }
             });
         }
@@ -1151,10 +1316,16 @@ class LogbookViewClass extends BaseView {
                 .map((site) => site.trim().toUpperCase());
             allSites = allSites.concat(historySites);
 
-            // 3. Dédoublonnage et tri alphabétique immuable (ES2023)
-            const processedSites = toSorted(Array.from(new Set(allSites)), (a, b) =>
-                a.localeCompare(b, 'fr', { sensitivity: 'base' }),
+            // 3. Les lieux où le pilote va le plus souvent d'abord (appris du carnet), puis les
+            // autres par ordre alphabétique
+            const usual = PilotHabits.rankByUse(LogbookService.getFlights(), (session) =>
+                (session.site || session.lieu || '').trim().toUpperCase(),
             );
+            const others = toSorted(
+                Array.from(new Set(allSites)).filter((site) => !usual.includes(site)),
+                (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }),
+            );
+            const processedSites = [...usual, ...others];
 
             // 4. Injection dans le DOM
             datalist.innerHTML = processedSites
@@ -1220,15 +1391,128 @@ class LogbookViewClass extends BaseView {
         }
     }
 
-    fillLastEquipment() {
-        // Automatically fill voile and sellette with the last used ones
-        if (LogbookService.getFlights().length > 0) {
-            const lastSession = LogbookService.getFlights()[0];
-            const voileInput = /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile'));
-            const selletteInput = /** @type {HTMLSelectElement} */ (document.getElementById('lb-sellette'));
-            if (voileInput && lastSession.voile) voileInput.value = lastSession.voile;
-            if (selletteInput && lastSession.sellette) selletteInput.value = lastSession.sellette;
+    // --- PRÉ-REMPLISSAGE APPRIS DU PILOTE (PilotHabits) ---
+    // Pour une nouvelle session, l'app propose ce que le pilote fait d'habitude dans la même
+    // situation : type de vol et technique du site, matériel utilisé là (sinon le dernier),
+    // école récente, lieu de gonflage habituel. Un champ que le pilote modifie n'est plus
+    // jamais remplacé ; une session existante n'est jamais modifiée.
+
+    // id du champ → nom du champ appris
+    static LEARNED_FIELD_IDS = {
+        'lb-typeVol': 'typeVol',
+        'lb-tech-decollage': 'techDecollage',
+        'lb-voile': 'voile',
+        'lb-sellette': 'sellette',
+        'lb-ecole-check': 'ecole',
+        'lb-ecole': 'ecole',
+        'lb-site': 'site',
+        'lb-lieu': 'lieu',
+    };
+    // Valeur de l'option « Dos voile » (identifiant, pas un texte affiché)
+    static WINCH_TAKEOFF_TECHNIQUE = 'Dos voile';
+
+    touchedFields = new Set();
+    learnedFields = new Map(); // champ → raison affichée
+
+    onLearnedFieldChanged(field) {
+        this.touchedFields.add(field);
+        this.learnedFields.delete(field);
+        this.applyLearnedDefaults();
+    }
+
+    /**
+     * Pré-remplit les champs que le pilote n'a pas touchés. `force` : champs à recalculer même
+     * en modification d'une session (ex. technique enregistrée avec un type de vol par défaut).
+     */
+    applyLearnedDefaults({ force = [] } = {}) {
+        const editing = Boolean(/** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit'))?.value);
+        if (editing && !force.length) return;
+        const can = (field) => force.includes(field) || (!editing && !this.touchedFields.has(field));
+        const sessions = LogbookService.getFlights();
+        const isVol = this.currentFormType === 'vol';
+        const sessionType = isVol ? 'vol' : 'gonflage';
+        const value = (id) => /** @type {HTMLInputElement} */ (document.getElementById(id))?.value || '';
+        const setSelect = (id, field, suggestion) => {
+            const select = /** @type {HTMLSelectElement} */ (document.getElementById(id));
+            if (!select || !suggestion || !Array.from(select.options).some((o) => o.value === suggestion.value)) return;
+            select.value = suggestion.value;
+            const other = document.getElementById(`${id}-autre`);
+            if (other) other.style.display = 'none';
+            this.learnedFields.set(field, suggestion.reason);
+        };
+
+        // Lieu de gonflage habituel (seulement s'il est vide)
+        if (!isVol && can('lieu') && !value('lb-lieu').trim()) {
+            const lieu = PilotHabits.suggest(sessions, 'lieu', { sessionType, minScore: 1.5 });
+            const input = /** @type {HTMLInputElement} */ (document.getElementById('lb-lieu'));
+            if (lieu && input) {
+                input.value = lieu.value;
+                this.learnedFields.set('lieu', 'habit');
+                this.onPlaceChanged(); // coordonnées connues de ce lieu
+            }
         }
+        const place = isVol ? value('lb-site') : value('lb-lieu');
+
+        if (isVol && can('typeVol')) {
+            setSelect(
+                'lb-typeVol',
+                'typeVol',
+                PilotHabits.suggest(sessions, 'typeVol', {
+                    sessionType,
+                    context: { place },
+                    mismatch: { place: 0.1 },
+                    minScore: 1,
+                }),
+            );
+        }
+        if (isVol && can('techDecollage')) {
+            const winch = value('lb-typeVol') === 'Treuil';
+            const technique = PilotHabits.suggest(sessions, 'techDecollage', {
+                sessionType,
+                context: { place, launch: winch ? 'treuil' : 'libre' },
+                // Règle générale, vite remplacée par les vols du pilote au treuil
+                prior: winch ? { value: LogbookViewClass.WINCH_TAKEOFF_TECHNIQUE, weight: 2, reason: 'winch' } : null,
+            });
+            if (technique && technique.reason === 'launch') technique.reason = winch ? 'launchWinch' : 'habit';
+            setSelect('lb-tech-decollage', 'techDecollage', technique);
+        }
+        for (const field of ['voile', 'sellette']) {
+            if (!can(field)) continue;
+            const gear = PilotHabits.latest(sessions, field, { place });
+            if (gear)
+                setSelect(`lb-${field}`, field, {
+                    value: gear.value,
+                    reason: gear.reason === 'place' ? 'gearPlace' : 'gearLatest',
+                });
+        }
+        if (can('ecole')) {
+            const ecole = PilotHabits.suggest(sessions, 'ecole', {
+                sessionType,
+                context: { place },
+                mismatch: { place: 0.1 }, // on vole en école sur certains sites, pas partout
+                includeEmpty: true,
+                minScore: 1,
+            });
+            if (ecole && ecole.value) {
+                this.setSchoolField(true, ecole.value);
+                this.learnedFields.set('ecole', ecole.reason);
+            } else if (ecole && this.learnedFields.has('ecole')) {
+                // Proposée pour un autre site : on la retire
+                this.setSchoolField(false);
+                this.learnedFields.delete('ecole');
+            }
+        }
+        this.renderLearnedSummary();
+    }
+
+    renderLearnedSummary() {
+        const box = document.getElementById('lb-learned-summary');
+        if (!box) return;
+        const items = [...this.learnedFields.entries()].map(
+            ([field, reason]) => `${tl(`form.learned.fields.${field}`)} (${tl(`form.learned.reasons.${reason}`)})`,
+        );
+        box.hidden = items.length === 0;
+        box.textContent = items.length ? tl('form.learned.summary', { items: items.join(', ') }) : '';
     }
 
     currentTraceData = null;
@@ -1237,11 +1521,16 @@ class LogbookViewClass extends BaseView {
     // null = correction d'altitude non touchée dans ce formulaire (on ne réécrit pas altOffset)
     currentIgcAltOffset = null;
 
-    handleIgcUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+    // Capteurs du vario (facteur de charge, température) lus dans le .sdf Syride
+    currentSensorStats = null;
+    // Trace du formulaire en cours (import ou vol modifié), pour caler le .sdf dessus
+    currentTraceInfo = null;
 
-        this._processIgcFile(file);
+    handleIgcUpload(event) {
+        const files = event.target.files;
+        if (!files || !files.length) return;
+
+        this._processFiles(files);
 
         // Permettre de re-sélectionner le même fichier si besoin
         if (event.target && event.target.type === 'file') {
@@ -1252,11 +1541,68 @@ class LogbookViewClass extends BaseView {
     // Partagé par la sélection de fichier (handleIgcUpload) et le drag-and-drop sur la
     // zone d'import, pour que les deux voies remplissent le formulaire à l'identique
     // (site géolocalisé inclus) au lieu de dupliquer la logique.
+    // Un ou plusieurs fichiers choisis ou déposés : la trace .igc d'abord, puis le .sdf Syride
+    // (même vol) qui s'y cale pour le facteur de charge et la température.
+    async _processFiles(fileList) {
+        const files = Array.from(fileList || []);
+        const isSdf = (f) => /\.sdf$/i.test(f.name);
+        const trace = files.find((f) => !isSdf(f));
+        const sdf = files.find(isSdf);
+        if (trace) await this._processIgcFile(trace);
+        if (sdf) await this._processSdfFile(sdf);
+    }
+
+    async _processSdfFile(file) {
+        const filenameLabel = document.getElementById('igc-upload-filename');
+        const records = SdfParser.parse(await file.arrayBuffer());
+        if (!records) {
+            alert(tl('igc.sdfInvalid', { name: file.name }));
+            return;
+        }
+        // Trace de référence : celle qu'on vient d'importer, sinon celle du vol modifié
+        let info = this.currentTraceInfo;
+        const editId = /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit'))?.value;
+        if (!info && editId) {
+            const raw = await LogbookService.getFlightTrace(editId);
+            const parsed = raw ? LogbookService.parseIGC(raw) : null;
+            if (parsed && parsed.success) info = parsed.data;
+        }
+        // Sans trace, impossible de vérifier que le .sdf est celui de ce vol : on le refuse
+        if (!info) {
+            alert(tl('igc.sdfNoTrace'));
+            return;
+        }
+        const offset = SdfParser.alignToTrace(records, info.points);
+        if (!SdfParser.matchesTrace(records, info.points, offset)) {
+            alert(tl('igc.sdfMismatch'));
+            return;
+        }
+        // Un enregistrement par seconde, à partir du premier point de la trace
+        const t0 = info.points[0].timestamp;
+        const at = (i) => offset + Math.round((info.points[i].timestamp - t0) / 1000);
+        const from = at(info.takeoffIndex || 0);
+        const to = at(info.landingIndex ?? info.points.length - 1);
+        this.currentSensorStats = { ...SdfParser.summarize(records, from, to), source: 'sdf' };
+        // Facteur de charge au largage du treuil (± 5 s autour du point le plus haut)
+        const winch = info.analysis && info.analysis.winch;
+        if (winch) {
+            const release = at((info.takeoffIndex || 0) + winch.releaseIndex);
+            const around = SdfParser.summarize(records, release - 5, release + 5);
+            if (around) this.currentSensorStats.gRelease = around.gMax;
+        }
+        if (filenameLabel) {
+            filenameLabel.textContent = tl('igc.sdfLoaded', { name: file.name, gMax: this.currentSensorStats.gMax });
+        }
+    }
+
     _processIgcFile(file) {
         const filenameLabel = document.getElementById('igc-upload-filename');
         if (filenameLabel) filenameLabel.textContent = tl('igc.fileLoaded', { name: file.name });
 
+        let done;
+        const finished = new Promise((resolve) => (done = resolve));
         const reader = new FileReader();
+        reader.onerror = () => done();
         reader.onload = async (e) => {
             const text = e.target.result;
             this.currentRawIgc = text;
@@ -1265,30 +1611,7 @@ class LogbookViewClass extends BaseView {
             if (flightStats.success) {
                 const parsed = flightStats.data;
                 this.currentTraceData = parsed.points;
-                this.currentIgcStats = {
-                    distanceKm: parsed.distanceKm,
-                    maxClimbRate: parsed.maxClimbRate,
-                    maxSpeedKmh: parsed.maxSpeedKmh,
-                    avgSpeedKmh: parsed.avgSpeedKmh,
-                };
-
-                const durationInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-duree'));
-                if (durationInput && parsed.duration > 0) {
-                    durationInput.value = parsed.duration;
-                }
-                const datetimeInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime'));
-                if (datetimeInput && parsed.dateStr) {
-                    datetimeInput.value = parsed.dateStr;
-                }
-
-                const altMaxInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-altMax'));
-                if (altMaxInput && parsed.maxAltitude !== null) {
-                    altMaxInput.value = parsed.maxAltitude;
-                }
-                const gainInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-gain'));
-                if (gainInput && parsed.gain !== null) {
-                    gainInput.value = parsed.gain;
-                }
+                this._fillFormFromIgc(parsed);
 
                 const siteInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-site'));
                 // Le vrai décollage (pas forcément le 1er point : vario allumé au parking,
@@ -1303,9 +1626,10 @@ class LogbookViewClass extends BaseView {
                 if (siteInput && !siteInput.value.trim()) {
                     // 1. Un site officiel connu tout près du décollage détecté : on l'utilise
                     // directement, c'est plus fiable et plus utile qu'un nom de ville/lieu-dit.
-                    const nearestSite = this.findNearestSite(takeoff.lat, takeoff.lon);
-                    if (nearestSite) {
-                        siteInput.value = nearestSite.nom || nearestSite.name;
+                    const nearbySites = this.findNearbySites(takeoff.lat, takeoff.lon);
+                    if (nearbySites.length > 0) {
+                        siteInput.value = nearbySites[0].nom || nearbySites[0].name;
+                        this.showSiteChoices(nearbySites);
                     } else {
                         // 2. Sinon, reverse-geocoding vers la ville/lieu-dit le plus proche.
                         siteInput.value = tl('igc.searchingPlace');
@@ -1320,15 +1644,116 @@ class LogbookViewClass extends BaseView {
                     }
                 }
                 this._setupAltitudeCheck(parsed);
+                this.applyLearnedDefaults(); // le site vient peut-être d'être trouvé
+                this.currentTraceInfo = parsed;
+                // Nouvelle trace : un .sdf d'un autre vol ne s'applique plus
+                this.currentSensorStats = null;
                 console.log('[IGC] Trace parsée :', parsed.points.length, 'points, durée :', parsed.duration, 'min');
             } else {
                 alert(tl('igc.parseError', { error: flightStats.error }));
                 this.currentTraceData = null;
                 this.currentRawIgc = null;
                 this.currentIgcStats = null;
+                this.currentTraceInfo = null;
             }
+            done();
         };
         reader.readAsText(file);
+        return finished;
+    }
+
+    // Champs du formulaire déduits de la trace : date du décollage, durée, altitude max
+    // (corrigée de `altOffset`), gain et statistiques du vol.
+    _fillFormFromIgc(parsed, altOffset = 0) {
+        this.currentIgcStats = {
+            distanceKm: parsed.distanceKm,
+            maxClimbRate: parsed.maxClimbRate,
+            maxSpeedKmh: parsed.maxSpeedKmh,
+            avgSpeedKmh: parsed.avgSpeedKmh,
+            igcStats: parsed.analysis || null,
+            ...(parsed.instrument ? { instrument: parsed.instrument } : {}),
+        };
+
+        const durationInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-duree'));
+        if (durationInput && parsed.duration > 0) {
+            durationInput.value = parsed.duration;
+        }
+        const datetimeInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime'));
+        if (datetimeInput && parsed.dateStr) {
+            datetimeInput.value = parsed.dateStr;
+        }
+
+        const altMaxInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-altMax'));
+        if (altMaxInput && parsed.maxAltitude !== null) {
+            altMaxInput.value = parsed.maxAltitude + altOffset;
+        }
+        const gainInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-gain'));
+        if (gainInput && parsed.gain !== null) {
+            gainInput.value = parsed.gain;
+        }
+
+        // Départ au treuil reconnu dans la trace : c'est un fait, il prime sur les habitudes.
+        // Type de vol « Treuil », sauf si le pilote l'a choisi lui-même (ou, pour un vol
+        // existant, si son type n'est plus la valeur par défaut « Plouf »).
+        const typeVolInput = /** @type {HTMLSelectElement} */ (document.getElementById('lb-typeVol'));
+        const editing = Boolean(/** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit'))?.value);
+        const typeVolFree = editing ? typeVolInput?.value === 'Plouf' : !this.touchedFields.has('typeVol');
+        if (typeVolInput && parsed.analysis && parsed.analysis.winch && typeVolFree) {
+            typeVolInput.value = 'Treuil';
+            this.touchedFields.add('typeVol');
+            this.learnedFields.set('typeVol', 'trace');
+            // Pour un vol existant, la technique enregistrée avec le type par défaut l'était sans
+            // doute aussi par défaut : on la réévalue.
+            this.applyLearnedDefaults({ force: editing ? ['techDecollage'] : [] });
+        }
+    }
+
+    // Édition d'un vol : refait les calculs à partir de la trace IGC déjà enregistrée (après
+    // une amélioration du parseur, par exemple), sans avoir à ré-importer le fichier. Seul ce
+    // qui vient de la trace est recalculé (date, durée, altitudes, stats, site et position du
+    // décollage) ; le matériel, le type de vol, l'école, le commentaire et la correction
+    // d'altitude sont gardés.
+    async recalculateFromTrace() {
+        const idField = /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit'));
+        const id = idField ? idField.value : '';
+        if (!id) return;
+        const raw = await LogbookService.getFlightTrace(id);
+        if (!raw) {
+            alert(tl('igc.noStoredTrace'));
+            return;
+        }
+        const result = LogbookService.parseIGC(raw);
+        if (!result.success) {
+            alert(tl('igc.parseError', { error: result.error }));
+            return;
+        }
+        const session = LogbookService.getFlightById(id);
+        const offset = this.currentIgcAltOffset ?? (session?.altOffset || 0);
+        const parsed = result.data;
+        this._fillFormFromIgc(parsed, offset);
+        this._setupAltitudeCheck(parsed, offset);
+
+        // Le site vient lui aussi de la trace : position du décollage détecté, et site connu le
+        // plus proche. Sans site connu à moins de 500 m, le nom saisi est gardé plutôt que
+        // remplacé par un nom de commune.
+        const takeoff = parsed.points[parsed.takeoffIndex] || parsed.points[0];
+        const coordsInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'));
+        if (coordsInput) {
+            coordsInput.value = formatCoordinates(takeoff.lat, takeoff.lon);
+            this.updateCoordsStatus();
+        }
+        await SitesService.ensureSitesLoaded().catch(() => null);
+        const nearbySites = this.findNearbySites(takeoff.lat, takeoff.lon);
+        const siteInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-site'));
+        if (siteInput && nearbySites.length > 0) {
+            // Le site déjà choisi reste s'il fait partie des candidats ; sinon, le plus proche.
+            const names = nearbySites.map((site) => site.nom || site.name);
+            if (!names.includes(siteInput.value)) siteInput.value = names[0];
+        }
+        this.showSiteChoices(nearbySites);
+
+        const filenameLabel = document.getElementById('igc-upload-filename');
+        if (filenameLabel) filenameLabel.textContent = tl('igc.recalculated');
     }
 
     // La correction d'altitude est toujours proposée (optionnelle). Une altitude d'atterrissage
@@ -1429,6 +1854,7 @@ class LogbookViewClass extends BaseView {
             duree: duree,
             commentaire: commentaire,
             ecole: ecole,
+            pilotes: this.getChecklistValues('pilotes'),
         };
 
         // Une trace IGC importée remplace ces coordonnées plus bas ; vidées en modification, elles sont retirées.
@@ -1471,6 +1897,7 @@ class LogbookViewClass extends BaseView {
                 }
                 session.techDecollage = techDecollage;
             }
+            session.typeExercice = ecole ? this.getChecklistValues('typeExercice') : [];
 
             const altMax = /** @type {HTMLInputElement} */ (document.getElementById('lb-altMax')).value;
             if (altMax) session.altitudeMax = parseInt(altMax, 10);
@@ -1489,6 +1916,11 @@ class LogbookViewClass extends BaseView {
                 Object.assign(session, this.currentIgcStats);
                 this.currentIgcStats = null; // reset
             }
+            if (this.currentSensorStats) {
+                session.sensorStats = this.currentSensorStats;
+                this.currentSensorStats = null;
+            }
+            this.currentTraceInfo = null;
             if (this.currentRawIgc) {
                 session.rawIgc = this.currentRawIgc;
                 this.currentRawIgc = null; // reset
@@ -1572,6 +2004,8 @@ class LogbookViewClass extends BaseView {
         this.currentTraceData = null;
         this.currentIgcStats = null;
         this.currentIgcAltOffset = null;
+        this.currentSensorStats = null;
+        this.currentTraceInfo = null;
         const filenameLabel = document.getElementById('igc-upload-filename');
         if (filenameLabel) filenameLabel.textContent = tl('form.igcHint');
         this.renderForm();
@@ -1588,6 +2022,17 @@ class LogbookViewClass extends BaseView {
 
         // Populate common fields
         /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit')).value = session.id;
+        // Session existante : ce qui a été pré-rempli à l'ouverture du formulaire ne doit pas
+        // remplacer un champ que la session laisse vide (sinon il serait enregistré).
+        this.learnedFields.clear();
+        this.renderLearnedSummary();
+        for (const id of ['lb-voile', 'lb-sellette']) {
+            const select = /** @type {HTMLSelectElement} */ (document.getElementById(id));
+            if (select) select.value = '';
+        }
+        const techSelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-tech-decollage'));
+        if (techSelect) techSelect.selectedIndex = 0;
+        this.setSchoolField(false);
         /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime')).value = session.datetime;
 
         // Helper pour "Autre..."
@@ -1623,6 +2068,8 @@ class LogbookViewClass extends BaseView {
         /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire')).value =
             session.commentaire || '';
         if (session.ecole) this.setSchoolField(true, session.ecole);
+        this.setChecklistValues('pilotes', session.pilotes || []);
+        if (session.typeExercice) this.setChecklistValues('typeExercice', session.typeExercice);
 
         // Populate specific fields
         if (session.type === 'vol') {
@@ -1635,11 +2082,17 @@ class LogbookViewClass extends BaseView {
                 /** @type {HTMLInputElement} */ (document.getElementById('lb-altMax')).value = session.altitudeMax;
             if (session.gain) /** @type {HTMLInputElement} */ (document.getElementById('lb-gain')).value = session.gain;
 
-            // Vol déjà enregistré : on peut corriger (ou annuler) l'altitude d'une trace ajoutée avant
-            if (session.rawIgc) {
-                const raw = LogbookService.parseIGC(session.rawIgc);
-                if (raw.success) this._setupAltitudeCheck(raw.data, session.altOffset || 0);
-            }
+            // Vol déjà enregistré avec sa trace (en mémoire ou dans IndexedDB) : on peut corriger
+            // (ou annuler) la correction d'altitude, et tout recalculer depuis la trace.
+            LogbookService.getFlightTrace(session.id).then((rawIgc) => {
+                const idField = /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit'));
+                if (!rawIgc || !idField || idField.value !== session.id) return; // formulaire refermé entre-temps
+                const raw = LogbookService.parseIGC(rawIgc);
+                if (!raw.success) return;
+                this._setupAltitudeCheck(raw.data, session.altOffset || 0);
+                const recalcBtn = document.getElementById('lb-igc-recalc');
+                if (recalcBtn) recalcBtn.style.display = 'block';
+            });
 
             if (session.traceGps && session.traceGps.length > 0) {
                 const filenameLabel = document.getElementById('igc-upload-filename');
@@ -1647,15 +2100,6 @@ class LogbookViewClass extends BaseView {
             }
         } else {
             /** @type {HTMLInputElement} */ (document.getElementById('lb-lieu')).value = session.lieu || '';
-            if (session.typeExercice) {
-                const checkboxes = /** @type {NodeListOf<HTMLInputElement>} */ (
-                    document.querySelectorAll('input[name="lb-typeExercice"]')
-                );
-                const typesArray = Array.isArray(session.typeExercice) ? session.typeExercice : [session.typeExercice];
-                checkboxes.forEach((cb) => {
-                    cb.checked = typesArray.includes(cb.value);
-                });
-            }
         }
 
         const coordsInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'));
@@ -1789,6 +2233,7 @@ class LogbookViewClass extends BaseView {
                         ${speedInfo}
                     </div>`;
                     }
+                    extraInfo += this.renderFlightAnalysis(session);
                 }
 
                 const meteoHtml = this.renderSessionWeatherHtml(session);
@@ -1813,13 +2258,16 @@ class LogbookViewClass extends BaseView {
                         <div class="session-location">${escapeHTML(location)}</div>
                         <div class="session-details">
                             <span class="detail-item"><i class="ri-time-line"></i> ${formatDuration(session.duree)}</span>
-                            <span class="detail-item"><i class="${subtitle.toLowerCase().includes('thermique') ? 'ri-fire-line' : subtitle.toLowerCase().includes('cross') ? 'ri-route-line' : subtitle.toLowerCase().includes('plouf') ? 'ri-arrow-left-down-line' : subtitle.toLowerCase().includes('restit') || subtitle.toLowerCase().includes('soaring') ? 'ri-sun-cloud-line' : subtitle.toLowerCase().includes('gonflage') ? 'ri-footprint-line' : 'ri-price-tag-3-line'}"></i> ${escapeHTML(subtitle)}</span>
+                            <span class="detail-item"><i class="${subtitle.toLowerCase().includes('treuil') ? 'ri-arrow-up-double-line' : subtitle.toLowerCase().includes('thermique') ? 'ri-fire-line' : subtitle.toLowerCase().includes('cross') ? 'ri-route-line' : subtitle.toLowerCase().includes('plouf') ? 'ri-arrow-left-down-line' : subtitle.toLowerCase().includes('restit') || subtitle.toLowerCase().includes('soaring') ? 'ri-sun-cloud-line' : subtitle.toLowerCase().includes('gonflage') ? 'ri-footprint-line' : 'ri-price-tag-3-line'}"></i> ${escapeHTML(subtitle)}</span>
                         </div>
                         ${extraInfo}
                         <div class="session-equip">
                             ${session.voile ? `<div><strong>${tt('history.wing')}</strong> ${escapeHTML(session.voile)}</div>` : ''}
                             ${session.sellette ? `<div><strong>${tt('history.harness')}</strong> ${escapeHTML(session.sellette)}</div>` : ''}
                             ${session.ecole ? `<div><strong>${tt('history.school')}</strong> ${escapeHTML(session.ecole)}</div>` : ''}
+                            ${session.instrument && (session.instrument.brand || session.instrument.model) ? `<div><strong>${tt('history.instrument')}</strong> ${escapeHTML([session.instrument.brand, session.instrument.model].filter(Boolean).join(' '))}${session.instrument.firmware ? ` ${tt('history.firmware', { version: session.instrument.firmware })}` : ''}</div>` : ''}
+                            ${isVol && Array.isArray(session.typeExercice) && session.typeExercice.length > 0 ? `<div><strong>${tt('history.exercises')}</strong> ${escapeHTML(session.typeExercice.join(', '))}</div>` : ''}
+                            ${Array.isArray(session.pilotes) && session.pilotes.length > 0 ? `<div><strong>${tt('history.pilots')}</strong> ${escapeHTML(session.pilotes.join(', '))}</div>` : ''}
                         </div>
                         ${session.commentaire ? `<div class="session-comment">"${escapeHTML(session.commentaire)}"</div>` : ''}
                         ${session.rawIgc || (session.traceGps && session.traceGps.length > 0) ? `<button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="${session.id}"><i class="ri-route-line"></i> ${tt('history.showTrace')}</button><div id="trace-container-${session.id}" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>` : ''}
@@ -1876,6 +2324,167 @@ class LogbookViewClass extends BaseView {
             console.error('Map3DComponent Error: Erreur lors du dessin de la trace.', error);
             container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-secondary);">${tt('history.trace3dError', { error: error.message })}</div>`;
         }
+    }
+
+    // Statistiques détaillées d'un vol calculées depuis sa trace (IGCParser.analyzeFlight),
+    // repliées sous la carte. Les altitudes absolues reçoivent la correction du pilote.
+    renderFlightAnalysis(session) {
+        const sensors = session.sensorStats && typeof session.sensorStats === 'object' ? session.sensorStats : null;
+        const device = session.instrument && typeof session.instrument === 'object' ? session.instrument : null;
+        const a =
+            session.igcStats && typeof session.igcStats === 'object' ? session.igcStats : sensors || device ? {} : null;
+        if (!a) return '';
+        const offset = Number(session.altOffset) || 0;
+        const num = (v) => typeof v === 'number' && Number.isFinite(v);
+        const row = (key, value, cond = true) =>
+            cond
+                ? `<div class="flight-analysis-row"><span>${tt(`analysis.${key}`)}</span><strong>${value}</strong></div>`
+                : '';
+        const group = (title, rows) =>
+            rows.trim() ? `<div class="flight-analysis-group"><h4>${tt(`analysis.${title}`)}</h4>${rows}</div>` : '';
+
+        const altitudes =
+            row('takeoffAlt', `${a.takeoffAlt + offset} m`, num(a.takeoffAlt)) +
+            row('landingAlt', `${a.landingAlt + offset} m`, num(a.landingAlt)) +
+            row('minAlt', `${a.minAlt + offset} m`, num(a.minAlt)) +
+            row('maxAboveTakeoff', `${a.maxAltAboveTakeoff} m`, num(a.maxAltAboveTakeoff)) +
+            row('cumulativeClimb', `${a.cumulativeClimb} m`, num(a.cumulativeClimb));
+        const vario =
+            row('maxClimb', `+${session.maxClimbRate} m/s`, num(session.maxClimbRate)) +
+            row('maxSink', `${a.maxSinkRate} m/s`, num(a.maxSinkRate)) +
+            row('avgVario', `${a.avgVario > 0 ? '+' : ''}${a.avgVario} m/s`, num(a.avgVario));
+        const thermals = !num(a.thermalCount)
+            ? ''
+            : a.thermalCount
+              ? row('thermalCount', a.thermalCount) +
+                row('thermalTime', `${a.thermalMinutes} min (${a.thermalPercent} %)`) +
+                row('avgThermalClimb', `+${a.avgThermalClimb} m/s`) +
+                row('bestThermalClimb', `+${a.bestThermalClimb} m/s`) +
+                row('maxThermalGain', `${a.maxThermalGain} m`) +
+                row('turns', tt('analysis.turnsValue', { left: a.turnsLeft, right: a.turnsRight }))
+              : row('thermalCount', '0');
+        const glides =
+            row('glideRatio', a.glideRatio, num(a.glideRatio)) +
+            row('bestGlideRatio', a.bestGlideRatio, num(a.bestGlideRatio)) +
+            row('glideSpeed', `${a.glideSpeedKmh} km/h`, num(a.glideSpeedKmh)) +
+            row('maxSpeed', `${session.maxSpeedKmh} km/h`, num(session.maxSpeedKmh)) +
+            row('avgSpeed', `${session.avgSpeedKmh} km/h`, num(session.avgSpeedKmh));
+        const distances =
+            row('pathDistance', `${session.distanceKm} km`, num(session.distanceKm)) +
+            row('freeDistance', `${a.freeDistanceKm} km`, num(a.freeDistanceKm)) +
+            row('maxFromTakeoff', `${a.maxFromTakeoffKm} km`, num(a.maxFromTakeoffKm)) +
+            row('straightDistance', `${a.straightDistanceKm} km`, num(a.straightDistanceKm));
+
+        const w = a.winch && typeof a.winch === 'object' ? a.winch : null;
+        const winch = w
+            ? row('towTime', formatDuration(Math.round(w.towSeconds / 60)) + ` (${w.towSeconds} s)`) +
+              row('release', tt('analysis.releaseValue', { alt: w.releaseAlt + offset, height: w.releaseHeight })) +
+              row('towClimb', tt('analysis.towClimbValue', { avg: w.avgClimb, max: w.maxClimb })) +
+              row('towDistance', `${Math.round(w.towDistanceKm * 1000)} m`) +
+              row('gRelease', `${sensors && sensors.gRelease} g`, Boolean(sensors && num(sensors.gRelease)))
+            : '';
+
+        // Facteur de charge : mesuré par l'accéléromètre (.sdf Syride), sinon estimé depuis
+        // les virages de la trace.
+        const loads = sensors
+            ? row('gMax', `${sensors.gMax} g`, num(sensors.gMax)) + row('gMin', `${sensors.gMin} g`, num(sensors.gMin))
+            : row('gEstimated', `≈ ${a.estimatedMaxG} g`, num(a.estimatedMaxG));
+
+        // Instrument qui a enregistré la trace (en-tête de l'IGC)
+        const text = (v) => escapeHTML(String(v));
+        const instrument = device
+            ? row('instrumentBrand', text(device.brand), Boolean(device.brand)) +
+              row('instrumentModel', text(device.model), Boolean(device.model)) +
+              row('instrumentSerial', text(device.serial), Boolean(device.serial)) +
+              row('instrumentFirmware', text(device.firmware), Boolean(device.firmware)) +
+              row('instrumentHardware', text(device.hardware), Boolean(device.hardware)) +
+              row('instrumentGps', text(device.gps), Boolean(device.gps)) +
+              row('instrumentPressure', text(device.pressureSensor), Boolean(device.pressureSensor))
+            : '';
+
+        return `
+                    <details class="flight-analysis">
+                        <summary><i class="ri-bar-chart-2-line"></i> ${tt('analysis.title')}</summary>
+                        <div class="flight-analysis-grid">
+                            ${group('winch', winch)}
+                            ${group('altitudes', altitudes)}
+                            ${group('vario', vario)}
+                            ${group('thermals', thermals)}
+                            ${group('glides', glides)}
+                            ${group('distances', distances)}
+                            ${group(sensors ? 'sensors' : 'loads', loads)}
+                            ${group('instrument', instrument)}
+                        </div>
+                    </details>`;
+    }
+
+    // Records personnels tirés des vols (et de leurs traces GPS) : valeur, date et site.
+    renderRecords(flights) {
+        const stat = (f, path) => path.split('.').reduce((o, k) => (o && typeof o === 'object' ? o[k] : undefined), f);
+        /** @type {Array<[string, string, (v: number) => string | number]>} */
+        const records = [
+            ['longestFlight', 'duree', (v) => formatDuration(v)],
+            ['highest', 'altitudeMax', (v) => `${v} m`],
+            ['freeDistance', 'igcStats.freeDistanceKm', (v) => `${v} km`],
+            ['maxFromTakeoff', 'igcStats.maxFromTakeoffKm', (v) => `${v} km`],
+            ['bestThermal', 'igcStats.bestThermalClimb', (v) => `+${v} m/s`],
+            ['maxThermalGain', 'igcStats.maxThermalGain', (v) => `${v} m`],
+            ['cumulativeClimb', 'igcStats.cumulativeClimb', (v) => `${v} m`],
+            ['maxClimb', 'maxClimbRate', (v) => `+${v} m/s`],
+            ['bestGlide', 'igcStats.bestGlideRatio', (v) => v],
+            ['maxSpeed', 'maxSpeedKmh', (v) => `${v} km/h`],
+            ['gMax', 'sensorStats.gMax', (v) => `${v} g`],
+            ['highestRelease', 'igcStats.winch.releaseHeight', (v) => `${v} m`],
+        ];
+        let rows = '';
+        for (const [key, path, format] of records) {
+            let best = null;
+            for (const f of flights) {
+                const v = stat(f, path);
+                if (typeof v === 'number' && Number.isFinite(v) && v > 0 && (!best || v > best.v)) best = { v, f };
+            }
+            if (!best) continue;
+            rows += `
+                    <div class="record-row">
+                        <span class="record-label">${tt(`records.${key}`)}</span>
+                        <strong class="record-value">${format(best.v)}</strong>
+                        <span class="record-when">${escapeHTML(formatDateOnly(best.f.datetime))} · ${escapeHTML(best.f.site || '')}</span>
+                    </div>`;
+        }
+
+        // Cumuls sur les vols avec trace analysée
+        const analysed = flights.filter((f) => f.igcStats && typeof f.igcStats === 'object');
+        const sum = (fn) => analysed.reduce((acc, f) => acc + (Number(fn(f)) || 0), 0);
+        const totals = analysed.length
+            ? tt('records.totals', {
+                  flights: analysed.length,
+                  distance: Math.round(sum((f) => f.distanceKm) * 10) / 10,
+                  climb: Math.round(sum((f) => f.igcStats.cumulativeClimb)),
+                  thermals: sum((f) => f.igcStats.thermalCount),
+                  thermalTime: formatDuration(sum((f) => f.igcStats.thermalMinutes)),
+              })
+            : '';
+
+        // Vols avec trace dont l'analyse détaillée manque (importés avant cette version)
+        const withTrace = flights.filter((f) => f.rawIgc || (f.traceGps && f.traceGps.length > 0));
+        const missing = withTrace.filter((f) => !f.igcStats).length;
+
+        if (!rows && !withTrace.length) return '';
+        return `
+            <h3 class="stats-section-title">${tt('records.title')}</h3>
+            ${totals ? `<p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 8px;">${totals}</p>` : ''}
+            <div class="records-list">${rows}</div>
+            <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent;">
+                <i class="ri-refresh-line"></i> ${missing ? tt('records.recomputeMissing', { count: missing }) : tt('records.recompute')}
+            </button>`;
+    }
+
+    async recomputeAllTraceStats(_args, _event, button) {
+        if (button && button.disabled !== undefined) button.disabled = true;
+        const count = await LogbookService.recomputeAllTraceStats();
+        alert(tl('records.recomputed', { count }));
+        this.renderStats();
+        this.renderHistory();
     }
 
     renderStats() {
@@ -2016,6 +2625,8 @@ class LogbookViewClass extends BaseView {
                 </div>
             </div>
         `;
+
+        html += this.renderRecords(LogbookService.getFlights().filter((f) => f.type === 'vol'));
 
         // Equipment Stats
         if (Object.keys(equipStats).length > 0) {

@@ -54,7 +54,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
     "submit": "Modifier la session",
   },
   "reset": {
-    "file": "Cliquez ou glissez-déposez le fichier",
+    "file": "Cliquez ou glissez-déposez le fichier (avec le .sdf Syride pour le facteur de charge)",
     "submit": "Enregistrer",
   },
 }
@@ -191,8 +191,9 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                 <div role="button" tabindex="0" class="form-group igc-upload-container" data-action="triggerIgcUpload" style="border: 2px dashed var(--border-light, #ccc); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 15px; cursor: pointer; background: var(--bg-card, #f9f9f9);">
                     <i class="ri-upload-cloud-line" style="font-size: 2rem; color: var(--accent-blue, #007bc4);"></i>
                     <div style="font-weight: bold; margin-top: 10px;">Importer une trace GPS (.igc)</div>
-                    <div style="font-size: 0.85rem; color: var(--text-secondary, #666); margin-top: 5px;" id="igc-upload-filename">Cliquez ou glissez-déposez le fichier</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary, #666); margin-top: 5px;" id="igc-upload-filename">Cliquez ou glissez-déposez le fichier (avec le .sdf Syride pour le facteur de charge)</div>
                 </div>
+                <button type="button" id="lb-igc-recalc" data-action="recalculateFromTrace" style="display:none; width: 100%; margin: -5px 0 15px; padding: 8px; border-radius: 6px; border: 1px solid var(--accent-blue, #007bc4); color: var(--accent-blue, #007bc4); background: transparent; cursor: pointer;"><i class="ri-refresh-line"></i> Recalculer depuis la trace IGC</button>
                 <div class="form-group" id="igc-alt-check" style="display:none; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-light, #ccc); margin-bottom: 15px;">
                     <div id="igc-alt-info" style="font-size: 0.85rem; margin-bottom: 8px;"></div>
                     <div style="display:flex; gap: 16px; margin-bottom: 6px; font-size: 0.9rem;">
@@ -210,6 +211,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <label>Site de vol <span class="required">*</span></label>
                     <input type="text" id="lb-site" list="sites-list" placeholder="Ex: Planfait, Forclaz..." required="" autocomplete="off">
                     <datalist id="sites-list"><option value="MONT LAMBERT"></option><option value="PENTE ÉCOLE"></option><option value="ZZZ INCONNU"></option></datalist>
+                    <div id="lb-site-choices" hidden="" style="font-size: 0.82rem; margin-top: 4px;"></div>
                     
                     <div class="lb-coords-block" style="margin-top: 6px;">
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.82rem;">
@@ -234,13 +236,13 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <div class="form-group">
                         <label>Voile <span class="required">*</span></label>
                         <select id="lb-voile" required=""><option value="">-- Sélectionner --</option><option value="OZONE | RUSH 6 | BLEU | M">OZONE | RUSH 6 | BLEU | M</option><option value="Autre">Autre...</option></select>
-                        <input type="text" id="lb-voile-autre" list="voiles-autre-list" placeholder="Spécifiez le modèle..." autocomplete="off" style="display:none; margin-top: 5px; width: 100%;">
+                        <input type="text" id="lb-voile-autre" list="voiles-autre-list" placeholder="Spécifiez le modèle..." autocomplete="off" style="display: none; margin-top: 5px; width: 100%;">
                         <datalist id="voiles-autre-list"><option value="OZONE | RUSH 6 | BLEU | M"></option></datalist>
                     </div>
                     <div class="form-group">
                         <label>Sellette</label>
                         <select id="lb-sellette"><option value="">-- Sélectionner --</option><option value="SUPAIR | ACCESS">SUPAIR | ACCESS</option><option value="Autre">Autre...</option></select>
-                        <input type="text" id="lb-sellette-autre" list="sellettes-autre-list" placeholder="Spécifiez le modèle..." autocomplete="off" style="display:none; margin-top: 5px; width: 100%;">
+                        <input type="text" id="lb-sellette-autre" list="sellettes-autre-list" placeholder="Spécifiez le modèle..." autocomplete="off" style="display: none; margin-top: 5px; width: 100%;">
                         <datalist id="sellettes-autre-list"><option value="SUPAIR | ACCESS"></option></datalist>
                     </div>
                 </div>
@@ -257,6 +259,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             <option value="Soaring">Soaring</option>
                             <option value="Restit">Restit</option>
                             <option value="Cross">Cross</option>
+                            <option value="Treuil">Treuil</option>
                         </select>
                     </div>
                 </div>
@@ -268,7 +271,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         
                         <option value="Autre">Autre...</option>
                     </select>
-                    <input type="text" id="lb-tech-decollage-autre" placeholder="Spécifiez la technique..." style="display:none; margin-top: 5px; width: 100%;">
+                    <input type="text" id="lb-tech-decollage-autre" placeholder="Spécifiez la technique..." style="display: none; margin-top: 5px; width: 100%;">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -289,13 +292,34 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <label for="lb-ecole">Nom de l'école <span class="required">*</span></label>
                         <input type="text" id="lb-ecole" list="ecoles-list" placeholder="Choisir ou saisir le nom" autocomplete="off" style="width: 100%;">
                         <datalist id="ecoles-list"></datalist>
+                        <label style="display:block; margin-top: 10px;">Exercices travaillés</label>
+                        
+                        <div id="lb-typeExercice-group" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                            <label><input type="checkbox" name="lb-typeExercice" value="Virages"> Virages</label><label><input type="checkbox" name="lb-typeExercice" value="Tangage/Roulis"> Tangage/Roulis</label><label><input type="checkbox" name="lb-typeExercice" value="Oreilles"> Oreilles</label><label><input type="checkbox" name="lb-typeExercice" value="Accélérateur"> Accélérateur</label><label><input type="checkbox" name="lb-typeExercice" value="Approche en 8"> Approche en 8</label><label><input type="checkbox" name="lb-typeExercice" value="Approche en U"> Approche en U</label><label><input type="checkbox" name="lb-typeExercice" value="Précision d'atterrissage"> Précision d'atterrissage</label>
+                        </div>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <input type="text" id="lb-typeExercice-new" data-checklist="typeExercice" placeholder="Autre exercice…" autocomplete="off" style="flex:1; min-width:0;">
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'typeExercice'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
+                        </div>
                     </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Pilotes avec qui j’ai volé</label>
+                    
+                        <div id="lb-pilotes-group" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                            
+                        </div>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <input type="text" id="lb-pilotes-new" data-checklist="pilotes" placeholder="Nom du pilote…" autocomplete="off" style="flex:1; min-width:0;">
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'pilotes'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
+                        </div>
                 </div>
                 <div class="form-group">
                     <label>Commentaire</label>
                     <textarea id="lb-commentaire" rows="3" placeholder="Sensations, conditions météo..."></textarea>
                 </div>
-            ",
+            <div id="lb-learned-summary" style="margin-top: 4px; font-size: 0.8rem; color: var(--text-secondary);">Pré-rempli d'après tes vols : type de vol (ton habitude), technique de décollage (ton habitude), voile (la dernière utilisée), sellette (la dernière utilisée). Tout reste modifiable.</div>",
   "ground": "
                 <div class="form-group">
                     <label>Date &amp; Heure <span class="required">*</span></label>
@@ -329,13 +353,13 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <div class="form-group">
                         <label>Voile <span class="required">*</span></label>
                         <select id="lb-voile" required=""><option value="">-- Sélectionner --</option><option value="OZONE | RUSH 6 | BLEU | M">OZONE | RUSH 6 | BLEU | M</option><option value="Autre">Autre...</option></select>
-                        <input type="text" id="lb-voile-autre" list="voiles-autre-list" placeholder="Spécifiez le modèle..." autocomplete="off" style="display:none; margin-top: 5px; width: 100%;">
+                        <input type="text" id="lb-voile-autre" list="voiles-autre-list" placeholder="Spécifiez le modèle..." autocomplete="off" style="display: none; margin-top: 5px; width: 100%;">
                         <datalist id="voiles-autre-list"><option value="OZONE | RUSH 6 | BLEU | M"></option></datalist>
                     </div>
                     <div class="form-group">
                         <label>Sellette</label>
                         <select id="lb-sellette"><option value="">-- Sélectionner --</option><option value="SUPAIR | ACCESS">SUPAIR | ACCESS</option><option value="Autre">Autre...</option></select>
-                        <input type="text" id="lb-sellette-autre" list="sellettes-autre-list" placeholder="Spécifiez le modèle..." autocomplete="off" style="display:none; margin-top: 5px; width: 100%;">
+                        <input type="text" id="lb-sellette-autre" list="sellettes-autre-list" placeholder="Spécifiez le modèle..." autocomplete="off" style="display: none; margin-top: 5px; width: 100%;">
                         <datalist id="sellettes-autre-list"><option value="SUPAIR | ACCESS"></option></datalist>
                     </div>
                 </div>
@@ -346,13 +370,13 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     </div>
                     <div class="form-group">
                         <label>Exercices travaillés</label>
+                        
                         <div id="lb-typeExercice-group" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
-                            <label><input type="checkbox" name="lb-typeExercice" value="Face voile"> Face voile</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Dos voile"> Dos voile</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Tangage/Roulis"> Tangage/Roulis</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Affalage"> Affalage</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Vent fort"> Vent fort</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Prégonflage / Démêlage"> Prégonflage / Démêlage</label>
+                            <label><input type="checkbox" name="lb-typeExercice" value="Face voile"> Face voile</label><label><input type="checkbox" name="lb-typeExercice" value="Dos voile"> Dos voile</label><label><input type="checkbox" name="lb-typeExercice" value="Tangage/Roulis"> Tangage/Roulis</label><label><input type="checkbox" name="lb-typeExercice" value="Affalage"> Affalage</label><label><input type="checkbox" name="lb-typeExercice" value="Vent fort"> Vent fort</label><label><input type="checkbox" name="lb-typeExercice" value="Prégonflage / Démêlage"> Prégonflage / Démêlage</label>
+                        </div>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <input type="text" id="lb-typeExercice-new" data-checklist="typeExercice" placeholder="Autre exercice…" autocomplete="off" style="flex:1; min-width:0;">
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'typeExercice'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
                         </div>
                     </div>
                 </div>
@@ -367,11 +391,23 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <datalist id="ecoles-list"></datalist>
                     </div>
                 </div>
+                
+                <div class="form-group">
+                    <label>Pilotes avec qui j’ai volé</label>
+                    
+                        <div id="lb-pilotes-group" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                            
+                        </div>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <input type="text" id="lb-pilotes-new" data-checklist="pilotes" placeholder="Nom du pilote…" autocomplete="off" style="flex:1; min-width:0;">
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'pilotes'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
+                        </div>
+                </div>
                 <div class="form-group">
                     <label>Commentaire</label>
                     <textarea id="lb-commentaire" rows="3" placeholder="Points à travailler..."></textarea>
                 </div>
-            ",
+            <div id="lb-learned-summary" style="margin-top: 4px; font-size: 0.8rem; color: var(--text-secondary);">Pré-rempli d'après tes vols : voile (la dernière utilisée), sellette (la dernière utilisée). Tout reste modifiable.</div>",
 }
 `;
 
@@ -409,6 +445,9 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <div class="session-equip">
                             <div><strong>Voile :</strong> OZONE | RUSH 6 | BLEU | M</div>
                             <div><strong>Sellette :</strong> SUPAIR | ACCESS</div>
+                            
+                            
+                            
                             
                         </div>
                         <div class="session-comment">"Belle journée"</div>
@@ -484,6 +523,9 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             <div><strong>Voile :</strong> OZONE | RUSH 6 | BLEU | M</div>
                             
                             
+                            
+                            
+                            
                         </div>
                         
                         
@@ -519,6 +561,9 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                         
                         <div class="session-equip">
+                            
+                            
+                            
                             
                             
                             
@@ -581,7 +626,33 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     </div>
                 </div>
             </div>
-        <h3 class="stats-section-title">Matériel (Voiles)</h3><div class="equip-list">
+        
+            <h3 class="stats-section-title">Records personnels</h3>
+            
+            <div class="records-list">
+                    <div class="record-row">
+                        <span class="record-label">Plus long vol</span>
+                        <strong class="record-value">1h 15min</strong>
+                        <span class="record-when">20/09/2026 · Mont Lambert</span>
+                    </div>
+                    <div class="record-row">
+                        <span class="record-label">Plus haut</span>
+                        <strong class="record-value">1250 m</strong>
+                        <span class="record-when">20/09/2026 · Mont Lambert</span>
+                    </div>
+                    <div class="record-row">
+                        <span class="record-label">Vario max</span>
+                        <strong class="record-value">+3.2 m/s</strong>
+                        <span class="record-when">20/09/2026 · Mont Lambert</span>
+                    </div>
+                    <div class="record-row">
+                        <span class="record-label">Vitesse sol max</span>
+                        <strong class="record-value">48 km/h</strong>
+                        <span class="record-when">20/09/2026 · Mont Lambert</span>
+                    </div></div>
+            <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent;">
+                <i class="ri-refresh-line"></i> Calculer les stats détaillées des vols avec trace (à mettre à jour : 1)
+            </button><h3 class="stats-section-title">Matériel (Voiles)</h3><div class="equip-list">
                     <div class="equip-card">
                         <div class="equip-name">OZONE | RUSH 6 | BLEU | M</div>
                         <div class="equip-details">
