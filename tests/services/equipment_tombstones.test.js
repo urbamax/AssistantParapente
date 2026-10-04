@@ -97,6 +97,25 @@ describe('Deleted equipment and cloud sync (spec 015)', () => {
         expect(localEquipmentIds()).not.toContain('wing-old');
     });
 
+    it('does not bring back an item deleted while the sync is running (spec 027)', async () => {
+        // Le pilote supprime l'équipement pendant que la synchro lit le cloud.
+        const getDocs = firestore.module.getDocs;
+        firestore.module.getDocs = async (col) => {
+            if (col.path === 'users/u1/equipment') LogbookService.deleteEquipment('wing-old');
+            return getDocs(col);
+        };
+
+        await FirebaseAuthEngine.syncDataWithCloud(true);
+        expect(localEquipmentIds().sort()).toEqual(['harness-cloud', 'wing-new']);
+        expect(pendingDeletions()).toEqual(['wing-old']);
+
+        // La synchro suivante termine la suppression dans le cloud, sans renvoyer l'équipement.
+        firestore.module.getDocs = getDocs;
+        await FirebaseAuthEngine.syncDataWithCloud(true);
+        expect(localEquipmentIds().sort()).toEqual(['harness-cloud', 'wing-new']);
+        expect(firestore.docs.has('users/u1/equipment/wing-old')).toBe(false);
+    });
+
     it('records each deleted id once and survives a corrupted list', () => {
         localStorage.setItem('deleted_equipment', '{corrupted');
         LogbookService.deleteEquipment('wing-old');
