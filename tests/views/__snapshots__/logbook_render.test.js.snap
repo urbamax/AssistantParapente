@@ -193,7 +193,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <div style="font-weight: bold; margin-top: 10px;">Importer une trace GPS (.igc)</div>
                     <div style="font-size: 0.85rem; color: var(--text-secondary, #666); margin-top: 5px;" id="igc-upload-filename">Cliquez ou glissez-déposez le fichier (avec le .sdf Syride pour le facteur de charge)</div>
                 </div>
-                <button type="button" id="lb-igc-recalc" data-action="recalculateFromTrace" style="display:none; width: 100%; margin: -5px 0 15px; padding: 8px; border-radius: 6px; border: 1px solid var(--accent-blue, #007bc4); color: var(--accent-blue, #007bc4); background: transparent; cursor: pointer;"><i class="ri-refresh-line"></i> Recalculer depuis la trace IGC</button>
+                <button type="button" id="lb-igc-recalc" data-action="recalculateFromTrace" style="display:none; width: 100%; margin: -5px 0 15px; padding: 10px; font-size: 0.95rem; font-weight: 500; border-radius: 6px; border: 1px solid var(--accent-blue, #007bc4); color: var(--accent-blue, #007bc4); background: transparent; cursor: pointer;"><i class="ri-refresh-line"></i> Recalculer depuis la trace IGC</button>
                 <div class="form-group" id="igc-alt-check" style="display:none; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-light, #ccc); margin-bottom: 15px;">
                     <div id="igc-alt-info" style="font-size: 0.85rem; margin-bottom: 8px;"></div>
                     <div style="display:flex; gap: 16px; margin-bottom: 6px; font-size: 0.9rem;">
@@ -211,7 +211,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <label>Site de vol <span class="required">*</span></label>
                     <input type="text" id="lb-site" list="sites-list" placeholder="Ex: Planfait, Forclaz..." required="" autocomplete="off">
                     <datalist id="sites-list"><option value="MONT LAMBERT"></option><option value="PENTE ÉCOLE"></option><option value="ZZZ INCONNU"></option></datalist>
-                    <div id="lb-site-choices" hidden="" style="font-size: 0.82rem; margin-top: 4px;"></div>
+                    <div id="lb-site-choices" hidden="" style="font-size: 0.9rem; margin-top: 4px;"></div>
                     
                     <div class="lb-coords-block" style="margin-top: 6px;">
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.82rem;">
@@ -299,7 +299,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                         <div style="display:flex; gap:6px; margin-top:8px;">
                             <input type="text" id="lb-typeExercice-new" data-checklist="typeExercice" placeholder="Autre exercice…" autocomplete="off" style="flex:1; min-width:0;">
-                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'typeExercice'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'typeExercice'" style="padding: 6px 12px; font-size: 0.95rem; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
                         </div>
                     </div>
                 </div>
@@ -312,14 +312,14 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                         <div style="display:flex; gap:6px; margin-top:8px;">
                             <input type="text" id="lb-pilotes-new" data-checklist="pilotes" placeholder="Nom du pilote…" autocomplete="off" style="flex:1; min-width:0;">
-                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'pilotes'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'pilotes'" style="padding: 6px 12px; font-size: 0.95rem; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
                         </div>
                 </div>
                 <div class="form-group">
                     <label>Commentaire</label>
                     <textarea id="lb-commentaire" rows="3" placeholder="Sensations, conditions météo..."></textarea>
                 </div>
-            <div id="lb-learned-summary" style="margin-top: 4px; font-size: 0.8rem; color: var(--text-secondary);">Pré-rempli d'après tes vols : type de vol (ton habitude), technique de décollage (ton habitude), voile (la dernière utilisée), sellette (la dernière utilisée). Tout reste modifiable.</div>",
+            <div id="lb-learned-summary" style="margin-top: 4px; font-size: 0.9rem; color: var(--text-secondary);">Pré-rempli d'après tes vols : type de vol (ton habitude), technique de décollage (ton habitude), voile (la dernière utilisée), sellette (la dernière utilisée). Tout reste modifiable.</div>",
   "ground": "
                 <div class="form-group">
                     <label>Date &amp; Heure <span class="required">*</span></label>
@@ -376,7 +376,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                         <div style="display:flex; gap:6px; margin-top:8px;">
                             <input type="text" id="lb-typeExercice-new" data-checklist="typeExercice" placeholder="Autre exercice…" autocomplete="off" style="flex:1; min-width:0;">
-                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'typeExercice'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'typeExercice'" style="padding: 6px 12px; font-size: 0.95rem; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
                         </div>
                     </div>
                 </div>
@@ -400,14 +400,14 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                         <div style="display:flex; gap:6px; margin-top:8px;">
                             <input type="text" id="lb-pilotes-new" data-checklist="pilotes" placeholder="Nom du pilote…" autocomplete="off" style="flex:1; min-width:0;">
-                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'pilotes'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'pilotes'" style="padding: 6px 12px; font-size: 0.95rem; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
                         </div>
                 </div>
                 <div class="form-group">
                     <label>Commentaire</label>
                     <textarea id="lb-commentaire" rows="3" placeholder="Points à travailler..."></textarea>
                 </div>
-            <div id="lb-learned-summary" style="margin-top: 4px; font-size: 0.8rem; color: var(--text-secondary);">Pré-rempli d'après tes vols : voile (la dernière utilisée), sellette (la dernière utilisée). Tout reste modifiable.</div>",
+            <div id="lb-learned-summary" style="margin-top: 4px; font-size: 0.9rem; color: var(--text-secondary);">Pré-rempli d'après tes vols : voile (la dernière utilisée), sellette (la dernière utilisée). Tout reste modifiable.</div>",
 }
 `;
 
@@ -650,7 +650,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <strong class="record-value">48 km/h</strong>
                         <span class="record-when">20/09/2026 · Mont Lambert</span>
                     </div></div>
-            <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent;">
+            <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 10px; font-size: 0.95rem; border-radius: 6px; cursor: pointer; background: transparent;">
                 <i class="ri-refresh-line"></i> Calculer les stats détaillées des vols avec trace (à mettre à jour : 1)
             </button><h3 class="stats-section-title">Matériel (Voiles)</h3><div class="equip-list">
                     <div class="equip-card">

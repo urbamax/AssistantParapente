@@ -243,7 +243,7 @@ class LogbookViewClass extends BaseView {
                   .map((site, i) => {
                       const name = site.nom || site.name;
                       const active = name === current;
-                      return `<button type="button" data-action="pickSiteChoice" data-args="${i}" aria-pressed="${active}" style="margin: 4px 4px 0 0; padding: 2px 8px; border-radius: 12px; cursor: pointer; border: 1px solid var(--accent-blue, #007bc4); background: ${active ? 'var(--accent-blue, #007bc4)' : 'transparent'}; color: ${active ? '#fff' : 'var(--accent-blue, #007bc4)'};">${escapeHTML(name)}</button>`;
+                      return `<button type="button" data-action="pickSiteChoice" data-args="${i}" aria-pressed="${active}" style="margin: 4px 4px 0 0; padding: 4px 10px; font-size: 0.9rem; border-radius: 12px; cursor: pointer; border: 1px solid var(--accent-blue, #007bc4); background: ${active ? 'var(--accent-blue, #007bc4)' : 'transparent'}; color: ${active ? '#fff' : 'var(--accent-blue, #007bc4)'};">${escapeHTML(name)}</button>`;
                   })
                   .join('')
             : '';
@@ -803,7 +803,7 @@ class LogbookViewClass extends BaseView {
                         </div>
                         <div style="display:flex; gap:6px; margin-top:8px;">
                             <input type="text" id="lb-${name}-new" data-checklist="${name}" placeholder="${placeholder}" autocomplete="off" style="flex:1; min-width:0;">
-                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'${name}'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> ${tt('form.add')}</button>
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'${name}'" style="padding: 6px 12px; font-size: 0.95rem; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> ${tt('form.add')}</button>
                         </div>`;
     }
 
@@ -1101,7 +1101,7 @@ class LogbookViewClass extends BaseView {
                     <div style="font-weight: bold; margin-top: 10px;">${tt('form.igcTitle')}</div>
                     <div style="font-size: 0.85rem; color: var(--text-secondary, #666); margin-top: 5px;" id="igc-upload-filename">${tt('form.igcHint')}</div>
                 </div>
-                <button type="button" id="lb-igc-recalc" data-action="recalculateFromTrace" style="display:none; width: 100%; margin: -5px 0 15px; padding: 8px; border-radius: 6px; border: 1px solid var(--accent-blue, #007bc4); color: var(--accent-blue, #007bc4); background: transparent; cursor: pointer;"><i class="ri-refresh-line"></i> ${tt('igc.recalculate')}</button>
+                <button type="button" id="lb-igc-recalc" data-action="recalculateFromTrace" style="display:none; width: 100%; margin: -5px 0 15px; padding: 10px; font-size: 0.95rem; font-weight: 500; border-radius: 6px; border: 1px solid var(--accent-blue, #007bc4); color: var(--accent-blue, #007bc4); background: transparent; cursor: pointer;"><i class="ri-refresh-line"></i> ${tt('igc.recalculate')}</button>
                 <div class="form-group" id="igc-alt-check" style="display:none; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-light, #ccc); margin-bottom: 15px;">
                     <div id="igc-alt-info" style="font-size: 0.85rem; margin-bottom: 8px;"></div>
                     <div style="display:flex; gap: 16px; margin-bottom: 6px; font-size: 0.9rem;">
@@ -1119,7 +1119,7 @@ class LogbookViewClass extends BaseView {
                     <label>${tt('form.site')} <span class="required">*</span></label>
                     <input type="text" id="lb-site" list="sites-list" placeholder="${tt('form.sitePlaceholder')}" required autocomplete="off">
                     <datalist id="sites-list"></datalist>
-                    <div id="lb-site-choices" hidden style="font-size: 0.82rem; margin-top: 4px;"></div>
+                    <div id="lb-site-choices" hidden style="font-size: 0.9rem; margin-top: 4px;"></div>
                     ${this.renderCoordsBlock()}
                 </div>
                 <div class="form-row">
@@ -1243,7 +1243,7 @@ class LogbookViewClass extends BaseView {
 
         this.releaseCoordsMap();
         // Ce que l'app a pré-rempli d'après les habitudes du pilote
-        html += `<div id="lb-learned-summary" hidden style="margin-top: 4px; font-size: 0.8rem; color: var(--text-secondary);"></div>`;
+        html += `<div id="lb-learned-summary" hidden style="margin-top: 4px; font-size: 0.9rem; color: var(--text-secondary);"></div>`;
         container.innerHTML = html;
         this.populateDropdowns();
         this.touchedFields = new Set();
@@ -2474,7 +2474,7 @@ class LogbookViewClass extends BaseView {
             <h3 class="stats-section-title">${tt('records.title')}</h3>
             ${totals ? `<p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 8px;">${totals}</p>` : ''}
             <div class="records-list">${rows}</div>
-            <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent;">
+            <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 10px; font-size: 0.95rem; border-radius: 6px; cursor: pointer; background: transparent;">
                 <i class="ri-refresh-line"></i> ${missing ? tt('records.recomputeMissing', { count: missing }) : tt('records.recompute')}
             </button>`;
     }
