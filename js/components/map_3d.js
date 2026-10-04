@@ -55,6 +55,11 @@ const Map3DComponent = {
         [3, [220, 38, 38]],
     ],
     PLAYBACK_INTERVAL_MS: 100,
+    // Trace, point et étiquette toujours dessinés par-dessus le relief : le relief gratuit est
+    // grossier (pas de ~30 m), il étale par exemple la falaise du Blanc-Nez sur la plage (27 m au
+    // lieu de 0 m). Testés contre lui, des morceaux de trace et l'étiquette d'altitude passaient
+    // sous le sol et disparaissaient. (deck.gl 9 : depthCompare remplace depthTest: false.)
+    ABOVE_TERRAIN: { depthCompare: 'always', depthWriteEnabled: false },
     _loadDependenciesPromise: null,
 
     /**
@@ -515,6 +520,7 @@ const Map3DComponent = {
             jointRounded: true,
             positionFormat: 'XYZ',
             pickable: false,
+            parameters: this.ABOVE_TERRAIN,
         });
 
         // Position actuelle : un point + une étiquette, tous deux à la vraie altitude du
@@ -531,6 +537,7 @@ const Map3DComponent = {
             getRadius: this.PILOT_MARKER_RADIUS_PIXELS,
             radiusUnits: 'pixels',
             positionFormat: 'XYZ',
+            parameters: this.ABOVE_TERRAIN,
         });
 
         const pilotLabelLayer = new deck.TextLayer({
@@ -546,6 +553,7 @@ const Map3DComponent = {
             backgroundPadding: [6, 3],
             fontFamily: '"Segoe UI", Arial, sans-serif',
             positionFormat: 'XYZ',
+            parameters: this.ABOVE_TERRAIN,
         });
 
         return [pathLayer, pilotMarkerLayer, pilotLabelLayer];
