@@ -529,12 +529,6 @@ input:checked+.gdpr-slider:before {
 /* =============================================
    MODAL MODE D'EMPLOI â€” MOBILE
    ============================================= */
-/* Sous-titres du mode d'emploi (« 1. Ajouter un Vol »…) : sans taille fixée, un <h5> s'affiche
-   plus petit que le texte qu'il introduit. */
-#manual-modal .manual-section h5 {
-    font-size: 1.05rem;
-}
-
 @media (max-width: 768px) {
 
     /* Le modal prend presque tout l'Ã©cran */
