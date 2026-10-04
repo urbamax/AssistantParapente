@@ -125,6 +125,7 @@ async function bootApplication() {
         'recalculateFromTrace',
         'addChecklistItem',
         'pickSiteChoice',
+        'recomputeAllTraceStats',
         'toggleCoordsPicker',
         'clearCoords',
         'closeSessionModal',

@@ -622,7 +622,33 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     </div>
                 </div>
             </div>
-        <h3 class="stats-section-title">Matériel (Voiles)</h3><div class="equip-list">
+        
+            <h3 class="stats-section-title">Records personnels</h3>
+            
+            <div class="records-list">
+                    <div class="record-row">
+                        <span class="record-label">Plus long vol</span>
+                        <strong class="record-value">1h 15min</strong>
+                        <span class="record-when">20/09/2026 · Mont Lambert</span>
+                    </div>
+                    <div class="record-row">
+                        <span class="record-label">Plus haut</span>
+                        <strong class="record-value">1250 m</strong>
+                        <span class="record-when">20/09/2026 · Mont Lambert</span>
+                    </div>
+                    <div class="record-row">
+                        <span class="record-label">Vario max</span>
+                        <strong class="record-value">+3.2 m/s</strong>
+                        <span class="record-when">20/09/2026 · Mont Lambert</span>
+                    </div>
+                    <div class="record-row">
+                        <span class="record-label">Vitesse sol max</span>
+                        <strong class="record-value">48 km/h</strong>
+                        <span class="record-when">20/09/2026 · Mont Lambert</span>
+                    </div></div>
+            <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent;">
+                <i class="ri-refresh-line"></i> Calculer les stats détaillées des vols avec trace (à mettre à jour : 1)
+            </button><h3 class="stats-section-title">Matériel (Voiles)</h3><div class="equip-list">
                     <div class="equip-card">
                         <div class="equip-name">OZONE | RUSH 6 | BLEU | M</div>
                         <div class="equip-details">

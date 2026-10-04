@@ -100,6 +100,7 @@ const IGCParser = {
         const gain = maxAltitude !== -Infinity ? Math.max(0, Math.round(maxAltitude - startAltitude)) : 0;
 
         const { distanceKm, maxClimbRate, maxSpeedKmh, avgSpeedKmh } = this._computeFlightStats(flight, duration);
+        const analysis = this.analyzeFlight(flight);
 
         console.log('Points IGC extraits avec succès :', trace.length);
 
@@ -115,6 +116,215 @@ const IGCParser = {
             maxClimbRate: maxClimbRate,
             maxSpeedKmh: maxSpeedKmh,
             avgSpeedKmh: avgSpeedKmh,
+            analysis: analysis,
+        };
+    },
+
+    /** Cap en degrés (0 = nord, sens horaire) de a vers b. */
+    _bearing: function (a, b) {
+        const toRad = Math.PI / 180;
+        const dLon = (b.lon - a.lon) * toRad;
+        const y = Math.sin(dLon) * Math.cos(b.lat * toRad);
+        const x =
+            Math.cos(a.lat * toRad) * Math.sin(b.lat * toRad) -
+            Math.sin(a.lat * toRad) * Math.cos(b.lat * toRad) * Math.cos(dLon);
+        return ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360;
+    },
+
+    /**
+     * Analyse détaillée du vol (décollage → atterrissage) : thermiques, transitions, finesse,
+     * distances de type « cross », altitudes et vario. Les altitudes sont celles du vario,
+     * sans la correction éventuelle du pilote (à ajouter à l'affichage).
+     *
+     * Thermiques : un pilote qui enroule tourne d'au moins ~200° en 20 s (≥ 10°/s en moyenne,
+     * un 360 prend 20 à 30 s). Les phases de spirale de moins de 20 s sont ignorées, les
+     * transitions de moins de 15 s entre deux spirales sont rattachées au thermique. Un thermique
+     * n'est compté que s'il fait monter.
+     *
+     * @param {Array<{lat:number, lon:number, alt:number, timestamp:number}>} flight
+     * @returns {Object|null}
+     */
+    analyzeFlight: function (flight) {
+        if (!flight || flight.length < 3) return null;
+        const round1 = (x) => Math.round(x * 10) / 10;
+        const dist = (a, b) => this._distanceKm(a.lat, a.lon, b.lat, b.lon);
+
+        // Échantillons espacés d'au moins 2 s : assez fin pour suivre un 360, moins sensible au bruit
+        const S = [];
+        for (const p of flight) {
+            if (S.length === 0 || p.timestamp - S[S.length - 1].timestamp >= 2000) S.push(p);
+        }
+        const n = S.length;
+        if (n < 3) return null;
+        const first = S[0];
+        const last = flight[flight.length - 1];
+        const durationS = (last.timestamp - first.timestamp) / 1000;
+
+        // --- Altitudes et dénivelé cumulé (pas de 10 s pour ne pas cumuler le bruit) ---
+        let minAlt = Infinity;
+        let maxAlt = -Infinity;
+        for (const p of flight) {
+            if (p.alt < minAlt) minAlt = p.alt;
+            if (p.alt > maxAlt) maxAlt = p.alt;
+        }
+        let cumulativeClimb = 0;
+        let prev = flight[0];
+        for (const p of flight) {
+            if (p.timestamp - prev.timestamp < 10000 && p !== last) continue;
+            if (p.alt > prev.alt) cumulativeClimb += p.alt - prev.alt;
+            prev = p;
+        }
+
+        // --- Taux de chute max (fenêtre de ~5 s, comme le vario max) ---
+        let maxSinkRate = 0;
+        for (let i = 0, j = 0; i < flight.length; i++) {
+            while (j < flight.length && flight[j].timestamp - flight[i].timestamp < 5000) j++;
+            if (j >= flight.length) break;
+            const v = (flight[j].alt - flight[i].alt) / ((flight[j].timestamp - flight[i].timestamp) / 1000);
+            if (v < maxSinkRate) maxSinkRate = v;
+        }
+
+        // --- Virages : variation de cap entre segments successifs (signée, + = à droite) ---
+        const headings = [];
+        for (let k = 0; k < n - 1; k++) {
+            headings.push(dist(S[k], S[k + 1]) * 1000 < 2 ? null : this._bearing(S[k], S[k + 1]));
+        }
+        const dh = new Array(n).fill(0); // variation de cap au point k
+        for (let k = 1; k < n - 1; k++) {
+            if (headings[k] === null || headings[k - 1] === null) continue;
+            let d = headings[k] - headings[k - 1];
+            if (d > 180) d -= 360;
+            if (d < -180) d += 360;
+            dh[k] = d;
+        }
+        const prefix = [0];
+        for (let k = 0; k < n; k++) prefix.push(prefix[k] + dh[k]);
+        const circling = new Array(n).fill(false);
+        for (let k = 0, lo = 0, hi = 0; k < n; k++) {
+            while (S[k].timestamp - S[lo].timestamp > 10000) lo++;
+            if (hi < k) hi = k;
+            while (hi + 1 < n && S[hi + 1].timestamp - S[k].timestamp <= 10000) hi++;
+            circling[k] = Math.abs(prefix[hi + 1] - prefix[lo]) >= 200;
+        }
+
+        // Phases (spirale / transition), en lissant les phases trop courtes
+        let runs = [];
+        for (let k = 0; k < n; k++) {
+            const r = runs[runs.length - 1];
+            if (r && r.circling === circling[k]) r.end = k;
+            else runs.push({ circling: circling[k], start: k, end: k });
+        }
+        const runSeconds = (r) => (S[r.end].timestamp - S[r.start].timestamp) / 1000;
+        const merged = [];
+        for (const r of runs) {
+            const prevRun = merged[merged.length - 1];
+            const tooShort = r.circling ? runSeconds(r) < 20 : runSeconds(r) < 15 && prevRun && prevRun.circling;
+            if (prevRun && (tooShort || prevRun.circling === r.circling)) prevRun.end = r.end;
+            else merged.push({ ...r, circling: tooShort ? !r.circling : r.circling });
+        }
+        runs = merged;
+
+        // --- Thermiques ---
+        let thermalCount = 0;
+        let thermalSeconds = 0;
+        let thermalGainTotal = 0;
+        let bestThermalClimb = 0;
+        let maxThermalGain = 0;
+        let turnsLeft = 0;
+        let turnsRight = 0;
+        for (const r of runs) {
+            if (!r.circling) continue;
+            const secs = runSeconds(r);
+            const turned = prefix[r.end + 1] - prefix[r.start];
+            const turns = Math.floor(Math.abs(turned) / 360);
+            if (turned > 0) turnsRight += turns;
+            else turnsLeft += turns;
+            const gainM = S[r.end].alt - S[r.start].alt;
+            if (secs < 20 || gainM <= 0) continue;
+            thermalCount++;
+            thermalSeconds += secs;
+            thermalGainTotal += gainM;
+            bestThermalClimb = Math.max(bestThermalClimb, gainM / secs);
+            maxThermalGain = Math.max(maxThermalGain, gainM);
+        }
+
+        // --- Transitions et finesse ---
+        // Phases en ligne droite d'au moins 30 s, découpées en tranches de ~30 s : seules les
+        // tranches où l'on descend vraiment (≥ 0,5 m/s) comptent, sinon le vol de pente ou une
+        // ascendance en ligne droite donneraient des finesses absurdes.
+        let glideKm = 0;
+        let glideLoss = 0;
+        let glideSeconds = 0;
+        let bestGlideRatio = 0;
+        for (const r of runs) {
+            if (r.circling || runSeconds(r) < 30) continue;
+            let runKm = 0;
+            let runLoss = 0;
+            let runSecs = 0;
+            let chunkStart = r.start;
+            for (let k = r.start + 1; k <= r.end; k++) {
+                const secs = (S[k].timestamp - S[chunkStart].timestamp) / 1000;
+                if (secs < 30 && k < r.end) continue;
+                const loss = S[chunkStart].alt - S[k].alt;
+                if (secs > 0 && loss / secs >= 0.5) {
+                    for (let m = chunkStart + 1; m <= k; m++) runKm += dist(S[m - 1], S[m]);
+                    runLoss += loss;
+                    runSecs += secs;
+                }
+                chunkStart = k;
+            }
+            glideKm += runKm;
+            glideLoss += runLoss;
+            glideSeconds += runSecs;
+            if (runSecs >= 60 && runLoss >= 30) bestGlideRatio = Math.max(bestGlideRatio, (runKm * 1000) / runLoss);
+        }
+
+        // --- Distances ---
+        const straightKm = dist(first, last);
+        let maxFromTakeoffKm = 0;
+        for (const p of S) maxFromTakeoffKm = Math.max(maxFromTakeoffKm, dist(first, p));
+        // Distance libre (départ, 3 points de contournement, arrivée), comme les classements
+        // de cross : programmation dynamique sur ~300 points.
+        const step = Math.max(1, Math.ceil(n / 300));
+        const P = S.filter((_, k) => k % step === 0);
+        if (P[P.length - 1] !== S[n - 1]) P.push(S[n - 1]);
+        let layer = new Array(P.length).fill(0);
+        for (let leg = 0; leg < 4; leg++) {
+            const next = new Array(P.length).fill(0);
+            for (let j = 0; j < P.length; j++) {
+                let best = 0;
+                for (let i = 0; i <= j; i++) {
+                    const v = layer[i] + dist(P[i], P[j]);
+                    if (v > best) best = v;
+                }
+                next[j] = best;
+            }
+            layer = next;
+        }
+        const freeDistanceKm = Math.max(...layer);
+
+        return {
+            takeoffAlt: Math.round(first.alt),
+            landingAlt: Math.round(last.alt),
+            minAlt: Math.round(minAlt),
+            maxAltAboveTakeoff: Math.round(maxAlt - first.alt),
+            cumulativeClimb: Math.round(cumulativeClimb),
+            maxSinkRate: round1(maxSinkRate),
+            avgVario: durationS > 0 ? Math.round(((last.alt - first.alt) / durationS) * 100) / 100 : 0,
+            thermalCount,
+            thermalMinutes: Math.round(thermalSeconds / 60),
+            thermalPercent: durationS > 0 ? Math.round((thermalSeconds / durationS) * 100) : 0,
+            avgThermalClimb: thermalSeconds > 0 ? round1(thermalGainTotal / thermalSeconds) : 0,
+            bestThermalClimb: round1(bestThermalClimb),
+            maxThermalGain: Math.round(maxThermalGain),
+            turnsLeft,
+            turnsRight,
+            glideRatio: glideLoss > 0 ? round1((glideKm * 1000) / glideLoss) : null,
+            bestGlideRatio: bestGlideRatio > 0 ? round1(bestGlideRatio) : null,
+            glideSpeedKmh: glideSeconds > 0 ? round1(glideKm / (glideSeconds / 3600)) : null,
+            straightDistanceKm: round1(straightKm),
+            maxFromTakeoffKm: round1(maxFromTakeoffKm),
+            freeDistanceKm: round1(freeDistanceKm),
         };
     },
 

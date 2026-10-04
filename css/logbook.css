@@ -555,3 +555,62 @@
         font-size: 0.95rem;
     }
 }
+/* Statistiques détaillées d'un vol (trace GPS) */
+.flight-analysis {
+    margin-top: 8px;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+}
+.flight-analysis summary {
+    cursor: pointer;
+    color: var(--accent-blue);
+    font-weight: 500;
+}
+.flight-analysis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 8px 16px;
+    margin-top: 8px;
+}
+.flight-analysis-group h4 {
+    margin: 0 0 4px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-main);
+}
+.flight-analysis-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 2px 0;
+    border-bottom: 1px dashed var(--border-light, rgba(0, 0, 0, 0.08));
+}
+.flight-analysis-row strong {
+    color: var(--text-main);
+    white-space: nowrap;
+}
+
+/* Records personnels (onglet Statistiques) */
+.records-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.record-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2px 12px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: var(--bg-card, rgba(0, 0, 0, 0.03));
+    border: 1px solid var(--border-light, rgba(0, 0, 0, 0.06));
+}
+.record-value {
+    text-align: right;
+}
+.record-when {
+    grid-column: 1 / -1;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+}

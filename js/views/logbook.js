@@ -1469,6 +1469,7 @@ class LogbookViewClass extends BaseView {
             maxClimbRate: parsed.maxClimbRate,
             maxSpeedKmh: parsed.maxSpeedKmh,
             avgSpeedKmh: parsed.avgSpeedKmh,
+            igcStats: parsed.analysis || null,
         };
 
         const durationInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-duree'));
@@ -1997,6 +1998,7 @@ class LogbookViewClass extends BaseView {
                         ${speedInfo}
                     </div>`;
                     }
+                    extraInfo += this.renderFlightAnalysis(session);
                 }
 
                 const meteoHtml = this.renderSessionWeatherHtml(session);
@@ -2086,6 +2088,130 @@ class LogbookViewClass extends BaseView {
             console.error('Map3DComponent Error: Erreur lors du dessin de la trace.', error);
             container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-secondary);">${tt('history.trace3dError', { error: error.message })}</div>`;
         }
+    }
+
+    // Statistiques détaillées d'un vol calculées depuis sa trace (IGCParser.analyzeFlight),
+    // repliées sous la carte. Les altitudes absolues reçoivent la correction du pilote.
+    renderFlightAnalysis(session) {
+        const a = session.igcStats;
+        if (!a || typeof a !== 'object') return '';
+        const offset = Number(session.altOffset) || 0;
+        const num = (v) => typeof v === 'number' && Number.isFinite(v);
+        const row = (key, value, cond = true) =>
+            cond
+                ? `<div class="flight-analysis-row"><span>${tt(`analysis.${key}`)}</span><strong>${value}</strong></div>`
+                : '';
+        const group = (title, rows) =>
+            rows.trim() ? `<div class="flight-analysis-group"><h4>${tt(`analysis.${title}`)}</h4>${rows}</div>` : '';
+
+        const altitudes =
+            row('takeoffAlt', `${a.takeoffAlt + offset} m`, num(a.takeoffAlt)) +
+            row('landingAlt', `${a.landingAlt + offset} m`, num(a.landingAlt)) +
+            row('minAlt', `${a.minAlt + offset} m`, num(a.minAlt)) +
+            row('maxAboveTakeoff', `${a.maxAltAboveTakeoff} m`, num(a.maxAltAboveTakeoff)) +
+            row('cumulativeClimb', `${a.cumulativeClimb} m`, num(a.cumulativeClimb));
+        const vario =
+            row('maxClimb', `+${session.maxClimbRate} m/s`, num(session.maxClimbRate)) +
+            row('maxSink', `${a.maxSinkRate} m/s`, num(a.maxSinkRate)) +
+            row('avgVario', `${a.avgVario > 0 ? '+' : ''}${a.avgVario} m/s`, num(a.avgVario));
+        const thermals = a.thermalCount
+            ? row('thermalCount', a.thermalCount) +
+              row('thermalTime', `${a.thermalMinutes} min (${a.thermalPercent} %)`) +
+              row('avgThermalClimb', `+${a.avgThermalClimb} m/s`) +
+              row('bestThermalClimb', `+${a.bestThermalClimb} m/s`) +
+              row('maxThermalGain', `${a.maxThermalGain} m`) +
+              row('turns', tt('analysis.turnsValue', { left: a.turnsLeft, right: a.turnsRight }))
+            : row('thermalCount', '0');
+        const glides =
+            row('glideRatio', a.glideRatio, num(a.glideRatio)) +
+            row('bestGlideRatio', a.bestGlideRatio, num(a.bestGlideRatio)) +
+            row('glideSpeed', `${a.glideSpeedKmh} km/h`, num(a.glideSpeedKmh)) +
+            row('maxSpeed', `${session.maxSpeedKmh} km/h`, num(session.maxSpeedKmh)) +
+            row('avgSpeed', `${session.avgSpeedKmh} km/h`, num(session.avgSpeedKmh));
+        const distances =
+            row('pathDistance', `${session.distanceKm} km`, num(session.distanceKm)) +
+            row('freeDistance', `${a.freeDistanceKm} km`, num(a.freeDistanceKm)) +
+            row('maxFromTakeoff', `${a.maxFromTakeoffKm} km`, num(a.maxFromTakeoffKm)) +
+            row('straightDistance', `${a.straightDistanceKm} km`, num(a.straightDistanceKm));
+
+        return `
+                    <details class="flight-analysis">
+                        <summary><i class="ri-bar-chart-2-line"></i> ${tt('analysis.title')}</summary>
+                        <div class="flight-analysis-grid">
+                            ${group('altitudes', altitudes)}
+                            ${group('vario', vario)}
+                            ${group('thermals', thermals)}
+                            ${group('glides', glides)}
+                            ${group('distances', distances)}
+                        </div>
+                    </details>`;
+    }
+
+    // Records personnels tirés des vols (et de leurs traces GPS) : valeur, date et site.
+    renderRecords(flights) {
+        const stat = (f, path) => path.split('.').reduce((o, k) => (o && typeof o === 'object' ? o[k] : undefined), f);
+        /** @type {Array<[string, string, (v: number) => string | number]>} */
+        const records = [
+            ['longestFlight', 'duree', (v) => formatDuration(v)],
+            ['highest', 'altitudeMax', (v) => `${v} m`],
+            ['freeDistance', 'igcStats.freeDistanceKm', (v) => `${v} km`],
+            ['maxFromTakeoff', 'igcStats.maxFromTakeoffKm', (v) => `${v} km`],
+            ['bestThermal', 'igcStats.bestThermalClimb', (v) => `+${v} m/s`],
+            ['maxThermalGain', 'igcStats.maxThermalGain', (v) => `${v} m`],
+            ['cumulativeClimb', 'igcStats.cumulativeClimb', (v) => `${v} m`],
+            ['maxClimb', 'maxClimbRate', (v) => `+${v} m/s`],
+            ['bestGlide', 'igcStats.bestGlideRatio', (v) => v],
+            ['maxSpeed', 'maxSpeedKmh', (v) => `${v} km/h`],
+        ];
+        let rows = '';
+        for (const [key, path, format] of records) {
+            let best = null;
+            for (const f of flights) {
+                const v = stat(f, path);
+                if (typeof v === 'number' && Number.isFinite(v) && v > 0 && (!best || v > best.v)) best = { v, f };
+            }
+            if (!best) continue;
+            rows += `
+                    <div class="record-row">
+                        <span class="record-label">${tt(`records.${key}`)}</span>
+                        <strong class="record-value">${format(best.v)}</strong>
+                        <span class="record-when">${escapeHTML(formatDateOnly(best.f.datetime))} · ${escapeHTML(best.f.site || '')}</span>
+                    </div>`;
+        }
+
+        // Cumuls sur les vols avec trace analysée
+        const analysed = flights.filter((f) => f.igcStats && typeof f.igcStats === 'object');
+        const sum = (fn) => analysed.reduce((acc, f) => acc + (Number(fn(f)) || 0), 0);
+        const totals = analysed.length
+            ? tt('records.totals', {
+                  flights: analysed.length,
+                  distance: Math.round(sum((f) => f.distanceKm) * 10) / 10,
+                  climb: Math.round(sum((f) => f.igcStats.cumulativeClimb)),
+                  thermals: sum((f) => f.igcStats.thermalCount),
+                  thermalTime: formatDuration(sum((f) => f.igcStats.thermalMinutes)),
+              })
+            : '';
+
+        // Vols avec trace dont l'analyse détaillée manque (importés avant cette version)
+        const withTrace = flights.filter((f) => f.rawIgc || (f.traceGps && f.traceGps.length > 0));
+        const missing = withTrace.filter((f) => !f.igcStats).length;
+
+        if (!rows && !withTrace.length) return '';
+        return `
+            <h3 class="stats-section-title">${tt('records.title')}</h3>
+            ${totals ? `<p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 8px;">${totals}</p>` : ''}
+            <div class="records-list">${rows}</div>
+            <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent;">
+                <i class="ri-refresh-line"></i> ${missing ? tt('records.recomputeMissing', { count: missing }) : tt('records.recompute')}
+            </button>`;
+    }
+
+    async recomputeAllTraceStats(_args, _event, button) {
+        if (button && button.disabled !== undefined) button.disabled = true;
+        const count = await LogbookService.recomputeAllTraceStats();
+        alert(tl('records.recomputed', { count }));
+        this.renderStats();
+        this.renderHistory();
     }
 
     renderStats() {
@@ -2226,6 +2352,8 @@ class LogbookViewClass extends BaseView {
                 </div>
             </div>
         `;
+
+        html += this.renderRecords(LogbookService.getFlights().filter((f) => f.type === 'vol'));
 
         // Equipment Stats
         if (Object.keys(equipStats).length > 0) {

@@ -220,6 +220,36 @@ class LogbookService {
         return this.flights;
     }
 
+    /**
+     * Recalcule les statistiques de trace (distance, vario, vitesses, analyse détaillée) de
+     * tous les vols qui ont une trace IGC. Ne touche qu'à ces statistiques : date, durée,
+     * altitudes saisies, site et le reste du vol restent tels quels.
+     * @returns {Promise<number>} nombre de vols mis à jour
+     */
+    async recomputeAllTraceStats() {
+        let updated = 0;
+        for (const flight of this.flights) {
+            if (flight.type !== 'vol') continue;
+            const raw = await this.getFlightTrace(flight.id);
+            if (!raw) continue;
+            const result = this.parseIGC(raw);
+            if (!result.success) continue;
+            const d = result.data;
+            Object.assign(flight, {
+                distanceKm: d.distanceKm,
+                maxClimbRate: d.maxClimbRate,
+                maxSpeedKmh: d.maxSpeedKmh,
+                avgSpeedKmh: d.avgSpeedKmh,
+                igcStats: d.analysis,
+                updatedAt: Date.now(),
+                syncPending: true,
+            });
+            updated++;
+        }
+        if (updated > 0) this.saveFlights();
+        return updated;
+    }
+
     getFlightById(id) {
         return this.flights.find((f) => f.id === id);
     }
@@ -417,6 +447,7 @@ class LogbookService {
                         maxClimbRate: parsed.maxClimbRate,
                         maxSpeedKmh: parsed.maxSpeedKmh,
                         avgSpeedKmh: parsed.avgSpeedKmh,
+                        analysis: parsed.analysis || null,
                         points,
                         takeoffIndex: parsed.takeoffIndex || 0,
                         // Altitudes au vrai décollage / atterrissage (pas au parking)
