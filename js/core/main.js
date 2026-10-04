@@ -124,6 +124,7 @@ async function bootApplication() {
         'triggerIgcUpload',
         'recalculateFromTrace',
         'addChecklistItem',
+        'pickSiteChoice',
         'toggleCoordsPicker',
         'clearCoords',
         'closeSessionModal',

@@ -170,6 +170,7 @@ export const FR = Object.freeze({
             addPilotPlaceholder: 'Nom du pilote…',
             add: 'Ajouter',
             commentPlaceholderGround: 'Points à travailler...',
+            siteChoices: 'Sites à moins de 500 m du décollage :',
             schoolSession: 'Session encadrée par une école',
             schoolName: "Nom de l'école",
             schoolPlaceholder: 'Choisir ou saisir le nom',

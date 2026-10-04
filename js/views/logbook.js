@@ -199,22 +199,52 @@ class LogbookViewClass extends BaseView {
 
     // Rayon de 500 m : au-delà, le site connu le plus proche est souvent un autre décollage
     // que celui d'où l'on est parti.
-    findNearestSite(lat, lon, maxDistanceKm = 0.5) {
-        if (lat === null || lon === null) return null;
-
-        let nearest = null;
-        let nearestDist = Infinity;
+    /** Sites de décollage connus dans le rayon, du plus proche au plus éloigné. */
+    findNearbySites(lat, lon, maxDistanceKm = 0.5) {
+        if (lat === null || lon === null) return [];
+        const nearby = [];
         SitesService.getSites().forEach((site) => {
             if (!this.isTakeoffSite(site)) return;
             const coords = this.getSiteCoords(site);
             if (coords.lat === null || coords.lon === null) return;
             const dist = this.haversineDistanceKm(lat, lon, coords.lat, coords.lon);
-            if (dist < nearestDist) {
-                nearestDist = dist;
-                nearest = site;
-            }
+            if (dist <= maxDistanceKm) nearby.push({ site, dist });
         });
-        return nearest && nearestDist <= maxDistanceKm ? nearest : null;
+        return nearby.sort((a, b) => a.dist - b.dist).map((n) => n.site);
+    }
+
+    findNearestSite(lat, lon, maxDistanceKm = 0.5) {
+        return this.findNearbySites(lat, lon, maxDistanceKm)[0] || null;
+    }
+
+    // Plusieurs sites connus près du décollage d'une trace (deux décos voisins, treuil et
+    // pente…) : le plus proche est pré-rempli, les autres sont proposés en boutons.
+    _siteChoices = [];
+
+    showSiteChoices(sites) {
+        const box = document.getElementById('lb-site-choices');
+        if (!box) return;
+        this._siteChoices = sites.length > 1 ? sites : [];
+        box.hidden = this._siteChoices.length === 0;
+        const current = /** @type {HTMLInputElement} */ (document.getElementById('lb-site'))?.value || '';
+        box.innerHTML = this._siteChoices.length
+            ? `<span>${tt('form.siteChoices')}</span> ` +
+              this._siteChoices
+                  .map((site, i) => {
+                      const name = site.nom || site.name;
+                      const active = name === current;
+                      return `<button type="button" data-action="pickSiteChoice" data-args="${i}" aria-pressed="${active}" style="margin: 4px 4px 0 0; padding: 2px 8px; border-radius: 12px; cursor: pointer; border: 1px solid var(--accent-blue, #007bc4); background: ${active ? 'var(--accent-blue, #007bc4)' : 'transparent'}; color: ${active ? '#fff' : 'var(--accent-blue, #007bc4)'};">${escapeHTML(name)}</button>`;
+                  })
+                  .join('')
+            : '';
+    }
+
+    pickSiteChoice(index) {
+        const site = this._siteChoices[parseInt(index, 10)];
+        const input = /** @type {HTMLInputElement} */ (document.getElementById('lb-site'));
+        if (!site || !input) return;
+        input.value = site.nom || site.name;
+        this.showSiteChoices(this._siteChoices);
     }
 
     show() {
@@ -1079,6 +1109,7 @@ class LogbookViewClass extends BaseView {
                     <label>${tt('form.site')} <span class="required">*</span></label>
                     <input type="text" id="lb-site" list="sites-list" placeholder="${tt('form.sitePlaceholder')}" required autocomplete="off">
                     <datalist id="sites-list"></datalist>
+                    <div id="lb-site-choices" hidden style="font-size: 0.82rem; margin-top: 4px;"></div>
                     ${this.renderCoordsBlock()}
                 </div>
                 <div class="form-row">
@@ -1401,9 +1432,10 @@ class LogbookViewClass extends BaseView {
                 if (siteInput && !siteInput.value.trim()) {
                     // 1. Un site officiel connu tout près du décollage détecté : on l'utilise
                     // directement, c'est plus fiable et plus utile qu'un nom de ville/lieu-dit.
-                    const nearestSite = this.findNearestSite(takeoff.lat, takeoff.lon);
-                    if (nearestSite) {
-                        siteInput.value = nearestSite.nom || nearestSite.name;
+                    const nearbySites = this.findNearbySites(takeoff.lat, takeoff.lon);
+                    if (nearbySites.length > 0) {
+                        siteInput.value = nearbySites[0].nom || nearbySites[0].name;
+                        this.showSiteChoices(nearbySites);
                     } else {
                         // 2. Sinon, reverse-geocoding vers la ville/lieu-dit le plus proche.
                         siteInput.value = tl('igc.searchingPlace');
@@ -1493,9 +1525,14 @@ class LogbookViewClass extends BaseView {
             this.updateCoordsStatus();
         }
         await SitesService.ensureSitesLoaded().catch(() => null);
-        const nearestSite = this.findNearestSite(takeoff.lat, takeoff.lon);
+        const nearbySites = this.findNearbySites(takeoff.lat, takeoff.lon);
         const siteInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-site'));
-        if (siteInput && nearestSite) siteInput.value = nearestSite.nom || nearestSite.name;
+        if (siteInput && nearbySites.length > 0) {
+            // Le site déjà choisi reste s'il fait partie des candidats ; sinon, le plus proche.
+            const names = nearbySites.map((site) => site.nom || site.name);
+            if (!names.includes(siteInput.value)) siteInput.value = names[0];
+        }
+        this.showSiteChoices(nearbySites);
 
         const filenameLabel = document.getElementById('igc-upload-filename');
         if (filenameLabel) filenameLabel.textContent = tl('igc.recalculated');

@@ -121,6 +121,27 @@ describe('logbook: recalculate a flight from its stored IGC trace', () => {
         expect(saved.lon).toBeCloseTo(2.5, 4);
     });
 
+    it('offers every known site near the takeoff, and keeps the one already chosen', async () => {
+        const site = (nom, lat) => ({ nom, latitude: lat, longitude: 2.5, type: ['NATUREL'], affiche: true });
+        // Le site choisi est le plus éloigné (~220 m), l'autre est à ~110 m.
+        LogbookService.flights[0].site = 'ANTIN TREUIL';
+        SitesService.getSites.mockReturnValue([site('ANTIN PENTE', 50.301), site('ANTIN TREUIL', 50.302)]);
+        LogbookView.editEntry('f1');
+        await flush();
+        await LogbookView.recalculateFromTrace();
+
+        expect($('lb-site').value).toBe('ANTIN TREUIL');
+        const choices = /** @type {HTMLElement} */ (document.getElementById('lb-site-choices'));
+        expect(choices.hidden).toBe(false);
+        const buttons = Array.from(choices.querySelectorAll('button'));
+        expect(buttons.map((b) => b.textContent)).toEqual(['ANTIN PENTE', 'ANTIN TREUIL']);
+        expect(buttons[1].getAttribute('aria-pressed')).toBe('true');
+
+        LogbookView.pickSiteChoice('0');
+        expect($('lb-site').value).toBe('ANTIN PENTE');
+        expect(choices.querySelectorAll('button')[0].getAttribute('aria-pressed')).toBe('true');
+    });
+
     it('keeps the typed site name when no known site is near the takeoff', async () => {
         LogbookView.editEntry('f1');
         await flush();
