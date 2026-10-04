@@ -300,9 +300,14 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <label for="lb-moniteur" style="display:block; margin-top: 10px;">Moniteur</label>
                         <input type="text" id="lb-moniteur" list="moniteurs-list" placeholder="Nom du moniteur" autocomplete="off" style="width: 100%;">
                         <datalist id="moniteurs-list"></datalist>
-                        <label for="lb-accompagnateur" style="display:block; margin-top: 10px;">Accompagnateur</label>
-                        <input type="text" id="lb-accompagnateur" list="accompagnateurs-list" placeholder="Nom de l'accompagnateur" autocomplete="off" style="width: 100%;">
-                        <datalist id="accompagnateurs-list"></datalist>
+                        <label style="display:block; margin-top: 10px;">Accompagnateurs</label>
+                        
+                        <div id="lb-accompagnateur-group" class="lb-chips"></div>
+                        <datalist id="lb-accompagnateur-options"></datalist>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <input type="text" id="lb-accompagnateur-new" list="lb-accompagnateur-options" data-checklist="accompagnateur" placeholder="Nom de l'accompagnateur…" autocomplete="off" style="flex:1; min-width:0;">
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'accompagnateur'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
+                        </div>
                         <label style="display:block; margin-top: 10px;">Exercices travaillés</label>
                         
                         <div id="lb-typeExercice-group" class="lb-chips"></div>
@@ -400,9 +405,14 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <label for="lb-moniteur" style="display:block; margin-top: 10px;">Moniteur</label>
                         <input type="text" id="lb-moniteur" list="moniteurs-list" placeholder="Nom du moniteur" autocomplete="off" style="width: 100%;">
                         <datalist id="moniteurs-list"></datalist>
-                        <label for="lb-accompagnateur" style="display:block; margin-top: 10px;">Accompagnateur</label>
-                        <input type="text" id="lb-accompagnateur" list="accompagnateurs-list" placeholder="Nom de l'accompagnateur" autocomplete="off" style="width: 100%;">
-                        <datalist id="accompagnateurs-list"></datalist>
+                        <label style="display:block; margin-top: 10px;">Accompagnateurs</label>
+                        
+                        <div id="lb-accompagnateur-group" class="lb-chips"></div>
+                        <datalist id="lb-accompagnateur-options"></datalist>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <input type="text" id="lb-accompagnateur-new" list="lb-accompagnateur-options" data-checklist="accompagnateur" placeholder="Nom de l'accompagnateur…" autocomplete="off" style="flex:1; min-width:0;">
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'accompagnateur'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
+                        </div>
                     </div>
                 </div>
                 

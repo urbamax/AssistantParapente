@@ -156,7 +156,7 @@ export const FR = Object.freeze({
                     lieu: 'lieu',
                     pilotes: 'pilotes',
                     moniteur: 'moniteur',
-                    accompagnateur: 'accompagnateur',
+                    accompagnateur: 'accompagnateurs',
                 }),
                 reasons: Object.freeze({
                     place: 'ton habitude sur ce site',
@@ -208,8 +208,8 @@ export const FR = Object.freeze({
             winchOperator: 'Treuilleur',
             winchOperatorPlaceholder: 'Nom du treuilleur',
             instructorPlaceholder: 'Nom du moniteur',
-            companion: 'Accompagnateur',
-            companionPlaceholder: "Nom de l'accompagnateur",
+            companion: 'Accompagnateurs',
+            companionPlaceholder: "Nom de l'accompagnateur…",
             save: 'Enregistrer',
             update: 'Modifier la session',
         }),
@@ -263,7 +263,7 @@ export const FR = Object.freeze({
             harness: 'Sellette :',
             school: 'École :',
             instructor: 'Moniteur :',
-            companion: 'Accompagnateur :',
+            companion: 'Accompagnateurs :',
             winchOperator: 'Treuilleur :',
             instrument: 'Instrument :',
             firmware: '(logiciel {version})',
@@ -1667,7 +1667,7 @@ export const FR = Object.freeze({
             indiquezLeTypeDe:
                 '<strong>Type de vol et décollage :</strong> Indiquez le type de vol (Plouf, Thermique, Soaring, Restit, Cross, Treuil) et la technique de décollage, obligatoire : <strong>"Face voile"</strong>, <strong>"Dos voile"</strong> ou une autre technique. Pour un vol au treuil, indiquez aussi le <strong>treuilleur</strong> : la liste propose d\'abord ceux de la journée sur ce site.',
             sessionEcoleExercices:
-                "<strong>Session encadrée par une école :</strong> Cochez cette case et indiquez le nom de l'école, du moniteur et, s'il y en a un, de l'accompagnateur lorsque la séance a eu lieu en stage (ceux de votre dernière session avec cette école au même endroit sont proposés). Pour un vol, cochez aussi les <strong>exercices travaillés</strong> ; un exercice absent de la liste s'ajoute avec le bouton <strong>Ajouter</strong> et sera proposé aux sessions suivantes.",
+                "<strong>Session encadrée par une école :</strong> Cochez cette case et indiquez le nom de l'école, du moniteur et, s'il y en a, des accompagnateurs lorsque la séance a eu lieu en stage (ceux de votre dernière session avec cette école au même endroit sont proposés). Pour un vol, cochez aussi les <strong>exercices travaillés</strong> ; un exercice absent de la liste s'ajoute avec le bouton <strong>Ajouter</strong> et sera proposé aux sessions suivantes.",
             pilotesSession:
                 "<strong>Pilotes :</strong> Choisissez dans la liste déroulante les pilotes avec qui vous avez volé, en école ou non, ou saisissez un nouveau nom : il rejoint la liste pour les sessions suivantes. Chaque pilote choisi s'affiche en étiquette, retirée d'un clic sur sa croix. Pour un vol à moins de 3 h d'une autre session au même endroit, les pilotes de cette session sont déjà sélectionnés.",
             formulaireQuiApprend:
