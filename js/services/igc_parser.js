@@ -340,6 +340,81 @@ const IGCParser = {
             maxFromTakeoffKm: round1(maxFromTakeoffKm),
             freeDistanceKm: round1(freeDistanceKm),
             estimatedMaxG: round1(estimatedMaxG),
+            winch: this.detectWinchTow(flight),
+        };
+    },
+
+    /**
+     * Repère un départ au treuil : dans les 30 s qui suivent le décollage, une montée soutenue
+     * (≥ 1,5 m/s en moyenne, au moins 30 s et 80 m) en ligne quasi droite (distance directe
+     * ≥ 85 % du chemin parcouru), qui s'arrête net au largage. Un départ de pente commence par
+     * descendre, un thermique s'enroule : ni l'un ni l'autre ne coche ces cases.
+     *
+     * @param {Array<{lat:number, lon:number, alt:number, timestamp:number}>} flight vol seul
+     * @returns {{towSeconds:number, releaseAlt:number, releaseHeight:number, avgClimb:number,
+     *   maxClimb:number, towDistanceKm:number, releaseIndex:number}|null}
+     */
+    detectWinchTow: function (flight) {
+        if (!flight || flight.length < 10) return null;
+        const t0 = flight[0].timestamp;
+        // Vario sur les 10 s suivant chaque point
+        const climbAhead = (i) => {
+            let j = i;
+            while (j < flight.length - 1 && flight[j].timestamp - flight[i].timestamp < 10000) j++;
+            const dt = (flight[j].timestamp - flight[i].timestamp) / 1000;
+            return dt > 0 ? (flight[j].alt - flight[i].alt) / dt : 0;
+        };
+
+        let start = -1;
+        for (let i = 0; i < flight.length && flight[i].timestamp - t0 <= 30000; i++) {
+            if (climbAhead(i) >= 1) {
+                start = i;
+                break;
+            }
+        }
+        if (start < 0) return null;
+
+        // Fin de la montée : le vario sur 10 s passe sous 0,3 m/s ; le largage est le point le
+        // plus haut atteint jusqu'à 10 s après
+        let end = start;
+        while (end < flight.length - 1 && climbAhead(end) >= 0.3) end++;
+        // (la voile continue de monter quelques secondes sur son élan après le largage)
+        let release = start;
+        for (let k = start; k < flight.length && flight[k].timestamp - flight[end].timestamp <= 10000; k++) {
+            if (flight[k].alt > flight[release].alt) release = k;
+        }
+
+        const towSeconds = (flight[release].timestamp - flight[start].timestamp) / 1000;
+        const gain = flight[release].alt - flight[start].alt;
+        if (towSeconds < 30 || gain < 80 || gain / towSeconds < 1.5) return null;
+
+        let pathKm = 0;
+        for (let k = start + 1; k <= release; k++) {
+            pathKm += this._distanceKm(flight[k - 1].lat, flight[k - 1].lon, flight[k].lat, flight[k].lon);
+        }
+        const straightKm = this._distanceKm(
+            flight[start].lat,
+            flight[start].lon,
+            flight[release].lat,
+            flight[release].lon,
+        );
+        if (pathKm <= 0 || straightKm / pathKm < 0.85) return null;
+
+        let maxClimb = 0;
+        for (let i = start, j = start; i <= release; i++) {
+            while (j < release && flight[j].timestamp - flight[i].timestamp < 5000) j++;
+            const dt = (flight[j].timestamp - flight[i].timestamp) / 1000;
+            if (dt >= 3) maxClimb = Math.max(maxClimb, (flight[j].alt - flight[i].alt) / dt);
+        }
+
+        return {
+            towSeconds: Math.round(towSeconds),
+            releaseAlt: Math.round(flight[release].alt),
+            releaseHeight: Math.round(flight[release].alt - flight[0].alt),
+            avgClimb: Math.round((gain / towSeconds) * 10) / 10,
+            maxClimb: Math.round(maxClimb * 10) / 10,
+            towDistanceKm: Math.round(pathKm * 100) / 100,
+            releaseIndex: release,
         };
     },
 

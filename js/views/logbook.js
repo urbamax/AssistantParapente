@@ -1144,6 +1144,7 @@ class LogbookViewClass extends BaseView {
                             <option value="Soaring">${tt('form.flightTypes.Soaring')}</option>
                             <option value="Restit">${tt('form.flightTypes.Restit')}</option>
                             <option value="Cross">${tt('form.flightTypes.Cross')}</option>
+                            <option value="Treuil">${tt('form.flightTypes.Treuil')}</option>
                         </select>
                     </div>
                 </div>
@@ -1450,6 +1451,13 @@ class LogbookViewClass extends BaseView {
         const from = at(info.takeoffIndex || 0);
         const to = at(info.landingIndex ?? info.points.length - 1);
         this.currentSensorStats = { ...SdfParser.summarize(records, from, to), source: 'sdf' };
+        // Facteur de charge au largage du treuil (± 5 s autour du point le plus haut)
+        const winch = info.analysis && info.analysis.winch;
+        if (winch) {
+            const release = at((info.takeoffIndex || 0) + winch.releaseIndex);
+            const around = SdfParser.summarize(records, release - 5, release + 5);
+            if (around) this.currentSensorStats.gRelease = around.gMax;
+        }
         if (filenameLabel) {
             filenameLabel.textContent = tl('igc.sdfLoaded', {
                 name: file.name,
@@ -1552,6 +1560,13 @@ class LogbookViewClass extends BaseView {
         const gainInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-gain'));
         if (gainInput && parsed.gain !== null) {
             gainInput.value = parsed.gain;
+        }
+
+        // Départ au treuil reconnu dans la trace : type de vol « Treuil », sauf si le pilote a
+        // déjà choisi autre chose que la valeur par défaut.
+        const typeVolInput = /** @type {HTMLSelectElement} */ (document.getElementById('lb-typeVol'));
+        if (typeVolInput && parsed.analysis && parsed.analysis.winch && typeVolInput.value === 'Plouf') {
+            typeVolInput.value = 'Treuil';
         }
     }
 
@@ -2094,7 +2109,7 @@ class LogbookViewClass extends BaseView {
                         <div class="session-location">${escapeHTML(location)}</div>
                         <div class="session-details">
                             <span class="detail-item"><i class="ri-time-line"></i> ${formatDuration(session.duree)}</span>
-                            <span class="detail-item"><i class="${subtitle.toLowerCase().includes('thermique') ? 'ri-fire-line' : subtitle.toLowerCase().includes('cross') ? 'ri-route-line' : subtitle.toLowerCase().includes('plouf') ? 'ri-arrow-left-down-line' : subtitle.toLowerCase().includes('restit') || subtitle.toLowerCase().includes('soaring') ? 'ri-sun-cloud-line' : subtitle.toLowerCase().includes('gonflage') ? 'ri-footprint-line' : 'ri-price-tag-3-line'}"></i> ${escapeHTML(subtitle)}</span>
+                            <span class="detail-item"><i class="${subtitle.toLowerCase().includes('treuil') ? 'ri-arrow-up-double-line' : subtitle.toLowerCase().includes('thermique') ? 'ri-fire-line' : subtitle.toLowerCase().includes('cross') ? 'ri-route-line' : subtitle.toLowerCase().includes('plouf') ? 'ri-arrow-left-down-line' : subtitle.toLowerCase().includes('restit') || subtitle.toLowerCase().includes('soaring') ? 'ri-sun-cloud-line' : subtitle.toLowerCase().includes('gonflage') ? 'ri-footprint-line' : 'ri-price-tag-3-line'}"></i> ${escapeHTML(subtitle)}</span>
                         </div>
                         ${extraInfo}
                         <div class="session-equip">
@@ -2206,6 +2221,15 @@ class LogbookViewClass extends BaseView {
             row('maxFromTakeoff', `${a.maxFromTakeoffKm} km`, num(a.maxFromTakeoffKm)) +
             row('straightDistance', `${a.straightDistanceKm} km`, num(a.straightDistanceKm));
 
+        const w = a.winch && typeof a.winch === 'object' ? a.winch : null;
+        const winch = w
+            ? row('towTime', formatDuration(Math.round(w.towSeconds / 60)) + ` (${w.towSeconds} s)`) +
+              row('release', tt('analysis.releaseValue', { alt: w.releaseAlt + offset, height: w.releaseHeight })) +
+              row('towClimb', tt('analysis.towClimbValue', { avg: w.avgClimb, max: w.maxClimb })) +
+              row('towDistance', `${Math.round(w.towDistanceKm * 1000)} m`) +
+              row('gRelease', `${sensors && sensors.gRelease} g`, Boolean(sensors && num(sensors.gRelease)))
+            : '';
+
         // Facteur de charge : mesuré par l'accéléromètre (.sdf Syride), sinon estimé depuis
         // les virages de la trace.
         const loads = sensors
@@ -2218,6 +2242,7 @@ class LogbookViewClass extends BaseView {
                     <details class="flight-analysis">
                         <summary><i class="ri-bar-chart-2-line"></i> ${tt('analysis.title')}</summary>
                         <div class="flight-analysis-grid">
+                            ${group('winch', winch)}
                             ${group('altitudes', altitudes)}
                             ${group('vario', vario)}
                             ${group('thermals', thermals)}
@@ -2244,6 +2269,7 @@ class LogbookViewClass extends BaseView {
             ['bestGlide', 'igcStats.bestGlideRatio', (v) => v],
             ['maxSpeed', 'maxSpeedKmh', (v) => `${v} km/h`],
             ['gMax', 'sensorStats.gMax', (v) => `${v} g`],
+            ['highestRelease', 'igcStats.winch.releaseHeight', (v) => `${v} m`],
         ];
         let rows = '';
         for (const [key, path, format] of records) {

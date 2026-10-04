@@ -60,6 +60,7 @@ describe('logbook: Syride .sdf with the .igc', () => {
         expect(saved.sensorStats).toEqual({
             gMax: 1.3,
             gMin: 0.9,
+            gRelease: 1.3,
             tempTakeoff: 27,
             tempMin: 22,
             tempMax: 27,
@@ -67,7 +68,12 @@ describe('logbook: Syride .sdf with the .igc', () => {
         });
         expect(saved.igcStats.estimatedMaxG).toBeGreaterThanOrEqual(1);
 
+        expect(saved.typeVol).toBe('Treuil'); // départ au treuil reconnu dans la trace
+        expect(saved.sensorStats.gRelease).toBe(1.3); // pic de G au largage
+
         const html = LogbookView.renderFlightAnalysis(saved);
+        expect(html).toContain('Largage</span><strong>425 m (+259 m)');
+        expect(html).toContain('Facteur de charge au largage</span><strong>1.3 g');
         expect(html).toContain('Facteur de charge max</span><strong>1.3 g');
         expect(html).toContain('27 °C au déco (22 à 27 °C)');
         expect(html).not.toContain('(estimé)');
@@ -90,7 +96,7 @@ describe('logbook: Syride .sdf with the .igc', () => {
         await LogbookView._processFiles([sdfFile()]);
         fillRequired();
         LogbookView.submitForm();
-        expect(LogbookService.getFlightById('f1').sensorStats.gMax).toBe(1.3);
+        expect(LogbookService.getFlightById('f1').sensorStats).toMatchObject({ gMax: 1.3, gRelease: 1.3 });
         expect(LogbookService.getFlightById('f1').rawIgc).toBe(IGC);
     });
 

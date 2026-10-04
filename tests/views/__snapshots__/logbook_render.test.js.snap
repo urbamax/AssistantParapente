@@ -259,6 +259,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             <option value="Soaring">Soaring</option>
                             <option value="Restit">Restit</option>
                             <option value="Cross">Cross</option>
+                            <option value="Treuil">Treuil</option>
                         </select>
                     </div>
                 </div>

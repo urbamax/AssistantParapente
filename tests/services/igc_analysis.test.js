@@ -118,6 +118,22 @@ describe('IGCParser.analyzeFlight', () => {
         expect(IGCParser.analyzeFlight(buildFlight([glide(300)])).estimatedMaxG).toBe(1);
     });
 
+    it('does not take a hill launch, a thermal or a ridge for a winch launch', () => {
+        const straightClimb = (seconds, verticalMs) => ({ seconds, glide: { speedKmh: 30, verticalMs } });
+        // Treuil synthétique : 90 s à +3 m/s en ligne droite, puis plané
+        expect(IGCParser.detectWinchTow(buildFlight([straightClimb(90, 3), glide(300)]))).toMatchObject({
+            towSeconds: 90,
+        });
+        // Départ de pente : on descend dès le décollage
+        expect(IGCParser.detectWinchTow(buildFlight([glide(120), thermal(180, 2)]))).toBeNull();
+        // Thermique enroulé dès le décollage : ça monte, mais en tournant
+        expect(IGCParser.detectWinchTow(buildFlight([thermal(180, 2.5), glide(120)]))).toBeNull();
+        // Petite bouffée de 20 s
+        expect(IGCParser.detectWinchTow(buildFlight([straightClimb(20, 2), glide(300)]))).toBeNull();
+        // Soaring faible en ligne droite : +0,8 m/s
+        expect(IGCParser.detectWinchTow(buildFlight([straightClimb(120, 0.8), glide(120)]))).toBeNull();
+    });
+
     it('returns null for too short a track', () => {
         expect(IGCParser.analyzeFlight([])).toBeNull();
         expect(IGCParser.analyzeFlight(buildFlight([glide(1)]))).toBeNull();
@@ -138,5 +154,16 @@ describe('IGCParser on a real Syride track (winch launch, 8s on approach)', () =
         expect(parsed.analysis.freeDistanceKm).toBeCloseTo(2, 0); // Syride : 2 km
         expect(parsed.analysis.thermalCount).toBe(0);
         expect(parsed.analysis.estimatedMaxG).toBeLessThan(1.4); // capteur Syride : 1,3 g max (largage)
+    });
+
+    it('recognises the winch launch: 83 s of tow, released at 425 m', () => {
+        expect(parsed.analysis.winch).toMatchObject({
+            towSeconds: 83,
+            releaseAlt: 425,
+            releaseHeight: 259,
+            avgClimb: 3.1,
+        });
+        expect(parsed.analysis.winch.maxClimb).toBeGreaterThan(4);
+        expect(parsed.analysis.winch.towDistanceKm).toBeCloseTo(0.75, 1);
     });
 });
