@@ -294,3 +294,27 @@ describe('statistics filter label (spec 025)', () => {
         expect(text('stats-content')).toContain('Détail : CORS');
     });
 });
+
+// Spec 027 : sur l'écran des résultats, le code, l'énoncé et l'explication d'une question fausse
+// sont affichés comme du texte (audit C6).
+describe('results screen escapes quiz texts (spec 027)', () => {
+    it('shows markup in the code, statement and explanation as text', () => {
+        const markup = (tag) => `<img src=x data-spec027="${tag}">`;
+        const question = Q(
+            `Z1${markup('code')}`,
+            'Météo',
+            `Énoncé ${markup('question')}`,
+            `Interdit < 1000m & ${markup('explication')}`,
+        );
+        QuizService.state.qcmConfig.mode = 'TRAINING';
+        QuizService.state.examResults = [{ isCorrect: false, question, selected: [question.choices[1]] }];
+
+        QuizView.renderExamResults();
+
+        const body = document.getElementById('qcm-question-text');
+        expect(body.querySelector('[data-spec027]')).toBeNull();
+        expect(body.querySelector('.bank-item-code').textContent).toBe(`#${question.code}`);
+        expect(body.querySelector('.bank-item-question').textContent).toBe(question.question);
+        expect(body.querySelector('.bank-item-explication').textContent).toContain(question.explication);
+    });
+});
