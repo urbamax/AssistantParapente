@@ -19,8 +19,12 @@ function runServiceWorker({ firebaseEnabled = true, importFails = false } = {}) 
         URL,
         Response,
         location: new URL('https://app.example/'),
-        caches: { open: vi.fn(), keys: vi.fn(), match: vi.fn(() => Promise.resolve(undefined)) },
-        fetch: vi.fn(),
+        caches: {
+            open: vi.fn(() => Promise.resolve({ put: vi.fn() })),
+            keys: vi.fn(),
+            match: vi.fn(() => Promise.resolve(undefined)),
+        },
+        fetch: vi.fn(() => Promise.resolve(new Response('', { status: 200 }))),
     };
     sandbox.self = {
         addEventListener: (type, fn) => (listeners[type] = fn),
@@ -111,10 +115,11 @@ describe('Firebase network requests are left to the browser', () => {
         expect(event.respondWith).not.toHaveBeenCalled();
     });
 
-    it('other third-party files are still served for offline use', () => {
+    it('other third-party files are still served for offline use', async () => {
         const { listeners } = runServiceWorker();
         const event = fetchEvent('https://mt1.google.com/vt/lyrs=y&x=1&y=2&z=3');
         listeners.fetch(event);
         expect(event.respondWith).toHaveBeenCalled();
+        await event.respondWith.mock.calls[0][0];
     });
 });
