@@ -81,6 +81,15 @@ class LogbookViewClass extends BaseView {
                 }
             });
 
+            // Entrée dans « Ajouter un exercice / un pilote » : ajoute à la liste au lieu
+            // d'envoyer le formulaire.
+            container.addEventListener('keydown', (e) => {
+                const target = /** @type {HTMLInputElement} */ (e.target);
+                if (e.key !== 'Enter' || !target.dataset || !target.dataset.checklist) return;
+                e.preventDefault();
+                LogbookView.addChecklistItem(target.dataset.checklist);
+            });
+
             // Logbook form submit
             container.addEventListener('submit', (e) => {
                 if (/** @type {HTMLElement} */ (e.target).id === 'logbook-add-form') {
@@ -587,6 +596,7 @@ class LogbookViewClass extends BaseView {
         const commentaire = /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire'))?.value || '';
         const ecoleChecked = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole-check'))?.checked;
         const ecole = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole'))?.value || '';
+        const pilotes = this.getChecklistValues('pilotes');
 
         const coordsText = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'))?.value || '';
         const coordsPanelOpen = document.getElementById('lb-coords-panel')?.hidden === false;
@@ -650,6 +660,7 @@ class LogbookViewClass extends BaseView {
             if (el) el.value = commentaire;
         }
         if (ecoleChecked) this.setSchoolField(true, ecole);
+        this.setChecklistValues('pilotes', pilotes);
 
         if (coordsText) {
             const el = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'));
@@ -665,7 +676,15 @@ class LogbookViewClass extends BaseView {
 
     // --- SESSION EN ÉCOLE ---
 
-    renderSchoolBlock() {
+    // En vol, les exercices travaillés ne sont demandés que pour une session en école (au sol,
+    // ils font déjà partie du formulaire).
+    renderSchoolBlock(type = 'gonflage') {
+        const exercises =
+            type === 'vol'
+                ? `
+                        <label style="display:block; margin-top: 10px;">${tt('form.exercises')}</label>
+                        ${this.renderChecklist('typeExercice', LogbookViewClass.FLIGHT_EXERCISES, this.getUsedValues('typeExercice', 'vol'), tt('form.addExercisePlaceholder'))}`
+                : '';
         return `
                 <div class="form-group">
                     <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
@@ -674,9 +693,113 @@ class LogbookViewClass extends BaseView {
                     <div id="lb-ecole-group" hidden style="margin-top: 6px;">
                         <label for="lb-ecole">${tt('form.schoolName')} <span class="required">*</span></label>
                         <input type="text" id="lb-ecole" list="ecoles-list" placeholder="${tt('form.schoolPlaceholder')}" autocomplete="off" style="width: 100%;">
-                        <datalist id="ecoles-list"></datalist>
+                        <datalist id="ecoles-list"></datalist>${exercises}
                     </div>
                 </div>`;
+    }
+
+    // Pilotes avec qui on a volé / gonflé, pour toute session (école ou pas).
+    renderPilotsBlock() {
+        return `
+                <div class="form-group">
+                    <label>${tt('form.pilots')}</label>
+                    ${this.renderChecklist('pilotes', [], this.getUsedValues('pilotes'), tt('form.addPilotPlaceholder'))}
+                </div>`;
+    }
+
+    // --- LISTES À COCHER EXTENSIBLES (exercices, pilotes) ---
+    // La liste proposée = valeurs par défaut + toutes celles déjà enregistrées dans le carnet :
+    // une valeur ajoutée à la main sur une session est donc reproposée sur les suivantes.
+
+    static FLIGHT_EXERCISES = [
+        'Virages',
+        'Tangage/Roulis',
+        'Oreilles',
+        'Accélérateur',
+        'Approche en 8',
+        'Approche en U',
+        "Précision d'atterrissage",
+    ];
+    static GROUND_EXERCISES = [
+        'Face voile',
+        'Dos voile',
+        'Tangage/Roulis',
+        'Affalage',
+        'Vent fort',
+        'Prégonflage / Démêlage',
+    ];
+
+    /** Valeurs distinctes d'un champ liste (`typeExercice`, `pilotes`) dans le carnet, triées. */
+    getUsedValues(field, type = null) {
+        const seen = new Map();
+        LogbookService.getFlights().forEach((session) => {
+            if (type && session.type !== type) return;
+            const values = Array.isArray(session[field]) ? session[field] : [session[field]];
+            values.forEach((value) => {
+                const v = typeof value === 'string' ? value.trim() : '';
+                if (v && !seen.has(v.toLowerCase())) seen.set(v.toLowerCase(), v);
+            });
+        });
+        return [...seen.values()].sort((a, b) => a.localeCompare(b, 'fr'));
+    }
+
+    _renderChecklistItem(name, value, checked = false) {
+        // Les valeurs par défaut ont un libellé traduit ; les autres sont affichées telles quelles.
+        const isDefault =
+            name === 'typeExercice' &&
+            (LogbookViewClass.FLIGHT_EXERCISES.includes(value) || LogbookViewClass.GROUND_EXERCISES.includes(value));
+        const label = isDefault ? tt(`form.exerciseTypes.${value}`) : escapeHTML(value);
+        return `<label><input type="checkbox" name="lb-${name}" value="${escapeHTML(value)}"${checked ? ' checked' : ''}> ${label}</label>`;
+    }
+
+    renderChecklist(name, defaults, used, placeholder) {
+        const lower = defaults.map((v) => v.toLowerCase());
+        const items = [...defaults, ...used.filter((v) => !lower.includes(v.toLowerCase()))];
+        return `
+                        <div id="lb-${name}-group" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                            ${items.map((v) => this._renderChecklistItem(name, v)).join('')}
+                        </div>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <input type="text" id="lb-${name}-new" data-checklist="${name}" placeholder="${placeholder}" autocomplete="off" style="flex:1; min-width:0;">
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'${name}'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> ${tt('form.add')}</button>
+                        </div>`;
+    }
+
+    /** Valeurs cochées d'une liste du formulaire. */
+    getChecklistValues(name) {
+        return Array.from(
+            /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll(`input[name="lb-${name}"]:checked`)),
+        ).map((cb) => cb.value);
+    }
+
+    /** Coche les valeurs données, en ajoutant à la liste celles qui n'y sont pas encore. */
+    setChecklistValues(name, values) {
+        const group = document.getElementById(`lb-${name}-group`);
+        if (!group) return;
+        const wanted = (Array.isArray(values) ? values : [values]).filter((v) => typeof v === 'string' && v.trim());
+        const boxes = /** @type {NodeListOf<HTMLInputElement>} */ (group.querySelectorAll(`input[name="lb-${name}"]`));
+        boxes.forEach((cb) => (cb.checked = wanted.includes(cb.value)));
+        wanted.forEach((value) => {
+            if (!Array.from(boxes).some((cb) => cb.value === value)) {
+                group.insertAdjacentHTML('beforeend', this._renderChecklistItem(name, value, true));
+            }
+        });
+    }
+
+    /** Bouton « Ajouter » (ou Entrée) : coche la valeur saisie, en l'ajoutant si elle est nouvelle. */
+    addChecklistItem(name) {
+        const input = /** @type {HTMLInputElement} */ (document.getElementById(`lb-${name}-new`));
+        const group = document.getElementById(`lb-${name}-group`);
+        if (!input || !group) return;
+        const value = input.value.trim();
+        if (!value) return;
+        const existing = Array.from(
+            /** @type {NodeListOf<HTMLInputElement>} */ (group.querySelectorAll(`input[name="lb-${name}"]`)),
+        ).find((cb) => cb.value.toLowerCase() === value.toLowerCase());
+        if (existing) existing.checked = true;
+        else group.insertAdjacentHTML('beforeend', this._renderChecklistItem(name, value, true));
+        input.value = '';
+        input.focus();
     }
 
     // Le nom de l'école n'est demandé (et obligatoire) que si la case est cochée.
@@ -1017,7 +1140,8 @@ class LogbookViewClass extends BaseView {
                         <input type="number" id="lb-gain" placeholder="${tt('form.gainPlaceholder')}">
                     </div>
                 </div>
-                ${this.renderSchoolBlock()}
+                ${this.renderSchoolBlock('vol')}
+                ${this.renderPilotsBlock()}
                 <div class="form-group">
                     <label>${tt('form.comment')}</label>
                     <textarea id="lb-commentaire" rows="3" placeholder="${tt('form.commentPlaceholderFlight')}"></textarea>
@@ -1061,17 +1185,11 @@ class LogbookViewClass extends BaseView {
                     </div>
                     <div class="form-group">
                         <label>${tt('form.exercises')}</label>
-                        <div id="lb-typeExercice-group" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
-                            <label><input type="checkbox" name="lb-typeExercice" value="Face voile"> ${tt('form.exerciseTypes.Face voile')}</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Dos voile"> ${tt('form.exerciseTypes.Dos voile')}</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Tangage/Roulis"> ${tt('form.exerciseTypes.Tangage/Roulis')}</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Affalage"> ${tt('form.exerciseTypes.Affalage')}</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Vent fort"> ${tt('form.exerciseTypes.Vent fort')}</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Prégonflage / Démêlage"> ${tt('form.exerciseTypes.Prégonflage / Démêlage')}</label>
-                        </div>
+                        ${this.renderChecklist('typeExercice', LogbookViewClass.GROUND_EXERCISES, this.getUsedValues('typeExercice', 'gonflage'), tt('form.addExercisePlaceholder'))}
                     </div>
                 </div>
                 ${this.renderSchoolBlock()}
+                ${this.renderPilotsBlock()}
                 <div class="form-group">
                     <label>${tt('form.comment')}</label>
                     <textarea id="lb-commentaire" rows="3" placeholder="${tt('form.commentPlaceholderGround')}"></textarea>
@@ -1479,6 +1597,7 @@ class LogbookViewClass extends BaseView {
             duree: duree,
             commentaire: commentaire,
             ecole: ecole,
+            pilotes: this.getChecklistValues('pilotes'),
         };
 
         // Une trace IGC importée remplace ces coordonnées plus bas ; vidées en modification, elles sont retirées.
@@ -1521,6 +1640,7 @@ class LogbookViewClass extends BaseView {
                 }
                 session.techDecollage = techDecollage;
             }
+            session.typeExercice = ecole ? this.getChecklistValues('typeExercice') : [];
 
             const altMax = /** @type {HTMLInputElement} */ (document.getElementById('lb-altMax')).value;
             if (altMax) session.altitudeMax = parseInt(altMax, 10);
@@ -1673,6 +1793,8 @@ class LogbookViewClass extends BaseView {
         /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire')).value =
             session.commentaire || '';
         if (session.ecole) this.setSchoolField(true, session.ecole);
+        this.setChecklistValues('pilotes', session.pilotes || []);
+        if (session.typeExercice) this.setChecklistValues('typeExercice', session.typeExercice);
 
         // Populate specific fields
         if (session.type === 'vol') {
@@ -1703,15 +1825,6 @@ class LogbookViewClass extends BaseView {
             }
         } else {
             /** @type {HTMLInputElement} */ (document.getElementById('lb-lieu')).value = session.lieu || '';
-            if (session.typeExercice) {
-                const checkboxes = /** @type {NodeListOf<HTMLInputElement>} */ (
-                    document.querySelectorAll('input[name="lb-typeExercice"]')
-                );
-                const typesArray = Array.isArray(session.typeExercice) ? session.typeExercice : [session.typeExercice];
-                checkboxes.forEach((cb) => {
-                    cb.checked = typesArray.includes(cb.value);
-                });
-            }
         }
 
         const coordsInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'));
@@ -1876,6 +1989,8 @@ class LogbookViewClass extends BaseView {
                             ${session.voile ? `<div><strong>${tt('history.wing')}</strong> ${escapeHTML(session.voile)}</div>` : ''}
                             ${session.sellette ? `<div><strong>${tt('history.harness')}</strong> ${escapeHTML(session.sellette)}</div>` : ''}
                             ${session.ecole ? `<div><strong>${tt('history.school')}</strong> ${escapeHTML(session.ecole)}</div>` : ''}
+                            ${isVol && Array.isArray(session.typeExercice) && session.typeExercice.length > 0 ? `<div><strong>${tt('history.exercises')}</strong> ${escapeHTML(session.typeExercice.join(', '))}</div>` : ''}
+                            ${Array.isArray(session.pilotes) && session.pilotes.length > 0 ? `<div><strong>${tt('history.pilots')}</strong> ${escapeHTML(session.pilotes.join(', '))}</div>` : ''}
                         </div>
                         ${session.commentaire ? `<div class="session-comment">"${escapeHTML(session.commentaire)}"</div>` : ''}
                         ${session.rawIgc || (session.traceGps && session.traceGps.length > 0) ? `<button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="${session.id}"><i class="ri-route-line"></i> ${tt('history.showTrace')}</button><div id="trace-container-${session.id}" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>` : ''}

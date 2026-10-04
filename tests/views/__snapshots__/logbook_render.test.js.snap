@@ -290,7 +290,28 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <label for="lb-ecole">Nom de l'école <span class="required">*</span></label>
                         <input type="text" id="lb-ecole" list="ecoles-list" placeholder="Choisir ou saisir le nom" autocomplete="off" style="width: 100%;">
                         <datalist id="ecoles-list"></datalist>
+                        <label style="display:block; margin-top: 10px;">Exercices travaillés</label>
+                        
+                        <div id="lb-typeExercice-group" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                            <label><input type="checkbox" name="lb-typeExercice" value="Virages"> Virages</label><label><input type="checkbox" name="lb-typeExercice" value="Tangage/Roulis"> Tangage/Roulis</label><label><input type="checkbox" name="lb-typeExercice" value="Oreilles"> Oreilles</label><label><input type="checkbox" name="lb-typeExercice" value="Accélérateur"> Accélérateur</label><label><input type="checkbox" name="lb-typeExercice" value="Approche en 8"> Approche en 8</label><label><input type="checkbox" name="lb-typeExercice" value="Approche en U"> Approche en U</label><label><input type="checkbox" name="lb-typeExercice" value="Précision d'atterrissage"> Précision d'atterrissage</label>
+                        </div>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <input type="text" id="lb-typeExercice-new" data-checklist="typeExercice" placeholder="Autre exercice…" autocomplete="off" style="flex:1; min-width:0;">
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'typeExercice'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
+                        </div>
                     </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Pilotes avec qui j’ai volé</label>
+                    
+                        <div id="lb-pilotes-group" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                            
+                        </div>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <input type="text" id="lb-pilotes-new" data-checklist="pilotes" placeholder="Nom du pilote…" autocomplete="off" style="flex:1; min-width:0;">
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'pilotes'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
+                        </div>
                 </div>
                 <div class="form-group">
                     <label>Commentaire</label>
@@ -347,13 +368,13 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     </div>
                     <div class="form-group">
                         <label>Exercices travaillés</label>
+                        
                         <div id="lb-typeExercice-group" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
-                            <label><input type="checkbox" name="lb-typeExercice" value="Face voile"> Face voile</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Dos voile"> Dos voile</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Tangage/Roulis"> Tangage/Roulis</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Affalage"> Affalage</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Vent fort"> Vent fort</label>
-                            <label><input type="checkbox" name="lb-typeExercice" value="Prégonflage / Démêlage"> Prégonflage / Démêlage</label>
+                            <label><input type="checkbox" name="lb-typeExercice" value="Face voile"> Face voile</label><label><input type="checkbox" name="lb-typeExercice" value="Dos voile"> Dos voile</label><label><input type="checkbox" name="lb-typeExercice" value="Tangage/Roulis"> Tangage/Roulis</label><label><input type="checkbox" name="lb-typeExercice" value="Affalage"> Affalage</label><label><input type="checkbox" name="lb-typeExercice" value="Vent fort"> Vent fort</label><label><input type="checkbox" name="lb-typeExercice" value="Prégonflage / Démêlage"> Prégonflage / Démêlage</label>
+                        </div>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <input type="text" id="lb-typeExercice-new" data-checklist="typeExercice" placeholder="Autre exercice…" autocomplete="off" style="flex:1; min-width:0;">
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'typeExercice'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
                         </div>
                     </div>
                 </div>
@@ -367,6 +388,18 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <input type="text" id="lb-ecole" list="ecoles-list" placeholder="Choisir ou saisir le nom" autocomplete="off" style="width: 100%;">
                         <datalist id="ecoles-list"></datalist>
                     </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Pilotes avec qui j’ai volé</label>
+                    
+                        <div id="lb-pilotes-group" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                            
+                        </div>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <input type="text" id="lb-pilotes-new" data-checklist="pilotes" placeholder="Nom du pilote…" autocomplete="off" style="flex:1; min-width:0;">
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'pilotes'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
+                        </div>
                 </div>
                 <div class="form-group">
                     <label>Commentaire</label>
@@ -410,6 +443,8 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <div class="session-equip">
                             <div><strong>Voile :</strong> OZONE | RUSH 6 | BLEU | M</div>
                             <div><strong>Sellette :</strong> SUPAIR | ACCESS</div>
+                            
+                            
                             
                         </div>
                         <div class="session-comment">"Belle journée"</div>
@@ -485,6 +520,8 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             <div><strong>Voile :</strong> OZONE | RUSH 6 | BLEU | M</div>
                             
                             
+                            
+                            
                         </div>
                         
                         
@@ -520,6 +557,8 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                         
                         <div class="session-equip">
+                            
+                            
                             
                             
                             

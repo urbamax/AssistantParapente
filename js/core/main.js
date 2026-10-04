@@ -123,6 +123,7 @@ async function bootApplication() {
         'toggleEquipmentStatus',
         'triggerIgcUpload',
         'recalculateFromTrace',
+        'addChecklistItem',
         'toggleCoordsPicker',
         'clearCoords',
         'closeSessionModal',
