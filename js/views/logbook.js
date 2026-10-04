@@ -197,7 +197,9 @@ class LogbookViewClass extends BaseView {
         return types.some((t) => LogbookViewClass.TAKEOFF_SITE_TYPES.includes(t));
     }
 
-    findNearestSite(lat, lon, maxDistanceKm = 2) {
+    // 1 km : au-delà, le site connu le plus proche est souvent un autre décollage que celui
+    // d'où l'on est parti.
+    findNearestSite(lat, lon, maxDistanceKm = 1) {
         if (lat === null || lon === null) return null;
 
         let nearest = null;
@@ -1482,7 +1484,7 @@ class LogbookViewClass extends BaseView {
         this._setupAltitudeCheck(parsed, offset);
 
         // Le site vient lui aussi de la trace : position du décollage détecté, et site connu le
-        // plus proche. Sans site connu à moins de 2 km, le nom saisi est gardé plutôt que
+        // plus proche. Sans site connu à moins de 1 km, le nom saisi est gardé plutôt que
         // remplacé par un nom de commune.
         const takeoff = parsed.points[parsed.takeoffIndex] || parsed.points[0];
         const coordsInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'));

@@ -173,8 +173,9 @@ describe('LogbookView.findNearestSite (import IGC)', () => {
         expect(LogbookView.findNearestSite(45.9, 6.87)).toBeNull();
     });
 
-    it('returns null beyond 2 km', () => {
+    it('returns null beyond 1 km', () => {
         SitesService.setSites([deco]);
-        expect(LogbookView.findNearestSite(45.93, 6.87)).toBeNull();
+        expect(LogbookView.findNearestSite(45.905, 6.87)).toBe(deco); // ~560 m
+        expect(LogbookView.findNearestSite(45.91, 6.87)).toBeNull(); // ~1,1 km
     });
 });
