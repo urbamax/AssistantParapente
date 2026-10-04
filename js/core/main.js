@@ -122,6 +122,7 @@ async function bootApplication() {
         'deleteEquipment',
         'toggleEquipmentStatus',
         'triggerIgcUpload',
+        'recalculateFromTrace',
         'toggleCoordsPicker',
         'clearCoords',
         'closeSessionModal',

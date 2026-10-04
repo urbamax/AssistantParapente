@@ -936,6 +936,7 @@ class LogbookViewClass extends BaseView {
                     <div style="font-weight: bold; margin-top: 10px;">${tt('form.igcTitle')}</div>
                     <div style="font-size: 0.85rem; color: var(--text-secondary, #666); margin-top: 5px;" id="igc-upload-filename">${tt('form.igcHint')}</div>
                 </div>
+                <button type="button" id="lb-igc-recalc" data-action="recalculateFromTrace" style="display:none; width: 100%; margin: -5px 0 15px; padding: 8px; border-radius: 6px; border: 1px solid var(--accent-blue, #007bc4); color: var(--accent-blue, #007bc4); background: transparent; cursor: pointer;"><i class="ri-refresh-line"></i> ${tt('igc.recalculate')}</button>
                 <div class="form-group" id="igc-alt-check" style="display:none; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-light, #ccc); margin-bottom: 15px;">
                     <div id="igc-alt-info" style="font-size: 0.85rem; margin-bottom: 8px;"></div>
                     <div style="display:flex; gap: 16px; margin-bottom: 6px; font-size: 0.9rem;">
@@ -1265,30 +1266,7 @@ class LogbookViewClass extends BaseView {
             if (flightStats.success) {
                 const parsed = flightStats.data;
                 this.currentTraceData = parsed.points;
-                this.currentIgcStats = {
-                    distanceKm: parsed.distanceKm,
-                    maxClimbRate: parsed.maxClimbRate,
-                    maxSpeedKmh: parsed.maxSpeedKmh,
-                    avgSpeedKmh: parsed.avgSpeedKmh,
-                };
-
-                const durationInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-duree'));
-                if (durationInput && parsed.duration > 0) {
-                    durationInput.value = parsed.duration;
-                }
-                const datetimeInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime'));
-                if (datetimeInput && parsed.dateStr) {
-                    datetimeInput.value = parsed.dateStr;
-                }
-
-                const altMaxInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-altMax'));
-                if (altMaxInput && parsed.maxAltitude !== null) {
-                    altMaxInput.value = parsed.maxAltitude;
-                }
-                const gainInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-gain'));
-                if (gainInput && parsed.gain !== null) {
-                    gainInput.value = parsed.gain;
-                }
+                this._fillFormFromIgc(parsed);
 
                 const siteInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-site'));
                 // Le vrai décollage (pas forcément le 1er point : vario allumé au parking,
@@ -1329,6 +1307,78 @@ class LogbookViewClass extends BaseView {
             }
         };
         reader.readAsText(file);
+    }
+
+    // Champs du formulaire déduits de la trace : date du décollage, durée, altitude max
+    // (corrigée de `altOffset`), gain et statistiques du vol.
+    _fillFormFromIgc(parsed, altOffset = 0) {
+        this.currentIgcStats = {
+            distanceKm: parsed.distanceKm,
+            maxClimbRate: parsed.maxClimbRate,
+            maxSpeedKmh: parsed.maxSpeedKmh,
+            avgSpeedKmh: parsed.avgSpeedKmh,
+        };
+
+        const durationInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-duree'));
+        if (durationInput && parsed.duration > 0) {
+            durationInput.value = parsed.duration;
+        }
+        const datetimeInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime'));
+        if (datetimeInput && parsed.dateStr) {
+            datetimeInput.value = parsed.dateStr;
+        }
+
+        const altMaxInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-altMax'));
+        if (altMaxInput && parsed.maxAltitude !== null) {
+            altMaxInput.value = parsed.maxAltitude + altOffset;
+        }
+        const gainInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-gain'));
+        if (gainInput && parsed.gain !== null) {
+            gainInput.value = parsed.gain;
+        }
+    }
+
+    // Édition d'un vol : refait les calculs à partir de la trace IGC déjà enregistrée (après
+    // une amélioration du parseur, par exemple), sans avoir à ré-importer le fichier. Seul ce
+    // qui vient de la trace est recalculé (date, durée, altitudes, stats, site et position du
+    // décollage) ; le matériel, le type de vol, l'école, le commentaire et la correction
+    // d'altitude sont gardés.
+    async recalculateFromTrace() {
+        const idField = /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit'));
+        const id = idField ? idField.value : '';
+        if (!id) return;
+        const raw = await LogbookService.getFlightTrace(id);
+        if (!raw) {
+            alert(tl('igc.noStoredTrace'));
+            return;
+        }
+        const result = LogbookService.parseIGC(raw);
+        if (!result.success) {
+            alert(tl('igc.parseError', { error: result.error }));
+            return;
+        }
+        const session = LogbookService.getFlightById(id);
+        const offset = this.currentIgcAltOffset ?? (session?.altOffset || 0);
+        const parsed = result.data;
+        this._fillFormFromIgc(parsed, offset);
+        this._setupAltitudeCheck(parsed, offset);
+
+        // Le site vient lui aussi de la trace : position du décollage détecté, et site connu le
+        // plus proche. Sans site connu à moins de 2 km, le nom saisi est gardé plutôt que
+        // remplacé par un nom de commune.
+        const takeoff = parsed.points[parsed.takeoffIndex] || parsed.points[0];
+        const coordsInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'));
+        if (coordsInput) {
+            coordsInput.value = formatCoordinates(takeoff.lat, takeoff.lon);
+            this.updateCoordsStatus();
+        }
+        await SitesService.ensureSitesLoaded().catch(() => null);
+        const nearestSite = this.findNearestSite(takeoff.lat, takeoff.lon);
+        const siteInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-site'));
+        if (siteInput && nearestSite) siteInput.value = nearestSite.nom || nearestSite.name;
+
+        const filenameLabel = document.getElementById('igc-upload-filename');
+        if (filenameLabel) filenameLabel.textContent = tl('igc.recalculated');
     }
 
     // La correction d'altitude est toujours proposée (optionnelle). Une altitude d'atterrissage
@@ -1635,11 +1685,17 @@ class LogbookViewClass extends BaseView {
                 /** @type {HTMLInputElement} */ (document.getElementById('lb-altMax')).value = session.altitudeMax;
             if (session.gain) /** @type {HTMLInputElement} */ (document.getElementById('lb-gain')).value = session.gain;
 
-            // Vol déjà enregistré : on peut corriger (ou annuler) l'altitude d'une trace ajoutée avant
-            if (session.rawIgc) {
-                const raw = LogbookService.parseIGC(session.rawIgc);
-                if (raw.success) this._setupAltitudeCheck(raw.data, session.altOffset || 0);
-            }
+            // Vol déjà enregistré avec sa trace (en mémoire ou dans IndexedDB) : on peut corriger
+            // (ou annuler) la correction d'altitude, et tout recalculer depuis la trace.
+            LogbookService.getFlightTrace(session.id).then((rawIgc) => {
+                const idField = /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit'));
+                if (!rawIgc || !idField || idField.value !== session.id) return; // formulaire refermé entre-temps
+                const raw = LogbookService.parseIGC(rawIgc);
+                if (!raw.success) return;
+                this._setupAltitudeCheck(raw.data, session.altOffset || 0);
+                const recalcBtn = document.getElementById('lb-igc-recalc');
+                if (recalcBtn) recalcBtn.style.display = 'block';
+            });
 
             if (session.traceGps && session.traceGps.length > 0) {
                 const filenameLabel = document.getElementById('igc-upload-filename');

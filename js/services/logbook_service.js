@@ -413,6 +413,10 @@ class LogbookService {
                         dateStr: parsed.dateStr || null,
                         maxAltitude: hasMax ? parsed.maxAltitude + Math.round(offset) : null,
                         gain: typeof parsed.gain === 'number' && !isNaN(parsed.gain) ? parsed.gain : null,
+                        distanceKm: parsed.distanceKm,
+                        maxClimbRate: parsed.maxClimbRate,
+                        maxSpeedKmh: parsed.maxSpeedKmh,
+                        avgSpeedKmh: parsed.avgSpeedKmh,
                         points,
                         takeoffIndex: parsed.takeoffIndex || 0,
                         // Altitudes au vrai décollage / atterrissage (pas au parking)
