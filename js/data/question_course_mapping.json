@@ -2522,9 +2522,10 @@
     "title": "2012 passeportspeed12 hd"
   },
   "S13T": {
-    "course_id": "general/passeport-telechargement-web/2012-passeportspeed12-hd/2012-passeportspeed12-hd",
-    "score": 0.1096,
-    "title": "2012 passeportspeed12 hd"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 7,
+    "verifiedAt": "2026-10-04"
   },
   "S14B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
@@ -2532,19 +2533,22 @@
     "title": "initiation 2025 web"
   },
   "S14T": {
-    "course_id": "general/2014-livret-ffvl-9bd",
-    "score": 0.1701,
-    "title": "2014 Livret FFVL 9BD"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 22,
+    "verifiedAt": "2026-10-04"
   },
   "S15B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.2877,
-    "title": "initiation 2025 web"
+    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 33,
+    "verifiedAt": "2026-10-04"
   },
   "S15T": {
-    "course_id": "general/2014-livret-ffvl-9bd",
-    "score": 0.0825,
-    "title": "2014 Livret FFVL 9BD"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 12,
+    "verifiedAt": "2026-10-04"
   },
   "S16B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
@@ -2562,14 +2566,16 @@
     "title": "milieux naturels2022"
   },
   "S18T": {
-    "course_id": "brevet-de-pilote-confirme---marron/fiche-eval-2025/2025-fiche-cval-bpc-4-modules/2025-fiche-cval-bpc-4-modules",
-    "score": 0.1068,
-    "title": "2025 fiche cval bpc 4 modules"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 15,
+    "verifiedAt": "2026-10-04"
   },
   "S19V": {
-    "course_id": "brevet-initial---vert/developpement-durable-0/milieux-naturels2022/milieux-naturels2022",
-    "score": 0.0562,
-    "title": "milieux naturels2022"
+    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 28,
+    "verifiedAt": "2026-10-04"
   },
   "S20M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -2577,19 +2583,22 @@
     "title": "cycle2 2025web"
   },
   "S20T": {
-    "course_id": "brevet-de-pilote-confirme---marron/fiche-eval-2025/2025-fiche-cval-bpc-4-modules/2025-fiche-cval-bpc-4-modules",
-    "score": 0.0515,
-    "title": "2025 fiche cval bpc 4 modules"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 19,
+    "verifiedAt": "2026-10-04"
   },
   "S21T": {
-    "course_id": "brevet-de-pilote-confirme---marron/fiche-eval-2025/2025-fiche-cval-bpc-4-modules/2025-fiche-cval-bpc-4-modules",
-    "score": 0.0606,
-    "title": "2025 fiche cval bpc 4 modules"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 20,
+    "verifiedAt": "2026-10-04"
   },
   "S22T": {
-    "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques-1",
-    "score": 0.1066,
-    "title": "Pratique BI BP maitrise aile vol exercices spécifiques 1"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 30,
+    "verifiedAt": "2026-10-04"
   },
   "S23M": {
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
@@ -2597,9 +2606,10 @@
     "title": "rcfcrentiel niveau bleu brevet de pilote "
   },
   "S23T": {
-    "course_id": "brevet-de-pilote-confirme---marron/fiche-eval-2025/2025-fiche-cval-bpc-4-modules/2025-fiche-cval-bpc-4-modules",
-    "score": 0.0629,
-    "title": "2025 fiche cval bpc 4 modules"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 19,
+    "verifiedAt": "2026-10-04"
   },
   "S24M": {
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
@@ -2607,19 +2617,22 @@
     "title": "rcfcrentiel niveau bleu brevet de pilote "
   },
   "S25T": {
-    "course_id": "general/facteurs-humains/4-fh-fiche-synthase-intro-vl/4-fh-fiche-synthase-intro-vl",
-    "score": 0.0483,
-    "title": "4 fh fiche synthase intro vl"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 19,
+    "verifiedAt": "2026-10-04"
   },
   "S25V": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
-    "score": 0.0591,
-    "title": "cycle1 2025web"
+    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 28,
+    "verifiedAt": "2026-10-04"
   },
   "S26B": {
-    "course_id": "brevet-initial---vert/developpement-durable-0/milieux-naturels2022/milieux-naturels2022",
-    "score": 0.0788,
-    "title": "milieux naturels2022"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 52,
+    "verifiedAt": "2026-10-04"
   },
   "S27M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -2627,34 +2640,40 @@
     "title": "cycle2 2025web"
   },
   "S27T": {
-    "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques-1",
-    "score": 0.1628,
-    "title": "Pratique BI BP maitrise aile vol exercices spécifiques 1"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 20,
+    "verifiedAt": "2026-10-04"
   },
   "S28T": {
-    "course_id": "general/2014-livret-ffvl-9bd",
-    "score": 0.0603,
-    "title": "2014 Livret FFVL 9BD"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 20,
+    "verifiedAt": "2026-10-04"
   },
   "S29B": {
-    "course_id": "general/passeport-telechargement-web/2012-passeportspeed12-hd/2012-passeportspeed12-hd",
-    "score": 0.1809,
-    "title": "2012 passeportspeed12 hd"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 22,
+    "verifiedAt": "2026-10-04"
   },
   "S29T": {
-    "course_id": "brevet-de-pilote-confirme---marron/fiche-eval-2025/2025-fiche-cval-bpc-4-modules/2025-fiche-cval-bpc-4-modules",
-    "score": 0.0887,
-    "title": "2025 fiche cval bpc 4 modules"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 20,
+    "verifiedAt": "2026-10-04"
   },
   "S30T": {
-    "course_id": "general/passeport-telechargement-web/2012-passeportspeed12-hd/2012-passeportspeed12-hd",
-    "score": 0.0401,
-    "title": "2012 passeportspeed12 hd"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 20,
+    "verifiedAt": "2026-10-04"
   },
   "S30V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
-    "score": 0.1581,
-    "title": "cycle1 2025web"
+    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
+    "verifiedPage": 30,
+    "verifiedAt": "2026-10-04"
   },
   "S31M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -2662,19 +2681,22 @@
     "title": "cycle2 2025web"
   },
   "S32T": {
-    "course_id": "general/passeport-telechargement-web/2012-passeportspeed12-hd/2012-passeportspeed12-hd",
-    "score": 0.1021,
-    "title": "2012 passeportspeed12 hd"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 21,
+    "verifiedAt": "2026-10-04"
   },
   "S32V": {
-    "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
-    "score": 0.0682,
-    "title": "rcfcrentiel niveau vert brevet initial "
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 3,
+    "verifiedAt": "2026-10-04"
   },
   "S33T": {
-    "course_id": "general/2014-livret-ffvl-9bd",
-    "score": 0.0925,
-    "title": "2014 Livret FFVL 9BD"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 21,
+    "verifiedAt": "2026-10-04"
   },
   "S33V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -2682,14 +2704,16 @@
     "title": "cycle1 2025web"
   },
   "S34T": {
-    "course_id": "general/2014-livret-ffvl-9bd",
-    "score": 0.0955,
-    "title": "2014 Livret FFVL 9BD"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 22,
+    "verifiedAt": "2026-10-04"
   },
   "S35T": {
-    "course_id": "general/2014-livret-ffvl-9bd",
-    "score": 0.0715,
-    "title": "2014 Livret FFVL 9BD"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 22,
+    "verifiedAt": "2026-10-04"
   },
   "S36B": {
     "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques-1",
@@ -2697,9 +2721,10 @@
     "title": "Pratique BI BP maitrise aile vol exercices spécifiques 1"
   },
   "S36T": {
-    "course_id": "general/facteurs-humains/4-fh-fiche-synthase-intro-vl/4-fh-fiche-synthase-intro-vl",
-    "score": 0.0473,
-    "title": "4 fh fiche synthase intro vl"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 22,
+    "verifiedAt": "2026-10-04"
   },
   "S37B": {
     "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/07-parachute-de-secours2019/07-parachute-de-secours2019",
@@ -2707,34 +2732,40 @@
     "title": "07 parachute de secours2019"
   },
   "S37T": {
-    "course_id": "general/20240409-ffvl-formation-espacesaeriens",
-    "score": 0.1207,
-    "title": "20240409 FFVL Formation EspacesAeriens"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 28,
+    "verifiedAt": "2026-10-04"
   },
   "S38B": {
-    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/15-les-brises2021/15-les-brises2021",
-    "score": 0.1824,
-    "title": "15 les brises2021"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 23,
+    "verifiedAt": "2026-10-04"
   },
   "S38T": {
-    "course_id": "general/2014-livret-ffvl-9bd",
-    "score": 0.0607,
-    "title": "2014 Livret FFVL 9BD"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 22,
+    "verifiedAt": "2026-10-04"
   },
   "S39T": {
-    "course_id": "general/passeport-telechargement-web/2012-passeportspeed12-hd/2012-passeportspeed12-hd",
-    "score": 0.1274,
-    "title": "2012 passeportspeed12 hd"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 24,
+    "verifiedAt": "2026-10-04"
   },
   "S40T": {
-    "course_id": "general/passeport-telechargement-web/2012-passeportspeed12-hd/2012-passeportspeed12-hd",
-    "score": 0.1613,
-    "title": "2012 passeportspeed12 hd"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 24,
+    "verifiedAt": "2026-10-04"
   },
   "S41M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "score": 0.0782,
-    "title": "cycle2 2025web"
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 41,
+    "verifiedAt": "2026-10-04"
   },
   "S42M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -4568,6 +4599,60 @@
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 32,
     "verifiedAt": "2026-09-24"
+  },
+  "S11T": {
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 4,
+    "verifiedAt": "2026-10-04"
+  },
+  "S12T": {
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 2,
+    "verifiedAt": "2026-10-04"
+  },
+  "S16T": {
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 14,
+    "verifiedAt": "2026-10-04"
+  },
+  "S19T": {
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 19,
+    "verifiedAt": "2026-10-04"
+  },
+  "S24T": {
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 19,
+    "verifiedAt": "2026-10-04"
+  },
+  "S26T": {
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 19,
+    "verifiedAt": "2026-10-04"
+  },
+  "S31T": {
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 23,
+    "verifiedAt": "2026-10-04"
+  },
+  "S39B": {
+    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 22,
+    "verifiedAt": "2026-10-04"
+  },
+  "S41T": {
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 28,
+    "verifiedAt": "2026-10-04"
   },
   "S42T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
