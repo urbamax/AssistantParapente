@@ -192,14 +192,41 @@ describe('logbook: instructor of a school session', () => {
         expect(options).toEqual(['Gilbert']);
     });
 
+    it('has a companion under the instructor, saved and proposed like him', () => {
+        setup([]);
+        $('lb-site').value = 'Plaine';
+        $('lb-datetime').value = '2026-10-03T12:06';
+        /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile')).value = 'Voile école';
+        $('lb-duree').value = '5';
+        $('lb-ecole-check').checked = true;
+        $('lb-ecole-check').dispatchEvent(new Event('change', { bubbles: true }));
+        $('lb-ecole').value = 'ÉCOLE TEST';
+        $('lb-moniteur').value = 'Gilbert';
+        $('lb-accompagnateur').value = 'Sophie';
+        LogbookView.submitForm();
+        expect(LogbookService.getFlights()[0]).toMatchObject({ moniteur: 'Gilbert', accompagnateur: 'Sophie' });
+        LogbookView.renderHistory();
+        expect(document.getElementById('logbook-history-list')?.innerHTML).toContain(
+            'Accompagnateur :</strong> Sophie',
+        );
+
+        // Vol suivant, même site, 1 h plus tard : même accompagnateur
+        LogbookView.resetForm();
+        change('lb-datetime', '2026-10-03T13:06');
+        change('lb-site', 'Plaine');
+        expect($('lb-accompagnateur').value).toBe('Sophie');
+    });
+
     it('is not kept without a school', () => {
         setup([]);
         $('lb-site').value = 'Plaine';
         /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile')).value = 'Voile école';
         $('lb-duree').value = '5';
         $('lb-moniteur').value = 'Gilbert';
+        $('lb-accompagnateur').value = 'Sophie';
         LogbookView.submitForm();
         expect(LogbookService.getFlights()[0].moniteur).toBe('');
+        expect(LogbookService.getFlights()[0].accompagnateur).toBe('');
     });
 });
 
@@ -220,12 +247,27 @@ describe('logbook: winch operator of a winch flight', () => {
         LogbookView.renderHistory();
         expect(document.getElementById('logbook-history-list')?.innerHTML).toContain('Treuilleur :</strong> Bruno');
 
-        // Vol suivant au treuil, même site, 2 h plus tard : même treuilleur
+        // Vol suivant au treuil, même site, 2 h plus tard : pas de pré-remplissage (souvent
+        // plusieurs treuilleurs le même jour), mais ceux du jour en tête de la liste
+        LogbookService.flights.push(
+            ...[1, 2, 3].map((k) => ({
+                ...vol('PLAINE', { typeVol: 'Treuil', treuilleur: 'Claude' }),
+                datetime: `2026-09-0${k}T10:00`,
+            })),
+        );
         LogbookView.resetForm();
         change('lb-datetime', '2026-10-03T14:00');
         change('lb-site', 'Plaine');
         expect($('lb-typeVol').value).toBe('Treuil');
-        expect($('lb-treuilleur').value).toBe('Bruno');
+        expect($('lb-treuilleur').value).toBe('');
+        const listed = () =>
+            Array.from(document.querySelectorAll('#treuilleurs-list option')).map(
+                (o) => /** @type {HTMLOptionElement} */ (o).value,
+            );
+        expect(listed()).toEqual(['Bruno', 'Claude']);
+        // Un autre jour : le plus fréquent d'abord
+        change('lb-datetime', '2026-10-10T14:00');
+        expect(listed()).toEqual(['Claude', 'Bruno']);
     });
 
     it('is not kept on a flight that is not a winch flight', () => {

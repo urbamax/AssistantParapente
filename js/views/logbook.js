@@ -660,6 +660,8 @@ class LogbookViewClass extends BaseView {
         const ecoleChecked = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole-check'))?.checked;
         const ecole = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole'))?.value || '';
         const moniteur = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'))?.value || '';
+        const accompagnateur =
+            /** @type {HTMLInputElement} */ (document.getElementById('lb-accompagnateur'))?.value || '';
         const pilotes = this.getChecklistValues('pilotes');
 
         const coordsText = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'))?.value || '';
@@ -726,6 +728,8 @@ class LogbookViewClass extends BaseView {
         if (ecoleChecked) this.setSchoolField(true, ecole);
         const instructorField = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
         if (instructorField && moniteur) instructorField.value = moniteur;
+        const companionField = /** @type {HTMLInputElement} */ (document.getElementById('lb-accompagnateur'));
+        if (companionField && accompagnateur) companionField.value = accompagnateur;
         this.setChecklistValues('pilotes', pilotes);
 
         if (coordsText) {
@@ -762,7 +766,10 @@ class LogbookViewClass extends BaseView {
                         <datalist id="ecoles-list"></datalist>
                         <label for="lb-moniteur" style="display:block; margin-top: 10px;">${tt('form.instructor')}</label>
                         <input type="text" id="lb-moniteur" list="moniteurs-list" placeholder="${tt('form.instructorPlaceholder')}" autocomplete="off" style="width: 100%;">
-                        <datalist id="moniteurs-list"></datalist>${exercises}
+                        <datalist id="moniteurs-list"></datalist>
+                        <label for="lb-accompagnateur" style="display:block; margin-top: 10px;">${tt('form.companion')}</label>
+                        <input type="text" id="lb-accompagnateur" list="accompagnateurs-list" placeholder="${tt('form.companionPlaceholder')}" autocomplete="off" style="width: 100%;">
+                        <datalist id="accompagnateurs-list"></datalist>${exercises}
                     </div>
                 </div>`;
     }
@@ -1369,6 +1376,15 @@ class LogbookViewClass extends BaseView {
             winchList.innerHTML = operators.map((name) => `<option value="${escapeHTML(name)}">`).join('');
         }
 
+        // Accompagnateurs déjà saisis, les plus fréquents d'abord
+        const companionList = document.getElementById('accompagnateurs-list');
+        if (companionList) {
+            const companions = PilotHabits.rankByUse(LogbookService.getFlights(), (session) =>
+                typeof session.accompagnateur === 'string' ? session.accompagnateur.trim() : '',
+            );
+            companionList.innerHTML = companions.map((name) => `<option value="${escapeHTML(name)}">`).join('');
+        }
+
         // Moniteurs déjà saisis, les plus fréquents d'abord
         const instructorList = document.getElementById('moniteurs-list');
         if (instructorList) {
@@ -1486,6 +1502,7 @@ class LogbookViewClass extends BaseView {
         'lb-ecole-check': 'ecole',
         'lb-ecole': 'ecole',
         'lb-moniteur': 'moniteur',
+        'lb-accompagnateur': 'accompagnateur',
         'lb-treuilleur': 'treuilleur',
         'lb-site': 'site',
         'lb-lieu': 'lieu',
@@ -1608,27 +1625,35 @@ class LogbookViewClass extends BaseView {
                 this.learnedFields.delete('moniteur');
             }
         }
-        // Treuilleur (vol au treuil) : celui d'une session de moins de 3 h ici, sinon le dernier ici
-        this.updateWinchOperatorField();
-        const winchInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-treuilleur'));
-        if (isVol && winchInput && can('treuilleur')) {
-            const atWinch = value('lb-typeVol') === 'Treuil';
-            const withOperator = sessions.filter((s) => typeof s.treuilleur === 'string' && s.treuilleur.trim());
-            const close = atWinch
-                ? this.findNearbySession(withOperator, place, value('lb-datetime'), 'treuilleur')
-                : null;
-            const last = atWinch && !close ? PilotHabits.latest(withOperator, 'treuilleur', { place }) : null;
+        // Accompagnateur : celui d'une session de moins de 3 h ici, sinon le dernier de cette école ici
+        const companionInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-accompagnateur'));
+        if (companionInput && can('accompagnateur')) {
+            const withCompanion = school
+                ? sessions.filter(
+                      (s) =>
+                          typeof s.accompagnateur === 'string' &&
+                          s.accompagnateur.trim() &&
+                          typeof s.ecole === 'string' &&
+                          s.ecole.trim().toLowerCase() === school,
+                  )
+                : [];
+            const close = this.findNearbySession(withCompanion, place, value('lb-datetime'), 'accompagnateur');
+            const last = !close ? PilotHabits.latest(withCompanion, 'accompagnateur', { place }) : null;
             if (close) {
-                winchInput.value = close.treuilleur;
-                this.learnedFields.set('treuilleur', 'nearbySession');
+                companionInput.value = close.accompagnateur;
+                this.learnedFields.set('accompagnateur', 'nearbySession');
             } else if (last && last.reason === 'place') {
-                winchInput.value = last.value;
-                this.learnedFields.set('treuilleur', 'winchOperatorPlace');
-            } else if (this.learnedFields.has('treuilleur')) {
-                winchInput.value = '';
-                this.learnedFields.delete('treuilleur');
+                companionInput.value = last.value;
+                this.learnedFields.set('accompagnateur', 'instructorPlace');
+            } else if (this.learnedFields.has('accompagnateur')) {
+                companionInput.value = '';
+                this.learnedFields.delete('accompagnateur');
             }
         }
+        // Treuilleur : pas de pré-remplissage (souvent plusieurs le même jour), mais ceux de la
+        // journée sur ce site en tête de la liste déroulante
+        this.updateWinchOperatorField();
+        if (isVol) this.refreshWinchOperatorList(sessions, place, value('lb-datetime'));
 
         // Pilotes : ceux d'une session au même endroit à moins de 3 h (plusieurs vols d'affilée)
         if (can('pilotes')) {
@@ -1664,6 +1689,26 @@ class LogbookViewClass extends BaseView {
             }
         }
         return best;
+    }
+
+    /** Treuilleurs proposés : ceux du même jour sur ce site d'abord, puis les plus fréquents. */
+    refreshWinchOperatorList(sessions, place, datetime) {
+        const list = document.getElementById('treuilleurs-list');
+        if (!list) return;
+        const key = (place || '').trim().toLowerCase();
+        const day = typeof datetime === 'string' ? datetime.slice(0, 10) : '';
+        const operatorOf = (session) => (typeof session.treuilleur === 'string' ? session.treuilleur.trim() : '');
+        const sameDay =
+            key && day
+                ? PilotHabits.rankByUse(
+                      sessions.filter(
+                          (s) => PilotHabits.placeOf(s) === key && String(s.datetime || '').slice(0, 10) === day,
+                      ),
+                      operatorOf,
+                  )
+                : [];
+        const others = PilotHabits.rankByUse(sessions, operatorOf).filter((name) => !sameDay.includes(name));
+        list.innerHTML = [...sameDay, ...others].map((name) => `<option value="${escapeHTML(name)}">`).join('');
     }
 
     // Le treuilleur n'est demandé que pour un vol au treuil
@@ -2006,6 +2051,8 @@ class LogbookViewClass extends BaseView {
         const ecole = ecoleCheck?.checked && ecoleInput ? ecoleInput.value.trim() : '';
         const moniteurInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
         const moniteur = ecole && moniteurInput ? moniteurInput.value.trim() : '';
+        const companionInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-accompagnateur'));
+        const accompagnateur = ecole && companionInput ? companionInput.value.trim() : '';
 
         const editId = document.getElementById('lb-id-edit')
             ? /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit')).value
@@ -2025,6 +2072,7 @@ class LogbookViewClass extends BaseView {
             commentaire: commentaire,
             ecole: ecole,
             moniteur: moniteur,
+            accompagnateur: accompagnateur,
             pilotes: this.getChecklistValues('pilotes'),
         };
 
@@ -2208,6 +2256,8 @@ class LogbookViewClass extends BaseView {
         this.setSchoolField(false);
         const instructorEdit = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
         if (instructorEdit) instructorEdit.value = session.moniteur || '';
+        const companionEdit = /** @type {HTMLInputElement} */ (document.getElementById('lb-accompagnateur'));
+        if (companionEdit) companionEdit.value = session.accompagnateur || '';
         /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime')).value = session.datetime;
 
         // Helper pour "Autre..."
@@ -2445,6 +2495,7 @@ class LogbookViewClass extends BaseView {
                             ${session.ecole ? `<div><strong>${tt('history.school')}</strong> ${escapeHTML(session.ecole)}</div>` : ''}
                             ${isVol && session.typeVol === 'Treuil' && session.treuilleur ? `<div><strong>${tt('history.winchOperator')}</strong> ${escapeHTML(session.treuilleur)}</div>` : ''}
                             ${session.ecole && session.moniteur ? `<div><strong>${tt('history.instructor')}</strong> ${escapeHTML(session.moniteur)}</div>` : ''}
+                            ${session.ecole && session.accompagnateur ? `<div><strong>${tt('history.companion')}</strong> ${escapeHTML(session.accompagnateur)}</div>` : ''}
                             ${session.instrument && (session.instrument.brand || session.instrument.model) ? `<div><strong>${tt('history.instrument')}</strong> ${escapeHTML([session.instrument.brand, session.instrument.model].filter(Boolean).join(' '))}${session.instrument.firmware ? ` ${tt('history.firmware', { version: session.instrument.firmware })}` : ''}</div>` : ''}
                             ${isVol && Array.isArray(session.typeExercice) && session.typeExercice.length > 0 ? `<div><strong>${tt('history.exercises')}</strong> ${escapeHTML(session.typeExercice.join(', '))}</div>` : ''}
                             ${Array.isArray(session.pilotes) && session.pilotes.length > 0 ? `<div><strong>${tt('history.pilots')}</strong> ${escapeHTML(session.pilotes.join(', '))}</div>` : ''}

@@ -300,6 +300,9 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <label for="lb-moniteur" style="display:block; margin-top: 10px;">Moniteur</label>
                         <input type="text" id="lb-moniteur" list="moniteurs-list" placeholder="Nom du moniteur" autocomplete="off" style="width: 100%;">
                         <datalist id="moniteurs-list"></datalist>
+                        <label for="lb-accompagnateur" style="display:block; margin-top: 10px;">Accompagnateur</label>
+                        <input type="text" id="lb-accompagnateur" list="accompagnateurs-list" placeholder="Nom de l'accompagnateur" autocomplete="off" style="width: 100%;">
+                        <datalist id="accompagnateurs-list"></datalist>
                         <label style="display:block; margin-top: 10px;">Exercices travaillés</label>
                         
                         <div id="lb-typeExercice-group" class="lb-chips"></div>
@@ -397,6 +400,9 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <label for="lb-moniteur" style="display:block; margin-top: 10px;">Moniteur</label>
                         <input type="text" id="lb-moniteur" list="moniteurs-list" placeholder="Nom du moniteur" autocomplete="off" style="width: 100%;">
                         <datalist id="moniteurs-list"></datalist>
+                        <label for="lb-accompagnateur" style="display:block; margin-top: 10px;">Accompagnateur</label>
+                        <input type="text" id="lb-accompagnateur" list="accompagnateurs-list" placeholder="Nom de l'accompagnateur" autocomplete="off" style="width: 100%;">
+                        <datalist id="accompagnateurs-list"></datalist>
                     </div>
                 </div>
                 
@@ -452,6 +458,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <div class="session-equip">
                             <div><strong>Voile :</strong> OZONE | RUSH 6 | BLEU | M</div>
                             <div><strong>Sellette :</strong> SUPAIR | ACCESS</div>
+                            
                             
                             
                             
@@ -537,6 +544,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             
                             
                             
+                            
                         </div>
                         
                         
@@ -572,6 +580,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                         
                         <div class="session-equip">
+                            
                             
                             
                             
