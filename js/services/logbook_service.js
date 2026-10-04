@@ -221,6 +221,21 @@ class LogbookService {
     }
 
     /**
+     * Empreinte de ce que le carnet affiche (vols et matériel). Après une synchro cloud, le carnet
+     * n'est redessiné que si elle a changé : sinon, toutes les 30 s, il refermait les traces et les
+     * encarts ouverts. L'état d'envoi (syncPending) n'est pas affiché ; la trace brute ne compte que
+     * par sa présence (bouton « Voir la trace »).
+     * @returns {string}
+     */
+    dataSignature() {
+        const shown = ({ syncPending: _syncPending, rawIgc, traceGps, ...rest }) => ({
+            ...rest,
+            hasTrace: Boolean(rawIgc) || (Array.isArray(traceGps) && traceGps.length > 0),
+        });
+        return JSON.stringify([this.flights.map(shown), this.equipment.map(shown)]);
+    }
+
+    /**
      * Recalcule depuis leur trace IGC tous les vols qui en ont une, comme le bouton « Recalculer »
      * d'une session : date et durée du vol, altitude max (avec la correction d'altitude du vol),
      * gain, position du décollage, distance, vario, vitesses, analyse détaillée et instrument.

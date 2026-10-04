@@ -2467,7 +2467,7 @@ class LogbookViewClass extends BaseView {
                 const meteoHtml = this.renderSessionWeatherHtml(session);
 
                 html += `
-                <div class="logbook-card">
+                <div class="logbook-card" data-session-id="${escapeHTML(session.id)}">
                     <div class="logbook-card-header">
                         <div class="session-badge" style="background-color: ${typeColor}22; color: ${typeColor};">
                             <i class="${icon}"></i> ${tt(isVol ? 'history.badgeFlight' : 'history.badgeGround')}
@@ -2514,7 +2514,48 @@ class LogbookViewClass extends BaseView {
             }
         });
 
+        const state = this._captureHistoryState(container);
         container.innerHTML = html;
+        this._restoreHistoryState(container, state);
+    }
+
+    // Redessiner le carnet (après une modification, une synchro qui a changé des données…) ne doit
+    // pas faire perdre au pilote ce qu'il regardait : position dans la liste, encarts dépliés
+    // (statistiques détaillées, balise) et traces affichées sont gardés.
+    _captureHistoryState(container) {
+        const scroller = document.getElementById('logbook-screen');
+        const openDetails = [];
+        container.querySelectorAll('.logbook-card[data-session-id]').forEach((card) => {
+            const id = /** @type {HTMLElement} */ (card).dataset.sessionId;
+            card.querySelectorAll('details').forEach((details, index) => {
+                if (/** @type {HTMLDetailsElement} */ (details).open) openDetails.push({ id, index });
+            });
+        });
+        const openTraces = Array.from(container.querySelectorAll('[id^="trace-container-"]'))
+            .filter((el) => /** @type {HTMLElement} */ (el).style.display === 'block')
+            .map((el) => el.id.slice('trace-container-'.length));
+        return { scrollTop: scroller ? scroller.scrollTop : null, openDetails, openTraces };
+    }
+
+    _restoreHistoryState(container, state) {
+        const cardOf = (id) =>
+            Array.from(container.querySelectorAll('.logbook-card[data-session-id]')).find(
+                (card) => /** @type {HTMLElement} */ (card).dataset.sessionId === id,
+            );
+        state.openDetails.forEach(({ id, index }) => {
+            const details = cardOf(id)?.querySelectorAll('details')[index];
+            if (details) /** @type {HTMLDetailsElement} */ (details).open = true;
+        });
+        const scroller = document.getElementById('logbook-screen');
+        const restoreScroll = () => {
+            if (scroller && state.scrollTop !== null) scroller.scrollTop = state.scrollTop;
+        };
+        restoreScroll();
+        if (state.openTraces.length) {
+            Promise.all(state.openTraces.filter((id) => cardOf(id)).map((id) => this.showTrace(id)))
+                .catch((err) => console.warn('[LogbookView] Trace non rouverte :', err))
+                .then(restoreScroll);
+        }
     }
 
     async showTrace(sessionId) {
