@@ -288,24 +288,25 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Assets statiques same-origin (production) : cache-first avec revalidation réseau en arrière-plan.
-    // Si rien n'est en cache ET que le réseau échoue, on ne doit jamais résoudre respondWith()
-    // avec `undefined` (le navigateur remonte alors un opaque net::ERR_FAILED, y compris pour
-    // du CSS/JS critique — c'est ce qui a cassé la mise en page en local) : on retombe sur un
-    // second essai réseau direct pour laisser passer la vraie erreur si celle-ci persiste.
+    // Fichiers du site (production) : réseau d'abord, cache seulement hors ligne. En cache d'abord,
+    // un site servi depuis les sources (nom de cache inchangé d'une version à l'autre) affichait
+    // l'ancienne version jusqu'au deuxième rechargement. `cache: 'no-cache'` fait revalider le
+    // cache HTTP du navigateur (réponse 304 légère si rien n'a changé). Réseau trop lent (> 4 s) :
+    // la copie en cache est servie, la réponse réseau la remplace pour la prochaine fois.
     event.respondWith(
-        caches.match(key).then((cached) => {
-            const networkFetch = fetch(request)
-                .then((response) => {
-                    if (response.ok) {
-                        const copy = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(key, copy));
-                    }
-                    return response;
-                })
-                .catch(() => cached || fetch(request));
-            return cached || networkFetch;
-        }),
+        (async () => {
+            const cached = await caches.match(key);
+            const network = fetch(request, { cache: 'no-cache' }).then((response) => {
+                if (response.ok) {
+                    const copy = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(key, copy));
+                }
+                return response;
+            });
+            if (!cached) return network;
+            const slow = new Promise((resolve) => setTimeout(() => resolve(cached), 4000));
+            return Promise.race([network, slow]).catch(() => cached);
+        })(),
     );
 });
 
