@@ -3746,19 +3746,22 @@
     "verifiedAt": "2026-10-04"
   },
   "U65V": {
-    "course_id": "general/facteurs-humains/1-fh-check-list/1-fh-check-list",
-    "score": 0.1097,
-    "title": "1 fh check list"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 42,
+    "verifiedAt": "2026-10-04"
   },
   "U66B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.1062,
-    "title": "initiation 2025 web"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 53,
+    "verifiedAt": "2026-10-04"
   },
   "U67B": {
-    "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques-1",
-    "score": 0.0993,
-    "title": "Pratique BI BP maitrise aile vol exercices spécifiques 1"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 59,
+    "verifiedAt": "2026-10-04"
   },
   "U68M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -3769,27 +3772,31 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 20,
-    "verifiedAt": "2026-09-20"
+    "verifiedAt": "2026-10-04"
   },
   "U70B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.181,
-    "title": "initiation 2025 web"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
+    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
+    "verifiedPage": 26,
+    "verifiedAt": "2026-10-04"
   },
   "U72B": {
-    "course_id": "general/facteurs-humains/1-fh-check-list/1-fh-check-list",
-    "score": 0.1226,
-    "title": "1 fh check list"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
+    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
+    "verifiedPage": 25,
+    "verifiedAt": "2026-10-04"
   },
   "U73B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.1372,
-    "title": "initiation 2025 web"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
+    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
+    "verifiedPage": 26,
+    "verifiedAt": "2026-10-04"
   },
   "U74V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.1687,
-    "title": "initiation 2025 web"
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 17,
+    "verifiedAt": "2026-10-04"
   },
   "U75B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
@@ -3797,9 +3804,10 @@
     "title": "initiation 2025 web"
   },
   "U76M": {
-    "course_id": "brevet-de-pilote---bleu/fiche-eval-2025/2025-fiche-cval-modules-bp/2025-fiche-cval-modules-bp",
-    "score": 0.1651,
-    "title": "2025 fiche cval modules bp"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 17,
+    "verifiedAt": "2026-10-04"
   },
   "U77B": {
     "course_id": "general/facteurs-humains/1-fh-check-list/1-fh-check-list",
@@ -3807,9 +3815,10 @@
     "title": "1 fh check list"
   },
   "U78B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.1637,
-    "title": "initiation 2025 web"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
+    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
+    "verifiedPage": 32,
+    "verifiedAt": "2026-10-04"
   },
   "U79B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
@@ -3817,49 +3826,58 @@
     "title": "initiation 2025 web"
   },
   "U80B": {
-    "course_id": "general/facteurs-humains/1-fh-check-list/1-fh-check-list",
-    "score": 0.0571,
-    "title": "1 fh check list"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
+    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
+    "verifiedPage": 32,
+    "verifiedAt": "2026-10-04"
   },
   "U80T": {
-    "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques-1",
-    "score": 0.1386,
-    "title": "Pratique BI BP maitrise aile vol exercices spécifiques 1"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 17,
+    "verifiedAt": "2026-10-04"
   },
   "U81V": {
-    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/05-les-pieges-aerologiques2019/05-les-pieges-aerologiques2019",
-    "score": 0.1819,
-    "title": "05 les pieges aerologiques2019"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 17,
+    "verifiedAt": "2026-10-04"
   },
   "U82V": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
-    "score": 0.1905,
-    "title": "cycle1 2025web"
+    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/05-les-pieges-aerologiques2019/05-les-pieges-aerologiques2019",
+    "title": "Les pièges aérologiques",
+    "verifiedPage": 1,
+    "verifiedAt": "2026-10-04"
   },
   "U83B": {
-    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/05-les-pieges-aerologiques2019/05-les-pieges-aerologiques2019",
-    "score": 0.3895,
-    "title": "05 les pieges aerologiques2019"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 15,
+    "verifiedAt": "2026-10-04"
   },
   "U84B": {
-    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/05-les-pieges-aerologiques2019/05-les-pieges-aerologiques2019",
-    "score": 0.2349,
-    "title": "05 les pieges aerologiques2019"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 17,
+    "verifiedAt": "2026-10-04"
   },
   "U85B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.2074,
-    "title": "initiation 2025 web"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 155,
+    "verifiedAt": "2026-10-04"
   },
   "U86V": {
-    "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques-1",
-    "score": 0.0766,
-    "title": "Pratique BI BP maitrise aile vol exercices spécifiques 1"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
+    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
+    "verifiedPage": 25,
+    "verifiedAt": "2026-10-04"
   },
   "U87M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "score": 0.1296,
-    "title": "cycle2 2025web"
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 10,
+    "verifiedAt": "2026-10-04"
   },
   "U88B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -3867,64 +3885,76 @@
     "title": "cycle1 2025web"
   },
   "U89B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.0854,
-    "title": "initiation 2025 web"
+    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 4,
+    "verifiedAt": "2026-10-04"
   },
   "U90V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
-    "score": 0.1399,
-    "title": "cycle1 2025web"
+    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
+    "verifiedPage": 25,
+    "verifiedAt": "2026-10-04"
   },
   "U91B": {
     "course_id": "general/2014-livret-ffvl-9bd",
-    "score": 0.0966,
-    "title": "2014 Livret FFVL 9BD"
+    "title": "Le guide des bonnes pratiques chez les libéristes",
+    "verifiedPage": 22,
+    "verifiedAt": "2026-10-04"
   },
   "U92B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
-    "score": 0.0756,
-    "title": "cycle1 2025web"
+    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 28,
+    "verifiedAt": "2026-10-04"
   },
   "U93M": {
-    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "score": 0.1113,
-    "title": "cycle2 2025web"
+    "course_id": "general/2014-livret-ffvl-9bd",
+    "title": "Le guide des bonnes pratiques chez les libéristes",
+    "verifiedPage": 29,
+    "verifiedAt": "2026-10-04"
   },
   "W1V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.1119,
-    "title": "initiation 2025 web"
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 31,
+    "verifiedAt": "2026-10-04"
   },
   "W2V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.159,
-    "title": "initiation 2025 web"
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 27,
+    "verifiedAt": "2026-10-04"
   },
   "W3V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
-    "score": 0.1859,
-    "title": "cycle1 2025web"
+    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
+    "verifiedPage": 35,
+    "verifiedAt": "2026-10-04"
   },
   "W4B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.2624,
-    "title": "initiation 2025 web"
+    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 10,
+    "verifiedAt": "2026-10-04"
   },
   "W5B": {
-    "course_id": "general/facteurs-humains/3-fh-fiche-synthase-attitude-vl/3-fh-fiche-synthase-attitude-vl",
-    "score": 0.0888,
-    "title": "3 fh fiche synthase attitude vl"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 28,
+    "verifiedAt": "2026-10-04"
   },
   "W6M": {
-    "course_id": "general/2014-livret-ffvl-9bd",
-    "score": 0.1119,
-    "title": "2014 Livret FFVL 9BD"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 118,
+    "verifiedAt": "2026-10-04"
   },
   "W7V": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.2362,
-    "title": "initiation 2025 web"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 71,
+    "verifiedAt": "2026-10-04"
   },
   "W8B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
@@ -3932,122 +3962,142 @@
     "title": "initiation 2025 web"
   },
   "W9B": {
-    "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques-1",
-    "score": 0.211,
-    "title": "Pratique BI BP maitrise aile vol exercices spécifiques 1"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
+    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
+    "verifiedPage": 23,
+    "verifiedAt": "2026-10-04"
   },
   "W10B": {
-    "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques-1",
-    "score": 0.1464,
-    "title": "Pratique BI BP maitrise aile vol exercices spécifiques 1"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 70,
+    "verifiedAt": "2026-10-04"
   },
   "W11B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.2358,
-    "title": "initiation 2025 web"
+    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 34,
+    "verifiedAt": "2026-10-04"
   },
   "W12B": {
-    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/05-les-pieges-aerologiques2019/05-les-pieges-aerologiques2019",
-    "score": 0.156,
-    "title": "05 les pieges aerologiques2019"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 70,
+    "verifiedAt": "2026-10-04"
   },
   "W13V": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.2423,
-    "title": "initiation 2025 web"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 71,
+    "verifiedAt": "2026-10-04"
   },
   "W14V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.2132,
-    "title": "initiation 2025 web"
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 12,
+    "verifiedAt": "2026-10-04"
   },
   "W15V": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.1895,
-    "title": "initiation 2025 web"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 69,
+    "verifiedAt": "2026-10-04"
   },
   "W16V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
-    "verifiedPage": 12,
-    "verifiedAt": "2026-09-17"
+    "verifiedPage": 27,
+    "verifiedAt": "2026-10-04"
   },
   "W17B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.1733,
-    "title": "initiation 2025 web"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
+    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
+    "verifiedPage": 23,
+    "verifiedAt": "2026-10-04"
   },
   "W18V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.1318,
-    "title": "initiation 2025 web"
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 12,
+    "verifiedAt": "2026-10-04"
   },
   "W19V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.1239,
-    "title": "initiation 2025 web"
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 13,
+    "verifiedAt": "2026-10-04"
   },
   "W20V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.166,
-    "title": "initiation 2025 web"
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 13,
+    "verifiedAt": "2026-10-04"
   },
   "W21V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.1231,
-    "title": "initiation 2025 web"
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 12,
+    "verifiedAt": "2026-10-04"
   },
   "W22V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 16,
-    "verifiedAt": "2026-09-22"
+    "verifiedAt": "2026-10-04"
   },
   "W23B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.127,
-    "title": "initiation 2025 web"
-  },
-  "W24V": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
-    "score": 0.1907,
-    "title": "cycle1 2025web"
-  },
-  "W25V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 13,
-    "verifiedAt": "2026-09-20"
+    "verifiedAt": "2026-10-04"
+  },
+  "W24V": {
+    "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
+    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
+    "verifiedPage": 21,
+    "verifiedAt": "2026-10-04"
+  },
+  "W25V": {
+    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 26,
+    "verifiedAt": "2026-10-04"
   },
   "W26V": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.1303,
-    "title": "initiation 2025 web"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 58,
+    "verifiedAt": "2026-10-04"
   },
   "W27B": {
-    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/06-mecanique-du-vol2021/06-mecanique-du-vol2021",
-    "score": 0.1231,
-    "title": "06 mecanique du vol2021"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 32,
+    "verifiedAt": "2026-10-04"
   },
   "W28B": {
-    "course_id": "general/affiches-pedagogiques-a3/10-parachutes-types2019/10-parachutes-types2019",
-    "score": 0.1584,
-    "title": "10 parachutes types2019"
+    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 17,
+    "verifiedAt": "2026-10-04"
   },
   "W29B": {
-    "course_id": "general/facteurs-humains/1-fh-check-list/1-fh-check-list",
-    "score": 0.199,
-    "title": "1 fh check list"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 58,
+    "verifiedAt": "2026-10-04"
   },
   "W30B": {
-    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/21-mecavol-virage2024/21-mecavol-virage2024",
-    "score": 0.2347,
-    "title": "21 mecavol virage2024"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 26,
+    "verifiedAt": "2026-10-04"
   },
   "W31V": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
-    "score": 0.1595,
-    "title": "cycle1 2025web"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 72,
+    "verifiedAt": "2026-10-04"
   },
   "W32M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
