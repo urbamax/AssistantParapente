@@ -4,6 +4,7 @@
  */
 import LogbookService from '../services/logbook_service.js';
 import SdfParser from '../services/sdf_parser.js';
+import PilotHabits from '../services/pilot_habits.js';
 import Map3DComponent from '../components/map_3d.js';
 import StorageService from '../services/storage.js'; // Retained just for custom select lists
 import SitesService from '../services/sites_service.js';
@@ -63,6 +64,14 @@ class LogbookViewClass extends BaseView {
                 const target = /** @type {HTMLInputElement} */ (e.target);
                 if (target.id === 'lb-coords' && target.value.trim() && !parseCoordinates(target.value)) {
                     LogbookView.showCoordsError();
+                }
+                // Champ choisi par le pilote : l'app ne le pré-remplit plus, et réévalue les
+                // autres (un autre site ou type de vol change les habitudes à appliquer).
+                const learnedField = LogbookViewClass.LEARNED_FIELD_IDS[target.id];
+                if (learnedField) LogbookView.onLearnedFieldChanged(learnedField);
+
+                if (target.id === 'lb-coords') {
+                    // traité plus haut
                 } else if (target.id === 'lb-ecole-check') {
                     LogbookView.setSchoolField(target.checked);
                 } else if (target.id === 'lb-voile' || target.id === 'lb-sellette') {
@@ -1233,9 +1242,13 @@ class LogbookViewClass extends BaseView {
         }
 
         this.releaseCoordsMap();
+        // Ce que l'app a pré-rempli d'après les habitudes du pilote
+        html += `<div id="lb-learned-summary" hidden style="margin-top: 4px; font-size: 0.8rem; color: var(--text-secondary);"></div>`;
         container.innerHTML = html;
         this.populateDropdowns();
-        this.fillLastEquipment();
+        this.touchedFields = new Set();
+        this.learnedFields = new Map();
+        this.applyLearnedDefaults();
         this.updateCoordsStatus();
 
         const uploadContainer = /** @type {HTMLElement} */ (document.querySelector('.igc-upload-container'));
@@ -1303,10 +1316,16 @@ class LogbookViewClass extends BaseView {
                 .map((site) => site.trim().toUpperCase());
             allSites = allSites.concat(historySites);
 
-            // 3. Dédoublonnage et tri alphabétique immuable (ES2023)
-            const processedSites = toSorted(Array.from(new Set(allSites)), (a, b) =>
-                a.localeCompare(b, 'fr', { sensitivity: 'base' }),
+            // 3. Les lieux où le pilote va le plus souvent d'abord (appris du carnet), puis les
+            // autres par ordre alphabétique
+            const usual = PilotHabits.rankByUse(LogbookService.getFlights(), (session) =>
+                (session.site || session.lieu || '').trim().toUpperCase(),
             );
+            const others = toSorted(
+                Array.from(new Set(allSites)).filter((site) => !usual.includes(site)),
+                (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }),
+            );
+            const processedSites = [...usual, ...others];
 
             // 4. Injection dans le DOM
             datalist.innerHTML = processedSites
@@ -1372,15 +1391,128 @@ class LogbookViewClass extends BaseView {
         }
     }
 
-    fillLastEquipment() {
-        // Automatically fill voile and sellette with the last used ones
-        if (LogbookService.getFlights().length > 0) {
-            const lastSession = LogbookService.getFlights()[0];
-            const voileInput = /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile'));
-            const selletteInput = /** @type {HTMLSelectElement} */ (document.getElementById('lb-sellette'));
-            if (voileInput && lastSession.voile) voileInput.value = lastSession.voile;
-            if (selletteInput && lastSession.sellette) selletteInput.value = lastSession.sellette;
+    // --- PRÉ-REMPLISSAGE APPRIS DU PILOTE (PilotHabits) ---
+    // Pour une nouvelle session, l'app propose ce que le pilote fait d'habitude dans la même
+    // situation : type de vol et technique du site, matériel utilisé là (sinon le dernier),
+    // école récente, lieu de gonflage habituel. Un champ que le pilote modifie n'est plus
+    // jamais remplacé ; une session existante n'est jamais modifiée.
+
+    // id du champ → nom du champ appris
+    static LEARNED_FIELD_IDS = {
+        'lb-typeVol': 'typeVol',
+        'lb-tech-decollage': 'techDecollage',
+        'lb-voile': 'voile',
+        'lb-sellette': 'sellette',
+        'lb-ecole-check': 'ecole',
+        'lb-ecole': 'ecole',
+        'lb-site': 'site',
+        'lb-lieu': 'lieu',
+    };
+    // Valeur de l'option « Dos voile » (identifiant, pas un texte affiché)
+    static WINCH_TAKEOFF_TECHNIQUE = 'Dos voile';
+
+    touchedFields = new Set();
+    learnedFields = new Map(); // champ → raison affichée
+
+    onLearnedFieldChanged(field) {
+        this.touchedFields.add(field);
+        this.learnedFields.delete(field);
+        this.applyLearnedDefaults();
+    }
+
+    /**
+     * Pré-remplit les champs que le pilote n'a pas touchés. `force` : champs à recalculer même
+     * en modification d'une session (ex. technique enregistrée avec un type de vol par défaut).
+     */
+    applyLearnedDefaults({ force = [] } = {}) {
+        const editing = Boolean(/** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit'))?.value);
+        if (editing && !force.length) return;
+        const can = (field) => force.includes(field) || (!editing && !this.touchedFields.has(field));
+        const sessions = LogbookService.getFlights();
+        const isVol = this.currentFormType === 'vol';
+        const sessionType = isVol ? 'vol' : 'gonflage';
+        const value = (id) => /** @type {HTMLInputElement} */ (document.getElementById(id))?.value || '';
+        const setSelect = (id, field, suggestion) => {
+            const select = /** @type {HTMLSelectElement} */ (document.getElementById(id));
+            if (!select || !suggestion || !Array.from(select.options).some((o) => o.value === suggestion.value)) return;
+            select.value = suggestion.value;
+            const other = document.getElementById(`${id}-autre`);
+            if (other) other.style.display = 'none';
+            this.learnedFields.set(field, suggestion.reason);
+        };
+
+        // Lieu de gonflage habituel (seulement s'il est vide)
+        if (!isVol && can('lieu') && !value('lb-lieu').trim()) {
+            const lieu = PilotHabits.suggest(sessions, 'lieu', { sessionType, minScore: 1.5 });
+            const input = /** @type {HTMLInputElement} */ (document.getElementById('lb-lieu'));
+            if (lieu && input) {
+                input.value = lieu.value;
+                this.learnedFields.set('lieu', 'habit');
+                this.onPlaceChanged(); // coordonnées connues de ce lieu
+            }
         }
+        const place = isVol ? value('lb-site') : value('lb-lieu');
+
+        if (isVol && can('typeVol')) {
+            setSelect(
+                'lb-typeVol',
+                'typeVol',
+                PilotHabits.suggest(sessions, 'typeVol', {
+                    sessionType,
+                    context: { place },
+                    mismatch: { place: 0.1 },
+                    minScore: 1,
+                }),
+            );
+        }
+        if (isVol && can('techDecollage')) {
+            const winch = value('lb-typeVol') === 'Treuil';
+            const technique = PilotHabits.suggest(sessions, 'techDecollage', {
+                sessionType,
+                context: { place, launch: winch ? 'treuil' : 'libre' },
+                // Règle générale, vite remplacée par les vols du pilote au treuil
+                prior: winch ? { value: LogbookViewClass.WINCH_TAKEOFF_TECHNIQUE, weight: 2, reason: 'winch' } : null,
+            });
+            if (technique && technique.reason === 'launch') technique.reason = winch ? 'launchWinch' : 'habit';
+            setSelect('lb-tech-decollage', 'techDecollage', technique);
+        }
+        for (const field of ['voile', 'sellette']) {
+            if (!can(field)) continue;
+            const gear = PilotHabits.latest(sessions, field, { place });
+            if (gear)
+                setSelect(`lb-${field}`, field, {
+                    value: gear.value,
+                    reason: gear.reason === 'place' ? 'gearPlace' : 'gearLatest',
+                });
+        }
+        if (can('ecole')) {
+            const ecole = PilotHabits.suggest(sessions, 'ecole', {
+                sessionType,
+                context: { place },
+                mismatch: { place: 0.1 }, // on vole en école sur certains sites, pas partout
+                includeEmpty: true,
+                minScore: 1,
+            });
+            if (ecole && ecole.value) {
+                this.setSchoolField(true, ecole.value);
+                this.learnedFields.set('ecole', ecole.reason);
+            } else if (ecole && this.learnedFields.has('ecole')) {
+                // Proposée pour un autre site : on la retire
+                this.setSchoolField(false);
+                this.learnedFields.delete('ecole');
+            }
+        }
+        this.renderLearnedSummary();
+    }
+
+    renderLearnedSummary() {
+        const box = document.getElementById('lb-learned-summary');
+        if (!box) return;
+        const items = [...this.learnedFields.entries()].map(
+            ([field, reason]) => `${tl(`form.learned.fields.${field}`)} (${tl(`form.learned.reasons.${reason}`)})`,
+        );
+        box.hidden = items.length === 0;
+        box.textContent = items.length ? tl('form.learned.summary', { items: items.join(', ') }) : '';
     }
 
     currentTraceData = null;
@@ -1516,6 +1648,7 @@ class LogbookViewClass extends BaseView {
                     }
                 }
                 this._setupAltitudeCheck(parsed);
+                this.applyLearnedDefaults(); // le site vient peut-être d'être trouvé
                 this.currentTraceInfo = parsed;
                 // Nouvelle trace : un .sdf d'un autre vol ne s'applique plus
                 this.currentSensorStats = null;
@@ -1562,11 +1695,19 @@ class LogbookViewClass extends BaseView {
             gainInput.value = parsed.gain;
         }
 
-        // Départ au treuil reconnu dans la trace : type de vol « Treuil », sauf si le pilote a
-        // déjà choisi autre chose que la valeur par défaut.
+        // Départ au treuil reconnu dans la trace : c'est un fait, il prime sur les habitudes.
+        // Type de vol « Treuil », sauf si le pilote l'a choisi lui-même (ou, pour un vol
+        // existant, si son type n'est plus la valeur par défaut « Plouf »).
         const typeVolInput = /** @type {HTMLSelectElement} */ (document.getElementById('lb-typeVol'));
-        if (typeVolInput && parsed.analysis && parsed.analysis.winch && typeVolInput.value === 'Plouf') {
+        const editing = Boolean(/** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit'))?.value);
+        const typeVolFree = editing ? typeVolInput?.value === 'Plouf' : !this.touchedFields.has('typeVol');
+        if (typeVolInput && parsed.analysis && parsed.analysis.winch && typeVolFree) {
             typeVolInput.value = 'Treuil';
+            this.touchedFields.add('typeVol');
+            this.learnedFields.set('typeVol', 'trace');
+            // Pour un vol existant, la technique enregistrée avec le type par défaut l'était sans
+            // doute aussi par défaut : on la réévalue.
+            this.applyLearnedDefaults({ force: editing ? ['techDecollage'] : [] });
         }
     }
 
@@ -1884,6 +2025,17 @@ class LogbookViewClass extends BaseView {
 
         // Populate common fields
         /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit')).value = session.id;
+        // Session existante : ce qui a été pré-rempli à l'ouverture du formulaire ne doit pas
+        // remplacer un champ que la session laisse vide (sinon il serait enregistré).
+        this.learnedFields.clear();
+        this.renderLearnedSummary();
+        for (const id of ['lb-voile', 'lb-sellette']) {
+            const select = /** @type {HTMLSelectElement} */ (document.getElementById(id));
+            if (select) select.value = '';
+        }
+        const techSelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-tech-decollage'));
+        if (techSelect) techSelect.selectedIndex = 0;
+        this.setSchoolField(false);
         /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime')).value = session.datetime;
 
         // Helper pour "Autre..."

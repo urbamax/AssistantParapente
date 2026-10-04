@@ -236,13 +236,13 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <div class="form-group">
                         <label>Voile <span class="required">*</span></label>
                         <select id="lb-voile" required=""><option value="">-- Sélectionner --</option><option value="OZONE | RUSH 6 | BLEU | M">OZONE | RUSH 6 | BLEU | M</option><option value="Autre">Autre...</option></select>
-                        <input type="text" id="lb-voile-autre" list="voiles-autre-list" placeholder="Spécifiez le modèle..." autocomplete="off" style="display:none; margin-top: 5px; width: 100%;">
+                        <input type="text" id="lb-voile-autre" list="voiles-autre-list" placeholder="Spécifiez le modèle..." autocomplete="off" style="display: none; margin-top: 5px; width: 100%;">
                         <datalist id="voiles-autre-list"><option value="OZONE | RUSH 6 | BLEU | M"></option></datalist>
                     </div>
                     <div class="form-group">
                         <label>Sellette</label>
                         <select id="lb-sellette"><option value="">-- Sélectionner --</option><option value="SUPAIR | ACCESS">SUPAIR | ACCESS</option><option value="Autre">Autre...</option></select>
-                        <input type="text" id="lb-sellette-autre" list="sellettes-autre-list" placeholder="Spécifiez le modèle..." autocomplete="off" style="display:none; margin-top: 5px; width: 100%;">
+                        <input type="text" id="lb-sellette-autre" list="sellettes-autre-list" placeholder="Spécifiez le modèle..." autocomplete="off" style="display: none; margin-top: 5px; width: 100%;">
                         <datalist id="sellettes-autre-list"><option value="SUPAIR | ACCESS"></option></datalist>
                     </div>
                 </div>
@@ -271,7 +271,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         
                         <option value="Autre">Autre...</option>
                     </select>
-                    <input type="text" id="lb-tech-decollage-autre" placeholder="Spécifiez la technique..." style="display:none; margin-top: 5px; width: 100%;">
+                    <input type="text" id="lb-tech-decollage-autre" placeholder="Spécifiez la technique..." style="display: none; margin-top: 5px; width: 100%;">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -319,7 +319,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <label>Commentaire</label>
                     <textarea id="lb-commentaire" rows="3" placeholder="Sensations, conditions météo..."></textarea>
                 </div>
-            ",
+            <div id="lb-learned-summary" style="margin-top: 4px; font-size: 0.8rem; color: var(--text-secondary);">Pré-rempli d'après tes vols : type de vol (ton habitude), technique de décollage (ton habitude), voile (la dernière utilisée), sellette (la dernière utilisée). Tout reste modifiable.</div>",
   "ground": "
                 <div class="form-group">
                     <label>Date &amp; Heure <span class="required">*</span></label>
@@ -353,13 +353,13 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <div class="form-group">
                         <label>Voile <span class="required">*</span></label>
                         <select id="lb-voile" required=""><option value="">-- Sélectionner --</option><option value="OZONE | RUSH 6 | BLEU | M">OZONE | RUSH 6 | BLEU | M</option><option value="Autre">Autre...</option></select>
-                        <input type="text" id="lb-voile-autre" list="voiles-autre-list" placeholder="Spécifiez le modèle..." autocomplete="off" style="display:none; margin-top: 5px; width: 100%;">
+                        <input type="text" id="lb-voile-autre" list="voiles-autre-list" placeholder="Spécifiez le modèle..." autocomplete="off" style="display: none; margin-top: 5px; width: 100%;">
                         <datalist id="voiles-autre-list"><option value="OZONE | RUSH 6 | BLEU | M"></option></datalist>
                     </div>
                     <div class="form-group">
                         <label>Sellette</label>
                         <select id="lb-sellette"><option value="">-- Sélectionner --</option><option value="SUPAIR | ACCESS">SUPAIR | ACCESS</option><option value="Autre">Autre...</option></select>
-                        <input type="text" id="lb-sellette-autre" list="sellettes-autre-list" placeholder="Spécifiez le modèle..." autocomplete="off" style="display:none; margin-top: 5px; width: 100%;">
+                        <input type="text" id="lb-sellette-autre" list="sellettes-autre-list" placeholder="Spécifiez le modèle..." autocomplete="off" style="display: none; margin-top: 5px; width: 100%;">
                         <datalist id="sellettes-autre-list"><option value="SUPAIR | ACCESS"></option></datalist>
                     </div>
                 </div>
@@ -407,7 +407,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <label>Commentaire</label>
                     <textarea id="lb-commentaire" rows="3" placeholder="Points à travailler..."></textarea>
                 </div>
-            ",
+            <div id="lb-learned-summary" style="margin-top: 4px; font-size: 0.8rem; color: var(--text-secondary);">Pré-rempli d'après tes vols : voile (la dernière utilisée), sellette (la dernière utilisée). Tout reste modifiable.</div>",
 }
 `;
 

@@ -144,6 +144,27 @@ export const FR = Object.freeze({
             takeoffTechnique: 'Technique de décollage :',
             takeoffTechniques: Object.freeze({ 'Face voile': 'Face voile', 'Dos voile': 'Dos voile' }),
             techniquePlaceholder: 'Spécifiez la technique...',
+            // Ce que l'app a pré-rempli d'après les habitudes du pilote, et pourquoi
+            learned: Object.freeze({
+                summary: "Pré-rempli d'après tes vols : {items}. Tout reste modifiable.",
+                fields: Object.freeze({
+                    typeVol: 'type de vol',
+                    techDecollage: 'technique de décollage',
+                    voile: 'voile',
+                    sellette: 'sellette',
+                    ecole: 'école',
+                    lieu: 'lieu',
+                }),
+                reasons: Object.freeze({
+                    place: 'ton habitude sur ce site',
+                    launchWinch: 'ton habitude au treuil',
+                    habit: 'ton habitude',
+                    winch: 'au treuil, on décolle presque toujours dos voile',
+                    trace: 'départ au treuil détecté dans la trace',
+                    gearPlace: 'utilisée la dernière fois ici',
+                    gearLatest: 'la dernière utilisée',
+                }),
+            }),
             maxAltitude: 'Altitude Max (m)',
             maxAltitudePlaceholder: 'Ex: 2100',
             gain: 'Gain (m)',
