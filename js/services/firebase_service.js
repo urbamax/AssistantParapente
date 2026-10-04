@@ -574,8 +574,12 @@ export const FirebaseAuthEngine = {
             // before the delete completes → cloud still has the doc → merge would re-add it).
             const deletedFlightsSet = new Set(readTombstoneIds('deleted_flights'));
 
+            // The local snapshot was read before this point too: a flight deleted meanwhile must
+            // not come back from it either (it would then be re-uploaded on the next sync).
             const mergedLogbookMap = new Map();
-            localLogbook.forEach((session) => mergedLogbookMap.set(session.id, session));
+            localLogbook.forEach((session) => {
+                if (!deletedFlightsSet.has(session.id)) mergedLogbookMap.set(session.id, session);
+            });
             cloudLogbook.forEach((cloudSession) => {
                 // Never re-insert a flight the user just deleted (tombstone guard)
                 if (deletedFlightsSet.has(cloudSession.id)) return;
@@ -669,7 +673,9 @@ export const FirebaseAuthEngine = {
             const deletedEquipSet = new Set(readTombstoneIds('deleted_equipment'));
 
             const mergedEquipMap = new Map();
-            localEquip.forEach((item) => mergedEquipMap.set(item.id, item));
+            localEquip.forEach((item) => {
+                if (!deletedEquipSet.has(item.id)) mergedEquipMap.set(item.id, item);
+            });
             cloudEquip.forEach((cloudItem) => {
                 // Never re-insert equipment the user just deleted (tombstone guard)
                 if (deletedEquipSet.has(cloudItem.id)) return;
