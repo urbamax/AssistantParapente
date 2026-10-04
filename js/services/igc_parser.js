@@ -185,6 +185,12 @@ const IGCParser = {
      * point à partir duquel l'une de ces deux conditions tient pendant au moins une minute
      * (fenêtres de 20 s, pour absorber le bruit GPS et la course d'envol).
      *
+     * La vitesse est mesurée sur le chemin parcouru (points espacés d'au moins 5 s) et non sur
+     * le seul écart entre les deux bouts de la fenêtre : en virage serré (8 d'approche,
+     * enroulement de thermique) le pilote revient presque à son point de départ en 20 s et
+     * serait sinon vu « au sol », ce qui coupait la fin du vol et faussait l'altitude
+     * d'atterrissage.
+     *
      * Limite connue : un vario allumé en voiture sera vu « en vol » dès le départ de la
      * voiture. Le point retourné reste alors au départ de la trace, comme avant.
      *
@@ -209,7 +215,7 @@ const IGCParser = {
                 continue;
             }
             const dtSec = (trace[j].timestamp - trace[i].timestamp) / 1000;
-            const speedKmh = this._distanceKm(trace[i].lat, trace[i].lon, trace[j].lat, trace[j].lon) / (dtSec / 3600);
+            const speedKmh = this._pathKm(trace, i, j) / (dtSec / 3600);
             const verticalMs = Math.abs(trace[j].alt - trace[i].alt) / dtSec;
             airborneFrom.push(speedKmh > MIN_SPEED_KMH || verticalMs > MIN_VERTICAL_MS);
         }
@@ -222,6 +228,22 @@ const IGCParser = {
             i = k; // la série s'est interrompue avant une minute : on repart après
         }
         return 0;
+    },
+
+    /**
+     * Longueur en km du chemin de trace[from] à trace[to], en ne retenant que des points espacés
+     * d'au moins 5 s : suit les virages sans cumuler le bruit GPS d'un pilote immobile.
+     */
+    _pathKm: function (trace, from, to) {
+        const MIN_STEP_MS = 5000;
+        let km = 0;
+        let prev = trace[from];
+        for (let k = from + 1; k <= to; k++) {
+            if (k < to && trace[k].timestamp - prev.timestamp < MIN_STEP_MS) continue;
+            km += this._distanceKm(prev.lat, prev.lon, trace[k].lat, trace[k].lon);
+            prev = trace[k];
+        }
+        return km;
     },
 
     /**
