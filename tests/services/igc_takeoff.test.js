@@ -92,6 +92,33 @@ describe('IGCParser.detectLandingIndex', () => {
         expectNear(IGCParser.detectLandingIndex(trace), phaseStarts[1], trace);
     });
 
+    it('keeps tight approach turns (figure 8) in the flight', () => {
+        // Vol en ligne droite, puis 2 min de virages serrés (rayon 25 m, 30 km/h, -1 m/s) :
+        // en 20 s le pilote revient presque à son point de départ.
+        const { trace, phaseStarts } = buildTrace([FLIGHT]);
+        const last = trace[trace.length - 1];
+        const r = 25;
+        const v = 30 / 3.6;
+        let alt = last.alt;
+        let t = last.timestamp;
+        for (let s = STEP_S; s <= 120; s += STEP_S) {
+            const angle = (v * s) / r;
+            t += STEP_S * 1000;
+            alt -= STEP_S;
+            trace.push({
+                lat: last.lat + (r * Math.sin(angle)) / M_PER_DEG_LAT,
+                lon: last.lon + (r * (1 - Math.cos(angle))) / (M_PER_DEG_LAT * Math.cos((last.lat * Math.PI) / 180)),
+                alt: Math.round(alt),
+                timestamp: t,
+            });
+        }
+        const landing = trace.length;
+        const { trace: ground } = buildTrace([WAIT], { ...trace[landing - 1] });
+        ground.forEach((p, k) => trace.push({ ...p, timestamp: t + (k + 1) * STEP_S * 1000 }));
+        expect(phaseStarts[0]).toBe(0);
+        expectNear(IGCParser.detectLandingIndex(trace), landing - 1, trace);
+    });
+
     it('keeps the whole track when the vario was switched off on landing', () => {
         const { trace } = buildTrace([FLIGHT]);
         expect(IGCParser.detectLandingIndex(trace)).toBe(trace.length - 1);
