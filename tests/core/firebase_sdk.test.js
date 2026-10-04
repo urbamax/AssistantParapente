@@ -10,6 +10,10 @@ const DIR = `vendor/firebase-${VERSION}`;
 const CDN_APP_IMPORT = `from"https://www.gstatic.com/firebasejs/${VERSION}/firebase-app.js"`;
 const LOCAL_APP_IMPORT = 'from"./firebase-app.js"';
 
+// Seule autre différence : la dernière ligne « //# sourceMappingURL=<fichier>.map » est retirée. Les
+// fichiers .map ne sont pas hébergés, et Safari affichait une erreur 404 par fichier dans la console.
+const MAP_COMMENT = (name) => `//# sourceMappingURL=${name}.map\n`;
+
 const sha384 = (buf) => `sha384-${createHash('sha384').update(buf).digest('base64')}`;
 
 // official : empreinte du fichier du paquet npm firebase@12.19.0 (identique à gstatic, vérifié le
@@ -50,7 +54,8 @@ describe('hosted Firebase SDK is the official 12.19.0 release (spec 013, FR-003,
             expect(hosted.split(LOCAL_APP_IMPORT).length - 1, `${name}: local import count`).toBe(1);
             expect(hosted, name).not.toContain('gstatic.com');
         }
-        const original = rewritten ? hosted.replace(LOCAL_APP_IMPORT, CDN_APP_IMPORT) : hosted;
+        expect(hosted, name).not.toContain('sourceMappingURL');
+        const original = (rewritten ? hosted.replace(LOCAL_APP_IMPORT, CDN_APP_IMPORT) : hosted) + MAP_COMMENT(name);
         expect(sha384(Buffer.from(original, 'utf8')), `${name} differs from the official file`).toBe(official);
     });
 

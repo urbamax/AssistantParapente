@@ -19,7 +19,7 @@ function runServiceWorker({ firebaseEnabled = true, importFails = false } = {}) 
         URL,
         Response,
         location: new URL('https://app.example/'),
-        caches: { open: vi.fn(), keys: vi.fn(), match: vi.fn() },
+        caches: { open: vi.fn(), keys: vi.fn(), match: vi.fn(() => Promise.resolve(undefined)) },
         fetch: vi.fn(),
     };
     sandbox.self = {
@@ -91,5 +91,30 @@ describe('background alerts (spec 013, FR-008)', () => {
         const run = runServiceWorker();
         run.background()({});
         expect(run.showNotification).toHaveBeenCalledWith('Assistant Parapente', expect.objectContaining({ body: '' }));
+    });
+});
+
+describe('Firebase network requests are left to the browser', () => {
+    const fetchEvent = (url) => ({
+        request: { method: 'GET', url, mode: 'cors', headers: new Headers() },
+        respondWith: vi.fn(),
+    });
+
+    it.each([
+        ['https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&t=1'],
+        ['https://firestore.googleapis.com/google.firestore.v1.Firestore/Write/channel?VER=8&t=2'],
+        ['https://identitytoolkit.googleapis.com/v1/accounts:lookup'],
+    ])('%s is not intercepted (no cache, no Safari access-control errors)', (url) => {
+        const { listeners } = runServiceWorker();
+        const event = fetchEvent(url);
+        listeners.fetch(event);
+        expect(event.respondWith).not.toHaveBeenCalled();
+    });
+
+    it('other third-party files are still served for offline use', () => {
+        const { listeners } = runServiceWorker();
+        const event = fetchEvent('https://mt1.google.com/vt/lyrs=y&x=1&y=2&z=3');
+        listeners.fetch(event);
+        expect(event.respondWith).toHaveBeenCalled();
     });
 });

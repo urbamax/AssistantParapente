@@ -9,7 +9,7 @@
 //   2. CACHE_NAME est versionné (synchronisé par bump.py avec le ?v= du reste du site) et
 //      activate() supprime systématiquement tout cache dont le nom ne correspond pas à la
 //      version courante.
-const CACHE_NAME = 'parapente-app-v2026.10.01_v20';
+const CACHE_NAME = 'parapente-app-v2026.10.04_v21';
 
 // La météo ne doit jamais être servie depuis le cache : une donnée de vent vieille de
 // plusieurs heures mais présentée comme "en direct" est un vrai risque sécurité pour un
@@ -187,6 +187,11 @@ self.addEventListener('fetch', (event) => {
     if (request.method !== 'GET') return; // laisser passer POST/PUT/DELETE sans interception
 
     const url = new URL(request.url);
+
+    // Firebase (Firestore, connexion, alertes) : jamais intercepté. Les canaux d'écoute de Firestore
+    // sont des requêtes longues que le navigateur interrompt et relance ; passées par le SW (et mises
+    // en cache), elles finissaient en erreurs « access control checks » dans la console de Safari.
+    if (url.hostname.endsWith('.googleapis.com')) return;
 
     // Numéro de version du site (bannière « Mettre à jour ») : toujours le réseau, jamais le cache
     if (url.origin === location.origin && url.pathname.endsWith('/version.json')) {
