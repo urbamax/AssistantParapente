@@ -194,7 +194,7 @@ export const FR = Object.freeze({
                 "Précision d'atterrissage": "Précision d'atterrissage",
             }),
             addExercisePlaceholder: 'Autre exercice…',
-            pilots: 'Pilotes avec qui j’ai volé',
+            pilots: 'Pilotes présents',
             addPilotPlaceholder: 'Nom du pilote…',
             add: 'Ajouter',
             remove: 'Retirer',
@@ -1668,7 +1668,7 @@ export const FR = Object.freeze({
             sessionEcoleExercices:
                 "<strong>Session encadrée par une école :</strong> Cochez cette case et indiquez le nom de l'école, du moniteur et, s'il y en a, des accompagnateurs lorsque la séance a eu lieu en stage (ceux de votre dernière session avec cette école au même endroit sont proposés). Pour un vol, cochez aussi les <strong>exercices travaillés</strong> ; un exercice absent de la liste s'ajoute avec le bouton <strong>Ajouter</strong> et sera proposé aux sessions suivantes.",
             pilotesSession:
-                "<strong>Pilotes :</strong> Choisissez dans la liste déroulante les pilotes avec qui vous avez volé, en école ou non, ou saisissez un nouveau nom : il rejoint la liste pour les sessions suivantes. Chaque pilote choisi s'affiche en étiquette, retirée d'un clic sur sa croix. Pour un vol à moins de 3 h d'une autre session au même endroit, les pilotes de cette session sont déjà sélectionnés.",
+                "<strong>Pilotes :</strong> Choisissez dans la liste déroulante les pilotes présents, en école ou non, ou saisissez un nouveau nom : il rejoint la liste pour les sessions suivantes. Chaque pilote choisi s'affiche en étiquette, retirée d'un clic sur sa croix. Pour un vol à moins de 3 h d'une autre session au même endroit, les pilotes de cette session sont déjà sélectionnés.",
             formulaireQuiApprend:
                 "<strong>Un formulaire qui apprend de vous :</strong> Pour une nouvelle session, l'application pré-remplit ce que vous faites d'habitude dans la même situation : type de vol et technique de décollage sur ce site, voile et sellette utilisées la dernière fois à cet endroit, école si vous y volez en stage en ce moment. Vos vols récents comptent davantage, et vos propres vols l'emportent sur les règles générales (par exemple « au treuil, on décolle dos voile »). Une ligne sous le formulaire indique ce qui a été pré-rempli et pourquoi. Tout reste modifiable : un champ que vous changez n'est jamais remplacé, et une session existante n'est jamais complétée.",
             commentaireSession:

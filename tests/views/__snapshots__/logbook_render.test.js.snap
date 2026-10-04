@@ -320,7 +320,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                 </div>
                 
                 <div class="form-group">
-                    <label>Pilotes avec qui j’ai volé</label>
+                    <label>Pilotes présents</label>
                     
                         <div id="lb-pilotes-group" class="lb-chips"></div>
                         <datalist id="lb-pilotes-options"></datalist>
@@ -417,7 +417,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                 </div>
                 
                 <div class="form-group">
-                    <label>Pilotes avec qui j’ai volé</label>
+                    <label>Pilotes présents</label>
                     
                         <div id="lb-pilotes-group" class="lb-chips"></div>
                         <datalist id="lb-pilotes-options"></datalist>
