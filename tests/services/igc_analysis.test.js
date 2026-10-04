@@ -141,7 +141,7 @@ describe('IGCParser.analyzeFlight', () => {
 });
 
 describe('IGCParser on a real Syride track (winch launch, 8s on approach)', () => {
-    const parsed = IGCParser.parse(readFileSync('tests/fixtures/syride-2026-10-03.igc', 'utf8'));
+    const parsed = IGCParser.parse(readFileSync('tests/fixtures/syride-winch-flight.igc', 'utf8'));
 
     it('matches what Syride shows', () => {
         const takeoff = parsed.points[parsed.takeoffIndex];

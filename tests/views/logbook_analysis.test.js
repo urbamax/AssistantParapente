@@ -30,8 +30,8 @@ const STATS = {
 const flight = (id, extra = {}) => ({
     id,
     type: 'vol',
-    datetime: '2026-10-03T12:06',
-    site: 'ANTIN <b>',
+    datetime: '2026-07-01T12:06',
+    site: 'PLAINE <b>',
     voile: 'V',
     duree: 10,
     maxClimbRate: 2.5,
@@ -78,7 +78,7 @@ describe('LogbookView.renderRecords', () => {
         expect(html).toContain('Plus long vol</span>\n                        <strong class="record-value">1h 35min');
         expect(html).toContain('12.3 km');
         expect(html).toContain('+3.4 m/s');
-        expect(html).toContain('ANTIN &lt;b&gt;');
+        expect(html).toContain('PLAINE &lt;b&gt;');
         expect(html).toContain('Sur 2 vols avec trace : 8.4 km parcourus');
     });
 
@@ -101,7 +101,7 @@ describe('LogbookService.recomputeAllTraceStats', () => {
         expect(await LogbookService.recomputeAllTraceStats()).toBe(1);
         const f = LogbookService.getFlightById('f1');
         expect(f).toMatchObject({ distanceKm: 4.9, maxClimbRate: 3, igcStats: STATS, syncPending: true });
-        expect(f).toMatchObject({ duree: 10, altitudeMax: 999, gain: 7, commentaire: 'garder', site: 'ANTIN <b>' });
+        expect(f).toMatchObject({ duree: 10, altitudeMax: 999, gain: 7, commentaire: 'garder', site: 'PLAINE <b>' });
         expect(LogbookService.saveFlights).toHaveBeenCalledTimes(1);
     });
 });

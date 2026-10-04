@@ -14,15 +14,15 @@ const LOGBOOK_SCREEN = ['logbook-screen', 'logbook-session-modal']
     })
     .join('');
 
-const IGC = readFileSync('tests/fixtures/syride-2026-10-03.igc', 'utf8');
-const SDF = readFileSync('tests/fixtures/syride-2026-10-03.sdf');
+const IGC = readFileSync('tests/fixtures/syride-winch-flight.igc', 'utf8');
+const SDF = readFileSync('tests/fixtures/syride-winch-flight.sdf');
 const igcFile = () => new File([IGC], 'flight.igc', { type: 'text/plain' });
 // jsdom n'implémente pas toujours Blob.arrayBuffer : on fournit un objet équivalent
 const sdfFile = (bytes = SDF) => ({ name: 'flight.SDF', arrayBuffer: async () => new Uint8Array(bytes).buffer });
 const $ = (id) => /** @type {HTMLInputElement} */ (document.getElementById(id));
 
 function fillRequired() {
-    $('lb-site').value = 'ANTIN';
+    $('lb-site').value = 'PLAINE';
     const wing = /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile'));
     wing.innerHTML = '<option value="Ma voile">Ma voile</option>';
     wing.value = 'Ma voile';
@@ -84,8 +84,8 @@ describe('logbook: Syride .sdf with the .igc', () => {
             {
                 id: 'f1',
                 type: 'vol',
-                datetime: '2026-10-03T12:06',
-                site: 'ANTIN',
+                datetime: '2026-07-01T12:06',
+                site: 'PLAINE',
                 voile: 'Ma voile',
                 duree: 4,
                 rawIgc: IGC,
@@ -118,8 +118,8 @@ describe('logbook: Syride .sdf with the .igc', () => {
             {
                 id: 'f1',
                 type: 'vol',
-                datetime: '2026-10-03T12:06',
-                site: 'ANTIN',
+                datetime: '2026-07-01T12:06',
+                site: 'PLAINE',
                 voile: 'Ma voile',
                 duree: 4,
                 rawIgc: IGC,
@@ -142,7 +142,7 @@ describe('logbook: Syride .sdf with the .igc', () => {
 
     it('refuses a .sdf on a flight without trace: nothing to check it against', async () => {
         LogbookService.flights = [
-            { id: 'f1', type: 'vol', datetime: '2026-10-03T12:06', site: 'ANTIN', voile: 'Ma voile', duree: 4 },
+            { id: 'f1', type: 'vol', datetime: '2026-07-01T12:06', site: 'PLAINE', voile: 'Ma voile', duree: 4 },
         ];
         vi.spyOn(LogbookService, 'getFlightTrace').mockResolvedValue(null);
         LogbookView.resetForm();
