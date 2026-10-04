@@ -1,0 +1,21 @@
+import { test, expect } from '@playwright/test';
+
+// Le champ « Treuilleur » n'apparaît que pour un vol au treuil : la règle `.form-group { display:
+// flex }` l'emportait sur l'attribut hidden, il restait affiché pour un vol en soaring.
+test('the winch operator field is shown only for a winch flight', async ({ page }) => {
+    await page.route('https://server.arcgisonline.com/**', (route) => route.abort());
+    await page.route('https://api.open-meteo.com/**', (route) => route.abort());
+    await page.goto('/');
+    await page.locator('.nav-menu-btn[data-target="LOGBOOK"]').first().click();
+    await page.locator('[data-action="openLogbookSection"][data-args="\'history\'"]').click();
+    await expect(page.locator('#logbook-screen')).toHaveClass(/active/);
+    await page.locator('#logbook-add-btn').click();
+    await expect(page.locator('#logbook-session-modal')).toBeVisible();
+
+    const field = page.locator('#lb-treuilleur-group');
+    await expect(field).toBeHidden();
+    await page.selectOption('#lb-typeVol', 'Treuil');
+    await expect(field).toBeVisible();
+    await page.selectOption('#lb-typeVol', 'Soaring');
+    await expect(field).toBeHidden();
+});

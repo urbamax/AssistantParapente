@@ -212,6 +212,12 @@
     flex: 1;
 }
 
+/* Champ masqué (treuilleur hors vol au treuil) : `display: flex` ci-dessus l'emportait sur
+   l'attribut hidden, le champ restait affiché. */
+.form-group[hidden] {
+    display: none;
+}
+
 .form-row {
     display: flex;
     gap: 16px;
