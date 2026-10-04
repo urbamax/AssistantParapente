@@ -35,6 +35,10 @@ const change = (id, value) => {
     $(id).value = value;
     $(id).dispatchEvent(new Event('change', { bubbles: true }));
 };
+const addCompanion = (name) => {
+    $('lb-accompagnateur-new').value = name;
+    LogbookView.addChecklistItem('accompagnateur');
+};
 
 function setup(flights) {
     LogbookService.flights = flights;
@@ -192,7 +196,7 @@ describe('logbook: instructor of a school session', () => {
         expect(options).toEqual(['Gilbert']);
     });
 
-    it('has a companion under the instructor, saved and proposed like him', () => {
+    it('has companions under the instructor, saved and proposed like him', () => {
         setup([]);
         $('lb-site').value = 'Plaine';
         $('lb-datetime').value = '2026-10-03T12:06';
@@ -202,19 +206,47 @@ describe('logbook: instructor of a school session', () => {
         $('lb-ecole-check').dispatchEvent(new Event('change', { bubbles: true }));
         $('lb-ecole').value = 'ÉCOLE TEST';
         $('lb-moniteur').value = 'Gilbert';
-        $('lb-accompagnateur').value = 'Sophie';
+        addCompanion('Sophie');
+        addCompanion('Jérémie');
         LogbookView.submitForm();
-        expect(LogbookService.getFlights()[0]).toMatchObject({ moniteur: 'Gilbert', accompagnateur: 'Sophie' });
+        expect(LogbookService.getFlights()[0]).toMatchObject({
+            moniteur: 'Gilbert',
+            accompagnateur: ['Sophie', 'Jérémie'],
+        });
         LogbookView.renderHistory();
         expect(document.getElementById('logbook-history-list')?.innerHTML).toContain(
-            'Accompagnateur :</strong> Sophie',
+            'Accompagnateurs :</strong> Sophie, Jérémie',
         );
 
-        // Vol suivant, même site, 1 h plus tard : même accompagnateur
+        // Vol suivant, même site, 1 h plus tard : mêmes accompagnateurs
         LogbookView.resetForm();
         change('lb-datetime', '2026-10-03T13:06');
         change('lb-site', 'Plaine');
-        expect($('lb-accompagnateur').value).toBe('Sophie');
+        expect(LogbookView.getChecklistValues('accompagnateur')).toEqual(['Sophie', 'Jérémie']);
+    });
+
+    it('reads the single companion of older sessions', () => {
+        const old = {
+            id: 'old',
+            type: 'vol',
+            datetime: '2026-09-01T10:00',
+            site: 'Plaine',
+            duree: 5,
+            ecole: 'ÉCOLE TEST',
+            moniteur: 'Gilbert',
+            accompagnateur: 'Sophie',
+        };
+        setup([old]);
+        LogbookView.renderHistory();
+        expect(document.getElementById('logbook-history-list')?.innerHTML).toContain(
+            'Accompagnateurs :</strong> Sophie',
+        );
+        LogbookView.editEntry('old');
+        expect(LogbookView.getChecklistValues('accompagnateur')).toEqual(['Sophie']);
+        // Nom tapé sans cliquer sur « Ajouter » : gardé à l'enregistrement
+        $('lb-accompagnateur-new').value = 'Jérémie';
+        LogbookView.submitForm();
+        expect(LogbookService.getFlights()[0].accompagnateur).toEqual(['Sophie', 'Jérémie']);
     });
 
     it('is not kept without a school', () => {
@@ -223,10 +255,10 @@ describe('logbook: instructor of a school session', () => {
         /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile')).value = 'Voile école';
         $('lb-duree').value = '5';
         $('lb-moniteur').value = 'Gilbert';
-        $('lb-accompagnateur').value = 'Sophie';
+        addCompanion('Sophie');
         LogbookView.submitForm();
         expect(LogbookService.getFlights()[0].moniteur).toBe('');
-        expect(LogbookService.getFlights()[0].accompagnateur).toBe('');
+        expect(LogbookService.getFlights()[0].accompagnateur).toEqual([]);
     });
 });
 

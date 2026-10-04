@@ -90,6 +90,21 @@ export const FirebaseAuthEngine = {
     _syncedSeq: 0,
     _syncsInFlight: 0,
 
+    /**
+     * Safari : au rechargement ou à la fermeture de la page, le navigateur coupait lui-même les
+     * connexions Firestore encore ouvertes et les affichait en erreurs « Fetch API cannot load …
+     * due to access control checks » dans la console. L'app les ferme avant, sauf quand la page est
+     * seulement gardée pour le bouton « retour » (event.persisted) et peut donc revenir telle quelle.
+     * @param {object} firestore Instance Firestore
+     * @param {(firestore: object) => Promise<void>} terminate Fonction terminate du SDK
+     */
+    _closeFirestoreOnPageHide(firestore, terminate) {
+        window.addEventListener('pagehide', (event) => {
+            if (event.persisted) return;
+            terminate(firestore).catch(() => {});
+        });
+    },
+
     markUnsyncedChange: function () {
         this._changeSeq++;
         this._updateSyncStatus();
@@ -150,7 +165,7 @@ export const FirebaseAuthEngine = {
             // Import Firebase SDKs dynamically from CDN
             const { initializeApp } = await loadAppModule();
             const { getAuth, onAuthStateChanged } = await loadAuthModule();
-            const { initializeFirestore } = await loadFirestoreModule();
+            const { initializeFirestore, terminate } = await loadFirestoreModule();
 
             app = initializeApp(FIREBASE_CONFIG);
             auth = getAuth(app);
@@ -158,6 +173,7 @@ export const FirebaseAuthEngine = {
             db = initializeFirestore(app, {
                 experimentalForceLongPolling: true,
             });
+            this._closeFirestoreOnPageHide(db, terminate);
             this.enabled = true;
             isInitialized = true;
             console.log('Firebase successfully initialized.');

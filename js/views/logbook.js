@@ -660,8 +660,7 @@ class LogbookViewClass extends BaseView {
         const ecoleChecked = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole-check'))?.checked;
         const ecole = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole'))?.value || '';
         const moniteur = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'))?.value || '';
-        const accompagnateur =
-            /** @type {HTMLInputElement} */ (document.getElementById('lb-accompagnateur'))?.value || '';
+        const accompagnateurs = this.getChecklistValues('accompagnateur');
         const pilotes = this.getChecklistValues('pilotes');
 
         const coordsText = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'))?.value || '';
@@ -728,8 +727,7 @@ class LogbookViewClass extends BaseView {
         if (ecoleChecked) this.setSchoolField(true, ecole);
         const instructorField = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
         if (instructorField && moniteur) instructorField.value = moniteur;
-        const companionField = /** @type {HTMLInputElement} */ (document.getElementById('lb-accompagnateur'));
-        if (companionField && accompagnateur) companionField.value = accompagnateur;
+        this.setChecklistValues('accompagnateur', accompagnateurs);
         this.setChecklistValues('pilotes', pilotes);
 
         if (coordsText) {
@@ -767,9 +765,8 @@ class LogbookViewClass extends BaseView {
                         <label for="lb-moniteur" style="display:block; margin-top: 10px;">${tt('form.instructor')}</label>
                         <input type="text" id="lb-moniteur" list="moniteurs-list" placeholder="${tt('form.instructorPlaceholder')}" autocomplete="off" style="width: 100%;">
                         <datalist id="moniteurs-list"></datalist>
-                        <label for="lb-accompagnateur" style="display:block; margin-top: 10px;">${tt('form.companion')}</label>
-                        <input type="text" id="lb-accompagnateur" list="accompagnateurs-list" placeholder="${tt('form.companionPlaceholder')}" autocomplete="off" style="width: 100%;">
-                        <datalist id="accompagnateurs-list"></datalist>${exercises}
+                        <label style="display:block; margin-top: 10px;">${tt('form.companion')}</label>
+                        ${this.renderChecklist('accompagnateur', [], this.getUsedValues('accompagnateur'), tt('form.companionPlaceholder'))}${exercises}
                     </div>
                 </div>`;
     }
@@ -1376,15 +1373,6 @@ class LogbookViewClass extends BaseView {
             winchList.innerHTML = operators.map((name) => `<option value="${escapeHTML(name)}">`).join('');
         }
 
-        // Accompagnateurs déjà saisis, les plus fréquents d'abord
-        const companionList = document.getElementById('accompagnateurs-list');
-        if (companionList) {
-            const companions = PilotHabits.rankByUse(LogbookService.getFlights(), (session) =>
-                typeof session.accompagnateur === 'string' ? session.accompagnateur.trim() : '',
-            );
-            companionList.innerHTML = companions.map((name) => `<option value="${escapeHTML(name)}">`).join('');
-        }
-
         // Moniteurs déjà saisis, les plus fréquents d'abord
         const instructorList = document.getElementById('moniteurs-list');
         if (instructorList) {
@@ -1502,11 +1490,23 @@ class LogbookViewClass extends BaseView {
         'lb-ecole-check': 'ecole',
         'lb-ecole': 'ecole',
         'lb-moniteur': 'moniteur',
-        'lb-accompagnateur': 'accompagnateur',
         'lb-treuilleur': 'treuilleur',
         'lb-site': 'site',
         'lb-lieu': 'lieu',
     };
+    /**
+     * Accompagnateurs d'une session, en liste. Ils peuvent être plusieurs ; les sessions plus
+     * anciennes n'en gardaient qu'un, en texte.
+     * @param {{accompagnateur?: unknown}} session
+     * @returns {string[]}
+     */
+    static companionsOf(session) {
+        const value = session ? session.accompagnateur : null;
+        return (Array.isArray(value) ? value : [value])
+            .filter((name) => typeof name === 'string' && name.trim())
+            .map((name) => name.trim());
+    }
+
     // Valeur de l'option « Dos voile » (identifiant, pas un texte affiché)
     static WINCH_TAKEOFF_TECHNIQUE = 'Dos voile';
 
@@ -1625,28 +1625,24 @@ class LogbookViewClass extends BaseView {
                 this.learnedFields.delete('moniteur');
             }
         }
-        // Accompagnateur : celui d'une session de moins de 3 h ici, sinon le dernier de cette école ici
-        const companionInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-accompagnateur'));
-        if (companionInput && can('accompagnateur')) {
+        // Accompagnateurs : ceux d'une session de moins de 3 h ici, sinon les derniers de cette école ici
+        if (document.getElementById('lb-accompagnateur-group') && can('accompagnateur')) {
             const withCompanion = school
                 ? sessions.filter(
                       (s) =>
-                          typeof s.accompagnateur === 'string' &&
-                          s.accompagnateur.trim() &&
+                          LogbookViewClass.companionsOf(s).length > 0 &&
                           typeof s.ecole === 'string' &&
                           s.ecole.trim().toLowerCase() === school,
                   )
                 : [];
             const close = this.findNearbySession(withCompanion, place, value('lb-datetime'), 'accompagnateur');
-            const last = !close ? PilotHabits.latest(withCompanion, 'accompagnateur', { place }) : null;
-            if (close) {
-                companionInput.value = close.accompagnateur;
-                this.learnedFields.set('accompagnateur', 'nearbySession');
-            } else if (last && last.reason === 'place') {
-                companionInput.value = last.value;
-                this.learnedFields.set('accompagnateur', 'instructorPlace');
+            const placeKey = (place || '').trim().toLowerCase();
+            const last = !close && placeKey ? withCompanion.find((s) => PilotHabits.placeOf(s) === placeKey) : null;
+            if (close || last) {
+                this.setChecklistValues('accompagnateur', LogbookViewClass.companionsOf(close || last));
+                this.learnedFields.set('accompagnateur', close ? 'nearbySession' : 'instructorPlace');
             } else if (this.learnedFields.has('accompagnateur')) {
-                companionInput.value = '';
+                this.setChecklistValues('accompagnateur', []);
                 this.learnedFields.delete('accompagnateur');
             }
         }
@@ -2020,6 +2016,13 @@ class LogbookViewClass extends BaseView {
     }
 
     submitForm() {
+        // Nom tapé dans « Ajouter » (accompagnateur, pilote, exercice) sans cliquer sur le bouton :
+        // il est ajouté plutôt que perdu à l'enregistrement.
+        document.querySelectorAll('input[data-checklist]').forEach((input) => {
+            const field = /** @type {HTMLInputElement} */ (input);
+            if (field.value.trim()) this.addChecklistItem(field.dataset.checklist);
+        });
+
         // Coordonnées choisies sur la carte ou collées (spec 011) : illisibles, rien n'est enregistré.
         const coordsInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-coords'));
         const coordsText = coordsInput ? coordsInput.value.trim() : '';
@@ -2051,8 +2054,6 @@ class LogbookViewClass extends BaseView {
         const ecole = ecoleCheck?.checked && ecoleInput ? ecoleInput.value.trim() : '';
         const moniteurInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
         const moniteur = ecole && moniteurInput ? moniteurInput.value.trim() : '';
-        const companionInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-accompagnateur'));
-        const accompagnateur = ecole && companionInput ? companionInput.value.trim() : '';
 
         const editId = document.getElementById('lb-id-edit')
             ? /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit')).value
@@ -2072,7 +2073,7 @@ class LogbookViewClass extends BaseView {
             commentaire: commentaire,
             ecole: ecole,
             moniteur: moniteur,
-            accompagnateur: accompagnateur,
+            accompagnateur: ecole ? this.getChecklistValues('accompagnateur') : [],
             pilotes: this.getChecklistValues('pilotes'),
         };
 
@@ -2256,8 +2257,7 @@ class LogbookViewClass extends BaseView {
         this.setSchoolField(false);
         const instructorEdit = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
         if (instructorEdit) instructorEdit.value = session.moniteur || '';
-        const companionEdit = /** @type {HTMLInputElement} */ (document.getElementById('lb-accompagnateur'));
-        if (companionEdit) companionEdit.value = session.accompagnateur || '';
+        this.setChecklistValues('accompagnateur', LogbookViewClass.companionsOf(session));
         /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime')).value = session.datetime;
 
         // Helper pour "Autre..."
@@ -2495,7 +2495,7 @@ class LogbookViewClass extends BaseView {
                             ${session.ecole ? `<div><strong>${tt('history.school')}</strong> ${escapeHTML(session.ecole)}</div>` : ''}
                             ${isVol && session.typeVol === 'Treuil' && session.treuilleur ? `<div><strong>${tt('history.winchOperator')}</strong> ${escapeHTML(session.treuilleur)}</div>` : ''}
                             ${session.ecole && session.moniteur ? `<div><strong>${tt('history.instructor')}</strong> ${escapeHTML(session.moniteur)}</div>` : ''}
-                            ${session.ecole && session.accompagnateur ? `<div><strong>${tt('history.companion')}</strong> ${escapeHTML(session.accompagnateur)}</div>` : ''}
+                            ${session.ecole && LogbookViewClass.companionsOf(session).length > 0 ? `<div><strong>${tt('history.companion')}</strong> ${escapeHTML(LogbookViewClass.companionsOf(session).join(', '))}</div>` : ''}
                             ${session.instrument && (session.instrument.brand || session.instrument.model) ? `<div><strong>${tt('history.instrument')}</strong> ${escapeHTML([session.instrument.brand, session.instrument.model].filter(Boolean).join(' '))}${session.instrument.firmware ? ` ${tt('history.firmware', { version: session.instrument.firmware })}` : ''}</div>` : ''}
                             ${isVol && Array.isArray(session.typeExercice) && session.typeExercice.length > 0 ? `<div><strong>${tt('history.exercises')}</strong> ${escapeHTML(session.typeExercice.join(', '))}</div>` : ''}
                             ${Array.isArray(session.pilotes) && session.pilotes.length > 0 ? `<div><strong>${tt('history.pilots')}</strong> ${escapeHTML(session.pilotes.join(', '))}</div>` : ''}

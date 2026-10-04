@@ -31,6 +31,15 @@ const IGCParser = {
         }
 
         // 2. Extraire les enregistrements B
+        // Altitude GPS si le fichier en contient, sinon celle du baromètre. Le choix vaut pour toute
+        // la trace : une altitude GPS de 0 m est une vraie valeur (vol au bord de la mer), et passer
+        // ce point-là sur le baromètre, souvent décalé de plus de 100 m faute de calage, créait des
+        // sauts d'altitude et des varios de +40 m/s.
+        const bLines = lines.map((line) => line.trim()).filter((l) => l.startsWith('B') && l.length >= 35);
+        const hasGnssAltitude = bLines.some((l) => {
+            const gnss = parseInt(l.substring(30, 35), 10);
+            return !isNaN(gnss) && gnss !== 0;
+        });
         for (const line of lines) {
             const l = line.trim();
             if (l.startsWith('B')) {
@@ -47,8 +56,9 @@ const IGCParser = {
                 const lat = this._parseCoordinate(latStr, true);
                 const lon = this._parseCoordinate(lonStr, false);
 
-                let alt = parseInt(altGnssStr, 10);
-                if (isNaN(alt) || alt === 0) alt = parseInt(altBaroStr, 10);
+                const altGnss = parseInt(altGnssStr, 10);
+                const altBaro = parseInt(altBaroStr, 10);
+                const alt = hasGnssAltitude && !isNaN(altGnss) ? altGnss : isNaN(altBaro) ? altGnss : altBaro;
 
                 if (lat !== null && lon !== null) {
                     const hours = parseInt(timeStr.substring(0, 2), 10);
