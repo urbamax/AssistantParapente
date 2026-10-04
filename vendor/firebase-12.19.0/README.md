@@ -19,13 +19,15 @@ Checked on 2026-09-30: each file is byte-identical to `https://www.gstatic.com/f
 
 The only change: in three files, `from"https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js"`
 becomes `from"./firebase-app.js"`, so that they share the hosted app module instead of loading a
-second copy from gstatic. `tests/core/firebase_sdk.test.js` checks every file against the official
-SHA-384 (after undoing that single rewrite).
+second copy from gstatic. In every file, the last line `//# sourceMappingURL=<file>.map` is also
+removed: the `.map` files are not hosted, and Safari logged a 404 for each one in the console.
+`tests/core/firebase_sdk.test.js` checks every file against the official SHA-384 (after undoing both
+changes).
 
 ## Updating to a new version
 
 1. `npm pack firebase@<version>` and extract it.
 2. Compare the six files with `https://www.gstatic.com/firebasejs/<version>/<file>`.
-3. Create `vendor/firebase-<version>/` with the six files, this README and `LICENSE`; apply the same rewrite (with the new version in the address).
+3. Create `vendor/firebase-<version>/` with the six files, this README and `LICENSE`; apply the same rewrite (with the new version in the address) and remove the last `//# sourceMappingURL=` line.
 4. Update the official hashes and `VERSION` in `tests/core/firebase_sdk.test.js`, `FIREBASE_VERSION` in `js/services/firebase_service.js`, `FIREBASE_SDK_DIR` and the precache list in `sw.js`.
 5. Remove the old folder and run all tests.
