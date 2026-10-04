@@ -3560,41 +3560,15 @@
                                     margin-bottom: 16px;
                                 "
                             >
-                                <li data-i18n="manualModal.glissezDeposezOuSelectionnezUn" style="margin-bottom: 8px">
-                                    <strong data-i18n="manualModal.importerUneTraceGps">Importer une trace GPS (.igc) :</strong> Glissez-déposez ou sélectionnez un
-                                    fichier IGC. L'application repère le vrai décollage et le vrai atterrissage (et non
-                                    le premier point enregistré au parking), puis calcule la date, la durée, l'altitude
-                                    max, le gain, la distance, le vario max et les vitesses. Si votre vario était mal
-                                    calé (par exemple une altitude d'atterrissage négative), elle vous le signale et
-                                    vous pouvez corriger les altitudes en saisissant l'altitude réelle du décollage ou
-                                    de l'atterrissage.
-                                </li>
-                                <li data-i18n-html="manualModal.uneProposeLesSites" style="margin-bottom: 8px">
-                                    <strong>Site de vol :</strong> Une <strong>autocomplétion</strong> propose les
-                                    sites de la base officielle FFVL. Pour un lieu absent de la base, le bouton
-                                    <strong>"Placer sur la carte"</strong> permet de le pointer sur une carte (vue
-                                    carte ou satellite) ou de coller des coordonnées, y compris un lien Google Maps.
-                                    La position est ensuite reprise automatiquement lors de vos prochaines sessions à
-                                    ce lieu.
-                                </li>
-                                <li data-i18n="manualModal.associezLaVoileEt" style="margin-bottom: 8px">
-                                    <strong data-i18n="manualModal.materiel">Matériel :</strong> Associez la voile et la sellette utilisées, choisies
-                                    parmi vos équipements enregistrés ou saisies librement (les saisies précédentes
-                                    sont proposées).
-                                </li>
-                                <li data-i18n-html="manualModal.indiquezLeTypeDe" style="margin-bottom: 8px">
-                                    <strong>Type de vol et décollage :</strong> Indiquez le type de vol (Plouf,
-                                    Thermique, Soaring, Restit, Cross) et la technique de décollage, obligatoire :
-                                    <strong>"Face voile"</strong>, <strong>"Dos voile"</strong> ou une autre technique.
-                                </li>
-                                <li data-i18n="manualModal.cochezCetteCaseEt" style="margin-bottom: 8px">
-                                    <strong data-i18n="manualModal.sessionEncadreeParUne">Session encadrée par une école :</strong> Cochez cette case et indiquez le
-                                    nom de l'école lorsque la séance a eu lieu en stage.
-                                </li>
-                                <li data-i18n="manualModal.notezVosImpressionsConditions" style="margin-bottom: 8px">
-                                    <strong data-i18n="manualModal.commentaire">Commentaire :</strong> Notez vos impressions, conditions aérologiques
-                                    locales, ou faits marquants de votre vol.
-                                </li>
+                                <li data-i18n-html="manualModal.importerTraceIgc" style="margin-bottom: 8px"><strong>Importer une trace GPS (.igc) :</strong> Glissez-déposez ou sélectionnez le fichier IGC de votre vario. L'application repère le vrai décollage et le vrai atterrissage (ni le parking, ni la marche du retour, même avec des virages serrés en approche), puis calcule la date, la durée, l'altitude max, le gain, la distance, le vario max et les vitesses. Un <strong>départ au treuil</strong> est reconnu tout seul (montée régulière en ligne droite dès le décollage) : le type de vol passe alors à <strong>Treuil</strong>. Si votre vario était mal calé (par exemple une altitude d'atterrissage négative), elle vous le signale et vous pouvez corriger les altitudes en saisissant l'altitude réelle du décollage ou de l'atterrissage.</li>
+                                <li data-i18n-html="manualModal.capteursSyride" style="margin-bottom: 8px"><strong>Capteurs Syride (.sdf) :</strong> Avec un vario Syride, ajoutez le fichier <strong>.sdf</strong> exporté avec le .igc (sélectionnez ou glissez les deux fichiers ensemble). Il apporte ce que l'IGC ne contient pas : le <strong>facteur de charge</strong> (G) mesuré par l'accéléromètre, y compris au largage du treuil, et la <strong>température</strong>. Vous pouvez aussi l'ajouter plus tard en modifiant le vol. L'application vérifie qu'il s'agit bien du même vol : sa trace doit suivre celle du .igc sur toute sa longueur, sinon il est refusé.</li>
+                                <li data-i18n-html="manualModal.uneProposeLesSites" style="margin-bottom: 8px"><strong>Site de vol :</strong> Une <strong>autocomplétion</strong> propose les sites de la base officielle FFVL, vos sites habituels en tête. À l'import d'une trace, l'application choisit le site connu le plus proche du décollage, dans un rayon de 500 m ; si plusieurs sites sont possibles, ils s'affichent en boutons sous le champ pour changer d'un clic. Pour un lieu absent de la base, le bouton <strong>"Placer sur la carte"</strong> permet de le pointer sur une carte (vue carte ou satellite) ou de coller des coordonnées, y compris un lien Google Maps. La position est ensuite reprise automatiquement lors de vos prochaines sessions à ce lieu.</li>
+                                <li data-i18n-html="manualModal.materielSession" style="margin-bottom: 8px"><strong>Matériel :</strong> Associez la voile et la sellette utilisées, choisies parmi vos équipements enregistrés ou saisies librement (les saisies précédentes sont proposées).</li>
+                                <li data-i18n-html="manualModal.indiquezLeTypeDe" style="margin-bottom: 8px"><strong>Type de vol et décollage :</strong> Indiquez le type de vol (Plouf, Thermique, Soaring, Restit, Cross, Treuil) et la technique de décollage, obligatoire : <strong>"Face voile"</strong>, <strong>"Dos voile"</strong> ou une autre technique.</li>
+                                <li data-i18n-html="manualModal.sessionEcoleExercices" style="margin-bottom: 8px"><strong>Session encadrée par une école :</strong> Cochez cette case et indiquez le nom de l'école lorsque la séance a eu lieu en stage. Pour un vol, cochez aussi les <strong>exercices travaillés</strong> ; un exercice absent de la liste s'ajoute avec le bouton <strong>Ajouter</strong> et sera proposé aux sessions suivantes.</li>
+                                <li data-i18n-html="manualModal.pilotesSession" style="margin-bottom: 8px"><strong>Pilotes :</strong> Cochez les pilotes avec qui vous avez volé, en école ou non. Un nouveau nom s'ajoute avec le bouton <strong>Ajouter</strong> et rejoint la liste pour les sessions suivantes.</li>
+                                <li data-i18n-html="manualModal.formulaireQuiApprend" style="margin-bottom: 8px"><strong>Un formulaire qui apprend de vous :</strong> Pour une nouvelle session, l'application pré-remplit ce que vous faites d'habitude dans la même situation : type de vol et technique de décollage sur ce site, voile et sellette utilisées la dernière fois à cet endroit, école si vous y volez en stage en ce moment. Vos vols récents comptent davantage, et vos propres vols l'emportent sur les règles générales (par exemple « au treuil, on décolle dos voile »). Une ligne sous le formulaire indique ce qui a été pré-rempli et pourquoi. Tout reste modifiable : un champ que vous changez n'est jamais remplacé, et une session existante n'est jamais complétée.</li>
+                                <li data-i18n-html="manualModal.commentaireSession" style="margin-bottom: 8px"><strong>Commentaire :</strong> Notez vos impressions, conditions aérologiques locales, ou faits marquants de votre vol.</li>
                             </ul>
 
                             <h5 data-i18n="manualModal.n2SessionDeGonflage" style="margin-top: 16px; margin-bottom: 8px">
@@ -3612,15 +3586,8 @@
                                     margin-bottom: 16px;
                                 "
                             >
-                                <li data-i18n="manualModal.saisissezLeLieuOu" style="margin-bottom: 6px">
-                                    <strong data-i18n="manualModal.lieuAutocompletion">Lieu &amp; Autocomplétion :</strong> Saisissez le lieu où vous avez gonflé,
-                                    assisté par l'autocomplétion des sites, ou placez-le sur la carte.
-                                </li>
-                                <li data-i18n="manualModal.cochezLesExercicesDe" style="margin-bottom: 6px">
-                                    <strong data-i18n="manualModal.exercicesTravaillesMultiSelection">Exercices travaillés (Multi-sélection) :</strong> Cochez les exercices de
-                                    la séance (face voile, dos voile, tangage/roulis, affalage, vent fort,
-                                    prégonflage/démêlage) pour garder une trace précise de votre progression technique.
-                                </li>
+                                <li data-i18n-html="manualModal.lieuGonflage" style="margin-bottom: 6px"><strong>Lieu &amp; Autocomplétion :</strong> Saisissez le lieu où vous avez gonflé, assisté par l'autocomplétion des sites, ou placez-le sur la carte. Votre lieu habituel est pré-rempli.</li>
+                                <li data-i18n-html="manualModal.exercicesGonflage" style="margin-bottom: 6px"><strong>Exercices travaillés (Multi-sélection) :</strong> Cochez les exercices de la séance (face voile, dos voile, tangage/roulis, affalage, vent fort, prégonflage/démêlage) ou ajoutez-en un avec le bouton <strong>Ajouter</strong>, pour garder une trace précise de votre progression technique.</li>
                             </ul>
 
                             <h5 data-i18n="manualModal.n3Historique" style="margin-top: 16px; margin-bottom: 8px">3. Activités</h5>
@@ -3669,20 +3636,12 @@
                                     <strong>"Voir la trace"</strong> ouvre un lecteur 3D (propulsé par
                                     <strong>MapLibre GL JS</strong>) qui rejoue le vol sur le relief réel.
                                 </li>
-                                <li data-i18n-html="manualModal.chaqueEntreePeutEtre" style="margin-bottom: 6px">
-                                    <strong>Modification et Suppression :</strong> Chaque entrée peut être modifiée
-                                    (le formulaire se préremplit, avec un bouton <strong>Annuler</strong>) ou
-                                    supprimée. Les heures d'usure de votre matériel sont ajustées automatiquement.
-                                </li>
+                                <li data-i18n-html="manualModal.statsDetaillees" style="margin-bottom: 6px"><strong>Statistiques détaillées :</strong> Sous chaque vol avec une trace, un bloc repliable détaille le remorquage au treuil (durée, hauteur de largage, montée), les altitudes et le dénivelé cumulé, le vario et le taux de chute, les thermiques enroulés (nombre, montée moyenne, meilleur thermique, tours à gauche et à droite), la finesse en transition, les distances (dont la distance libre à 3 points), ainsi que le facteur de charge et la température si le .sdf a été ajouté (sinon un facteur de charge estimé d'après les virages).</li>
+                                <li data-i18n-html="manualModal.chaqueEntreePeutEtre" style="margin-bottom: 6px"><strong>Modification et Suppression :</strong> Chaque entrée peut être modifiée (le formulaire se préremplit, avec un bouton <strong>Annuler</strong>) ou supprimée. Les heures d'usure de votre matériel sont ajustées automatiquement. En modification, le bouton <strong>Recalculer depuis la trace IGC</strong> refait les calculs à partir de la trace enregistrée (date, durée, altitudes, statistiques, site, et type Treuil si besoin) sans toucher au reste.</li>
                             </ul>
 
                             <h5 data-i18n="manualModal.n4StatistiquesDuCarnet" style="margin-top: 16px; margin-bottom: 8px">4. Statistiques du Carnet</h5>
-                            <p data-i18n="manualModal.laPartieStatistiquesResume" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
-                                La partie Statistiques résume votre activité : nombre et temps de vol, sessions de
-                                gonflage, altitude maximale et gain cumulé, utilisation de chaque voile et heures
-                                restantes avant révision, lieux les plus fréquentés, part des sessions en école,
-                                types de vols, techniques de décollage et exercices de gonflage.
-                            </p>
+                            <p data-i18n-html="manualModal.statistiquesEtRecords" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">La partie Statistiques résume votre activité : nombre et temps de vol, sessions de gonflage, altitude maximale et gain cumulé, utilisation de chaque voile et heures restantes avant révision, lieux les plus fréquentés, part des sessions en école, types de vols, techniques de décollage et exercices de gonflage. La section <strong>Records personnels</strong> donne vos meilleurs vols (plus long, plus haut, distance libre, meilleur thermique, meilleure finesse, plus haut largage au treuil, facteur de charge…) avec leur date et leur site, et les cumuls de vos vols avec trace. Le bouton <strong>Recalculer les stats de toutes les traces</strong> met à jour les statistiques de vos vols déjà importés.</p>
 
                             <!-- CAPTURE METEO AUTOMATIQUE -->
                             <div
