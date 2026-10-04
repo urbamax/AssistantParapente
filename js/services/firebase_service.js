@@ -801,10 +801,13 @@ export const FirebaseAuthEngine = {
             // On attend whenReady() avant de rendre : sinon le rendu peut avoir lieu avant la
             // réhydratation de rawIgc depuis IndexedDB, cachant à tort le bouton "Voir la trace"
             // d'un vol dont la trace n'est stockée que là (cf. LogbookService.getFlightTrace()).
+            // Rien de changé (cas le plus courant de la synchro toutes les 30 s) : pas de nouveau
+            // rendu, qui refermait les traces et les encarts ouverts par le pilote.
+            const shownBefore = LogbookService.dataSignature();
             LogbookService.loadData();
             await LogbookService.whenReady();
             const logbookView = AppRouter.getView('LOGBOOK');
-            if (logbookView && logbookView.currentTab !== 'add') {
+            if (logbookView && logbookView.currentTab !== 'add' && LogbookService.dataSignature() !== shownBefore) {
                 logbookView.switchTab(logbookView.currentTab);
             }
 

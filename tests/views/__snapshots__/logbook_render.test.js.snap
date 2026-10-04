@@ -436,7 +436,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
 
 exports[`logbook renders (spec 014: identical before and after moving the texts) > history 1`] = `
 "
-                <div class="logbook-card">
+                <div class="logbook-card" data-session-id="f1">
                     <div class="logbook-card-header">
                         <div class="session-badge" style="background-color: var(--accent-blue)22; color: var(--accent-blue);">
                             <i class="ri-windy-line"></i> VOL
@@ -523,7 +523,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     </div>
                 </div>
             
-                <div class="logbook-card">
+                <div class="logbook-card" data-session-id="g1">
                     <div class="logbook-card-header">
                         <div class="session-badge" style="background-color: #f59e0b22; color: #f59e0b;">
                             <i class="ri-footprint-line"></i> GONFLAGE
@@ -567,7 +567,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     </div>
                 </div>
             
-                <div class="logbook-card">
+                <div class="logbook-card" data-session-id="n1">
                     <div class="logbook-card-header">
                         <div class="session-badge" style="background-color: var(--accent-blue)22; color: var(--accent-blue);">
                             <i class="ri-windy-line"></i> VOL
