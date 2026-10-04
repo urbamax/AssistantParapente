@@ -116,7 +116,7 @@ export const FR = Object.freeze({
             select: '-- Sélectionner --',
             freeEntry: '-- Saisie libre (ou choisir) --',
             igcTitle: 'Importer une trace GPS (.igc)',
-            igcHint: 'Cliquez ou glissez-déposez le fichier',
+            igcHint: 'Cliquez ou glissez-déposez le fichier (avec le .sdf Syride pour le facteur de charge)',
             altKnowLanding: "Je connais l'altitude de l'atterrissage",
             altKnowTakeoff: 'du décollage',
             realAltitude: 'Altitude réelle (m)',
@@ -138,10 +138,32 @@ export const FR = Object.freeze({
                 Soaring: 'Soaring',
                 Restit: 'Restit',
                 Cross: 'Cross',
+                Treuil: 'Treuil',
             }),
             takeoffTechnique: 'Technique de décollage :',
             takeoffTechniques: Object.freeze({ 'Face voile': 'Face voile', 'Dos voile': 'Dos voile' }),
             techniquePlaceholder: 'Spécifiez la technique...',
+            // Ce que l'app a pré-rempli d'après les habitudes du pilote, et pourquoi
+            learned: Object.freeze({
+                summary: "Pré-rempli d'après tes vols : {items}. Tout reste modifiable.",
+                fields: Object.freeze({
+                    typeVol: 'type de vol',
+                    techDecollage: 'technique de décollage',
+                    voile: 'voile',
+                    sellette: 'sellette',
+                    ecole: 'école',
+                    lieu: 'lieu',
+                }),
+                reasons: Object.freeze({
+                    place: 'ton habitude sur ce site',
+                    launchWinch: 'ton habitude au treuil',
+                    habit: 'ton habitude',
+                    winch: 'au treuil, on décolle presque toujours dos voile',
+                    trace: 'départ au treuil détecté dans la trace',
+                    gearPlace: 'utilisée la dernière fois ici',
+                    gearLatest: 'la dernière utilisée',
+                }),
+            }),
             maxAltitude: 'Altitude Max (m)',
             maxAltitudePlaceholder: 'Ex: 2100',
             gain: 'Gain (m)',
@@ -190,6 +212,12 @@ export const FR = Object.freeze({
             takeoffImported: 'Décollage importé (GPS)',
             parseError: 'Erreur lors du parsing IGC : {error}',
             existingTrace: 'Trace GPS (existante)',
+            sdfLoaded: 'Capteurs Syride chargés ({name}) : {gMax} g max',
+            sdfInvalid: "{name} n'est pas un fichier .sdf Syride lisible.",
+            sdfMismatch:
+                "Ce fichier .sdf n'est pas celui de ce vol : sa trace ne correspond pas à la trace GPS enregistrée (positions, altitudes ou durée différentes).",
+            sdfNoTrace:
+                "Impossible de vérifier ce fichier .sdf : ce vol n'a pas de trace GPS. Importe le .igc et le .sdf ensemble.",
             recalculate: 'Recalculer depuis la trace IGC',
             recalculated: 'Valeurs recalculées depuis la trace enregistrée',
             noStoredTrace: "Aucune trace IGC n'est enregistrée pour ce vol.",
@@ -226,6 +254,71 @@ export const FR = Object.freeze({
             trace3dError: "Impossible d'afficher la carte 3D. ({error})",
             deleteConfirm: 'Voulez-vous vraiment supprimer cette session ?',
             mountError: 'Erreur critique du carnet',
+        }),
+        // Statistiques détaillées d'un vol, calculées depuis sa trace IGC.
+        analysis: Object.freeze({
+            title: 'Statistiques détaillées (trace GPS)',
+            altitudes: 'Altitudes',
+            takeoffAlt: 'Décollage',
+            landingAlt: 'Atterrissage',
+            minAlt: 'Altitude min',
+            maxAboveTakeoff: 'Max au-dessus du déco',
+            cumulativeClimb: 'Dénivelé positif cumulé',
+            vario: 'Vario',
+            maxClimb: 'Vario max',
+            maxSink: 'Taux de chute max',
+            avgVario: 'Vario moyen',
+            thermals: 'Thermiques',
+            thermalCount: 'Thermiques enroulés',
+            thermalTime: 'Temps en thermique',
+            avgThermalClimb: 'Montée moyenne en thermique',
+            bestThermalClimb: 'Meilleur thermique',
+            maxThermalGain: 'Plus gros gain en thermique',
+            turns: 'Tours de 360°',
+            turnsValue: '{left} à gauche, {right} à droite',
+            glides: 'Transitions et vitesse',
+            glideRatio: 'Finesse moyenne en transition',
+            bestGlideRatio: 'Meilleure finesse en transition',
+            glideSpeed: 'Vitesse moyenne en transition',
+            maxSpeed: 'Vitesse sol max',
+            avgSpeed: 'Vitesse sol moyenne',
+            distances: 'Distances',
+            pathDistance: 'Distance parcourue',
+            freeDistance: 'Distance libre (3 points)',
+            maxFromTakeoff: 'Éloignement max du déco',
+            straightDistance: 'Distance déco → atterro',
+            winch: 'Treuillé',
+            towTime: 'Durée du remorquage',
+            release: 'Largage',
+            releaseValue: '{alt} m (+{height} m)',
+            towClimb: 'Montée au treuil',
+            towClimbValue: '+{avg} m/s moy. (+{max} m/s max)',
+            towDistance: 'Distance remorquée',
+            gRelease: 'Facteur de charge au largage',
+            loads: 'Facteur de charge',
+            gEstimated: 'Facteur de charge max (estimé)',
+            sensors: 'Capteurs du vario',
+            gMax: 'Facteur de charge max',
+            gMin: 'Facteur de charge min',
+        }),
+        records: Object.freeze({
+            title: 'Records personnels',
+            longestFlight: 'Plus long vol',
+            highest: 'Plus haut',
+            freeDistance: 'Plus grande distance libre',
+            maxFromTakeoff: 'Plus loin du déco',
+            bestThermal: 'Meilleur thermique (moyenne)',
+            maxThermalGain: 'Plus gros gain en thermique',
+            cumulativeClimb: 'Plus gros dénivelé cumulé',
+            maxClimb: 'Vario max',
+            bestGlide: 'Meilleure finesse',
+            maxSpeed: 'Vitesse sol max',
+            gMax: 'Facteur de charge max (capteur)',
+            highestRelease: 'Plus haut largage au treuil',
+            totals: 'Sur {flights} vols avec trace : {distance} km parcourus, {climb} m de dénivelé positif, {thermals} thermiques enroulés ({thermalTime}).',
+            recompute: 'Recalculer les stats de toutes les traces',
+            recomputeMissing: 'Calculer les stats détaillées des vols avec trace (à mettre à jour : {count})',
+            recomputed: '{count} vols mis à jour depuis leur trace IGC.',
         }),
         stats: Object.freeze({
             empty: 'Aucune donnée pour afficher des statistiques.',
@@ -1536,29 +1629,30 @@ export const FR = Object.freeze({
             ceModuleVousPermet:
                 "Ce module vous permet d'enregistrer et de conserver l'historique complet de vos activités en vol libre et au sol (vols et sessions de gonflage). Le bouton <strong>Carnet</strong> de la barre de navigation ouvre un sous-menu : <strong>Activités</strong>, <strong>Statistiques</strong> et <strong>Matériel</strong>. Le bouton <strong>Ajouter une session</strong>, en haut de la page Activités, ouvre une fenêtre de saisie ; la modification d'une session se fait dans la même fenêtre, fermée par <strong>Annuler</strong>, la croix ou la touche Échap.",
             n1AjouterUnVol: '1. Ajouter un Vol',
-            glissezDeposezOuSelectionnezUn:
-                "Glissez-déposez ou sélectionnez un fichier IGC. L'application repère le vrai décollage et le vrai atterrissage (et non le premier point enregistré au parking), puis calcule la date, la durée, l'altitude max, le gain, la distance, le vario max et les vitesses. Si votre vario était mal calé (par exemple une altitude d'atterrissage négative), elle vous le signale et vous pouvez corriger les altitudes en saisissant l'altitude réelle du décollage ou de l'atterrissage.",
-            importerUneTraceGps: 'Importer une trace GPS (.igc) :',
+            importerTraceIgc:
+                "<strong>Importer une trace GPS (.igc) :</strong> Glissez-déposez ou sélectionnez le fichier IGC de votre vario. L'application repère le vrai décollage et le vrai atterrissage (ni le parking, ni la marche du retour, même avec des virages serrés en approche), puis calcule la date, la durée, l'altitude max, le gain, la distance, le vario max et les vitesses. Un <strong>départ au treuil</strong> est reconnu tout seul (montée régulière en ligne droite dès le décollage) : le type de vol passe alors à <strong>Treuil</strong>. Si votre vario était mal calé (par exemple une altitude d'atterrissage négative), elle vous le signale et vous pouvez corriger les altitudes en saisissant l'altitude réelle du décollage ou de l'atterrissage.",
+            capteursSyride:
+                "<strong>Capteurs Syride (.sdf) :</strong> Avec un vario Syride, ajoutez le fichier <strong>.sdf</strong> exporté avec le .igc (sélectionnez ou glissez les deux fichiers ensemble). Il apporte ce que l'IGC ne contient pas : le <strong>facteur de charge</strong> (G) mesuré par l'accéléromètre, y compris au largage du treuil. Vous pouvez aussi l'ajouter plus tard en modifiant le vol. L'application vérifie qu'il s'agit bien du même vol : sa trace doit suivre celle du .igc sur toute sa longueur, sinon il est refusé.",
             uneProposeLesSites:
-                '<strong>Site de vol :</strong> Une <strong>autocomplétion</strong> propose les sites de la base officielle FFVL. Pour un lieu absent de la base, le bouton <strong>"Placer sur la carte"</strong> permet de le pointer sur une carte (vue carte ou satellite) ou de coller des coordonnées, y compris un lien Google Maps. La position est ensuite reprise automatiquement lors de vos prochaines sessions à ce lieu.',
-            associezLaVoileEt:
-                'Associez la voile et la sellette utilisées, choisies parmi vos équipements enregistrés ou saisies librement (les saisies précédentes sont proposées).',
-            materiel: 'Matériel :',
+                "<strong>Site de vol :</strong> Une <strong>autocomplétion</strong> propose les sites de la base officielle FFVL, vos sites habituels en tête. À l'import d'une trace, l'application choisit le site connu le plus proche du décollage, dans un rayon de 500 m ; si plusieurs sites sont possibles, ils s'affichent en boutons sous le champ pour changer d'un clic. Pour un lieu absent de la base, le bouton <strong>\"Placer sur la carte\"</strong> permet de le pointer sur une carte (vue carte ou satellite) ou de coller des coordonnées, y compris un lien Google Maps. La position est ensuite reprise automatiquement lors de vos prochaines sessions à ce lieu.",
+            materielSession:
+                '<strong>Matériel :</strong> Associez la voile et la sellette utilisées, choisies parmi vos équipements enregistrés ou saisies librement (les saisies précédentes sont proposées).',
             indiquezLeTypeDe:
-                '<strong>Type de vol et décollage :</strong> Indiquez le type de vol (Plouf, Thermique, Soaring, Restit, Cross) et la technique de décollage, obligatoire : <strong>"Face voile"</strong>, <strong>"Dos voile"</strong> ou une autre technique.',
-            cochezCetteCaseEt: "Cochez cette case et indiquez le nom de l'école lorsque la séance a eu lieu en stage.",
-            sessionEncadreeParUne: 'Session encadrée par une école :',
-            notezVosImpressionsConditions:
-                'Notez vos impressions, conditions aérologiques locales, ou faits marquants de votre vol.',
-            commentaire: 'Commentaire :',
+                '<strong>Type de vol et décollage :</strong> Indiquez le type de vol (Plouf, Thermique, Soaring, Restit, Cross, Treuil) et la technique de décollage, obligatoire : <strong>"Face voile"</strong>, <strong>"Dos voile"</strong> ou une autre technique.',
+            sessionEcoleExercices:
+                "<strong>Session encadrée par une école :</strong> Cochez cette case et indiquez le nom de l'école lorsque la séance a eu lieu en stage. Pour un vol, cochez aussi les <strong>exercices travaillés</strong> ; un exercice absent de la liste s'ajoute avec le bouton <strong>Ajouter</strong> et sera proposé aux sessions suivantes.",
+            pilotesSession:
+                "<strong>Pilotes :</strong> Cochez les pilotes avec qui vous avez volé, en école ou non. Un nouveau nom s'ajoute avec le bouton <strong>Ajouter</strong> et rejoint la liste pour les sessions suivantes.",
+            formulaireQuiApprend:
+                "<strong>Un formulaire qui apprend de vous :</strong> Pour une nouvelle session, l'application pré-remplit ce que vous faites d'habitude dans la même situation : type de vol et technique de décollage sur ce site, voile et sellette utilisées la dernière fois à cet endroit, école si vous y volez en stage en ce moment. Vos vols récents comptent davantage, et vos propres vols l'emportent sur les règles générales (par exemple « au treuil, on décolle dos voile »). Une ligne sous le formulaire indique ce qui a été pré-rempli et pourquoi. Tout reste modifiable : un champ que vous changez n'est jamais remplacé, et une session existante n'est jamais complétée.",
+            commentaireSession:
+                '<strong>Commentaire :</strong> Notez vos impressions, conditions aérologiques locales, ou faits marquants de votre vol.',
             n2SessionDeGonflage: '2. Session de Gonflage (Jeux de Voile / Groundhandling)',
             leTravailAuSol: 'Le travail au sol est crucial pour la sécurité. Enregistrez vos sessions de gonflage :',
-            saisissezLeLieuOu:
-                "Saisissez le lieu où vous avez gonflé, assisté par l'autocomplétion des sites, ou placez-le sur la carte.",
-            lieuAutocompletion: 'Lieu & Autocomplétion :',
-            cochezLesExercicesDe:
-                'Cochez les exercices de la séance (face voile, dos voile, tangage/roulis, affalage, vent fort, prégonflage/démêlage) pour garder une trace précise de votre progression technique.',
-            exercicesTravaillesMultiSelection: 'Exercices travaillés (Multi-sélection) :',
+            lieuGonflage:
+                "<strong>Lieu &amp; Autocomplétion :</strong> Saisissez le lieu où vous avez gonflé, assisté par l'autocomplétion des sites, ou placez-le sur la carte. Votre lieu habituel est pré-rempli.",
+            exercicesGonflage:
+                '<strong>Exercices travaillés (Multi-sélection) :</strong> Cochez les exercices de la séance (face voile, dos voile, tangage/roulis, affalage, vent fort, prégonflage/démêlage) ou ajoutez-en un avec le bouton <strong>Ajouter</strong>, pour garder une trace précise de votre progression technique.',
             n3Historique: '3. Activités',
             toutesVosSessionsSont:
                 'Toutes vos sessions sont répertoriées chronologiquement avec un code couleur clair :',
@@ -1568,11 +1662,13 @@ export const FR = Object.freeze({
             orangeGonflages: 'Orange (Gonflages) :',
             pourUnVolImporte:
                 '<strong>Trace 3D :</strong> Pour un vol importé, le bouton <strong>"Voir la trace"</strong> ouvre un lecteur 3D (propulsé par <strong>MapLibre GL JS</strong>) qui rejoue le vol sur le relief réel.',
+            statsDetaillees:
+                "<strong>Statistiques détaillées :</strong> Sous chaque vol avec une trace, un bloc repliable détaille le remorquage au treuil (durée, hauteur de largage, montée), les altitudes et le dénivelé cumulé, le vario et le taux de chute, les thermiques enroulés (nombre, montée moyenne, meilleur thermique, tours à gauche et à droite), la finesse en transition, les distances (dont la distance libre à 3 points), ainsi que le facteur de charge mesuré si le .sdf a été ajouté (sinon un facteur de charge estimé d'après les virages).",
             chaqueEntreePeutEtre:
-                "<strong>Modification et Suppression :</strong> Chaque entrée peut être modifiée (le formulaire se préremplit, avec un bouton <strong>Annuler</strong>) ou supprimée. Les heures d'usure de votre matériel sont ajustées automatiquement.",
+                "<strong>Modification et Suppression :</strong> Chaque entrée peut être modifiée (le formulaire se préremplit, avec un bouton <strong>Annuler</strong>) ou supprimée. Les heures d'usure de votre matériel sont ajustées automatiquement. En modification, le bouton <strong>Recalculer depuis la trace IGC</strong> refait les calculs à partir de la trace enregistrée (date, durée, altitudes, statistiques, site, et type Treuil si besoin) sans toucher au reste.",
             n4StatistiquesDuCarnet: '4. Statistiques du Carnet',
-            laPartieStatistiquesResume:
-                'La partie Statistiques résume votre activité : nombre et temps de vol, sessions de gonflage, altitude maximale et gain cumulé, utilisation de chaque voile et heures restantes avant révision, lieux les plus fréquentés, part des sessions en école, types de vols, techniques de décollage et exercices de gonflage.',
+            statistiquesEtRecords:
+                'La partie Statistiques résume votre activité : nombre et temps de vol, sessions de gonflage, altitude maximale et gain cumulé, utilisation de chaque voile et heures restantes avant révision, lieux les plus fréquentés, part des sessions en école, types de vols, techniques de décollage et exercices de gonflage. La section <strong>Records personnels</strong> donne vos meilleurs vols (plus long, plus haut, distance libre, meilleur thermique, meilleure finesse, plus haut largage au treuil, facteur de charge…) avec leur date et leur site, et les cumuls de vos vols avec trace. Le bouton <strong>Recalculer les stats de toutes les traces</strong> met à jour les statistiques de vos vols déjà importés.',
             captureMeteoAutomatiqueOpenMeteo: 'Capture Météo Automatique (Open-Meteo)',
             lorsDeLEnregistrementDUn:
                 "Lors de l'enregistrement d'un vol ou d'une session de gonflage, l'application interroge automatiquement le service météorologique <strong>Open-Meteo</strong> (modèles de Météo-France pour les dates récentes, archives pour les plus anciennes). À partir des coordonnées du site et de l'heure de votre activité, elle enregistre les conditions au <strong>décollage et à l'atterrissage</strong> (ou au début et à la fin d'un gonflage) : <strong >vitesse du vent, rafales, direction (en degrés et cardinal), température, et état du ciel</strong >. Lorsque les deux relevés sont identiques, une seule ligne est affichée. Si le site dispose d'une balise FFVL, le graphique du <strong>vent réellement mesuré</strong> ce jour-là est aussi consultable. Pas besoin de saisie manuelle !",
