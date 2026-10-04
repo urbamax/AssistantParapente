@@ -153,6 +153,9 @@ export const FR = Object.freeze({
                     sellette: 'sellette',
                     ecole: 'école',
                     lieu: 'lieu',
+                    pilotes: 'pilotes',
+                    moniteur: 'moniteur',
+                    accompagnateur: 'accompagnateur',
                 }),
                 reasons: Object.freeze({
                     place: 'ton habitude sur ce site',
@@ -162,6 +165,9 @@ export const FR = Object.freeze({
                     trace: 'départ au treuil détecté dans la trace',
                     gearPlace: 'utilisée la dernière fois ici',
                     gearLatest: 'la dernière utilisée',
+                    nearbySession: 'comme ta session de moins de 3 h ici',
+                    instructorPlace: 'le dernier de cette école ici',
+                    instructorLatest: 'le dernier de cette école',
                 }),
             }),
             maxAltitude: 'Altitude Max (m)',
@@ -191,11 +197,18 @@ export const FR = Object.freeze({
             pilots: 'Pilotes avec qui j’ai volé',
             addPilotPlaceholder: 'Nom du pilote…',
             add: 'Ajouter',
+            remove: 'Retirer',
             commentPlaceholderGround: 'Points à travailler...',
             siteChoices: 'Sites à moins de 500 m du décollage :',
             schoolSession: 'Session encadrée par une école',
             schoolName: "Nom de l'école",
             schoolPlaceholder: 'Choisir ou saisir le nom',
+            instructor: 'Moniteur',
+            winchOperator: 'Treuilleur',
+            winchOperatorPlaceholder: 'Nom du treuilleur',
+            instructorPlaceholder: 'Nom du moniteur',
+            companion: 'Accompagnateur',
+            companionPlaceholder: "Nom de l'accompagnateur",
             save: 'Enregistrer',
             update: 'Modifier la session',
         }),
@@ -248,6 +261,9 @@ export const FR = Object.freeze({
             wing: 'Voile :',
             harness: 'Sellette :',
             school: 'École :',
+            instructor: 'Moniteur :',
+            companion: 'Accompagnateur :',
+            winchOperator: 'Treuilleur :',
             instrument: 'Instrument :',
             firmware: '(logiciel {version})',
             exercises: 'Exercices :',
@@ -1648,11 +1664,11 @@ export const FR = Object.freeze({
             materielSession:
                 '<strong>Matériel :</strong> Associez la voile et la sellette utilisées, choisies parmi vos équipements enregistrés ou saisies librement (les saisies précédentes sont proposées).',
             indiquezLeTypeDe:
-                '<strong>Type de vol et décollage :</strong> Indiquez le type de vol (Plouf, Thermique, Soaring, Restit, Cross, Treuil) et la technique de décollage, obligatoire : <strong>"Face voile"</strong>, <strong>"Dos voile"</strong> ou une autre technique.',
+                '<strong>Type de vol et décollage :</strong> Indiquez le type de vol (Plouf, Thermique, Soaring, Restit, Cross, Treuil) et la technique de décollage, obligatoire : <strong>"Face voile"</strong>, <strong>"Dos voile"</strong> ou une autre technique. Pour un vol au treuil, indiquez aussi le <strong>treuilleur</strong> : la liste propose d\'abord ceux de la journée sur ce site.',
             sessionEcoleExercices:
-                "<strong>Session encadrée par une école :</strong> Cochez cette case et indiquez le nom de l'école lorsque la séance a eu lieu en stage. Pour un vol, cochez aussi les <strong>exercices travaillés</strong> ; un exercice absent de la liste s'ajoute avec le bouton <strong>Ajouter</strong> et sera proposé aux sessions suivantes.",
+                "<strong>Session encadrée par une école :</strong> Cochez cette case et indiquez le nom de l'école, du moniteur et, s'il y en a un, de l'accompagnateur lorsque la séance a eu lieu en stage (ceux de votre dernière session avec cette école au même endroit sont proposés). Pour un vol, cochez aussi les <strong>exercices travaillés</strong> ; un exercice absent de la liste s'ajoute avec le bouton <strong>Ajouter</strong> et sera proposé aux sessions suivantes.",
             pilotesSession:
-                "<strong>Pilotes :</strong> Cochez les pilotes avec qui vous avez volé, en école ou non. Un nouveau nom s'ajoute avec le bouton <strong>Ajouter</strong> et rejoint la liste pour les sessions suivantes.",
+                "<strong>Pilotes :</strong> Choisissez dans la liste déroulante les pilotes avec qui vous avez volé, en école ou non, ou saisissez un nouveau nom : il rejoint la liste pour les sessions suivantes. Chaque pilote choisi s'affiche en étiquette, retirée d'un clic sur sa croix. Pour un vol à moins de 3 h d'une autre session au même endroit, les pilotes de cette session sont déjà sélectionnés.",
             formulaireQuiApprend:
                 "<strong>Un formulaire qui apprend de vous :</strong> Pour une nouvelle session, l'application pré-remplit ce que vous faites d'habitude dans la même situation : type de vol et technique de décollage sur ce site, voile et sellette utilisées la dernière fois à cet endroit, école si vous y volez en stage en ce moment. Vos vols récents comptent davantage, et vos propres vols l'emportent sur les règles générales (par exemple « au treuil, on décolle dos voile »). Une ligne sous le formulaire indique ce qui a été pré-rempli et pourquoi. Tout reste modifiable : un champ que vous changez n'est jamais remplacé, et une session existante n'est jamais complétée.",
             commentaireSession:

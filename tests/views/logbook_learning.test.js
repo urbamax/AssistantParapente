@@ -127,10 +127,156 @@ describe('logbook: the form learns from the pilot', () => {
         expect(options).toEqual(['DUNE', 'PLAINE', 'AAA PREMIER ALPHABÉTIQUE']);
     });
 
+    it('pre-selects the pilots of a session less than 3 hours away on the same site', () => {
+        const earlier = vol('PLAINE', { datetime: '2026-10-03T12:06', pilotes: ['Gilbert', 'Julie'] });
+        const otherDay = vol('PLAINE', { datetime: '2026-09-20T12:00', pilotes: ['Marc'] });
+        setup([earlier, otherDay]);
+        change('lb-datetime', '2026-10-03T13:57');
+        change('lb-site', 'Plaine');
+        expect(LogbookView.getChecklistValues('pilotes')).toEqual(['Gilbert', 'Julie']);
+        expect($('lb-learned-summary').textContent).toContain('pilotes (comme ta session de moins de 3 h ici)');
+
+        // Plus de 3 h plus tard : plus de pré-sélection
+        change('lb-datetime', '2026-10-03T17:30');
+        expect(LogbookView.getChecklistValues('pilotes')).toEqual([]);
+        // Autre site
+        change('lb-datetime', '2026-10-03T13:57');
+        change('lb-site', 'Dune');
+        expect(LogbookView.getChecklistValues('pilotes')).toEqual([]);
+    });
+
+    it('stops pre-selecting pilots once the pilot edits the list', () => {
+        setup([vol('PLAINE', { datetime: '2026-10-03T12:06', pilotes: ['Gilbert', 'Julie'] })]);
+        change('lb-datetime', '2026-10-03T13:57');
+        change('lb-site', 'Plaine');
+        /** @type {HTMLElement} */ (document.querySelector('#lb-pilotes-group .lb-chip-remove')).click();
+        expect(LogbookView.getChecklistValues('pilotes')).toEqual(['Julie']);
+        change('lb-site', 'Dune');
+        change('lb-site', 'Plaine');
+        expect(LogbookView.getChecklistValues('pilotes')).toEqual(['Julie']);
+    });
+
     it('fills the usual ground handling place', () => {
         const ground = (lieu) => ({ id: `g${n++}`, type: 'gonflage', datetime: '2026-09-01T10:00', lieu, duree: 30 });
         setup([ground('Pente école'), ground('Pente école'), ground('Plage')]);
         LogbookView.setFormType('gonflage');
         expect($('lb-lieu').value).toBe('Pente école');
+    });
+});
+
+describe('logbook: instructor of a school session', () => {
+    it('is saved with the school, proposed again, and shown on the card', () => {
+        setup([]);
+        $('lb-site').value = 'Plaine';
+        const wing = /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile'));
+        wing.value = 'Voile école';
+        $('lb-duree').value = '5';
+        $('lb-ecole-check').checked = true;
+        $('lb-ecole-check').dispatchEvent(new Event('change', { bubbles: true }));
+        $('lb-ecole').value = 'ÉCOLE TEST';
+        $('lb-moniteur').value = 'Gilbert';
+        LogbookView.submitForm();
+        expect(LogbookService.getFlights()[0]).toMatchObject({ ecole: 'ÉCOLE TEST', moniteur: 'Gilbert' });
+
+        LogbookView.renderHistory();
+        expect(document.getElementById('logbook-history-list')?.innerHTML).toContain('Moniteur :</strong> Gilbert');
+
+        // Nouvelle session au même endroit : école et moniteur proposés
+        LogbookView.resetForm();
+        change('lb-site', 'Plaine');
+        expect($('lb-ecole-check').checked).toBe(true);
+        expect($('lb-moniteur').value).toBe('Gilbert');
+        const options = Array.from(document.querySelectorAll('#moniteurs-list option')).map(
+            (o) => /** @type {HTMLOptionElement} */ (o).value,
+        );
+        expect(options).toEqual(['Gilbert']);
+    });
+
+    it('has a companion under the instructor, saved and proposed like him', () => {
+        setup([]);
+        $('lb-site').value = 'Plaine';
+        $('lb-datetime').value = '2026-10-03T12:06';
+        /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile')).value = 'Voile école';
+        $('lb-duree').value = '5';
+        $('lb-ecole-check').checked = true;
+        $('lb-ecole-check').dispatchEvent(new Event('change', { bubbles: true }));
+        $('lb-ecole').value = 'ÉCOLE TEST';
+        $('lb-moniteur').value = 'Gilbert';
+        $('lb-accompagnateur').value = 'Sophie';
+        LogbookView.submitForm();
+        expect(LogbookService.getFlights()[0]).toMatchObject({ moniteur: 'Gilbert', accompagnateur: 'Sophie' });
+        LogbookView.renderHistory();
+        expect(document.getElementById('logbook-history-list')?.innerHTML).toContain(
+            'Accompagnateur :</strong> Sophie',
+        );
+
+        // Vol suivant, même site, 1 h plus tard : même accompagnateur
+        LogbookView.resetForm();
+        change('lb-datetime', '2026-10-03T13:06');
+        change('lb-site', 'Plaine');
+        expect($('lb-accompagnateur').value).toBe('Sophie');
+    });
+
+    it('is not kept without a school', () => {
+        setup([]);
+        $('lb-site').value = 'Plaine';
+        /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile')).value = 'Voile école';
+        $('lb-duree').value = '5';
+        $('lb-moniteur').value = 'Gilbert';
+        $('lb-accompagnateur').value = 'Sophie';
+        LogbookView.submitForm();
+        expect(LogbookService.getFlights()[0].moniteur).toBe('');
+        expect(LogbookService.getFlights()[0].accompagnateur).toBe('');
+    });
+});
+
+describe('logbook: winch operator of a winch flight', () => {
+    it('is asked only for a winch flight, saved, proposed again and shown on the card', () => {
+        setup([]);
+        expect(/** @type {HTMLElement} */ (document.getElementById('lb-treuilleur-group')).hidden).toBe(true);
+        change('lb-typeVol', 'Treuil');
+        expect(/** @type {HTMLElement} */ (document.getElementById('lb-treuilleur-group')).hidden).toBe(false);
+
+        $('lb-site').value = 'Plaine';
+        $('lb-datetime').value = '2026-10-03T12:06';
+        /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile')).value = 'Voile école';
+        $('lb-duree').value = '5';
+        $('lb-treuilleur').value = 'Bruno';
+        LogbookView.submitForm();
+        expect(LogbookService.getFlights()[0]).toMatchObject({ typeVol: 'Treuil', treuilleur: 'Bruno' });
+        LogbookView.renderHistory();
+        expect(document.getElementById('logbook-history-list')?.innerHTML).toContain('Treuilleur :</strong> Bruno');
+
+        // Vol suivant au treuil, même site, 2 h plus tard : pas de pré-remplissage (souvent
+        // plusieurs treuilleurs le même jour), mais ceux du jour en tête de la liste
+        LogbookService.flights.push(
+            ...[1, 2, 3].map((k) => ({
+                ...vol('PLAINE', { typeVol: 'Treuil', treuilleur: 'Claude' }),
+                datetime: `2026-09-0${k}T10:00`,
+            })),
+        );
+        LogbookView.resetForm();
+        change('lb-datetime', '2026-10-03T14:00');
+        change('lb-site', 'Plaine');
+        expect($('lb-typeVol').value).toBe('Treuil');
+        expect($('lb-treuilleur').value).toBe('');
+        const listed = () =>
+            Array.from(document.querySelectorAll('#treuilleurs-list option')).map(
+                (o) => /** @type {HTMLOptionElement} */ (o).value,
+            );
+        expect(listed()).toEqual(['Bruno', 'Claude']);
+        // Un autre jour : le plus fréquent d'abord
+        change('lb-datetime', '2026-10-10T14:00');
+        expect(listed()).toEqual(['Claude', 'Bruno']);
+    });
+
+    it('is not kept on a flight that is not a winch flight', () => {
+        setup([]);
+        $('lb-site').value = 'Dune';
+        /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile')).value = 'Voile côte';
+        $('lb-duree').value = '5';
+        $('lb-treuilleur').value = 'Bruno';
+        LogbookView.submitForm();
+        expect(LogbookService.getFlights()[0].treuilleur).toBe('');
     });
 });

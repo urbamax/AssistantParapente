@@ -3,8 +3,17 @@
 /* Sous-parties (Historique, Statistiques, Matériel), choisies depuis la barre de navigation */
 .logbook-history-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     margin-bottom: 16px;
+}
+
+/* « Ajouter une session » : bouton neutre, centré sous le titre */
+.logbook-history-actions .action-btn-secondary {
+    color: var(--text-main);
+}
+
+.logbook-history-actions .action-btn-secondary:hover {
+    background: var(--bg-card-hover, rgba(0, 0, 0, 0.05));
 }
 
 .logbook-tab-content {
@@ -613,4 +622,39 @@
     grid-column: 1 / -1;
     font-size: 0.78rem;
     color: var(--text-secondary);
+}
+
+/* Valeurs choisies d'une liste (exercices, pilotes) : étiquettes avec une croix */
+.lb-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+.lb-chips:empty {
+    display: none;
+}
+.lb-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 4px 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
+    background: var(--bg-card-hover, rgba(0, 0, 0, 0.04));
+    color: var(--text-main);
+    font-size: 0.9rem;
+}
+.lb-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    color: var(--text-secondary);
+}
+.lb-chip-remove:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--text-main);
 }

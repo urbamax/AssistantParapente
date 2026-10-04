@@ -75,10 +75,16 @@ function staticAndServiceWorker() {
                 .filter((url) => !NOT_PRECACHED.some((dir) => url.startsWith(`./${dir}/`)));
             const assets = ['./', ...emitted.sort()];
 
-            // Nom de cache dérivé du contenu : chaque build différent invalide l'ancien cache.
+            // Nom de cache dérivé des noms ET du contenu des fichiers : la moindre modification
+            // (y compris d'un fichier copié tel quel, comme les questions du QCM) donne une
+            // nouvelle version, donc un nouveau service worker et la bannière « Mettre à jour ».
             const hash = createHash('sha256');
-            for (const url of assets.slice(1)) hash.update(url);
+            for (const url of assets.slice(1)) {
+                hash.update(url);
+                hash.update(readFileSync(join(outDir, url)));
+            }
             const version = hash.digest('hex').slice(0, 10);
+            writeFileSync(join(outDir, 'version.json'), JSON.stringify({ version }) + '\n');
 
             let sw = readFileSync(join(root, 'sw.js'), 'utf8');
             sw = sw.replace(/const CACHE_NAME = '[^']*';/, `const CACHE_NAME = 'parapente-app-v${version}';`);

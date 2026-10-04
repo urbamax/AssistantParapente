@@ -16,10 +16,8 @@ const LOGBOOK_SCREEN = ['logbook-screen', 'logbook-session-modal']
     .join('');
 
 const $ = (id) => /** @type {HTMLInputElement} */ (document.getElementById(id));
-const options = (name) =>
-    Array.from(document.querySelectorAll(`input[name="lb-${name}"]`)).map(
-        (cb) => /** @type {HTMLInputElement} */ (cb).value,
-    );
+// Valeurs proposées dans la liste déroulante du champ « Ajouter »
+const options = (name) => LogbookView.getChecklistOptions(name);
 
 function fillFlight() {
     $('lb-site').value = 'Mont Lambert';
@@ -66,9 +64,7 @@ describe('logbook: exercises of a school flight', () => {
     it('saves the ticked and added exercises, and offers the new one next time', () => {
         fillFlight();
         checkSchool();
-        /** @type {HTMLInputElement} */ (
-            document.querySelector('input[name="lb-typeExercice"][value="Oreilles"]')
-        ).checked = true;
+        addItem('typeExercice', 'Oreilles');
         addItem('typeExercice', 'Wingover', { enter: true });
         LogbookView.submitForm();
 
@@ -87,10 +83,27 @@ describe('logbook: exercises of a school flight', () => {
         expect(LogbookService.getFlights()[0].typeExercice).toEqual([]);
     });
 
-    it('ticks an existing exercise instead of duplicating it', () => {
+    it('picks an existing exercise instead of duplicating it, and only once', () => {
         addItem('typeExercice', 'oreilles');
+        addItem('typeExercice', 'OREILLES');
         expect(options('typeExercice').filter((v) => v.toLowerCase() === 'oreilles')).toHaveLength(1);
         expect(LogbookView.getChecklistValues('typeExercice')).toEqual(['Oreilles']);
+    });
+
+    it('shows the chosen values as tags that can be removed', () => {
+        addItem('typeExercice', 'Oreilles');
+        addItem('typeExercice', 'Wingover');
+        const chips = document.querySelectorAll('#lb-typeExercice-group .lb-chip');
+        expect(Array.from(chips).map((c) => c.textContent.trim())).toEqual(['Oreilles', 'Wingover']);
+        /** @type {HTMLElement} */ (chips[0].querySelector('.lb-chip-remove')).click();
+        expect(LogbookView.getChecklistValues('typeExercice')).toEqual(['Wingover']);
+    });
+
+    it('adds a value picked in the dropdown list right away', () => {
+        $('lb-typeExercice-new').value = 'Accélérateur';
+        $('lb-typeExercice-new').dispatchEvent(new Event('input', { bubbles: true })); // choix dans la liste
+        expect(LogbookView.getChecklistValues('typeExercice')).toEqual(['Accélérateur']);
+        expect($('lb-typeExercice-new').value).toBe('');
     });
 });
 

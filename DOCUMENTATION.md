@@ -415,7 +415,9 @@ npm run preview    # serves dist/ locally
 ```
 The service worker also keeps two **runtime caches that survive app updates** (spec 008): `parapente-courses-v1` (course PDFs the pilot has opened — never downloaded in advance; a partial Range read triggers one full download; offline, the stored document is served, never `index.html`) and `parapente-tiles-v1` (Esri map tiles already displayed, requested with CORS via `crossOrigin: true`, capped at 1 500 tiles, oldest removed first; no area pre-download, as the tile provider's terms do not allow it). Activation deletes every other old cache.
 
-The build rewrites `sw.js` into `dist/sw.js`: the precache list is generated from the emitted files and `CACHE_NAME` is derived from their names, so no manual `bump.py` is needed for a `dist/` deployment.
+The build rewrites `sw.js` into `dist/sw.js`: the precache list is generated from the emitted files and `CACHE_NAME` is derived from their names and contents, so no manual `bump.py` is needed for a `dist/` deployment.
+
+**« Mettre à jour » banner on any change.** `js/core/app_update.js` shows the banner when a new service worker takes over, and also when `version.json` (fetched every 5 minutes and when the tab comes back, never from a cache) differs from the version the page was loaded with. The build writes `dist/version.json` from the content hash. A site served straight from the sources (`git pull`, no build) gets it from a git hook: run `sh scripts/install_update_hook.sh` once on the server; after each pull or checkout it writes `version.json` (ignored by git) with the current commit. The banner's button empties the app caches (`parapente-app-*`, not the opened courses nor the map tiles) before reloading, so the new files are really loaded.
 
 ---
 

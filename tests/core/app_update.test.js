@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { initAppUpdateNotifier } from '../../js/core/app_update.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { initAppUpdateNotifier, watchSiteVersion } from '../../js/core/app_update.js';
 
 function stubServiceWorker(controller) {
     const listeners = {};
@@ -44,5 +44,63 @@ describe('initAppUpdateNotifier', () => {
         listeners.controllerchange();
         document.querySelector('.app-update-dismiss').click();
         expect(document.getElementById('app-update-banner')).toBeNull();
+    });
+});
+
+describe('watchSiteVersion (version.json, any change of the repository)', () => {
+    /** version.json successives renvoyées par le serveur */
+    function serve(...versions) {
+        const fetch = vi.fn(async () => {
+            const v = versions.length > 1 ? versions.shift() : versions[0];
+            if (v instanceof Error) throw v;
+            return v === null ? { ok: false } : { ok: true, json: async () => ({ version: v }) };
+        });
+        vi.stubGlobal('fetch', fetch);
+        return fetch;
+    }
+
+    beforeEach(() => {
+        document.body.innerHTML = '';
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+    });
+
+    it('shows the banner as soon as the site version changes', async () => {
+        const fetch = serve('abc', 'abc', 'def');
+        const check = await watchSiteVersion({ intervalMs: 0 });
+        await check();
+        expect(document.getElementById('app-update-banner')).toBeNull();
+        await check();
+        expect(document.getElementById('app-update-banner')).not.toBeNull();
+        // jamais depuis un cache
+        expect(fetch.mock.calls[0][1]).toEqual({ cache: 'no-store' });
+    });
+
+    it('stays quiet offline or on a site without version.json', async () => {
+        serve(null);
+        let check = await watchSiteVersion({ intervalMs: 0 });
+        await check();
+        serve('abc', new Error('offline'));
+        check = await watchSiteVersion({ intervalMs: 0 });
+        await check();
+        expect(document.getElementById('app-update-banner')).toBeNull();
+    });
+
+    it('"Mettre à jour" empties the app caches (not the opened courses nor the map tiles) before reloading', async () => {
+        serve('abc', 'def');
+        const deleted = [];
+        vi.stubGlobal('caches', {
+            keys: async () => ['parapente-app-v1', 'parapente-courses-v1', 'parapente-tiles-v1'],
+            delete: async (k) => deleted.push(k),
+        });
+        const reload = vi.fn();
+        Object.defineProperty(window, 'location', { configurable: true, value: { ...window.location, reload } });
+        const check = await watchSiteVersion({ intervalMs: 0 });
+        await check();
+        document.querySelector('.app-update-reload').click();
+        await vi.waitFor(() => expect(reload).toHaveBeenCalled());
+        expect(deleted).toEqual(['parapente-app-v1']);
     });
 });
