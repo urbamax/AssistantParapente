@@ -75,9 +75,7 @@ describe('logbook: Syride .sdf with the .igc', () => {
         expect(html).toContain('Largage</span><strong>425 m (+259 m)');
         expect(html).toContain('Facteur de charge au largage</span><strong>1.3 g');
         expect(html).toContain('Facteur de charge max</span><strong>1.3 g');
-        expect(html).toContain(
-            'Température du vario (boîtier)</span><strong>27 °C au déco (22 à 27 °C), pas celle de l&#39;air',
-        );
+        expect(html).not.toContain('°C'); // température du boîtier : enregistrée, pas affichée
         expect(html).not.toContain('(estimé)');
     });
 

@@ -44,7 +44,7 @@ npm run preview   # sert dist/ en local
 - **Météo**: API Open-Meteo (Prévisions haute résolution AROME & GFS).
 - **Navigation & État**: Routeur SPA custom avec API History & Gestionnaire d'état réactif Pub/Sub (`AppState`).
 - **Synchronisation**: Stockage hybride LocalStorage (`StorageService`) + Firebase Cloud Firestore (`FirebaseService`).
-- **Parsing GPS**: Parser IGC natif côté client (`igc_parser.js` : détection du vol, analyse, treuil) et capteurs Syride `.sdf` (`sdf_parser.js` : facteur de charge, température du boîtier).
+- **Parsing GPS**: Parser IGC natif côté client (`igc_parser.js` : détection du vol, analyse, treuil) et capteurs Syride `.sdf` (`sdf_parser.js` : facteur de charge).
 
 ---
 

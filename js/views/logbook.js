@@ -2381,9 +2381,7 @@ class LogbookViewClass extends BaseView {
         // Facteur de charge : mesuré par l'accéléromètre (.sdf Syride), sinon estimé depuis
         // les virages de la trace.
         const loads = sensors
-            ? row('gMax', `${sensors.gMax} g`, num(sensors.gMax)) +
-              row('gMin', `${sensors.gMin} g`, num(sensors.gMin)) +
-              row('temperature', tt('analysis.temperatureValue', sensors), num(sensors.tempTakeoff))
+            ? row('gMax', `${sensors.gMax} g`, num(sensors.gMax)) + row('gMin', `${sensors.gMin} g`, num(sensors.gMin))
             : row('gEstimated', `≈ ${a.estimatedMaxG} g`, num(a.estimatedMaxG));
 
         return `
