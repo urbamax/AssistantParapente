@@ -1434,20 +1434,21 @@ class LogbookViewClass extends BaseView {
             const parsed = raw ? LogbookService.parseIGC(raw) : null;
             if (parsed && parsed.success) info = parsed.data;
         }
-        let from = 0;
-        let to = records.length - 1;
-        if (info) {
-            const offset = SdfParser.alignToTrace(records, info.points);
-            if (offset < 0) {
-                alert(tl('igc.sdfMismatch'));
-                return;
-            }
-            // Un enregistrement par seconde, à partir du premier point de la trace
-            const t0 = info.points[0].timestamp;
-            const at = (i) => offset + Math.round((info.points[i].timestamp - t0) / 1000);
-            from = at(info.takeoffIndex || 0);
-            to = at(info.landingIndex ?? info.points.length - 1);
+        // Sans trace, impossible de vérifier que le .sdf est celui de ce vol : on le refuse
+        if (!info) {
+            alert(tl('igc.sdfNoTrace'));
+            return;
         }
+        const offset = SdfParser.alignToTrace(records, info.points);
+        if (!SdfParser.matchesTrace(records, info.points, offset)) {
+            alert(tl('igc.sdfMismatch'));
+            return;
+        }
+        // Un enregistrement par seconde, à partir du premier point de la trace
+        const t0 = info.points[0].timestamp;
+        const at = (i) => offset + Math.round((info.points[i].timestamp - t0) / 1000);
+        const from = at(info.takeoffIndex || 0);
+        const to = at(info.landingIndex ?? info.points.length - 1);
         this.currentSensorStats = { ...SdfParser.summarize(records, from, to), source: 'sdf' };
         if (filenameLabel) {
             filenameLabel.textContent = tl('igc.sdfLoaded', {

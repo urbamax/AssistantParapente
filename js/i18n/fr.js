@@ -192,7 +192,10 @@ export const FR = Object.freeze({
             existingTrace: 'Trace GPS (existante)',
             sdfLoaded: 'Capteurs Syride chargés ({name}) : {gMax} g max, {temp} °C au déco',
             sdfInvalid: "{name} n'est pas un fichier .sdf Syride lisible.",
-            sdfMismatch: 'Le fichier .sdf ne correspond pas à la trace de ce vol (positions différentes).',
+            sdfMismatch:
+                "Ce fichier .sdf n'est pas celui de ce vol : sa trace ne correspond pas à la trace GPS enregistrée (positions, altitudes ou durée différentes).",
+            sdfNoTrace:
+                "Impossible de vérifier ce fichier .sdf : ce vol n'a pas de trace GPS. Importe le .igc et le .sdf ensemble.",
             recalculate: 'Recalculer depuis la trace IGC',
             recalculated: 'Valeurs recalculées depuis la trace enregistrée',
             noStoredTrace: "Aucune trace IGC n'est enregistrée pour ce vol.",

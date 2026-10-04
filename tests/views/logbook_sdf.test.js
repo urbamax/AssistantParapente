@@ -106,6 +106,46 @@ describe('logbook: Syride .sdf with the .igc', () => {
         expect(LogbookView.currentSensorStats).toBeNull();
     });
 
+    it('refuses, when editing, the .sdf of another flight from the same takeoff', async () => {
+        const previous = { gMax: 2, gMin: 0.5, tempTakeoff: 20, tempMin: 18, tempMax: 20, source: 'sdf' };
+        LogbookService.flights = [
+            {
+                id: 'f1',
+                type: 'vol',
+                datetime: '2026-10-03T12:06',
+                site: 'ANTIN',
+                voile: 'Ma voile',
+                duree: 4,
+                rawIgc: IGC,
+                sensorStats: previous,
+            },
+        ];
+        LogbookView.resetForm();
+        LogbookView.editEntry('f1');
+        // Même premier enregistrement, puis une autre trace
+        const other = new Uint8Array(SDF);
+        const view = new DataView(other.buffer);
+        for (let o = 8 + 20 * 21; o < other.length; o += 21) view.setInt32(o, view.getInt32(o) + 30000);
+        await LogbookView._processFiles([sdfFile(other)]);
+
+        expect(alert).toHaveBeenCalledWith(expect.stringContaining("n'est pas celui de ce vol"));
+        fillRequired();
+        LogbookView.submitForm();
+        expect(LogbookService.getFlightById('f1').sensorStats).toEqual(previous); // rien d'écrasé
+    });
+
+    it('refuses a .sdf on a flight without trace: nothing to check it against', async () => {
+        LogbookService.flights = [
+            { id: 'f1', type: 'vol', datetime: '2026-10-03T12:06', site: 'ANTIN', voile: 'Ma voile', duree: 4 },
+        ];
+        vi.spyOn(LogbookService, 'getFlightTrace').mockResolvedValue(null);
+        LogbookView.resetForm();
+        LogbookView.editEntry('f1');
+        await LogbookView._processFiles([sdfFile()]);
+        expect(alert).toHaveBeenCalledWith(expect.stringContaining("n'a pas de trace GPS"));
+        expect(LogbookView.currentSensorStats).toBeNull();
+    });
+
     it('shows the estimated load factor when there is no sensor file', () => {
         const html = LogbookView.renderFlightAnalysis({ igcStats: { estimatedMaxG: 1.4 } });
         expect(html).toContain('Facteur de charge max (estimé)</span><strong>≈ 1.4 g');

@@ -33,6 +33,19 @@ describe('SdfParser', () => {
         expect(summary).toEqual({ gMax: 1.3, gMin: 0.9, tempTakeoff: 27, tempMin: 22, tempMax: 27 });
     });
 
+    it('recognises the .sdf of this flight, not one of another flight from the same takeoff', () => {
+        expect(SdfParser.matchesTrace(records, igc.points, 0)).toBe(true);
+
+        // Autre vol du même jour au même déco : même premier point, puis une autre trace
+        const otherFlight = records.map((r, k) => (k < 20 ? r : { ...r, lat: r.lat + 0.003, alt: r.alt + 40 }));
+        expect(SdfParser.alignToTrace(otherFlight, igc.points)).toBe(0); // le départ seul ne suffit pas
+        expect(SdfParser.matchesTrace(otherFlight, igc.points, 0)).toBe(false);
+
+        // Même début mais durée très différente (vol plus court)
+        expect(SdfParser.matchesTrace(records.slice(0, 100), igc.points, 0)).toBe(false);
+        expect(SdfParser.matchesTrace(records, igc.points, -1)).toBe(false);
+    });
+
     it('rejects anything that is not a Syride record file', () => {
         expect(SdfParser.parse(new Uint8Array(10))).toBeNull();
         expect(SdfParser.parse(new TextEncoder().encode('AXSR\nHFDTE031026\n'))).toBeNull();
