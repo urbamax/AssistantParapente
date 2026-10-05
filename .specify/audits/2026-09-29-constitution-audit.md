@@ -111,6 +111,8 @@ Principle III.
   verified source and nothing tells the user so.
 - Official FFVL/DGAC documents (now admissible) are not yet used as sources.
 
+**Status (2026-10-05): fixed.** Of the 777 paragliding questions, 696 cite a hand-verified library page and the other 81 say in their explanation that no library source was found (rewrite batches, then specs 030 and 031). Guard tests: `tests/data/quiz_explanations_readable.test.js` and `tests/data/quiz_sources_declared.test.js`.
+
 ### B4. Test gaps
 Principle IV.
 
