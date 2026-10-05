@@ -5,6 +5,7 @@
  */
 
 import { escapeHTML } from './security.js';
+import { t } from '../utils/i18n.js';
 
 class BaseView {
     constructor() {
@@ -68,9 +69,9 @@ class BaseView {
         errorContainer.innerHTML = `
             <div class="empty-state" style="margin-top: 2rem;">
                 <div class="empty-icon" style="color: var(--danger-color); font-size: 3rem;">⚠️</div>
-                <h3 style="margin-bottom: 1rem;">Erreur de chargement</h3>
+                <h3 style="margin-bottom: 1rem;">${escapeHTML(t('errors.loadTitle'))}</h3>
                 <p style="margin-bottom: 2rem; color: var(--text-muted);">${safeError}</p>
-                <button class="btn btn-primary" data-action="reloadApp">Réessayer</button>
+                <button class="btn btn-primary" data-action="reloadApp">${escapeHTML(t('errors.retry'))}</button>
             </div>
         `;
     }

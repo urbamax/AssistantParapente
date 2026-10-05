@@ -5,6 +5,7 @@
  * on propose à l'utilisateur de recharger, sans jamais le faire d'office (quiz en cours,
  * saisie de carnet de vol...).
  */
+import { t } from '../utils/i18n.js';
 
 const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000;
 
@@ -50,18 +51,18 @@ function showUpdateBanner() {
     banner.setAttribute('role', 'status');
 
     const label = document.createElement('span');
-    label.textContent = 'Nouvelle version disponible';
+    label.textContent = t('update.available');
 
     const reloadBtn = document.createElement('button');
     reloadBtn.type = 'button';
     reloadBtn.className = 'app-update-reload';
-    reloadBtn.textContent = 'Mettre à jour';
+    reloadBtn.textContent = t('update.reload');
     reloadBtn.addEventListener('click', () => reloadWithFreshFiles());
 
     const dismissBtn = document.createElement('button');
     dismissBtn.type = 'button';
     dismissBtn.className = 'app-update-dismiss';
-    dismissBtn.setAttribute('aria-label', 'Plus tard');
+    dismissBtn.setAttribute('aria-label', t('update.later'));
     dismissBtn.textContent = '×';
     dismissBtn.addEventListener('click', () => banner.remove());
 

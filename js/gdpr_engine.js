@@ -7,6 +7,7 @@
 import GlobalState from './core/app_state.js';
 import AppRouter from './core/router.js';
 import SitesService from './services/sites_service.js';
+import { t } from './utils/i18n.js';
 
 const GdprEngine = {
     consentKey: 'parapente_gdpr_consent',
@@ -207,7 +208,7 @@ const GdprEngine = {
                 SitesService.state.userLocation = null;
             }
             if (gpsStatusEl) {
-                gpsStatusEl.innerHTML = `<i class="ri-shield-user-line" style="color: var(--text-muted);"></i> Géolocalisation désactivée par vos choix de confidentialité.`;
+                gpsStatusEl.innerHTML = `<i class="ri-shield-user-line" style="color: var(--text-muted);"></i> ${t('privacy.gpsDisabled')}`;
                 gpsStatusEl.style.color = 'var(--text-muted)';
             }
             if (gpsBtn) {
