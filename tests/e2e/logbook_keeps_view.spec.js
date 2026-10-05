@@ -62,7 +62,10 @@ test('saving an edited session keeps the position in the list', async ({ page })
     const before = await scrollTop(page);
     expect(before).toBeGreaterThan(0);
 
-    await card(page, 5).locator('[data-action="editEntry"]').click();
+    // Clic envoyé directement : avant un clic normal, Playwright fait défiler la page s'il juge le
+    // bouton masqué (barre de navigation fixe), ce qu'un pilote ne provoque pas. Sous WebKit Linux,
+    // ce défilement de l'outil (572 → 106) faisait échouer le test sans défaut de l'application.
+    await card(page, 5).locator('[data-action="editEntry"]').dispatchEvent('click');
     await expect(page.locator('#logbook-session-modal')).toBeVisible();
     await page.evaluate(() =>
         document
