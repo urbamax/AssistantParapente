@@ -338,7 +338,9 @@ async function serveCourse(event, request, url) {
     try {
         const response = await fetch(request);
         if (response.status === 200) {
-            cache.put(key, response.clone()).catch(() => {});
+            // Rattaché à l'événement : le navigateur ne doit pas arrêter le service worker avant
+            // la fin de l'écriture, sinon la copie hors ligne peut manquer.
+            event.waitUntil(cache.put(key, response.clone()).catch(() => {}));
         } else if (response.status === 206) {
             // Le lecteur ne demande que des morceaux : on garde une fois le document entier.
             event.waitUntil(
