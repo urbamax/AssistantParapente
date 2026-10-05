@@ -1,0 +1,22 @@
+# Feature Specification: Logbook Keeps Its Position When the Session Dialog Closes
+
+**Feature Branch**: `fix/webkit-keep-scroll`
+
+**Created**: 2026-10-05
+
+**Status**: Implemented
+
+**Input**: CI on `main` has failed since PR 111: the e2e test « saving an edited session keeps the position in the list » fails on WebKit Linux every time (expected scroll 572, received 106), while it passes on Chromium and on WebKit macOS.
+
+## Cause
+
+A first fix (keeping the position across `modal.close()`) did not change the CI result. A temporary CI diagnostic (scroll events, focus and every scrolling call, logged at each step) showed that on WebKit Linux the logbook jumps from 572 to 106 **while the dialog opens** (`showModal`), with no JavaScript scrolling call: the browser moves it. It does not happen every time (it passed on retry). The logbook then saved that wrong position when re-rendering after the save. The return of the focus on close can move it too.
+
+## Requirements *(mandatory)*
+
+- **FR-001**: The logbook MUST stay at the position it had when the session dialog opened: restored right after `showModal()` and after `close()`, whatever the browser does with the scroll or the focus.
+
+## Success Criteria *(mandatory)*
+
+- **SC-001**: Unit test reproducing the focus scroll (`tests/views/logbook_modal_scroll.test.js`, jump on open and on close): fails before, passes after.
+- **SC-002**: CI e2e green on WebKit Linux (the existing `tests/e2e/logbook_keeps_view.spec.js`).

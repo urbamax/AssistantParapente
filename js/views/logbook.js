@@ -612,8 +612,13 @@ class LogbookViewClass extends BaseView {
                 this.closeSessionModal();
             });
         }
+        // Position du carnet derrière la fenêtre : WebKit (Linux) la fait parfois sauter à
+        // l'ouverture, sans appel JavaScript ; elle est rétablie aussitôt et à la fermeture.
+        const screen = document.getElementById('logbook-screen');
+        this._scrollBehindModal = screen ? screen.scrollTop : null;
         modal.style.display = 'flex';
         if (typeof modal.showModal === 'function' && !modal.open) modal.showModal();
+        this._restoreScrollBehindModal();
         void modal.offsetWidth; // fait jouer le fondu d'ouverture
         modal.classList.add('active');
         const body = modal.querySelector('.gdpr-modal-body');
@@ -626,8 +631,18 @@ class LogbookViewClass extends BaseView {
         this.resetForm();
         if (!modal) return;
         modal.classList.remove('active');
+        // La fermeture rend le focus à l'élément qui l'avait avant l'ouverture et peut faire défiler
+        // la page jusqu'à lui : le carnet reprend la position qu'il avait à l'ouverture.
         if (typeof modal.close === 'function' && modal.open) modal.close();
+        this._restoreScrollBehindModal();
+        this._scrollBehindModal = null;
         modal.style.display = 'none';
+    }
+
+    _restoreScrollBehindModal() {
+        const screen = document.getElementById('logbook-screen');
+        const top = this._scrollBehindModal;
+        if (screen && typeof top === 'number' && screen.scrollTop !== top) screen.scrollTop = top;
     }
 
     setSessionModalTitle(isEdit) {
