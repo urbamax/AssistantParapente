@@ -213,6 +213,18 @@ dialog.gdpr-modal-overlay::backdrop {
     max-height: 90vh;
 }
 
+/* Fenêtres de travail (saisie d'une session, mode d'emploi) : elles occupent la hauteur de
+   l'écran au lieu de se réduire à leur contenu, le texte défile à l'intérieur. */
+.gdpr-modal--large {
+    height: 92vh;
+}
+
+/* Sans quoi le contenu s'arrête à 60 % de l'écran et laisse un vide en bas de la fenêtre */
+.gdpr-modal--large .gdpr-modal-body {
+    max-height: none;
+    min-height: 0;
+}
+
 .gdpr-modal-overlay.active .gdpr-modal {
     transform: translateY(0) scale(1);
 }

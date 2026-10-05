@@ -61,9 +61,16 @@ test.describe('Spec 008 - stockage hors ligne', () => {
         // lecteur de PDF (les navigateurs sans affichage téléchargent le PDF au lieu de l'ouvrir).
         const online = await fetchFromPage(page, url);
         expect(online.status).toBe(200);
+        // L'écriture en cache se termine après la réponse : on attend la copie complète, pas seulement
+        // la présence d'une entrée, avant de couper le réseau.
         await expect
-            .poll(() => page.evaluate(async () => (await (await caches.open('parapente-courses-v1')).keys()).length))
-            .toBeGreaterThan(0);
+            .poll(() =>
+                page.evaluate(async (u) => {
+                    const cached = await (await caches.open('parapente-courses-v1')).match(new URL(u, location.href));
+                    return cached ? (await cached.arrayBuffer()).byteLength : 0;
+                }, url),
+            )
+            .toBe(OPENED_PDF_SIZE);
 
         if (!offlineCheckable(browserName)) return;
         await context.setOffline(true);

@@ -62,7 +62,9 @@ AssistantParapente/
 │   │   ├── logbook_service.js  # Flight records CRUD & wing maintenance calculations
 │   │   ├── quiz_service.js     # Question randomization, scoring & streak tracking
 │   │   ├── firebase_service.js # Authentication & Cloud Firestore synchronization
-│   │   ├── igc_parser.js       # Native IGC GPS file parser (B-records, vario, stats)
+│   │   ├── igc_parser.js       # Native IGC GPS file parser (B-records, flight detection, analysis, winch)
+│   │   ├── sdf_parser.js       # Syride .sdf sensor file (load factor, temperature)
+│   │   ├── pilot_habits.js     # What the add form learns from the pilot's logbook
 │   │   ├── storage.js          # LocalStorage wrapper & fallback keys
 │   │   └── idb_storage.js      # Native IndexedDB wrapper for heavy flights & IGC traces
 │   ├── components/
@@ -264,18 +266,24 @@ The map popup, the site card and the favourites table show, next to each verdict
 ## 🪂 Flight Logbook & IGC Parser
 
 ### 1. Native IGC GPS Parser (`js/services/igc_parser.js`)
-Processes binary `.igc` GPS log files strictly on the client side without server uploading.
+Parses `.igc` GPS log files strictly on the client side, without server uploading.
 
-**Extracted Parameters**:
-- `date` & `flightDuration`: Date and start/end time.
-- `maxAltitude` & `minAltitude`: Extracted from B-records (`B1102324545678N00612345EA0123401450`).
-- `maxVario` & `minVario`: Calculated via temporal derivative of pressure altitude ($\frac{\Delta z}{\Delta t}$).
-- `gpsTrack`: Normalized array of `{ lat, lon, alt, timestamp, vario }` for 2D/3D map playback.
+- **Flight only**: `detectTakeoffIndex` / `detectLandingIndex` cut the walk up, the wait on takeoff and the walk back. A pilot is airborne when the path speed over 20 s windows (points at least 5 s apart, so tight approach turns still count) exceeds 15 km/h, or the vertical speed exceeds 1.5 m/s, for at least a minute. The full track stays in `points` for the 3D replay.
+- **Basic stats**: date of takeoff, duration, max altitude, gain, distance, max climb, max and average ground speed.
+- **`analyzeFlight`** (stored as `igcStats` on the flight): altitudes (takeoff, landing, min, max above takeoff, cumulative climb), max sink and average vario, thermals (circling detected from ≥ 200° turned in 20 s, ≥ 20 s and climbing: count, time and share, average and best climb, biggest gain, 360s left/right), glides (straight phases actually descending: average and best glide ratio, speed), distances (free distance with 3 turnpoints by dynamic programming, max from takeoff, takeoff to landing) and a load factor estimated from ground speed × turn rate.
+- **`parseInstrument`** (stored as `instrument`): brand, model, firmware and hardware versions, GPS and pressure sensor, serial number, read from the A record and H lines of the header (Syride puts its serial number in the competition class field `HFCCL`).
+- **`detectWinchTow`**: within 30 s of takeoff, a sustained climb (≥ 1.5 m/s, ≥ 30 s, ≥ 80 m) in a nearly straight line; the release is the highest point up to 10 s after the climb stops. Sets the flight type `Treuil` on import.
 
-### 2. Wing & Equipment Hours Tracking (`js/services/logbook_service.js`)
+### 2. Syride sensors (`js/services/sdf_parser.js`)
+The IGC has no accelerometer. Syride varios export a binary `.sdf` next to the `.igc`: an 8-byte header, then one 21-byte big-endian record per second (lat/lon int32 1e-7°, GPS and relative baro altitude int16, ground speed, satellites, device (case) temperature, not the air, vario 0.1 m/s, five load-factor samples 0.1 g). The file is accepted only if it follows the stored IGC track (`matchesTrace`: 90 % of points sampled every 5 s within 30 m and 15 m, duration within 2 min); its flight window is summed up as `sensorStats` (G max/min, G at the winch release; the device temperatures are kept but not shown).
+
+### 3. Pre-filling learned from the pilot (`js/services/pilot_habits.js`)
+For a new session, `LogbookView.applyLearnedDefaults()` fills the fields the pilot has not touched from the logbook: every past session is evidence weighted by recency (half-life of 15 sessions) and by similarity (same site, same launch mode). General rules are priors worth a couple of sessions (back-facing launch at the winch). Flight type, takeoff technique, school and ground handling place use `suggest`; wing and harness use `latest` (last used on this site, otherwise last used); site suggestions are ordered by `rankByUse`. A field changed by the pilot is never overridden and an edited session is never filled in.
+
+### 4. Wing & Equipment Hours Tracking (`js/services/logbook_service.js`)
 Every logged flight automatically increments the total airtime (hours & minutes) of the associated wing and harness, triggering visual alerts when equipment passes maintenance thresholds (e.g., 100h inspection alert).
 
-### 3. Coordinates of a Manually Entered Place (spec 011)
+### 5. Coordinates of a Manually Entered Place (spec 011)
 A place typed in the add form that is not in the site database can be placed on an inline Leaflet map (« Placer sur la carte »: Esri satellite and topo layers from the host already cached by the service worker, created only when opened and released on re-render and in `unmount()`), or by pasting coordinates (decimal, degrees-minutes-seconds or a Google Maps `@lat,lon` link, parsed by `parseCoordinates` in `js/utils/geo_utils.js`). They are stored as `lat`/`lon` on the session and used for its weather; an imported IGC track overrides them. `LogbookService.findLastCoordsForPlace(name)` proposes the coordinates of the latest earlier session at the same place.
 
 ---
@@ -362,7 +370,7 @@ When modifying or expanding the codebase, follow these rules strictly:
 `npm run typecheck` runs plain TypeScript's `checkJs` over `js/**/*.js` (config: `jsconfig.json`, ambient types for CDN globals in `types/`). It is part of CI and must stay at **0 errors**. Use JSDoc (`/** @type {HTMLInputElement} */`) casts for DOM reads. `sw.js` is excluded (service worker globals need a different `lib` set than the rest of the app, which targets the browser DOM).
 
 ### UI strings
-User-facing text of new or reworked features lives in `js/i18n/fr.js` (frozen catalogue) and is read with `t('section.key', { placeholder })` from `js/utils/i18n.js` — never hard-coded in views (constitution, Language constraint). Screens migrate one at a time. **Done: the logbook view** (spec 014, `js/views/logbook.js` → `FR.logbook`): it uses `tt()` (text for HTML, parameters escaped), `th()` (a parameter is HTML built from numbers) and `tl()` (plain text for `innerText`, field values, `alert`/`confirm`); stored values (flight types, take-off techniques, exercises, `Autre`) stay data, only their labels are in the catalogue. `tests/views/inline_strings.test.js` fails on any inline user-facing text in that file and on any missing key; `tests/views/logbook_render.test.js` snapshots the rendered screens (update with `npx vitest run -u` only for an intended visible change). **Done: the sites view** (spec 015, `js/views/sites.js` → `FR.sites`, same helpers; codes such as wind directions, site types, levels and map ids stay data). The inline-text check is shared in `tests/helpers/inline_texts.js` and runs on both screens (`tests/views/inline_strings.test.js`); snapshots in `tests/views/sites_render.test.js`. **Done: the safety view** (spec 019, `FR.safety`; FFVL content kept word for word, only `<strong>` allowed in those texts). The guard tests of the migrated screens are one table in `tests/views/inline_strings.test.js`: add a row when a screen is migrated. Missing accents are fixed when certain (owner's rule). **Done: account messages and course library** (spec 021, `FR.account` for `js/services/firebase_service.js`, `FR.library` for `js/views/manual.js`; error codes returned to code stay in English as data). Still to migrate: quiz and the static texts of `index.html`.
+User-facing text of new or reworked features lives in `js/i18n/fr.js` (frozen catalogue) and is read with `t('section.key', { placeholder })` from `js/utils/i18n.js` — never hard-coded in views (constitution, Language constraint). Screens migrate one at a time. **Done: the logbook view** (spec 014, `js/views/logbook.js` → `FR.logbook`): it uses `tt()` (text for HTML, parameters escaped), `th()` (a parameter is HTML built from numbers) and `tl()` (plain text for `innerText`, field values, `alert`/`confirm`); stored values (flight types, take-off techniques, exercises, `Autre`) stay data, only their labels are in the catalogue. `tests/views/inline_strings.test.js` fails on any inline user-facing text in that file and on any missing key; `tests/views/logbook_render.test.js` snapshots the rendered screens (update with `npx vitest run -u` only for an intended visible change). **Done: the sites view** (spec 015, `js/views/sites.js` → `FR.sites`, same helpers; codes such as wind directions, site types, levels and map ids stay data). The inline-text check is shared in `tests/helpers/inline_texts.js` and runs on both screens (`tests/views/inline_strings.test.js`); snapshots in `tests/views/sites_render.test.js`. **Done: the safety view** (spec 019, `FR.safety`; FFVL content kept word for word, only `<strong>` allowed in those texts). The guard tests of the migrated screens are one table in `tests/views/inline_strings.test.js`: add a row when a screen is migrated. Missing accents are fixed when certain (owner's rule). **Done: account messages and course library** (spec 021, `FR.account` for `js/services/firebase_service.js`, `FR.library` for `js/views/manual.js`; error codes returned to code stay in English as data). **Done: the quiz** (spec 024, `FR.quiz`, helpers `tq` / `tqh` / `tql`; theme names from the question file stay data). **Done: the static HTML** (spec 026): `index.html`, `components/header.html` and `components/footer.html` keep their French text and each text carries a key of `FR.html` (`data-i18n`, `data-i18n-html` for text mixed with links or bold, `data-i18n-placeholder` / `-title` / `-aria-label` / `-alt`); `tests/views/static_texts.test.js` fails on an unkeyed text or a difference with the catalogue. A new text in the HTML needs a key in `FR.html`. `applyStaticTexts()` (`js/utils/i18n_dom.js`) will apply another language when one is offered; it is not wired today.
 
 ### Code shared with the notification Cloud Function
 Firebase deploys `functions/` alone, so it cannot import `js/`. `scripts/sync_functions_shared.mjs` copies `js/weatherScoring.js` and its imports into `functions/shared/*.mjs` (imports rewritten) and `js/data/sites_data.json` into `functions/`. It runs as a `predeploy` hook (`firebase.json`) and via `npm run sync:functions`; `tests/functions/shared_copy.test.js` fails in CI if a copy is stale. Never edit `functions/shared/` by hand. Server-only helpers (hour selection, notification rule) live in `functions/evaluate.mjs`.
@@ -407,7 +415,9 @@ npm run preview    # serves dist/ locally
 ```
 The service worker also keeps two **runtime caches that survive app updates** (spec 008): `parapente-courses-v1` (course PDFs the pilot has opened — never downloaded in advance; a partial Range read triggers one full download; offline, the stored document is served, never `index.html`) and `parapente-tiles-v1` (Esri map tiles already displayed, requested with CORS via `crossOrigin: true`, capped at 1 500 tiles, oldest removed first; no area pre-download, as the tile provider's terms do not allow it). Activation deletes every other old cache.
 
-The build rewrites `sw.js` into `dist/sw.js`: the precache list is generated from the emitted files and `CACHE_NAME` is derived from their names, so no manual `bump.py` is needed for a `dist/` deployment.
+The build rewrites `sw.js` into `dist/sw.js`: the precache list is generated from the emitted files and `CACHE_NAME` is derived from their names and contents, so no manual `bump.py` is needed for a `dist/` deployment.
+
+**« Mettre à jour » banner on any change.** `js/core/app_update.js` shows the banner when a new service worker takes over, and also when `version.json` (fetched every 5 minutes and when the tab comes back, never from a cache) differs from the version the page was loaded with. The build writes `dist/version.json` from the content hash. A site served straight from the sources (`git pull`, no build) gets it from a git hook: run `sh scripts/install_update_hook.sh` once on the server; after each pull or checkout it writes `version.json` (ignored by git) with the current commit. The banner's button empties the app caches (`parapente-app-*`, not the opened courses nor the map tiles) before reloading, so the new files are really loaded.
 
 ---
 

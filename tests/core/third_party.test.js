@@ -6,7 +6,14 @@ import { createHash } from 'node:crypto';
 // Spec 009 : aucun appel à un serveur tiers au démarrage, liens externes protégés, pas
 // d'identifiant Analytics, et fichiers hébergés identiques aux versions vérifiées (SRI d'origine).
 const read = (p) => readFileSync(p, 'utf8');
-const sri = (algo, path) => `${algo}-${createHash(algo).update(readFileSync(path)).digest('base64')}`;
+// leaflet.js est hébergé sans sa dernière ligne « //# sourceMappingURL=leaflet.js.map » (fichier .map non
+// hébergé : Safari affichait une erreur 404 dans la console) ; l'empreinte est celle du fichier d'origine.
+const ORIGINAL_SUFFIX = { 'vendor/leaflet-1.9.4/leaflet.js': '//# sourceMappingURL=leaflet.js.map' };
+const sri = (algo, path) => {
+    const suffix = ORIGINAL_SUFFIX[path] ?? '';
+    const content = Buffer.concat([readFileSync(path), Buffer.from(suffix, 'utf8')]);
+    return `${algo}-${createHash(algo).update(content).digest('base64')}`;
+};
 const THIRD_PARTY = [
     'fonts.googleapis.com',
     'fonts.gstatic.com',
@@ -39,6 +46,7 @@ describe('hosted libraries are the audited versions (spec 009, FR-003)', () => {
             'sha384-2+8OcleUOxnP/2cYXK9FBoMe12ojS0iPrrJy9Um4ICFk2AXl8iODUaIoUKI6TmGj',
         ],
     ])('%s %s', (algo, path, expected) => {
+        expect(read(path)).not.toContain('sourceMappingURL');
         expect(sri(algo, path)).toBe(expected);
     });
 });

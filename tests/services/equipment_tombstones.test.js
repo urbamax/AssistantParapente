@@ -4,36 +4,10 @@ import LogbookService from '../../js/services/logbook_service.js';
 import SitesService from '../../js/services/sites_service.js';
 import StorageService from '../../js/services/storage.js';
 import QuizView from '../../js/views/quiz.js';
+import { createFakeFirestore } from '../fixtures/fake_firestore.js';
 
 // Spec 015 : un équipement supprimé ne doit pas être ramené par la synchro cloud, même si la
 // suppression cloud immédiate n'a pas abouti (hors ligne, connexion pas prête).
-
-/** Firestore en mémoire : juste ce que syncDataWithCloud utilise. */
-function createFakeFirestore(initialDocs = {}) {
-    const docs = new Map(Object.entries(initialDocs));
-    const ref = (_db, ...segments) => ({ path: segments.join('/') });
-    return {
-        docs,
-        module: {
-            doc: ref,
-            collection: ref,
-            getDoc: async (r) => ({ exists: () => docs.has(r.path), data: () => docs.get(r.path) }),
-            setDoc: async (r, data) => {
-                docs.set(r.path, JSON.parse(JSON.stringify(data)));
-            },
-            deleteDoc: vi.fn(async (r) => {
-                docs.delete(r.path);
-            }),
-            getDocs: async (col) => {
-                const prefix = `${col.path}/`;
-                const matches = [...docs.entries()].filter(
-                    ([path]) => path.startsWith(prefix) && !path.slice(prefix.length).includes('/'),
-                );
-                return { forEach: (cb) => matches.forEach(([, data]) => cb({ data: () => data })) };
-            },
-        },
-    };
-}
 
 const oldWing = { id: 'wing-old', nom: 'Vieille voile', type: 'voile', statut: 'actif', updatedAt: 1000 };
 const newWing = { id: 'wing-new', nom: 'Nouvelle voile', type: 'voile', statut: 'actif', updatedAt: 2000 };
@@ -121,6 +95,25 @@ describe('Deleted equipment and cloud sync (spec 015)', () => {
         expect(result.success).toBe(false);
         expect(pendingDeletions()).toEqual(['wing-old']);
         expect(localEquipmentIds()).not.toContain('wing-old');
+    });
+
+    it('does not bring back an item deleted while the sync is running (spec 027)', async () => {
+        // Le pilote supprime l'équipement pendant que la synchro lit le cloud.
+        const getDocs = firestore.module.getDocs;
+        firestore.module.getDocs = async (col) => {
+            if (col.path === 'users/u1/equipment') LogbookService.deleteEquipment('wing-old');
+            return getDocs(col);
+        };
+
+        await FirebaseAuthEngine.syncDataWithCloud(true);
+        expect(localEquipmentIds().sort()).toEqual(['harness-cloud', 'wing-new']);
+        expect(pendingDeletions()).toEqual(['wing-old']);
+
+        // La synchro suivante termine la suppression dans le cloud, sans renvoyer l'équipement.
+        firestore.module.getDocs = getDocs;
+        await FirebaseAuthEngine.syncDataWithCloud(true);
+        expect(localEquipmentIds().sort()).toEqual(['harness-cloud', 'wing-new']);
+        expect(firestore.docs.has('users/u1/equipment/wing-old')).toBe(false);
     });
 
     it('records each deleted id once and survives a corrupted list', () => {

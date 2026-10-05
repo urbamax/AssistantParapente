@@ -220,6 +220,60 @@ class LogbookService {
         return this.flights;
     }
 
+    /**
+     * Empreinte de ce que le carnet affiche (vols et matériel). Après une synchro cloud, le carnet
+     * n'est redessiné que si elle a changé : sinon, toutes les 30 s, il refermait les traces et les
+     * encarts ouverts. L'état d'envoi (syncPending) n'est pas affiché ; la trace brute ne compte que
+     * par sa présence (bouton « Voir la trace »).
+     * @returns {string}
+     */
+    dataSignature() {
+        const shown = ({ syncPending: _syncPending, rawIgc, traceGps, ...rest }) => ({
+            ...rest,
+            hasTrace: Boolean(rawIgc) || (Array.isArray(traceGps) && traceGps.length > 0),
+        });
+        return JSON.stringify([this.flights.map(shown), this.equipment.map(shown)]);
+    }
+
+    /**
+     * Recalcule depuis leur trace IGC tous les vols qui en ont une, comme le bouton « Recalculer »
+     * d'une session : date et durée du vol, altitude max (avec la correction d'altitude du vol),
+     * gain, position du décollage, distance, vario, vitesses, analyse détaillée et instrument.
+     * Ce que le pilote a saisi reste tel quel : site, type de vol, matériel, école, pilotes,
+     * commentaire et correction d'altitude.
+     * @returns {Promise<number>} nombre de vols mis à jour
+     */
+    async recomputeAllTraceStats() {
+        let updated = 0;
+        for (const flight of this.flights) {
+            if (flight.type !== 'vol') continue;
+            const raw = await this.getFlightTrace(flight.id);
+            if (!raw) continue;
+            const result = this.parseIGC(raw, Number(flight.altOffset) || 0);
+            if (!result.success) continue;
+            const d = result.data;
+            const takeoff = Array.isArray(d.points) ? d.points[d.takeoffIndex || 0] || d.points[0] : null;
+            Object.assign(flight, {
+                ...(d.dateStr ? { datetime: d.dateStr } : {}),
+                ...(d.duration > 0 ? { duree: d.duration } : {}),
+                ...(typeof d.maxAltitude === 'number' ? { altitudeMax: d.maxAltitude } : {}),
+                ...(typeof d.gain === 'number' ? { gain: d.gain } : {}),
+                ...(takeoff ? { lat: takeoff.lat, lon: takeoff.lon } : {}),
+                distanceKm: d.distanceKm,
+                maxClimbRate: d.maxClimbRate,
+                maxSpeedKmh: d.maxSpeedKmh,
+                avgSpeedKmh: d.avgSpeedKmh,
+                igcStats: d.analysis,
+                ...(d.instrument ? { instrument: d.instrument } : {}),
+                updatedAt: Date.now(),
+                syncPending: true,
+            });
+            updated++;
+        }
+        if (updated > 0) this.saveFlights();
+        return updated;
+    }
+
     getFlightById(id) {
         return this.flights.find((f) => f.id === id);
     }
@@ -413,6 +467,12 @@ class LogbookService {
                         dateStr: parsed.dateStr || null,
                         maxAltitude: hasMax ? parsed.maxAltitude + Math.round(offset) : null,
                         gain: typeof parsed.gain === 'number' && !isNaN(parsed.gain) ? parsed.gain : null,
+                        distanceKm: parsed.distanceKm,
+                        maxClimbRate: parsed.maxClimbRate,
+                        maxSpeedKmh: parsed.maxSpeedKmh,
+                        avgSpeedKmh: parsed.avgSpeedKmh,
+                        analysis: parsed.analysis || null,
+                        instrument: parsed.instrument || null,
                         points,
                         takeoffIndex: parsed.takeoffIndex || 0,
                         // Altitudes au vrai décollage / atterrissage (pas au parking)

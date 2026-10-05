@@ -6,7 +6,7 @@ import { stripDeveloperText, findInlineTexts, catalogueKeys } from '../helpers/i
 
 // Contrainte « Language » de la constitution (écart d'audit C8) : aucun texte affiché au pilote
 // n'est écrit en dur dans les écrans migrés ; tout passe par le catalogue js/i18n/fr.js.
-// Un écran s'ajoute ici quand ses textes ont été déplacés (specs 014, 015, 019, 021…).
+// Un écran s'ajoute ici quand ses textes ont été déplacés (specs 014, 015, 019, 021, 024…).
 const SCREENS = [
     // Valeurs enregistrées dans le carnet (données, pas textes d'interface).
     { file: 'js/views/logbook.js', spec: '014', prefix: 'logbook.', dataValues: ['Autre', 'Plouf'], minKeys: 100 },
@@ -28,6 +28,26 @@ const SCREENS = [
         ],
         minKeys: 30,
     },
+    // Noms de thèmes du fichier des questions et codes de niveau (données).
+    {
+        file: 'js/views/quiz.js',
+        spec: '024',
+        prefix: 'quiz.',
+        helpers: ['tq', 'tqh', 'tql'],
+        dataValues: [
+            'Météo',
+            'Mécavol',
+            'Matériel',
+            'Pilotage',
+            'Réglementation',
+            'Facteurs humains',
+            'Milieu naturel',
+            'Autre',
+            'BI',
+            'ALL',
+        ],
+        minKeys: 60,
+    },
     {
         file: 'js/views/manual.js',
         spec: '021',
@@ -39,7 +59,7 @@ const SCREENS = [
 
 const resolves = (key) => typeof key.split('.').reduce((node, part) => node?.[part], FR) === 'string';
 
-describe.each(SCREENS)('$file (spec $spec)', ({ file, prefix, dataValues, minKeys }) => {
+describe.each(SCREENS)('$file (spec $spec)', ({ file, prefix, helpers = ['tt', 'th', 'tl'], dataValues, minKeys }) => {
     const source = readFileSync(file, 'utf8');
 
     it('writes no user-facing text inline', () => {
@@ -47,7 +67,7 @@ describe.each(SCREENS)('$file (spec $spec)', ({ file, prefix, dataValues, minKey
     });
 
     it('uses only catalogue keys that exist', () => {
-        const keys = catalogueKeys(source, { prefix, helpers: ['tt', 'th', 'tl'] });
+        const keys = catalogueKeys(source, { prefix, helpers });
         expect(keys.size).toBeGreaterThanOrEqual(minKeys);
         expect([...keys].filter((key) => !resolves(key))).toEqual([]);
     });

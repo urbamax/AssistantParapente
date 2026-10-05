@@ -9,7 +9,7 @@
 //   2. CACHE_NAME est versionné (synchronisé par bump.py avec le ?v= du reste du site) et
 //      activate() supprime systématiquement tout cache dont le nom ne correspond pas à la
 //      version courante.
-const CACHE_NAME = 'parapente-app-v2026.10.05_v20';
+const CACHE_NAME = 'parapente-app-v2026.10.05_v22';
 
 // La météo ne doit jamais être servie depuis le cache : une donnée de vent vieille de
 // plusieurs heures mais présentée comme "en direct" est un vrai risque sécurité pour un
@@ -188,6 +188,17 @@ self.addEventListener('fetch', (event) => {
 
     const url = new URL(request.url);
 
+    // Firebase (Firestore, connexion, alertes) : jamais intercepté. Les canaux d'écoute de Firestore
+    // sont des requêtes longues que le navigateur interrompt et relance ; passées par le SW (et mises
+    // en cache), elles finissaient en erreurs « access control checks » dans la console de Safari.
+    if (url.hostname.endsWith('.googleapis.com')) return;
+
+    // Numéro de version du site (bannière « Mettre à jour ») : toujours le réseau, jamais le cache
+    if (url.origin === location.origin && url.pathname.endsWith('/version.json')) {
+        event.respondWith(fetch(request, { cache: 'no-store' }));
+        return;
+    }
+
     if (url.hostname === WEATHER_API_HOSTNAME) {
         event.respondWith(fetch(request));
         return;
@@ -266,41 +277,55 @@ self.addEventListener('fetch', (event) => {
     // un serveur local sans Cache-Control) pouvait resservir un ancien module importé par un module
     // à jour (« Importing binding name 'shuffled' is not found »).
     const isDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    const key = dataKey(request, url);
     if (isDev) {
         event.respondWith(
             fetch(request, { cache: 'no-cache' })
                 .then((response) => {
                     if (response.ok) {
                         const copy = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                        caches.open(CACHE_NAME).then((cache) => cache.put(key, copy));
                     }
                     return response;
                 })
-                .catch(() => caches.match(request)),
+                .catch(() => caches.match(key)),
         );
         return;
     }
 
-    // Assets statiques same-origin (production) : cache-first avec revalidation réseau en arrière-plan.
-    // Si rien n'est en cache ET que le réseau échoue, on ne doit jamais résoudre respondWith()
-    // avec `undefined` (le navigateur remonte alors un opaque net::ERR_FAILED, y compris pour
-    // du CSS/JS critique — c'est ce qui a cassé la mise en page en local) : on retombe sur un
-    // second essai réseau direct pour laisser passer la vraie erreur si celle-ci persiste.
+    // Fichiers du site (production) : réseau d'abord, cache seulement hors ligne. En cache d'abord,
+    // un site servi depuis les sources (nom de cache inchangé d'une version à l'autre) affichait
+    // l'ancienne version jusqu'au deuxième rechargement. `cache: 'no-cache'` fait revalider le
+    // cache HTTP du navigateur (réponse 304 légère si rien n'a changé). Réseau trop lent (> 4 s) :
+    // la copie en cache est servie, la réponse réseau la remplace pour la prochaine fois.
     event.respondWith(
-        caches.match(request).then((cached) => {
-            const networkFetch = fetch(request)
-                .then((response) => {
-                    if (response.ok) {
-                        const copy = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-                    }
-                    return response;
-                })
-                .catch(() => cached || fetch(request));
-            return cached || networkFetch;
-        }),
+        (async () => {
+            const cached = await caches.match(key);
+            const network = fetch(request, { cache: 'no-cache' }).then((response) => {
+                if (response.ok) {
+                    const copy = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(key, copy));
+                }
+                return response;
+            });
+            if (!cached) return network;
+            const slow = new Promise((resolve) => setTimeout(() => resolve(cached), 4000));
+            return Promise.race([network, slow]).catch(() => cached);
+        })(),
     );
 });
+
+/**
+ * Clé de cache d'une requête du site. Les fichiers de données (questions du QCM, sites…) sont
+ * demandés avec « ?v=<heure> » pour contourner le cache HTTP du navigateur : chaque visite a une
+ * adresse différente, que le cache ne retrouvait jamais hors ligne (QCM vide sans réseau). Pour
+ * eux, la clé est l'adresse sans cette suite, celle sous laquelle l'installation les a rangés.
+ */
+function dataKey(request, url) {
+    return url.origin === location.origin && url.pathname.includes('/js/data/')
+        ? `${url.origin}${url.pathname}`
+        : request;
+}
 
 /** Clé de cache d'un cours : l'adresse sans l'ancre (#page=N), commune aux ouvertures complètes et partielles. */
 function courseKey(url) {
@@ -313,7 +338,9 @@ async function serveCourse(event, request, url) {
     try {
         const response = await fetch(request);
         if (response.status === 200) {
-            cache.put(key, response.clone()).catch(() => {});
+            // Rattaché à l'événement : le navigateur ne doit pas arrêter le service worker avant
+            // la fin de l'écriture, sinon la copie hors ligne peut manquer.
+            event.waitUntil(cache.put(key, response.clone()).catch(() => {}));
         } else if (response.status === 206) {
             // Le lecteur ne demande que des morceaux : on garde une fois le document entier.
             event.waitUntil(
