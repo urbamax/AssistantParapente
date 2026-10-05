@@ -44,11 +44,12 @@ class QuizService {
         }
 
         try {
-            const cacheBuster = `v=${Date.now()}`;
+            // URLs stables (sans paramètre horodaté) : le service worker les met en cache et les
+            // ressert hors ligne ; une URL unique à chaque appel ne trouvait jamais de copie.
             const [questionsRes, explicationsRes, courseMappingRes] = await Promise.all([
-                fetch(`${this.basePath}/js/data/qcm_ffvl.csv?${cacheBuster}`),
-                fetch(`${this.basePath}/js/data/qcm_ffvl_explanations.csv?${cacheBuster}`),
-                fetch(`${this.basePath}/js/data/question_course_mapping.json?${cacheBuster}`),
+                fetch(`${this.basePath}/js/data/qcm_ffvl.csv`),
+                fetch(`${this.basePath}/js/data/qcm_ffvl_explanations.csv`),
+                fetch(`${this.basePath}/js/data/question_course_mapping.json`),
             ]);
 
             if (!questionsRes.ok || !explicationsRes.ok) throw new Error('Failed to load QCM CSV data');

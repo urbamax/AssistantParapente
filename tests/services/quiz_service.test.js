@@ -146,3 +146,15 @@ describe('QuizService - Mode REVISION', () => {
         expect(QuizService.getQuestionByCode(null)).toBeNull();
     });
 });
+
+describe('QuizService - chargement hors ligne', () => {
+    it('demande des URL stables (sans paramètre) pour que le service worker serve la copie en cache', async () => {
+        QuizService.setQuestions([]);
+        const fetchMock = vi.fn().mockResolvedValue({ ok: false });
+        vi.stubGlobal('fetch', fetchMock);
+        await QuizService.loadOfficialData();
+        vi.unstubAllGlobals();
+        expect(fetchMock).toHaveBeenCalled();
+        for (const [url] of fetchMock.mock.calls) expect(url).not.toContain('?');
+    });
+});
