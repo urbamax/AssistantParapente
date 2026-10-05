@@ -7,6 +7,7 @@
 import GlobalState from './app_state.js';
 import StorageService from '../services/storage.js';
 import { capitalizeFirstLetter } from '../utils/text_utils.js';
+import { t } from '../utils/i18n.js';
 
 class UIManager {
     constructor() {
@@ -120,13 +121,13 @@ class UIManager {
         if (effectiveMode === 'auto') {
             const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             effectiveMode = systemDark ? 'dark' : 'light';
-            if (btn) btn.title = 'Mode: Auto';
+            if (btn) btn.title = t('theme.auto');
             if (iconSun && iconMoon) {
                 iconSun.style.opacity = '1';
                 iconMoon.style.opacity = '1';
             }
         } else {
-            if (btn) btn.title = 'Mode: ' + capitalizeFirstLetter(effectiveMode);
+            if (btn) btn.title = t('theme.mode', { mode: capitalizeFirstLetter(effectiveMode) });
             if (effectiveMode === 'light') {
                 if (iconSun) iconSun.style.opacity = '1';
             } else {

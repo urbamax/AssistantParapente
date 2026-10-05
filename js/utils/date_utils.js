@@ -2,6 +2,7 @@
  * UTILS - Date Utilities
  * Pure functions for formatting dates and durations across the application.
  */
+import { t } from './i18n.js';
 
 /**
  * Format a duration in minutes into a human readable string.
@@ -53,7 +54,7 @@ export function formatDateTime(dateStr) {
     if (!dateStr) return '';
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return '';
-    return `${dateFormatter.format(d)} à ${timeFormatter.format(d)}`;
+    return t('dates.dateAtTime', { date: dateFormatter.format(d), time: timeFormatter.format(d) });
 }
 
 /**
