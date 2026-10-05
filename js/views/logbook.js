@@ -626,7 +626,13 @@ class LogbookViewClass extends BaseView {
         this.resetForm();
         if (!modal) return;
         modal.classList.remove('active');
+        // À la fermeture, le navigateur rend le focus à l'élément qui l'avait avant l'ouverture et
+        // fait défiler la page jusqu'à lui (WebKit sous Linux : la liste remontait en haut). Le
+        // carnet garde la position qu'il avait derrière la fenêtre.
+        const screen = document.getElementById('logbook-screen');
+        const scrollTop = screen ? screen.scrollTop : null;
         if (typeof modal.close === 'function' && modal.open) modal.close();
+        if (screen && scrollTop !== null && screen.scrollTop !== scrollTop) screen.scrollTop = scrollTop;
         modal.style.display = 'none';
     }
 
