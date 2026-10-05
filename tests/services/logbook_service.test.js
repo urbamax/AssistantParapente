@@ -110,7 +110,7 @@ describe('LogbookService - Core Functions', () => {
     it('parseIGC reports failure when the file has no GPS points', () => {
         const res = LogbookService.parseIGC('fake-raw-text');
         expect(res.success).toBe(false);
-        expect(res.error).toBe('No valid GPS data found in file.');
+        expect(res.error).toBe('Aucun point GPS valide dans le fichier.');
     });
 
     it('loadData() normalizes flights/equipment missing typeVol/typeExercice/nom/type, so a legacy or corrupted record can no longer crash a render (regression test for the .toLowerCase()/.toUpperCase() crashes on undefined)', () => {

@@ -6,7 +6,7 @@ import { stripDeveloperText, findInlineTexts, catalogueKeys } from '../helpers/i
 
 // Contrainte « Language » de la constitution (écart d'audit C8) : aucun texte affiché au pilote
 // n'est écrit en dur dans les écrans migrés ; tout passe par le catalogue js/i18n/fr.js.
-// Un écran s'ajoute ici quand ses textes ont été déplacés (specs 014, 015, 019, 021, 024…).
+// Un écran s'ajoute ici quand ses textes ont été déplacés (specs 014, 015, 019, 021, 024, 029…).
 const SCREENS = [
     // Valeurs enregistrées dans le carnet (données, pas textes d'interface).
     { file: 'js/views/logbook.js', spec: '014', prefix: 'logbook.', dataValues: ['Autre', 'Plouf'], minKeys: 100 },
@@ -55,6 +55,33 @@ const SCREENS = [
         dataValues: ['ALL', 'GENERAL', 'Autre'],
         minKeys: 2,
     },
+    // Spec 029 : les autres fichiers qui affichent du texte (bannière, erreurs, thème, confidentialité,
+    // carte 3D, dates, messages des services). Données : thèmes du fichier des questions, symboles,
+    // mention légale des fonds de carte, police de caractères, valeurs internes de filtre.
+    ...[
+        ['js/core/app_update.js', ['×']],
+        ['js/core/base_view.js', []],
+        ['js/core/router.js', []],
+        ['js/core/ui_manager.js', []],
+        ['js/gdpr_engine.js', []],
+        ['js/components/map_3d.js', ['© Google', '"Segoe UI", Arial, sans-serif']],
+        ['js/utils/date_utils.js', []],
+        [
+            'js/services/quiz_service.js',
+            [
+                'Météo',
+                'Mécavol',
+                'Matériel',
+                'Pilotage',
+                'Réglementation',
+                'Facteurs humains',
+                'Milieu naturel',
+                'Autre',
+            ],
+        ],
+        ['js/services/logbook_service.js', []],
+        ['js/services/sites_service.js', ['Inconnu']],
+    ].map(([file, dataValues]) => ({ file, spec: '029', prefix: '', dataValues, minKeys: 1 })),
 ];
 
 const resolves = (key) => typeof key.split('.').reduce((node, part) => node?.[part], FR) === 'string';

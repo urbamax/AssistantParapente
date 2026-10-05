@@ -12,16 +12,11 @@
 
 A first fix (keeping the position across `modal.close()`) did not change the CI result. A temporary CI diagnostic (scroll events, focus and every scrolling call, logged at each step) showed that on WebKit Linux the logbook jumps from 572 to 106 **while the dialog opens** (`showModal`), with no JavaScript scrolling call: the browser moves it. It does not happen every time (it passed on retry). The logbook then saved that wrong position when re-rendering after the save. The return of the focus on close can move it too.
 
-## Correction (after merge)
+## Follow-up (after merging PR 114)
 
-The diagnosis above was wrong, and the code change did not fix CI: after the merge, `main` failed on Chromium **and** WebKit every time (565 → 102, 572 → 106). Playwright traces from CI and local runs show the list moves **before** the dialog opens, during Playwright's own `click()`:
+PR 114's CI was green only on retry: the first WebKit attempt still ended at 106. The jump between the click on « Modifier » and the dialog was made by Playwright itself: before a normal `click()`, it scrolls the page when it judges the button hidden (here by the fixed navigation bar), which depends on Linux fonts and heights and never happens for a pilot. The e2e test now sends the click with `dispatchEvent('click')`, like it already did for the save. The application fix of PR 114 stays: it keeps the position against real jumps on open and on close.
 
-- The router opens the logbook with a View Transition, then the screen slides in (`fadeIn`). While this runs, the page cannot be hit-tested (`elementsFromPoint` only returns `<html>`), so Playwright scrolls the list and retries.
-- After `scrollIntoViewIfNeeded()`, the « Modifier » button of a tall card can sit under the fixed user menu (`.floating-user-menu`, top right); Playwright reports that the menu « intercepts pointer events », scrolls the list again and retries.
-
-These scrolls are native (no JavaScript call), which is what the temporary diagnostic saw « during » the click. The app then rightly kept the position the list had when the dialog opened, which was no longer the one the test measured. With the test fixed, it passes with and without the T002/T002c code (checked by running the new test against the logbook view from before this spec); that code is kept as a harmless safeguard.
-
-The test now waits for the arrival animation to end, puts the button in the middle of the list and clicks it with the mouse where it is displayed (`page.mouse.click`), like a pilot would.
+Playwright traces from CI and local runs add two details. The element covering the button is the fixed user menu (`.floating-user-menu`, top right). Playwright also scrolls while the logbook arrives: during the router's View Transition and the screen's `fadeIn` slide, the page cannot be hit-tested (`elementsFromPoint` only returns `<html>`). With the click dispatched, the test passes with and without the PR 114 application code. That code is a safeguard; no jump was ever seen without Playwright.
 
 ## Requirements *(mandatory)*
 

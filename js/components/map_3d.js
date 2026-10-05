@@ -11,6 +11,8 @@
  * de polygones extrudés pour simuler l'effet. C'est l'outil fait pour ce problème plutôt
  * qu'un contournement des limites de MapLibre.
  */
+import { t } from '../utils/i18n.js';
+import { escapeHTML } from '../core/security.js';
 const Map3DComponent = {
     activeInterval: null,
     _smoothProtocolRegistered: false,
@@ -150,22 +152,20 @@ const Map3DComponent = {
             container.innerHTML = `
                 <div style="padding: 40px; text-align: center; color: var(--text-secondary);">
                     <i class="ri-loader-4-line ri-spin" style="font-size: 2rem; display: block; margin-bottom: 12px; color: var(--accent-blue);"></i>
-                    <p style="margin: 0; font-size: 0.95rem;">Chargement du moteur 3D (MapLibre &amp; deck.gl)...</p>
+                    <p style="margin: 0; font-size: 0.95rem;">${escapeHTML(t('map3d.loading'))}</p>
                 </div>
             `;
             try {
                 await this.ensureDependenciesLoaded();
             } catch (err) {
                 console.error('[Map3D] Échec de chargement des dépendances 3D :', err);
-                container.innerHTML = this._errorHtml(
-                    'Impossible de charger les librairies 3D (MapLibre / deck.gl). Vérifiez votre connexion.',
-                );
+                container.innerHTML = this._errorHtml(t('map3d.librariesError'));
                 return;
             }
         }
 
         if (typeof maplibregl.supported === 'function' && !maplibregl.supported()) {
-            container.innerHTML = this._errorHtml('Votre navigateur ne supporte pas le rendu 3D (WebGL).');
+            container.innerHTML = this._errorHtml(t('map3d.webglError'));
             return;
         }
 
@@ -194,7 +194,7 @@ const Map3DComponent = {
             });
         } catch (err) {
             console.error('[Map3D] Échec de création de la carte :', err);
-            container.innerHTML = this._errorHtml("Impossible d'initialiser la carte 3D.");
+            container.innerHTML = this._errorHtml(t('map3d.initError'));
             return;
         }
 
@@ -221,10 +221,21 @@ const Map3DComponent = {
                 map3D.easeTo({ center: [pt.lon, pt.lat], duration: this.PLAYBACK_INTERVAL_MS, easing: (t) => t });
             }
 
-            info.innerHTML =
-                `Heure : <strong style="color:var(--text-primary);">${pt.time}</strong>` +
-                ` &nbsp;·&nbsp; Alt : <strong style="color:var(--text-primary);">${Math.round(pt.alt)} m</strong>` +
-                ` &nbsp;·&nbsp; Vario : <strong style="color:${this._varioTextColor(vario)};">${vario >= 0 ? '+' : ''}${vario.toFixed(1)} m/s</strong>`;
+            const strong = (color, value) => `<strong style="color:${color};">${escapeHTML(String(value))}</strong>`;
+            info.innerHTML = [
+                escapeHTML(t('map3d.time')).replace('{value}', strong('var(--text-primary)', pt.time)),
+                escapeHTML(t('map3d.altitude')).replace(
+                    '{value}',
+                    strong('var(--text-primary)', t('map3d.altitudeValue', { alt: Math.round(pt.alt) })),
+                ),
+                escapeHTML(t('map3d.vario')).replace(
+                    '{value}',
+                    strong(
+                        this._varioTextColor(vario),
+                        t('map3d.varioValue', { vario: `${vario >= 0 ? '+' : ''}${vario.toFixed(1)}` }),
+                    ),
+                ),
+            ].join(' &nbsp;·&nbsp; ');
         };
 
         slider.addEventListener('input', () => {
@@ -544,7 +555,8 @@ const Map3DComponent = {
             id: 'pilot-label',
             data: [pt],
             getPosition: (d) => [d.lon, d.lat, d.alt],
-            getText: (d) => `${Math.round(d.alt)} m\n${vario >= 0 ? '+' : ''}${vario.toFixed(1)} m/s`,
+            getText: (d) =>
+                t('map3d.label', { alt: Math.round(d.alt), vario: `${vario >= 0 ? '+' : ''}${vario.toFixed(1)}` }),
             getSize: 13,
             getColor: [255, 255, 255, 255],
             getPixelOffset: [0, -22],
@@ -573,12 +585,12 @@ const Map3DComponent = {
                         <input type="range" id="slider-${sessionId}" min="0" max="${maxIndex}" value="0" style="flex: 1; cursor: pointer;">
                     </div>
                     <div id="info-${sessionId}" style="font-size: 0.85rem; font-family: monospace; color: var(--text-secondary); text-align: center;">
-                        Heure : --:--:--
+                        ${escapeHTML(t('map3d.timeEmpty'))}
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px; font-size: 0.7rem; color: var(--text-secondary); justify-content: center;">
-                        <span>Chute</span>
+                        <span>${escapeHTML(t('map3d.sink'))}</span>
                         <div style="width: 120px; height: 8px; border-radius: 4px; background: linear-gradient(to right, ${gradientStops});"></div>
-                        <span>Ascendance</span>
+                        <span>${escapeHTML(t('map3d.climb'))}</span>
                     </div>
                 </div>
             </div>
