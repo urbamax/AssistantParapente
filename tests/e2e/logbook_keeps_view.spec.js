@@ -62,13 +62,50 @@ test('saving an edited session keeps the position in the list', async ({ page })
     const before = await scrollTop(page);
     expect(before).toBeGreaterThan(0);
 
+    // DIAGNOSTIC TEMPORAIRE (WebKit Linux) : qui fait défiler l'écran du carnet ?
+    page.on('console', (msg) => {
+        if (msg.text().startsWith('[DIAG]')) console.log(msg.text());
+    });
+    await page.evaluate(() => {
+        const screen = document.getElementById('logbook-screen');
+        const log = (what) =>
+            console.log(
+                `[DIAG] ${what} scrollTop=${screen.scrollTop} active=${document.activeElement?.tagName}#${document.activeElement?.id}.${document.activeElement?.className} stack=${(new Error().stack || '').split('\n').slice(1, 6).join(' | ')}`,
+            );
+        const desc = Object.getOwnPropertyDescriptor(Element.prototype, 'scrollTop');
+        Object.defineProperty(screen, 'scrollTop', {
+            configurable: true,
+            get() {
+                return desc.get.call(this);
+            },
+            set(v) {
+                log(`SET scrollTop=${v} (avant)`);
+                desc.set.call(this, v);
+            },
+        });
+        for (const name of ['scrollIntoView', 'focus', 'scrollTo', 'scrollBy']) {
+            const orig = Element.prototype[name] || HTMLElement.prototype[name];
+            const owner = Element.prototype[name] ? Element.prototype : HTMLElement.prototype;
+            owner[name] = function (...args) {
+                log(`${name} sur ${this.tagName}#${this.id}.${this.className} args=${JSON.stringify(args)}`);
+                return orig.apply(this, args);
+            };
+        }
+        screen.addEventListener('scroll', () => log('event scroll'));
+        window.__diagLog = log;
+    });
+    await page.evaluate(() => window.__diagLog('avant clic Modifier'));
     await card(page, 5).locator('[data-action="editEntry"]').click();
     await expect(page.locator('#logbook-session-modal')).toBeVisible();
+    await page.evaluate(() => window.__diagLog('fenetre visible'));
     await page.evaluate(() =>
         document
             .getElementById('logbook-add-form')
             .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })),
     );
+    await page.evaluate(() => window.__diagLog('apres submit'));
     await expect(page.locator('#logbook-session-modal')).toBeHidden();
+    await page.waitForTimeout(500);
+    await page.evaluate(() => window.__diagLog('500 ms apres'));
     await expect.poll(() => scrollTop(page)).toBe(before);
 });
