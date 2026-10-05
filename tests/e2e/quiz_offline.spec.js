@@ -17,10 +17,9 @@ async function loadWithServiceWorker(page) {
         );
     });
     await page.goto('/');
-    await page.waitForFunction(async () => {
-        await navigator.serviceWorker.ready;
-        return !!navigator.serviceWorker.controller;
-    });
+    // Prédicat synchrone : waitForFunction n'attend pas une promesse (une fonction async rendait
+    // la main aussitôt, avant que le service worker contrôle la page).
+    await page.waitForFunction(() => navigator.serviceWorker.controller?.state === 'activated');
 }
 
 test.describe('QCM hors ligne', () => {
@@ -30,14 +29,20 @@ test.describe('QCM hors ligne', () => {
         test.skip(browserName === 'webkit', 'hors-ligne simulé non vu par le service worker en WebKit');
         await loadWithServiceWorker(page);
         // Installation terminée : les fichiers de questions sont dans le cache
-        await page.waitForFunction(async () => {
-            const keys = await caches.keys();
-            for (const key of keys) {
-                const cache = await caches.open(key);
-                if (await cache.match('./js/data/qcm_ffvl.csv')) return true;
-            }
-            return false;
-        });
+        await expect
+            .poll(
+                () =>
+                    page.evaluate(async () => {
+                        const keys = await caches.keys();
+                        for (const key of keys) {
+                            const cache = await caches.open(key);
+                            if (await cache.match('./js/data/qcm_ffvl.csv')) return true;
+                        }
+                        return false;
+                    }),
+                { timeout: 20_000 },
+            )
+            .toBe(true);
 
         await context.setOffline(true);
         const result = await page.evaluate(async () => {

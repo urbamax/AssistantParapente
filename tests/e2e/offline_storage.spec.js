@@ -23,10 +23,9 @@ async function loadWithServiceWorker(page) {
     });
     await page.goto('/');
     // Le service worker contrôle la page (clients.claim à l'activation).
-    await page.waitForFunction(async () => {
-        await navigator.serviceWorker.ready;
-        return !!navigator.serviceWorker.controller;
-    });
+    // Prédicat synchrone : waitForFunction n'attend pas une promesse (une fonction async rendait
+    // la main aussitôt, avant que le service worker contrôle la page).
+    await page.waitForFunction(() => navigator.serviceWorker.controller?.state === 'activated');
 }
 
 /** Requête faite depuis la page (donc via le service worker) : statut, taille, type. */

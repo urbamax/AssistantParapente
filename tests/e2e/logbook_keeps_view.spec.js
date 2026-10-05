@@ -32,6 +32,19 @@ test.beforeEach(async ({ page }) => {
     await page.locator('.nav-menu-btn[data-target="LOGBOOK"]').first().click();
     await page.locator('[data-action="openLogbookSection"][data-args="\'history\'"]').click();
     await expect(page.locator('.logbook-card').nth(5)).toBeVisible();
+    // L'arrivée sur le carnet est animée (View Transition du routeur, puis fondu glissant de
+    // l'écran) : tant qu'elle joue, Playwright ne peut pas viser un bouton et fait défiler la liste
+    // pour réessayer, ce qui fausse la position mesurée. On attend qu'elle soit finie.
+    await page.evaluate(async () => {
+        const { default: AppRouter } = await import('/js/core/router.js');
+        await AppRouter._activeTransition?.finished.catch(() => {});
+        await Promise.all(
+            document
+                .getAnimations()
+                .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
+                .map((a) => a.finished.catch(() => {})),
+        );
+    });
 });
 
 const card = (page, i) => page.locator(`.logbook-card[data-session-id="f${i}"]`);
@@ -58,11 +71,17 @@ test('a re-render keeps open details, open traces and the position in the list',
 });
 
 test('saving an edited session keeps the position in the list', async ({ page }) => {
-    await card(page, 5).scrollIntoViewIfNeeded();
+    // Bouton « Modifier » au milieu de la liste, cliqué à la souris là où il est affiché. Le clic de
+    // Playwright, lui, fait d'abord défiler la liste quand le bouton lui paraît masqué (menu
+    // utilisateur fixe, en haut) ou en mouvement : la position mesurée ici ne serait plus celle du
+    // carnet à l'ouverture de la fenêtre.
+    const edit = card(page, 5).locator('[data-action="editEntry"]');
+    await edit.evaluate((el) => el.scrollIntoView({ block: 'center' }));
     const before = await scrollTop(page);
     expect(before).toBeGreaterThan(0);
 
-    await card(page, 5).locator('[data-action="editEntry"]').click();
+    const box = await edit.boundingBox();
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
     await expect(page.locator('#logbook-session-modal')).toBeVisible();
     await page.evaluate(() =>
         document
