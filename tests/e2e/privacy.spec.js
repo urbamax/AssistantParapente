@@ -63,10 +63,9 @@ test.describe('Spec 013 - page et service worker, sans consentement', () => {
         });
 
         await page.goto('/');
-        await page.waitForFunction(async () => {
-            await navigator.serviceWorker.ready;
-            return !!navigator.serviceWorker.controller;
-        });
+        // Prédicat synchrone : waitForFunction n'attend pas une promesse (une fonction async rendait
+        // la main aussitôt, avant que le service worker contrôle la page).
+        await page.waitForFunction(() => navigator.serviceWorker.controller?.state === 'activated');
         await page.goto('/?mode=SITES');
         await expect(page.locator('#sites-map-canvas')).toBeVisible();
         await page.waitForLoadState('networkidle');
