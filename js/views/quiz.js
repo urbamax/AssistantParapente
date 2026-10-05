@@ -1419,6 +1419,12 @@ class QuizViewClass extends BaseView {
             return;
         }
 
+        // Question suivante/précédente : l'écran garde sinon la position de l'explication précédente,
+        // et la nouvelle question reste hors de vue au-dessus.
+        const qcmScreen = document.getElementById('qcm-screen');
+        if (qcmScreen) qcmScreen.scrollTo({ top: 0 });
+        window.scrollTo({ top: 0 });
+
         const qIdx = QuizService.state.qcmIndex + 1;
         const total = QuizService.state.qcmSessionData.length;
 
