@@ -620,7 +620,7 @@ class SitesService {
             clearLoadingIndicator();
             return this._withSavedForecast({
                 success: false,
-                error: { message: 'Service météo momentanément saturé' },
+                error: { message: t('sites.service.saturated') },
                 cooldownRemainingMs: cooldownRemaining,
                 reason: this._failureReason(),
             });
@@ -1248,8 +1248,7 @@ class SitesService {
 
             if (!hasValidData) {
                 if (warningNotice) {
-                    warningNotice.textContent =
-                        "Vous n'avez pas encore configuré de voile avec des plages de vent dans votre Matériel. Configuration requise avant d'utiliser ce mode.";
+                    warningNotice.textContent = t('sites.service.noWingWindRange');
                     warningNotice.style.display = 'block';
                 }
                 if (filterModeSelect) filterModeSelect.value = 'manual';
@@ -1305,7 +1304,7 @@ class SitesService {
 
         const label = document.getElementById('radius-val-label');
         if (label) {
-            label.textContent = radius === 210 ? 'Illimité' : `${radius} km`;
+            label.textContent = radius === 210 ? t('sites.service.unlimited') : t('forecast.radiusKm', { km: radius });
         }
 
         this.savePreferences();
@@ -1380,7 +1379,7 @@ class SitesService {
             const loadingHtml = `
             <div id="weather-loading-indicator" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px; margin-bottom: 16px; font-size: 1rem; color: var(--text-secondary); background: rgba(255,255,255,0.03); border-radius: 8px;">
                 <i class="ri-loader-4-line" style="animation: spin 1s linear infinite; font-size: 1.2rem;"></i>
-                <span>Changement du modèle météo (${model.toUpperCase()})...</span>
+                <span>${escapeHTML(t('sites.service.modelChanging', { model: model.toUpperCase() }))}</span>
             </div>
         `;
             container.parentNode.insertBefore(document.createRange().createContextualFragment(loadingHtml), container);
@@ -1397,12 +1396,12 @@ class SitesService {
         if (btn) {
             if (this.state.filterFavoritesOnly) {
                 btn.classList.add('active');
-                btn.innerHTML = `<i class="ri-star-fill" style="color: #fbbf24;"></i> Favoris`;
+                btn.innerHTML = `<i class="ri-star-fill" style="color: #fbbf24;"></i> ${escapeHTML(t('sites.service.favorites'))}`;
                 btn.style.background = 'rgba(251, 191, 36, 0.15)';
                 btn.style.borderColor = 'rgba(251, 191, 36, 0.3)';
             } else {
                 btn.classList.remove('active');
-                btn.innerHTML = `<i class="ri-star-line"></i> Favoris`;
+                btn.innerHTML = `<i class="ri-star-line"></i> ${escapeHTML(t('sites.service.favorites'))}`;
                 btn.style.background = 'rgba(255,255,255,0.03)';
                 btn.style.borderColor = 'var(--border-color)';
             }
@@ -1552,7 +1551,7 @@ class SitesService {
 
     geocodeAddress(query) {
         if (!query || query.trim() === '') {
-            alert('Veuillez saisir une adresse ou une ville.');
+            alert(t('sites.service.addressRequired'));
             return;
         }
 
@@ -1561,7 +1560,7 @@ class SitesService {
         const btnSave = document.getElementById('btn-save-location');
 
         if (statusEl) {
-            statusEl.innerHTML = `<i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i> Recherche de l'adresse...`;
+            statusEl.innerHTML = `<i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i> ${escapeHTML(t('sites.service.addressSearching'))}`;
             statusEl.style.color = 'var(--text-muted)';
         }
 
@@ -1639,7 +1638,7 @@ class SitesService {
                     this.state.userLocation = { lat, lng };
 
                     if (statusEl) {
-                        statusEl.innerHTML = `<i class="ri-checkbox-circle-line" style="color: var(--accent-green);"></i> Localisé : ${escapeHTML(result.display_name)}`;
+                        statusEl.innerHTML = `<i class="ri-checkbox-circle-line" style="color: var(--accent-green);"></i> ${escapeHTML(t('sites.service.addressFound', { name: result.display_name }))}`;
                         statusEl.style.color = 'var(--accent-green)';
                     }
                     if (btnSave) btnSave.style.display = 'inline-block';
@@ -1657,7 +1656,7 @@ class SitesService {
                     }
                 } else {
                     if (statusEl) {
-                        statusEl.innerHTML = `<i class="ri-error-warning-line" style="color: var(--accent-red);"></i> Adresse non trouvée.`;
+                        statusEl.innerHTML = `<i class="ri-error-warning-line" style="color: var(--accent-red);"></i> ${escapeHTML(t('sites.service.addressNotFound'))}`;
                         statusEl.style.color = 'var(--accent-red)';
                     }
                 }
@@ -1665,7 +1664,7 @@ class SitesService {
             .catch((err) => {
                 console.error('Geocoding error:', err);
                 if (statusEl) {
-                    statusEl.innerHTML = `<i class="ri-error-warning-line" style="color: var(--accent-red);"></i> Erreur de connexion au service.`;
+                    statusEl.innerHTML = `<i class="ri-error-warning-line" style="color: var(--accent-red);"></i> ${escapeHTML(t('sites.service.addressServiceError'))}`;
                     statusEl.style.color = 'var(--accent-red)';
                 }
             });
@@ -1676,9 +1675,9 @@ class SitesService {
         const inputEl = /** @type {HTMLInputElement} */ (document.getElementById('address-input'));
         const name =
             inputEl.value ||
-            (inputEl.placeholder !== 'Adresse ou ville (ex: Annecy, Gourdon)...'
+            (inputEl.placeholder !== t('html.sitesScreen.placeholderAdresseOuVille')
                 ? inputEl.placeholder
-                : 'Nouveau lieu');
+                : t('sites.service.newPlace'));
         const newLoc = {
             name: name,
             lat: this.state.userLocation.lat,
@@ -1702,8 +1701,9 @@ class SitesService {
         if (loc) {
             this.state.userLocation = { lat: loc.lat, lng: loc.lng, name: loc.name };
             /** @type {HTMLInputElement} */ (document.getElementById('address-input')).value = loc.name;
-            /** @type {HTMLInputElement} */ (document.getElementById('address-input')).placeholder =
-                'Adresse ou ville (ex: Annecy, Gourdon)...';
+            /** @type {HTMLInputElement} */ (document.getElementById('address-input')).placeholder = t(
+                'html.sitesScreen.placeholderAdresseOuVille',
+            );
             document.getElementById('address-status-message').innerHTML =
                 '<i class="ri-check-line"></i> Lieu favori chargé';
             const btnSave = document.getElementById('btn-save-location');

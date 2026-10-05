@@ -1,5 +1,6 @@
 import StorageService from './storage.js';
 import { toSorted } from '../utils/array_utils.js';
+import { t } from '../utils/i18n.js';
 
 class QuizService {
     constructor() {
@@ -67,7 +68,7 @@ class QuizService {
             this.state.isLoaded = true;
             return { success: true, data: questions, error: null };
         } catch (err) {
-            this.state.loadingError = err.message || 'Erreur inconnue';
+            this.state.loadingError = err.message || t('quiz.dialogs.unknownError');
             this.state.isLoaded = true;
             return { success: false, data: null, error: err.message };
         }

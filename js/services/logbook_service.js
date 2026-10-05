@@ -482,7 +482,7 @@ class LogbookService {
                     error: null,
                 };
             }
-            return { success: false, data: null, error: 'No valid GPS data found in file.' };
+            return { success: false, data: null, error: t('logbook.igc.noGpsData') };
         } catch (e) {
             return { success: false, data: null, error: e.message };
         }
@@ -498,7 +498,7 @@ class LogbookService {
                 null;
             return { success: true, data: { city }, error: null };
         } catch (e) {
-            return { success: false, data: null, error: e.message || 'Erreur de géocodage' };
+            return { success: false, data: null, error: e.message || t('logbook.weather.geocodeError') };
         }
     }
 
@@ -536,14 +536,14 @@ class LogbookService {
             if (!response.ok) {
                 const error =
                     response.status === 429
-                        ? 'Service météo momentanément saturé, réessayez dans quelques minutes'
-                        : `Open-Meteo API error: ${response.status}`;
+                        ? t('logbook.weather.saturated')
+                        : t('logbook.weather.apiError', { status: response.status });
                 return { success: false, data: null, error };
             }
 
             const result = await response.json();
             if (!result || !result.hourly || !result.hourly.temperature_2m) {
-                return { success: false, data: null, error: "Format JSON inattendu de l'API" };
+                return { success: false, data: null, error: t('logbook.weather.unexpectedFormat') };
             }
 
             const temp = result.hourly.temperature_2m[hour];
@@ -553,7 +553,7 @@ class LogbookService {
             const weatherCode = result.hourly.weather_code[hour];
 
             if (temp === undefined || temp === null || windSpeed === undefined || windSpeed === null) {
-                return { success: false, data: null, error: 'Données hors couverture (trop ancien)' };
+                return { success: false, data: null, error: t('logbook.weather.outOfCoverage') };
             }
 
             return {
