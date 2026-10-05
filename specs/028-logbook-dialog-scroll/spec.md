@@ -10,13 +10,13 @@
 
 ## Cause
 
-Closing a modal `<dialog>` gives the focus back to the element that had it before the dialog opened, and the browser scrolls the page to that element. WebKit on Linux focuses buttons on click (macOS Safari does not), so the focus returned to a control near the top of the logbook and the list jumped up; the logbook then saved and « restored » that wrong position.
+A first fix (keeping the position across `modal.close()`) did not change the CI result. A temporary CI diagnostic (scroll events, focus and every scrolling call, logged at each step) showed that on WebKit Linux the logbook jumps from 572 to 106 **while the dialog opens** (`showModal`), with no JavaScript scrolling call: the browser moves it. It does not happen every time (it passed on retry). The logbook then saved that wrong position when re-rendering after the save. The return of the focus on close can move it too.
 
 ## Requirements *(mandatory)*
 
-- **FR-001**: Closing the session dialog MUST leave the logbook at the position it had behind the dialog, whatever element the browser gives the focus back to.
+- **FR-001**: The logbook MUST stay at the position it had when the session dialog opened: restored right after `showModal()` and after `close()`, whatever the browser does with the scroll or the focus.
 
 ## Success Criteria *(mandatory)*
 
-- **SC-001**: Unit test reproducing the focus scroll (`tests/views/logbook_modal_scroll.test.js`): fails before, passes after.
+- **SC-001**: Unit test reproducing the focus scroll (`tests/views/logbook_modal_scroll.test.js`, jump on open and on close): fails before, passes after.
 - **SC-002**: CI e2e green on WebKit Linux (the existing `tests/e2e/logbook_keeps_view.spec.js`).
