@@ -366,7 +366,7 @@ export const FR = Object.freeze({
             longestFlight: 'Plus long vol',
             highest: 'Plus haut',
             freeDistance: 'Plus grande distance libre',
-            maxFromTakeoff: 'Plus loin du déco',
+            maxFromTakeoff: 'Distance max depuis le déco',
             bestThermal: 'Meilleur thermique (moyenne)',
             maxThermalGain: 'Plus gros gain en thermique',
             cumulativeClimb: 'Plus gros dénivelé cumulé',
