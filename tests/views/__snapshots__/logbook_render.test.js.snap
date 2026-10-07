@@ -724,25 +724,49 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
             <h3 class="stats-section-title">Records personnels</h3>
             
             <div class="records-list">
-                    <div class="record-row">
-                        <span class="record-label">Plus long vol</span>
-                        <strong class="record-value">1h 15min</strong>
-                        <span class="record-when">20/09/2026 · Mont Lambert</span>
+                    <div class="record-row" role="button" tabindex="0" data-action="scrollToSession" data-args="f1">
+                        <div class="record-icon"><i class="ri-time-line"></i></div>
+                        <div class="record-content">
+                            <div class="record-label">Plus long vol</div>
+                            <div class="record-when"><i class="ri-calendar-event-line"></i> 20/09/2026 • <i class="ri-map-pin-line"></i> Mont Lambert</div>
+                        </div>
+                        <div class="record-value-container">
+                            <strong class="record-value">1h 15min</strong>
+                            <i class="ri-arrow-right-s-line record-chevron"></i>
+                        </div>
                     </div>
-                    <div class="record-row">
-                        <span class="record-label">Plus haut</span>
-                        <strong class="record-value">1250 m</strong>
-                        <span class="record-when">20/09/2026 · Mont Lambert</span>
+                    <div class="record-row" role="button" tabindex="0" data-action="scrollToSession" data-args="f1">
+                        <div class="record-icon"><i class="ri-arrow-up-circle-line"></i></div>
+                        <div class="record-content">
+                            <div class="record-label">Plus haut</div>
+                            <div class="record-when"><i class="ri-calendar-event-line"></i> 20/09/2026 • <i class="ri-map-pin-line"></i> Mont Lambert</div>
+                        </div>
+                        <div class="record-value-container">
+                            <strong class="record-value">1250 m</strong>
+                            <i class="ri-arrow-right-s-line record-chevron"></i>
+                        </div>
                     </div>
-                    <div class="record-row">
-                        <span class="record-label">Vario max</span>
-                        <strong class="record-value">+3.2 m/s</strong>
-                        <span class="record-when">20/09/2026 · Mont Lambert</span>
+                    <div class="record-row" role="button" tabindex="0" data-action="scrollToSession" data-args="f1">
+                        <div class="record-icon"><i class="ri-stock-line"></i></div>
+                        <div class="record-content">
+                            <div class="record-label">Vario max</div>
+                            <div class="record-when"><i class="ri-calendar-event-line"></i> 20/09/2026 • <i class="ri-map-pin-line"></i> Mont Lambert</div>
+                        </div>
+                        <div class="record-value-container">
+                            <strong class="record-value">+3.2 m/s</strong>
+                            <i class="ri-arrow-right-s-line record-chevron"></i>
+                        </div>
                     </div>
-                    <div class="record-row">
-                        <span class="record-label">Vitesse sol max</span>
-                        <strong class="record-value">48 km/h</strong>
-                        <span class="record-when">20/09/2026 · Mont Lambert</span>
+                    <div class="record-row" role="button" tabindex="0" data-action="scrollToSession" data-args="f1">
+                        <div class="record-icon"><i class="ri-speed-up-line"></i></div>
+                        <div class="record-content">
+                            <div class="record-label">Vitesse sol max</div>
+                            <div class="record-when"><i class="ri-calendar-event-line"></i> 20/09/2026 • <i class="ri-map-pin-line"></i> Mont Lambert</div>
+                        </div>
+                        <div class="record-value-container">
+                            <strong class="record-value">48 km/h</strong>
+                            <i class="ri-arrow-right-s-line record-chevron"></i>
+                        </div>
                     </div></div>
             <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent;">
                 <i class="ri-refresh-line"></i> Calculer les stats détaillées des vols avec trace (à mettre à jour : 1)

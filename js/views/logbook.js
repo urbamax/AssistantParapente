@@ -623,6 +623,23 @@ class LogbookViewClass extends BaseView {
         this.updateEquipmentAlertBadge();
     }
 
+    scrollToSession(id) {
+        this.switchTab('history');
+        // Let the tab display before trying to scroll
+        setTimeout(() => {
+            const card = document.querySelector(`.logbook-card[data-session-id="${id}"]`);
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Highlight the card
+                card.style.transition = 'box-shadow 0.3s ease-in-out';
+                card.style.boxShadow = '0 0 15px rgba(14, 165, 233, 0.8)';
+                setTimeout(() => {
+                    card.style.boxShadow = '';
+                }, 2000);
+            }
+        }, 100);
+    }
+
     // --- FENÊTRE D'AJOUT / MODIFICATION D'UNE SESSION ---
 
     openSessionModal() {
@@ -2906,11 +2923,32 @@ class LogbookViewClass extends BaseView {
                 if (typeof v === 'number' && Number.isFinite(v) && v > 0 && (!best || v > best.v)) best = { v, f };
             }
             if (!best) continue;
+            const icons = {
+                longestFlight: 'ri-time-line',
+                highest: 'ri-arrow-up-circle-line',
+                freeDistance: 'ri-route-line',
+                maxFromTakeoff: 'ri-flight-takeoff-line',
+                bestThermal: 'ri-fire-line',
+                maxThermalGain: 'ri-arrow-up-line',
+                cumulativeClimb: 'ri-funds-line',
+                maxClimb: 'ri-stock-line',
+                bestGlide: 'ri-flight-land-line',
+                maxSpeed: 'ri-speed-up-line',
+                gMax: 'ri-dashboard-3-line',
+                highestRelease: 'ri-arrow-up-double-line'
+            };
+            const iconClass = icons[key] || 'ri-trophy-line';
             rows += `
-                    <div class="record-row">
-                        <span class="record-label">${tt(`records.${key}`)}</span>
-                        <strong class="record-value">${format(best.v)}</strong>
-                        <span class="record-when">${escapeHTML(formatDateOnly(best.f.datetime))} · ${escapeHTML(best.f.site || '')}</span>
+                    <div class="record-row" role="button" tabindex="0" data-action="scrollToSession" data-args="${best.f.id}">
+                        <div class="record-icon"><i class="${iconClass}"></i></div>
+                        <div class="record-content">
+                            <div class="record-label">${tt(`records.${key}`)}</div>
+                            <div class="record-when"><i class="ri-calendar-event-line"></i> ${escapeHTML(formatDateOnly(best.f.datetime))} ${best.f.site ? `• <i class="ri-map-pin-line"></i> ${escapeHTML(best.f.site)}` : ''}</div>
+                        </div>
+                        <div class="record-value-container">
+                            <strong class="record-value">${format(best.v)}</strong>
+                            <i class="ri-arrow-right-s-line record-chevron"></i>
+                        </div>
                     </div>`;
         }
 
