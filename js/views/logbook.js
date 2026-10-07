@@ -3306,9 +3306,9 @@ class LogbookViewClass extends BaseView {
                             </div>
                             <div class="equipment-secondary-details" style="font-size: 0.8rem; opacity: 0.8; display:flex; gap:15px; flex-wrap:wrap; margin-bottom: 12px;">
                                 ${equip.dateAchat ? `<span class="detail-item"><strong>${tt('equipment.purchase')}</strong> ${formatDateOnly(equip.dateAchat)}</span>` : ''}
-                                ${equip.derniereRevision ? `<span class="detail-item"><strong>${tt('equipment.lastRevision')}</strong> ${formatDateOnly(equip.derniereRevision)}</span>` : ''}
-                                ${stats && stats.nextRevisionDate ? `<span class="detail-item"><strong>${tt('equipment.nextRevision')}</strong> ${formatDateOnly(stats.revisionDateStr)}</span>` : ''}
-                                ${stats && stats.hoursRemaining !== null ? `<span class="detail-item"><strong>${tt('equipment.hoursBeforeRevision')}</strong> ${stats.hoursRemaining <= 0 ? `<span style="color:#ef4444; font-weight:bold;">${tt('equipment.overdueBy', { hours: Math.abs(Math.round(stats.hoursRemaining * 10) / 10) })}</span>` : tt('equipment.hours', { hours: Math.round(stats.hoursRemaining * 10) / 10 })} ${tt('equipment.ofPeriod', { period: equip.periodiciteHeures })}</span>` : ''}
+                                ${equip.derniereRevision ? `<span class="detail-item"><strong>${tt(equip.type === 'secours' ? 'equipment.lastRepacking' : 'equipment.lastRevision')}</strong> ${formatDateOnly(equip.derniereRevision)}</span>` : ''}
+                                ${stats && stats.nextRevisionDate ? `<span class="detail-item"><strong>${tt(equip.type === 'secours' ? 'equipment.nextRepacking' : 'equipment.nextRevision')}</strong> ${formatDateOnly(stats.revisionDateStr)}</span>` : ''}
+                                ${stats && stats.hoursRemaining !== null ? `<span class="detail-item"><strong>${tt(equip.type === 'secours' ? 'equipment.hoursBeforeRepacking' : 'equipment.hoursBeforeRevision')}</strong> ${stats.hoursRemaining <= 0 ? `<span style="color:#ef4444; font-weight:bold;">${tt('equipment.overdueBy', { hours: Math.abs(Math.round(stats.hoursRemaining * 10) / 10) })}</span>` : tt('equipment.hours', { hours: Math.round(stats.hoursRemaining * 10) / 10 })} ${tt('equipment.ofPeriod', { period: equip.periodiciteHeures })}</span>` : ''}
                                 ${equip.type === 'voile' && equip.ventMin !== undefined ? `<span class="detail-item"><strong>${tt('equipment.windRange')}</strong> ${tt('equipment.windRangeValue', { min: equip.ventMin, max: equip.ventMax })}</span>` : ''}
                                 ${equip.type === 'sellette' && equip.linkedRescueId ? `<span class="detail-item"><strong>${tt('equipment.linkedRescue')}</strong> ${escapeHTML(LogbookService.getEquipmentById(equip.linkedRescueId)?.nom || tt('equipment.archived'))}</span>` : ''}
                             </div>
@@ -3416,7 +3416,7 @@ class LogbookViewClass extends BaseView {
     updateEquipmentLabels(type) {
         const revLabel = document.querySelector('label[for="eq-derniere-revision"]');
         if (revLabel) {
-            revLabel.innerText = tl(type === 'secours' ? 'logbookScreen.dernierPliageOptionnel' : 'logbookScreen.derniereRevisionOptionnel');
+            revLabel.innerText = t(type === 'secours' ? 'logbookScreen.dernierPliageOptionnel' : 'logbookScreen.derniereRevisionOptionnel');
         }
     }
 
