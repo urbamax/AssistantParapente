@@ -588,7 +588,8 @@ export const FirebaseAuthEngine = {
             // Re-read tombstones here in case a deletion happened concurrently while this sync
             // was running (race condition: deleteLogbookEntry fires async, sync reads cloud
             // before the delete completes → cloud still has the doc → merge would re-add it).
-            const deletedFlightsSet = new Set(readTombstoneIds('deleted_flights'));
+            const newlyDeletedFlights = readTombstoneIds('deleted_flights');
+            const deletedFlightsSet = new Set([...deletedFlights, ...newlyDeletedFlights]);
 
             // The local snapshot was read before this point too: a flight deleted meanwhile must
             // not come back from it either (it would then be re-uploaded on the next sync).
@@ -686,7 +687,8 @@ export const FirebaseAuthEngine = {
 
             // 2. Smart Merge: Compare updatedAt
             // Re-read tombstones (same race-condition guard as logbook above).
-            const deletedEquipSet = new Set(readTombstoneIds('deleted_equipment'));
+            const newlyDeletedEquip = readTombstoneIds('deleted_equipment');
+            const deletedEquipSet = new Set([...deletedEquip, ...newlyDeletedEquip]);
 
             const mergedEquipMap = new Map();
             localEquip.forEach((item) => {
