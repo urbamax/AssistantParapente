@@ -2128,7 +2128,7 @@ class LogbookViewClass extends BaseView {
             // Find which required field is empty
             const requiredFields = Array.from(form.querySelectorAll('[required]'));
             const emptyField = requiredFields.find(
-                (field) => !/** @type {HTMLInputElement|HTMLSelectElement} */ (field).value.trim(),
+                (field) => !(/** @type {HTMLInputElement|HTMLSelectElement} */ (field).value.trim()),
             );
 
             if (emptyField) {
