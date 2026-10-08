@@ -3077,7 +3077,7 @@ class LogbookViewClass extends BaseView {
             <div class="stats-grid">
                 <!-- KPI: Vols -->
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background: var(--accent-blue); color: white;"><i class="ri-windy-line"></i></div>
+                    <div class="kpi-icon" style="background-color: var(--accent-blue); color: white;"><i class="ri-windy-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">${tt('stats.flights', { count: totalVols })}</div>
                         <div class="kpi-label">${tt('stats.flightTime', { duration: formatDuration(totalTimeVols) })}</div>
@@ -3085,7 +3085,7 @@ class LogbookViewClass extends BaseView {
                 </div>
                 <!-- KPI: Gonflages -->
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background: #f59e0b; color: white;"><i class="ri-footprint-line"></i></div>
+                    <div class="kpi-icon" style="background-color: #f59e0b; color: white;"><i class="ri-footprint-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">${tt('stats.groundSessions', { count: totalGonflages })}</div>
                         <div class="kpi-label">${tt('stats.groundTime', { duration: formatDuration(totalTimeGonflages) })}</div>
@@ -3093,7 +3093,7 @@ class LogbookViewClass extends BaseView {
                 </div>
                 <!-- KPI: Alt Max -->
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background: #8b5cf6; color: white;"><i class="ri-mist-line"></i></div>
+                    <div class="kpi-icon" style="background-color: #8b5cf6; color: white;"><i class="ri-mist-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">${maxAltitudeReached} m</div>
                         <div class="kpi-label">${tt('stats.maxAltitude')}</div>
@@ -3154,7 +3154,7 @@ class LogbookViewClass extends BaseView {
                     <div class="bar-row">
                         <div class="bar-label">${escapeHTML(site)}</div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: ${percent}%; background: var(--accent-green)"></div>
+                            <div class="bar-fill" style="width: ${percent}%; background-color: var(--accent-green)"></div>
                         </div>
                         <div class="bar-value">${count}</div>
                     </div>
@@ -3196,7 +3196,7 @@ class LogbookViewClass extends BaseView {
                     <div class="bar-row">
                         <div class="bar-label">${escapeHTML(type)}</div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: ${percent}%; background: var(--accent-blue)"></div>
+                            <div class="bar-fill" style="width: ${percent}%; background-color: var(--accent-blue)"></div>
                         </div>
                         <div class="bar-value">${count} (${Math.round(percent)}%)</div>
                     </div>
@@ -3215,7 +3215,7 @@ class LogbookViewClass extends BaseView {
                     <div class="bar-row">
                         <div class="bar-label" title="${escapeHTML(type)}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(type)}</div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: ${percent}%; background: #8b5cf6"></div>
+                            <div class="bar-fill" style="width: ${percent}%; background-color: #8b5cf6"></div>
                         </div>
                         <div class="bar-value">${count} (${Math.round(percent)}%)</div>
                     </div>
@@ -3233,7 +3233,7 @@ class LogbookViewClass extends BaseView {
                     <div class="bar-row">
                         <div class="bar-label">${escapeHTML(type)}</div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: ${percent}%; background: #f59e0b"></div>
+                            <div class="bar-fill" style="width: ${percent}%; background-color: #f59e0b"></div>
                         </div>
                         <div class="bar-value">${count} (${Math.round(percent)}%)</div>
                     </div>

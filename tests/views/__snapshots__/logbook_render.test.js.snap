@@ -643,7 +643,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
             <div class="stats-grid">
                 <!-- KPI: Vols -->
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background: var(--accent-blue); color: white;"><i class="ri-windy-line"></i></div>
+                    <div class="kpi-icon" style="background-color: var(--accent-blue); color: white;"><i class="ri-windy-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">2 vols</div>
                         <div class="kpi-label">1h 35min cumulé</div>
@@ -651,7 +651,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                 </div>
                 <!-- KPI: Gonflages -->
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background: #f59e0b; color: white;"><i class="ri-footprint-line"></i></div>
+                    <div class="kpi-icon" style="background-color: #f59e0b; color: white;"><i class="ri-footprint-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">1 sessions</div>
                         <div class="kpi-label">45min gonflage</div>
@@ -659,7 +659,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                 </div>
                 <!-- KPI: Alt Max -->
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background: #8b5cf6; color: white;"><i class="ri-mist-line"></i></div>
+                    <div class="kpi-icon" style="background-color: #8b5cf6; color: white;"><i class="ri-mist-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">1250 m</div>
                         <div class="kpi-label">Alt max atteinte</div>
@@ -737,7 +737,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <div class="bar-row">
                         <div class="bar-label">Mont Lambert</div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: 100%; background: var(--accent-green)"></div>
+                            <div class="bar-fill" style="width: 100%; background-color: var(--accent-green)"></div>
                         </div>
                         <div class="bar-value">1</div>
                     </div>
@@ -745,7 +745,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <div class="bar-row">
                         <div class="bar-label">Pente école</div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: 100%; background: var(--accent-green)"></div>
+                            <div class="bar-fill" style="width: 100%; background-color: var(--accent-green)"></div>
                         </div>
                         <div class="bar-value">1</div>
                     </div>
@@ -753,7 +753,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <div class="bar-row">
                         <div class="bar-label">Zzz inconnu</div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: 100%; background: var(--accent-green)"></div>
+                            <div class="bar-fill" style="width: 100%; background-color: var(--accent-green)"></div>
                         </div>
                         <div class="bar-value">1</div>
                     </div>
@@ -761,7 +761,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <div class="bar-row">
                         <div class="bar-label">Thermique</div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: 50%; background: var(--accent-blue)"></div>
+                            <div class="bar-fill" style="width: 50%; background-color: var(--accent-blue)"></div>
                         </div>
                         <div class="bar-value">1 (50%)</div>
                     </div>
@@ -769,7 +769,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <div class="bar-row">
                         <div class="bar-label">Plouf</div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: 50%; background: var(--accent-blue)"></div>
+                            <div class="bar-fill" style="width: 50%; background-color: var(--accent-blue)"></div>
                         </div>
                         <div class="bar-value">1 (50%)</div>
                     </div>
@@ -777,7 +777,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <div class="bar-row">
                         <div class="bar-label" title="Face voile" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Face voile</div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: 100%; background: #8b5cf6"></div>
+                            <div class="bar-fill" style="width: 100%; background-color: #8b5cf6"></div>
                         </div>
                         <div class="bar-value">1 (100%)</div>
                     </div>
@@ -785,7 +785,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <div class="bar-row">
                         <div class="bar-label">Face voile</div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: 100%; background: #f59e0b"></div>
+                            <div class="bar-fill" style="width: 100%; background-color: #f59e0b"></div>
                         </div>
                         <div class="bar-value">1 (100%)</div>
                     </div>
@@ -793,7 +793,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <div class="bar-row">
                         <div class="bar-label">Vent fort</div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: 100%; background: #f59e0b"></div>
+                            <div class="bar-fill" style="width: 100%; background-color: #f59e0b"></div>
                         </div>
                         <div class="bar-value">1 (100%)</div>
                     </div>
