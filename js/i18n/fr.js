@@ -212,32 +212,33 @@ export const FR = Object.freeze({
             noneOrNotApplicable: 'Aucun / Non applicable',
 
             // Validation Messages
-            alertMissingWingConfig: "Vous n'avez pas de voile configurée. Veuillez l'ajouter dans l'onglet Matériel avant de l'enregistrer.",
-            alertMissingWing: "Il manque la voile.",
-            alertMissingSite: "Il manque le nom du site ou du lieu.",
-            alertMissingDuration: "Il manque la durée de la session.",
+            alertMissingWingConfig:
+                "Vous n'avez pas de voile configurée. Veuillez l'ajouter dans l'onglet Matériel avant de l'enregistrer.",
+            alertMissingWing: 'Il manque la voile.',
+            alertMissingSite: 'Il manque le nom du site ou du lieu.',
+            alertMissingDuration: 'Il manque la durée de la session.',
             alertMissingDateTime: "Il manque la date et l'heure.",
             alertMissingSchool: "Il manque le nom de l'école ou de la structure.",
-            alertMissingRequired: "Veuillez remplir tous les champs obligatoires (*).",
+            alertMissingRequired: 'Veuillez remplir tous les champs obligatoires (*).',
 
             // Stage fields
             isCourse: "C'est un stage",
-            courseName: "Nom du stage",
-            courseNamePlaceholder: "Ex: Stage perf estival",
-            specialty: "Spécialité",
-            specialtySelect: "Sélectionner...",
+            courseName: 'Nom du stage',
+            courseNamePlaceholder: 'Ex: Stage perf estival',
+            specialty: 'Spécialité',
+            specialtySelect: 'Sélectionner...',
             specialties: Object.freeze({
-                Initiation: "Initiation",
-                Perfectionnement: "Perfectionnement",
-                Progression: "Progression",
+                Initiation: 'Initiation',
+                Perfectionnement: 'Perfectionnement',
+                Progression: 'Progression',
                 SIV: "SIV (Simulation d'Incidents de Vol)",
-                Cross: "Cross",
-                Autre: "Autre"
+                Cross: 'Cross',
+                Autre: 'Autre',
             }),
 
             // Rescue parachute fields
-            rescueDeployed: "Secours ouvert ?",
-            rescueUsed: "Secours utilisé",
+            rescueDeployed: 'Secours ouvert ?',
+            rescueUsed: 'Secours utilisé',
 
             save: 'Enregistrer',
             update: 'Modifier la session',

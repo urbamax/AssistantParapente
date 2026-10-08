@@ -442,7 +442,9 @@ class LogbookViewClass extends BaseView {
                         parseInt(/** @type {HTMLInputElement} */ (document.getElementById('eq-vent-max')).value, 10) ||
                         25;
                 } else if (type === 'sellette') {
-                    const linkedRescueSelect = /** @type {HTMLSelectElement} */ (document.getElementById('eq-linked-rescue'));
+                    const linkedRescueSelect = /** @type {HTMLSelectElement} */ (
+                        document.getElementById('eq-linked-rescue')
+                    );
                     if (linkedRescueSelect) equipDataObj.linkedRescueId = linkedRescueSelect.value || null;
                 }
 
@@ -1564,9 +1566,9 @@ class LogbookViewClass extends BaseView {
         if (!selletteName) return;
 
         const equipments = LogbookService.getEquipment();
-        const sellette = equipments.find(e => e.type === 'sellette' && e.nom === selletteName);
+        const sellette = equipments.find((e) => e.type === 'sellette' && e.nom === selletteName);
         if (sellette && sellette.linkedRescueId) {
-            const linkedRescue = equipments.find(e => e.id === sellette.linkedRescueId);
+            const linkedRescue = equipments.find((e) => e.id === sellette.linkedRescueId);
             if (linkedRescue) {
                 const rescueSelect = document.getElementById('lb-rescue');
                 if (rescueSelect) {
@@ -2118,15 +2120,20 @@ class LogbookViewClass extends BaseView {
 
     submitForm() {
         const form = /** @type {HTMLFormElement} */ (document.getElementById('logbook-add-form'));
-        const isTestEnv = (typeof window !== 'undefined' && typeof window.process !== 'undefined' || typeof process !== 'undefined' && process.env.NODE_ENV === 'test') || (typeof navigator !== 'undefined' && navigator.webdriver);
+        const isTestEnv =
+            (typeof window !== 'undefined' && typeof window.process !== 'undefined') ||
+            (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') ||
+            (typeof navigator !== 'undefined' && navigator.webdriver);
         if (!isTestEnv && !form.checkValidity()) {
             // Find which required field is empty
             const requiredFields = Array.from(form.querySelectorAll('[required]'));
-            const emptyField = requiredFields.find(field => !(/** @type {HTMLInputElement|HTMLSelectElement} */ (field)).value.trim());
-            
+            const emptyField = requiredFields.find(
+                (field) => !/** @type {HTMLInputElement|HTMLSelectElement} */ (field).value.trim(),
+            );
+
             if (emptyField) {
                 if (emptyField.id === 'lb-voile') {
-                    const voiles = LogbookService.getEquipment().filter(e => e.type === 'voile');
+                    const voiles = LogbookService.getEquipment().filter((e) => e.type === 'voile');
                     if (voiles.length === 0) {
                         alert(tt('form.alertMissingWingConfig'));
                     } else {
@@ -2186,7 +2193,7 @@ class LogbookViewClass extends BaseView {
         const ecole = ecoleCheck?.checked && ecoleInput ? ecoleInput.value.trim() : '';
         const moniteurInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
         const moniteur = ecole && moniteurInput ? moniteurInput.value.trim() : '';
-        
+
         // Nouveaux champs de stage
         const stageCheck = /** @type {HTMLInputElement} */ (document.getElementById('lb-stage-check'));
         const stageNameInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-stage-nom'));
@@ -2233,7 +2240,7 @@ class LogbookViewClass extends BaseView {
             session.typeVol = /** @type {HTMLSelectElement} */ (document.getElementById('lb-typeVol')).value;
             const winchOperator = /** @type {HTMLInputElement} */ (document.getElementById('lb-treuilleur'));
             session.treuilleur = session.typeVol === 'Treuil' && winchOperator ? winchOperator.value.trim() : '';
-            
+
             const rescueCheck = /** @type {HTMLInputElement} */ (document.getElementById('lb-rescue-check'));
             if (rescueCheck && rescueCheck.checked) {
                 session.rescueDeployed = true;
@@ -2453,7 +2460,7 @@ class LogbookViewClass extends BaseView {
         /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire')).value =
             session.commentaire || '';
         if (session.ecole) this.setSchoolField(true, session.ecole);
-        
+
         // Load Stage info
         if (session.stageName || session.stageSpecialty) {
             const stageCheck = /** @type {HTMLInputElement} */ (document.getElementById('lb-stage-check'));
@@ -2464,7 +2471,9 @@ class LogbookViewClass extends BaseView {
             }
             const stageNameInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-stage-nom'));
             if (stageNameInput && session.stageName) stageNameInput.value = session.stageName;
-            const stageSpecialtySelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-stage-specialite'));
+            const stageSpecialtySelect = /** @type {HTMLSelectElement} */ (
+                document.getElementById('lb-stage-specialite')
+            );
             if (stageSpecialtySelect && session.stageSpecialty) stageSpecialtySelect.value = session.stageSpecialty;
         }
 
@@ -2916,7 +2925,7 @@ class LogbookViewClass extends BaseView {
                 bestGlide: 'ri-flight-land-line',
                 maxSpeed: 'ri-speed-up-line',
                 gMax: 'ri-dashboard-3-line',
-                highestRelease: 'ri-arrow-up-double-line'
+                highestRelease: 'ri-arrow-up-double-line',
             };
             const iconClass = icons[key] || 'ri-trophy-line';
             rows += `
@@ -3321,12 +3330,16 @@ class LogbookViewClass extends BaseView {
                                     ${isArchive ? `<span class="session-badge" style="margin-left: 4px; background: #333; color: white; font-size:0.75rem; padding:2px 6px; border-radius:4px;">${tt('equipment.archived')}</span>` : ''}
                                 </div>
                             </div>
-                            ${equip.type === 'secours' ? '' : `
+                            ${
+                                equip.type === 'secours'
+                                    ? ''
+                                    : `
                             <div class="session-details" style="font-size: 0.85rem; display:flex; gap:15px; margin-bottom: 6px;">
                                 <span class="detail-item"><i class="ri-windy-line"></i> ${tt('equipment.sessions', { count: stats ? stats.totalSessions : 0 })}</span>
                                 <span class="detail-item"><i class="ri-time-line"></i> ${stats ? formatDuration(stats.totalTime) : '0h 00m'}</span>
                             </div>
-                            `}
+                            `
+                            }
                             <div class="equipment-secondary-details" style="font-size: 0.8rem; opacity: 0.8; display:flex; gap:15px; flex-wrap:wrap; margin-bottom: 12px;">
                                 ${equip.dateAchat ? `<span class="detail-item"><strong>${tt('equipment.purchase')}</strong> ${formatDateOnly(equip.dateAchat)}</span>` : ''}
                                 ${equip.derniereRevision ? `<span class="detail-item"><strong>${tt(equip.type === 'secours' ? 'equipment.lastRepacking' : 'equipment.lastRevision')}</strong> ${formatDateOnly(equip.derniereRevision)}</span>` : ''}
@@ -3381,7 +3394,7 @@ class LogbookViewClass extends BaseView {
         if (windLimitsDiv) {
             windLimitsDiv.style.display = typeSelect.value === 'voile' ? 'flex' : 'none';
         }
-        
+
         const linkedRescueDiv = document.getElementById('eq-linked-rescue-group');
         if (linkedRescueDiv) {
             linkedRescueDiv.style.display = typeSelect.value === 'sellette' ? 'block' : 'none';
@@ -3440,7 +3453,9 @@ class LogbookViewClass extends BaseView {
     updateEquipmentLabels(type) {
         const revLabel = document.querySelector('label[for="eq-derniere-revision"]');
         if (revLabel) {
-            revLabel.innerText = t(type === 'secours' ? 'logbookScreen.dernierPliageOptionnel' : 'logbookScreen.derniereRevisionOptionnel');
+            revLabel.innerText = t(
+                type === 'secours' ? 'logbookScreen.dernierPliageOptionnel' : 'logbookScreen.derniereRevisionOptionnel',
+            );
         }
     }
 
