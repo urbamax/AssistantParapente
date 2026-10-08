@@ -39,7 +39,7 @@ const tl = (key, params) => t(`logbook.${key}`, params);
 class LogbookViewClass extends BaseView {
     constructor() {
         super();
-        this.currentTab = 'history';
+        this.currentTab = StorageService.get('LAST_LOGBOOK_TAB') || 'history';
         this.currentFormType = 'vol';
     } // Ends constructor
 
@@ -599,6 +599,7 @@ class LogbookViewClass extends BaseView {
             return;
         }
         this.currentTab = tabName;
+        StorageService.set('LAST_LOGBOOK_TAB', tabName);
 
         // Sous-partie affichée, signalée dans le sous-menu « Carnet » de la barre de navigation
         document.querySelectorAll('[data-logbook-tab]').forEach((btn) => {
