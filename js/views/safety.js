@@ -1,3 +1,4 @@
+/* global GlobalState */
 /**
  * VIEW - SafetyView
  * Écran « Sécurité » : procédure d'urgence (alerte, position GPS, hélicoptère, arbre/falaise),

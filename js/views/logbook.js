@@ -1,3 +1,4 @@
+/* global process, GlobalState */
 /**
  * VIEW/CONTROLLER - LogbookView
  * Wrapped from logbook_engine.js
@@ -2117,7 +2118,7 @@ class LogbookViewClass extends BaseView {
 
     submitForm() {
         const form = /** @type {HTMLFormElement} */ (document.getElementById('logbook-add-form'));
-        const isTestEnv = (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') || (typeof navigator !== 'undefined' && navigator.webdriver);
+        const isTestEnv = (typeof window !== 'undefined' && typeof window.process !== 'undefined' || typeof process !== 'undefined' && process.env.NODE_ENV === 'test') || (typeof navigator !== 'undefined' && navigator.webdriver);
         if (!isTestEnv && !form.checkValidity()) {
             // Find which required field is empty
             const requiredFields = Array.from(form.querySelectorAll('[required]'));
@@ -2237,7 +2238,7 @@ class LogbookViewClass extends BaseView {
             if (rescueCheck && rescueCheck.checked) {
                 session.rescueDeployed = true;
                 const rescueSelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-rescue'));
-                let rescueValue = rescueSelect ? rescueSelect.value.trim() : '';
+                const rescueValue = rescueSelect ? rescueSelect.value.trim() : '';
                 session.rescueId = rescueValue;
             } else {
                 session.rescueDeployed = false;
