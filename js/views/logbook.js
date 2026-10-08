@@ -602,9 +602,11 @@ class LogbookViewClass extends BaseView {
         StorageService.set('LAST_LOGBOOK_TAB', tabName);
 
         // Sous-partie affichée, signalée dans le sous-menu « Carnet » de la barre de navigation
-        document.querySelectorAll('[data-logbook-tab]').forEach((btn) => {
-            btn.setAttribute('aria-current', String(btn.getAttribute('data-logbook-tab') === tabName));
-        });
+        if (GlobalState.get('mode') === 'LOGBOOK') {
+            document.querySelectorAll('[data-logbook-tab]').forEach((btn) => {
+                btn.setAttribute('aria-current', String(btn.getAttribute('data-logbook-tab') === tabName));
+            });
+        }
 
         // Update Content
         document.querySelectorAll('.logbook-tab-content').forEach((content) => {

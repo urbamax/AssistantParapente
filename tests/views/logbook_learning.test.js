@@ -232,8 +232,6 @@ describe('logbook: instructor of a school session', () => {
             datetime: '2026-09-01T10:00',
             site: 'Plaine',
             duree: 5,
-            voile: 'Ma voile',
-            techDecollage: 'Face voile',
             ecole: 'ÉCOLE TEST',
             moniteur: 'Gilbert',
             accompagnateur: 'Sophie',

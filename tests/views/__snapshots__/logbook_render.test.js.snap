@@ -63,7 +63,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
 exports[`logbook renders (spec 014: identical before and after moving the texts) > equipment 1`] = `
 "<h3 class="stats-section-title">Mon Inventaire</h3><div class="equip-list">
                     <div class="equip-card status-danger" style=" border:1px solid #eee; padding:15px; border-radius:8px; margin-bottom:15px; background:var(--bg-card); display:flex; flex-direction:column; justify-content:space-between; min-height:160px;">
-                        <div class="equip-alert text-danger" style="color:#ef4444; font-weight:bold; margin-bottom:8px;"><i class="ri-tools-line"></i> ⚠️ ATTENTION : Révision requise - Date dépassée (10/01/2025) ET Heures dépassées (2h / 1h)</div>
+                        <div class="equip-alert text-danger" style="color:#ef4444; font-weight:bold; margin-bottom:8px;"><i class="ri-tools-line"></i> ⚠️ ATTENTION : Révision requise - Date dépassée (2025-01-10) ET Heures dépassées (2h / 1h)</div>
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
                                 <div class="equip-name" style="font-size:1.1rem; font-weight:600;">
@@ -79,10 +79,9 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             <div class="equipment-secondary-details" style="font-size: 0.8rem; opacity: 0.8; display:flex; gap:15px; flex-wrap:wrap; margin-bottom: 12px;">
                                 <span class="detail-item"><strong>Achat:</strong> 01/03/2020</span>
                                 <span class="detail-item"><strong>Dernière révision:</strong> 10/01/2023</span>
-                                <span class="detail-item"><strong>Prochaine révision:</strong> 10/01/2025</span>
+                                <span class="detail-item"><strong>Prochaine révision:</strong> 2025-01-10</span>
                                 <span class="detail-item"><strong>Heures avant révision:</strong> <span style="color:#ef4444; font-weight:bold;">Dépassé de 1h</span> (sur 1h)</span>
                                 <span class="detail-item"><strong>Plage de Vent:</strong> 0 - 25 km/h</span>
-                                
                             </div>
                         </div>
                         <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid rgba(0,0,0,0.05); padding-top:8px; margin-top: auto;">
@@ -115,9 +114,8 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             <div class="equipment-secondary-details" style="font-size: 0.8rem; opacity: 0.8; display:flex; gap:15px; flex-wrap:wrap; margin-bottom: 12px;">
                                 
                                 <span class="detail-item"><strong>Dernière révision:</strong> 15/10/2024</span>
-                                <span class="detail-item"><strong>Prochaine révision:</strong> 15/10/2026</span>
+                                <span class="detail-item"><strong>Prochaine révision:</strong> 2026-10-15</span>
                                 <span class="detail-item"><strong>Heures avant révision:</strong> 1.8h (sur 3h)</span>
-                                
                                 
                             </div>
                         </div>
@@ -149,7 +147,6 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                                 <span class="detail-item"><i class="ri-time-line"></i> 0min</span>
                             </div>
                             <div class="equipment-secondary-details" style="font-size: 0.8rem; opacity: 0.8; display:flex; gap:15px; flex-wrap:wrap; margin-bottom: 12px;">
-                                
                                 
                                 
                                 
@@ -266,18 +263,6 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </select>
                     </div>
                 </div>
-                
-                <!-- NEW RESCUE FIELD -->
-                <div class="form-group" style="margin-bottom: 10px; padding-top: 5px; border-top: 1px solid rgba(0,0,0,0.1);">
-                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-bottom: 5px;">
-                        <input type="checkbox" id="lb-rescue-check" aria-controls="lb-rescue-group"> Secours ouvert ?
-                    </label>
-                    <div id="lb-rescue-group" hidden="">
-                        <label for="lb-rescue" style="display:block; margin-bottom: 5px;">Secours utilisé</label>
-                        <select id="lb-rescue" style="width:100%; padding:8px;"><option value="">-- Sélectionner --</option><option value="Autre">Autre...</option></select>
-                    </div>
-                </div>
-
                 <div class="form-group" style="margin-bottom: 10px;">
                     <label for="lb-tech-decollage" style="display:block; margin-bottom:5px;">Technique de décollage :</label>
                     <select id="lb-tech-decollage" style="width:100%; padding:8px;" required="" data-change-action="toggleOtherField" data-toggle-id="lb-tech-decollage-autre">
@@ -315,28 +300,6 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <label for="lb-moniteur" style="display:block; margin-top: 10px;">Moniteur</label>
                         <input type="text" id="lb-moniteur" list="moniteurs-list" placeholder="Nom du moniteur" autocomplete="off" style="width: 100%;">
                         <datalist id="moniteurs-list"></datalist>
-                        
-                        <!-- NEW STAGE FIELDS -->
-                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1);">
-                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-                                <input type="checkbox" id="lb-stage-check" aria-controls="lb-stage-group"> C'est un stage
-                            </label>
-                            <div id="lb-stage-group" hidden="" style="margin-top: 6px;">
-                                <label for="lb-stage-nom" style="display:block; margin-top: 5px;">Nom du stage</label>
-                                <input type="text" id="lb-stage-nom" placeholder="Ex: Stage perf estival" autocomplete="off" style="width: 100%;">
-                                <label for="lb-stage-specialite" style="display:block; margin-top: 10px;">Spécialité</label>
-                                <select id="lb-stage-specialite" style="width: 100%;">
-                                    <option value="">Sélectionner...</option>
-                                    <option value="Initiation">Initiation</option>
-                                    <option value="Perfectionnement">Perfectionnement</option>
-                                    <option value="Progression">Progression</option>
-                                    <option value="SIV">SIV (Simulation d'Incidents de Vol)</option>
-                                    <option value="Cross">Cross</option>
-                                    <option value="Autre">Autre</option>
-                                </select>
-                            </div>
-                        </div>
-
                         <label style="display:block; margin-top: 10px;">Accompagnateurs</label>
                         
                         <div id="lb-accompagnateur-group" class="lb-chips"></div>
@@ -442,28 +405,6 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <label for="lb-moniteur" style="display:block; margin-top: 10px;">Moniteur</label>
                         <input type="text" id="lb-moniteur" list="moniteurs-list" placeholder="Nom du moniteur" autocomplete="off" style="width: 100%;">
                         <datalist id="moniteurs-list"></datalist>
-                        
-                        <!-- NEW STAGE FIELDS -->
-                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1);">
-                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-                                <input type="checkbox" id="lb-stage-check" aria-controls="lb-stage-group"> C'est un stage
-                            </label>
-                            <div id="lb-stage-group" hidden="" style="margin-top: 6px;">
-                                <label for="lb-stage-nom" style="display:block; margin-top: 5px;">Nom du stage</label>
-                                <input type="text" id="lb-stage-nom" placeholder="Ex: Stage perf estival" autocomplete="off" style="width: 100%;">
-                                <label for="lb-stage-specialite" style="display:block; margin-top: 10px;">Spécialité</label>
-                                <select id="lb-stage-specialite" style="width: 100%;">
-                                    <option value="">Sélectionner...</option>
-                                    <option value="Initiation">Initiation</option>
-                                    <option value="Perfectionnement">Perfectionnement</option>
-                                    <option value="Progression">Progression</option>
-                                    <option value="SIV">SIV (Simulation d'Incidents de Vol)</option>
-                                    <option value="Cross">Cross</option>
-                                    <option value="Autre">Autre</option>
-                                </select>
-                            </div>
-                        </div>
-
                         <label style="display:block; margin-top: 10px;">Accompagnateurs</label>
                         
                         <div id="lb-accompagnateur-group" class="lb-chips"></div>
@@ -527,7 +468,6 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <div class="session-equip">
                             <div><strong>Voile :</strong> OZONE | RUSH 6 | BLEU | M</div>
                             <div><strong>Sellette :</strong> SUPAIR | ACCESS</div>
-                            
                             
                             
                             
@@ -615,7 +555,6 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             
                             
                             
-                            
                         </div>
                         
                         
@@ -651,7 +590,6 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                         
                         <div class="session-equip">
-                            
                             
                             
                             
@@ -724,49 +662,25 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
             <h3 class="stats-section-title">Records personnels</h3>
             
             <div class="records-list">
-                    <div class="record-row" role="button" tabindex="0" data-action="scrollToSession" data-args="f1">
-                        <div class="record-icon"><i class="ri-time-line"></i></div>
-                        <div class="record-content">
-                            <div class="record-label">Plus long vol</div>
-                            <div class="record-when"><i class="ri-calendar-event-line"></i> 20/09/2026 • <i class="ri-map-pin-line"></i> Mont Lambert</div>
-                        </div>
-                        <div class="record-value-container">
-                            <strong class="record-value">1h 15min</strong>
-                            <i class="ri-arrow-right-s-line record-chevron"></i>
-                        </div>
+                    <div class="record-row">
+                        <span class="record-label">Plus long vol</span>
+                        <strong class="record-value">1h 15min</strong>
+                        <span class="record-when">20/09/2026 · Mont Lambert</span>
                     </div>
-                    <div class="record-row" role="button" tabindex="0" data-action="scrollToSession" data-args="f1">
-                        <div class="record-icon"><i class="ri-arrow-up-circle-line"></i></div>
-                        <div class="record-content">
-                            <div class="record-label">Plus haut</div>
-                            <div class="record-when"><i class="ri-calendar-event-line"></i> 20/09/2026 • <i class="ri-map-pin-line"></i> Mont Lambert</div>
-                        </div>
-                        <div class="record-value-container">
-                            <strong class="record-value">1250 m</strong>
-                            <i class="ri-arrow-right-s-line record-chevron"></i>
-                        </div>
+                    <div class="record-row">
+                        <span class="record-label">Plus haut</span>
+                        <strong class="record-value">1250 m</strong>
+                        <span class="record-when">20/09/2026 · Mont Lambert</span>
                     </div>
-                    <div class="record-row" role="button" tabindex="0" data-action="scrollToSession" data-args="f1">
-                        <div class="record-icon"><i class="ri-stock-line"></i></div>
-                        <div class="record-content">
-                            <div class="record-label">Vario max</div>
-                            <div class="record-when"><i class="ri-calendar-event-line"></i> 20/09/2026 • <i class="ri-map-pin-line"></i> Mont Lambert</div>
-                        </div>
-                        <div class="record-value-container">
-                            <strong class="record-value">+3.2 m/s</strong>
-                            <i class="ri-arrow-right-s-line record-chevron"></i>
-                        </div>
+                    <div class="record-row">
+                        <span class="record-label">Vario max</span>
+                        <strong class="record-value">+3.2 m/s</strong>
+                        <span class="record-when">20/09/2026 · Mont Lambert</span>
                     </div>
-                    <div class="record-row" role="button" tabindex="0" data-action="scrollToSession" data-args="f1">
-                        <div class="record-icon"><i class="ri-speed-up-line"></i></div>
-                        <div class="record-content">
-                            <div class="record-label">Vitesse sol max</div>
-                            <div class="record-when"><i class="ri-calendar-event-line"></i> 20/09/2026 • <i class="ri-map-pin-line"></i> Mont Lambert</div>
-                        </div>
-                        <div class="record-value-container">
-                            <strong class="record-value">48 km/h</strong>
-                            <i class="ri-arrow-right-s-line record-chevron"></i>
-                        </div>
+                    <div class="record-row">
+                        <span class="record-label">Vitesse sol max</span>
+                        <strong class="record-value">48 km/h</strong>
+                        <span class="record-when">20/09/2026 · Mont Lambert</span>
                     </div></div>
             <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent;">
                 <i class="ri-refresh-line"></i> Calculer les stats détaillées des vols avec trace (à mettre à jour : 1)

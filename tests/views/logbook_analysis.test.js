@@ -75,8 +75,7 @@ describe('LogbookView.renderRecords', () => {
             flight('a', { igcStats: STATS }),
             flight('b', { duree: 95, igcStats: { ...STATS, freeDistanceKm: 12.3, bestThermalClimb: 3.4 } }),
         ]);
-        expect(html).toContain('<div class="record-label">Plus long vol</div>');
-        expect(html).toContain('<strong class="record-value">1h 35min');
+        expect(html).toContain('Plus long vol</span>\n                        <strong class="record-value">1h 35min');
         expect(html).toContain('12.3 km');
         expect(html).toContain('+3.4 m/s');
         expect(html).toContain('PLAINE &lt;b&gt;');
