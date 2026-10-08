@@ -733,7 +733,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                         <div style="font-size: 0.8rem; margin-top: 6px; color: var(--text-secondary);"><strong>Avant révision:</strong> <span style="color:#ef4444; font-weight:bold;">Dépassé de 1h</span> (sur 1h)</div>
                     </div>
-                </div><h3 class="stats-section-title">Top Lieux fréquentés</h3><div class="chart-container">
+                </div><div class="charts-grid"><h3 class="stats-section-title">Top Lieux fréquentés</h3><div class="chart-container">
                     <div class="bar-row">
                         <div class="bar-label">Mont Lambert</div>
                         <div class="bar-track">
@@ -797,7 +797,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                         <div class="bar-value">1 (100%)</div>
                     </div>
-                </div>"
+                </div></div>"
 `;
 
 exports[`logbook renders (spec 014: identical before and after moving the texts) > statistics, empty 1`] = `

@@ -3144,6 +3144,8 @@ class LogbookViewClass extends BaseView {
             html += `</div>`;
         }
 
+        html += `<div class="charts-grid">`;
+
         // Top Sites Bar Chart
         if (topSites.length > 0) {
             html += `<h3 class="stats-section-title">${tt('stats.topPlaces')}</h3><div class="chart-container">`;
