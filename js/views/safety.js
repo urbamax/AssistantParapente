@@ -423,7 +423,7 @@ class SafetyViewClass extends BaseView {
             if (panel) panel.hidden = tab !== this.activeTab;
         });
         // Rubrique affichée, signalée dans le sous-menu « Sécurité » de la barre de navigation
-        if (GlobalState.get('mode') === 'SAFETY') {
+        if (typeof GlobalState !== 'undefined' && GlobalState.get('mode') === 'SAFETY') {
             document.querySelectorAll('[data-safety-tab]').forEach((btn) => {
                 btn.setAttribute('aria-current', String(btn.getAttribute('data-safety-tab') === this.activeTab));
             });

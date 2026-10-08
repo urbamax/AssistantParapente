@@ -401,6 +401,17 @@ class LogbookService {
             if (stats[sellette]) {
                 stats[sellette].totalSessions++;
                 stats[sellette].totalTime += duree;
+                const linkedRescueId = stats[sellette].equip.linkedRescueId;
+                if (linkedRescueId) {
+                    const rescue = this.equipment.find(e => e.id === linkedRescueId);
+                    if (rescue) {
+                        const rescueKey = (rescue.nom || '').toLowerCase();
+                        if (stats[rescueKey]) {
+                            stats[rescueKey].totalSessions++;
+                            stats[rescueKey].totalTime += duree;
+                        }
+                    }
+                }
             }
         });
 
