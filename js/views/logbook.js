@@ -2441,6 +2441,13 @@ class LogbookViewClass extends BaseView {
         setSelectOrAutre('lb-voile', 'lb-voile-autre', session.voile);
         setSelectOrAutre('lb-sellette', 'lb-sellette-autre', session.sellette);
 
+        if (session.rescueDeployed) {
+            const rescueSelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-rescue'));
+            if (rescueSelect && session.rescueId) {
+                rescueSelect.value = session.rescueId;
+            }
+        }
+
         /** @type {HTMLInputElement} */ (document.getElementById('lb-duree')).value = session.duree;
         /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire')).value =
             session.commentaire || '';
@@ -3379,6 +3386,9 @@ class LogbookViewClass extends BaseView {
         this.updateEquipmentLabels(typeSelect.value);
 
         const linkedRescueSelect = /** @type {HTMLSelectElement} */ (document.getElementById('eq-linked-rescue'));
+        if (linkedRescueSelect) {
+            linkedRescueSelect.value = equip.linkedRescueId || '';
+        }
 
         const minField = /** @type {HTMLInputElement} */ (document.getElementById('eq-vent-min'));
         if (minField) minField.value = equip.ventMin !== undefined ? equip.ventMin : 0;
