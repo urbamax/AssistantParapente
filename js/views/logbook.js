@@ -1,4 +1,3 @@
-/* global process, GlobalState */
 /**
  * VIEW/CONTROLLER - LogbookView
  * Wrapped from logbook_engine.js
@@ -24,6 +23,7 @@ import { parseCoordinates, formatCoordinates } from '../utils/geo_utils.js';
 import { t } from '../utils/i18n.js';
 
 import BaseView from '../core/base_view.js';
+import GlobalState from '../core/app_state.js';
 
 // Textes du carnet (spec 014), tous dans js/i18n/fr.js (section logbook). tt() : texte pour du HTML,
 // paramètres échappés ; th() : un paramètre est un fragment HTML construit ici (nombres en gras) ;
@@ -605,7 +605,7 @@ class LogbookViewClass extends BaseView {
         StorageService.set('LAST_LOGBOOK_TAB', tabName);
 
         // Sous-partie affichée, signalée dans le sous-menu « Carnet » de la barre de navigation
-        if (typeof GlobalState !== 'undefined' && GlobalState.get('mode') === 'LOGBOOK') {
+        if (GlobalState.get('mode') === 'LOGBOOK') {
             document.querySelectorAll('[data-logbook-tab]').forEach((btn) => {
                 btn.setAttribute('aria-current', String(btn.getAttribute('data-logbook-tab') === tabName));
             });
@@ -633,7 +633,9 @@ class LogbookViewClass extends BaseView {
         this.switchTab('history');
         // Let the tab display before trying to scroll
         setTimeout(() => {
-            const card = document.querySelector(`.logbook-card[data-session-id="${id}"]`);
+            const card = /** @type {HTMLElement|null} */ (
+                document.querySelector(`.logbook-card[data-session-id="${id}"]`)
+            );
             if (card) {
                 card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 // Highlight the card
@@ -1556,10 +1558,10 @@ class LogbookViewClass extends BaseView {
     }
 
     updateLinkedRescue() {
-        const rescueCheck = document.getElementById('lb-rescue-check');
+        const rescueCheck = /** @type {HTMLInputElement|null} */ (document.getElementById('lb-rescue-check'));
         if (!rescueCheck || !rescueCheck.checked) return;
 
-        const selletteSelect = document.getElementById('lb-sellette');
+        const selletteSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-sellette'));
         if (!selletteSelect) return;
 
         const selletteName = selletteSelect.value;
@@ -1570,7 +1572,7 @@ class LogbookViewClass extends BaseView {
         if (sellette && sellette.linkedRescueId) {
             const linkedRescue = equipments.find((e) => e.id === sellette.linkedRescueId);
             if (linkedRescue) {
-                const rescueSelect = document.getElementById('lb-rescue');
+                const rescueSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-rescue'));
                 if (rescueSelect) {
                     rescueSelect.value = linkedRescue.nom;
                 }
@@ -2120,11 +2122,7 @@ class LogbookViewClass extends BaseView {
 
     submitForm() {
         const form = /** @type {HTMLFormElement} */ (document.getElementById('logbook-add-form'));
-        const isTestEnv =
-            (typeof window !== 'undefined' && typeof window.process !== 'undefined') ||
-            (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') ||
-            (typeof navigator !== 'undefined' && navigator.webdriver);
-        if (!isTestEnv && !form.checkValidity()) {
+        if (!form.checkValidity()) {
             // Find which required field is empty
             const requiredFields = Array.from(form.querySelectorAll('[required]'));
             const emptyField = requiredFields.find(
@@ -2150,7 +2148,7 @@ class LogbookViewClass extends BaseView {
                 } else {
                     alert(tt('form.alertMissingRequired'));
                 }
-                emptyField.focus();
+                /** @type {HTMLElement} */ (emptyField).focus();
             }
             return;
         }
@@ -3451,7 +3449,7 @@ class LogbookViewClass extends BaseView {
     }
 
     updateEquipmentLabels(type) {
-        const revLabel = document.querySelector('label[for="eq-derniere-revision"]');
+        const revLabel = /** @type {HTMLElement|null} */ (document.querySelector('label[for="eq-derniere-revision"]'));
         if (revLabel) {
             revLabel.innerText = t(
                 type === 'secours' ? 'logbookScreen.dernierPliageOptionnel' : 'logbookScreen.derniereRevisionOptionnel',

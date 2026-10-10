@@ -235,6 +235,7 @@ describe('logbook: instructor of a school session', () => {
             ecole: 'ÉCOLE TEST',
             moniteur: 'Gilbert',
             accompagnateur: 'Sophie',
+            voile: 'Voile école',
         };
         setup([old]);
         LogbookView.renderHistory();
