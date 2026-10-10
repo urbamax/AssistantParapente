@@ -396,14 +396,16 @@ class LogbookService {
             const sellette = (f.sellette || '').toLowerCase();
             const duree = parseInt(f.duree || 0, 10);
 
-            if (stats[voile]) {
-                stats[voile].totalSessions++;
-                stats[voile].totalTime += duree;
-            }
-            if (stats[sellette]) {
-                stats[sellette].totalSessions++;
-                stats[sellette].totalTime += duree;
-            }
+            // Le secours monté sur la sellette vole avec elle.
+            const linkedRescueId = stats[sellette]?.equip.linkedRescueId;
+            const rescue = linkedRescueId ? this.equipment.find((e) => e.id === linkedRescueId) : null;
+            const rescueKey = rescue ? (rescue.nom || '').toLowerCase() : '';
+
+            [voile, sellette, rescueKey].forEach((key) => {
+                if (!stats[key]) return;
+                stats[key].totalSessions++;
+                stats[key].totalTime += duree;
+            });
         });
 
         // Calculate Alerts

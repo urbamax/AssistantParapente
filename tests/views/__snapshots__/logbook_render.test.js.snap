@@ -269,8 +269,18 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </select>
                     </div>
                 </div>
+
                 
-                
+
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-bottom: 5px;">
+                        <input type="checkbox" id="lb-rescue-check" aria-controls="lb-rescue-group"> Secours ouvert ?
+                    </label>
+                    <div id="lb-rescue-group" hidden="">
+                        <label for="lb-rescue" style="display:block; margin-bottom: 5px;">Secours utilisé</label>
+                        <select id="lb-rescue" style="width:100%; padding:8px;"><option value="">-- Sélectionner --</option><option value="Autre">Autre...</option></select>
+                    </div>
+                </div>
 
                 <div class="form-group" style="margin-bottom: 10px;">
                     <label for="lb-tech-decollage" style="display:block; margin-bottom:5px;">Technique de décollage :</label>
@@ -309,7 +319,19 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <label for="lb-moniteur" style="display:block; margin-top: 10px;">Moniteur</label>
                         <input type="text" id="lb-moniteur" list="moniteurs-list" placeholder="Nom du moniteur" autocomplete="off" style="width: 100%;">
                         <datalist id="moniteurs-list"></datalist>
-                        
+
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-top: 10px;">
+                            <input type="checkbox" id="lb-stage-check" aria-controls="lb-stage-group"> C'est un stage
+                        </label>
+                        <div id="lb-stage-group" hidden="" style="margin-top: 6px;">
+                            <label for="lb-stage-nom" style="display:block;">Nom du stage</label>
+                            <input type="text" id="lb-stage-nom" placeholder="Ex: Stage perf estival" autocomplete="off" style="width: 100%;">
+                            <label for="lb-stage-specialite" style="display:block; margin-top: 10px;">Spécialité</label>
+                            <select id="lb-stage-specialite" style="width: 100%;">
+                                <option value="">Sélectionner...</option>
+                                <option value="Initiation">Initiation</option><option value="Perfectionnement">Perfectionnement</option><option value="Progression">Progression</option><option value="SIV">SIV (Simulation d'Incidents de Vol)</option><option value="Cross">Cross</option><option value="Autre">Autre</option>
+                            </select>
+                        </div>
 
                         <label style="display:block; margin-top: 10px;">Accompagnateurs</label>
                         
@@ -416,7 +438,19 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <label for="lb-moniteur" style="display:block; margin-top: 10px;">Moniteur</label>
                         <input type="text" id="lb-moniteur" list="moniteurs-list" placeholder="Nom du moniteur" autocomplete="off" style="width: 100%;">
                         <datalist id="moniteurs-list"></datalist>
-                        
+
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-top: 10px;">
+                            <input type="checkbox" id="lb-stage-check" aria-controls="lb-stage-group"> C'est un stage
+                        </label>
+                        <div id="lb-stage-group" hidden="" style="margin-top: 6px;">
+                            <label for="lb-stage-nom" style="display:block;">Nom du stage</label>
+                            <input type="text" id="lb-stage-nom" placeholder="Ex: Stage perf estival" autocomplete="off" style="width: 100%;">
+                            <label for="lb-stage-specialite" style="display:block; margin-top: 10px;">Spécialité</label>
+                            <select id="lb-stage-specialite" style="width: 100%;">
+                                <option value="">Sélectionner...</option>
+                                <option value="Initiation">Initiation</option><option value="Perfectionnement">Perfectionnement</option><option value="Progression">Progression</option><option value="SIV">SIV (Simulation d'Incidents de Vol)</option><option value="Cross">Cross</option><option value="Autre">Autre</option>
+                            </select>
+                        </div>
 
                         <label style="display:block; margin-top: 10px;">Accompagnateurs</label>
                         

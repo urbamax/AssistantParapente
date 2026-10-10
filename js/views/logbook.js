@@ -834,7 +834,19 @@ class LogbookViewClass extends BaseView {
                         <label for="lb-moniteur" style="display:block; margin-top: 10px;">${tt('form.instructor')}</label>
                         <input type="text" id="lb-moniteur" list="moniteurs-list" placeholder="${tt('form.instructorPlaceholder')}" autocomplete="off" style="width: 100%;">
                         <datalist id="moniteurs-list"></datalist>
-                        
+
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-top: 10px;">
+                            <input type="checkbox" id="lb-stage-check" aria-controls="lb-stage-group"> ${tt('form.isCourse')}
+                        </label>
+                        <div id="lb-stage-group" hidden style="margin-top: 6px;">
+                            <label for="lb-stage-nom" style="display:block;">${tt('form.courseName')}</label>
+                            <input type="text" id="lb-stage-nom" placeholder="${tt('form.courseNamePlaceholder')}" autocomplete="off" style="width: 100%;">
+                            <label for="lb-stage-specialite" style="display:block; margin-top: 10px;">${tt('form.specialty')}</label>
+                            <select id="lb-stage-specialite" style="width: 100%;">
+                                <option value="">${tt('form.specialtySelect')}</option>
+                                ${LogbookViewClass.STAGE_SPECIALTIES.map((name) => `<option value="${name}">${tt(`form.specialties.${name}`)}</option>`).join('')}
+                            </select>
+                        </div>
 
                         <label style="display:block; margin-top: 10px;">${tt('form.companion')}</label>
                         ${this.renderChecklist('accompagnateur', [], this.getUsedValues('accompagnateur'), tt('form.companionPlaceholder'))}${exercises}
@@ -854,6 +866,8 @@ class LogbookViewClass extends BaseView {
     // --- LISTES À COCHER EXTENSIBLES (exercices, pilotes) ---
     // La liste proposée = valeurs par défaut + toutes celles déjà enregistrées dans le carnet :
     // une valeur ajoutée à la main sur une session est donc reproposée sur les suivantes.
+
+    static STAGE_SPECIALTIES = ['Initiation', 'Perfectionnement', 'Progression', 'SIV', 'Cross', 'Autre'];
 
     static FLIGHT_EXERCISES = [
         'Virages',
@@ -1289,7 +1303,19 @@ class LogbookViewClass extends BaseView {
                         </select>
                     </div>
                 </div>
-                
+
+                </div>
+
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-bottom: 5px;">
+                        <input type="checkbox" id="lb-rescue-check" aria-controls="lb-rescue-group"> ${tt('form.rescueDeployed')}
+                    </label>
+                    <div id="lb-rescue-group" hidden>
+                        <label for="lb-rescue" style="display:block; margin-bottom: 5px;">${tt('form.rescueUsed')}</label>
+                        <select id="lb-rescue" style="width:100%; padding:8px;">
+                            <option value="">${tt('form.select')}</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="form-group" style="margin-bottom: 10px;">
