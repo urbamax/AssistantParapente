@@ -309,7 +309,6 @@ export const FR = Object.freeze({
             wing: 'Voile :',
             harness: 'Sellette :',
             school: 'École :',
-            course: 'Stage',
             specialty: 'Spécialité :',
             rescueDeployed: 'Secours ouvert :',
             course: 'Stage',
