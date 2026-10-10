@@ -385,10 +385,13 @@ class LogbookService {
                 equip: e,
                 totalSessions: 0,
                 totalTime: 0,
+                openings: 0,
+                lastOpening: '',
                 nextRevisionDate: this._calculateNextRevision(e),
                 alerts: {
                     dateAlert: false, // Orange/Red if date is close/passed
                     hoursAlert: false, // Orange/Red if flight hours are close/passed to periodiciteHeures
+                    openedAlert: false, // Red : secours ouvert et pas replié depuis
                 },
             };
         });
@@ -399,16 +402,19 @@ class LogbookService {
             const sellette = (f.sellette || '').toLowerCase();
             const duree = parseInt(f.duree || 0, 10);
 
-            // Le secours monté sur la sellette vole avec elle.
-            const linkedRescueId = stats[sellette]?.equip.linkedRescueId;
-            const rescue = linkedRescueId ? this.equipment.find((e) => e.id === linkedRescueId) : null;
-            const rescueKey = rescue ? (rescue.nom || '').toLowerCase() : '';
-
-            [voile, sellette, rescueKey].forEach((key) => {
+            [voile, sellette].forEach((key) => {
                 if (!stats[key]) return;
                 stats[key].totalSessions++;
                 stats[key].totalTime += duree;
             });
+
+            // Un secours ne s'use qu'à l'ouverture : on compte les ouvertures, pas les heures de vol.
+            const opened = f.rescueDeployed && stats[(f.rescueId || '').toLowerCase()];
+            if (opened && opened.equip.type === 'secours') {
+                opened.openings++;
+                const date = (f.datetime || '').slice(0, 10);
+                if (date > opened.lastOpening) opened.lastOpening = date;
+            }
         });
 
         // Calculate Alerts
@@ -429,6 +435,10 @@ class LogbookService {
                 if (s.diffDays <= 0) s.alerts.dateAlert = 'red';
                 else if (s.diffDays <= 30) s.alerts.dateAlert = 'orange';
             }
+
+            // Secours ouvert : en défaut tant qu'il n'a pas été replié (pliage daté au jour de
+            // l'ouverture ou après).
+            if (s.lastOpening && !((e.derniereRevision || '') >= s.lastOpening)) s.alerts.openedAlert = 'red';
 
             // Hours alerts
             s.hoursRemaining = null;

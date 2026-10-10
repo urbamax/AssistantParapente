@@ -152,6 +152,12 @@ export class LogbookHistoryBase extends LogbookStatsBase {
         if (session && slot) slot.innerHTML = this.renderSessionWeatherHtml(session);
     }
 
+    // « Nom du stage » d'une session (« Stage » seul si seule la spécialité est renseignée).
+    getCourseLabel(session) {
+        if (session.stageName) return escapeHTML(session.stageName);
+        return session.stageSpecialty ? tt('history.course') : '';
+    }
+
     renderHistory() {
         const container = document.getElementById('logbook-history-list');
         if (!container) return;
@@ -292,7 +298,8 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                             ${session.voile ? `<div><strong>${tt('history.wing')}</strong> ${escapeHTML(session.voile)}</div>` : ''}
                             ${session.sellette ? `<div><strong>${tt('history.harness')}</strong> ${escapeHTML(session.sellette)}</div>` : ''}
                             ${session.rescueDeployed ? `<div style="color: #ef4444;"><strong>${tt('history.rescueDeployed')}</strong> ${escapeHTML(session.rescueId || tt('history.yes'))}</div>` : ''}
-                            ${session.ecole ? `<div><strong>${tt('history.school')}</strong> ${escapeHTML(session.ecole)}${session.stageName || session.stageSpecialty ? ` (${tt('history.course')}${session.stageSpecialty ? ` ${escapeHTML(session.stageSpecialty)}` : ''}${session.stageName ? ` : ${escapeHTML(session.stageName)}` : ''})` : ''}</div>` : ''}
+                            ${session.ecole ? `<div><strong>${tt('history.school')}</strong> ${[this.getCourseLabel(session), escapeHTML(session.ecole)].filter(Boolean).join(' | ')}</div>` : ''}
+                            ${session.ecole && session.stageSpecialty ? `<div><strong>${tt('history.specialty')}</strong> ${escapeHTML(session.stageSpecialty)}</div>` : ''}
                             ${isVol && session.typeVol === 'Treuil' && session.treuilleur ? `<div><strong>${tt('history.winchOperator')}</strong> ${escapeHTML(session.treuilleur)}</div>` : ''}
                             ${session.ecole && session.moniteur ? `<div><strong>${tt('history.instructor')}</strong> ${escapeHTML(session.moniteur)}</div>` : ''}
                             ${session.ecole && LogbookHistoryBase.companionsOf(session).length > 0 ? `<div><strong>${tt('history.companion')}</strong> ${escapeHTML(LogbookHistoryBase.companionsOf(session).join(', '))}</div>` : ''}
