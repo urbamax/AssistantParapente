@@ -2133,20 +2133,20 @@ class LogbookViewClass extends BaseView {
                 if (emptyField.id === 'lb-voile') {
                     const voiles = LogbookService.getEquipment().filter((e) => e.type === 'voile');
                     if (voiles.length === 0) {
-                        alert(tt('form.alertMissingWingConfig'));
+                        alert(tl('form.alertMissingWingConfig'));
                     } else {
-                        alert(tt('form.alertMissingWing'));
+                        alert(tl('form.alertMissingWing'));
                     }
                 } else if (emptyField.id === 'lb-site' || emptyField.id === 'lb-lieu') {
-                    alert(tt('form.alertMissingSite'));
+                    alert(tl('form.alertMissingSite'));
                 } else if (emptyField.id === 'lb-duree') {
-                    alert(tt('form.alertMissingDuration'));
+                    alert(tl('form.alertMissingDuration'));
                 } else if (emptyField.id === 'lb-datetime') {
-                    alert(tt('form.alertMissingDateTime'));
+                    alert(tl('form.alertMissingDateTime'));
                 } else if (emptyField.id === 'lb-ecole') {
-                    alert(tt('form.alertMissingSchool'));
+                    alert(tl('form.alertMissingSchool'));
                 } else {
-                    alert(tt('form.alertMissingRequired'));
+                    alert(tl('form.alertMissingRequired'));
                 }
                 /** @type {HTMLElement} */ (emptyField).focus();
             }
@@ -3452,7 +3452,7 @@ class LogbookViewClass extends BaseView {
         const revLabel = /** @type {HTMLElement|null} */ (document.querySelector('label[for="eq-derniere-revision"]'));
         if (revLabel) {
             revLabel.innerText = t(
-                type === 'secours' ? 'logbookScreen.dernierPliageOptionnel' : 'logbookScreen.derniereRevisionOptionnel',
+                type === 'secours' ? 'html.logbookScreen.dernierPliage' : 'html.logbookScreen.derniereRevision',
             );
         }
     }

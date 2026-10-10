@@ -27,6 +27,9 @@ test.describe('E2E - Logbook site coordinates picker', () => {
         await page.locator('#btn-type-gonflage').first().click();
         await page.fill('#lb-lieu', 'Pente Test Carte');
         await page.fill('#lb-duree', '60');
+        // La voile est obligatoire : sans matériel configuré, on la saisit via « Autre ».
+        await page.selectOption('#lb-voile', 'Autre');
+        await page.fill('#lb-voile-autre', 'Voile test');
     });
 
     const savedSession = (page) =>
