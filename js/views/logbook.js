@@ -79,18 +79,8 @@ class LogbookViewClass extends BaseView {
                     // traité plus haut
                 } else if (target.id === 'lb-ecole-check') {
                     LogbookView.setSchoolField(target.checked);
-                } else if (target.id === 'lb-stage-check') {
-                    const group = document.getElementById('lb-stage-group');
-                    if (group) group.hidden = !target.checked;
-                } else if (target.id === 'lb-rescue-check') {
-                    const group = document.getElementById('lb-rescue-group');
-                    if (group) group.hidden = !target.checked;
-                    if (target.checked) LogbookView.updateLinkedRescue();
                 } else if (target.id === 'lb-voile' || target.id === 'lb-sellette') {
                     LogbookView.setSelectOrAutre(target.id, target.id + '-autre', target.value);
-                    if (target.id === 'lb-sellette') {
-                        LogbookView.updateLinkedRescue();
-                    }
                 } else if (
                     target.id === 'eq-marque' ||
                     target.id === 'eq-modele' ||
@@ -1525,11 +1515,9 @@ class LogbookViewClass extends BaseView {
         // Populate Equipment
         const voilesSelect = document.getElementById('lb-voile');
         const sellettesSelect = document.getElementById('lb-sellette');
-        const rescueSelect = document.getElementById('lb-rescue');
 
         let voilesHtml = `<option value="">${tt('form.select')}</option>`;
         let sellettesHtml = `<option value="">${tt('form.select')}</option>`;
-        let rescueHtml = `<option value="">${tt('form.select')}</option>`;
 
         LogbookService.getEquipment()
             .filter((e) => e.statut !== 'archive')
@@ -1538,8 +1526,6 @@ class LogbookViewClass extends BaseView {
                     voilesHtml += `<option value="${escapeHTML(equip.nom)}">${escapeHTML(equip.nom)}</option>`;
                 } else if (equip.type === 'sellette') {
                     sellettesHtml += `<option value="${escapeHTML(equip.nom)}">${escapeHTML(equip.nom)}</option>`;
-                } else if (equip.type === 'secours') {
-                    rescueHtml += `<option value="${escapeHTML(equip.nom)}">${escapeHTML(equip.nom)}</option>`;
                 }
             });
 
@@ -1550,33 +1536,6 @@ class LogbookViewClass extends BaseView {
         if (sellettesSelect) {
             sellettesSelect.innerHTML = sellettesHtml;
             sellettesSelect.innerHTML += `<option value="Autre">${tt('form.other')}</option>`;
-        }
-        if (rescueSelect) {
-            rescueSelect.innerHTML = rescueHtml;
-            rescueSelect.innerHTML += `<option value="Autre">${tt('form.other')}</option>`;
-        }
-    }
-
-    updateLinkedRescue() {
-        const rescueCheck = /** @type {HTMLInputElement|null} */ (document.getElementById('lb-rescue-check'));
-        if (!rescueCheck || !rescueCheck.checked) return;
-
-        const selletteSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-sellette'));
-        if (!selletteSelect) return;
-
-        const selletteName = selletteSelect.value;
-        if (!selletteName) return;
-
-        const equipments = LogbookService.getEquipment();
-        const sellette = equipments.find((e) => e.type === 'sellette' && e.nom === selletteName);
-        if (sellette && sellette.linkedRescueId) {
-            const linkedRescue = equipments.find((e) => e.id === sellette.linkedRescueId);
-            if (linkedRescue) {
-                const rescueSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-rescue'));
-                if (rescueSelect) {
-                    rescueSelect.value = linkedRescue.nom;
-                }
-            }
         }
     }
 
@@ -2192,14 +2151,6 @@ class LogbookViewClass extends BaseView {
         const moniteurInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
         const moniteur = ecole && moniteurInput ? moniteurInput.value.trim() : '';
 
-        // Nouveaux champs de stage
-        const stageCheck = /** @type {HTMLInputElement} */ (document.getElementById('lb-stage-check'));
-        const stageNameInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-stage-nom'));
-        const stageSpecialtySelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-stage-specialite'));
-        const isStage = ecoleCheck?.checked && stageCheck?.checked;
-        const stageName = isStage && stageNameInput ? stageNameInput.value.trim() : '';
-        const stageSpecialty = isStage && stageSpecialtySelect ? stageSpecialtySelect.value : '';
-
         const editId = document.getElementById('lb-id-edit')
             ? /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit')).value
             : '';
@@ -2218,8 +2169,6 @@ class LogbookViewClass extends BaseView {
             commentaire: commentaire,
             ecole: ecole,
             moniteur: moniteur,
-            stageName: stageName,
-            stageSpecialty: stageSpecialty,
             accompagnateur: ecole ? this.getChecklistValues('accompagnateur') : [],
             pilotes: this.getChecklistValues('pilotes'),
         };
@@ -2238,17 +2187,6 @@ class LogbookViewClass extends BaseView {
             session.typeVol = /** @type {HTMLSelectElement} */ (document.getElementById('lb-typeVol')).value;
             const winchOperator = /** @type {HTMLInputElement} */ (document.getElementById('lb-treuilleur'));
             session.treuilleur = session.typeVol === 'Treuil' && winchOperator ? winchOperator.value.trim() : '';
-
-            const rescueCheck = /** @type {HTMLInputElement} */ (document.getElementById('lb-rescue-check'));
-            if (rescueCheck && rescueCheck.checked) {
-                session.rescueDeployed = true;
-                const rescueSelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-rescue'));
-                const rescueValue = rescueSelect ? rescueSelect.value.trim() : '';
-                session.rescueId = rescueValue;
-            } else {
-                session.rescueDeployed = false;
-                session.rescueId = '';
-            }
 
             const techDecoEl = /** @type {HTMLSelectElement} */ (document.getElementById('lb-tech-decollage'));
             if (techDecoEl) {
@@ -2447,33 +2385,10 @@ class LogbookViewClass extends BaseView {
         setSelectOrAutre('lb-voile', 'lb-voile-autre', session.voile);
         setSelectOrAutre('lb-sellette', 'lb-sellette-autre', session.sellette);
 
-        if (session.rescueDeployed) {
-            const rescueSelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-rescue'));
-            if (rescueSelect && session.rescueId) {
-                rescueSelect.value = session.rescueId;
-            }
-        }
-
         /** @type {HTMLInputElement} */ (document.getElementById('lb-duree')).value = session.duree;
         /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire')).value =
             session.commentaire || '';
         if (session.ecole) this.setSchoolField(true, session.ecole);
-
-        // Load Stage info
-        if (session.stageName || session.stageSpecialty) {
-            const stageCheck = /** @type {HTMLInputElement} */ (document.getElementById('lb-stage-check'));
-            if (stageCheck) {
-                stageCheck.checked = true;
-                const group = document.getElementById('lb-stage-group');
-                if (group) group.hidden = false;
-            }
-            const stageNameInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-stage-nom'));
-            if (stageNameInput && session.stageName) stageNameInput.value = session.stageName;
-            const stageSpecialtySelect = /** @type {HTMLSelectElement} */ (
-                document.getElementById('lb-stage-specialite')
-            );
-            if (stageSpecialtySelect && session.stageSpecialty) stageSpecialtySelect.value = session.stageSpecialty;
-        }
 
         this.setChecklistValues('pilotes', session.pilotes || []);
         if (session.typeExercice) this.setChecklistValues('typeExercice', session.typeExercice);
@@ -2485,18 +2400,6 @@ class LogbookViewClass extends BaseView {
             const winchOperatorEdit = /** @type {HTMLInputElement} */ (document.getElementById('lb-treuilleur'));
             if (winchOperatorEdit) winchOperatorEdit.value = session.treuilleur || '';
             this.updateWinchOperatorField();
-
-            // Load Rescue info
-            if (session.rescueDeployed) {
-                const rescueCheck = /** @type {HTMLInputElement} */ (document.getElementById('lb-rescue-check'));
-                if (rescueCheck) {
-                    rescueCheck.checked = true;
-                    const group = document.getElementById('lb-rescue-group');
-                    if (group) group.hidden = false;
-                }
-                const rescueSelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-rescue'));
-                if (rescueSelect && session.rescueId) rescueSelect.value = session.rescueId;
-            }
 
             setSelectOrAutre('lb-tech-decollage', 'lb-tech-decollage-autre', session.techDecollage);
 
@@ -2686,8 +2589,7 @@ class LogbookViewClass extends BaseView {
                         <div class="session-equip">
                             ${session.voile ? `<div><strong>${tt('history.wing')}</strong> ${escapeHTML(session.voile)}</div>` : ''}
                             ${session.sellette ? `<div><strong>${tt('history.harness')}</strong> ${escapeHTML(session.sellette)}</div>` : ''}
-                            ${session.rescueDeployed ? `<div style="color: #ef4444;"><strong>${tt('history.rescueDeployed')}</strong> ${escapeHTML(session.rescueId || tt('history.yes'))}</div>` : ''}
-                            ${session.ecole ? `<div><strong>${tt('history.school')}</strong> ${escapeHTML(session.ecole)}${session.stageName || session.stageSpecialty ? ` (${tt('history.course')}${session.stageSpecialty ? ` ${escapeHTML(session.stageSpecialty)}` : ''}${session.stageName ? ` : ${escapeHTML(session.stageName)}` : ''})` : ''}</div>` : ''}
+                            ${session.ecole ? `<div><strong>${tt('history.school')}</strong> ${escapeHTML(session.ecole)}</div>` : ''}
                             ${isVol && session.typeVol === 'Treuil' && session.treuilleur ? `<div><strong>${tt('history.winchOperator')}</strong> ${escapeHTML(session.treuilleur)}</div>` : ''}
                             ${session.ecole && session.moniteur ? `<div><strong>${tt('history.instructor')}</strong> ${escapeHTML(session.moniteur)}</div>` : ''}
                             ${session.ecole && LogbookViewClass.companionsOf(session).length > 0 ? `<div><strong>${tt('history.companion')}</strong> ${escapeHTML(LogbookViewClass.companionsOf(session).join(', '))}</div>` : ''}
