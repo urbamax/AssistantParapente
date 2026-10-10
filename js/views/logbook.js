@@ -23,6 +23,7 @@ import { parseCoordinates, formatCoordinates } from '../utils/geo_utils.js';
 import { t } from '../utils/i18n.js';
 
 import BaseView from '../core/base_view.js';
+import GlobalState from '../core/app_state.js';
 
 // Textes du carnet (spec 014), tous dans js/i18n/fr.js (section logbook). tt() : texte pour du HTML,
 // paramètres échappés ; th() : un paramètre est un fragment HTML construit ici (nombres en gras) ;
@@ -39,7 +40,7 @@ const tl = (key, params) => t(`logbook.${key}`, params);
 class LogbookViewClass extends BaseView {
     constructor() {
         super();
-        this.currentTab = 'history';
+        this.currentTab = StorageService.get('LAST_LOGBOOK_TAB') || 'history';
         this.currentFormType = 'vol';
     } // Ends constructor
 
@@ -78,8 +79,18 @@ class LogbookViewClass extends BaseView {
                     // traité plus haut
                 } else if (target.id === 'lb-ecole-check') {
                     LogbookView.setSchoolField(target.checked);
+                } else if (target.id === 'lb-stage-check') {
+                    const group = document.getElementById('lb-stage-group');
+                    if (group) group.hidden = !target.checked;
+                } else if (target.id === 'lb-rescue-check') {
+                    const group = document.getElementById('lb-rescue-group');
+                    if (group) group.hidden = !target.checked;
+                    if (target.checked) LogbookView.updateLinkedRescue();
                 } else if (target.id === 'lb-voile' || target.id === 'lb-sellette') {
                     LogbookView.setSelectOrAutre(target.id, target.id + '-autre', target.value);
+                    if (target.id === 'lb-sellette') {
+                        LogbookView.updateLinkedRescue();
+                    }
                 } else if (
                     target.id === 'eq-marque' ||
                     target.id === 'eq-modele' ||
@@ -92,6 +103,11 @@ class LogbookViewClass extends BaseView {
                     if (windLimitsDiv) {
                         windLimitsDiv.style.display = target.value === 'voile' ? 'flex' : 'none';
                     }
+                    const linkedRescueDiv = document.getElementById('eq-linked-rescue-group');
+                    if (linkedRescueDiv) {
+                        linkedRescueDiv.style.display = target.value === 'sellette' ? 'block' : 'none';
+                    }
+                    LogbookView.updateEquipmentLabels(target.value);
                 }
             });
 
@@ -425,6 +441,11 @@ class LogbookViewClass extends BaseView {
                     equipDataObj.ventMax =
                         parseInt(/** @type {HTMLInputElement} */ (document.getElementById('eq-vent-max')).value, 10) ||
                         25;
+                } else if (type === 'sellette') {
+                    const linkedRescueSelect = /** @type {HTMLSelectElement} */ (
+                        document.getElementById('eq-linked-rescue')
+                    );
+                    if (linkedRescueSelect) equipDataObj.linkedRescueId = linkedRescueSelect.value || null;
                 }
 
                 if (idEdit) {
@@ -529,6 +550,17 @@ class LogbookViewClass extends BaseView {
         populateSelect('eq-modele', [], 'customEquipModeles', getUniqueValues('modele'));
         populateSelect('eq-taille', DEFAULT_EQUIPMENT_SIZES, 'customEquipTailles', getUniqueValues('taille'));
         populateSelect('eq-couleur', DEFAULT_EQUIPMENT_COLORS, 'customEquipCouleurs', getUniqueValues('couleur'));
+
+        const eqLinkedRescue = document.getElementById('eq-linked-rescue');
+        if (eqLinkedRescue) {
+            let rescueHtml = `<option value="">${tt('form.noneOrNotApplicable')}</option>`;
+            LogbookService.getEquipment()
+                .filter((e) => e.type === 'secours' && e.statut !== 'archive')
+                .forEach((equip) => {
+                    rescueHtml += `<option value="${escapeHTML(equip.id)}">${escapeHTML(equip.nom)}</option>`;
+                });
+            eqLinkedRescue.innerHTML = rescueHtml;
+        }
     }
 
     updateEquipmentNomPreview() {
@@ -570,11 +602,14 @@ class LogbookViewClass extends BaseView {
             return;
         }
         this.currentTab = tabName;
+        StorageService.set('LAST_LOGBOOK_TAB', tabName);
 
         // Sous-partie affichée, signalée dans le sous-menu « Carnet » de la barre de navigation
-        document.querySelectorAll('[data-logbook-tab]').forEach((btn) => {
-            btn.setAttribute('aria-current', String(btn.getAttribute('data-logbook-tab') === tabName));
-        });
+        if (GlobalState.get('mode') === 'LOGBOOK') {
+            document.querySelectorAll('[data-logbook-tab]').forEach((btn) => {
+                btn.setAttribute('aria-current', String(btn.getAttribute('data-logbook-tab') === tabName));
+            });
+        }
 
         // Update Content
         document.querySelectorAll('.logbook-tab-content').forEach((content) => {
@@ -592,6 +627,25 @@ class LogbookViewClass extends BaseView {
             this.renderEquipment();
         }
         this.updateEquipmentAlertBadge();
+    }
+
+    scrollToSession(id) {
+        this.switchTab('history');
+        // Let the tab display before trying to scroll
+        setTimeout(() => {
+            const card = /** @type {HTMLElement|null} */ (
+                document.querySelector(`.logbook-card[data-session-id="${id}"]`)
+            );
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Highlight the card
+                card.style.transition = 'box-shadow 0.3s ease-in-out';
+                card.style.boxShadow = '0 0 15px rgba(14, 165, 233, 0.8)';
+                setTimeout(() => {
+                    card.style.boxShadow = '';
+                }, 2000);
+            }
+        }, 100);
     }
 
     // --- FENÊTRE D'AJOUT / MODIFICATION D'UNE SESSION ---
@@ -780,6 +834,20 @@ class LogbookViewClass extends BaseView {
                         <label for="lb-moniteur" style="display:block; margin-top: 10px;">${tt('form.instructor')}</label>
                         <input type="text" id="lb-moniteur" list="moniteurs-list" placeholder="${tt('form.instructorPlaceholder')}" autocomplete="off" style="width: 100%;">
                         <datalist id="moniteurs-list"></datalist>
+
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-top: 10px;">
+                            <input type="checkbox" id="lb-stage-check" aria-controls="lb-stage-group"> ${tt('form.isCourse')}
+                        </label>
+                        <div id="lb-stage-group" hidden style="margin-top: 6px;">
+                            <label for="lb-stage-nom" style="display:block;">${tt('form.courseName')}</label>
+                            <input type="text" id="lb-stage-nom" placeholder="${tt('form.courseNamePlaceholder')}" autocomplete="off" style="width: 100%;">
+                            <label for="lb-stage-specialite" style="display:block; margin-top: 10px;">${tt('form.specialty')}</label>
+                            <select id="lb-stage-specialite" style="width: 100%;">
+                                <option value="">${tt('form.specialtySelect')}</option>
+                                ${LogbookViewClass.STAGE_SPECIALTIES.map((name) => `<option value="${name}">${tt(`form.specialties.${name}`)}</option>`).join('')}
+                            </select>
+                        </div>
+
                         <label style="display:block; margin-top: 10px;">${tt('form.companion')}</label>
                         ${this.renderChecklist('accompagnateur', [], this.getUsedValues('accompagnateur'), tt('form.companionPlaceholder'))}${exercises}
                     </div>
@@ -798,6 +866,8 @@ class LogbookViewClass extends BaseView {
     // --- LISTES À COCHER EXTENSIBLES (exercices, pilotes) ---
     // La liste proposée = valeurs par défaut + toutes celles déjà enregistrées dans le carnet :
     // une valeur ajoutée à la main sur une session est donc reproposée sur les suivantes.
+
+    static STAGE_SPECIALTIES = ['Initiation', 'Perfectionnement', 'Progression', 'SIV', 'Cross', 'Autre'];
 
     static FLIGHT_EXERCISES = [
         'Virages',
@@ -1233,6 +1303,21 @@ class LogbookViewClass extends BaseView {
                         </select>
                     </div>
                 </div>
+
+                </div>
+
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-bottom: 5px;">
+                        <input type="checkbox" id="lb-rescue-check" aria-controls="lb-rescue-group"> ${tt('form.rescueDeployed')}
+                    </label>
+                    <div id="lb-rescue-group" hidden>
+                        <label for="lb-rescue" style="display:block; margin-bottom: 5px;">${tt('form.rescueUsed')}</label>
+                        <select id="lb-rescue" style="width:100%; padding:8px;">
+                            <option value="">${tt('form.select')}</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="form-group" style="margin-bottom: 10px;">
                     <label for="lb-tech-decollage" style="display:block; margin-bottom:5px;">${tt('form.takeoffTechnique')}</label>
                     <select id="lb-tech-decollage" style="width:100%; padding:8px;" required data-change-action="toggleOtherField" data-toggle-id="lb-tech-decollage-autre">
@@ -1466,9 +1551,11 @@ class LogbookViewClass extends BaseView {
         // Populate Equipment
         const voilesSelect = document.getElementById('lb-voile');
         const sellettesSelect = document.getElementById('lb-sellette');
+        const rescueSelect = document.getElementById('lb-rescue');
 
         let voilesHtml = `<option value="">${tt('form.select')}</option>`;
         let sellettesHtml = `<option value="">${tt('form.select')}</option>`;
+        let rescueHtml = `<option value="">${tt('form.select')}</option>`;
 
         LogbookService.getEquipment()
             .filter((e) => e.statut !== 'archive')
@@ -1477,6 +1564,8 @@ class LogbookViewClass extends BaseView {
                     voilesHtml += `<option value="${escapeHTML(equip.nom)}">${escapeHTML(equip.nom)}</option>`;
                 } else if (equip.type === 'sellette') {
                     sellettesHtml += `<option value="${escapeHTML(equip.nom)}">${escapeHTML(equip.nom)}</option>`;
+                } else if (equip.type === 'secours') {
+                    rescueHtml += `<option value="${escapeHTML(equip.nom)}">${escapeHTML(equip.nom)}</option>`;
                 }
             });
 
@@ -1487,6 +1576,33 @@ class LogbookViewClass extends BaseView {
         if (sellettesSelect) {
             sellettesSelect.innerHTML = sellettesHtml;
             sellettesSelect.innerHTML += `<option value="Autre">${tt('form.other')}</option>`;
+        }
+        if (rescueSelect) {
+            rescueSelect.innerHTML = rescueHtml;
+            rescueSelect.innerHTML += `<option value="Autre">${tt('form.other')}</option>`;
+        }
+    }
+
+    updateLinkedRescue() {
+        const rescueCheck = /** @type {HTMLInputElement|null} */ (document.getElementById('lb-rescue-check'));
+        if (!rescueCheck || !rescueCheck.checked) return;
+
+        const selletteSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-sellette'));
+        if (!selletteSelect) return;
+
+        const selletteName = selletteSelect.value;
+        if (!selletteName) return;
+
+        const equipments = LogbookService.getEquipment();
+        const sellette = equipments.find((e) => e.type === 'sellette' && e.nom === selletteName);
+        if (sellette && sellette.linkedRescueId) {
+            const linkedRescue = equipments.find((e) => e.id === sellette.linkedRescueId);
+            if (linkedRescue) {
+                const rescueSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-rescue'));
+                if (rescueSelect) {
+                    rescueSelect.value = linkedRescue.nom;
+                }
+            }
         }
     }
 
@@ -2031,6 +2147,38 @@ class LogbookViewClass extends BaseView {
     }
 
     submitForm() {
+        const form = /** @type {HTMLFormElement} */ (document.getElementById('logbook-add-form'));
+        if (!form.checkValidity()) {
+            // Find which required field is empty
+            const requiredFields = Array.from(form.querySelectorAll('[required]'));
+            const emptyField = requiredFields.find(
+                (field) => !(/** @type {HTMLInputElement|HTMLSelectElement} */ (field).value.trim()),
+            );
+
+            if (emptyField) {
+                if (emptyField.id === 'lb-voile') {
+                    const voiles = LogbookService.getEquipment().filter((e) => e.type === 'voile');
+                    if (voiles.length === 0) {
+                        alert(tl('form.alertMissingWingConfig'));
+                    } else {
+                        alert(tl('form.alertMissingWing'));
+                    }
+                } else if (emptyField.id === 'lb-site' || emptyField.id === 'lb-lieu') {
+                    alert(tl('form.alertMissingSite'));
+                } else if (emptyField.id === 'lb-duree') {
+                    alert(tl('form.alertMissingDuration'));
+                } else if (emptyField.id === 'lb-datetime') {
+                    alert(tl('form.alertMissingDateTime'));
+                } else if (emptyField.id === 'lb-ecole') {
+                    alert(tl('form.alertMissingSchool'));
+                } else {
+                    alert(tl('form.alertMissingRequired'));
+                }
+                /** @type {HTMLElement} */ (emptyField).focus();
+            }
+            return;
+        }
+
         // Nom tapé dans « Ajouter » (accompagnateur, pilote, exercice) sans cliquer sur le bouton :
         // il est ajouté plutôt que perdu à l'enregistrement.
         document.querySelectorAll('input[data-checklist]').forEach((input) => {
@@ -2070,6 +2218,14 @@ class LogbookViewClass extends BaseView {
         const moniteurInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
         const moniteur = ecole && moniteurInput ? moniteurInput.value.trim() : '';
 
+        // Nouveaux champs de stage
+        const stageCheck = /** @type {HTMLInputElement} */ (document.getElementById('lb-stage-check'));
+        const stageNameInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-stage-nom'));
+        const stageSpecialtySelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-stage-specialite'));
+        const isStage = ecoleCheck?.checked && stageCheck?.checked;
+        const stageName = isStage && stageNameInput ? stageNameInput.value.trim() : '';
+        const stageSpecialty = isStage && stageSpecialtySelect ? stageSpecialtySelect.value : '';
+
         const editId = document.getElementById('lb-id-edit')
             ? /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit')).value
             : '';
@@ -2088,6 +2244,8 @@ class LogbookViewClass extends BaseView {
             commentaire: commentaire,
             ecole: ecole,
             moniteur: moniteur,
+            stageName: stageName,
+            stageSpecialty: stageSpecialty,
             accompagnateur: ecole ? this.getChecklistValues('accompagnateur') : [],
             pilotes: this.getChecklistValues('pilotes'),
         };
@@ -2106,6 +2264,17 @@ class LogbookViewClass extends BaseView {
             session.typeVol = /** @type {HTMLSelectElement} */ (document.getElementById('lb-typeVol')).value;
             const winchOperator = /** @type {HTMLInputElement} */ (document.getElementById('lb-treuilleur'));
             session.treuilleur = session.typeVol === 'Treuil' && winchOperator ? winchOperator.value.trim() : '';
+
+            const rescueCheck = /** @type {HTMLInputElement} */ (document.getElementById('lb-rescue-check'));
+            if (rescueCheck && rescueCheck.checked) {
+                session.rescueDeployed = true;
+                const rescueSelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-rescue'));
+                const rescueValue = rescueSelect ? rescueSelect.value.trim() : '';
+                session.rescueId = rescueValue;
+            } else {
+                session.rescueDeployed = false;
+                session.rescueId = '';
+            }
 
             const techDecoEl = /** @type {HTMLSelectElement} */ (document.getElementById('lb-tech-decollage'));
             if (techDecoEl) {
@@ -2304,10 +2473,34 @@ class LogbookViewClass extends BaseView {
         setSelectOrAutre('lb-voile', 'lb-voile-autre', session.voile);
         setSelectOrAutre('lb-sellette', 'lb-sellette-autre', session.sellette);
 
+        if (session.rescueDeployed) {
+            const rescueSelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-rescue'));
+            if (rescueSelect && session.rescueId) {
+                rescueSelect.value = session.rescueId;
+            }
+        }
+
         /** @type {HTMLInputElement} */ (document.getElementById('lb-duree')).value = session.duree;
         /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire')).value =
             session.commentaire || '';
         if (session.ecole) this.setSchoolField(true, session.ecole);
+
+        // Load Stage info
+        if (session.stageName || session.stageSpecialty) {
+            const stageCheck = /** @type {HTMLInputElement} */ (document.getElementById('lb-stage-check'));
+            if (stageCheck) {
+                stageCheck.checked = true;
+                const group = document.getElementById('lb-stage-group');
+                if (group) group.hidden = false;
+            }
+            const stageNameInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-stage-nom'));
+            if (stageNameInput && session.stageName) stageNameInput.value = session.stageName;
+            const stageSpecialtySelect = /** @type {HTMLSelectElement} */ (
+                document.getElementById('lb-stage-specialite')
+            );
+            if (stageSpecialtySelect && session.stageSpecialty) stageSpecialtySelect.value = session.stageSpecialty;
+        }
+
         this.setChecklistValues('pilotes', session.pilotes || []);
         if (session.typeExercice) this.setChecklistValues('typeExercice', session.typeExercice);
 
@@ -2318,6 +2511,18 @@ class LogbookViewClass extends BaseView {
             const winchOperatorEdit = /** @type {HTMLInputElement} */ (document.getElementById('lb-treuilleur'));
             if (winchOperatorEdit) winchOperatorEdit.value = session.treuilleur || '';
             this.updateWinchOperatorField();
+
+            // Load Rescue info
+            if (session.rescueDeployed) {
+                const rescueCheck = /** @type {HTMLInputElement} */ (document.getElementById('lb-rescue-check'));
+                if (rescueCheck) {
+                    rescueCheck.checked = true;
+                    const group = document.getElementById('lb-rescue-group');
+                    if (group) group.hidden = false;
+                }
+                const rescueSelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-rescue'));
+                if (rescueSelect && session.rescueId) rescueSelect.value = session.rescueId;
+            }
 
             setSelectOrAutre('lb-tech-decollage', 'lb-tech-decollage-autre', session.techDecollage);
 
@@ -2507,7 +2712,8 @@ class LogbookViewClass extends BaseView {
                         <div class="session-equip">
                             ${session.voile ? `<div><strong>${tt('history.wing')}</strong> ${escapeHTML(session.voile)}</div>` : ''}
                             ${session.sellette ? `<div><strong>${tt('history.harness')}</strong> ${escapeHTML(session.sellette)}</div>` : ''}
-                            ${session.ecole ? `<div><strong>${tt('history.school')}</strong> ${escapeHTML(session.ecole)}</div>` : ''}
+                            ${session.rescueDeployed ? `<div style="color: #ef4444;"><strong>${tt('history.rescueDeployed')}</strong> ${escapeHTML(session.rescueId || tt('history.yes'))}</div>` : ''}
+                            ${session.ecole ? `<div><strong>${tt('history.school')}</strong> ${escapeHTML(session.ecole)}${session.stageName || session.stageSpecialty ? ` (${tt('history.course')}${session.stageSpecialty ? ` ${escapeHTML(session.stageSpecialty)}` : ''}${session.stageName ? ` : ${escapeHTML(session.stageName)}` : ''})` : ''}</div>` : ''}
                             ${isVol && session.typeVol === 'Treuil' && session.treuilleur ? `<div><strong>${tt('history.winchOperator')}</strong> ${escapeHTML(session.treuilleur)}</div>` : ''}
                             ${session.ecole && session.moniteur ? `<div><strong>${tt('history.instructor')}</strong> ${escapeHTML(session.moniteur)}</div>` : ''}
                             ${session.ecole && LogbookViewClass.companionsOf(session).length > 0 ? `<div><strong>${tt('history.companion')}</strong> ${escapeHTML(LogbookViewClass.companionsOf(session).join(', '))}</div>` : ''}
@@ -2731,11 +2937,32 @@ class LogbookViewClass extends BaseView {
                 if (typeof v === 'number' && Number.isFinite(v) && v > 0 && (!best || v > best.v)) best = { v, f };
             }
             if (!best) continue;
+            const icons = {
+                longestFlight: 'ri-time-line',
+                highest: 'ri-arrow-up-circle-line',
+                freeDistance: 'ri-route-line',
+                maxFromTakeoff: 'ri-flight-takeoff-line',
+                bestThermal: 'ri-fire-line',
+                maxThermalGain: 'ri-arrow-up-line',
+                cumulativeClimb: 'ri-funds-line',
+                maxClimb: 'ri-stock-line',
+                bestGlide: 'ri-flight-land-line',
+                maxSpeed: 'ri-speed-up-line',
+                gMax: 'ri-dashboard-3-line',
+                highestRelease: 'ri-arrow-up-double-line',
+            };
+            const iconClass = icons[key] || 'ri-trophy-line';
             rows += `
-                    <div class="record-row">
-                        <span class="record-label">${tt(`records.${key}`)}</span>
-                        <strong class="record-value">${format(best.v)}</strong>
-                        <span class="record-when">${escapeHTML(formatDateOnly(best.f.datetime))} · ${escapeHTML(best.f.site || '')}</span>
+                    <div class="record-row" role="button" tabindex="0" data-action="scrollToSession" data-args="${best.f.id}">
+                        <div class="record-icon"><i class="${iconClass}"></i></div>
+                        <div class="record-content">
+                            <div class="record-label">${tt(`records.${key}`)}</div>
+                            <div class="record-when"><i class="ri-calendar-event-line"></i> ${escapeHTML(formatDateOnly(best.f.datetime))} ${best.f.site ? `• <i class="ri-map-pin-line"></i> ${escapeHTML(best.f.site)}` : ''}</div>
+                        </div>
+                        <div class="record-value-container">
+                            <strong class="record-value">${format(best.v)}</strong>
+                            <i class="ri-arrow-right-s-line record-chevron"></i>
+                        </div>
                     </div>`;
         }
 
@@ -2884,7 +3111,7 @@ class LogbookViewClass extends BaseView {
             <div class="stats-grid">
                 <!-- KPI: Vols -->
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background: var(--accent-blue); color: white;"><i class="ri-windy-line"></i></div>
+                    <div class="kpi-icon" style="background-color: var(--accent-blue); color: white;"><i class="ri-windy-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">${tt('stats.flights', { count: totalVols })}</div>
                         <div class="kpi-label">${tt('stats.flightTime', { duration: formatDuration(totalTimeVols) })}</div>
@@ -2892,7 +3119,7 @@ class LogbookViewClass extends BaseView {
                 </div>
                 <!-- KPI: Gonflages -->
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background: #f59e0b; color: white;"><i class="ri-footprint-line"></i></div>
+                    <div class="kpi-icon" style="background-color: #f59e0b; color: white;"><i class="ri-footprint-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">${tt('stats.groundSessions', { count: totalGonflages })}</div>
                         <div class="kpi-label">${tt('stats.groundTime', { duration: formatDuration(totalTimeGonflages) })}</div>
@@ -2900,7 +3127,7 @@ class LogbookViewClass extends BaseView {
                 </div>
                 <!-- KPI: Alt Max -->
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background: #8b5cf6; color: white;"><i class="ri-mist-line"></i></div>
+                    <div class="kpi-icon" style="background-color: #8b5cf6; color: white;"><i class="ri-mist-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">${maxAltitudeReached} m</div>
                         <div class="kpi-label">${tt('stats.maxAltitude')}</div>
@@ -2951,6 +3178,8 @@ class LogbookViewClass extends BaseView {
             html += `</div>`;
         }
 
+        html += `<div class="charts-grid">`;
+
         // Top Sites Bar Chart
         if (topSites.length > 0) {
             html += `<h3 class="stats-section-title">${tt('stats.topPlaces')}</h3><div class="chart-container">`;
@@ -2961,7 +3190,7 @@ class LogbookViewClass extends BaseView {
                     <div class="bar-row">
                         <div class="bar-label">${escapeHTML(site)}</div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: ${percent}%; background: var(--accent-green)"></div>
+                            <div class="bar-fill" style="width: ${percent}%; background-color: var(--accent-green)"></div>
                         </div>
                         <div class="bar-value">${count}</div>
                     </div>
@@ -3003,7 +3232,7 @@ class LogbookViewClass extends BaseView {
                     <div class="bar-row">
                         <div class="bar-label">${escapeHTML(type)}</div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: ${percent}%; background: var(--accent-blue)"></div>
+                            <div class="bar-fill" style="width: ${percent}%; background-color: var(--accent-blue)"></div>
                         </div>
                         <div class="bar-value">${count} (${Math.round(percent)}%)</div>
                     </div>
@@ -3022,7 +3251,7 @@ class LogbookViewClass extends BaseView {
                     <div class="bar-row">
                         <div class="bar-label" title="${escapeHTML(type)}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(type)}</div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: ${percent}%; background: #8b5cf6"></div>
+                            <div class="bar-fill" style="width: ${percent}%; background-color: #8b5cf6"></div>
                         </div>
                         <div class="bar-value">${count} (${Math.round(percent)}%)</div>
                     </div>
@@ -3040,7 +3269,7 @@ class LogbookViewClass extends BaseView {
                     <div class="bar-row">
                         <div class="bar-label">${escapeHTML(type)}</div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: ${percent}%; background: #f59e0b"></div>
+                            <div class="bar-fill" style="width: ${percent}%; background-color: #f59e0b"></div>
                         </div>
                         <div class="bar-value">${count} (${Math.round(percent)}%)</div>
                     </div>
@@ -3083,7 +3312,7 @@ class LogbookViewClass extends BaseView {
                         statusClass = 'status-danger';
                         const reason = [];
                         if (stats.alerts.dateAlert === 'red')
-                            reason.push(tl('equipment.dateOverdue', { date: stats.revisionDateStr }));
+                            reason.push(tl('equipment.dateOverdue', { date: formatDateOnly(stats.revisionDateStr) }));
                         if (stats.alerts.hoursAlert === 'red')
                             reason.push(
                                 tl('equipment.hoursOverdue', {
@@ -3125,15 +3354,21 @@ class LogbookViewClass extends BaseView {
                                     ${isArchive ? `<span class="session-badge" style="margin-left: 4px; background: #333; color: white; font-size:0.75rem; padding:2px 6px; border-radius:4px;">${tt('equipment.archived')}</span>` : ''}
                                 </div>
                             </div>
+                            ${
+                                equip.type === 'secours'
+                                    ? ''
+                                    : `
                             <div class="session-details" style="font-size: 0.85rem; display:flex; gap:15px; margin-bottom: 6px;">
                                 <span class="detail-item"><i class="ri-windy-line"></i> ${tt('equipment.sessions', { count: stats ? stats.totalSessions : 0 })}</span>
                                 <span class="detail-item"><i class="ri-time-line"></i> ${stats ? formatDuration(stats.totalTime) : '0h 00m'}</span>
                             </div>
+                            `
+                            }
                             <div class="equipment-secondary-details" style="font-size: 0.8rem; opacity: 0.8; display:flex; gap:15px; flex-wrap:wrap; margin-bottom: 12px;">
                                 ${equip.dateAchat ? `<span class="detail-item"><strong>${tt('equipment.purchase')}</strong> ${formatDateOnly(equip.dateAchat)}</span>` : ''}
-                                ${equip.derniereRevision ? `<span class="detail-item"><strong>${tt('equipment.lastRevision')}</strong> ${formatDateOnly(equip.derniereRevision)}</span>` : ''}
-                                ${stats && stats.nextRevisionDate ? `<span class="detail-item"><strong>${tt('equipment.nextRevision')}</strong> ${stats.revisionDateStr}</span>` : ''}
-                                ${stats && stats.hoursRemaining !== null ? `<span class="detail-item"><strong>${tt('equipment.hoursBeforeRevision')}</strong> ${stats.hoursRemaining <= 0 ? `<span style="color:#ef4444; font-weight:bold;">${tt('equipment.overdueBy', { hours: Math.abs(Math.round(stats.hoursRemaining * 10) / 10) })}</span>` : tt('equipment.hours', { hours: Math.round(stats.hoursRemaining * 10) / 10 })} ${tt('equipment.ofPeriod', { period: equip.periodiciteHeures })}</span>` : ''}
+                                ${equip.derniereRevision ? `<span class="detail-item"><strong>${tt(equip.type === 'secours' ? 'equipment.lastRepacking' : 'equipment.lastRevision')}</strong> ${formatDateOnly(equip.derniereRevision)}</span>` : ''}
+                                ${stats && stats.nextRevisionDate ? `<span class="detail-item"><strong>${tt(equip.type === 'secours' ? 'equipment.nextRepacking' : 'equipment.nextRevision')}</strong> ${formatDateOnly(stats.revisionDateStr)}</span>` : ''}
+                                ${equip.type !== 'secours' && stats && stats.hoursRemaining !== null ? `<span class="detail-item"><strong>${tt('equipment.hoursBeforeRevision')}</strong> ${stats.hoursRemaining <= 0 ? `<span style="color:#ef4444; font-weight:bold;">${tt('equipment.overdueBy', { hours: Math.abs(Math.round(stats.hoursRemaining * 10) / 10) })}</span>` : tt('equipment.hours', { hours: Math.round(stats.hoursRemaining * 10) / 10 })} ${tt('equipment.ofPeriod', { period: equip.periodiciteHeures })}</span>` : ''}
                                 ${equip.type === 'voile' && equip.ventMin !== undefined ? `<span class="detail-item"><strong>${tt('equipment.windRange')}</strong> ${tt('equipment.windRangeValue', { min: equip.ventMin, max: equip.ventMax })}</span>` : ''}
                             </div>
                         </div>
@@ -3184,6 +3419,17 @@ class LogbookViewClass extends BaseView {
             windLimitsDiv.style.display = typeSelect.value === 'voile' ? 'flex' : 'none';
         }
 
+        const linkedRescueDiv = document.getElementById('eq-linked-rescue-group');
+        if (linkedRescueDiv) {
+            linkedRescueDiv.style.display = typeSelect.value === 'sellette' ? 'block' : 'none';
+        }
+        this.updateEquipmentLabels(typeSelect.value);
+
+        const linkedRescueSelect = /** @type {HTMLSelectElement} */ (document.getElementById('eq-linked-rescue'));
+        if (linkedRescueSelect) {
+            linkedRescueSelect.value = equip.linkedRescueId || '';
+        }
+
         const minField = /** @type {HTMLInputElement} */ (document.getElementById('eq-vent-min'));
         if (minField) minField.value = equip.ventMin !== undefined ? equip.ventMin : 0;
 
@@ -3228,6 +3474,15 @@ class LogbookViewClass extends BaseView {
         }
     }
 
+    updateEquipmentLabels(type) {
+        const revLabel = /** @type {HTMLElement|null} */ (document.querySelector('label[for="eq-derniere-revision"]'));
+        if (revLabel) {
+            revLabel.innerText = t(
+                type === 'secours' ? 'html.logbookScreen.dernierPliage' : 'html.logbookScreen.derniereRevision',
+            );
+        }
+    }
+
     resetEquipmentForm() {
         const form = /** @type {HTMLFormElement} */ (document.getElementById('equip-form'));
         if (form) form.reset();
@@ -3243,6 +3498,7 @@ class LogbookViewClass extends BaseView {
 
         const windLimitsDiv = document.getElementById('eq-wind-limits');
         if (windLimitsDiv) windLimitsDiv.style.display = 'flex'; // Default type is 'voile'
+        this.updateEquipmentLabels('voile');
 
         const idEditField = /** @type {HTMLInputElement} */ (document.getElementById('eq-id-edit'));
         if (idEditField) idEditField.value = '';

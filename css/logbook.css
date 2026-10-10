@@ -267,23 +267,33 @@
 
 .kpi-card {
     background: var(--bg-card);
-    border: var(--border-glass);
+    border: 1px solid var(--border-light, rgba(0,0,0,0.05));
     border-radius: var(--radius-card);
-    padding: 20px;
+    padding: 24px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex: 1;
+    min-width: 250px;
+}
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
 .kpi-icon {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1.7rem;
     flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background-image: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%);
 }
 
 .kpi-info {
@@ -292,13 +302,14 @@
 }
 
 .kpi-value {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     font-weight: 800;
     color: var(--text-main);
+    line-height: 1;
 }
 
 .kpi-label {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: var(--text-secondary);
     font-weight: 500;
 }
@@ -314,23 +325,28 @@
 
 .chart-container {
     background: var(--bg-card);
-    border: var(--border-glass);
+    border: 1px solid var(--border-light, rgba(0,0,0,0.05));
     border-radius: var(--radius-card);
-    padding: 20px;
+    padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.chart-container:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
 }
 
 .bar-row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
 }
 
 .bar-label {
-    width: 120px;
-    font-size: 0.9rem;
+    width: 140px;
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--text-main);
     text-overflow: ellipsis;
@@ -341,25 +357,27 @@
 
 .bar-track {
     flex: 1;
-    height: 12px;
-    background: rgba(255, 255, 255, 0.05);
+    height: 14px;
+    background: transparent;
     border-radius: var(--radius-pill);
     overflow: hidden;
-}
+    position: relative;
+    }
 
 .bar-fill {
     height: 100%;
     border-radius: var(--radius-pill);
-    transition: width 1s ease-out;
+    background-image: linear-gradient(90deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bar-value {
     width: 60px;
     text-align: right;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
+    font-weight: 700;
     color: var(--text-secondary);
-    font-weight: 600;
-    flex-shrink: 0;
 }
 
 .equip-list {
@@ -370,25 +388,35 @@
 
 .equip-card {
     background: var(--bg-card);
-    border: var(--border-glass);
-    padding: 16px;
-    border-radius: var(--radius-md);
+    border: 1px solid var(--border-light, rgba(0,0,0,0.05));
+    padding: 20px;
+    border-radius: var(--radius-card);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.equip-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
 }
 
 .equip-name {
-    font-weight: 700;
-    font-size: 1.05rem;
+    font-weight: 800;
+    font-size: 1.1rem;
     color: var(--text-main);
+    letter-spacing: -0.01em;
 }
 
 .equip-details {
     display: flex;
     justify-content: space-between;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-weight: 600;
+    padding: 10px 0;
+    border-top: 1px dashed var(--border-light, rgba(0,0,0,0.1));
+    border-bottom: 1px dashed var(--border-light, rgba(0,0,0,0.1));
 }
 
 .empty-state {
@@ -615,21 +643,71 @@
     gap: 6px;
 }
 .record-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 2px 12px;
-    padding: 8px 10px;
-    border-radius: 8px;
-    background: var(--bg-card, rgba(0, 0, 0, 0.03));
-    border: 1px solid var(--border-light, rgba(0, 0, 0, 0.06));
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+    margin-bottom: 8px;
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border-light, rgba(0, 0, 0, 0.05));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.record-value {
-    text-align: right;
+
+.record-row:hover {
+    border-color: var(--accent-blue);
+    background: rgba(14, 165, 233, 0.05);
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.15);
+}
+.record-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(14, 165, 233, 0.08);
+    color: var(--accent-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+.record-content {
+    flex: 1;
+    min-width: 0;
+}
+.record-label {
+    font-size: 0.85rem;
+    color: var(--text-color);
+    font-weight: 500;
 }
 .record-when {
-    grid-column: 1 / -1;
     font-size: 0.78rem;
     color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.record-value-container {
+    text-align: right;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.record-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+.record-chevron {
+    color: var(--text-secondary);
+    opacity: 0.5;
+    transition: transform 0.2s;
+}
+.record-row:hover .record-chevron {
+    opacity: 1;
+    transform: translateX(3px);
 }
 
 /* Valeurs choisies d'une liste (exercices, pilotes) : étiquettes avec une croix */
@@ -665,4 +743,15 @@
 .lb-chip-remove:hover {
     background: rgba(0, 0, 0, 0.08);
     color: var(--text-main);
+}
+
+.records-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 16px;
+}
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
 }

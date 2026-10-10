@@ -20,6 +20,7 @@ import { shuffled } from '../utils/array_utils.js';
 import { escapeHTML } from '../core/security.js';
 import { t } from '../utils/i18n.js';
 import { FR } from '../i18n/fr.js';
+import GlobalState from '../core/app_state.js';
 
 // Textes de l'écran (spec 019), tous dans js/i18n/fr.js (section safety). esc() : texte pour du
 // HTML ; rich() : idem, en gardant le gras <strong> de l'affiche ou du livret (seule balise permise).
@@ -423,9 +424,11 @@ class SafetyViewClass extends BaseView {
             if (panel) panel.hidden = tab !== this.activeTab;
         });
         // Rubrique affichée, signalée dans le sous-menu « Sécurité » de la barre de navigation
-        document.querySelectorAll('[data-safety-tab]').forEach((btn) => {
-            btn.setAttribute('aria-current', String(btn.getAttribute('data-safety-tab') === this.activeTab));
-        });
+        if (GlobalState.get('mode') === 'SAFETY') {
+            document.querySelectorAll('[data-safety-tab]').forEach((btn) => {
+                btn.setAttribute('aria-current', String(btn.getAttribute('data-safety-tab') === this.activeTab));
+            });
+        }
     }
 
     // ------------------------------------------------------------------ position GPS

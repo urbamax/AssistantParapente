@@ -10,6 +10,7 @@ import { t } from '../utils/i18n.js';
 // de simplement s'afficher avec un champ vide.
 function normalizeFlight(f) {
     if (!f || typeof f !== 'object') return f;
+    if (f.id && typeof f.id === 'number') f.id = f.id.toString();
     if (f.typeVol === undefined || f.typeVol === null) f.typeVol = '';
     if (f.typeExercice === undefined || f.typeExercice === null) f.typeExercice = '';
     return f;
@@ -17,6 +18,7 @@ function normalizeFlight(f) {
 
 function normalizeEquipment(e) {
     if (!e || typeof e !== 'object') return e;
+    if (e.id && typeof e.id === 'number') e.id = e.id.toString();
     if (e.nom === undefined || e.nom === null) e.nom = '';
     if (e.type === undefined || e.type === null) e.type = '';
     return e;
@@ -77,10 +79,10 @@ class LogbookService {
             // this used to overwrite that merge with a stale IndexedDB snapshot one line later).
             // IndexedDB's only unique value is rawIgc (LocalStorage never stores it, see
             // saveFlights()), so hydrate that onto matching flights instead of replacing the list.
-            const idbById = new Map(idbFlights.map((f) => [f.id, f]));
+            const idbById = new Map(idbFlights.map((f) => [f.id ? f.id.toString() : '', f]));
             this.flights.forEach((f) => {
                 if (!f.rawIgc) {
-                    const stored = idbById.get(f.id);
+                    const stored = idbById.get(f.id ? f.id.toString() : '');
                     if (stored?.rawIgc) f.rawIgc = stored.rawIgc;
                 }
             });
@@ -394,14 +396,16 @@ class LogbookService {
             const sellette = (f.sellette || '').toLowerCase();
             const duree = parseInt(f.duree || 0, 10);
 
-            if (stats[voile]) {
-                stats[voile].totalSessions++;
-                stats[voile].totalTime += duree;
-            }
-            if (stats[sellette]) {
-                stats[sellette].totalSessions++;
-                stats[sellette].totalTime += duree;
-            }
+            // Le secours monté sur la sellette vole avec elle.
+            const linkedRescueId = stats[sellette]?.equip.linkedRescueId;
+            const rescue = linkedRescueId ? this.equipment.find((e) => e.id === linkedRescueId) : null;
+            const rescueKey = rescue ? (rescue.nom || '').toLowerCase() : '';
+
+            [voile, sellette, rescueKey].forEach((key) => {
+                if (!stats[key]) return;
+                stats[key].totalSessions++;
+                stats[key].totalTime += duree;
+            });
         });
 
         // Calculate Alerts

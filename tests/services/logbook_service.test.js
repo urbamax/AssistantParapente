@@ -301,4 +301,32 @@ describe('LogbookService.findLastCoordsForPlace', () => {
         expect(LogbookService.findLastCoordsForPlace('Inconnu')).toBeNull();
         expect(LogbookService.findLastCoordsForPlace('')).toBeNull();
     });
+
+    describe('computeEquipmentWear: linked rescue', () => {
+        const harness = (extra = {}) => ({ id: 'h1', nom: 'Sellette', type: 'sellette', ...extra });
+        const rescue = { id: 's1', nom: 'Secours', type: 'secours' };
+
+        it('adds the flights of a harness to the rescue mounted on it', () => {
+            LogbookService.equipment = [harness({ linkedRescueId: 's1' }), rescue];
+            LogbookService.flights = [
+                { id: 'f1', sellette: 'Sellette', duree: 30 },
+                { id: 'f2', sellette: 'Sellette', duree: 45 },
+            ];
+            const stats = LogbookService.computeEquipmentWear();
+            expect(stats.secours).toMatchObject({ totalSessions: 2, totalTime: 75 });
+            expect(stats.sellette).toMatchObject({ totalSessions: 2, totalTime: 75 });
+        });
+
+        it('leaves the rescue alone without a link', () => {
+            LogbookService.equipment = [harness(), rescue];
+            LogbookService.flights = [{ id: 'f1', sellette: 'Sellette', duree: 30 }];
+            expect(LogbookService.computeEquipmentWear().secours).toMatchObject({ totalSessions: 0, totalTime: 0 });
+        });
+
+        it('ignores a link to a deleted rescue', () => {
+            LogbookService.equipment = [harness({ linkedRescueId: 'gone' })];
+            LogbookService.flights = [{ id: 'f1', sellette: 'Sellette', duree: 30 }];
+            expect(LogbookService.computeEquipmentWear().sellette.totalSessions).toBe(1);
+        });
+    });
 });

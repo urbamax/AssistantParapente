@@ -979,7 +979,7 @@
                         gap: 15px;
                         margin-bottom: 24px;
                         overflow: visible;
-                        z-index: 50;
+                        z-index: 1050;
                     "
                 >
                     <!-- 2A. Rayon GPS (Sans bordure autour, juste les éléments) -->
@@ -1796,6 +1796,18 @@
                                     data-input-action="LogbookupdateEquipmentNomPreview"
                                 />
                             </div>
+                            
+                            <!-- NEW LINKED RESCUE FIELD FOR SELLETTE -->
+                            <div class="form-group" id="eq-linked-rescue-group" style="flex: 1; min-width: 200px; display: none;">
+                                <label data-i18n="logbookScreen.linkedRescue" for="eq-linked-rescue" style="display: block; margin-bottom: 5px">Secours monté sur cette sellette :</label>
+                                <select
+                                    id="eq-linked-rescue"
+                                    style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc"
+                                >
+                                    <option data-i18n="logbookScreen.noneOrNotApplicable" value="">Aucun / Non applicable</option>
+                                </select>
+                            </div>
+
                             <div class="form-group" style="flex: 1; min-width: 200px">
                                 <label data-i18n="logbookScreen.nomDuMaterielAuto" for="eq-nom" style="display: block; margin-bottom: 5px"
                                     >Nom du matériel (auto) :</label
@@ -1851,8 +1863,8 @@
                                 />
                             </div>
                             <div class="form-group" style="flex: 1">
-                                <label data-i18n="logbookScreen.derniereRevisionOptionnel" for="eq-derniere-revision" style="display: block; margin-bottom: 5px"
-                                    >Dernière révision (optionnel) :</label
+                                <label data-i18n="logbookScreen.derniereRevision" for="eq-derniere-revision" style="display: block; margin-bottom: 5px"
+                                    >Dernière révision :</label
                                 >
                                 <input
                                     type="date"
