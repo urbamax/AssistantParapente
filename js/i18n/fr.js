@@ -221,6 +221,25 @@ export const FR = Object.freeze({
             alertMissingSchool: "Il manque le nom de l'école ou de la structure.",
             alertMissingRequired: 'Veuillez remplir tous les champs obligatoires (*).',
 
+            // Stage fields
+            isCourse: "C'est un stage",
+            courseName: 'Nom du stage',
+            courseNamePlaceholder: 'Ex: Stage perf estival',
+            specialty: 'Spécialité',
+            specialtySelect: 'Sélectionner...',
+            specialties: Object.freeze({
+                Initiation: 'Initiation',
+                Perfectionnement: 'Perfectionnement',
+                Progression: 'Progression',
+                SIV: "SIV (Simulation d'Incidents de Vol)",
+                Cross: 'Cross',
+                Autre: 'Autre',
+            }),
+
+            // Rescue parachute fields
+            rescueDeployed: 'Secours ouvert ?',
+            rescueUsed: 'Secours utilisé',
+
             save: 'Enregistrer',
             update: 'Modifier la session',
         }),
@@ -274,6 +293,9 @@ export const FR = Object.freeze({
             wing: 'Voile :',
             harness: 'Sellette :',
             school: 'École :',
+            rescueDeployed: 'Secours ouvert :',
+            course: 'Stage',
+            yes: 'Oui',
             instructor: 'Moniteur :',
             companion: 'Accompagnateurs :',
             winchOperator: 'Treuilleur :',
