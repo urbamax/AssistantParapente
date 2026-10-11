@@ -23,6 +23,9 @@ import { parseCoordinates, formatCoordinates } from '../utils/geo_utils.js';
 import { t } from '../utils/i18n.js';
 
 import BaseView from '../core/base_view.js';
+import { buildIgcFileName, buildLogbookReportHtml } from '../services/logbook_export.js';
+import { saveTextFile } from '../utils/download.js';
+import { printHtml } from '../utils/print.js';
 import GlobalState from '../core/app_state.js';
 
 // Textes du carnet (spec 014), tous dans js/i18n/fr.js (section logbook). tt() : texte pour du HTML,
@@ -2722,7 +2725,7 @@ class LogbookViewClass extends BaseView {
                             ${Array.isArray(session.pilotes) && session.pilotes.length > 0 ? `<div><strong>${tt('history.pilots')}</strong> ${escapeHTML(session.pilotes.join(', '))}</div>` : ''}
                         </div>
                         ${session.commentaire ? `<div class="session-comment">"${escapeHTML(session.commentaire)}"</div>` : ''}
-                        ${session.rawIgc || (session.traceGps && session.traceGps.length > 0) ? `<button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="${session.id}"><i class="ri-route-line"></i> ${tt('history.showTrace')}</button><div id="trace-container-${session.id}" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>` : ''}
+                        ${session.rawIgc || (session.traceGps && session.traceGps.length > 0) ? `<button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="${session.id}"><i class="ri-route-line"></i> ${tt('history.showTrace')}</button><button class="btn-download-trace action-btn-secondary" style="margin-top: 6px; width: 100%; padding: 8px; border-radius: 6px; cursor: pointer;" data-action="downloadTrace" data-args="${session.id}"><i class="ri-download-2-line"></i> ${tt('history.downloadIgc')}</button><div id="trace-container-${session.id}" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>` : ''}
                         <div data-session-weather="${session.id}">${meteoHtml}</div>
                     </div>
                 </div>
@@ -2776,6 +2779,32 @@ class LogbookViewClass extends BaseView {
             Promise.all(state.openTraces.filter((id) => cardOf(id)).map((id) => this.showTrace(id)))
                 .catch((err) => console.warn('[LogbookView] Trace non rouverte :', err))
                 .then(restoreScroll);
+        }
+    }
+
+    // Télécharge le fichier .igc d'origine du vol, tel qu'il a été importé.
+    async downloadTrace(sessionId) {
+        const flight = LogbookService.getFlightById(sessionId);
+        const rawIgc = flight ? await LogbookService.getFlightTrace(sessionId) : null;
+        if (!rawIgc) {
+            alert(tl('export.noTrace'));
+            return;
+        }
+        saveTextFile(buildIgcFileName(flight), rawIgc, 'application/octet-stream');
+    }
+
+    // Ouvre le bilan imprimable du carnet (« Enregistrer au format PDF » dans la boîte d'impression).
+    async exportLogbookPdf() {
+        const flights = LogbookService.getFlights();
+        if (flights.length === 0) {
+            alert(tl('export.empty'));
+            return;
+        }
+        try {
+            await printHtml(buildLogbookReportHtml(flights));
+        } catch (error) {
+            console.error('Logbook print failed', error);
+            alert(tl('export.printError'));
         }
     }
 
