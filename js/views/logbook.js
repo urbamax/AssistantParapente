@@ -23,6 +23,7 @@ import { parseCoordinates, formatCoordinates } from '../utils/geo_utils.js';
 import { t } from '../utils/i18n.js';
 
 import BaseView from '../core/base_view.js';
+import { classifyFlight } from '../services/flight_classifier.js';
 import GlobalState from '../core/app_state.js';
 
 // Textes du carnet (spec 014), tous dans js/i18n/fr.js (section logbook). tt() : texte pour du HTML,
@@ -2032,16 +2033,18 @@ class LogbookViewClass extends BaseView {
             gainInput.value = parsed.gain;
         }
 
-        // Départ au treuil reconnu dans la trace : c'est un fait, il prime sur les habitudes.
-        // Type de vol « Treuil », sauf si le pilote l'a choisi lui-même (ou, pour un vol
-        // existant, si son type n'est plus la valeur par défaut « Plouf »).
+        // Type de vol lu dans la trace (spec 034). Un départ au treuil est un fait : il vaut aussi
+        // pour un vol existant dont le type est resté « Plouf » (valeur par défaut). Les autres
+        // types ne sont qu'une suggestion, réservée à une nouvelle session dont le pilote n'a pas
+        // choisi le type : on ne remplace jamais un choix, ni le type d'un vol enregistré.
         const typeVolInput = /** @type {HTMLSelectElement} */ (document.getElementById('lb-typeVol'));
         const editing = Boolean(/** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit'))?.value);
         const typeVolFree = editing ? typeVolInput?.value === 'Plouf' : !this.touchedFields.has('typeVol');
-        if (typeVolInput && parsed.analysis && parsed.analysis.winch && typeVolFree) {
-            typeVolInput.value = 'Treuil';
+        const suggestion = classifyFlight(parsed.analysis, parsed.duration);
+        if (typeVolInput && suggestion && typeVolFree && (!editing || suggestion.type === 'Treuil')) {
+            typeVolInput.value = suggestion.type;
             this.touchedFields.add('typeVol');
-            this.learnedFields.set('typeVol', 'trace');
+            this.learnedFields.set('typeVol', suggestion.reason);
             // Pour un vol existant, la technique enregistrée avec le type par défaut l'était sans
             // doute aussi par défaut : on la réévalue.
             this.applyLearnedDefaults({ force: editing ? ['techDecollage'] : [] });

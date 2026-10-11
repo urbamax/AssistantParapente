@@ -1,51 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import IGCParser from '../../js/services/igc_parser.js';
-
-const M_PER_DEG_LAT = 111320;
-const START = Date.UTC(2026, 6, 14, 11, 0, 0);
-
-/**
- * Trace synthétique à 1 point/s. Phases :
- *  - { seconds, glide: { speedKmh, verticalMs, headingDeg } } : ligne droite
- *  - { seconds, circle: { speedKmh, radiusM, verticalMs, direction } } : spirale (+1 droite, -1 gauche)
- */
-function buildFlight(phases, origin = { lat: 45.9, lon: 6.87, alt: 1500 }) {
-    const trace = [];
-    let { lat, lon, alt } = origin;
-    let t = START;
-    let heading = 0;
-    const mPerDegLon = M_PER_DEG_LAT * Math.cos((origin.lat * Math.PI) / 180);
-    const push = () => trace.push({ lat, lon, alt: Math.round(alt), timestamp: t });
-    push();
-    for (const phase of phases) {
-        for (let s = 0; s < phase.seconds; s++) {
-            if (phase.glide) {
-                heading = phase.glide.headingDeg ?? heading;
-                const v = phase.glide.speedKmh / 3.6;
-                lat += (v * Math.cos((heading * Math.PI) / 180)) / M_PER_DEG_LAT;
-                lon += (v * Math.sin((heading * Math.PI) / 180)) / mPerDegLon;
-                alt += phase.glide.verticalMs;
-            } else {
-                const { speedKmh, radiusM, verticalMs, direction } = phase.circle;
-                const v = speedKmh / 3.6;
-                heading = (heading + (direction * ((v / radiusM) * 180)) / Math.PI + 360) % 360;
-                lat += (v * Math.cos((heading * Math.PI) / 180)) / M_PER_DEG_LAT;
-                lon += (v * Math.sin((heading * Math.PI) / 180)) / mPerDegLon;
-                alt += verticalMs;
-            }
-            t += 1000;
-            push();
-        }
-    }
-    return trace;
-}
-
-const thermal = (seconds, verticalMs, direction = -1) => ({
-    seconds,
-    circle: { speedKmh: 32, radiusM: 35, verticalMs, direction },
-});
-const glide = (seconds, headingDeg = 0) => ({ seconds, glide: { speedKmh: 36, verticalMs: -1.2, headingDeg } });
+import { buildFlight, thermal, glide } from '../helpers/synthetic_flight.js';
 
 describe('IGCParser.analyzeFlight', () => {
     it('finds the thermals, their climb and the turn direction', () => {
