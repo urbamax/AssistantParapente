@@ -1394,7 +1394,7 @@ class SitesViewClass extends BaseView {
                         iconClass = 'ri-checkbox-fill';
                     } else if (SitesService.state.filterWindExclude.includes(w)) {
                         stateName = 'exclude';
-                        iconClass = 'ri-close-box-fill';
+                        iconClass = 'ri-close-circle-fill';
                     }
                     return `
                     <label role="button" tabindex="0" class="filter-option state-${stateName}" data-action="cycleFilterState" data-args="'wind', '${w}'">

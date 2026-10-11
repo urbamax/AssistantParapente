@@ -1,7 +1,7 @@
 // js/data/equipment_config.js
 
 export const EQUIPMENT_TYPES = [
-    { id: 'voile', label: 'Voile', icon: 'ri-parachute-line', alertColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' },
+    { id: 'voile', label: 'Voile', icon: 'ri-umbrella-line', alertColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' },
     {
         id: 'sellette',
         label: 'Sellette',

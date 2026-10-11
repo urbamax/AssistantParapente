@@ -29,6 +29,7 @@ class LogbookViewClass extends LogbookEquipmentBase {
         super();
         this.currentTab = StorageService.get('LAST_LOGBOOK_TAB') || 'history';
         this.currentFormType = 'vol';
+        this.activeFilter = null;
     } // Ends constructor
 
     setupEventListeners() {
@@ -304,6 +305,9 @@ class LogbookViewClass extends LogbookEquipmentBase {
     }
 
     scrollToSession(id) {
+        if (this.activeFilter) {
+            this.activeFilter = null;
+        }
         this.switchTab('history');
         // Let the tab display before trying to scroll
         setTimeout(() => {
@@ -320,6 +324,26 @@ class LogbookViewClass extends LogbookEquipmentBase {
                 }, 2000);
             }
         }, 100);
+    }
+
+    filterHistoryByStat(_args, _e, target) {
+        const el = target ? target.closest('[data-stat-type]') : null;
+        if (!el) return;
+        const type = el.dataset.statType;
+        const value = el.dataset.statValue;
+        if (type && value) {
+            this.applyHistoryFilter(type, value);
+        }
+    }
+
+    applyHistoryFilter(type, value) {
+        this.activeFilter = { type, value };
+        this.switchTab('history');
+    }
+
+    clearHistoryFilter() {
+        this.activeFilter = null;
+        this.renderHistory();
     }
 
     // --- FENÊTRE D'AJOUT / MODIFICATION D'UNE SESSION ---
@@ -2293,7 +2317,8 @@ class LogbookViewClass extends LogbookEquipmentBase {
         const container = document.getElementById('logbook-history-list');
         if (!container) return;
 
-        if (LogbookService.getFlights().length === 0) {
+        const allFlights = LogbookService.getFlights();
+        if (allFlights.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
                     <i class="ri-history-line"></i>
@@ -2303,8 +2328,49 @@ class LogbookViewClass extends LogbookEquipmentBase {
             return;
         }
 
-        let html = '';
-        LogbookService.getFlights().forEach((session) => {
+        let flights = allFlights;
+        let filterBannerHtml = '';
+        if (this.activeFilter && this.activeFilter.type && this.activeFilter.value) {
+            const { type, value } = this.activeFilter;
+            flights = allFlights.filter((s) => {
+                if (type === 'site') return (s.site || s.lieu) === value;
+                if (type === 'typeVol') return s.typeVol === value;
+                if (type === 'techDecollage') return s.techDecollage === value;
+                if (type === 'exercice') {
+                    return Array.isArray(s.typeExercice) ? s.typeExercice.includes(value) : s.typeExercice === value;
+                }
+                if (type === 'voile') return s.voile === value;
+                if (type === 'ecole') return s.ecole === value;
+                if (type === 'type') return s.type === value;
+                return true;
+            });
+            filterBannerHtml = `
+                <div class="logbook-filter-banner">
+                    <div class="filter-banner-text">
+                        <i class="ri-filter-3-line"></i>
+                        <span>${tt('history.filterActive', { value })} <strong>(${flights.length} / ${allFlights.length})</strong></span>
+                    </div>
+                    <button type="button" class="filter-banner-clear" data-action="clearHistoryFilter">
+                        <i class="ri-close-line"></i> ${tt('history.filterClear')}
+                    </button>
+                </div>
+            `;
+        }
+
+        if (flights.length === 0) {
+            container.innerHTML =
+                filterBannerHtml +
+                `
+                <div class="empty-state">
+                    <i class="ri-filter-line"></i>
+                    <p>${tt('history.empty')}</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = filterBannerHtml;
+        flights.forEach((session) => {
             try {
                 const isVol = session.type === 'vol';
                 const icon = isVol ? 'ri-windy-line' : 'ri-footprint-line';
@@ -2380,7 +2446,7 @@ class LogbookViewClass extends LogbookEquipmentBase {
                         <div class="session-location">${escapeHTML(location)}</div>
                         <div class="session-details">
                             <span class="detail-item"><i class="ri-time-line"></i> ${formatDuration(session.duree)}</span>
-                            <span class="detail-item"><i class="${subtitle.toLowerCase().includes('treuil') ? 'ri-arrow-up-double-line' : subtitle.toLowerCase().includes('thermique') ? 'ri-fire-line' : subtitle.toLowerCase().includes('cross') ? 'ri-route-line' : subtitle.toLowerCase().includes('plouf') ? 'ri-arrow-left-down-line' : subtitle.toLowerCase().includes('restit') || subtitle.toLowerCase().includes('soaring') ? 'ri-sun-cloud-line' : subtitle.toLowerCase().includes('gonflage') ? 'ri-footprint-line' : 'ri-price-tag-3-line'}"></i> ${escapeHTML(subtitle)}</span>
+                            <span class="detail-item"><i class="${subtitle.toLowerCase().includes('treuil') ? 'ri-arrow-up-double-line' : subtitle.toLowerCase().includes('thermique') ? 'ri-fire-line' : subtitle.toLowerCase().includes('cross') ? 'ri-route-line' : subtitle.toLowerCase().includes('plouf') ? 'ri-arrow-left-down-line' : subtitle.toLowerCase().includes('restit') || subtitle.toLowerCase().includes('soaring') ? 'ri-sun-cloudy-line' : subtitle.toLowerCase().includes('gonflage') ? 'ri-footprint-line' : 'ri-price-tag-3-line'}"></i> ${escapeHTML(subtitle)}</span>
                         </div>
                         ${extraInfo}
                         <div class="session-equip">
@@ -2685,12 +2751,14 @@ class LogbookViewClass extends LogbookEquipmentBase {
 
         if (!rows && !withTrace.length) return '';
         return `
-            <h3 class="stats-section-title">${tt('records.title')}</h3>
-            ${totals ? `<p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 8px;">${totals}</p>` : ''}
-            <div class="records-list">${rows}</div>
-            <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent;">
-                <i class="ri-refresh-line"></i> ${missing ? tt('records.recomputeMissing', { count: missing }) : tt('records.recompute')}
-            </button>`;
+            <div class="stats-section-box">
+                <h3 class="stats-section-title"><i class="ri-trophy-line" style="color: #f59e0b"></i> ${tt('records.title')}</h3>
+                ${totals ? `<p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 12px;">${totals}</p>` : ''}
+                <div class="records-grid">${rows}</div>
+                <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 14px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 10px; border-radius: var(--radius-md, 8px); cursor: pointer; background: transparent; font-weight: 600;">
+                    <i class="ri-refresh-line"></i> ${missing ? tt('records.recomputeMissing', { count: missing }) : tt('records.recompute')}
+                </button>
+            </div>`;
     }
 
     // « Tout recalculer » (à côté d'« Ajouter une session », et dans les records) : chaque vol avec
@@ -2810,7 +2878,7 @@ class LogbookViewClass extends LogbookEquipmentBase {
         let html = `
             <div class="stats-grid">
                 <!-- KPI: Vols -->
-                <div class="kpi-card">
+                <div class="kpi-card" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="type" data-stat-value="vol" title="${tt('stats.filterBy', { name: tl('history.badgeFlight') })}">
                     <div class="kpi-icon" style="background-color: var(--accent-blue); color: white;"><i class="ri-windy-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">${tt('stats.flights', { count: totalVols })}</div>
@@ -2818,7 +2886,7 @@ class LogbookViewClass extends LogbookEquipmentBase {
                     </div>
                 </div>
                 <!-- KPI: Gonflages -->
-                <div class="kpi-card">
+                <div class="kpi-card" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="type" data-stat-value="gonflage" title="${tt('stats.filterBy', { name: tl('history.badgeGround') })}">
                     <div class="kpi-icon" style="background-color: #f59e0b; color: white;"><i class="ri-footprint-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">${tt('stats.groundSessions', { count: totalGonflages })}</div>
@@ -2848,10 +2916,13 @@ class LogbookViewClass extends LogbookEquipmentBase {
 
         // Equipment Stats
         if (Object.keys(equipStats).length > 0) {
-            html += `<h3 class="stats-section-title">${tt('stats.wings')}</h3><div class="equip-list">`;
+            html += `
+            <div class="stats-section-box">
+                <h3 class="stats-section-title"><i class="ri-umbrella-line" style="color: var(--accent-blue)"></i> ${tt('stats.wings')}</h3>
+                <div class="equip-list">`;
             for (const [voile, st] of Object.entries(equipStats)) {
                 html += `
-                    <div class="equip-card">
+                    <div class="equip-card" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="voile" data-stat-value="${escapeHTML(voile)}" title="${tt('stats.filterBy', { name: voile })}">
                         <div class="equip-name">${escapeHTML(voile)}</div>
                         <div class="equip-details">
                             <span style="color: var(--accent-blue)">${tt('stats.wingFlights', { count: st.vols, duration: formatDuration(st.timeVols) })}</span>
@@ -2875,28 +2946,35 @@ class LogbookViewClass extends LogbookEquipmentBase {
                     </div>
                 `;
             }
-            html += `</div>`;
+            html += `</div></div>`;
         }
 
         html += `<div class="charts-grid">`;
 
         // Top Sites Bar Chart
         if (topSites.length > 0) {
-            html += `<h3 class="stats-section-title">${tt('stats.topPlaces')}</h3><div class="chart-container">`;
+            html += `
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <h3 class="chart-card-title"><i class="ri-map-pin-2-line" style="color: var(--accent-green)"></i> ${tt('stats.topPlaces')}</h3>
+                    </div>
+                    <div class="chart-card-body">`;
             const maxVal = topSites[0][1];
             topSites.forEach(([site, count]) => {
                 const percent = (count / maxVal) * 100;
                 html += `
-                    <div class="bar-row">
-                        <div class="bar-label">${escapeHTML(site)}</div>
+                    <div class="bar-row" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="site" data-stat-value="${escapeHTML(site)}" title="${tt('stats.filterBy', { name: site })}">
+                        <div class="bar-info">
+                            <div class="bar-label" title="${escapeHTML(site)}">${escapeHTML(site)}</div>
+                            <div class="bar-value">${count}</div>
+                        </div>
                         <div class="bar-track">
                             <div class="bar-fill" style="width: ${percent}%; background-color: var(--accent-green)"></div>
                         </div>
-                        <div class="bar-value">${count}</div>
                     </div>
                 `;
             });
-            html += `</div>`;
+            html += `</div></div>`;
         }
 
         // Sessions en école, de la plus fréquentée à la moins fréquentée
@@ -2906,12 +2984,17 @@ class LogbookViewClass extends LogbookEquipmentBase {
         );
         if (schools.length > 0) {
             const schoolSessions = schools.reduce((sum, [, st]) => sum + st.vols + st.gonflages, 0);
-            html += `<h3 class="stats-section-title">${tt('stats.schools')}</h3>
-                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 8px;">${tt('stats.schoolShare', { count: schoolSessions, total: totalVols + totalGonflages })}</p>
-                <div class="equip-list">`;
+            html += `
+                <div class="chart-card chart-card-wide">
+                    <div class="chart-card-header">
+                        <h3 class="chart-card-title"><i class="ri-graduation-cap-line" style="color: var(--accent-blue)"></i> ${tt('stats.schools')}</h3>
+                        <span class="chart-card-subtitle" style="font-size: 0.85rem; color: var(--text-secondary);">${tt('stats.schoolShare', { count: schoolSessions, total: totalVols + totalGonflages })}</span>
+                    </div>
+                    <div class="chart-card-body">
+                        <div class="equip-list">`;
             for (const [school, st] of schools) {
                 html += `
-                    <div class="equip-card">
+                    <div class="equip-card" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="ecole" data-stat-value="${escapeHTML(school)}" title="${tt('stats.filterBy', { name: school })}">
                         <div class="equip-name">${escapeHTML(school)}</div>
                         <div class="equip-details">
                             <span style="color: var(--accent-blue)">${tt('stats.wingFlights', { count: st.vols, duration: formatDuration(st.timeVols) })}</span>
@@ -2920,63 +3003,86 @@ class LogbookViewClass extends LogbookEquipmentBase {
                     </div>
                 `;
             }
-            html += `</div>`;
+            html += `</div></div></div>`;
         }
 
         // Types de Vol
         if (Object.keys(volTypes).length > 0) {
-            html += `<h3 class="stats-section-title">${tt('stats.flightTypes')}</h3><div class="chart-container">`;
+            html += `
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <h3 class="chart-card-title"><i class="ri-flight-takeoff-line" style="color: var(--accent-blue)"></i> ${tt('stats.flightTypes')}</h3>
+                    </div>
+                    <div class="chart-card-body">`;
             for (const [type, count] of Object.entries(volTypes)) {
                 const percent = (count / totalVols) * 100;
                 html += `
-                    <div class="bar-row">
-                        <div class="bar-label">${escapeHTML(type)}</div>
+                    <div class="bar-row" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="typeVol" data-stat-value="${escapeHTML(type)}" title="${tt('stats.filterBy', { name: type })}">
+                        <div class="bar-info">
+                            <div class="bar-label" title="${escapeHTML(type)}">${escapeHTML(type)}</div>
+                            <div class="bar-value">${count} (${Math.round(percent)}%)</div>
+                        </div>
                         <div class="bar-track">
                             <div class="bar-fill" style="width: ${percent}%; background-color: var(--accent-blue)"></div>
                         </div>
-                        <div class="bar-value">${count} (${Math.round(percent)}%)</div>
                     </div>
                 `;
             }
-            html += `</div>`;
+            html += `</div></div>`;
         }
 
         // Techniques de déco
         if (Object.keys(decoTypes).length > 0) {
-            html += `<h3 class="stats-section-title">${tt('stats.takeoffTechniques')}</h3><div class="chart-container">`;
+            html += `
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <h3 class="chart-card-title"><i class="ri-compass-3-line" style="color: #8b5cf6"></i> ${tt('stats.takeoffTechniques')}</h3>
+                    </div>
+                    <div class="chart-card-body">`;
             const totalDeco = Object.values(decoTypes).reduce((a, b) => a + b, 0);
             for (const [type, count] of Object.entries(decoTypes)) {
                 const percent = (count / totalDeco) * 100;
                 html += `
-                    <div class="bar-row">
-                        <div class="bar-label" title="${escapeHTML(type)}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(type)}</div>
+                    <div class="bar-row" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="techDecollage" data-stat-value="${escapeHTML(type)}" title="${tt('stats.filterBy', { name: type })}">
+                        <div class="bar-info">
+                            <div class="bar-label" title="${escapeHTML(type)}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(type)}</div>
+                            <div class="bar-value">${count} (${Math.round(percent)}%)</div>
+                        </div>
                         <div class="bar-track">
                             <div class="bar-fill" style="width: ${percent}%; background-color: #8b5cf6"></div>
                         </div>
-                        <div class="bar-value">${count} (${Math.round(percent)}%)</div>
                     </div>
                 `;
             }
-            html += `</div>`;
+            html += `</div></div>`;
         }
 
         // Types Exercice
         if (Object.keys(exoTypes).length > 0) {
-            html += `<h3 class="stats-section-title">${tt('stats.groundExercises')}</h3><div class="chart-container">`;
+            html += `
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <h3 class="chart-card-title"><i class="ri-footprint-line" style="color: #f59e0b"></i> ${tt('stats.groundExercises')}</h3>
+                    </div>
+                    <div class="chart-card-body">`;
             for (const [type, count] of Object.entries(exoTypes)) {
                 const percent = (count / totalGonflages) * 100;
                 html += `
-                    <div class="bar-row">
-                        <div class="bar-label">${escapeHTML(type)}</div>
+                    <div class="bar-row" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="exercice" data-stat-value="${escapeHTML(type)}" title="${tt('stats.filterBy', { name: type })}">
+                        <div class="bar-info">
+                            <div class="bar-label" title="${escapeHTML(type)}">${escapeHTML(type)}</div>
+                            <div class="bar-value">${count} (${Math.round(percent)}%)</div>
+                        </div>
                         <div class="bar-track">
                             <div class="bar-fill" style="width: ${percent}%; background-color: #f59e0b"></div>
                         </div>
-                        <div class="bar-value">${count} (${Math.round(percent)}%)</div>
                     </div>
                 `;
             }
-            html += `</div>`;
+            html += `</div></div>`;
         }
+
+        html += `</div>`;
 
         container.innerHTML = html;
     }

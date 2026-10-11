@@ -279,6 +279,8 @@ export const FR = Object.freeze({
             downloadIgc: "Télécharger l'IGC",
             edit: 'Modifier',
             delete: 'Supprimer',
+            filterActive: 'Filtre : {value}',
+            filterClear: 'Tout afficher',
             takeoffTitle: 'Décollage',
             takeoff: 'Décollage : {technique}',
             altMaxTitle: 'Alt Max',
@@ -403,6 +405,7 @@ export const FR = Object.freeze({
             flightTypes: 'Types de vols',
             takeoffTechniques: 'Techniques de décollage',
             groundExercises: 'Exercices de gonflage',
+            filterBy: 'Filtrer par {name}',
         }),
         export: Object.freeze({
             title: 'Carnet de vol',

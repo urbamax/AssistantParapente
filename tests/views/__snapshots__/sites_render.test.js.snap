@@ -142,7 +142,7 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
                 ",
   "wind": "
                     <label role="button" tabindex="0" class="filter-option state-exclude" data-action="cycleFilterState" data-args="'wind', 'N'">
-                        <span class="custom-filter-icon"><i class="ri-close-box-fill"></i></span>
+                        <span class="custom-filter-icon"><i class="ri-close-circle-fill"></i></span>
                         <span class="filter-label">N</span>
                     </label>
                 
