@@ -2,6 +2,14 @@
 
 Ce fichier centralise les concepts techniques et les idées d'amélioration validés pour le futur, afin de ne pas perturber le code stable actuel.
 
+**Légende :** ✅ fait · 🟡 partiel · ❌ abandonné · (sans marque) à faire. Statuts revérifiés dans le code le 2026-10-11.
+
+### Priorités actuelles
+1. Brief pré-vol unifié (météo + brevet + matériel) : toutes les briques existent, il manque l'écran.
+2. Export PDF du carnet et téléchargement `.igc`.
+3. Classification automatique du type de vol (la détection de spirales existe déjà).
+4. Découpage de `js/views/logbook.js` (~3 700 lignes) avant d'y ajouter d'autres fonctions.
+
 ---
 
 ## 🎨 1. Iconographie Officielle FFVL & SpotAir — ❌ ABANDONNÉ (vérifié 2026-09-15)
@@ -66,46 +74,55 @@ Module Théorie (Brevet Initial)
 
 ## 📡 4. Offline & Alertes (validé 2026-09-14)
 
-### Cache offline réel pour les sites favoris
+### Cache offline réel pour les sites favoris — 🟡 PARTIEL (vérifié 2026-10-11)
+*Fait : dernière prévision conservée hors ligne avec son horodatage (specs 007 et 008, `sw.js`). Reste à vérifier : mise en cache des tuiles de carte des favoris (voir 9.15).*
 Le `sw.js` existe déjà mais il faut vérifier qu'il précache bien les tuiles carte + la météo + les données de site pour les favoris, car en zone de déco/atterro le réseau est souvent absent. Prévoir un indicateur "dernière synchro" visible pour ne pas laisser croire qu'une météo vieille de plusieurs heures est en direct.
 
-### Alertes météo push sur les sites favoris
+### Alertes météo push sur les sites favoris — ✅ FAIT (vérifié 2026-10-11)
+*Cloud Function `checkFavoriteSitesWeather` (toutes les 30 min, `functions/index.js`) + FCM + `sw.js`, scoring partagé avec `js/weatherScoring.js`.*
 S'appuyer sur le moteur de scoring déjà en place (`js/weatherScoring.js`) pour envoyer une notification (Notification API) quand une fenêtre de vol s'ouvre sur un site favori. Dépend du Service Worker actif (point précédent) + gestion des permissions navigateur.
 
-### Digest "meilleure fenêtre des 7 prochains jours"
+### Digest "meilleure fenêtre des 7 prochains jours" — 🟡 PARTIEL (vérifié 2026-10-11)
+*Fait : « meilleur créneau à venir » par site (`js/views/sites.js`). Reste : le digest multi-sites sur 7 jours.*
 Le scoring répond aujourd'hui à "est-ce volable maintenant" mais pas "quel est le meilleur créneau à venir". Un résumé hebdo sur les sites favoris (même sans notif, juste affiché) éviterait de re-checker chaque site un par un.
 
 ---
 
 ## 🪂 5. Carnet de Vol & Matériel (validé 2026-09-14)
 
-### Auto-tag du site de vol depuis la trace IGC
+### Auto-tag du site de vol depuis la trace IGC — ✅ FAIT (vérifié 2026-10-11)
+*`LogbookView.findNearestSite` (rayon 500 m), testé dans `tests/services/igc_takeoff.test.js`.*
 `js/services/logbook_service.js` ne fait aujourd'hui aucun lien avec `sites_data.json`. Au moment du parsing IGC (`js/services/igc_parser.js`), matcher le point de décollage au site connu le plus proche via `calculateDistance()` (déjà présent dans `js/utils/geo_utils.js`) et pré-remplir le champ "Lieu" automatiquement.
 
-### Alertes de révision matériel proactives
+### Alertes de révision matériel proactives — 🟡 PARTIEL (vérifié 2026-10-11)
+*Fait : pastille sur le menu Carnet et alertes par carte (date, heures ; secours ouvert = défaut jusqu'au pliage). Reste : notification avant l'échéance.*
 Les périodes de révision (mois/heures) sont déjà définies dans `js/data/equipment_config.js` (`REVISION_PERIODS_MONTHS`, `REVISION_PERIODS_HOURS`), mais rien ne prévient l'utilisateur avant l'échéance. Ajouter un badge dashboard ou une notification (même mécanisme que l'alerte météo) qui alerte avant la date/heures limite plutôt que de devoir consulter la fiche matériel.
 
 ---
 
 ## ✈️ 6. Vue d'ensemble & Confort (validé 2026-09-14)
 
-### Brief pré-vol unifié
+### Brief pré-vol unifié — priorité 1
+*Les check-lists de prévol existent dans `safety.js` mais ne sont pas liées à la météo ni au matériel.*
 Une vue unique combinant météo du site + niveau de brevet requis (BI/BP/BPC) + état des révisions matériel, plutôt que de checker ces trois choses séparément avant de partir voler. Capitalise sur les sections 4 et 5 ci-dessus.
 
-### Indicateur de sync visible
+### Indicateur de sync visible — ✅ FAIT (vérifié 2026-10-11)
+*Pastille `sync-active-dot` : bleu pendant la synchro, orange si des modifications sont en attente, masquée sinon (`firebase_service.js`).*
 `js/services/firebase_service.js` gère déjà tout le merge local/cloud (stats, historique, logbook, équipement) mais aucune UI ne montre "en attente de sync" / "synchronisé". Utile pour rassurer l'utilisateur en zone blanche, en cohérence avec le cache offline de la section 4.
 
-### Comparateur multi-sites
+### Comparateur multi-sites — à faire
 Un tableau côte-à-côte du score d'exploitabilité de plusieurs sites favoris pour le jour même, pour décider où aller sans ouvrir chaque fiche une par une. Complète le digest 7 jours de la section 4.
 
 ---
 
 ## 📊 7. Stats & Fiabilité (validé 2026-09-14)
 
-### Stats de vol avancées depuis l'IGC
+### Stats de vol avancées depuis l'IGC — ✅ FAIT (vérifié 2026-10-11)
+*`igc_parser.js` extrait vario, distance, vitesses, thermiques ; records personnels interactifs dans l'onglet Stats du carnet.*
 `js/services/igc_parser.js` n'extrait aujourd'hui que durée, altitude max et gain. Les points GPS + altitude + timestamp permettent aussi de calculer le vario max (taux de montée), la distance parcourue et la vitesse max/moyenne — stats attendues par les pilotes (façon XCTrack/Strava), rien ne bloque techniquement.
 
-### Indice de confiance météo multi-modèles
+### Indice de confiance météo multi-modèles — 🟡 PARTIEL (vérifié 2026-10-11)
+*Fait : comparaison de deux modèles avec indication d'accord (`loadModelComparison`). Reste : étendre à 3 modèles ou plus.*
 `weather_config.js` référence 4 modèles (AROME, ICON, GFS, ECMWF) mais `js/services/sites_service.js` (ligne ~219) n'en interroge qu'un seul à la fois, choisi manuellement. Comparer 2-3 modèles pour le même créneau et afficher un indice "modèles d'accord / en désaccord" donnerait un signal de fiabilité plus parlant qu'un chiffre brut.
 
 ---
@@ -113,31 +130,35 @@ Un tableau côte-à-côte du score d'exploitabilité de plusieurs sites favoris 
 ## 🎓 8. Théorie & Sécurité (validé 2026-09-14)
 
 ### Spaced repetition réelle pour le mode Révision QCM
+*Le mode Révision existe mais reste basé sur le ratio de réussite, sans dimension temporelle.*
 `js/services/quiz_service.js` (`startSession`, mode `REVISION`, ligne ~203) filtre déjà les questions par ratio de réussite (< 75% = à revoir), mais sans notion temporelle : une question ratée une fois il y a 6 mois pèse pareil qu'une ratée hier. Ajouter un vrai espacement (type SM-2 simplifié : intervalle qui grandit à chaque bonne réponse, se réinitialise à une erreur) rendrait la révision plus efficace qu'un simple seuil fixe.
 
-### Content-Security-Policy
+### Content-Security-Policy — ✅ FAIT (vérifié 2026-10-11)
+*Balise `Content-Security-Policy` dans `index.html`.*
 `index.html` ne déclare aucune CSP alors que l'app fait déjà un travail rigoureux d'échappement XSS (`js/core/security.js`, `escapeHTML` systématique). Une meta CSP (`default-src 'self'`, whitelist des domaines Firebase/API météo/tuiles carte) serait un renfort naturel en défense en profondeur, cohérent avec la politique de sécurité déjà en place.
 
-> **À vérifier avant tout :** la section 2 (ruban 3D suspendu) semble déjà en grande partie implémentée dans `js/components/map_3d.js` (`_buildDeckLayers`, `_computeVarioSeries`, `_varioColor`, coloration par vario) — à requalifier "fait" plutôt que "R&D" si confirmé.
 
 
 ## 🚀 9. Phase 3 & Idées Validées (2026-09-26)
-### 1. Auto-tagging intelligent du Site depuis IGC
+### 1. Auto-tagging intelligent du Site depuis IGC — ✅ FAIT (vérifié 2026-10-11)
 Extraire le point de décollage depuis l'IGC et trouver le site le plus proche dans `SITES_DATA` (rayon de 2-3km) pour pré-remplir le lieu de vol.
 
-### 2. Exploitation avancée des statistiques IGC
+### 2. Exploitation avancée des statistiques IGC — 🟡 PARTIEL (vérifié 2026-10-11)
+*Fait : records et totaux. Reste à confirmer : profil altimétrique 2D coloré par le vario dans le détail d'un vol (la coloration existe en 3D, `map_3d.js`).*
 Dashboard avec records (Vitesse max, Thermique max, Distance). Profil altimétrique 2D coloré par le Vario dans la vue de détail du vol.
 
-### 3. Auto-Nettoyage IGC (Détection Atterrissage Réel)
+### 3. Auto-Nettoyage IGC (Détection Atterrissage Réel) — ✅ FAIT (vérifié 2026-10-11)
+*`detectLandingIndex` dans `igc_parser.js`.*
 Tronquer automatiquement la fin de la trace IGC (la marche vers la voiture) en détectant une vitesse < 5 km/h et une altitude constante, pour des stats de vol exactes.
 
-### 4. Auto-Classification du Vol (Analyse IGC)
+### 4. Auto-Classification du Vol (Analyse IGC) — 🟡 PARTIEL (vérifié 2026-10-11)
+*La détection de spirales et de thermiques existe ; le type de vol (Plouf, Thermique, Soaring, Cross) reste saisi à la main.*
 L'app tague le vol (Plouf, Thermique, Soaring, Cross) en analysant la géométrie de la trace (virages 360, inversions de cap, distance max). Affichage d'un graphique de répartition.
 
 ### 5. Apprentissage Espacé "Spaced Repetition" (QCM)
 Algorithme SM-2. Bonne réponse = intervalle grandi (1j, 3j, 7j). Mauvaise réponse = reset. Tirage prioritaire des questions échues.
 
-### 6. Indicateur de Synchronisation Cloud discret
+### 6. Indicateur de Synchronisation Cloud discret — ✅ FAIT (vérifié 2026-10-11)
 Petite pastille de couleur (orange=en attente, vert/invisible=sync) branchée sur l'état de `FirebaseService`.
 
 ### 7. Espaces Aériens 3D (TMA / CTR)
@@ -180,7 +201,8 @@ L'analyse IGC calcule le ratio entre le temps passé à chercher le thermique (v
 
 Une section d'assistance au décollage affichant la checklist vitale de pré-vol (SIGR : Sangles, Instruments, Goupille de secours, Radio, etc.). L'idée est de fournir une interface claire, peut-être avec une option pour se la faire lire à voix haute par le téléphone pour avoir les mains libres, afin de garantir une sécurité maximale avant de décoller.
 
-### 19. Le "Sniper" Météo (Alertes Push Sur-Mesure)
+### 19. Le "Sniper" Météo (Alertes Push Sur-Mesure) — 🟡 PARTIEL (vérifié 2026-10-11)
+*Les alertes push utilisent déjà les préférences de scoring de chaque utilisateur ; reste à vérifier la finesse par site (plafond, orientation, jours de la semaine).*
 Plutôt qu'une alerte météo générique, permettre au pilote de configurer ses "Conditions Idéales" par site (ex: Plafond > 2000m, Vent < 15km/h, Orientation N/NE, uniquement le week-end). Une Cloud Function surveille ces critères et envoie une notification push uniquement quand la fenêtre parfaite s'ouvre.
 
 ### 20. Tableau de Bord "Navettes & Covoiturage"
