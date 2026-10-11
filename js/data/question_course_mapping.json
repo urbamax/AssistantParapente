@@ -2512,8 +2512,9 @@
   },
   "S10M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "score": 0.0937,
-    "title": "cycle2 2025web"
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 41,
+    "verifiedAt": "2026-10-11"
   },
   "S10T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -2522,9 +2523,10 @@
     "verifiedAt": "2026-10-02"
   },
   "S11M": {
-    "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques-1",
-    "score": 0.0986,
-    "title": "Pratique BI BP maitrise aile vol exercices spécifiques 1"
+    "course_id": "treuil/ffvl-dossiertracte-2023",
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
+    "verifiedPage": 20,
+    "verifiedAt": "2026-10-11"
   },
   "S12M": {
     "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques-1",
@@ -2558,7 +2560,7 @@
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 33,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S15T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -2589,9 +2591,7 @@
   },
   "S19V": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
-    "verifiedPage": 28,
-    "verifiedAt": "2026-10-04"
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote"
   },
   "S20M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -2601,8 +2601,8 @@
   "S20T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
-    "verifiedPage": 19,
-    "verifiedAt": "2026-10-04"
+    "verifiedPage": 46,
+    "verifiedAt": "2026-10-11"
   },
   "S21T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -2636,19 +2636,17 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 19,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S25V": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
-    "verifiedPage": 28,
-    "verifiedAt": "2026-10-04"
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote"
   },
   "S26B": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 52,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S27M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -3297,10 +3295,10 @@
     "verifiedAt": "2026-10-04"
   },
   "S115V": {
-    "course_id": "general/20240409-ffvl-formation-espacesaeriens",
-    "title": "Espaces Aériens - Les Fondamentaux",
-    "verifiedPage": 25,
-    "verifiedAt": "2026-10-04"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 81,
+    "verifiedAt": "2026-10-11"
   },
   "S116B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
@@ -3311,7 +3309,7 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 23,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S118B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
@@ -3328,7 +3326,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 83,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S121B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -3352,24 +3350,25 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 81,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S125B": {
-    "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
-    "score": 0.0636,
-    "title": "rcfcrentiel niveau vert brevet initial "
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 131,
+    "verifiedAt": "2026-10-11"
   },
   "S126B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 77,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S127B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 134,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S128B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -3399,7 +3398,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 137,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S134B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -4867,7 +4866,7 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 19,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S26T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
