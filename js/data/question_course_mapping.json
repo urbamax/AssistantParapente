@@ -2474,7 +2474,7 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 30,
-    "verifiedAt": "2026-10-02"
+    "verifiedAt": "2026-10-11"
   },
   "S4B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -2489,9 +2489,10 @@
     "verifiedAt": "2026-10-02"
   },
   "S6M": {
-    "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques-1",
-    "score": 0.141,
-    "title": "Pratique BI BP maitrise aile vol exercices spécifiques 1"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 14,
+    "verifiedAt": "2026-10-11"
   },
   "S7M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -2667,9 +2668,7 @@
   },
   "S29B": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
-    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
-    "verifiedPage": 22,
-    "verifiedAt": "2026-10-04"
+    "title": "Dossier Tracté FFVL - Treuillage (version 2023)"
   },
   "S29T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -2687,12 +2686,13 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 30,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S31M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "score": 0.056,
-    "title": "cycle2 2025web"
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 41,
+    "verifiedAt": "2026-10-11"
   },
   "S32T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -2704,18 +2704,19 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 3,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S33T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 21,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S33V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
-    "score": 0.2007,
-    "title": "cycle1 2025web"
+    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
+    "verifiedPage": 30,
+    "verifiedAt": "2026-10-11"
   },
   "S34T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -2741,9 +2742,10 @@
     "verifiedAt": "2026-10-04"
   },
   "S37B": {
-    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/07-parachute-de-secours2019/07-parachute-de-secours2019",
-    "score": 0.0744,
-    "title": "07 parachute de secours2019"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 22,
+    "verifiedAt": "2026-10-11"
   },
   "S37T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -2776,15 +2778,16 @@
     "verifiedAt": "2026-10-04"
   },
   "S41M": {
-    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
-    "verifiedPage": 41,
-    "verifiedAt": "2026-10-04"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 23,
+    "verifiedAt": "2026-10-11"
   },
   "S42M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "score": 0.1172,
-    "title": "cycle2 2025web"
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 40,
+    "verifiedAt": "2026-10-11"
   },
   "S43M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -2798,10 +2801,10 @@
     "verifiedAt": "2026-10-04"
   },
   "S44M": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "title": "Livret Pédagogique - Initiation",
-    "verifiedPage": 21,
-    "verifiedAt": "2026-10-04"
+    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/07-parachute-de-secours2019/07-parachute-de-secours2019",
+    "title": "Le Parachute de secours",
+    "verifiedPage": 1,
+    "verifiedAt": "2026-10-11"
   },
   "S44T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -2810,10 +2813,10 @@
     "verifiedAt": "2026-10-04"
   },
   "S45B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "title": "Livret Pédagogique - Initiation",
-    "verifiedPage": 23,
-    "verifiedAt": "2026-10-04"
+    "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025",
+    "title": "Réglementation - La division de l’espace aérien",
+    "verifiedPage": 1,
+    "verifiedAt": "2026-10-11"
   },
   "S45T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -2831,19 +2834,19 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 23,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S47B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 25,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S47T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 27,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S48B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -2867,7 +2870,7 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 28,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S50B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -2879,7 +2882,7 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 28,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S51B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -2920,20 +2923,20 @@
   "S54T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
-    "verifiedPage": 30,
-    "verifiedAt": "2026-10-04"
+    "verifiedPage": 29,
+    "verifiedAt": "2026-10-11"
   },
   "S55B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 25,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S56B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 25,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S56T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -2948,10 +2951,10 @@
     "verifiedAt": "2026-10-04"
   },
   "S58M": {
-    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
-    "verifiedPage": 28,
-    "verifiedAt": "2026-10-04"
+    "course_id": "general/20240409-ffvl-formation-espacesaeriens",
+    "title": "Espaces Aériens - Les Fondamentaux",
+    "verifiedPage": 6,
+    "verifiedAt": "2026-10-11"
   },
   "S59M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -3029,13 +3032,13 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 29,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S71M": {
     "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025",
     "title": "Réglementation - La division de l’espace aérien",
     "verifiedPage": 1,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S72M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -4926,7 +4929,7 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 30,
-    "verifiedAt": "2026-10-04"
+    "verifiedAt": "2026-10-11"
   },
   "S57T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -4981,5 +4984,11 @@
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 31,
     "verifiedAt": "2026-10-10"
+  },
+  "S40M": {
+    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 23,
+    "verifiedAt": "2026-10-11"
   }
 }
