@@ -280,6 +280,7 @@ export const FR = Object.freeze({
             empty: 'Votre carnet est vide.',
             badgeFlight: 'VOL',
             badgeGround: 'GONFLAGE',
+            downloadIgc: "Télécharger l'IGC",
             edit: 'Modifier',
             delete: 'Supprimer',
             takeoffTitle: 'Décollage',
@@ -406,6 +407,27 @@ export const FR = Object.freeze({
             flightTypes: 'Types de vols',
             takeoffTechniques: 'Techniques de décollage',
             groundExercises: 'Exercices de gonflage',
+        }),
+        export: Object.freeze({
+            title: 'Carnet de vol',
+            generated: 'Édité le {date}',
+            columns: Object.freeze({
+                date: 'Date',
+                type: 'Type',
+                site: 'Site',
+                wing: 'Voile',
+                duration: 'Durée',
+                comment: 'Commentaire',
+            }),
+            typeFlight: 'Vol',
+            typeGround: 'Gonflage',
+            totalSession: '{count} session',
+            totalSessions: '{count} sessions',
+            totalFlights: 'Vols : {duration}',
+            totalGround: 'Gonflage : {duration}',
+            empty: 'Votre carnet est vide : rien à exporter.',
+            noTrace: 'La trace de ce vol est introuvable.',
+            printError: "L'impression n'a pas pu être lancée.",
         }),
         equipment: Object.freeze({
             inventory: 'Mon Inventaire',
@@ -1293,6 +1315,7 @@ export const FR = Object.freeze({
             carnetDeVol: 'CARNET DE VOL',
             ajouterUneSession: 'Ajouter une session',
             toutRecalculer: 'Tout recalculer',
+            exporterEnPdf: 'Exporter en PDF',
             ajouterUnEquipement: 'Ajouter un Équipement',
             type: 'Type :',
             voile: 'Voile',
@@ -1762,6 +1785,8 @@ export const FR = Object.freeze({
                 "<strong>Statistiques détaillées :</strong> Sous chaque vol avec une trace, un bloc repliable détaille le remorquage au treuil (durée, hauteur de largage, montée), les altitudes et le dénivelé cumulé, le vario et le taux de chute, les thermiques enroulés (nombre, montée moyenne, meilleur thermique, tours à gauche et à droite), la finesse en transition, les distances (dont la distance libre à 3 points), ainsi que le facteur de charge mesuré si le .sdf a été ajouté (sinon un facteur de charge estimé d'après les virages), et l'instrument qui a enregistré le vol : marque, modèle, numéro de série et version du logiciel, lus dans le fichier IGC.",
             chaqueEntreePeutEtre:
                 "<strong>Modification et Suppression :</strong> Chaque entrée peut être modifiée (le formulaire se préremplit, avec un bouton <strong>Annuler</strong>) ou supprimée. Les heures d'usure de votre matériel sont ajustées automatiquement. En modification, le bouton <strong>Recalculer depuis la trace IGC</strong> refait les calculs à partir de la trace enregistrée (date, durée, altitudes, statistiques, site, et type Treuil si besoin) sans toucher au reste.",
+            exporterCarnet:
+                "<strong>Exporter :</strong> le bouton <strong>Exporter en PDF</strong> ouvre un bilan A4 de tout le carnet (date, type, site, voile, durée, commentaire, totaux) : choisissez « Enregistrer au format PDF » dans la fenêtre d'impression. Sur une session avec trace, <strong>Télécharger l'IGC</strong> redonne le fichier d'origine, prêt à être déclaré sur CFD ou XContest.",
             n4StatistiquesDuCarnet: '4. Statistiques du Carnet',
             statistiquesEtRecords:
                 'La partie Statistiques résume votre activité : nombre et temps de vol, sessions de gonflage, altitude maximale et gain cumulé, utilisation de chaque voile et heures restantes avant révision, lieux les plus fréquentés, part des sessions en école, types de vols, techniques de décollage et exercices de gonflage. La section <strong>Records personnels</strong> donne vos meilleurs vols (plus long, plus haut, distance libre, meilleur thermique, meilleure finesse, plus haut largage au treuil, facteur de charge…) avec leur date et leur site, et les cumuls de vos vols avec trace. Le bouton <strong>Tout recalculer</strong>, à côté d’<strong>Ajouter une session</strong> (ou sous les records), recalcule tous vos vols depuis leur trace : date, durée, altitude max, gain, position du décollage et statistiques. Vos saisies sont gardées : site, type de vol, matériel, école, pilotes, commentaire et correction d’altitude.',

@@ -118,6 +118,8 @@ async function bootApplication() {
         'editEntry',
         'deleteEntry',
         'showTrace',
+        'downloadTrace',
+        'exportLogbookPdf',
         'editEquipment',
         'deleteEquipment',
         'toggleEquipmentStatus',
