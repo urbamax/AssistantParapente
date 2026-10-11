@@ -90,6 +90,19 @@ describe('IGCParser.analyzeFlight', () => {
         expect(IGCParser.detectWinchTow(buildFlight([straightClimb(120, 0.8), glide(120)]))).toBeNull();
     });
 
+    it('counts the turnarounds of a ridge flight, not the thermals nor a straight line', () => {
+        const leg = (heading) => ({ seconds: 200, glide: { speedKmh: 34, verticalMs: -0.1, headingDeg: heading } });
+        const turn = (direction) => ({
+            seconds: 14,
+            circle: { speedKmh: 34, radiusM: 40, verticalMs: -0.1, direction },
+        });
+        const ridge = buildFlight([leg(0), turn(1), leg(180), turn(-1), leg(0), turn(1), leg(180)]);
+        expect(IGCParser.analyzeFlight(ridge).reversals).toBe(3);
+
+        expect(IGCParser.analyzeFlight(buildFlight([glide(600)])).reversals).toBe(0);
+        expect(IGCParser.analyzeFlight(buildFlight([glide(120), thermal(240, 2), glide(120)])).reversals).toBe(0);
+    });
+
     it('returns null for too short a track', () => {
         expect(IGCParser.analyzeFlight([])).toBeNull();
         expect(IGCParser.analyzeFlight(buildFlight([glide(1)]))).toBeNull();

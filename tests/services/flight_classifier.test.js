@@ -9,6 +9,7 @@ const analysis = (extra = {}) => ({
     maxThermalGain: 0,
     freeDistanceKm: 2,
     avgVario: -1.2,
+    reversals: 0,
     winch: null,
     ...extra,
 });
@@ -39,28 +40,41 @@ describe('classifyFlight: the rule table', () => {
         expect(classifyFlight(a, 12).type).toBe('Plouf');
     });
 
-    it('staying up for a while without thermals is Soaring', () => {
-        const a = analysis({ avgVario: CLASSIFICATION.soaringMinAvgVario });
+    it('staying up for a while going back and forth without thermals is Soaring', () => {
+        const a = analysis({
+            avgVario: CLASSIFICATION.soaringMinAvgVario,
+            reversals: CLASSIFICATION.soaringMinReversals,
+        });
         expect(classifyFlight(a, CLASSIFICATION.soaringMinMinutes)).toEqual({
             type: 'Soaring',
             reason: 'traceSoaring',
         });
     });
 
+    it('staying up without going back and forth is not Soaring', () => {
+        const a = analysis({
+            avgVario: -0.1,
+            reversals: CLASSIFICATION.soaringMinReversals - 1,
+        });
+        expect(classifyFlight(a, 30).type).toBe('Plouf');
+    });
+
     it('a short flight that stays up is not Soaring', () => {
-        const a = analysis({ avgVario: -0.1 });
+        const a = analysis({ avgVario: -0.1, reversals: 8 });
         expect(classifyFlight(a, CLASSIFICATION.soaringMinMinutes - 1).type).toBe('Plouf');
     });
 
-    it('a flight that loses height steadily is a Plouf', () => {
-        const a = analysis({ avgVario: CLASSIFICATION.soaringMinAvgVario - 0.1 });
+    it('a flight that loses height steadily is a Plouf, even with turns back', () => {
+        const a = analysis({ avgVario: CLASSIFICATION.soaringMinAvgVario - 0.1, reversals: 8 });
         expect(classifyFlight(a, 30)).toEqual({ type: 'Plouf', reason: 'tracePlouf' });
     });
 
     it('never suggests Restit, which a trace cannot tell', () => {
-        const types = [analysis(), analysis({ thermalCount: 1, maxThermalGain: 90 }), analysis({ avgVario: 0 })].map(
-            (a) => classifyFlight(a, 30).type,
-        );
+        const types = [
+            analysis(),
+            analysis({ thermalCount: 1, maxThermalGain: 90 }),
+            analysis({ avgVario: 0, reversals: 6 }),
+        ].map((a) => classifyFlight(a, 30).type);
         expect(types).not.toContain('Restit');
     });
 });
@@ -79,6 +93,21 @@ describe('classifyFlight: on traces analysed by the parser', () => {
     it('a long ridge flight without circling is Soaring', () => {
         const ridge = (heading) => ({ seconds: 240, glide: { speedKmh: 34, verticalMs: -0.1, headingDeg: heading } });
         expect(classify([ridge(0), ridge(180), ridge(0), ridge(180), ridge(0)])).toBe('Soaring');
+    });
+
+    it('rounded turnarounds along a ridge are Soaring too', () => {
+        const leg = (heading) => ({ seconds: 200, glide: { speedKmh: 34, verticalMs: -0.1, headingDeg: heading } });
+        const turn = (direction) => ({
+            seconds: 14,
+            circle: { speedKmh: 34, radiusM: 40, verticalMs: -0.1, direction },
+        });
+        expect(classify([leg(0), turn(1), leg(180), turn(-1), leg(0), turn(1), leg(180), turn(-1), leg(0)])).toBe(
+            'Soaring',
+        );
+    });
+
+    it('a long steady line without turning back is not Soaring', () => {
+        expect(classify([{ seconds: 900, glide: { speedKmh: 34, verticalMs: -0.1, headingDeg: 90 } }])).toBe('Plouf');
     });
 
     it('circling up in a thermal near the take-off is a Thermique', () => {

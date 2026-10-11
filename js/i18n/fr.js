@@ -165,7 +165,7 @@ export const FR = Object.freeze({
                     trace: 'départ au treuil détecté dans la trace',
                     traceThermals: 'thermiques repérés dans la trace',
                     traceCross: 'thermiques et grande distance repérés dans la trace',
-                    traceSoaring: 'long vol sans thermique repéré dans la trace',
+                    traceSoaring: 'allers-retours sans thermique repérés dans la trace',
                     tracePlouf: 'descente directe repérée dans la trace',
                     gearPlace: 'utilisée la dernière fois ici',
                     gearLatest: 'la dernière utilisée',

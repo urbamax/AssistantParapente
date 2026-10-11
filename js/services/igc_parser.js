@@ -292,6 +292,24 @@ const IGCParser = {
             circling[k] = Math.abs(prefix[hi + 1] - prefix[lo]) >= 200;
         }
 
+        // Demi-tours : un changement de cap de 150 à 230° en moins de 30 s, hors spirale. C'est
+        // l'aller-retour le long d'une crête (soaring) ; une spirale (thermique) fait plus de 200°
+        // en 10 s et n'est pas comptée ici.
+        let reversals = 0;
+        for (let k = 0; k < n - 1;) {
+            let hi = k;
+            while (hi + 1 < n && S[hi + 1].timestamp - S[k].timestamp <= 30000) hi++;
+            const turned = Math.abs(prefix[hi + 1] - prefix[k]);
+            let spiral = false;
+            for (let m = k; m <= hi && !spiral; m++) spiral = circling[m];
+            if (!spiral && turned >= 150 && turned <= 230) {
+                reversals++;
+                k = hi + 1;
+            } else {
+                k++;
+            }
+        }
+
         // Phases (spirale / transition), en lissant les phases trop courtes
         let runs = [];
         for (let k = 0; k < n; k++) {
@@ -404,6 +422,7 @@ const IGCParser = {
             maxThermalGain: Math.round(maxThermalGain),
             turnsLeft,
             turnsRight,
+            reversals,
             glideRatio: glideLoss > 0 ? round1((glideKm * 1000) / glideLoss) : null,
             bestGlideRatio: bestGlideRatio > 0 ? round1(bestGlideRatio) : null,
             glideSpeedKmh: glideSeconds > 0 ? round1(glideKm / (glideSeconds / 3600)) : null,

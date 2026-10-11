@@ -23,11 +23,12 @@ overwritten.
 | Treuil | A winch tow is detected at take-off (existing detection). |
 | Cross | At least one thermal gaining 50 m or more **and** a free distance of 15 km or more. |
 | Thermique | At least one thermal gaining 50 m or more. |
-| Soaring | No such thermal, a flight of 10 min or more, and an average vertical speed of -0.6 m/s or better (the pilot stays up without circling: ridge soaring). |
+| Soaring | No such thermal, a flight of 10 min or more, an average vertical speed of -0.6 m/s or better, **and at least 3 turnarounds** (the pilot stays up going back and forth along the slope: ridge soaring). |
 | Plouf | Anything else with a usable analysis: a direct descent. |
 
 - **Restit** (school flight shown to the instructor) cannot be read from a trace: it is never suggested.
 - With no usable analysis (trace too short) nothing is suggested and the field is left alone.
+- A turnaround is a heading change of 150–230° within 30 s outside a spiral (the analysis counts them as `reversals`).
 - The thresholds are heuristics gathered in one exported constant, so they can be tuned in one place.
 
 ## Requirements

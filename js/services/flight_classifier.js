@@ -13,13 +13,15 @@ export const CLASSIFICATION = Object.freeze({
     crossMinKm: 15,
     /** Durée minimale d'un vol de soaring (min). */
     soaringMinMinutes: 10,
+    /** Demi-tours minimaux d'un vol de soaring (aller-retours le long de la pente). */
+    soaringMinReversals: 3,
     /** Vario moyen minimal d'un vol de soaring : en dessous, le pilote descend (m/s). */
     soaringMinAvgVario: -0.6,
 });
 
 /**
  * @param {{winch?: object|null, thermalCount?: number, maxThermalGain?: number,
- *   freeDistanceKm?: number, avgVario?: number}|null|undefined} analysis
+ *   freeDistanceKm?: number, avgVario?: number, reversals?: number}|null|undefined} analysis
  * @param {number} durationMinutes durée du vol
  * @returns {{type: string, reason: string}|null} le type suggéré et la raison affichée au pilote
  */
@@ -35,8 +37,9 @@ export function classifyFlight(analysis, durationMinutes) {
             : { type: 'Thermique', reason: 'traceThermals' };
     }
 
-    const staysUp =
+    const ridgeSoaring =
         durationMinutes >= CLASSIFICATION.soaringMinMinutes &&
-        (analysis.avgVario ?? -Infinity) >= CLASSIFICATION.soaringMinAvgVario;
-    return staysUp ? { type: 'Soaring', reason: 'traceSoaring' } : { type: 'Plouf', reason: 'tracePlouf' };
+        (analysis.avgVario ?? -Infinity) >= CLASSIFICATION.soaringMinAvgVario &&
+        (analysis.reversals || 0) >= CLASSIFICATION.soaringMinReversals;
+    return ridgeSoaring ? { type: 'Soaring', reason: 'traceSoaring' } : { type: 'Plouf', reason: 'tracePlouf' };
 }
