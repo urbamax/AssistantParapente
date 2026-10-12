@@ -82,8 +82,8 @@ describe('logbook: course of a school session', () => {
         LogbookView.submitForm();
 
         expect(lastFlight()).toMatchObject({ stageName: 'Stage été', stageSpecialty: 'SIV' });
-        expect(history()).toContain('Stage SIV');
-        expect(history()).toContain('Stage été');
+        expect(history()).toContain('Stage été | ÉCOLE TEST');
+        expect(history()).toContain('Spécialité : SIV');
 
         LogbookView.editEntry(lastFlight().id);
         expect($('lb-stage-check').checked).toBe(true);
@@ -157,5 +157,25 @@ describe('logbook: rescue deployed during a flight', () => {
         $('lb-rescue').value = 'Secours B';
         choose('lb-sellette', 'Sellette');
         expect($('lb-rescue').value).toBe('Secours B');
+    });
+});
+
+describe('equipment: a rescue that was opened', () => {
+    const card = () => document.querySelector('.equip-card.status-danger');
+
+    it('shows the number of openings and is in default until it is repacked', () => {
+        setup();
+        toggle('lb-rescue-check', true);
+        $('lb-rescue').value = 'Secours B';
+        LogbookView.submitForm();
+
+        LogbookView.renderEquipment();
+        expect(card()?.textContent).toContain('Secours ouvert le');
+        expect(card()?.textContent).toContain('Ouvertures : 1');
+
+        LogbookService.equipment.find((e) => e.id === 's2').derniereRevision = '2999-01-01';
+        LogbookView.renderEquipment();
+        expect(card()).toBeNull();
+        expect(document.body.textContent).toContain('Ouvertures : 1');
     });
 });

@@ -525,6 +525,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             
                             
                             
+                            
                         </div>
                         <div class="session-comment">"Belle journée"</div>
                         <button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="f1"><i class="ri-route-line"></i> Voir la trace 🗺️</button><button class="btn-download-trace action-btn-secondary" style="margin-top: 6px; width: 100%; padding: 8px; border-radius: 6px; cursor: pointer;" data-action="downloadTrace" data-args="f1"><i class="ri-download-2-line"></i> Télécharger l'IGC</button><div id="trace-container-f1" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>
@@ -606,6 +607,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             
                             
                             
+                            
                         </div>
                         
                         
@@ -641,6 +643,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                         
                         <div class="session-equip">
+                            
                             
                             
                             

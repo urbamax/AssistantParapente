@@ -65,7 +65,9 @@ export class LogbookEquipmentBase extends BaseView {
         const badge = document.getElementById('logbook-nav-badge');
         if (!badge) return;
         const wear = LogbookService.computeEquipmentWear();
-        const alertCount = Object.values(wear).filter((s) => s.alerts.dateAlert || s.alerts.hoursAlert).length;
+        const alertCount = Object.values(wear).filter(
+            (s) => s.alerts.dateAlert || s.alerts.hoursAlert || s.alerts.openedAlert,
+        ).length;
         if (alertCount > 0) {
             badge.textContent = String(alertCount);
             badge.style.display = 'flex';
@@ -359,7 +361,10 @@ export class LogbookEquipmentBase extends BaseView {
                     let statusClass = 'status-ok';
 
                     // Logique des alertes combinées
-                    if (stats && (stats.alerts.dateAlert === 'red' || stats.alerts.hoursAlert === 'red')) {
+                    if (stats?.alerts.openedAlert) {
+                        statusClass = 'status-danger';
+                        alertHtml = `<div class="equip-alert text-danger" style="color:#ef4444; font-weight:bold; margin-bottom:8px;"><i class="ri-umbrella-line"></i> ${tt('equipment.rescueOpened', { date: formatDateOnly(stats.lastOpening) })}</div>`;
+                    } else if (stats && (stats.alerts.dateAlert === 'red' || stats.alerts.hoursAlert === 'red')) {
                         statusClass = 'status-danger';
                         const reason = [];
                         if (stats.alerts.dateAlert === 'red')
@@ -407,7 +412,11 @@ export class LogbookEquipmentBase extends BaseView {
                             </div>
                             ${
                                 equip.type === 'secours'
-                                    ? ''
+                                    ? `
+                            <div class="session-details" style="font-size: 0.85rem; display:flex; gap:15px; margin-bottom: 6px;">
+                                <span class="detail-item"><i class="ri-umbrella-line"></i> ${tt('equipment.openings', { count: stats ? stats.openings : 0 })}</span>
+                            </div>
+                            `
                                     : `
                             <div class="session-details" style="font-size: 0.85rem; display:flex; gap:15px; margin-bottom: 6px;">
                                 <span class="detail-item"><i class="ri-windy-line"></i> ${tt('equipment.sessions', { count: stats ? stats.totalSessions : 0 })}</span>

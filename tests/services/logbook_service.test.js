@@ -302,31 +302,49 @@ describe('LogbookService.findLastCoordsForPlace', () => {
         expect(LogbookService.findLastCoordsForPlace('')).toBeNull();
     });
 
-    describe('computeEquipmentWear: linked rescue', () => {
-        const harness = (extra = {}) => ({ id: 'h1', nom: 'Sellette', type: 'sellette', ...extra });
-        const rescue = { id: 's1', nom: 'Secours', type: 'secours' };
+    describe('computeEquipmentWear: rescue openings', () => {
+        const rescue = (extra = {}) => ({ id: 's1', nom: 'Secours', type: 'secours', ...extra });
+        const flight = (id, datetime, extra = {}) => ({
+            id,
+            datetime,
+            sellette: 'Sellette',
+            duree: 30,
+            ...extra,
+        });
+        const opened = (id, datetime) => flight(id, datetime, { rescueDeployed: true, rescueId: 'Secours' });
+        const wear = () => LogbookService.computeEquipmentWear().secours;
 
-        it('adds the flights of a harness to the rescue mounted on it', () => {
-            LogbookService.equipment = [harness({ linkedRescueId: 's1' }), rescue];
-            LogbookService.flights = [
-                { id: 'f1', sellette: 'Sellette', duree: 30 },
-                { id: 'f2', sellette: 'Sellette', duree: 45 },
-            ];
-            const stats = LogbookService.computeEquipmentWear();
-            expect(stats.secours).toMatchObject({ totalSessions: 2, totalTime: 75 });
-            expect(stats.sellette).toMatchObject({ totalSessions: 2, totalTime: 75 });
+        it('does not count flight time for a rescue, only openings', () => {
+            LogbookService.equipment = [rescue()];
+            LogbookService.flights = [flight('f1', '2026-09-01T10:00'), opened('f2', '2026-09-02T10:00')];
+            expect(wear()).toMatchObject({ openings: 1, totalSessions: 0, totalTime: 0 });
         });
 
-        it('leaves the rescue alone without a link', () => {
-            LogbookService.equipment = [harness(), rescue];
-            LogbookService.flights = [{ id: 'f1', sellette: 'Sellette', duree: 30 }];
-            expect(LogbookService.computeEquipmentWear().secours).toMatchObject({ totalSessions: 0, totalTime: 0 });
+        it('is in default after an opening until it is repacked', () => {
+            LogbookService.equipment = [rescue({ derniereRevision: '2026-08-01' })];
+            LogbookService.flights = [opened('f1', '2026-09-02T10:00')];
+            expect(wear().alerts.openedAlert).toBe('red');
         });
 
-        it('ignores a link to a deleted rescue', () => {
-            LogbookService.equipment = [harness({ linkedRescueId: 'gone' })];
-            LogbookService.flights = [{ id: 'f1', sellette: 'Sellette', duree: 30 }];
-            expect(LogbookService.computeEquipmentWear().sellette.totalSessions).toBe(1);
+        it('is back to normal once repacked on or after the opening day', () => {
+            LogbookService.equipment = [rescue({ derniereRevision: '2026-09-02' })];
+            LogbookService.flights = [opened('f1', '2026-09-02T10:00')];
+            expect(wear()).toMatchObject({ openings: 1 });
+            expect(wear().alerts.openedAlert).toBe(false);
+        });
+
+        it('is in default again at a new opening after a repacking', () => {
+            LogbookService.equipment = [rescue({ derniereRevision: '2026-09-02' })];
+            LogbookService.flights = [opened('f1', '2026-09-02T10:00'), opened('f2', '2026-10-01T10:00')];
+            expect(wear()).toMatchObject({ openings: 2 });
+            expect(wear().alerts.openedAlert).toBe('red');
+        });
+
+        it('never opened means no default', () => {
+            LogbookService.equipment = [rescue()];
+            LogbookService.flights = [flight('f1', '2026-09-01T10:00')];
+            expect(wear()).toMatchObject({ openings: 0 });
+            expect(wear().alerts.openedAlert).toBe(false);
         });
     });
 });
