@@ -163,6 +163,10 @@ export const FR = Object.freeze({
                     habit: 'ton habitude',
                     winch: 'au treuil, on décolle presque toujours dos voile',
                     trace: 'départ au treuil détecté dans la trace',
+                    traceThermals: 'thermiques repérés dans la trace',
+                    traceCross: 'thermiques et grande distance repérés dans la trace',
+                    traceSoaring: 'allers-retours sans thermique repérés dans la trace',
+                    tracePlouf: 'descente directe repérée dans la trace',
                     gearPlace: 'utilisée la dernière fois ici',
                     gearLatest: 'la dernière utilisée',
                     nearbySession: 'comme ta session de moins de 3 h ici',
@@ -1762,7 +1766,7 @@ export const FR = Object.freeze({
             pilotesSession:
                 "<strong>Pilotes :</strong> Choisissez dans la liste déroulante les pilotes présents, en école ou non, ou saisissez un nouveau nom : il rejoint la liste pour les sessions suivantes. Chaque pilote choisi s'affiche en étiquette, retirée d'un clic sur sa croix. Pour un vol à moins de 3 h d'une autre session au même endroit, les pilotes de cette session sont déjà sélectionnés.",
             formulaireQuiApprend:
-                "<strong>Un formulaire qui apprend de vous :</strong> Pour une nouvelle session, l'application pré-remplit ce que vous faites d'habitude dans la même situation : type de vol et technique de décollage sur ce site, voile et sellette utilisées la dernière fois à cet endroit, école si vous y volez en stage en ce moment. Vos vols récents comptent davantage, et vos propres vols l'emportent sur les règles générales (par exemple « au treuil, on décolle dos voile »). Une ligne sous le formulaire indique ce qui a été pré-rempli et pourquoi. Tout reste modifiable : un champ que vous changez n'est jamais remplacé, et une session existante n'est jamais complétée.",
+                "<strong>Un formulaire qui apprend de vous :</strong> Pour une nouvelle session, l'application pré-remplit ce que vous faites d'habitude dans la même situation : type de vol et technique de décollage sur ce site, voile et sellette utilisées la dernière fois à cet endroit, école si vous y volez en stage en ce moment. Vos vols récents comptent davantage, et vos propres vols l'emportent sur les règles générales (par exemple « au treuil, on décolle dos voile »). Une ligne sous le formulaire indique ce qui a été pré-rempli et pourquoi. Tout reste modifiable : un champ que vous changez n'est jamais remplacé, et une session existante n'est jamais complétée. À l'import d'une trace IGC, le type de vol est aussi déduit de la trace (thermiques, distance, départ au treuil) et la ligne le précise ; « Restit » ne se lit pas dans une trace, il reste à choisir vous-même.",
             commentaireSession:
                 '<strong>Commentaire :</strong> Notez vos impressions, conditions aérologiques locales, ou faits marquants de votre vol.',
             n2SessionDeGonflage: '2. Session de Gonflage (Jeux de Voile / Groundhandling)',
