@@ -9,7 +9,14 @@ import { stripDeveloperText, findInlineTexts, catalogueKeys } from '../helpers/i
 // Un écran s'ajoute ici quand ses textes ont été déplacés (specs 014, 015, 019, 021, 024, 029…).
 const SCREENS = [
     // Valeurs enregistrées dans le carnet (données, pas textes d'interface).
-    { file: 'js/views/logbook.js', spec: '014', prefix: 'logbook.', dataValues: ['Autre', 'Plouf'], minKeys: 100 },
+    // logbook.js a été découpé (specs 014, puis étapes du découpage) : chaque fichier reste contrôlé.
+    ...[
+        ['js/views/logbook.js', 75],
+        ['js/views/logbook_equipment.js', 25],
+        ['js/views/logbook_stats.js', 25],
+        ['js/views/logbook_history.js', 50],
+        ['js/views/logbook_coords.js', 10],
+    ].map(([file, minKeys]) => ({ file, spec: '014', prefix: 'logbook.', dataValues: ['Autre', 'Plouf'], minKeys })),
     // Code de niveau enregistré dans les préférences.
     { file: 'js/views/sites.js', spec: '015', prefix: 'sites.', dataValues: ['ALL'], minKeys: 80 },
     { file: 'js/views/safety.js', spec: '019', prefix: 'safety.', dataValues: [], minKeys: 15 },
