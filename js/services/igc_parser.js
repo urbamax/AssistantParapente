@@ -117,6 +117,8 @@ const IGCParser = {
         return {
             points: trace,
             takeoffIndex: takeoffIndex,
+            startsAirborne: takeoffIndex === 0 && this.isAirborneAtStart(trace),
+            endsAirborne: landingIndex === trace.length - 1 && this.isAirborneAtEnd(trace),
             landingIndex: trace.length > 0 ? landingIndex : 0,
             dateStr: dateStr,
             duration: duration,
@@ -618,6 +620,28 @@ const IGCParser = {
             i = k; // la série s'est interrompue avant une minute : on repart après
         }
         return 0;
+    },
+
+    /**
+     * Vrai si la trace commence déjà en l'air (vario allumé en vol) : le premier point est
+     * alors en mouvement, et l'heure de début n'est pas celle du vrai décollage.
+     */
+    isAirborneAtStart: function (trace) {
+        if (!trace || trace.length < 2) return false;
+        let j = 1;
+        while (j < trace.length - 1 && trace[j].timestamp - trace[0].timestamp < 20000) j++;
+        const dtSec = (trace[j].timestamp - trace[0].timestamp) / 1000;
+        if (dtSec < 10) return false;
+        const speedKmh = this._pathKm(trace, 0, j) / (dtSec / 3600);
+        const verticalMs = Math.abs(trace[j].alt - trace[0].alt) / dtSec;
+        return speedKmh > 15 || verticalMs > 1.5;
+    },
+
+    /** Vrai si la trace s'arrête en l'air (vario éteint avant le posé). */
+    isAirborneAtEnd: function (trace) {
+        if (!trace || trace.length < 2) return false;
+        const reversed = [...trace].reverse().map((p) => ({ ...p, timestamp: -p.timestamp }));
+        return this.isAirborneAtStart(reversed);
     },
 
     /**
