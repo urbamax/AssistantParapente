@@ -132,6 +132,8 @@ async function bootApplication() {
         'toggleCoordsPicker',
         'clearCoords',
         'closeSessionModal',
+        'filterHistoryByStat',
+        'clearHistoryFilter',
     ].forEach((action) => {
         AppEvents.register('Logbook' + action, (args, e, t) =>
             LogbookView[action] ? LogbookView[action](args || e, e, t) : null,

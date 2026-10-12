@@ -676,7 +676,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
 "
             <div class="stats-grid">
                 <!-- KPI: Vols -->
-                <div class="kpi-card">
+                <div class="kpi-card" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="type" data-stat-value="vol" title="Filtrer par VOL">
                     <div class="kpi-icon" style="background-color: var(--accent-blue); color: white;"><i class="ri-windy-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">2 vols</div>
@@ -684,7 +684,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     </div>
                 </div>
                 <!-- KPI: Gonflages -->
-                <div class="kpi-card">
+                <div class="kpi-card" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="type" data-stat-value="gonflage" title="Filtrer par GONFLAGE">
                     <div class="kpi-icon" style="background-color: #f59e0b; color: white;"><i class="ri-footprint-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">1 sessions</div>
@@ -709,9 +709,10 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                 </div>
             </div>
         
-            <h3 class="stats-section-title">Records personnels</h3>
-            
-            <div class="records-list">
+            <div class="stats-section-box">
+                <h3 class="stats-section-title"><i class="ri-trophy-line" style="color: #f59e0b"></i> Records personnels</h3>
+                
+                <div class="records-grid">
                     <div class="record-row" role="button" tabindex="0" data-action="scrollToSession" data-args="f1">
                         <div class="record-icon"><i class="ri-time-line"></i></div>
                         <div class="record-content">
@@ -756,10 +757,14 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             <i class="ri-arrow-right-s-line record-chevron"></i>
                         </div>
                     </div></div>
-            <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent;">
-                <i class="ri-refresh-line"></i> Calculer les stats détaillées des vols avec trace (à mettre à jour : 1)
-            </button><h3 class="stats-section-title">Matériel (Voiles)</h3><div class="equip-list">
-                    <div class="equip-card">
+                <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 14px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 10px; border-radius: var(--radius-md, 8px); cursor: pointer; background: transparent; font-weight: 600;">
+                    <i class="ri-refresh-line"></i> Calculer les stats détaillées des vols avec trace (à mettre à jour : 1)
+                </button>
+            </div>
+            <div class="stats-section-box">
+                <h3 class="stats-section-title"><i class="ri-umbrella-line" style="color: var(--accent-blue)"></i> Matériel (Voiles)</h3>
+                <div class="equip-list">
+                    <div class="equip-card" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="voile" data-stat-value="OZONE | RUSH 6 | BLEU | M" title="Filtrer par OZONE | RUSH 6 | BLEU | M">
                         <div class="equip-name">OZONE | RUSH 6 | BLEU | M</div>
                         <div class="equip-details">
                             <span style="color: var(--accent-blue)">Vols: 1 (1h 15min)</span>
@@ -767,71 +772,107 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                         <div style="font-size: 0.8rem; margin-top: 6px; color: var(--text-secondary);"><strong>Avant révision:</strong> <span style="color:#ef4444; font-weight:bold;">Dépassé de 1h</span> (sur 1h)</div>
                     </div>
-                </div><div class="charts-grid"><h3 class="stats-section-title">Top Lieux fréquentés</h3><div class="chart-container">
-                    <div class="bar-row">
-                        <div class="bar-label">Mont Lambert</div>
+                </div></div><div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <h3 class="chart-card-title"><i class="ri-map-pin-2-line" style="color: var(--accent-green)"></i> Top Lieux fréquentés</h3>
+                    </div>
+                    <div class="chart-card-body">
+                    <div class="bar-row" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="site" data-stat-value="Mont Lambert" title="Filtrer par Mont Lambert">
+                        <div class="bar-info">
+                            <div class="bar-label" title="Mont Lambert">Mont Lambert</div>
+                            <div class="bar-value">1</div>
+                        </div>
                         <div class="bar-track">
                             <div class="bar-fill" style="width: 100%; background-color: var(--accent-green)"></div>
                         </div>
-                        <div class="bar-value">1</div>
                     </div>
                 
-                    <div class="bar-row">
-                        <div class="bar-label">Pente école</div>
+                    <div class="bar-row" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="site" data-stat-value="Pente école" title="Filtrer par Pente école">
+                        <div class="bar-info">
+                            <div class="bar-label" title="Pente école">Pente école</div>
+                            <div class="bar-value">1</div>
+                        </div>
                         <div class="bar-track">
                             <div class="bar-fill" style="width: 100%; background-color: var(--accent-green)"></div>
                         </div>
-                        <div class="bar-value">1</div>
                     </div>
                 
-                    <div class="bar-row">
-                        <div class="bar-label">Zzz inconnu</div>
+                    <div class="bar-row" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="site" data-stat-value="Zzz inconnu" title="Filtrer par Zzz inconnu">
+                        <div class="bar-info">
+                            <div class="bar-label" title="Zzz inconnu">Zzz inconnu</div>
+                            <div class="bar-value">1</div>
+                        </div>
                         <div class="bar-track">
                             <div class="bar-fill" style="width: 100%; background-color: var(--accent-green)"></div>
                         </div>
-                        <div class="bar-value">1</div>
                     </div>
-                </div><h3 class="stats-section-title">Types de vols</h3><div class="chart-container">
-                    <div class="bar-row">
-                        <div class="bar-label">Thermique</div>
+                </div></div>
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <h3 class="chart-card-title"><i class="ri-flight-takeoff-line" style="color: var(--accent-blue)"></i> Types de vols</h3>
+                    </div>
+                    <div class="chart-card-body">
+                    <div class="bar-row" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="typeVol" data-stat-value="Thermique" title="Filtrer par Thermique">
+                        <div class="bar-info">
+                            <div class="bar-label" title="Thermique">Thermique</div>
+                            <div class="bar-value">1 (50%)</div>
+                        </div>
                         <div class="bar-track">
                             <div class="bar-fill" style="width: 50%; background-color: var(--accent-blue)"></div>
                         </div>
-                        <div class="bar-value">1 (50%)</div>
                     </div>
                 
-                    <div class="bar-row">
-                        <div class="bar-label">Plouf</div>
+                    <div class="bar-row" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="typeVol" data-stat-value="Plouf" title="Filtrer par Plouf">
+                        <div class="bar-info">
+                            <div class="bar-label" title="Plouf">Plouf</div>
+                            <div class="bar-value">1 (50%)</div>
+                        </div>
                         <div class="bar-track">
                             <div class="bar-fill" style="width: 50%; background-color: var(--accent-blue)"></div>
                         </div>
-                        <div class="bar-value">1 (50%)</div>
                     </div>
-                </div><h3 class="stats-section-title">Techniques de décollage</h3><div class="chart-container">
-                    <div class="bar-row">
-                        <div class="bar-label" title="Face voile" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Face voile</div>
+                </div></div>
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <h3 class="chart-card-title"><i class="ri-compass-3-line" style="color: #8b5cf6"></i> Techniques de décollage</h3>
+                    </div>
+                    <div class="chart-card-body">
+                    <div class="bar-row" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="techDecollage" data-stat-value="Face voile" title="Filtrer par Face voile">
+                        <div class="bar-info">
+                            <div class="bar-label" title="Face voile" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Face voile</div>
+                            <div class="bar-value">1 (100%)</div>
+                        </div>
                         <div class="bar-track">
                             <div class="bar-fill" style="width: 100%; background-color: #8b5cf6"></div>
                         </div>
-                        <div class="bar-value">1 (100%)</div>
                     </div>
-                </div><h3 class="stats-section-title">Exercices de gonflage</h3><div class="chart-container">
-                    <div class="bar-row">
-                        <div class="bar-label">Face voile</div>
+                </div></div>
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <h3 class="chart-card-title"><i class="ri-footprint-line" style="color: #f59e0b"></i> Exercices de gonflage</h3>
+                    </div>
+                    <div class="chart-card-body">
+                    <div class="bar-row" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="exercice" data-stat-value="Face voile" title="Filtrer par Face voile">
+                        <div class="bar-info">
+                            <div class="bar-label" title="Face voile">Face voile</div>
+                            <div class="bar-value">1 (100%)</div>
+                        </div>
                         <div class="bar-track">
                             <div class="bar-fill" style="width: 100%; background-color: #f59e0b"></div>
                         </div>
-                        <div class="bar-value">1 (100%)</div>
                     </div>
                 
-                    <div class="bar-row">
-                        <div class="bar-label">Vent fort</div>
+                    <div class="bar-row" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="exercice" data-stat-value="Vent fort" title="Filtrer par Vent fort">
+                        <div class="bar-info">
+                            <div class="bar-label" title="Vent fort">Vent fort</div>
+                            <div class="bar-value">1 (100%)</div>
+                        </div>
                         <div class="bar-track">
                             <div class="bar-fill" style="width: 100%; background-color: #f59e0b"></div>
                         </div>
-                        <div class="bar-value">1 (100%)</div>
                     </div>
-                </div></div>"
+                </div></div></div>"
 `;
 
 exports[`logbook renders (spec 014: identical before and after moving the texts) > statistics, empty 1`] = `
