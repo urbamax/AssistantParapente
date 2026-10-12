@@ -17,6 +17,7 @@ const SCREENS = [
         ['js/views/logbook_history.js', 50],
         ['js/views/logbook_coords.js', 10],
         ['js/views/logbook_sites.js', 1],
+        ['js/views/logbook_checklists.js', 14],
     ].map(([file, minKeys]) => ({ file, spec: '014', prefix: 'logbook.', dataValues: ['Autre', 'Plouf'], minKeys })),
     // Code de niveau enregistré dans les préférences.
     { file: 'js/views/sites.js', spec: '015', prefix: 'sites.', dataValues: ['ALL'], minKeys: 80 },
