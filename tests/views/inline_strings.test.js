@@ -11,13 +11,14 @@ const SCREENS = [
     // Valeurs enregistrées dans le carnet (données, pas textes d'interface).
     // logbook.js a été découpé (specs 014, puis étapes du découpage) : chaque fichier reste contrôlé.
     ...[
-        ['js/views/logbook.js', 75],
+        ['js/views/logbook.js', 59],
         ['js/views/logbook_equipment.js', 25],
         ['js/views/logbook_stats.js', 25],
         ['js/views/logbook_history.js', 50],
         ['js/views/logbook_coords.js', 10],
         ['js/views/logbook_sites.js', 1],
         ['js/views/logbook_checklists.js', 14],
+        ['js/views/logbook_learned.js', 1],
     ].map(([file, minKeys]) => ({ file, spec: '014', prefix: 'logbook.', dataValues: ['Autre', 'Plouf'], minKeys })),
     // Code de niveau enregistré dans les préférences.
     { file: 'js/views/sites.js', spec: '015', prefix: 'sites.', dataValues: ['ALL'], minKeys: 80 },
