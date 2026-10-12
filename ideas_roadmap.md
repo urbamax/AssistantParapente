@@ -2,13 +2,21 @@
 
 Ce fichier centralise les concepts techniques et les idées d'amélioration validés pour le futur, afin de ne pas perturber le code stable actuel.
 
-**Légende :** ✅ fait · 🟡 partiel · ❌ abandonné · (sans marque) à faire. Statuts revérifiés dans le code le 2026-10-11.
+**Légende :** ✅ fait · 🟡 partiel · ❌ abandonné · (sans marque) à faire. Statuts revérifiés dans le code le 2026-10-12.
+
+### Fait récemment (2026-10-11 et 12)
+- Export PDF du carnet et téléchargement `.igc` (9 et 10 ci-dessous).
+- Type de vol pré-rempli d'après la trace IGC (4).
+- Page stats du carnet redessinée, avec filtre de l'historique au clic (2).
+- Secours compté en ouvertures et en défaut jusqu'au pliage (5).
+- Découpage de `js/views/logbook.js` : 3 757 → ~1 180 lignes, en classes de base par onglet (matériel, stats, historique) et par rôle (coordonnées, sites, listes, pré-remplissage, import IGC).
 
 ### Priorités actuelles
 1. Brief pré-vol unifié (météo + brevet + matériel) : toutes les briques existent, il manque l'écran.
-2. Export PDF du carnet et téléchargement `.igc`.
-3. Classification automatique du type de vol (la détection de spirales existe déjà).
-4. Découpage de `js/views/logbook.js` (~3 700 lignes) avant d'y ajouter d'autres fonctions.
+2. Valider les seuils de la classification de vol (`CLASSIFICATION` dans `js/services/flight_classifier.js`) sur de vrais fichiers IGC : soaring de crête, journée thermique, cross.
+3. Météo multi-sites : « meilleur créneau » sur 7 jours et comparateur de sites favoris (le meilleur créneau par site existe déjà).
+4. Répétition espacée du mode Révision du QCM.
+5. Alertes de révision du matériel en notification, avant l'échéance.
 
 ---
 
@@ -95,7 +103,7 @@ Le scoring répond aujourd'hui à "est-ce volable maintenant" mais pas "quel est
 `js/services/logbook_service.js` ne fait aujourd'hui aucun lien avec `sites_data.json`. Au moment du parsing IGC (`js/services/igc_parser.js`), matcher le point de décollage au site connu le plus proche via `calculateDistance()` (déjà présent dans `js/utils/geo_utils.js`) et pré-remplir le champ "Lieu" automatiquement.
 
 ### Alertes de révision matériel proactives — 🟡 PARTIEL (vérifié 2026-10-11)
-*Fait : pastille sur le menu Carnet et alertes par carte (date, heures ; secours ouvert = défaut jusqu'au pliage). Reste : notification avant l'échéance.*
+*Fait : pastille sur le menu Carnet et alertes par carte (date, heures). Un secours ne compte pas d'heures de vol mais ses ouvertures, et il est en défaut tant qu'il n'a pas été replié après la dernière ouverture. Reste : notification avant l'échéance.*
 Les périodes de révision (mois/heures) sont déjà définies dans `js/data/equipment_config.js` (`REVISION_PERIODS_MONTHS`, `REVISION_PERIODS_HOURS`), mais rien ne prévient l'utilisateur avant l'échéance. Ajouter un badge dashboard ou une notification (même mécanisme que l'alerte météo) qui alerte avant la date/heures limite plutôt que de devoir consulter la fiche matériel.
 
 ---
@@ -143,16 +151,16 @@ Un tableau côte-à-côte du score d'exploitabilité de plusieurs sites favoris 
 ### 1. Auto-tagging intelligent du Site depuis IGC — ✅ FAIT (vérifié 2026-10-11)
 Extraire le point de décollage depuis l'IGC et trouver le site le plus proche dans `SITES_DATA` (rayon de 2-3km) pour pré-remplir le lieu de vol.
 
-### 2. Exploitation avancée des statistiques IGC — 🟡 PARTIEL (vérifié 2026-10-11)
-*Fait : records et totaux. Reste à confirmer : profil altimétrique 2D coloré par le vario dans le détail d'un vol (la coloration existe en 3D, `map_3d.js`).*
+### 2. Exploitation avancée des statistiques IGC — 🟡 PARTIEL (vérifié 2026-10-12)
+*Fait : records et totaux, page stats redessinée (cartes, barres, grille adaptative) avec filtre de l'historique au clic sur une statistique. Reste à confirmer : profil altimétrique 2D coloré par le vario dans le détail d'un vol (la coloration existe en 3D, `map_3d.js`).*
 Dashboard avec records (Vitesse max, Thermique max, Distance). Profil altimétrique 2D coloré par le Vario dans la vue de détail du vol.
 
 ### 3. Auto-Nettoyage IGC (Détection Atterrissage Réel) — ✅ FAIT (vérifié 2026-10-11)
 *`detectLandingIndex` dans `igc_parser.js`.*
 Tronquer automatiquement la fin de la trace IGC (la marche vers la voiture) en détectant une vitesse < 5 km/h et une altitude constante, pour des stats de vol exactes.
 
-### 4. Auto-Classification du Vol (Analyse IGC) — 🟡 PARTIEL (vérifié 2026-10-11)
-*La détection de spirales et de thermiques existe ; le type de vol (Plouf, Thermique, Soaring, Cross) reste saisi à la main.*
+### 4. Auto-Classification du Vol (Analyse IGC) — ✅ FAIT (vérifié 2026-10-12)
+*À l'import d'une trace dans une nouvelle session, le type est pré-rempli et la ligne sous le formulaire dit pourquoi ; un type choisi par le pilote n'est jamais remplacé (`js/services/flight_classifier.js`, spec 034). Règles : Treuil (remorquage détecté), Cross (thermique ≥ 50 m et distance libre ≥ 15 km), Thermique, Soaring (≥ 10 min, vario moyen ≥ -0,6 m/s, sans thermique, au moins 3 demi-tours), sinon Plouf. « Restit » ne se lit pas dans une trace. Les seuils sont des estimations, validées sur des traces synthétiques et un seul vol réel : à ajuster sur d'autres vols (priorité 2). Reste du point d'origine : le graphique de répartition.*
 L'app tague le vol (Plouf, Thermique, Soaring, Cross) en analysant la géométrie de la trace (virages 360, inversions de cap, distance max). Affichage d'un graphique de répartition.
 
 ### 5. Apprentissage Espacé "Spaced Repetition" (QCM)
@@ -167,10 +175,12 @@ Intégration d'OpenAIP dans Deck.GL avec une option "Afficher les espaces aérie
 ### 8. Prédiction de Plafond (Météo Avancée)
 Affichage de l'isotherme 0°C ou couverture nuageuse base (`cloudbase`) via Open-Meteo.
 
-### 9. Export de la Trace IGC (Déclaration CFD / XContest)
+### 9. Export de la Trace IGC (Déclaration CFD / XContest) — ✅ FAIT (vérifié 2026-10-12)
+*Bouton « Télécharger l'IGC » sur les vols avec trace : le fichier d'origine, sans modification, nommé `<date>_<site>.igc` (spec 033).*
 Bouton pour recréer le fichier `.igc` depuis `rawIgc` et le télécharger sur le téléphone/PC.
 
-### 10. Export PDF du Carnet de Vol (Bilan FFVL)
+### 10. Export PDF du Carnet de Vol (Bilan FFVL) — ✅ FAIT (vérifié 2026-10-12)
+*Bouton « Exporter en PDF » : bilan A4 imprimable du carnet (sessions par date, totaux vols et gonflage), via la boîte d'impression du navigateur, sans dépendance et hors ligne (spec 033).*
 Bouton pour générer un PDF A4 tabulaire du carnet (Date, Site, Voile, Durée, Commentaires).
 
 ### 11. Partage Météo aux Copains (Visuel WhatsApp)
