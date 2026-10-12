@@ -61,6 +61,14 @@ class LogbookViewClass extends LogbookStatsBase {
                 if (learnedField) LogbookView.onLearnedFieldChanged(learnedField);
                 // Autre heure : les pilotes d'une session proche ne sont peut-être plus les mêmes
                 if (target.id === 'lb-datetime') LogbookView.applyLearnedDefaults();
+                // Heure ou durée corrigée à la main : « Recalculer depuis la trace » la garde
+                if (target.id === 'lb-datetime' || target.id === 'lb-duree') LogbookView.manualTimeFields.add(target.id);
+                // Trace commencée en vol : la durée réelle donne le décollage (atterrissage - durée)
+                if (target.id === 'lb-duree') LogbookView.setTakeoffFromDuration();
+                if (target.id === 'lb-vario-in-flight' || target.id === 'lb-vario-off-in-flight') {
+                    LogbookView.manualTimeFields.add(target.id);
+                    LogbookView.setTakeoffFromDuration();
+                }
                 // Treuilleur affiché seulement pour un vol au treuil (y compris en modification)
                 if (target.id === 'lb-typeVol') LogbookView.updateWinchOperatorField();
 
@@ -947,6 +955,8 @@ class LogbookViewClass extends LogbookStatsBase {
                     <div style="font-size: 0.85rem; color: var(--text-secondary, #666); margin-top: 5px;" id="igc-upload-filename">${tt('form.igcHint')}</div>
                 </div>
                 <button type="button" id="lb-igc-recalc" data-action="recalculateFromTrace" style="display:none; width: 100%; margin: -5px 0 15px; padding: 8px; border-radius: 6px; border: 1px solid var(--accent-blue, #007bc4); color: var(--accent-blue, #007bc4); background: transparent; cursor: pointer;"><i class="ri-refresh-line"></i> ${tt('igc.recalculate')}</button>
+                <label class="form-group" style="display:flex; align-items:center; gap:8px; margin: -5px 0 15px; font-size: 0.9rem;"><input type="checkbox" id="lb-vario-in-flight"> ${tt('form.varioInFlight')}</label>
+                <label class="form-group" style="display:flex; align-items:center; gap:8px; margin: -5px 0 15px; font-size: 0.9rem;"><input type="checkbox" id="lb-vario-off-in-flight"> ${tt('form.varioOffInFlight')}</label>
                 <div class="form-group" id="igc-alt-check" style="display:none; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-light, #ccc); margin-bottom: 15px;">
                     <div id="igc-alt-info" style="font-size: 0.85rem; margin-bottom: 8px;"></div>
                     <div style="display:flex; gap: 16px; margin-bottom: 6px; font-size: 0.9rem;">
@@ -1112,6 +1122,8 @@ class LogbookViewClass extends LogbookStatsBase {
         container.innerHTML = html;
         this.populateDropdowns();
         this.touchedFields = new Set();
+        this.manualTimeFields = new Set();
+        this.igcLandingStr = null;
         this.learnedFields = new Map();
         this.applyLearnedDefaults();
         this.updateCoordsStatus();
@@ -1341,6 +1353,23 @@ class LogbookViewClass extends LogbookStatsBase {
     static WINCH_TAKEOFF_TECHNIQUE = 'Dos voile';
 
     touchedFields = new Set();
+    // Heure et durée saisies par le pilote (trace commençant en vol) : jamais écrasées par un recalcul
+    manualTimeFields = new Set();
+    // Heure d'atterrissage de la trace (datetime-local) quand elle commence déjà en vol
+    igcLandingStr = null;
+
+    setTakeoffFromDuration() {
+        const datetimeInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime'));
+        const dureeInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-duree'));
+        const minutes = parseInt(dureeInput?.value, 10);
+        const box = /** @type {HTMLInputElement} */ (document.getElementById('lb-vario-in-flight'));
+        const offBox = /** @type {HTMLInputElement} */ (document.getElementById('lb-vario-off-in-flight'));
+        // Éteint aussi en vol : l'atterrissage de la trace n'est pas le vrai, rien à déduire
+        if (!box?.checked || offBox?.checked || !this.igcLandingStr || !datetimeInput || !(minutes > 0)) return;
+        if (this.manualTimeFields.has('lb-datetime')) return;
+        const start = addMinutesToDatetimeLocal(this.igcLandingStr, -minutes);
+        if (start) datetimeInput.value = start;
+    }
     learnedFields = new Map(); // champ → raison affichée
 
     onLearnedFieldChanged(field) {
@@ -1714,13 +1743,22 @@ class LogbookViewClass extends LogbookStatsBase {
         };
 
         const durationInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-duree'));
-        if (durationInput && parsed.duration > 0) {
+        if (durationInput && parsed.duration > 0 && !this.manualTimeFields.has('lb-duree')) {
             durationInput.value = parsed.duration;
         }
         const datetimeInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime'));
-        if (datetimeInput && parsed.dateStr) {
+        if (datetimeInput && parsed.dateStr && !this.manualTimeFields.has('lb-datetime')) {
             datetimeInput.value = parsed.dateStr;
         }
+        this.igcLandingStr = addMinutesToDatetimeLocal(parsed.dateStr, parsed.duration);
+        const varioBox = /** @type {HTMLInputElement} */ (document.getElementById('lb-vario-in-flight'));
+        const varioOffBox = /** @type {HTMLInputElement} */ (document.getElementById('lb-vario-off-in-flight'));
+        if (varioOffBox && parsed.endsAirborne && !this.manualTimeFields.has('lb-vario-off-in-flight')) varioOffBox.checked = true;
+        if (varioBox && parsed.startsAirborne && !this.manualTimeFields.has('lb-vario-in-flight')) varioBox.checked = true;
+        const filenameNote = document.getElementById('igc-upload-filename');
+        if (filenameNote && parsed.startsAirborne && parsed.endsAirborne) filenameNote.textContent = tl('igc.startsAndEndsAirborne');
+        else if (filenameNote && parsed.startsAirborne) filenameNote.textContent = tl('igc.startsAirborne');
+        else if (filenameNote && parsed.endsAirborne) filenameNote.textContent = tl('igc.endsAirborne');
 
         const altMaxInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-altMax'));
         if (altMaxInput && parsed.maxAltitude !== null) {
@@ -2032,6 +2070,8 @@ class LogbookViewClass extends LogbookStatsBase {
                 session.rawIgc = this.currentRawIgc;
                 this.currentRawIgc = null; // reset
             }
+            session.varioOffInFlight = Boolean(/** @type {HTMLInputElement} */ (document.getElementById('lb-vario-off-in-flight'))?.checked);
+            session.varioInFlight = Boolean(/** @type {HTMLInputElement} */ (document.getElementById('lb-vario-in-flight'))?.checked);
             // Le brut IGC reste inchangé : la correction est ré-appliquée à chaque lecture de la trace
             if (this.currentIgcAltOffset !== null) {
                 session.altOffset = this.currentIgcAltOffset;
@@ -2231,6 +2271,11 @@ class LogbookViewClass extends LogbookStatsBase {
                 /** @type {HTMLInputElement} */ (document.getElementById('lb-altMax')).value = session.altitudeMax;
             if (session.gain) /** @type {HTMLInputElement} */ (document.getElementById('lb-gain')).value = session.gain;
 
+            const varioBox = /** @type {HTMLInputElement} */ (document.getElementById('lb-vario-in-flight'));
+            if (varioBox) varioBox.checked = Boolean(session.varioInFlight);
+            const varioOffBox = /** @type {HTMLInputElement} */ (document.getElementById('lb-vario-off-in-flight'));
+            if (varioOffBox) varioOffBox.checked = Boolean(session.varioOffInFlight);
+
             // Vol déjà enregistré avec sa trace (en mémoire ou dans IndexedDB) : on peut corriger
             // (ou annuler) la correction d'altitude, et tout recalculer depuis la trace.
             LogbookService.getFlightTrace(session.id).then((rawIgc) => {
@@ -2239,6 +2284,7 @@ class LogbookViewClass extends LogbookStatsBase {
                 const raw = LogbookService.parseIGC(rawIgc);
                 if (!raw.success) return;
                 this._setupAltitudeCheck(raw.data, session.altOffset || 0);
+                this.igcLandingStr = addMinutesToDatetimeLocal(raw.data.dateStr, raw.data.duration);
                 const recalcBtn = document.getElementById('lb-igc-recalc');
                 if (recalcBtn) recalcBtn.style.display = 'block';
             });

@@ -255,9 +255,12 @@ class LogbookService {
             if (!result.success) continue;
             const d = result.data;
             const takeoff = Array.isArray(d.points) ? d.points[d.takeoffIndex || 0] || d.points[0] : null;
+            // Vario allumé ou éteint en vol : heure et durée de la trace sont fausses, le pilote
+            // les a corrigées à la main, on les garde.
+            const timesFromPilot = flight.varioInFlight || flight.varioOffInFlight;
             Object.assign(flight, {
-                ...(d.dateStr ? { datetime: d.dateStr } : {}),
-                ...(d.duration > 0 ? { duree: d.duration } : {}),
+                ...(d.dateStr && !timesFromPilot ? { datetime: d.dateStr } : {}),
+                ...(d.duration > 0 && !timesFromPilot ? { duree: d.duration } : {}),
                 ...(typeof d.maxAltitude === 'number' ? { altitudeMax: d.maxAltitude } : {}),
                 ...(typeof d.gain === 'number' ? { gain: d.gain } : {}),
                 ...(takeoff ? { lat: takeoff.lat, lon: takeoff.lon } : {}),
@@ -479,6 +482,9 @@ class LogbookService {
                         instrument: parsed.instrument || null,
                         points,
                         takeoffIndex: parsed.takeoffIndex || 0,
+                        // Vario allumé / éteint en vol : la trace commence ou finit en l'air
+                        startsAirborne: Boolean(parsed.startsAirborne),
+                        endsAirborne: Boolean(parsed.endsAirborne),
                         // Altitudes au vrai décollage / atterrissage (pas au parking)
                         takeoffAlt: (points[parsed.takeoffIndex] || points[0]).alt,
                         landingAlt: (points[parsed.landingIndex] || points[points.length - 1]).alt,

@@ -200,6 +200,8 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <div style="font-size: 0.85rem; color: var(--text-secondary, #666); margin-top: 5px;" id="igc-upload-filename">Cliquez ou glissez-déposez le fichier (avec le .sdf Syride pour le facteur de charge)</div>
                 </div>
                 <button type="button" id="lb-igc-recalc" data-action="recalculateFromTrace" style="display:none; width: 100%; margin: -5px 0 15px; padding: 8px; border-radius: 6px; border: 1px solid var(--accent-blue, #007bc4); color: var(--accent-blue, #007bc4); background: transparent; cursor: pointer;"><i class="ri-refresh-line"></i> Recalculer depuis la trace IGC</button>
+                <label class="form-group" style="display:flex; align-items:center; gap:8px; margin: -5px 0 15px; font-size: 0.9rem;"><input type="checkbox" id="lb-vario-in-flight"> Vario allumé pendant le vol (la durée saisie donne l'heure de décollage)</label>
+                <label class="form-group" style="display:flex; align-items:center; gap:8px; margin: -5px 0 15px; font-size: 0.9rem;"><input type="checkbox" id="lb-vario-off-in-flight"> Vario éteint pendant le vol (la durée saisie reste celle du vol réel)</label>
                 <div class="form-group" id="igc-alt-check" style="display:none; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-light, #ccc); margin-bottom: 15px;">
                     <div id="igc-alt-info" style="font-size: 0.85rem; margin-bottom: 8px;"></div>
                     <div style="display:flex; gap: 16px; margin-bottom: 6px; font-size: 0.9rem;">
