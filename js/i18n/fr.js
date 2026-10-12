@@ -116,7 +116,7 @@ export const FR = Object.freeze({
             select: '-- Sélectionner --',
             freeEntry: '-- Saisie libre (ou choisir) --',
             igcTitle: 'Importer une trace GPS (.igc)',
-            varioInFlight: 'Vario allumé pendant le vol (la durée saisie donne l\'heure de décollage)',
+            varioInFlight: "Vario allumé pendant le vol (la durée saisie donne l'heure de décollage)",
             varioOffInFlight: 'Vario éteint pendant le vol (la durée saisie reste celle du vol réel)',
             igcHint: 'Cliquez ou glissez-déposez le fichier (avec le .sdf Syride pour le facteur de charge)',
             altKnowLanding: "Je connais l'altitude de l'atterrissage",
@@ -271,9 +271,12 @@ export const FR = Object.freeze({
                 "Impossible de vérifier ce fichier .sdf : ce vol n'a pas de trace GPS. Importe le .igc et le .sdf ensemble.",
             recalculate: 'Recalculer depuis la trace IGC',
             recalculated: 'Valeurs recalculées depuis la trace enregistrée',
-            startsAirborne: "La trace commence déjà en l'air (vario allumé en vol) : l'heure de début est approximative. « Vario allumé pendant le vol » est coché : saisis la durée réelle pour retrouver l'heure de décollage.",
-            endsAirborne: "La trace s'arrête en l'air (vario éteint avant le posé) : la durée calculée est trop courte. Saisis la durée réelle du vol.",
-            startsAndEndsAirborne: "La trace commence et s'arrête en l'air : l'heure de décollage et la durée sont approximatives. Saisis-les à la main.",
+            startsAirborne:
+                "La trace commence déjà en l'air (vario allumé en vol) : l'heure de début est approximative. « Vario allumé pendant le vol » est coché : saisis la durée réelle pour retrouver l'heure de décollage.",
+            endsAirborne:
+                "La trace s'arrête en l'air (vario éteint avant le posé) : la durée calculée est trop courte. Saisis la durée réelle du vol.",
+            startsAndEndsAirborne:
+                "La trace commence et s'arrête en l'air : l'heure de décollage et la durée sont approximatives. Saisis-les à la main.",
             noStoredTrace: "Aucune trace IGC n'est enregistrée pour ce vol.",
             altitudes: 'Altitudes de la trace : décollage {takeoff}, atterrissage {landing}.',
             suspiciousTitle: "Attention, c'est bizarre :",
