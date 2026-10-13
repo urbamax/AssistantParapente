@@ -18,7 +18,7 @@ const WEATHER_API_HOSTNAME = 'api.open-meteo.com';
 
 // Caches « d'usage » conservés d'une version de l'application à l'autre (spec 008) : seulement ce
 // que le pilote a réellement ouvert ou affiché, jamais de téléchargement d'avance.
-const COURSE_CACHE = 'parapente-courses-v1'; // cours (PDF) déjà ouverts
+const COURSE_CACHE = 'parapente-courses-v2'; // cours (PDF) déjà ouverts
 const TILE_CACHE = 'parapente-tiles-v1'; // zones de carte déjà affichées
 const TILE_CACHE_MAX = 1500; // ≈ 35 Mo à ≈ 23 Ko par morceau ; les plus anciens partent d'abord
 const TILE_HOSTNAME = 'server.arcgisonline.com';

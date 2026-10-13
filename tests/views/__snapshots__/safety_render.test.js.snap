@@ -174,7 +174,7 @@ exports[`safety renders (spec 019: identical before and after moving the texts) 
                 </ul>
             </div>
 
-            <button type="button" class="safety-source" data-action="openUrl" data-url="courses/GENERAL/affiches-pedagogiques-a3/19-secours2022/19-secours2022.pdf">
+            <button type="button" class="safety-source" data-action="openUrl" data-url="courses/c8a5d66e9096.pdf">
         <i class="ri-file-pdf-2-line" aria-hidden="true"></i> Source : affiche FFVL « Secours vol libre » (2022)
     </button>
         
@@ -233,7 +233,7 @@ exports[`safety renders (spec 019: identical before and after moving the texts) 
                     </button>
                 </div>
             </div>
-            <button type="button" class="safety-source" data-action="openUrl" data-url="courses/GENERAL/2014_Livret_FFVL_9BD.pdf#page=7">
+            <button type="button" class="safety-source" data-action="openUrl" data-url="courses/6c9e02957c04.pdf#page=7">
         <i class="ri-file-pdf-2-line" aria-hidden="true"></i> Source : livret FFVL 9BD, « Votre check-list » (© Mentalpilote)
     </button>
         
@@ -300,7 +300,7 @@ exports[`safety renders (spec 019: identical before and after moving the texts) 
                 </div>
                 <p class="safety-hint">Astuce : faites-la en « partner-check », en vérifiant à deux l'équipement de chacun.</p>
             </div>
-            <button type="button" class="safety-source" data-action="openUrl" data-url="courses/BREVET INITIAL - VERT/livrets-pp-2025/initiation-2025-web/initiation-2025-web.pdf#page=15">
+            <button type="button" class="safety-source" data-action="openUrl" data-url="courses/bcc9fa0b6e34.pdf#page=15">
         <i class="ri-file-pdf-2-line" aria-hidden="true"></i> Source : livret FFVL Initiation 2025, « Visite prévol »
     </button>
         
@@ -372,7 +372,7 @@ exports[`safety renders (spec 019: identical before and after moving the texts) 
                 <p id="safety-sigr-summary" class="safety-sigr-summary" aria-live="polite"></p>
                 <p class="safety-warning">La SIGR doit être continuellement réévaluée au fur et à mesure de votre progression.</p>
             </div>
-            <button type="button" class="safety-source" data-action="openUrl" data-url="courses/GENERAL/affiches-pedagogiques-a3/16-sigr2019/16-sigr2019.pdf">
+            <button type="button" class="safety-source" data-action="openUrl" data-url="courses/f767e5322de4.pdf">
         <i class="ri-file-pdf-2-line" aria-hidden="true"></i> Source : affiche FFVL « La SIGR » (2019)
     </button>
         
