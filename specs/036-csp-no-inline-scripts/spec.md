@@ -38,3 +38,13 @@ running, which is the main thing a CSP is for.
 - Removing `'unsafe-inline'` from `style-src` (would mean replacing the `style=""` attributes).
 - Removing `https://apis.google.com` (needs a test with a real Firebase sign-in).
 - A debugging banner that shows raw error stacks to users stays as it is (separate decision).
+
+## Known, harmless violation: `wasm-eval` on the 3D map
+
+Opening a 3D trace reports one violation, `script-src wasm-eval`. It comes from `long.js`, bundled
+in deck.gl, which tries to speed up 64-bit integer maths with a tiny WebAssembly module inside a
+`try/catch` and falls back to plain JavaScript when it is refused. The other WebAssembly code in
+deck.gl (the meshopt decoder) only runs for compressed 3D meshes, which the app does not display.
+`'unsafe-inline'` never allowed WebAssembly (that takes `'wasm-unsafe-eval'`), so this predates the
+change, and the map renders normally. **Decision: do not add `'wasm-unsafe-eval'`**; it would widen
+the policy for no visible benefit. Revisit only if a deck.gl upgrade makes WebAssembly mandatory.
