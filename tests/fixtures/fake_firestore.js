@@ -10,9 +10,9 @@ export function createFakeFirestore(initialDocs = {}) {
             doc: ref,
             collection: ref,
             getDoc: async (r) => ({ exists: () => docs.has(r.path), data: () => docs.get(r.path) }),
-            setDoc: async (r, data) => {
+            setDoc: vi.fn(async (r, data) => {
                 docs.set(r.path, JSON.parse(JSON.stringify(data)));
-            },
+            }),
             deleteDoc: vi.fn(async (r) => {
                 docs.delete(r.path);
             }),

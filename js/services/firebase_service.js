@@ -66,6 +66,17 @@ function readTombstoneIds(key) {
     return Array.isArray(value) ? value.filter((id) => typeof id === 'string' && id !== '') : [];
 }
 
+/**
+ * Marqueur de suppression stocké dans le cloud à la place du vol. Il survit à la liste locale
+ * `deleted_flights` (vidée après la première synchro) : un autre appareil qui a encore le vol
+ * en local le voit et le retire au lieu de le renvoyer.
+ * @param {string} id
+ */
+function deletedFlightMarker(id) {
+    const now = Date.now();
+    return { id, deleted: true, deletedAt: now, updatedAt: now };
+}
+
 // We will expose this engine to the window object so it can be called from non-module scripts
 const SYNC_DOT_TITLES = {
     syncing: t('account.syncDot.syncing'),
@@ -543,7 +554,7 @@ export const FirebaseAuthEngine = {
                         continue;
                     }
                     const sRef = doc(db, 'users', uid, 'logbook', delId);
-                    await deleteDoc(sRef);
+                    await setDoc(sRef, deletedFlightMarker(delId));
                 }
                 localStorage.setItem('deleted_flights', '[]');
                 console.log(`Removed ${deletedFlights.length} deleted flights from Cloud.`);
@@ -576,11 +587,14 @@ export const FirebaseAuthEngine = {
             const logbookSnap = await getDocs(logbookColRef);
 
             const cloudLogbook = [];
+            // Vols supprimés sur un autre appareil : id -> date de suppression
+            const cloudDeletedAt = new Map();
             logbookSnap.forEach((docSnap) => {
                 const data = docSnap.data();
                 // Guard : on n'accepte que les docs avec un ID string valide
                 if (data && data.id && typeof data.id === 'string') {
-                    cloudLogbook.push(data);
+                    if (data.deleted === true) cloudDeletedAt.set(data.id, data.deletedAt || 0);
+                    else cloudLogbook.push(data);
                 }
             });
 
@@ -595,7 +609,10 @@ export const FirebaseAuthEngine = {
             // not come back from it either (it would then be re-uploaded on the next sync).
             const mergedLogbookMap = new Map();
             localLogbook.forEach((session) => {
-                if (!deletedFlightsSet.has(session.id)) mergedLogbookMap.set(session.id, session);
+                if (deletedFlightsSet.has(session.id)) return;
+                // Supprimé ailleurs : définitif, un appareil resté en retard ne le ressuscite pas.
+                if (cloudDeletedAt.has(session.id)) return;
+                mergedLogbookMap.set(session.id, session);
             });
             cloudLogbook.forEach((cloudSession) => {
                 // Never re-insert a flight the user just deleted (tombstone guard)
@@ -960,11 +977,19 @@ export const FirebaseAuthEngine = {
             return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
-            const { doc, setDoc } = await loadFirestoreModule();
+            const { doc, setDoc, collection, getDocs } = await this._loadFirestore();
             const uid = this.currentUser.uid;
+
+            // Un vol supprimé est définitif : on n'écrase jamais son marqueur cloud
+            const deletedIds = new Set();
+            (await getDocs(collection(db, 'users', uid, 'logbook'))).forEach((d) => {
+                const data = d.data();
+                if (data?.deleted === true && data.id) deletedIds.add(data.id);
+            });
 
             // Save all locally present to cloud
             for (const session of data) {
+                if (deletedIds.has(session.id)) continue;
                 const docRef = doc(db, 'users', uid, 'logbook', session.id);
                 await setDoc(docRef, session);
             }
@@ -984,11 +1009,11 @@ export const FirebaseAuthEngine = {
             return { success: false, data: null, error: 'Not enabled or logged in' };
 
         try {
-            const { doc, deleteDoc } = await loadFirestoreModule();
+            const { doc, setDoc } = await this._loadFirestore();
             const uid = this.currentUser.uid;
 
             const docRef = doc(db, 'users', uid, 'logbook', id);
-            await deleteDoc(docRef);
+            await setDoc(docRef, deletedFlightMarker(id));
             console.log(`Logbook entry ${id} deleted from cloud.`);
             return { success: true, data: null, error: null };
         } catch (error) {
@@ -1065,10 +1090,15 @@ export const FirebaseAuthEngine = {
             return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
-            const { doc, setDoc } = await loadFirestoreModule();
+            const { doc, getDoc, setDoc } = await this._loadFirestore();
             const uid = this.currentUser.uid;
 
             const docRef = doc(db, 'users', uid, 'logbook', session.id);
+            // Un vol supprimé est définitif : on n'écrase jamais son marqueur cloud
+            const existing = await getDoc(docRef);
+            if (existing.exists() && existing.data()?.deleted === true) {
+                return { success: true, data: null, error: null };
+            }
             await setDoc(docRef, session);
 
             this.lastSyncTime = new Date().toLocaleTimeString();

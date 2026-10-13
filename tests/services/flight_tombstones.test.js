@@ -67,24 +67,27 @@ describe('Deleted flights and cloud sync (spec 027)', () => {
 
         expect(result.success).toBe(true);
         expect(localFlightIds()).toEqual(['vol-cloud', 'vol-new']);
-        expect(firestore.docs.has('users/u1/logbook/vol-old')).toBe(false);
+        expect(firestore.docs.get('users/u1/logbook/vol-old')?.deleted).toBe(true);
         expect(pendingDeletions()).toEqual([]);
     });
 
     it('does not replay deletions on the next sync', async () => {
         LogbookService.deleteFlight('vol-old');
         await FirebaseAuthEngine.syncDataWithCloud(true);
-        firestore.module.deleteDoc.mockClear();
+        firestore.module.setDoc.mockClear();
 
         await FirebaseAuthEngine.syncDataWithCloud(true);
 
-        expect(firestore.module.deleteDoc).not.toHaveBeenCalled();
+        expect(firestore.module.setDoc).not.toHaveBeenCalledWith(
+            expect.objectContaining({ path: 'users/u1/logbook/vol-old' }),
+            expect.anything(),
+        );
         expect(localFlightIds()).toEqual(['vol-cloud', 'vol-new']);
     });
 
     it('keeps pending deletions when the cloud delete fails during the sync', async () => {
         LogbookService.deleteFlight('vol-old');
-        firestore.module.deleteDoc.mockRejectedValueOnce(new Error('unavailable'));
+        firestore.module.setDoc.mockRejectedValueOnce(new Error('unavailable'));
         vi.spyOn(console, 'error').mockImplementation(() => {});
 
         const result = await FirebaseAuthEngine.syncDataWithCloud(true);
@@ -110,6 +113,58 @@ describe('Deleted flights and cloud sync (spec 027)', () => {
         firestore.module.getDocs = getDocs;
         await FirebaseAuthEngine.syncDataWithCloud(true);
         expect(localFlightIds()).toEqual(['vol-cloud', 'vol-new']);
-        expect(firestore.docs.has('users/u1/logbook/vol-old')).toBe(false);
+        expect(firestore.docs.get('users/u1/logbook/vol-old')?.deleted).toBe(true);
+    });
+});
+
+describe('Deleted flight marker in the cloud', () => {
+    it('removes a stale local copy on another device instead of re-uploading it', async () => {
+        localStorage.clear();
+        LogbookService.equipment = [];
+        LogbookService.flights = [structuredClone(oldFlight)];
+        StorageService.set(StorageService.KEYS.LOGBOOK_DATA, LogbookService.flights);
+        const firestore = createFakeFirestore({
+            'users/u1/logbook/vol-old': { id: 'vol-old', deleted: true, deletedAt: 5000, updatedAt: 5000 },
+        });
+        const defaultLoad = FirebaseAuthEngine._loadFirestore;
+        FirebaseAuthEngine._loadFirestore = async () => firestore.module;
+        FirebaseAuthEngine.currentUser = { uid: 'u1' };
+        FirebaseAuthEngine.enabled = true;
+        vi.spyOn(FirebaseAuthEngine, 'updateModalUI').mockImplementation(() => {});
+        vi.spyOn(QuizView, 'renderStats').mockImplementation(() => {});
+        vi.spyOn(SitesService, 'loadUserPreferences').mockImplementation(() => {});
+        vi.spyOn(SitesService, 'renderList').mockImplementation(() => {});
+
+        await FirebaseAuthEngine.syncDataWithCloud(true);
+
+        expect(localFlightIds()).toEqual([]);
+        expect(firestore.docs.get('users/u1/logbook/vol-old')?.deleted).toBe(true);
+        vi.restoreAllMocks();
+        FirebaseAuthEngine._loadFirestore = defaultLoad;
+        FirebaseAuthEngine.currentUser = null;
+        FirebaseAuthEngine.enabled = false;
+    });
+});
+
+describe('Deleted flights are never overwritten in the cloud', () => {
+    it('syncLogbookData and syncLogbookEntry skip a flight with a deletion marker', async () => {
+        const firestore = createFakeFirestore({
+            'users/u1/logbook/vol-old': { id: 'vol-old', deleted: true, deletedAt: 5000, updatedAt: 5000 },
+        });
+        const defaultLoad = FirebaseAuthEngine._loadFirestore;
+        FirebaseAuthEngine._loadFirestore = async () => firestore.module;
+        FirebaseAuthEngine.currentUser = { uid: 'u1' };
+        FirebaseAuthEngine.enabled = true;
+        vi.spyOn(FirebaseAuthEngine, 'updateModalUI').mockImplementation(() => {});
+
+        await FirebaseAuthEngine.syncLogbookData([structuredClone(oldFlight), structuredClone(newFlight)]);
+        await FirebaseAuthEngine.syncLogbookEntry(structuredClone(oldFlight));
+
+        expect(firestore.docs.get('users/u1/logbook/vol-old')?.deleted).toBe(true);
+        expect(firestore.docs.get('users/u1/logbook/vol-new')?.site).toBe('Chamonix');
+        vi.restoreAllMocks();
+        FirebaseAuthEngine._loadFirestore = defaultLoad;
+        FirebaseAuthEngine.currentUser = null;
+        FirebaseAuthEngine.enabled = false;
     });
 });
