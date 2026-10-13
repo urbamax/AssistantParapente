@@ -40,7 +40,7 @@
 
     &:hover:not(:disabled) {
         background: rgba(255, 255, 255, 0.08);
-        border-color: var(--accent-blue);
+        border-color: var(--accent-orange);
         color: var(--text-main);
         transform: translateY(-2px);
         box-shadow: 0 10px 30px -10px rgba(14, 165, 233, 0.3);
@@ -59,7 +59,7 @@
     width: 100%;
     padding: 20px 32px;
     text-align: center;
-    background: var(--accent-blue) !important;
+    background: var(--accent-orange) !important;
     color: #ffffff !important;
     /* Fixed from #000 for readability */
     font-weight: 700;
@@ -217,7 +217,7 @@ body.course-open #course-pdf-frame {
 }
 
 .level-BP {
-    color: var(--accent-blue);
+    color: var(--accent-orange);
     border-color: rgba(56, 189, 248, 0.3);
 }
 
@@ -256,7 +256,7 @@ body.light-mode .level-tag {
 
 .quiz-theme-tag {
     font-size: 0.75rem;
-    color: var(--accent-blue);
+    color: var(--accent-orange);
     background: rgba(14, 165, 233, 0.1);
     padding: 4px 10px;
     border-radius: 6px;
@@ -310,14 +310,14 @@ body.light-mode .choice-btn {
 
 .choice-btn:hover {
     transform: translateY(-6px) scale(1.02);
-    border-color: var(--accent-blue);
+    border-color: var(--accent-orange);
     background: rgba(255, 255, 255, 0.08);
     box-shadow: 0 25px 45px rgba(14, 165, 233, 0.2);
 }
 
 .choice-btn i {
     font-size: 1.5rem;
-    color: var(--accent-blue);
+    color: var(--accent-orange);
 }
 
 /* --- MODULE: QCM BANK --- */
@@ -373,7 +373,7 @@ body.light-mode .bank-item-code {
 
 .bank-item-theme {
     font-size: 0.75rem;
-    color: var(--accent-blue);
+    color: var(--accent-orange);
     background: rgba(14, 165, 233, 0.1);
     padding: 6px 12px;
     border-radius: 9999px;
@@ -428,7 +428,7 @@ body.light-mode .bank-choice {
     margin-top: 16px;
     padding: 20px;
     background: rgba(14, 165, 233, 0.05);
-    border-left: 4px solid var(--accent-blue);
+    border-left: 4px solid var(--accent-orange);
     border-radius: 8px;
     font-size: 0.95rem;
     line-height: 1.6;
@@ -576,17 +576,17 @@ body.light-mode .bank-choice.correct {
     cursor: pointer;
 
     &:hover {
-        border-color: var(--accent-blue);
+        border-color: var(--accent-orange);
     }
 
     &:focus-visible {
-        outline: 2px solid var(--accent-blue);
+        outline: 2px solid var(--accent-orange);
         outline-offset: 2px;
     }
 
     &[aria-pressed='true'] {
-        background: var(--accent-blue);
-        border-color: var(--accent-blue);
+        background: var(--accent-orange);
+        border-color: var(--accent-orange);
         color: #ffffff;
     }
 
@@ -610,7 +610,7 @@ body.light-mode .bank-choice.correct {
     cursor: pointer;
 
     &:focus-visible {
-        outline: 2px solid var(--accent-blue);
+        outline: 2px solid var(--accent-orange);
         outline-offset: 2px;
     }
 }
@@ -662,5 +662,5 @@ body.light-mode .bank-choice.correct {
 .revision-summary {
     font-style: normal;
     font-weight: 600;
-    color: var(--accent-blue);
+    color: var(--accent-orange);
 }

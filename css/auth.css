@@ -197,7 +197,7 @@ body.light-mode .auth-tabs {
     transition: all 0.2s ease;
 
     &:focus {
-        border-color: var(--accent-blue);
+        border-color: var(--accent-orange);
         box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.15);
     }
 
@@ -248,7 +248,7 @@ body.light-mode .auth-tabs {
 }
 
 .auth-forgot-link:hover {
-    color: var(--accent-blue);
+    color: var(--accent-orange);
 }
 
 /* Alert Boxes */
@@ -429,7 +429,7 @@ body.light-mode .auth-sync-status {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--accent-blue, #3b82f6);
+    background: var(--accent-orange, #3b82f6);
     border: 2px solid var(--bg-surface);
     display: none;
     animation: sync-pulse 1s ease-in-out infinite;
@@ -481,8 +481,8 @@ body.light-mode .auth-sync-status {
 }
 
 .auth-remember-checkbox:checked {
-    background: var(--accent-blue);
-    border-color: var(--accent-blue);
+    background: var(--accent-orange);
+    border-color: var(--accent-orange);
 }
 
 .auth-remember-checkbox:checked::after {

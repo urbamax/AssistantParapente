@@ -158,7 +158,7 @@ class UIManager {
             color = '#6366f1'; // Indigo
         else if (level === 'ALL') color = '#64748b'; // Slate
 
-        root.style.setProperty('--accent-blue', color);
+        root.style.setProperty('--accent-orange', color);
     }
 
     updateHeaderNavigation() {

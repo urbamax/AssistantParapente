@@ -116,7 +116,6 @@ const CRITICAL_ASSETS = [
     './js/utils/date_utils.js',
     './js/utils/geo_utils.js',
     './js/utils/i18n.js',
-    './js/utils/math_utils.js',
     './js/utils/text_utils.js',
     './js/views/logbook.js',
     './js/views/manual.js',

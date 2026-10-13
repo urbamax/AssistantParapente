@@ -117,7 +117,7 @@ export class LogbookSitesBase extends LogbookCoordsBase {
                   .map((site, i) => {
                       const name = site.nom || site.name;
                       const active = name === current;
-                      return `<button type="button" data-action="pickSiteChoice" data-args="${i}" aria-pressed="${active}" style="margin: 4px 4px 0 0; padding: 2px 8px; border-radius: 12px; cursor: pointer; border: 1px solid var(--accent-blue, #007bc4); background: ${active ? 'var(--accent-blue, #007bc4)' : 'transparent'}; color: ${active ? '#fff' : 'var(--accent-blue, #007bc4)'};">${escapeHTML(name)}</button>`;
+                      return `<button type="button" data-action="pickSiteChoice" data-args="${i}" aria-pressed="${active}" style="margin: 4px 4px 0 0; padding: 2px 8px; border-radius: 12px; cursor: pointer; border: 1px solid var(--accent-orange, #007bc4); background: ${active ? 'var(--accent-orange, #007bc4)' : 'transparent'}; color: ${active ? '#fff' : 'var(--accent-orange, #007bc4)'};">${escapeHTML(name)}</button>`;
                   })
                   .join('')
             : '';

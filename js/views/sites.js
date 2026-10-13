@@ -440,7 +440,7 @@ class SitesViewClass extends BaseView {
                 if (openSettings) GdprEngine.showModal('gdpr-settings-modal');
             }
             if (statusEl)
-                statusEl.innerHTML = `<i class="ri-shield-user-line" style="color: var(--text-muted);"></i> ${tt('gps.disabled')} <a href="#" data-action="GdprshowModal" data-args="gdpr-settings-modal" data-prevent-default style="color: var(--accent-blue);">${tt('gps.manage')}</a>`;
+                statusEl.innerHTML = `<i class="ri-shield-user-line" style="color: var(--text-muted);"></i> ${tt('gps.disabled')} <a href="#" data-action="GdprshowModal" data-args="gdpr-settings-modal" data-prevent-default style="color: var(--accent-orange);">${tt('gps.manage')}</a>`;
             return;
         }
 
@@ -470,8 +470,8 @@ class SitesViewClass extends BaseView {
                     statusEl.style.color = 'var(--accent-green)';
                 }
                 if (gpsBtn) {
-                    gpsBtn.style.borderColor = 'var(--accent-blue)';
-                    gpsBtn.style.color = 'var(--accent-blue)';
+                    gpsBtn.style.borderColor = 'var(--accent-orange)';
+                    gpsBtn.style.color = 'var(--accent-orange)';
                 }
 
                 this.renderList();
@@ -526,7 +526,7 @@ class SitesViewClass extends BaseView {
                         btn.classList.add('active');
                         btn.style.background = 'rgba(14, 165, 233, 0.15)';
                         btn.style.borderColor = 'rgba(14, 165, 233, 0.3)';
-                        btn.style.color = 'var(--accent-blue)';
+                        btn.style.color = 'var(--accent-orange)';
                     } else {
                         btn.classList.remove('active');
                         btn.style.background = 'rgba(255, 255, 255, 0.03)';
@@ -1576,7 +1576,7 @@ class SitesViewClass extends BaseView {
         locations.forEach((loc, index) => {
             const pill = document.createElement('div');
             pill.style.cssText =
-                'background: rgba(14,165,233,0.15); border: 1px solid rgba(14,165,233,0.3); color: var(--accent-blue); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; cursor: pointer;';
+                'background: rgba(14,165,233,0.15); border: 1px solid rgba(14,165,233,0.3); color: var(--accent-orange); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; cursor: pointer;';
 
             const label = document.createElement('span');
             label.textContent = loc.name;
@@ -1743,7 +1743,7 @@ class SitesViewClass extends BaseView {
         if (btn) {
             if (this.state.showComparator) {
                 btn.classList.add('active');
-                btn.innerHTML = `<i class="ri-table-line" style="color: var(--accent-blue);"></i> ${tt('comparator.button')}`;
+                btn.innerHTML = `<i class="ri-table-line" style="color: var(--accent-orange);"></i> ${tt('comparator.button')}`;
                 btn.style.background = 'rgba(59, 130, 246, 0.15)';
                 btn.style.borderColor = 'rgba(59, 130, 246, 0.3)';
             } else {
@@ -2120,7 +2120,7 @@ class SitesViewClass extends BaseView {
                     const background = dotClass.includes('--incomplete') ? '' : ` background: ${barColor};`;
                     let dotStyle = `flex: 1; height: 100%;${background} transition: all 0.2s; cursor: pointer;`;
                     if (j === SitesService.state.forecastOffset) {
-                        dotStyle += ` outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);`;
+                        dotStyle += ` outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-orange);`;
                     }
                     timelineBarsHtml += `<div role="button" tabindex="0" class="${dotClass}" style="${dotStyle}" title="${escapeHTML(`${timeStr} : ${statusLabel}`)}" data-action="SitessetForecastOffset" data-args="${j}"></div>`;
                 }

@@ -131,7 +131,7 @@
     display: flex;
     gap: 12px;
     font-size: 0.85rem;
-    color: var(--accent-blue);
+    color: var(--accent-orange);
     background: rgba(14, 165, 233, 0.1);
     padding: 6px 12px;
     border-radius: var(--radius-sm);
@@ -197,8 +197,8 @@
 
 #btn-type-vol.active {
     background: rgba(14, 165, 233, 0.1);
-    border-color: var(--accent-blue);
-    color: var(--accent-blue);
+    border-color: var(--accent-orange);
+    color: var(--accent-orange);
 }
 
 #btn-type-gonflage.active {
@@ -254,7 +254,7 @@
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-    border-color: var(--accent-blue);
+    border-color: var(--accent-orange);
 }
 
 /* Stats */
@@ -682,7 +682,7 @@ html.dark-theme .bar-track {
 }
 .flight-analysis summary {
     cursor: pointer;
-    color: var(--accent-blue);
+    color: var(--accent-orange);
     font-weight: 500;
 }
 .flight-analysis-grid {
@@ -731,7 +731,7 @@ html.dark-theme .bar-track {
 }
 
 .record-row:hover {
-    border-color: var(--accent-blue);
+    border-color: var(--accent-orange);
     background: rgba(14, 165, 233, 0.05);
     box-shadow: 0 2px 8px rgba(14, 165, 233, 0.15);
 }
@@ -740,7 +740,7 @@ html.dark-theme .bar-track {
     height: 42px;
     border-radius: 50%;
     background: rgba(14, 165, 233, 0.08);
-    color: var(--accent-blue);
+    color: var(--accent-orange);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -860,7 +860,7 @@ html.dark-theme .bar-track {
 
 .filter-banner-text i {
     font-size: 1.2rem;
-    color: var(--accent-blue);
+    color: var(--accent-orange);
 }
 
 .filter-banner-clear {

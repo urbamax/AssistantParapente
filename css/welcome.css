@@ -102,7 +102,7 @@
 
 .welcome-card i {
     font-size: 1.6rem;
-    color: var(--accent-blue);
+    color: var(--accent-orange);
 }
 
 .welcome-card-title {
@@ -121,12 +121,12 @@
 }
 
 .welcome-card:hover {
-    border-color: var(--accent-blue);
+    border-color: var(--accent-orange);
 }
 
 .welcome-level:focus-visible,
 .welcome-card:focus-visible {
-    outline: 2px solid var(--accent-blue);
+    outline: 2px solid var(--accent-orange);
     outline-offset: 2px;
 }
 

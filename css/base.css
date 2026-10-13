@@ -19,16 +19,14 @@
     --p-light-border: rgba(0, 0, 0, 0.1);
 
     /* Accents (Shared) */
-    --accent-blue: #ff7a00;
+    --accent-orange: #ff7a00;
     /* Vibrant Wing Orange */
-    --accent-purple: #e2001a;
-    /* Vibrant School Red */
     --accent-green: #22c55e;
     --accent-red: #e2001a;
     --accent-gold: #eab308;
     /* Referenced by .nav-menu-btn.active (css/header.css) for the active nav item's text
        color; was never defined, so that color silently fell back to plain text. */
-    --primary-color: var(--accent-blue);
+    --primary-color: var(--accent-orange);
 
     /* --- THEME VARIABLES (Default: Dark) --- */
     --bg-app: var(--p-dark-deep);
@@ -42,7 +40,7 @@
     --text-secondary: #cbd5e1;
 
     /* FFVL Branded Colors */
-    --accent-blue: #ff7a00;
+    --accent-orange: #ff7a00;
     --accent-red: #e2001a;
     --accent-green: #22c55e;
 

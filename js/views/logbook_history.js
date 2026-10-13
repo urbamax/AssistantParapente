@@ -219,7 +219,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
             try {
                 const isVol = session.type === 'vol';
                 const icon = isVol ? 'ri-windy-line' : 'ri-footprint-line';
-                const typeColor = isVol ? 'var(--accent-blue)' : '#f59e0b';
+                const typeColor = isVol ? 'var(--accent-orange)' : '#f59e0b';
                 const location = isVol ? session.site : session.lieu;
                 // Repli sur '' : un enregistrement corrompu/partiel (import JSON manuel, ancien
                 // format, fusion cloud incomplète) sans typeVol/typeExercice ferait planter tout le
@@ -308,7 +308,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                             ${Array.isArray(session.pilotes) && session.pilotes.length > 0 ? `<div><strong>${tt('history.pilots')}</strong> ${escapeHTML(session.pilotes.join(', '))}</div>` : ''}
                         </div>
                         ${session.commentaire ? `<div class="session-comment">"${escapeHTML(session.commentaire)}"</div>` : ''}
-                        ${session.rawIgc || (session.traceGps && session.traceGps.length > 0) ? `<button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="${session.id}"><i class="ri-route-line"></i> ${tt('history.showTrace')}</button><button class="btn-download-trace action-btn-secondary" style="margin-top: 6px; width: 100%; padding: 8px; border-radius: 6px; cursor: pointer;" data-action="downloadTrace" data-args="${session.id}"><i class="ri-download-2-line"></i> ${tt('history.downloadIgc')}</button><div id="trace-container-${session.id}" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>` : ''}
+                        ${session.rawIgc || (session.traceGps && session.traceGps.length > 0) ? `<button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-orange); color: var(--accent-orange); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="${session.id}"><i class="ri-route-line"></i> ${tt('history.showTrace')}</button><button class="btn-download-trace action-btn-secondary" style="margin-top: 6px; width: 100%; padding: 8px; border-radius: 6px; cursor: pointer;" data-action="downloadTrace" data-args="${session.id}"><i class="ri-download-2-line"></i> ${tt('history.downloadIgc')}</button><div id="trace-container-${session.id}" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>` : ''}
                         <div data-session-weather="${session.id}">${meteoHtml}</div>
                     </div>
                 </div>
@@ -466,7 +466,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
             <span style="font-weight: 600; min-width: 90px;">${escapeHTML(label)} :</span>
             <span title="${tt('weather.temperatureTitle')}"><strong>${weatherIcon} ${tt('weather.temperature', { value: m.temperature })}</strong></span>
             <span style="color: rgba(0,0,0,0.2);">|</span>
-            <span title="${tt('weather.windTitle')}"><i class="ri-windy-line" style="color: var(--accent-blue);"></i> <strong>${tt('weather.wind')}</strong> ${tt('weather.windSpeed', { value: m.ventVitesse })} ${m.ventRafales ? tt('weather.gusts', { value: m.ventRafales }) : ''}</span>
+            <span title="${tt('weather.windTitle')}"><i class="ri-windy-line" style="color: var(--accent-orange);"></i> <strong>${tt('weather.wind')}</strong> ${tt('weather.windSpeed', { value: m.ventVitesse })} ${m.ventRafales ? tt('weather.gusts', { value: m.ventRafales }) : ''}</span>
             ${
                 m.ventDirection !== null && m.ventDirection !== undefined
                     ? `
@@ -494,13 +494,13 @@ export class LogbookHistoryBase extends LogbookStatsBase {
         return `
         <details class="logbook-card-balise" style="margin-top: 8px; padding: 10px; background: var(--bg-card-hover, rgba(0,0,0,0.03)); border-radius: var(--radius-sm); border: 1px solid var(--border-light, rgba(0,0,0,0.06)); font-size: 0.82rem; color: var(--text-secondary);">
             <summary style="cursor: pointer; display: flex; align-items: center; gap: 6px; list-style: revert;">
-                <i class="ri-broadcast-line" style="color: var(--accent-blue);"></i> <strong>${tt('weather.beacon', { date: dateStr.split('-').reverse().join('/') })}</strong>
+                <i class="ri-broadcast-line" style="color: var(--accent-orange);"></i> <strong>${tt('weather.beacon', { date: dateStr.split('-').reverse().join('/') })}</strong>
             </summary>
             <div style="margin-top: 8px;">
                 <a href="${histoPageUrl}" target="_blank" rel="noopener noreferrer">
                     <img src="${graphUrl}" alt="${tt('weather.beaconAlt')}" loading="lazy" style="width: 100%; max-width: 500px; height: auto; border-radius: 4px; display: block;">
                 </a>
-                <a href="${histoPageUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; margin-top: 6px; color: var(--accent-blue); text-decoration: none; font-size: 0.78rem;">
+                <a href="${histoPageUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; margin-top: 6px; color: var(--accent-orange); text-decoration: none; font-size: 0.78rem;">
                     ${tt('weather.beaconHistory')} <i class="ri-external-link-line"></i>
                 </a>
             </div>
@@ -514,7 +514,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
         // 1. Immediately show loading state in the UI to remove any error banner
         const container = document.getElementById('weather-container-' + sessionId);
         if (container) {
-            container.innerHTML = `<div style="color: var(--accent-blue); font-size: 0.85rem; padding: 8px 12px; background: rgba(14,165,233,0.08); border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 6px;"><i class="ri-loader-4-line ri-spin"></i> <strong>${tt('weather.loading')}</strong></div>`;
+            container.innerHTML = `<div style="color: var(--accent-orange); font-size: 0.85rem; padding: 8px 12px; background: rgba(14,165,233,0.08); border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 6px;"><i class="ri-loader-4-line ri-spin"></i> <strong>${tt('weather.loading')}</strong></div>`;
         }
 
         let lat = null,

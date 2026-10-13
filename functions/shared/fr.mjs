@@ -1162,7 +1162,7 @@ export const FR = Object.freeze({
             theorie: 'THÉORIE',
             vousNEtesPasConnecte: "Vous n'êtes pas connecté",
             vosResultatsDExamensSont:
-                'Vos résultats d\'examens sont stockés localement. <a href="#" data-action="FirebaseAuthopenAuthModal" data-prevent-default style="color: var(--accent-blue); text-decoration: underline" >Créez un compte (100% gratuit)</a > pour synchroniser votre progression et ne jamais la perdre.',
+                'Vos résultats d\'examens sont stockés localement. <a href="#" data-action="FirebaseAuthopenAuthModal" data-prevent-default style="color: var(--accent-orange); text-decoration: underline" >Créez un compte (100% gratuit)</a > pour synchroniser votre progression et ne jamais la perdre.',
             entrainement: 'Entraînement',
             examen: 'Examen',
             revision: 'Révision',
@@ -1185,7 +1185,7 @@ export const FR = Object.freeze({
             statistiques: 'STATISTIQUES',
             vousNEtesPasConnecte: "Vous n'êtes pas connecté",
             vosStatistiquesDeRevision:
-                'Vos statistiques de révision sont stockées localement. <a href="#" data-action="FirebaseAuthopenAuthModal" data-prevent-default style="color: var(--accent-blue); text-decoration: underline" >Créez un compte (100% gratuit)</a > pour les synchroniser sur tous vos appareils.',
+                'Vos statistiques de révision sont stockées localement. <a href="#" data-action="FirebaseAuthopenAuthModal" data-prevent-default style="color: var(--accent-orange); text-decoration: underline" >Créez un compte (100% gratuit)</a > pour les synchroniser sur tous vos appareils.',
         }),
         qcmBankScreen: Object.freeze({
             banqueDeQuestions: 'BANQUE DE QUESTIONS',
