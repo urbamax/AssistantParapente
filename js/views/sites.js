@@ -2,7 +2,7 @@
  * VIEW - SitesView
  * Dumb UI strictly focused on DOM and Leaflet Map Rendering.
  */
-import SitesService from '../services/sites_service.js';
+import SitesService, { SITES_EVENTS } from '../services/sites_service.js';
 import { WIND_DIRECTIONS } from '../data/weather_config.js';
 import GdprEngine from '../gdpr_engine.js';
 
@@ -20,6 +20,8 @@ class SitesViewClass extends SitesListBase {
         console.time('SITES_MOUNT_TOTAL');
         await super.mount(container);
         await SitesService.ensureSitesLoaded();
+        // S'abonner AVANT l'initialisation du service : il peut annoncer des mises à jour dès init().
+        this.subscribeToService();
         console.time('SITES_SERVICE_INIT');
         SitesService.init();
         console.timeEnd('SITES_SERVICE_INIT');
@@ -32,6 +34,28 @@ class SitesViewClass extends SitesListBase {
         this.show();
         console.timeEnd('SITES_SHOW_METHOD');
         console.timeEnd('SITES_MOUNT_TOTAL');
+    }
+
+    /**
+     * Applique les mises à jour d'affichage annoncées par SitesService (SITES_EVENTS). L'abonnement
+     * n'existe que pendant que l'écran est ouvert ; un remontage sans fermeture ne le double pas.
+     */
+    subscribeToService() {
+        this.unsubscribeFromService();
+        this._serviceSubscriptions = [
+            SitesService.on(SITES_EVENTS.LIST, () => this.renderList()),
+            SitesService.on(SITES_EVENTS.MARKERS, () => this.updateMapMarkers()),
+            SitesService.on(SITES_EVENTS.MAP_TOGGLES, () => this.updateMapTogglesVisibility()),
+            SitesService.on(SITES_EVENTS.FORECAST_LABEL, () => this.updateForecastLabel()),
+            SitesService.on(SITES_EVENTS.BADGES, () => this.updateBadges()),
+            SitesService.on(SITES_EVENTS.DROPDOWNS, () => this.renderDropdowns()),
+            SitesService.on(SITES_EVENTS.WEATHER_FETCHED, (result) => this.handleWeatherFetchResult(result)),
+        ];
+    }
+
+    unsubscribeFromService() {
+        for (const unsubscribe of this._serviceSubscriptions ?? []) unsubscribe();
+        this._serviceSubscriptions = [];
     }
 
     toggleAdvancedSettings() {
@@ -85,6 +109,7 @@ class SitesViewClass extends SitesListBase {
 
     async unmount() {
         await super.unmount();
+        this.unsubscribeFromService();
         clearInterval(this._weatherRetryInterval);
         clearInterval(this._forecastAgeInterval);
         clearTimeout(this._radiusTimeout);

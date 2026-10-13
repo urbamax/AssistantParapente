@@ -19,8 +19,23 @@ import { evaluateSpotForecast, normalizeForecastValue, getSiteOrientations } fro
 import { toSorted } from '../utils/array_utils.js';
 import IDBStorage from './idb_storage.js';
 import { t } from '../utils/i18n.js';
+import { createEmitter } from '../utils/emitter.js';
 
 const sitesView = () => AppRouter.getView('SITES');
+
+/**
+ * Événements d'affichage annoncés par le service. L'écran des sites s'y abonne quand il s'ouvre
+ * (SitesView.mount) : le service ne sait plus comment ni où l'affichage est rafraîchi.
+ */
+export const SITES_EVENTS = Object.freeze({
+    LIST: 'list', // la liste des sites doit être redessinée
+    MARKERS: 'markers', // les repères de la carte doivent être mis à jour
+    MAP_TOGGLES: 'mapToggles', // la visibilité des boutons de la carte a changé
+    FORECAST_LABEL: 'forecastLabel', // l'heure de prévision affichée a changé
+    BADGES: 'badges', // le nombre de filtres actifs a changé
+    DROPDOWNS: 'dropdowns', // les menus déroulants doivent être redessinés
+    WEATHER_FETCHED: 'weatherFetched', // une récupération météo en arrière-plan est terminée (donnée : son résultat)
+});
 
 // Values offered by the sort (#select-sort-mode) and weather model (#weather-model-select) menus.
 const SORT_MODES = ['CONDITIONS', 'DISTANCE', 'AZ'];
@@ -73,6 +88,8 @@ class SitesService {
 
         /** @type {Array} Catalogue des sites (sites_data.json), chargé à la demande. */
         this._sites = [];
+
+        this._events = createEmitter();
 
         this.state = {
             filterWind: [],
@@ -877,11 +894,7 @@ class SitesService {
             if (!missing) return;
 
             this.fetchWeatherForSites().then((result) => {
-                if (sitesView()?.handleWeatherFetchResult) {
-                    sitesView().handleWeatherFetchResult(result);
-                    return;
-                }
-                sitesView()?.renderList?.();
+                this._events.emit(SITES_EVENTS.WEATHER_FETCHED, result);
             });
         }, 400);
     }
@@ -1720,24 +1733,39 @@ class SitesService {
         this.savePreferences();
     }
 
-    // Forward UI updates to SitesView if it exists (legacy code adaptation)
+    /**
+     * S'abonne à un événement d'affichage (voir SITES_EVENTS).
+     * @param {string} event
+     * @param {(payload?: any) => void} handler
+     * @returns {() => void} fonction de désabonnement
+     */
+    on(event, handler) {
+        return this._events.on(event, handler);
+    }
+
+    /** @param {string} event @param {(payload?: any) => void} handler */
+    off(event, handler) {
+        this._events.off(event, handler);
+    }
+
+    // Mises à jour d'affichage : le service les annonce, l'écran des sites (s'il est ouvert) les applique.
     renderList() {
-        sitesView()?.renderList();
+        this._events.emit(SITES_EVENTS.LIST);
     }
     updateMapMarkers() {
-        sitesView()?.updateMapMarkers();
+        this._events.emit(SITES_EVENTS.MARKERS);
     }
     updateMapTogglesVisibility() {
-        sitesView()?.updateMapTogglesVisibility();
+        this._events.emit(SITES_EVENTS.MAP_TOGGLES);
     }
     updateForecastLabel() {
-        sitesView()?.updateForecastLabel();
+        this._events.emit(SITES_EVENTS.FORECAST_LABEL);
     }
     updateBadges() {
-        sitesView()?.updateBadges();
+        this._events.emit(SITES_EVENTS.BADGES);
     }
     renderDropdowns() {
-        sitesView()?.renderDropdowns();
+        this._events.emit(SITES_EVENTS.DROPDOWNS);
     }
 }
 export default new SitesService();
