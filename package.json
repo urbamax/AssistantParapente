@@ -19,7 +19,8 @@
     "sync:functions": "node scripts/sync_functions_shared.mjs",
     "verify": "bash scripts/verify.sh",
     "verify:full": "bash scripts/verify.sh --e2e",
-    "prepare": "git config core.hooksPath .githooks || true"
+    "prepare": "git config core.hooksPath .githooks || true",
+    "test:rules": "npx --yes firebase-tools@15.33.0 emulators:exec --only firestore --project demo-assistantparapente \"vitest run --config vitest.rules.config.js\""
   },
   "repository": {
     "type": "git",
@@ -35,10 +36,12 @@
   "homepage": "https://github.com/urbamax/AssistantParapente#readme",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@firebase/rules-unit-testing": "5.0.2",
     "@playwright/test": "^1.62.1",
     "@vitest/coverage-v8": "^4.1.11",
     "@vitest/ui": "^4.1.11",
     "eslint": "^10.10.0",
+    "firebase": "12.19.0",
     "globals": "^17.12.0",
     "happy-dom": "^20.11.6",
     "http-server": "^14.1.1",

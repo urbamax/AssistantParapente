@@ -1,0 +1,35 @@
+rules_version = '2';
+
+// Règles Firestore d'Assistant Parapente. À déployer avec : firebase deploy --only firestore:rules
+// (ou à coller dans la console Firebase > Firestore > Règles). Testées en local : npm run test:rules.
+//
+// Principe : chaque pilote n'accède qu'à ses propres données, sous users/{son uid}. Tout le reste
+// est refusé (refus par défaut), y compris users/{uid}/pushState, réservé à la Cloud Function
+// (le SDK admin ignore ces règles).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    match /users/{userId} {
+      // Le document du compte (jeton de notification fcmToken).
+      allow read, write: if isOwner(userId);
+
+      // Seuls les sous-ensembles utilisés par l'application (js/services/firebase_service.js).
+      match /logbook/{flightId} {
+        allow read, write: if isOwner(userId);
+      }
+      match /equipment/{itemId} {
+        allow read, write: if isOwner(userId);
+      }
+      match /stats/{statId} {
+        allow read, write: if isOwner(userId);
+      }
+      match /preferences/{prefId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+  }
+}

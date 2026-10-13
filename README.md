@@ -44,6 +44,16 @@ npm run verify:full   # + tests e2e Playwright Chromium et WebKit (≈ 35 s)
 
 Un hook `pre-push` (`.githooks/`, activé par `npm install`) lance `npm run verify` avant chaque `git push` et bloque l'envoi si quelque chose échoue (`git push --no-verify` pour contourner exceptionnellement).
 
+### Règles Firestore
+
+`firestore.rules` est la source de vérité des règles de sécurité (chaque pilote n'accède qu'à `users/{son uid}`). Les tester en local, sur l'émulateur (Java requis, rien n'est envoyé à Firebase) :
+
+```bash
+npm run test:rules
+```
+
+Le déploiement reste manuel : `firebase deploy --only firestore:rules`, ou coller le fichier dans la console Firebase > Firestore > Règles.
+
 ---
 
 ## 🛠️ Stack Technique
