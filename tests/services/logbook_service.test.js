@@ -348,3 +348,32 @@ describe('LogbookService.findLastCoordsForPlace', () => {
         });
     });
 });
+
+// Équipement à surveiller : date, heures de vol, ou secours ouvert et pas encore replié.
+describe('LogbookService.countEquipmentAlerts', () => {
+    const wear = (...alerts) => Object.fromEntries(alerts.map((a, i) => [`e${i}`, { alerts: a }]));
+
+    it('counts the equipment with a date, hours or opened-rescue alert', () => {
+        expect(LogbookService.countEquipmentAlerts(wear({ dateAlert: 'orange' }))).toBe(1);
+        expect(LogbookService.countEquipmentAlerts(wear({ hoursAlert: 'red' }))).toBe(1);
+        expect(LogbookService.countEquipmentAlerts(wear({ openedAlert: 'red' }))).toBe(1);
+    });
+
+    it('counts each piece of equipment once, whatever the number of alerts', () => {
+        const both = { dateAlert: 'red', hoursAlert: 'orange', openedAlert: 'red' };
+        expect(LogbookService.countEquipmentAlerts(wear(both, {}, { dateAlert: 'orange' }))).toBe(2);
+    });
+
+    it('is zero when nothing needs attention', () => {
+        expect(LogbookService.countEquipmentAlerts({})).toBe(0);
+        expect(LogbookService.countEquipmentAlerts(wear({}, { dateAlert: false, hoursAlert: false }))).toBe(0);
+    });
+
+    it('computes the wear itself by default: a rescue opened and not repacked counts', () => {
+        LogbookService.equipment = [{ id: 's1', nom: 'Secours', type: 'secours' }];
+        LogbookService.flights = [
+            { id: 'f1', type: 'vol', datetime: '2026-09-01T10:00', rescueDeployed: true, rescueId: 'Secours' },
+        ];
+        expect(LogbookService.countEquipmentAlerts()).toBe(1);
+    });
+});
