@@ -56,6 +56,10 @@ Le déploiement reste manuel : `firebase deploy --only firestore:rules`, ou coll
 
 ---
 
+## ⚖️ Droits et contenus tiers
+
+Le code source est © Maxime Urbaniak, **tous droits réservés** (voir `LICENSE`). Les cours, affiches, livrets et questions du QCM **appartiennent à la FFVL et à leurs auteurs** : ils ne nous appartiennent pas et ne sont présentés que pour faciliter la formation (voir `NOTICE`). Toute demande de retrait est traitée sans délai.
+
 ## 🛠️ Stack Technique
 
 - **Core**: HTML5, Vanilla JavaScript (ES6 Modules), CSS3 (Variables & Glassmorphism).

@@ -1230,6 +1230,8 @@ export const FR = Object.freeze({
             bibliotheque: 'BIBLIOTHEQUE',
             placeholderRechercherUnDossier: 'Rechercher un dossier, une affiche...',
             parCategorie: 'PAR CATÉGORIE',
+            avisProprieteDocuments:
+                'Ces documents appartiennent à la FFVL et à leurs auteurs. Ils sont présentés ici pour faciliter la formation des pilotes.',
         }),
         courseScreen: Object.freeze({
             retourALaBibliotheque: 'Retour à la bibliothèque',
@@ -1551,6 +1553,8 @@ export const FR = Object.freeze({
                 'La base des sites de vol est dérivée des données ouvertes de la <strong>FFVL</strong> (<em >Source : FFVL</em >, Licence Ouverte / Etalab 2.0) complétées par <strong>ParaglidingEarth</strong> (licence Creative Commons BY-SA 3.0). Ces données sont fournies à titre indicatif et ne remplacent pas les informations officielles des structures gestionnaires.',
             touteReproductionOuUtilisation:
                 "Toute reproduction ou utilisation non autorisée des cours et des affiches à des fins commerciales est interdite sans l'accord préalable des auteurs ou de la FFVL.",
+            lesCoursAffichesEtDocuments:
+                "Les cours, affiches, livrets et questions du QCM présentés ou liés dans cette application ne nous appartiennent pas : ils sont la propriété de la <strong>FFVL</strong> et de leurs auteurs, qui conservent tous leurs droits. Ils ne sont mis à disposition ici que pour faciliter la formation des pilotes, gratuitement et sans but lucratif. Pour toute demande de retrait ou de modification, contactez l'éditeur.",
         }),
         spotairModal: Object.freeze({
             ventEnDirect: 'Vent en direct — SpotAiR',
@@ -1947,6 +1951,8 @@ export const FR = Object.freeze({
             gestionDesCookies: 'Gestion des cookies & données',
             leClubEtLa:
                 "Le club et la FFVL déclinent toute responsabilité quant à l'édition, au contenu et à l'utilisation de cette application indépendante.",
+            proprieteDesCours:
+                'Cours, affiches et questions du QCM : propriété de la FFVL et de leurs auteurs, présentés ici pour faciliter la formation.',
         }),
     }),
     // Spec 029 : derniers textes hors écrans (bannière de mise à jour, écrans d'erreur, thème,
