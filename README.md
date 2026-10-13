@@ -35,6 +35,16 @@ npm run build     # génère dist/ (JS/CSS hachés et minifiés, service worker 
 npm run preview   # sert dist/ en local
 ```
 
+### Règles Firestore
+
+`firestore.rules` est la source de vérité des règles de sécurité (chaque pilote n'accède qu'à `users/{son uid}`). Les tester en local, sur l'émulateur (Java requis, rien n'est envoyé à Firebase) :
+
+```bash
+npm run test:rules
+```
+
+Le déploiement reste manuel : `firebase deploy --only firestore:rules`, ou coller le fichier dans la console Firebase > Firestore > Règles.
+
 ---
 
 ## 🛠️ Stack Technique
