@@ -4,8 +4,7 @@ import { statSync } from 'node:fs';
 // Spec 008 : cours déjà ouverts et zones de carte déjà affichées disponibles hors ligne, grâce au
 // service worker (ici activé, contrairement à sites_flow.spec.js).
 const OPENED_PDF = 'courses/561c47ad1db0.pdf';
-const NEVER_OPENED_PDF =
-    'courses/dd005fe06258.pdf';
+const NEVER_OPENED_PDF = 'courses/dd005fe06258.pdf';
 const OPENED_PDF_SIZE = statSync(OPENED_PDF).size;
 
 async function loadWithServiceWorker(page) {
