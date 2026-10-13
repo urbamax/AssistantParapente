@@ -1,0 +1,7 @@
+# Bibliothèques tierces (SDK, cartes) et fichiers générés : analysés par leurs auteurs, pas ici.
+paths-ignore:
+  - vendor
+  - node_modules
+  - dist
+  - functions/shared
+  - js/data
