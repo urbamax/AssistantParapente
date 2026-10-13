@@ -16,3 +16,4 @@ RAPPORT_*.md
 
 # Version du site, écrite par le build ou par scripts/install_update_hook.sh
 version.json
+coverage/
