@@ -1,56 +1,8 @@
 <!doctype html>
 <html lang="fr">
     <head>
-        <script>
-            // Apply the saved theme before first paint to avoid a dark background
-            // flash while the app's module scripts (loaded at the end of body) boot up.
-            (function () {
-                try {
-                    const saved = localStorage.getItem('themeMode') || 'auto';
-                    let effective = saved;
-                    if (effective === 'auto') {
-                        effective =
-                            window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-                                ? 'dark'
-                                : 'light';
-                    }
-                    if (effective === 'light') {
-                        document.documentElement.classList.add('light-mode');
-                        document.documentElement.style.colorScheme = 'light';
-                    } else {
-                        document.documentElement.classList.add('dark-theme');
-                        document.documentElement.style.colorScheme = 'dark';
-                    }
-                } catch (e) {}
-            })();
-        </script>
-        <script>
-            window.addEventListener('error', function (e) {
-                const errDiv = document.createElement('div');
-                errDiv.style.cssText =
-                    'position:fixed;top:10px;left:10px;z-index:99999;background:red;color:white;padding:10px;white-space:pre-wrap;font-family:monospace;';
-                errDiv.textContent =
-                    'GLOBAL ERROR: ' +
-                    e.message +
-                    '\n' +
-                    e.filename +
-                    ':' +
-                    e.lineno +
-                    ':' +
-                    e.colno +
-                    '\n' +
-                    (e.error ? e.error.stack : '');
-                (document.body || document.documentElement).appendChild(errDiv);
-            });
-            window.addEventListener('unhandledrejection', function (e) {
-                const errDiv = document.createElement('div');
-                errDiv.style.cssText =
-                    'position:fixed;top:10px;left:10px;z-index:99999;background:red;color:white;padding:10px;white-space:pre-wrap;font-family:monospace;';
-                errDiv.textContent =
-                    'UNHANDLED REJECTION: ' + (e.reason ? e.reason.stack || e.reason : 'Unknown reason');
-                (document.body || document.documentElement).appendChild(errDiv);
-            });
-        </script>
+        <script src="js/theme_boot.js?v=2026.10.05_v23"></script>
+        <script src="js/error_overlay.js?v=2026.10.05_v23"></script>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="color-scheme" content="light dark" />
@@ -61,20 +13,20 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Assistant Parapente" />
         <!--
-        Content-Security-Policy : renfort en défense en profondeur, en complément de
-        l'échappement XSS déjà systématique côté JS (js/core/security.js, escapeHTML).
-        'unsafe-inline' reste nécessaire en script-src/style-src car l'app utilise encore
-        des attributs onclick/onchange/oninput inline à plusieurs endroits (index.html,
-        js/views/*.js) — les retirer serait un refactor séparé, pas fait ici. La CSP
-        protège quand même contre le vecteur principal : le chargement de script/style/
-        connexions vers un domaine hors de cette liste (ex: script de supply-chain
-        compromis, exfiltration de données vers un serveur tiers).
+        Content-Security-Policy (spec 036). Les scripts ne peuvent venir que de ce site, de unpkg.com
+        (MapLibre et deck.gl, chargés à la demande avec un contrôle d'intégrité) et de apis.google.com
+        (chargé par le SDK Firebase pour les connexions par fenêtre) : plus de script inline, donc un
+        <script> ou une URL javascript: injectés dans la page ne s'exécutent pas. Les deux scripts
+        qui étaient inline (thème au premier affichage, bandeau d'erreur) sont dans js/.
+        'unsafe-inline' reste dans style-src : l'application et ses bibliothèques utilisent des
+        attributs style="" (environ 850), et le rapport imprimable du carnet est un document avec
+        un bloc <style> dans une iframe.
     -->
         <meta
             http-equiv="Content-Security-Policy"
             content="
         default-src 'self';
-        script-src 'self' 'unsafe-inline' https://unpkg.com https://apis.google.com;
+        script-src 'self' https://unpkg.com https://apis.google.com;
         style-src 'self' 'unsafe-inline' https://unpkg.com;
         font-src 'self' data:;
         img-src 'self' data: blob: https://server.arcgisonline.com https://www.spotair.mobi https://balisemeteo.com;
