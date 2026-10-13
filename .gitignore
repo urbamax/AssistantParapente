@@ -21,3 +21,10 @@ coverage/
 # Journaux de l'émulateur Firestore (npm run test:rules)
 firestore-debug.log
 ui-debug.log
+
+# Contenus de la FFVL et de leurs auteurs : servis par le site, jamais dans le dépôt (voir NOTICE)
+courses/
+
+# Python
+__pycache__/
+*.pyc
