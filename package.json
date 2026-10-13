@@ -27,8 +27,8 @@
     "url": "git+https://github.com/urbamax/AssistantParapente.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Maxime Urbaniak",
+  "license": "UNLICENSED",
   "type": "module",
   "bugs": {
     "url": "https://github.com/urbamax/AssistantParapente/issues"
@@ -52,5 +52,6 @@
   },
   "overrides": {
     "@grpc/grpc-js": "^1.13.6"
-  }
+  },
+  "private": true
 }
