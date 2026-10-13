@@ -217,7 +217,7 @@
                     <!-- Options injected manually -->
                 </div>
 
-                <div id="qcm-feedback" class="narrative-text qcm-feedback" style="display: none">
+                <div id="qcm-feedback" class="narrative-text qcm-feedback" role="status" aria-live="polite" style="display: none">
                     <!-- Feedback text -->
                 </div>
 
@@ -1047,6 +1047,8 @@
                         </div>
                         <div data-i18n="sitesScreen.aucunPointDeReference"
                             id="address-status-message"
+                            role="status"
+                            aria-live="polite"
                             style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px"
                         >
                             <i class="ri-information-line"></i> Aucun point de référence (GPS désactivé).
@@ -2211,7 +2213,7 @@
                         </div>
                         <div class="auth-sync-row">
                             <span data-i18n="authLoggedInView.derniereSynchro">Dernière synchro :</span>
-                            <span data-i18n="authLoggedInView.jamais" id="auth-sync-time" class="auth-sync-time">Jamais</span>
+                            <span data-i18n="authLoggedInView.jamais" id="auth-sync-time" class="auth-sync-time" role="status" aria-live="polite">Jamais</span>
                         </div>
                     </div>
 
