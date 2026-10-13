@@ -3,9 +3,8 @@ import { statSync } from 'node:fs';
 
 // Spec 008 : cours déjà ouverts et zones de carte déjà affichées disponibles hors ligne, grâce au
 // service worker (ici activé, contrairement à sites_flow.spec.js).
-const OPENED_PDF = 'courses/GENERAL/facteurs_humains/1-fh-check-list/1-fh-check-list.pdf';
-const NEVER_OPENED_PDF =
-    'courses/BREVET INITIAL - VERT/developpement-durable_0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-.pdf';
+const OPENED_PDF = 'courses/561c47ad1db0.pdf';
+const NEVER_OPENED_PDF = 'courses/dd005fe06258.pdf';
 const OPENED_PDF_SIZE = statSync(OPENED_PDF).size;
 
 async function loadWithServiceWorker(page) {
@@ -65,7 +64,7 @@ test.describe('Spec 008 - stockage hors ligne', () => {
         await expect
             .poll(() =>
                 page.evaluate(async (u) => {
-                    const cached = await (await caches.open('parapente-courses-v1')).match(new URL(u, location.href));
+                    const cached = await (await caches.open('parapente-courses-v2')).match(new URL(u, location.href));
                     return cached ? (await cached.arrayBuffer()).byteLength : 0;
                 }, url),
             )

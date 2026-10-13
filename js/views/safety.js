@@ -32,10 +32,10 @@ const tl = (key, params) => t(`safety.${key}`, params);
 export const SAFETY_FREQUENCY = '143,9875 MHz';
 
 const SOURCES = {
-    SECOURS: 'courses/GENERAL/affiches-pedagogiques-a3/19-secours2022/19-secours2022.pdf',
-    PREVOL: 'courses/BREVET INITIAL - VERT/livrets-pp-2025/initiation-2025-web/initiation-2025-web.pdf#page=15',
-    SIGR: 'courses/GENERAL/affiches-pedagogiques-a3/16-sigr2019/16-sigr2019.pdf',
-    READY: 'courses/GENERAL/2014_Livret_FFVL_9BD.pdf#page=7',
+    SECOURS: 'courses/c8a5d66e9096.pdf',
+    PREVOL: 'courses/bcc9fa0b6e34.pdf#page=15',
+    SIGR: 'courses/f767e5322de4.pdf',
+    READY: 'courses/6c9e02957c04.pdf#page=7',
 };
 
 /**

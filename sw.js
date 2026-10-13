@@ -18,7 +18,7 @@ const WEATHER_API_HOSTNAME = 'api.open-meteo.com';
 
 // Caches « d'usage » conservés d'une version de l'application à l'autre (spec 008) : seulement ce
 // que le pilote a réellement ouvert ou affiché, jamais de téléchargement d'avance.
-const COURSE_CACHE = 'parapente-courses-v1'; // cours (PDF) déjà ouverts
+const COURSE_CACHE = 'parapente-courses-v2'; // cours (PDF) déjà ouverts
 const TILE_CACHE = 'parapente-tiles-v1'; // zones de carte déjà affichées
 const COURSE_CACHE_MAX_BYTES = 80 * 1024 * 1024; // ≈ 4 gros livrets ; le cours le plus anciennement ouvert part d'abord
 const TILE_CACHE_MAX = 1500; // ≈ 35 Mo à ≈ 23 Ko par morceau ; les plus anciens partent d'abord
