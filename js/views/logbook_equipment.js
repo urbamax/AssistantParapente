@@ -65,9 +65,7 @@ export class LogbookEquipmentBase extends BaseView {
         const badge = document.getElementById('logbook-nav-badge');
         if (!badge) return;
         const wear = LogbookService.computeEquipmentWear();
-        const alertCount = Object.values(wear).filter(
-            (s) => s.alerts.dateAlert || s.alerts.hoursAlert || s.alerts.openedAlert,
-        ).length;
+        const alertCount = LogbookService.countEquipmentAlerts(wear);
         if (alertCount > 0) {
             badge.textContent = String(alertCount);
             badge.style.display = 'flex';

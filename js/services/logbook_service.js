@@ -454,6 +454,18 @@ class LogbookService {
         return stats;
     }
 
+    /**
+     * Nombre d'équipements à surveiller : date de révision dépassée ou proche, heures de vol, ou
+     * secours ouvert et pas encore replié. Un même équipement n'est compté qu'une fois. Une seule
+     * définition pour la pastille du Carnet et le brief pré-vol des sites.
+     * @param {Record<string, {alerts: {dateAlert?: string|false, hoursAlert?: string|false, openedAlert?: string|false}}>} [wear]
+     * @returns {number}
+     */
+    countEquipmentAlerts(wear = this.computeEquipmentWear()) {
+        return Object.values(wear).filter((s) => s.alerts.dateAlert || s.alerts.hoursAlert || s.alerts.openedAlert)
+            .length;
+    }
+
     _calculateNextRevision(equip) {
         if (!equip.periodicite || equip.periodicite <= 0) return null;
         const refDateStr = equip.derniereRevision || equip.dateAchat;

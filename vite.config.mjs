@@ -16,6 +16,8 @@ const STATIC_PATHS = [
     'vendor',
     'manifest.json',
     'js/firebase_config.js',
+    'js/theme_boot.js',
+    'js/error_overlay.js',
     'js/data/sites_data.json',
     'js/data/qcm_ffvl.csv',
     'js/data/qcm_ffvl_explanations.csv',

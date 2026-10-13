@@ -165,6 +165,13 @@ describe('sites renders (spec 015: identical before and after moving the texts)'
         expect({ on, off: html('btn-compare-favorites') }).toMatchSnapshot();
     });
 
+    it('pre-flight brief reports a rescue opened and not repacked, like the Carnet badge', () => {
+        LogbookService.computeEquipmentWear.mockReturnValue({ rescue: { alerts: { openedAlert: 'red' } } });
+        const brief = SitesView.buildPreFlightBriefHtml();
+        expect(brief).toContain('1 équipement à réviser');
+        expect(brief).not.toContain('Matériel à jour');
+    });
+
     it('pre-flight brief', () => {
         const none = SitesView.buildPreFlightBriefHtml();
         LogbookService.computeEquipmentWear.mockReturnValue({ a: { alerts: {} } });

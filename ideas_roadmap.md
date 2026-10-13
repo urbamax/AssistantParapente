@@ -13,12 +13,12 @@ Ce fichier centralise les concepts techniques et les idées d'amélioration vali
 
 ### Priorités actuelles
 1. Valider les seuils de la classification de vol (`CLASSIFICATION` dans `js/services/flight_classifier.js`) sur de vrais fichiers IGC : soaring de crête, journée thermique, cross.
-2. Météo multi-sites : « meilleur créneau » sur 7 jours et comparateur de sites favoris (le meilleur créneau par site existe déjà).
+2. Météo : digest « meilleur créneau des 7 prochains jours » sur les sites favoris (le meilleur créneau par site et le comparateur de favoris existent déjà).
 3. Alertes de révision du matériel en notification, avant l'échéance.
 4. Répétition espacée : facteur de difficulté par question (SM-2 complet) et rappel des questions à réviser (voir le point 5 de la phase 3).
 
 ### Secondaire
-- Brief pré-vol unifié (météo + brevet + matériel) : toutes les briques existent, il manque l'écran. Pas jugé utile pour le moment ; l'emplacement (fiche d'un site ou écran dédié) reste à décider.
+- Brief pré-vol unifié : une version simple existe déjà dans le panneau de chaque site (niveau de brevet sélectionné et état du matériel, secours ouvert compris). Reste, si utile, de l'unifier avec le verdict météo. Pas jugé prioritaire pour le moment.
 
 ---
 
@@ -112,15 +112,16 @@ Les périodes de révision (mois/heures) sont déjà définies dans `js/data/equ
 
 ## ✈️ 6. Vue d'ensemble & Confort (validé 2026-09-14)
 
-### Brief pré-vol unifié — secondaire
-*Les check-lists de prévol existent dans `safety.js` mais ne sont pas liées à la météo ni au matériel.*
+### Brief pré-vol unifié — 🟡 PARTIEL, secondaire (vérifié 2026-10-13)
+*Fait : un « Brief pré-vol » dans le panneau de chaque site (`buildPreFlightBriefHtml`, `js/views/sites.js`) : niveau de brevet sélectionné à confronter aux dangers du site, et état du matériel via `LogbookService.countEquipmentAlerts` (même règle que la pastille du Carnet : date, heures, secours ouvert non replié). Les check-lists de prévol sont à part, dans `safety.js`. Reste : l'unifier avec le verdict météo du créneau.*
 Une vue unique combinant météo du site + niveau de brevet requis (BI/BP/BPC) + état des révisions matériel, plutôt que de checker ces trois choses séparément avant de partir voler. Capitalise sur les sections 4 et 5 ci-dessus.
 
 ### Indicateur de sync visible — ✅ FAIT (vérifié 2026-10-11)
 *Pastille `sync-active-dot` : bleu pendant la synchro, orange si des modifications sont en attente, masquée sinon (`firebase_service.js`).*
 `js/services/firebase_service.js` gère déjà tout le merge local/cloud (stats, historique, logbook, équipement) mais aucune UI ne montre "en attente de sync" / "synchronisé". Utile pour rassurer l'utilisateur en zone blanche, en cohérence avec le cache offline de la section 4.
 
-### Comparateur multi-sites — à faire
+### Comparateur multi-sites — ✅ FAIT (vérifié 2026-10-13)
+*Bouton « Comparer mes favoris » : tableau côte à côte des sites favoris pour le créneau affiché (`renderComparator`, `js/views/sites.js`), avec le contexte de la prévision.*
 Un tableau côte-à-côte du score d'exploitabilité de plusieurs sites favoris pour le jour même, pour décider où aller sans ouvrir chaque fiche une par une. Complète le digest 7 jours de la section 4.
 
 ---

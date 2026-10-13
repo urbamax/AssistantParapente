@@ -456,7 +456,7 @@ export class SitesListBase extends SitesMapBase {
         let equipmentHtml = `<span style="color: var(--text-muted);">${tt('brief.noEquipment')}</span>`;
         try {
             const wear = LogbookService.computeEquipmentWear();
-            const alertCount = Object.values(wear).filter((s) => s.alerts.dateAlert || s.alerts.hoursAlert).length;
+            const alertCount = LogbookService.countEquipmentAlerts(wear);
             if (alertCount > 0) {
                 equipmentHtml = `<span style="color: #f59e0b; font-weight: 600;">${tt(alertCount > 1 ? 'brief.toReviewMany' : 'brief.toReviewOne', { count: alertCount })}</span>`;
             } else if (Object.keys(wear).length > 0) {

@@ -136,6 +136,8 @@ const CRITICAL_ASSETS = [
     './js/weatherScoring.js',
     './js/gdpr_engine.js',
     './js/firebase_config.js',
+    './js/theme_boot.js',
+    './js/error_overlay.js',
     './img/logo.png',
     './img/icons/icon-192x192.png',
     './img/icons/icon-512x512.png',
