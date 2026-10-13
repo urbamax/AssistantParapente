@@ -361,7 +361,7 @@ async function bootApplication() {
 
 // Start
 document.addEventListener('DOMContentLoaded', () => {
-    // Déclenche le chargement asynchrone des sites en arrière-plan sans bloquer le boot
-    SitesService.ensureSitesLoaded().catch((e) => console.error('Erreur chargement asynchrone sites_data.json:', e));
+    // Le catalogue des sites (≈ 3 Mo) n'est plus chargé au démarrage : les écrans qui en ont besoin
+    // (Sites, Carnet) l'attendent eux-mêmes en appelant ensureSitesLoaded dans leur mount().
     bootApplication();
 });
