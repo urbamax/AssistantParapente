@@ -24,7 +24,8 @@ const SCREENS = [
     // Code de niveau enregistré dans les préférences.
     // sites.js a été découpé : chaque fichier reste contrôlé.
     ...[
-        ['js/views/sites.js', 80],
+        ['js/views/sites.js', 19],
+        ['js/views/sites_list.js', 64],
         ['js/views/sites_forecast.js', 16],
         ['js/views/sites_map.js', 21],
     ].map(([file, minKeys]) => ({ file, spec: '015', prefix: 'sites.', dataValues: ['ALL'], minKeys })),
