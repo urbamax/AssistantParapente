@@ -496,7 +496,7 @@ export const COURSES_DATA = {
         category: 'Général',
         path: 'courses/BREVET DE PILOTE CONFIRMÉ - MARRON',
         pages: 0,
-        pdf: 'courses/BREVET DE PILOTE CONFIRMÉ - MARRON/bpc_pp_delta_v2025_may.pdf',
+        pdf: 'courses/BREVET DE PILOTE CONFIRMÉ - MARRON/bpc_pp_delta_v2026_apr.pdf',
         keywords: ['bpc', 'confirmé', 'delta', 'règlementation', 'compétition', 'distance'],
         level: ['BPC'],
     },
