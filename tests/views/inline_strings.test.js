@@ -26,6 +26,7 @@ const SCREENS = [
     ...[
         ['js/views/sites.js', 80],
         ['js/views/sites_forecast.js', 16],
+        ['js/views/sites_map.js', 21],
     ].map(([file, minKeys]) => ({ file, spec: '015', prefix: 'sites.', dataValues: ['ALL'], minKeys })),
     { file: 'js/views/safety.js', spec: '019', prefix: 'safety.', dataValues: [], minKeys: 15 },
     // Codes d'erreur renvoyés au code appelant (jamais affichés) et codes de niveau / catégorie.
