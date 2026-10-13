@@ -374,11 +374,11 @@ class LogbookViewClass extends LogbookIgcImportBase {
         if (this.currentFormType === 'vol') {
             html = `
                 <div role="button" tabindex="0" class="form-group igc-upload-container" data-action="triggerIgcUpload" style="border: 2px dashed var(--border-light, #ccc); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 15px; cursor: pointer; background: var(--bg-card, #f9f9f9);">
-                    <i class="ri-upload-cloud-line" style="font-size: 2rem; color: var(--accent-blue, #007bc4);"></i>
+                    <i class="ri-upload-cloud-line" style="font-size: 2rem; color: var(--accent-orange, #007bc4);"></i>
                     <div style="font-weight: bold; margin-top: 10px;">${tt('form.igcTitle')}</div>
                     <div style="font-size: 0.85rem; color: var(--text-secondary, #666); margin-top: 5px;" id="igc-upload-filename">${tt('form.igcHint')}</div>
                 </div>
-                <button type="button" id="lb-igc-recalc" data-action="recalculateFromTrace" style="display:none; width: 100%; margin: -5px 0 15px; padding: 8px; border-radius: 6px; border: 1px solid var(--accent-blue, #007bc4); color: var(--accent-blue, #007bc4); background: transparent; cursor: pointer;"><i class="ri-refresh-line"></i> ${tt('igc.recalculate')}</button>
+                <button type="button" id="lb-igc-recalc" data-action="recalculateFromTrace" style="display:none; width: 100%; margin: -5px 0 15px; padding: 8px; border-radius: 6px; border: 1px solid var(--accent-orange, #007bc4); color: var(--accent-orange, #007bc4); background: transparent; cursor: pointer;"><i class="ri-refresh-line"></i> ${tt('igc.recalculate')}</button>
                 <label class="form-group" style="display:flex; align-items:center; gap:8px; margin: -5px 0 15px; font-size: 0.9rem;"><input type="checkbox" id="lb-vario-in-flight"> ${tt('form.varioInFlight')}</label>
                 <label class="form-group" style="display:flex; align-items:center; gap:8px; margin: -5px 0 15px; font-size: 0.9rem;"><input type="checkbox" id="lb-vario-off-in-flight"> ${tt('form.varioOffInFlight')}</label>
                 <div class="form-group" id="igc-alt-check" style="display:none; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-light, #ccc); margin-bottom: 15px;">
@@ -561,7 +561,7 @@ class LogbookViewClass extends LogbookIgcImportBase {
             uploadContainer.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                uploadContainer.style.borderColor = 'var(--accent-blue)';
+                uploadContainer.style.borderColor = 'var(--accent-orange)';
                 uploadContainer.style.background = 'rgba(0, 123, 196, 0.1)';
             });
             uploadContainer.addEventListener('dragleave', (e) => {

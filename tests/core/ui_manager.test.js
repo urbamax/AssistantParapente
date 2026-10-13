@@ -44,10 +44,10 @@ describe('UIManager', () => {
 
     it('updateAppTheme updates css variables based on level', () => {
         UIManagerModule.updateAppTheme('BI');
-        expect(document.documentElement.style.getPropertyValue('--accent-blue')).toBe('#22c55e');
+        expect(document.documentElement.style.getPropertyValue('--accent-orange')).toBe('#22c55e');
 
         UIManagerModule.updateAppTheme('BPC');
-        expect(document.documentElement.style.getPropertyValue('--accent-blue')).toBe('#8B4513');
+        expect(document.documentElement.style.getPropertyValue('--accent-orange')).toBe('#8B4513');
     });
 
     it('loadComponents fetches HTML and inserts it', async () => {

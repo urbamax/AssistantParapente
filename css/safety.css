@@ -231,7 +231,7 @@
 
 /* --- Check-lists --- */
 .safety-phase {
-    color: var(--accent-blue);
+    color: var(--accent-orange);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-size: 0.8rem !important;
@@ -338,7 +338,7 @@
 
 .safety-progress {
     font-weight: 800;
-    color: var(--accent-blue);
+    color: var(--accent-orange);
 }
 
 .safety-card .safety-checklist {
@@ -390,7 +390,7 @@
 
 .safety-check-num {
     font-weight: 800;
-    color: var(--accent-blue);
+    color: var(--accent-orange);
 }
 
 .safety-done {

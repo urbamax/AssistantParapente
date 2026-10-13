@@ -547,12 +547,12 @@ class QuizViewClass extends BaseView {
         if (!GdprEngine.isConsentGranted('stats')) {
             container.innerHTML = `
                 <div style="padding:40px; text-align:center; color:var(--text-main); max-width: 500px; margin: 0 auto; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                    <i class="ri-shield-user-line" style="font-size:3.5rem; color:var(--accent-blue); display:block; margin-bottom:20px;"></i>
+                    <i class="ri-shield-user-line" style="font-size:3.5rem; color:var(--accent-orange); display:block; margin-bottom:20px;"></i>
                     <h2 style="margin-bottom:12px; font-weight: 800; font-size: 1.4rem;">${tq('stats.disabledTitle')}</h2>
                     <p style="opacity:0.7; font-size:0.9rem; line-height: 1.6; margin-bottom: 24px;">
                         ${tq('stats.disabledText')}
                     </p>
-                    <button data-action="GdprshowModal" data-args="gdpr-settings-modal" style="background:var(--accent-blue); color:white; border:none; padding:12px 24px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; font-size:0.9rem;">
+                    <button data-action="GdprshowModal" data-args="gdpr-settings-modal" style="background:var(--accent-orange); color:white; border:none; padding:12px 24px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; font-size:0.9rem;">
                         ${tq('stats.enable')}
                     </button>
                 </div>
@@ -1019,7 +1019,7 @@ class QuizViewClass extends BaseView {
                     <div style="font-size:0.9rem; opacity:0.7;">
                         ${tqh('stats.questionCount', { count: `<span style="font-weight:700; color:var(--text-main);">${visibleQuestions.length}</span>` })} 
                         <span style="opacity:0.6;">(${displayLabel})</span>
-                        ${QuizView.state.masteryFilter !== 'ALL' || QuizView.state.themeFilter ? `<a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">${tq('stats.clearFilters')}</a>` : ''}
+                        ${QuizView.state.masteryFilter !== 'ALL' || QuizView.state.themeFilter ? `<a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">${tq('stats.clearFilters')}</a>` : ''}
                     </div>
                     <div style="display:flex; gap:8px;">
                         <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
@@ -1109,7 +1109,7 @@ class QuizViewClass extends BaseView {
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#${code}</span>
-                                    ${QuizView.getCourseUrl(code) ? `<button data-action="openUrl" data-url="${escapeHTML(QuizView.getCourseUrl(code))}" style="background:var(--accent-blue); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> ${tq('stats.course')}</button>` : ''}
+                                    ${QuizView.getCourseUrl(code) ? `<button data-action="openUrl" data-url="${escapeHTML(QuizView.getCourseUrl(code))}" style="background:var(--accent-orange); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> ${tq('stats.course')}</button>` : ''}
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">${theme}</span>
                                     ${streak >= 3 ? `<span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 ${streak}</span>` : ''}
                                     ${hasAnswers ? '<i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-' + code + '"></i>' : ''}
@@ -1487,7 +1487,7 @@ class QuizViewClass extends BaseView {
             const stats = QuizService.getPersistentStats();
             const s = stats.questions[q.code];
             if (!s || s.total === 0) {
-                badgeHtml = `<div class="quiz-theme-tag" style="background:var(--accent-blue, #3b82f6); color:#fff; border-color:var(--accent-blue, #3b82f6); margin-left: 8px;"><i class="ri-sparkling-line"></i> ${tq('question.new')}</div>`;
+                badgeHtml = `<div class="quiz-theme-tag" style="background:var(--accent-orange, #3b82f6); color:#fff; border-color:var(--accent-orange, #3b82f6); margin-left: 8px;"><i class="ri-sparkling-line"></i> ${tq('question.new')}</div>`;
             } else {
                 badgeHtml = `<div class="quiz-theme-tag" style="background:#f87171; color:#fff; border-color:#f87171; margin-left: 8px;"><i class="ri-refresh-line"></i> ${tq('question.toReview')}</div>`;
             }
@@ -1631,7 +1631,7 @@ class QuizViewClass extends BaseView {
         feedbackDiv.innerHTML = `
             <div class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}">
                 <div>${escapeHTML(result.question.explication)}</div>
-                ${courseUrl ? `<button data-action="openUrl" data-url="${escapeHTML(courseUrl)}" style="margin-top:10px; background:var(--accent-blue); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> ${tq('question.seeCourse')}</button>` : ''}
+                ${courseUrl ? `<button data-action="openUrl" data-url="${escapeHTML(courseUrl)}" style="margin-top:10px; background:var(--accent-orange); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> ${tq('question.seeCourse')}</button>` : ''}
             </div>
         `;
 

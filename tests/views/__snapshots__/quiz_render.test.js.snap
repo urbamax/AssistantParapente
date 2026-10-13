@@ -9,7 +9,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
   "feedback": "
             <div class="instructor-feedback feedback-success">
                 <div>Un front sépare deux masses d’air.</div>
-                <button data-action="openUrl" data-url="courses/GENERAL/20240409_FFVL-Formation-EspacesAeriens.pdf#page=3" style="margin-top:10px; background:var(--accent-blue); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR DANS LE COURS</button>
+                <button data-action="openUrl" data-url="courses/GENERAL/20240409_FFVL-Formation-EspacesAeriens.pdf#page=3" style="margin-top:10px; background:var(--accent-orange); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR DANS LE COURS</button>
             </div>
         ",
 }
@@ -303,7 +303,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div class="quiz-meta" style="display:flex; align-items:center;">
                     <span class="bank-item-code" style="margin-right: 8px; background: rgba(34, 197, 94, 0.2); color: var(--level-text-V, #4ade80); border: 1px solid rgba(34, 197, 94, 0.4);">F4V</span>
                     <div class="quiz-theme-tag">Facteurs humains</div>
-                    <div class="quiz-theme-tag" style="background:var(--accent-blue, #3b82f6); color:#fff; border-color:var(--accent-blue, #3b82f6); margin-left: 8px;"><i class="ri-sparkling-line"></i> Nouveau</div>
+                    <div class="quiz-theme-tag" style="background:var(--accent-orange, #3b82f6); color:#fff; border-color:var(--accent-orange, #3b82f6); margin-left: 8px;"><i class="ri-sparkling-line"></i> Nouveau</div>
                     <div class="quiz-progress" style="margin-left: auto;">Question 1 / 2</div>
                 </div>
             </div>
@@ -1383,7 +1383,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#A1V</span>
-                                    <button data-action="openUrl" data-url="courses/GENERAL/20240409_FFVL-Formation-EspacesAeriens.pdf#page=3" style="background:var(--accent-blue); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>
+                                    <button data-action="openUrl" data-url="courses/GENERAL/20240409_FFVL-Formation-EspacesAeriens.pdf#page=3" style="background:var(--accent-orange); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Météo</span>
                                     <span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 3</span>
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-A1V"></i>
@@ -1744,7 +1744,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.9rem; opacity:0.7;">
                         <span style="font-weight:700; color:var(--text-main);">0</span> questions 
                         <span style="opacity:0.6;">(Questions Excellentes (90-99%))</span>
-                        <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">Tout effacer</a>
+                        <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
                     <div style="display:flex; gap:8px;">
                         <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
@@ -2084,7 +2084,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.9rem; opacity:0.7;">
                         <span style="font-weight:700; color:var(--text-main);">1</span> questions 
                         <span style="opacity:0.6;">(Questions Échouées (0%))</span>
-                        <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">Tout effacer</a>
+                        <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
                     <div style="display:flex; gap:8px;">
                         <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
@@ -2461,7 +2461,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.9rem; opacity:0.7;">
                         <span style="font-weight:700; color:var(--text-main);">0</span> questions 
                         <span style="opacity:0.6;">(Questions Satisfaisantes (50-74%))</span>
-                        <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">Tout effacer</a>
+                        <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
                     <div style="display:flex; gap:8px;">
                         <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
@@ -2801,7 +2801,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.9rem; opacity:0.7;">
                         <span style="font-weight:700; color:var(--text-main);">1</span> questions 
                         <span style="opacity:0.6;">(Questions Non Tentées)</span>
-                        <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">Tout effacer</a>
+                        <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
                     <div style="display:flex; gap:8px;">
                         <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
@@ -3183,7 +3183,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.9rem; opacity:0.7;">
                         <span style="font-weight:700; color:var(--text-main);">1</span> questions 
                         <span style="opacity:0.6;">(Questions Maîtrisées (100%))</span>
-                        <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">Tout effacer</a>
+                        <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
                     <div style="display:flex; gap:8px;">
                         <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
@@ -3204,7 +3204,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#A1V</span>
-                                    <button data-action="openUrl" data-url="courses/GENERAL/20240409_FFVL-Formation-EspacesAeriens.pdf#page=3" style="background:var(--accent-blue); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>
+                                    <button data-action="openUrl" data-url="courses/GENERAL/20240409_FFVL-Formation-EspacesAeriens.pdf#page=3" style="background:var(--accent-orange); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Météo</span>
                                     <span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 3</span>
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-A1V"></i>
@@ -3565,7 +3565,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.9rem; opacity:0.7;">
                         <span style="font-weight:700; color:var(--text-main);">1</span> questions 
                         <span style="opacity:0.6;">(Questions À travailler (1-49%))</span>
-                        <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">Tout effacer</a>
+                        <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
                     <div style="display:flex; gap:8px;">
                         <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
@@ -3947,7 +3947,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.9rem; opacity:0.7;">
                         <span style="font-weight:700; color:var(--text-main);">0</span> questions 
                         <span style="opacity:0.6;">(Questions Très Bonnes (75-89%))</span>
-                        <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">Tout effacer</a>
+                        <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
                     <div style="display:flex; gap:8px;">
                         <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
@@ -4287,7 +4287,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.9rem; opacity:0.7;">
                         <span style="font-weight:700; color:var(--text-main);">1</span> questions 
                         <span style="opacity:0.6;">(Toutes les questions tentées • Thème : Météo)</span>
-                        <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-blue);">Tout effacer</a>
+                        <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
                     <div style="display:flex; gap:8px;">
                         <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
@@ -4308,7 +4308,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#A1V</span>
-                                    <button data-action="openUrl" data-url="courses/GENERAL/20240409_FFVL-Formation-EspacesAeriens.pdf#page=3" style="background:var(--accent-blue); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>
+                                    <button data-action="openUrl" data-url="courses/GENERAL/20240409_FFVL-Formation-EspacesAeriens.pdf#page=3" style="background:var(--accent-orange); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Météo</span>
                                     <span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 3</span>
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-A1V"></i>
@@ -4387,12 +4387,12 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             ",
   "noConsent": "
                 <div style="padding:40px; text-align:center; color:var(--text-main); max-width: 500px; margin: 0 auto; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                    <i class="ri-shield-user-line" style="font-size:3.5rem; color:var(--accent-blue); display:block; margin-bottom:20px;"></i>
+                    <i class="ri-shield-user-line" style="font-size:3.5rem; color:var(--accent-orange); display:block; margin-bottom:20px;"></i>
                     <h2 style="margin-bottom:12px; font-weight: 800; font-size: 1.4rem;">Statistiques désactivées</h2>
                     <p style="opacity:0.7; font-size:0.9rem; line-height: 1.6; margin-bottom: 24px;">
                         Vous avez désactivé le stockage de vos statistiques d'entraînement dans vos préférences de confidentialité. Pour suivre votre progression et voir votre historique, veuillez activer cette option.
                     </p>
-                    <button data-action="GdprshowModal" data-args="gdpr-settings-modal" style="background:var(--accent-blue); color:white; border:none; padding:12px 24px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; font-size:0.9rem;">
+                    <button data-action="GdprshowModal" data-args="gdpr-settings-modal" style="background:var(--accent-orange); color:white; border:none; padding:12px 24px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; font-size:0.9rem;">
                         Activer le suivi de progression
                     </button>
                 </div>

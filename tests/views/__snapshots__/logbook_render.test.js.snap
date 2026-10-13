@@ -68,7 +68,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
                                 <div class="equip-name" style="font-size:1.1rem; font-weight:600;">
                                     OZONE | RUSH 6 | BLEU | M
-                                    <span class="session-badge" style="margin-left: 8px; font-size:0.75rem; padding:2px 6px; border-radius:4px; background: rgba(14, 165, 233, 0.1); color: var(--accent-blue);">VOILE</span>
+                                    <span class="session-badge" style="margin-left: 8px; font-size:0.75rem; padding:2px 6px; border-radius:4px; background: rgba(14, 165, 233, 0.1); color: var(--accent-orange);">VOILE</span>
                                     
                                 </div>
                             </div>
@@ -87,7 +87,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             </div>
                         </div>
                         <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid rgba(0,0,0,0.05); padding-top:8px; margin-top: auto;">
-                            <button class="action-btn" data-action="editEquipment" data-args="'e1'" title="Modifier" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-blue);">
+                            <button class="action-btn" data-action="editEquipment" data-args="'e1'" title="Modifier" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-orange);">
                                 ✏️
                             </button>
                             <button class="action-btn" data-action="toggleEquipmentStatus" data-args="'e1'" title="Archiver" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#6b7280;">
@@ -124,7 +124,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             </div>
                         </div>
                         <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid rgba(0,0,0,0.05); padding-top:8px; margin-top: auto;">
-                            <button class="action-btn" data-action="editEquipment" data-args="'e2'" title="Modifier" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-blue);">
+                            <button class="action-btn" data-action="editEquipment" data-args="'e2'" title="Modifier" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-orange);">
                                 ✏️
                             </button>
                             <button class="action-btn" data-action="toggleEquipmentStatus" data-args="'e2'" title="Archiver" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#6b7280;">
@@ -161,7 +161,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             </div>
                         </div>
                         <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid rgba(0,0,0,0.05); padding-top:8px; margin-top: auto;">
-                            <button class="action-btn" data-action="editEquipment" data-args="'e3'" title="Modifier" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-blue);">
+                            <button class="action-btn" data-action="editEquipment" data-args="'e3'" title="Modifier" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-orange);">
                                 ✏️
                             </button>
                             <button class="action-btn" data-action="toggleEquipmentStatus" data-args="'e3'" title="Désarchiver" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#6b7280;">
@@ -195,11 +195,11 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
 {
   "flight": "
                 <div role="button" tabindex="0" class="form-group igc-upload-container" data-action="triggerIgcUpload" style="border: 2px dashed var(--border-light, #ccc); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 15px; cursor: pointer; background: var(--bg-card, #f9f9f9);">
-                    <i class="ri-upload-cloud-line" style="font-size: 2rem; color: var(--accent-blue, #007bc4);"></i>
+                    <i class="ri-upload-cloud-line" style="font-size: 2rem; color: var(--accent-orange, #007bc4);"></i>
                     <div style="font-weight: bold; margin-top: 10px;">Importer une trace GPS (.igc)</div>
                     <div style="font-size: 0.85rem; color: var(--text-secondary, #666); margin-top: 5px;" id="igc-upload-filename">Cliquez ou glissez-déposez le fichier (avec le .sdf Syride pour le facteur de charge)</div>
                 </div>
-                <button type="button" id="lb-igc-recalc" data-action="recalculateFromTrace" style="display:none; width: 100%; margin: -5px 0 15px; padding: 8px; border-radius: 6px; border: 1px solid var(--accent-blue, #007bc4); color: var(--accent-blue, #007bc4); background: transparent; cursor: pointer;"><i class="ri-refresh-line"></i> Recalculer depuis la trace IGC</button>
+                <button type="button" id="lb-igc-recalc" data-action="recalculateFromTrace" style="display:none; width: 100%; margin: -5px 0 15px; padding: 8px; border-radius: 6px; border: 1px solid var(--accent-orange, #007bc4); color: var(--accent-orange, #007bc4); background: transparent; cursor: pointer;"><i class="ri-refresh-line"></i> Recalculer depuis la trace IGC</button>
                 <label class="form-group" style="display:flex; align-items:center; gap:8px; margin: -5px 0 15px; font-size: 0.9rem;"><input type="checkbox" id="lb-vario-in-flight"> Vario allumé pendant le vol (la durée saisie donne l'heure de décollage)</label>
                 <label class="form-group" style="display:flex; align-items:center; gap:8px; margin: -5px 0 15px; font-size: 0.9rem;"><input type="checkbox" id="lb-vario-off-in-flight"> Vario éteint pendant le vol (la durée saisie reste celle du vol réel)</label>
                 <div class="form-group" id="igc-alt-check" style="display:none; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-light, #ccc); margin-bottom: 15px;">
@@ -223,7 +223,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     
                     <div class="lb-coords-block" style="margin-top: 6px;">
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.82rem;">
-                            <button type="button" data-action="toggleCoordsPicker" aria-expanded="false" aria-controls="lb-coords-panel" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border: 1px solid var(--border-light, #ccc); border-radius: var(--radius-sm); background: none; color: var(--accent-blue); cursor: pointer; font-size: 0.82rem;">
+                            <button type="button" data-action="toggleCoordsPicker" aria-expanded="false" aria-controls="lb-coords-panel" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border: 1px solid var(--border-light, #ccc); border-radius: var(--radius-sm); background: none; color: var(--accent-orange); cursor: pointer; font-size: 0.82rem;">
                                 <i class="ri-map-pin-line" aria-hidden="true"></i> <span id="lb-coords-toggle-label">Placer sur la carte</span>
                             </button>
                             <span id="lb-coords-status" style="color: var(--text-muted);"></span>
@@ -381,7 +381,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     
                     <div class="lb-coords-block" style="margin-top: 6px;">
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.82rem;">
-                            <button type="button" data-action="toggleCoordsPicker" aria-expanded="false" aria-controls="lb-coords-panel" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border: 1px solid var(--border-light, #ccc); border-radius: var(--radius-sm); background: none; color: var(--accent-blue); cursor: pointer; font-size: 0.82rem;">
+                            <button type="button" data-action="toggleCoordsPicker" aria-expanded="false" aria-controls="lb-coords-panel" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border: 1px solid var(--border-light, #ccc); border-radius: var(--radius-sm); background: none; color: var(--accent-orange); cursor: pointer; font-size: 0.82rem;">
                                 <i class="ri-map-pin-line" aria-hidden="true"></i> <span id="lb-coords-toggle-label">Placer sur la carte</span>
                             </button>
                             <span id="lb-coords-status" style="color: var(--text-muted);"></span>
@@ -487,7 +487,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
 "
                 <div class="logbook-card" data-session-id="f1">
                     <div class="logbook-card-header">
-                        <div class="session-badge" style="background-color: var(--accent-blue)22; color: var(--accent-blue);">
+                        <div class="session-badge" style="background-color: var(--accent-orange)22; color: var(--accent-orange);">
                             <i class="ri-windy-line"></i> VOL
                         </div>
                         <div class="session-date">20/09/2026 à 14:30</div>
@@ -528,7 +528,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             
                         </div>
                         <div class="session-comment">"Belle journée"</div>
-                        <button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="f1"><i class="ri-route-line"></i> Voir la trace 🗺️</button><button class="btn-download-trace action-btn-secondary" style="margin-top: 6px; width: 100%; padding: 8px; border-radius: 6px; cursor: pointer;" data-action="downloadTrace" data-args="f1"><i class="ri-download-2-line"></i> Télécharger l'IGC</button><div id="trace-container-f1" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>
+                        <button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-orange); color: var(--accent-orange); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="f1"><i class="ri-route-line"></i> Voir la trace 🗺️</button><button class="btn-download-trace action-btn-secondary" style="margin-top: 6px; width: 100%; padding: 8px; border-radius: 6px; cursor: pointer;" data-action="downloadTrace" data-args="f1"><i class="ri-download-2-line"></i> Télécharger l'IGC</button><div id="trace-container-f1" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>
                         <div data-session-weather="f1">
             <div class="logbook-card-weather" style="margin-top: 10px; padding: 10px; background: rgba(14,165,233,0.06); border-radius: var(--radius-sm); border: 1px solid rgba(14,165,233,0.15); font-size: 0.85rem; color: var(--text-secondary);">
                 
@@ -536,7 +536,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
             <span style="font-weight: 600; min-width: 90px;">Décollage :</span>
             <span title="Température"><strong>🌤️ 21°C</strong></span>
             <span style="color: rgba(0,0,0,0.2);">|</span>
-            <span title="Vent"><i class="ri-windy-line" style="color: var(--accent-blue);"></i> <strong>Vent :</strong> 14 km/h (Rafales : 22 km/h)</span>
+            <span title="Vent"><i class="ri-windy-line" style="color: var(--accent-orange);"></i> <strong>Vent :</strong> 14 km/h (Rafales : 22 km/h)</span>
             
             <span style="color: rgba(0,0,0,0.2);">|</span>
             <span title="Direction"><i class="ri-arrow-up-fill" style="color: #10b981; font-size: 1.05em; display:inline-block; transform: rotate(250deg);"></i> <strong>Dir :</strong> WSW (250°)</span>
@@ -547,7 +547,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
             <span style="font-weight: 600; min-width: 90px;">Atterrissage :</span>
             <span title="Température"><strong>🌤️ 21°C</strong></span>
             <span style="color: rgba(0,0,0,0.2);">|</span>
-            <span title="Vent"><i class="ri-windy-line" style="color: var(--accent-blue);"></i> <strong>Vent :</strong> 14 km/h (Rafales : 22 km/h)</span>
+            <span title="Vent"><i class="ri-windy-line" style="color: var(--accent-orange);"></i> <strong>Vent :</strong> 14 km/h (Rafales : 22 km/h)</span>
             
             <span style="color: rgba(0,0,0,0.2);">|</span>
             <span title="Direction"><i class="ri-arrow-up-fill" style="color: #10b981; font-size: 1.05em; display:inline-block; transform: rotate(250deg);"></i> <strong>Dir :</strong> WSW (250°)</span>
@@ -560,13 +560,13 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
             
         <details class="logbook-card-balise" style="margin-top: 8px; padding: 10px; background: var(--bg-card-hover, rgba(0,0,0,0.03)); border-radius: var(--radius-sm); border: 1px solid var(--border-light, rgba(0,0,0,0.06)); font-size: 0.82rem; color: var(--text-secondary);">
             <summary style="cursor: pointer; display: flex; align-items: center; gap: 6px; list-style: revert;">
-                <i class="ri-broadcast-line" style="color: var(--accent-blue);"></i> <strong>Vent réel (balise FFVL, 20/09/2026)</strong>
+                <i class="ri-broadcast-line" style="color: var(--accent-orange);"></i> <strong>Vent réel (balise FFVL, 20/09/2026)</strong>
             </summary>
             <div style="margin-top: 8px;">
                 <a href="https://balisemeteo.com/balise_histo.php?idBalise=67&amp;date=2026-09-20" target="_blank" rel="noopener noreferrer">
                     <img src="https://balisemeteo.com/graphs/histo_vent.php?idBalise=67&amp;interval=1&amp;marks=false&amp;date=2026-09-20" alt="Historique du vent - balise FFVL" loading="lazy" style="width: 100%; max-width: 500px; height: auto; border-radius: 4px; display: block;">
                 </a>
-                <a href="https://balisemeteo.com/balise_histo.php?idBalise=67&amp;date=2026-09-20" target="_blank" rel="noopener noreferrer" style="display: inline-block; margin-top: 6px; color: var(--accent-blue); text-decoration: none; font-size: 0.78rem;">
+                <a href="https://balisemeteo.com/balise_histo.php?idBalise=67&amp;date=2026-09-20" target="_blank" rel="noopener noreferrer" style="display: inline-block; margin-top: 6px; color: var(--accent-orange); text-decoration: none; font-size: 0.78rem;">
                     Voir l'historique complet <i class="ri-external-link-line"></i>
                 </a>
             </div>
@@ -622,7 +622,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
             
                 <div class="logbook-card" data-session-id="n1">
                     <div class="logbook-card-header">
-                        <div class="session-badge" style="background-color: var(--accent-blue)22; color: var(--accent-blue);">
+                        <div class="session-badge" style="background-color: var(--accent-orange)22; color: var(--accent-orange);">
                             <i class="ri-windy-line"></i> VOL
                         </div>
                         <div class="session-date">10/09/2026 à 11:00</div>
@@ -682,7 +682,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
             <div class="stats-grid">
                 <!-- KPI: Vols -->
                 <div class="kpi-card" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="type" data-stat-value="vol" title="Filtrer par VOL">
-                    <div class="kpi-icon" style="background-color: var(--accent-blue); color: white;"><i class="ri-windy-line"></i></div>
+                    <div class="kpi-icon" style="background-color: var(--accent-orange); color: white;"><i class="ri-windy-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">2 vols</div>
                         <div class="kpi-label">1h 35min cumulé</div>
@@ -762,17 +762,17 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             <i class="ri-arrow-right-s-line record-chevron"></i>
                         </div>
                     </div></div>
-                <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 14px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 10px; border-radius: var(--radius-md, 8px); cursor: pointer; background: transparent; font-weight: 600;">
+                <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 14px; width: 100%; border: 1px solid var(--accent-orange); color: var(--accent-orange); padding: 10px; border-radius: var(--radius-md, 8px); cursor: pointer; background: transparent; font-weight: 600;">
                     <i class="ri-refresh-line"></i> Calculer les stats détaillées des vols avec trace (à mettre à jour : 1)
                 </button>
             </div>
             <div class="stats-section-box">
-                <h3 class="stats-section-title"><i class="ri-umbrella-line" style="color: var(--accent-blue)"></i> Matériel (Voiles)</h3>
+                <h3 class="stats-section-title"><i class="ri-umbrella-line" style="color: var(--accent-orange)"></i> Matériel (Voiles)</h3>
                 <div class="equip-list">
                     <div class="equip-card" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="voile" data-stat-value="OZONE | RUSH 6 | BLEU | M" title="Filtrer par OZONE | RUSH 6 | BLEU | M">
                         <div class="equip-name">OZONE | RUSH 6 | BLEU | M</div>
                         <div class="equip-details">
-                            <span style="color: var(--accent-blue)">Vols: 1 (1h 15min)</span>
+                            <span style="color: var(--accent-orange)">Vols: 1 (1h 15min)</span>
                             <span style="color: #f59e0b">Gonflage: 1 (45min)</span>
                         </div>
                         <div style="font-size: 0.8rem; margin-top: 6px; color: var(--text-secondary);"><strong>Avant révision:</strong> <span style="color:#ef4444; font-weight:bold;">Dépassé de 1h</span> (sur 1h)</div>
@@ -815,7 +815,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                 </div></div>
                 <div class="chart-card">
                     <div class="chart-card-header">
-                        <h3 class="chart-card-title"><i class="ri-flight-takeoff-line" style="color: var(--accent-blue)"></i> Types de vols</h3>
+                        <h3 class="chart-card-title"><i class="ri-flight-takeoff-line" style="color: var(--accent-orange)"></i> Types de vols</h3>
                     </div>
                     <div class="chart-card-body">
                     <div class="bar-row" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="typeVol" data-stat-value="Thermique" title="Filtrer par Thermique">
@@ -824,7 +824,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             <div class="bar-value">1 (50%)</div>
                         </div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: 50%; background-color: var(--accent-blue)"></div>
+                            <div class="bar-fill" style="width: 50%; background-color: var(--accent-orange)"></div>
                         </div>
                     </div>
                 
@@ -834,7 +834,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             <div class="bar-value">1 (50%)</div>
                         </div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: 50%; background-color: var(--accent-blue)"></div>
+                            <div class="bar-fill" style="width: 50%; background-color: var(--accent-orange)"></div>
                         </div>
                     </div>
                 </div></div>

@@ -124,7 +124,7 @@ body.light-mode .badge-GENERAL {
 }
 
 .library-section-header.level-BP {
-    color: var(--accent-blue);
+    color: var(--accent-orange);
     border-bottom-color: rgba(14, 165, 233, 0.3);
 }
 
@@ -167,7 +167,7 @@ body.light-mode .library-section-header {
 
 .mode-toggle-btn.active,
 .count-btn.active {
-    background: var(--accent-blue);
+    background: var(--accent-orange);
     color: #fff;
     box-shadow: 0 4px 12px var(--shadow-glow);
 }
@@ -255,7 +255,7 @@ body.light-mode .library-section-header {
 }
 
 .sort-btn.active {
-    background: var(--accent-blue);
+    background: var(--accent-orange);
     color: #fff;
     box-shadow: 0 4px 12px var(--shadow-glow);
 }
@@ -347,9 +347,9 @@ body.light-mode .sort-btn.active {
     }
 
     &:focus-visible {
-        outline: 2px solid var(--accent-blue);
+        outline: 2px solid var(--accent-orange);
         outline-offset: 2px;
-        border-color: var(--accent-blue);
+        border-color: var(--accent-orange);
         box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
 
         & .list-item-action {
@@ -366,7 +366,7 @@ body.light-mode .sort-btn.active {
         left: 0;
         width: 4px;
         height: 100%;
-        background: var(--accent-blue);
+        background: var(--accent-orange);
         opacity: 0;
         transition: opacity 0.3s ease;
     }
@@ -423,12 +423,12 @@ body.light-mode .library-list-item {
 
     &:hover {
         background: #ffffff;
-        border-color: var(--accent-blue);
+        border-color: var(--accent-orange);
         box-shadow: 0 10px 20px rgba(14, 165, 233, 0.1);
     }
 
     &:focus-visible {
-        outline-color: var(--accent-blue);
+        outline-color: var(--accent-orange);
         box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
     }
 }

@@ -388,7 +388,7 @@ export class LogbookEquipmentBase extends BaseView {
                     }
 
                     const typeBadgeColors = {
-                        voile: 'background: rgba(14, 165, 233, 0.1); color: var(--accent-blue);',
+                        voile: 'background: rgba(14, 165, 233, 0.1); color: var(--accent-orange);',
                         sellette: 'background: rgba(245, 158, 11, 0.1); color: #f59e0b;',
                         secours: 'background: rgba(239, 68, 68, 0.1); color: #ef4444;',
                         accessoire: 'background: rgba(156, 163, 175, 0.1); color: #9ca3af;',
@@ -431,7 +431,7 @@ export class LogbookEquipmentBase extends BaseView {
                             </div>
                         </div>
                         <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid rgba(0,0,0,0.05); padding-top:8px; margin-top: auto;">
-                            <button class="action-btn" data-action="editEquipment" data-args="'${equip.id}'" title="${tt('equipment.edit')}" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-blue);">
+                            <button class="action-btn" data-action="editEquipment" data-args="'${equip.id}'" title="${tt('equipment.edit')}" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-orange);">
                                 ✏️
                             </button>
                             <button class="action-btn" data-action="toggleEquipmentStatus" data-args="'${equip.id}'" title="${tt(isArchive ? 'equipment.unarchive' : 'equipment.archive')}" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#6b7280;">

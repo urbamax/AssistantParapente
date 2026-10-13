@@ -54,7 +54,7 @@
 }
 
 .gdpr-banner-title i {
-    color: var(--accent-blue);
+    color: var(--accent-orange);
     font-size: 1.25rem;
 }
 
@@ -65,7 +65,7 @@
 }
 
 .gdpr-banner-text a {
-    color: var(--accent-blue);
+    color: var(--accent-orange);
     text-decoration: underline;
     cursor: pointer;
     font-weight: 600;
@@ -460,8 +460,8 @@ body.light-mode .gdpr-slider {
 }
 
 input:checked+.gdpr-slider {
-    background-color: var(--accent-blue);
-    border-color: var(--accent-blue);
+    background-color: var(--accent-orange);
+    border-color: var(--accent-orange);
 }
 
 input:checked+.gdpr-slider:before {

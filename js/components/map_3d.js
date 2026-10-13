@@ -151,7 +151,7 @@ const Map3DComponent = {
         if (typeof maplibregl === 'undefined' || typeof deck === 'undefined') {
             container.innerHTML = `
                 <div style="padding: 40px; text-align: center; color: var(--text-secondary);">
-                    <i class="ri-loader-4-line ri-spin" style="font-size: 2rem; display: block; margin-bottom: 12px; color: var(--accent-blue);"></i>
+                    <i class="ri-loader-4-line ri-spin" style="font-size: 2rem; display: block; margin-bottom: 12px; color: var(--accent-orange);"></i>
                     <p style="margin: 0; font-size: 0.95rem;">${escapeHTML(t('map3d.loading'))}</p>
                 </div>
             `;

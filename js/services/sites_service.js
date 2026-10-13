@@ -507,7 +507,7 @@ class SitesService {
         if (this.state.forecastOffset > sliderMax) this.state.forecastOffset = sliderMax;
         slider.value = String(this.state.forecastOffset);
         const percentage = sliderMax > 0 ? (this.state.forecastOffset / sliderMax) * 100 : 0;
-        slider.style.background = `linear-gradient(to right, var(--accent-blue) 0%, var(--accent-blue) ${percentage}%, rgba(255,255,255,0.1) ${percentage}%, rgba(255,255,255,0.1) 100%)`;
+        slider.style.background = `linear-gradient(to right, var(--accent-orange) 0%, var(--accent-orange) ${percentage}%, rgba(255,255,255,0.1) ${percentage}%, rgba(255,255,255,0.1) 100%)`;
     }
 
     /**
@@ -1353,7 +1353,7 @@ class SitesService {
                     btn.classList.add('active');
                     btn.style.background = 'rgba(14,165,233,0.15)';
                     btn.style.borderColor = 'rgba(14,165,233,0.3)';
-                    btn.style.color = 'var(--accent-blue)';
+                    btn.style.color = 'var(--accent-orange)';
                 } else {
                     btn.classList.remove('active');
                     btn.style.background = 'rgba(255,255,255,0.03)';
@@ -1474,7 +1474,7 @@ class SitesService {
             slider.value = String(offset);
             const maxVal = parseInt(slider.max) || 120;
             const percentage = maxVal > 0 ? (offset / maxVal) * 100 : 0;
-            slider.style.background = `linear-gradient(to right, var(--accent-blue) 0%, var(--accent-blue) ${percentage}%, rgba(255,255,255,0.1) ${percentage}%, rgba(255,255,255,0.1) 100%)`;
+            slider.style.background = `linear-gradient(to right, var(--accent-orange) 0%, var(--accent-orange) ${percentage}%, rgba(255,255,255,0.1) ${percentage}%, rgba(255,255,255,0.1) 100%)`;
         }
 
         const view = sitesView();

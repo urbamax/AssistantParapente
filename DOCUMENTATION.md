@@ -183,7 +183,6 @@ export default instance;
 ### 5. Utilities & Shared Logic (`js/utils/`)
 To maintain the DRY (Don't Repeat Yourself) principle, all reusable domain-agnostic logic must be extracted into pure functions within the `js/utils/` directory.
 - `date_utils.js`: Date, time, and duration formatting (`formatDateTime`, `formatDuration`).
-- `math_utils.js`: Mathematical functions (e.g., rounding `roundToDecimals`, percentages).
 - `geo_utils.js`: Geographic and trigonometric calculations (Haversine distance, angle normalizations, cardinal conversions).
 - `i18n.js`: `t(key, params)` reads the French strings catalogue `js/i18n/fr.js`.
 - `text_utils.js`: Text manipulation and sanitization. *(Planned)*

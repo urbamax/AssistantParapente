@@ -20,7 +20,7 @@ export class LogbookCoordsBase extends LogbookHistoryBase {
         return `
                     <div class="lb-coords-block" style="margin-top: 6px;">
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.82rem;">
-                            <button type="button" data-action="toggleCoordsPicker" aria-expanded="false" aria-controls="lb-coords-panel" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border: 1px solid var(--border-light, #ccc); border-radius: var(--radius-sm); background: none; color: var(--accent-blue); cursor: pointer; font-size: 0.82rem;">
+                            <button type="button" data-action="toggleCoordsPicker" aria-expanded="false" aria-controls="lb-coords-panel" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border: 1px solid var(--border-light, #ccc); border-radius: var(--radius-sm); background: none; color: var(--accent-orange); cursor: pointer; font-size: 0.82rem;">
                                 <i class="ri-map-pin-line" aria-hidden="true"></i> <span id="lb-coords-toggle-label">${escapeHTML(t('logbook.coords.open'))}</span>
                             </button>
                             <span id="lb-coords-status" style="color: var(--text-muted);"></span>

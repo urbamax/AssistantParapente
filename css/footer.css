@@ -29,7 +29,7 @@
         transition: color 0.2s;
 
         &:hover {
-            color: var(--accent-blue);
+            color: var(--accent-orange);
         }
     }
 }
@@ -106,7 +106,7 @@ body.light-mode .club-logo:hover {
 }
 
 .footer-gdpr-links a:hover {
-    color: var(--accent-blue) !important;
+    color: var(--accent-orange) !important;
     text-decoration: underline;
 }
 

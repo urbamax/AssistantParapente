@@ -189,7 +189,7 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
                 <h3 class="stats-section-title"><i class="ri-trophy-line" style="color: #f59e0b"></i> ${tt('records.title')}</h3>
                 ${totals ? `<p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 12px;">${totals}</p>` : ''}
                 <div class="records-grid">${rows}</div>
-                <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 14px; width: 100%; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 10px; border-radius: var(--radius-md, 8px); cursor: pointer; background: transparent; font-weight: 600;">
+                <button type="button" class="action-btn-secondary" data-action="recomputeAllTraceStats" style="margin-top: 14px; width: 100%; border: 1px solid var(--accent-orange); color: var(--accent-orange); padding: 10px; border-radius: var(--radius-md, 8px); cursor: pointer; background: transparent; font-weight: 600;">
                     <i class="ri-refresh-line"></i> ${missing ? tt('records.recomputeMissing', { count: missing }) : tt('records.recompute')}
                 </button>
             </div>`;
@@ -313,7 +313,7 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
             <div class="stats-grid">
                 <!-- KPI: Vols -->
                 <div class="kpi-card" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="type" data-stat-value="vol" title="${tt('stats.filterBy', { name: tl('history.badgeFlight') })}">
-                    <div class="kpi-icon" style="background-color: var(--accent-blue); color: white;"><i class="ri-windy-line"></i></div>
+                    <div class="kpi-icon" style="background-color: var(--accent-orange); color: white;"><i class="ri-windy-line"></i></div>
                     <div class="kpi-info">
                         <div class="kpi-value">${tt('stats.flights', { count: totalVols })}</div>
                         <div class="kpi-label">${tt('stats.flightTime', { duration: formatDuration(totalTimeVols) })}</div>
@@ -352,14 +352,14 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
         if (Object.keys(equipStats).length > 0) {
             html += `
             <div class="stats-section-box">
-                <h3 class="stats-section-title"><i class="ri-umbrella-line" style="color: var(--accent-blue)"></i> ${tt('stats.wings')}</h3>
+                <h3 class="stats-section-title"><i class="ri-umbrella-line" style="color: var(--accent-orange)"></i> ${tt('stats.wings')}</h3>
                 <div class="equip-list">`;
             for (const [voile, st] of Object.entries(equipStats)) {
                 html += `
                     <div class="equip-card" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="voile" data-stat-value="${escapeHTML(voile)}" title="${tt('stats.filterBy', { name: voile })}">
                         <div class="equip-name">${escapeHTML(voile)}</div>
                         <div class="equip-details">
-                            <span style="color: var(--accent-blue)">${tt('stats.wingFlights', { count: st.vols, duration: formatDuration(st.timeVols) })}</span>
+                            <span style="color: var(--accent-orange)">${tt('stats.wingFlights', { count: st.vols, duration: formatDuration(st.timeVols) })}</span>
                             <span style="color: #f59e0b">${tt('stats.wingGround', { count: st.gonflages, duration: formatDuration(st.timeGonflages) })}</span>
                         </div>
                         ${(() => {
@@ -421,7 +421,7 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
             html += `
                 <div class="chart-card chart-card-wide">
                     <div class="chart-card-header">
-                        <h3 class="chart-card-title"><i class="ri-graduation-cap-line" style="color: var(--accent-blue)"></i> ${tt('stats.schools')}</h3>
+                        <h3 class="chart-card-title"><i class="ri-graduation-cap-line" style="color: var(--accent-orange)"></i> ${tt('stats.schools')}</h3>
                         <span class="chart-card-subtitle" style="font-size: 0.85rem; color: var(--text-secondary);">${tt('stats.schoolShare', { count: schoolSessions, total: totalVols + totalGonflages })}</span>
                     </div>
                     <div class="chart-card-body">
@@ -431,7 +431,7 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
                     <div class="equip-card" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="ecole" data-stat-value="${escapeHTML(school)}" title="${tt('stats.filterBy', { name: school })}">
                         <div class="equip-name">${escapeHTML(school)}</div>
                         <div class="equip-details">
-                            <span style="color: var(--accent-blue)">${tt('stats.wingFlights', { count: st.vols, duration: formatDuration(st.timeVols) })}</span>
+                            <span style="color: var(--accent-orange)">${tt('stats.wingFlights', { count: st.vols, duration: formatDuration(st.timeVols) })}</span>
                             <span style="color: #f59e0b">${tt('stats.wingGround', { count: st.gonflages, duration: formatDuration(st.timeGonflages) })}</span>
                         </div>
                     </div>
@@ -445,7 +445,7 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
             html += `
                 <div class="chart-card">
                     <div class="chart-card-header">
-                        <h3 class="chart-card-title"><i class="ri-flight-takeoff-line" style="color: var(--accent-blue)"></i> ${tt('stats.flightTypes')}</h3>
+                        <h3 class="chart-card-title"><i class="ri-flight-takeoff-line" style="color: var(--accent-orange)"></i> ${tt('stats.flightTypes')}</h3>
                     </div>
                     <div class="chart-card-body">`;
             for (const [type, count] of Object.entries(volTypes)) {
@@ -457,7 +457,7 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
                             <div class="bar-value">${count} (${Math.round(percent)}%)</div>
                         </div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: ${percent}%; background-color: var(--accent-blue)"></div>
+                            <div class="bar-fill" style="width: ${percent}%; background-color: var(--accent-orange)"></div>
                         </div>
                     </div>
                 `;

@@ -62,7 +62,7 @@ export class SitesListBase extends SitesMapBase {
         if (btn) {
             if (this.state.showComparator) {
                 btn.classList.add('active');
-                btn.innerHTML = `<i class="ri-table-line" style="color: var(--accent-blue);"></i> ${tt('comparator.button')}`;
+                btn.innerHTML = `<i class="ri-table-line" style="color: var(--accent-orange);"></i> ${tt('comparator.button')}`;
                 btn.style.background = 'rgba(59, 130, 246, 0.15)';
                 btn.style.borderColor = 'rgba(59, 130, 246, 0.3)';
             } else {
@@ -407,7 +407,7 @@ export class SitesListBase extends SitesMapBase {
                     const background = dotClass.includes('--incomplete') ? '' : ` background: ${barColor};`;
                     let dotStyle = `flex: 1; height: 100%;${background} transition: all 0.2s; cursor: pointer;`;
                     if (j === SitesService.state.forecastOffset) {
-                        dotStyle += ` outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-blue);`;
+                        dotStyle += ` outline: 1.5px solid var(--text-main); transform: scaleY(1.3); z-index: 5; box-shadow: 0 0 6px var(--accent-orange);`;
                     }
                     timelineBarsHtml += `<div role="button" tabindex="0" class="${dotClass}" style="${dotStyle}" title="${escapeHTML(`${timeStr} : ${statusLabel}`)}" data-action="SitessetForecastOffset" data-args="${j}"></div>`;
                 }
