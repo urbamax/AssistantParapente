@@ -35,6 +35,15 @@ npm run build     # génère dist/ (JS/CSS hachés et minifiés, service worker 
 npm run preview   # sert dist/ en local
 ```
 
+### Vérifier avant d'envoyer (mêmes contrôles que la CI) :
+
+```bash
+npm run verify        # lint, format, typecheck, tests, tests Python, build (≈ 5 s)
+npm run verify:full   # + tests e2e Playwright Chromium et WebKit (≈ 35 s)
+```
+
+Un hook `pre-push` (`.githooks/`, activé par `npm install`) lance `npm run verify` avant chaque `git push` et bloque l'envoi si quelque chose échoue (`git push --no-verify` pour contourner exceptionnellement).
+
 ---
 
 ## 🛠️ Stack Technique

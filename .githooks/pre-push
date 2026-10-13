@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Bloque le push si les contrôles locaux échouent (mêmes étapes que la CI, sans e2e).
+# Pour lancer aussi les tests e2e : npm run verify:full. Contournement exceptionnel : git push --no-verify
+exec "$(git rev-parse --show-toplevel)/scripts/verify.sh"

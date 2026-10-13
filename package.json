@@ -16,7 +16,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc -p jsconfig.json",
-    "sync:functions": "node scripts/sync_functions_shared.mjs"
+    "sync:functions": "node scripts/sync_functions_shared.mjs",
+    "verify": "bash scripts/verify.sh",
+    "verify:full": "bash scripts/verify.sh --e2e",
+    "prepare": "git config core.hooksPath .githooks || true"
   },
   "repository": {
     "type": "git",
