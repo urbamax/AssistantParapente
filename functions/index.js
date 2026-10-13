@@ -57,6 +57,8 @@ async function fetchWeatherForSite(site, { forecastUrl, buildHourlyForecast }) {
 
 exports.checkFavoriteSitesWeather = onSchedule('every 30 minutes', async () => {
     const shared = await loadShared();
+    // Une seule requête Open-Meteo par site et par exécution, même si plusieurs pilotes l'ont en favori.
+    const weatherCache = shared.createSiteWeatherCache((site) => fetchWeatherForSite(site, shared));
     const usersSnap = await db.collection('users').get();
 
     for (const userDoc of usersSnap.docs) {
@@ -83,7 +85,7 @@ exports.checkFavoriteSitesWeather = onSchedule('every 30 minutes', async () => {
             if (!site) continue;
 
             try {
-                const weather = await fetchWeatherForSite(site, shared);
+                const weather = await weatherCache.get(siteId, site);
                 const outcome = shared.evaluateSpotForecast(site, weather, shared.toScoringPrefs(prefs));
                 newState[siteId] = shared.nextState(previousState[siteId], outcome);
 
@@ -108,4 +110,8 @@ exports.checkFavoriteSitesWeather = onSchedule('every 30 minutes', async () => {
 
         await stateRef.set(newState);
     }
+
+    console.log(
+        `Météo des favoris : ${weatherCache.requests} site(s) interrogé(s) pour ${usersSnap.size} utilisateur(s).`,
+    );
 });

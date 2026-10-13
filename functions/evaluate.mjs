@@ -131,3 +131,29 @@ export function buildNotification(site, weather, forecastTimeMs) {
         }),
     };
 }
+
+/**
+ * Mémorise la prévision de chaque site pour la durée d'une exécution de la fonction planifiée.
+ *
+ * Sans cela, un site présent dans les favoris de N pilotes était demandé N fois à Open-Meteo à
+ * chaque passage (toutes les 30 minutes) : risque de dépasser le quota gratuit et de saturer la
+ * fonction. Avec ce cache, chaque site n'est demandé qu'une fois, quel que soit le nombre de
+ * pilotes. La promesse est mémorisée (pas seulement le résultat) : deux pilotes qui demandent le
+ * même site en même temps partagent la même requête, et une erreur réseau est partagée au lieu
+ * d'être retentée pour chaque pilote. Le cache ne doit pas survivre à l'exécution : la météo
+ * serait périmée au passage suivant.
+ * @param {(site: object) => Promise<any>} fetchWeather
+ * @returns {{get: (siteId: string, site: object) => Promise<any>, readonly requests: number}}
+ */
+export function createSiteWeatherCache(fetchWeather) {
+    const byId = new Map();
+    return {
+        get(siteId, site) {
+            if (!byId.has(siteId)) byId.set(siteId, fetchWeather(site));
+            return byId.get(siteId);
+        },
+        get requests() {
+            return byId.size;
+        },
+    };
+}
