@@ -22,7 +22,11 @@ const SCREENS = [
         ['js/views/logbook_igc_import.js', 12],
     ].map(([file, minKeys]) => ({ file, spec: '014', prefix: 'logbook.', dataValues: ['Autre', 'Plouf'], minKeys })),
     // Code de niveau enregistré dans les préférences.
-    { file: 'js/views/sites.js', spec: '015', prefix: 'sites.', dataValues: ['ALL'], minKeys: 80 },
+    // sites.js a été découpé : chaque fichier reste contrôlé.
+    ...[
+        ['js/views/sites.js', 80],
+        ['js/views/sites_forecast.js', 16],
+    ].map(([file, minKeys]) => ({ file, spec: '015', prefix: 'sites.', dataValues: ['ALL'], minKeys })),
     { file: 'js/views/safety.js', spec: '019', prefix: 'safety.', dataValues: [], minKeys: 15 },
     // Codes d'erreur renvoyés au code appelant (jamais affichés) et codes de niveau / catégorie.
     {
