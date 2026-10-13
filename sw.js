@@ -20,6 +20,7 @@ const WEATHER_API_HOSTNAME = 'api.open-meteo.com';
 // que le pilote a réellement ouvert ou affiché, jamais de téléchargement d'avance.
 const COURSE_CACHE = 'parapente-courses-v1'; // cours (PDF) déjà ouverts
 const TILE_CACHE = 'parapente-tiles-v1'; // zones de carte déjà affichées
+const COURSE_CACHE_MAX_BYTES = 80 * 1024 * 1024; // ≈ 4 gros livrets ; le cours le plus anciennement ouvert part d'abord
 const TILE_CACHE_MAX = 1500; // ≈ 35 Mo à ≈ 23 Ko par morceau ; les plus anciens partent d'abord
 const TILE_HOSTNAME = 'server.arcgisonline.com';
 const RUNTIME_CACHES = [COURSE_CACHE, TILE_CACHE];
@@ -362,14 +363,22 @@ async function serveCourse(event, request, url) {
         if (response.status === 200) {
             // Rattaché à l'événement : le navigateur ne doit pas arrêter le service worker avant
             // la fin de l'écriture, sinon la copie hors ligne peut manquer.
-            event.waitUntil(cache.put(key, response.clone()).catch(() => {}));
+            event.waitUntil(
+                cache
+                    .put(key, response.clone())
+                    .then(() => trimCacheBySize(cache, COURSE_CACHE_MAX_BYTES, key))
+                    .catch(() => {}),
+            );
         } else if (response.status === 206) {
             // Le lecteur ne demande que des morceaux : on garde une fois le document entier.
             event.waitUntil(
                 (async () => {
                     if (await cache.match(key)) return;
                     const full = await fetch(key);
-                    if (full.status === 200) await cache.put(key, full);
+                    if (full.status === 200) {
+                        await cache.put(key, full);
+                        await trimCacheBySize(cache, COURSE_CACHE_MAX_BYTES, key);
+                    }
                 })().catch(() => {}),
             );
         }
@@ -392,6 +401,28 @@ async function serveTile(request) {
         trimCache(cache, TILE_CACHE_MAX);
     }
     return response;
+}
+
+/**
+ * Limite le poids total d'un cache : les entrées les plus anciennes (ordre d'insertion) sont
+ * retirées d'abord, jamais `keepKey` (le document qui vient d'être enregistré, même s'il dépasse
+ * seul la limite : il doit rester lisible hors ligne).
+ */
+async function trimCacheBySize(cache, maxBytes, keepKey) {
+    const keys = await cache.keys();
+    const sizes = [];
+    let total = 0;
+    for (const request of keys) {
+        const response = await cache.match(request);
+        const size = response ? (await response.blob()).size : 0;
+        sizes.push(size);
+        total += size;
+    }
+    for (let i = 0; i < keys.length && total > maxBytes; i++) {
+        if (keys[i].url === keepKey) continue;
+        await cache.delete(keys[i]);
+        total -= sizes[i];
+    }
 }
 
 /** Limite le nombre d'entrées : les plus anciennes (ordre d'insertion) sont retirées d'abord. */
