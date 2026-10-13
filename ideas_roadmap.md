@@ -14,8 +14,8 @@ Ce fichier centralise les concepts techniques et les idées d'amélioration vali
 ### Priorités actuelles
 1. Valider les seuils de la classification de vol (`CLASSIFICATION` dans `js/services/flight_classifier.js`) sur de vrais fichiers IGC : soaring de crête, journée thermique, cross.
 2. Météo multi-sites : « meilleur créneau » sur 7 jours et comparateur de sites favoris (le meilleur créneau par site existe déjà).
-3. Répétition espacée du mode Révision du QCM.
-4. Alertes de révision du matériel en notification, avant l'échéance.
+3. Alertes de révision du matériel en notification, avant l'échéance.
+4. Répétition espacée : facteur de difficulté par question (SM-2 complet) et rappel des questions à réviser (voir le point 5 de la phase 3).
 
 ### Secondaire
 - Brief pré-vol unifié (météo + brevet + matériel) : toutes les briques existent, il manque l'écran. Pas jugé utile pour le moment ; l'emplacement (fiche d'un site ou écran dédié) reste à décider.
@@ -139,8 +139,8 @@ Un tableau côte-à-côte du score d'exploitabilité de plusieurs sites favoris 
 
 ## 🎓 8. Théorie & Sécurité (validé 2026-09-14)
 
-### Spaced repetition réelle pour le mode Révision QCM
-*Le mode Révision existe mais reste basé sur le ratio de réussite, sans dimension temporelle.*
+### Spaced repetition réelle pour le mode Révision QCM — ✅ FAIT (vérifié 2026-10-13)
+*Correction : cette note était périmée. Le mode Révision planifie déjà les questions dans le temps : série de bonnes réponses (`streak`) et date de dernière présentation (`lastSeen`), intervalles de 0, 1, 3, 7, 14 puis 30 jours, états fusionnés entre appareils. Fait en plus (spec 035) : logique extraite et testée dans `js/services/review_scheduler.js`, ligne « À réviser : N · Nouvelles : M » dans l'écran du mode, message honnête quand rien n'est à réviser.*
 `js/services/quiz_service.js` (`startSession`, mode `REVISION`, ligne ~203) filtre déjà les questions par ratio de réussite (< 75% = à revoir), mais sans notion temporelle : une question ratée une fois il y a 6 mois pèse pareil qu'une ratée hier. Ajouter un vrai espacement (type SM-2 simplifié : intervalle qui grandit à chaque bonne réponse, se réinitialise à une erreur) rendrait la révision plus efficace qu'un simple seuil fixe.
 
 ### Content-Security-Policy — ✅ FAIT (vérifié 2026-10-11)
@@ -165,7 +165,8 @@ Tronquer automatiquement la fin de la trace IGC (la marche vers la voiture) en d
 *À l'import d'une trace dans une nouvelle session, le type est pré-rempli et la ligne sous le formulaire dit pourquoi ; un type choisi par le pilote n'est jamais remplacé (`js/services/flight_classifier.js`, spec 034). Règles : Treuil (remorquage détecté), Cross (thermique ≥ 50 m et distance libre ≥ 15 km), Thermique, Soaring (≥ 10 min, vario moyen ≥ -0,6 m/s, sans thermique, au moins 3 demi-tours), sinon Plouf. « Restit » ne se lit pas dans une trace. Les seuils sont des estimations, validées sur des traces synthétiques et un seul vol réel : à ajuster sur d'autres vols (priorité 2). Reste du point d'origine : le graphique de répartition.*
 L'app tague le vol (Plouf, Thermique, Soaring, Cross) en analysant la géométrie de la trace (virages 360, inversions de cap, distance max). Affichage d'un graphique de répartition.
 
-### 5. Apprentissage Espacé "Spaced Repetition" (QCM)
+### 5. Apprentissage Espacé "Spaced Repetition" (QCM) — 🟡 PARTIEL (vérifié 2026-10-13)
+*Fait : intervalles croissants 1, 3, 7, 14, 30 jours selon la série de bonnes réponses, remise à zéro à l'erreur, tirage prioritaire des questions échues, affichage du nombre de questions à réviser. Reste : le facteur de difficulté par question de SM-2 (intervalles fixes aujourd'hui) et un rappel (notification) des questions à réviser.*
 Algorithme SM-2. Bonne réponse = intervalle grandi (1j, 3j, 7j). Mauvaise réponse = reset. Tirage prioritaire des questions échues.
 
 ### 6. Indicateur de Synchronisation Cloud discret — ✅ FAIT (vérifié 2026-10-11)

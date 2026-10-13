@@ -657,3 +657,10 @@ body.light-mode .bank-choice.correct {
     font-weight: 700;
     opacity: 0.8;
 }
+
+/* Mode Révision : bilan de la répétition espacée sous la description du mode (spec 035) */
+.revision-summary {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--accent-blue);
+}
