@@ -138,10 +138,10 @@ const CRITICAL_ASSETS = [
     './js/views/manual.js',
     './js/views/quiz.js',
     './js/views/sites.js',
-    './js/views/sites_forecast.js
-js/views/sites_list.js
-js/views/sites_map.js
-js/views/sites_strings.js',
+    './js/views/sites_forecast.js',
+    './js/views/sites_list.js',
+    './js/views/sites_map.js',
+    './js/views/sites_strings.js',
     './js/views/welcome.js',
     './js/views/safety.js',
     './js/components/map_3d.js',
