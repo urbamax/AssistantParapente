@@ -12,11 +12,13 @@ Ce fichier centralise les concepts techniques et les idées d'amélioration vali
 - Découpage de `js/views/logbook.js` : 3 757 → ~1 180 lignes, en classes de base par onglet (matériel, stats, historique) et par rôle (coordonnées, sites, listes, pré-remplissage, import IGC).
 
 ### Priorités actuelles
-1. Brief pré-vol unifié (météo + brevet + matériel) : toutes les briques existent, il manque l'écran.
-2. Valider les seuils de la classification de vol (`CLASSIFICATION` dans `js/services/flight_classifier.js`) sur de vrais fichiers IGC : soaring de crête, journée thermique, cross.
-3. Météo multi-sites : « meilleur créneau » sur 7 jours et comparateur de sites favoris (le meilleur créneau par site existe déjà).
-4. Répétition espacée du mode Révision du QCM.
-5. Alertes de révision du matériel en notification, avant l'échéance.
+1. Valider les seuils de la classification de vol (`CLASSIFICATION` dans `js/services/flight_classifier.js`) sur de vrais fichiers IGC : soaring de crête, journée thermique, cross.
+2. Météo multi-sites : « meilleur créneau » sur 7 jours et comparateur de sites favoris (le meilleur créneau par site existe déjà).
+3. Répétition espacée du mode Révision du QCM.
+4. Alertes de révision du matériel en notification, avant l'échéance.
+
+### Secondaire
+- Brief pré-vol unifié (météo + brevet + matériel) : toutes les briques existent, il manque l'écran. Pas jugé utile pour le moment ; l'emplacement (fiche d'un site ou écran dédié) reste à décider.
 
 ---
 
@@ -110,7 +112,7 @@ Les périodes de révision (mois/heures) sont déjà définies dans `js/data/equ
 
 ## ✈️ 6. Vue d'ensemble & Confort (validé 2026-09-14)
 
-### Brief pré-vol unifié — priorité 1
+### Brief pré-vol unifié — secondaire
 *Les check-lists de prévol existent dans `safety.js` mais ne sont pas liées à la météo ni au matériel.*
 Une vue unique combinant météo du site + niveau de brevet requis (BI/BP/BPC) + état des révisions matériel, plutôt que de checker ces trois choses séparément avant de partir voler. Capitalise sur les sections 4 et 5 ci-dessus.
 
