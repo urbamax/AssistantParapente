@@ -3,7 +3,7 @@ import AppRouter from '../core/router.js';
 import QuizService from '../services/quiz_service.js';
 import StorageService from '../services/storage.js';
 import { escapeHTML } from '../core/security.js';
-import { formatDateTime } from '../utils/date_utils.js';
+import { formatDateTime, formatDateOnly } from '../utils/date_utils.js';
 import { truncate } from '../utils/text_utils.js';
 import { toSorted } from '../utils/array_utils.js';
 import { COURSES_DATA } from '../data/courses_data.js';
@@ -294,6 +294,7 @@ class QuizViewClass extends BaseView {
     handleChange(e) {
         if (e.target.id === 'qcm-theme-select') {
             QuizService.setTheme(e.target.value);
+            this.updateRevisionSummary();
         } else if (e.target.id === 'bank-theme-filter' || e.target.id === 'bank-search') {
             const select = /** @type {HTMLSelectElement} */ (document.getElementById('bank-theme-filter'));
             this.renderBankContent(select ? select.value : 'ALL');
@@ -437,6 +438,8 @@ class QuizViewClass extends BaseView {
             }
         }
 
+        this.updateRevisionSummary();
+
         const trainingOptions = document.getElementById('training-options');
         if (trainingOptions) {
             if (mode === 'EXAM') {
@@ -458,6 +461,33 @@ class QuizViewClass extends BaseView {
 
         const masteryOptions = document.getElementById('mastery-options');
         if (masteryOptions) masteryOptions.style.display = mode === 'MASTERY' ? '' : 'none';
+    }
+
+    // Mode Révision : combien de questions sont à réviser, et pourquoi la session peut proposer des
+    // questions qui ne sont pas encore à réviser (spec 035).
+    updateRevisionSummary() {
+        const el = document.getElementById('revision-summary');
+        if (!el) return;
+        if (QuizService.state.qcmConfig.mode !== 'REVISION' || !QuizService.state.isLoaded) {
+            el.hidden = true;
+            el.textContent = '';
+            return;
+        }
+        const level = (typeof GlobalState !== 'undefined' && GlobalState.get('level')) || 'BI';
+        const summary = QuizService.getReviewSummary(level);
+        if (summary.total === 0) {
+            el.hidden = true;
+            el.textContent = '';
+            return;
+        }
+        if (summary.due + summary.fresh > 0) {
+            el.textContent = tql('modes.revisionSummary', { due: summary.due, fresh: summary.fresh });
+        } else if (summary.nextDueAt !== null) {
+            el.textContent = tql('modes.revisionNothingDue', { date: formatDateOnly(new Date(summary.nextDueAt)) });
+        } else {
+            el.textContent = tql('modes.revisionNothingDueNoDate');
+        }
+        el.hidden = false;
     }
 
     updateMasteryTargetUI(target, targetBtn) {

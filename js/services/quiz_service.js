@@ -1,6 +1,7 @@
 import StorageService from './storage.js';
 import { toSorted } from '../utils/array_utils.js';
 import { t } from '../utils/i18n.js';
+import { dueScore, summarizeReviews } from './review_scheduler.js';
 
 class QuizService {
     constructor() {
@@ -399,9 +400,8 @@ class QuizService {
         };
     }
 
-    startSession(level = 'BI') {
-        if (!this.state.isLoaded) throw new Error('Données QCM non chargées');
-
+    // Questions proposables pour un niveau (BI, BP, BPC, TREUIL ou tout), sans filtre de thème.
+    getLevelQuestions(level = 'BI') {
         let sourceData = this.getQuestions();
         const excludedPrefixes = ['H', 'R', 'X'];
         sourceData = sourceData.filter((q) => !excludedPrefixes.includes(q.code.charAt(0)));
@@ -416,6 +416,22 @@ class QuizService {
         } else if (level === 'TREUIL') {
             sourceData = sourceData.filter((q) => hasLevel(q.code, 'T'));
         }
+        return sourceData;
+    }
+
+    // Bilan de la répétition espacée pour le niveau et le thème choisis : combien de questions sont
+    // nouvelles, à réviser ou pas encore à réviser, et la prochaine échéance (voir review_scheduler.js).
+    getReviewSummary(level = 'BI') {
+        const theme = this.state.qcmConfig.theme;
+        let questions = this.getLevelQuestions(level);
+        if (theme && theme !== 'ALL') questions = questions.filter((q) => q.theme === theme);
+        return summarizeReviews(questions, this.getPersistentStats().questions || {});
+    }
+
+    startSession(level = 'BI') {
+        if (!this.state.isLoaded) throw new Error('Données QCM non chargées');
+
+        let sourceData = this.getLevelQuestions(level);
 
         let count = this.state.qcmConfig.count;
         const selectedTheme = this.state.qcmConfig.mode === 'EXAM' ? 'ALL' : this.state.qcmConfig.theme;
@@ -427,30 +443,10 @@ class QuizService {
             const stats = this.getPersistentStats();
             if (selectedTheme !== 'ALL') sourceData = sourceData.filter((q) => q.theme === selectedTheme);
 
-            // Spaced repetition : l'intervalle avant la prochaine révision grandit avec le nombre
-            // de bonnes réponses consécutives (streak, déjà suivi dans updateStats), et repart de
-            // zéro à la moindre erreur. Une question jamais vue est toujours prioritaire ; parmi
-            // les questions déjà vues, la plus en retard sur son échéance passe en premier (le
-            // ratio de réussite ne sert plus que de départage à échéance égale).
-            const REVIEW_INTERVALS_DAYS = [0, 1, 3, 7, 14, 30];
-            const DAY_MS = 24 * 60 * 60 * 1000;
+            // Répétition espacée (voir review_scheduler.js) : une question jamais vue passe en premier,
+            // puis la plus en retard sur son échéance.
             const now = Date.now();
-
-            const getDueScore = (q) => {
-                const s = stats.questions[q.code];
-                if (!s || s.total === 0) return Infinity; // jamais tentée
-                const ratio = s.correct / s.total;
-                if (!s.lastSeen) {
-                    // Statistique enregistrée avant l'introduction du suivi temporel (pas de
-                    // lastSeen) : on retombe sur l'ancien critère de seuil de ratio pour ne pas
-                    // casser l'historique existant tant que la question n'a pas été retentée.
-                    return 0.75 - ratio;
-                }
-                const streak = s.streak || 0;
-                const intervalDays = REVIEW_INTERVALS_DAYS[Math.min(streak, REVIEW_INTERVALS_DAYS.length - 1)];
-                const daysSinceSeen = (now - s.lastSeen) / DAY_MS;
-                return daysSinceSeen - intervalDays - ratio;
-            };
+            const getDueScore = (q) => dueScore(stats.questions[q.code], now);
 
             // On mélange d'abord (comme l'ancienne implémentation) puis on trie par échéance :
             // le tri étant stable, les questions à égalité de priorité (ex: toutes "jamais vues")

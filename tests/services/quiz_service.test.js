@@ -158,3 +158,66 @@ describe('QuizService - chargement hors ligne', () => {
         for (const [url] of fetchMock.mock.calls) expect(url).not.toContain('?');
     });
 });
+
+describe('QuizService - Révision espacée (échéances)', () => {
+    const DAY = 24 * 60 * 60 * 1000;
+    const questions = [
+        { code: 'A01V', theme: 'Météo', question: 'Q1' },
+        { code: 'A02V', theme: 'Météo', question: 'Q2' },
+        { code: 'A03V', theme: 'Météo', question: 'Q3' },
+        { code: 'P01V', theme: 'Pilotage', question: 'Q4' },
+        { code: 'P02B', theme: 'Pilotage', question: 'Q5' }, // niveau BP seulement
+    ];
+    const stat = (streak, daysAgo) => ({ total: 4, correct: 4, streak, lastSeen: Date.now() - daysAgo * DAY });
+
+    beforeEach(() => {
+        QuizService.setQuestions(questions);
+        QuizService.state.isLoaded = true;
+        QuizService.state.qcmConfig.mode = 'REVISION';
+        QuizService.state.qcmConfig.count = 'ALL';
+        QuizService.state.qcmConfig.theme = 'ALL';
+    });
+
+    it('proposes only the questions that are due, the most overdue first', () => {
+        StorageService.set(StorageService.KEYS.QCM_STATS, {
+            themes: {},
+            questions: {
+                A01V: stat(2, 40), // due depuis longtemps
+                A02V: stat(2, 4.5), // due depuis peu (3 + 1 = 4 jours)
+                A03V: stat(5, 2), // pas due avant 31 jours
+                // P01V jamais vue : toujours en premier
+            },
+        });
+        QuizService.startSession('BI');
+        expect(QuizService.state.qcmSessionData.map((q) => q.code)).toEqual(['P01V', 'A01V', 'A02V']);
+    });
+
+    it('falls back on the questions closest to their due date when nothing is due', () => {
+        StorageService.set(StorageService.KEYS.QCM_STATS, {
+            themes: {},
+            questions: {
+                A01V: stat(5, 2),
+                A02V: stat(5, 20), // la plus proche de son échéance
+                A03V: stat(5, 1),
+                P01V: stat(5, 3),
+            },
+        });
+        QuizService.startSession('BI');
+        const codes = QuizService.state.qcmSessionData.map((q) => q.code);
+        expect(codes).toHaveLength(4);
+        expect(codes[0]).toBe('A02V');
+    });
+
+    it('getReviewSummary counts for the level, and for the chosen theme', () => {
+        StorageService.set(StorageService.KEYS.QCM_STATS, {
+            themes: {},
+            questions: { A01V: stat(2, 40), A02V: stat(5, 2) },
+        });
+        // Niveau BI : A01V, A02V, A03V, P01V (P02B est BP seulement)
+        expect(QuizService.getReviewSummary('BI')).toMatchObject({ total: 4, fresh: 2, due: 1, notDue: 1 });
+        expect(QuizService.getReviewSummary('BP')).toMatchObject({ total: 1, fresh: 1 });
+
+        QuizService.state.qcmConfig.theme = 'Pilotage';
+        expect(QuizService.getReviewSummary('BI')).toMatchObject({ total: 1, fresh: 1, due: 0 });
+    });
+});
