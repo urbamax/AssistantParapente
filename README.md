@@ -79,7 +79,7 @@ Le code source est © Maxime Urbaniak, **tous droits réservés** (voir `LICENSE
 - `js/services/` : Services métiers et API (`sites_service.js`, `logbook_service.js`, `quiz_service.js`, `firebase_service.js`, `igc_parser.js`).
 - `js/components/` : Composants 3D MapLibre GL (`map_3d.js`).
 - `css/` : Style modulaire Vanilla CSS (Thèmes Auto/Clair/Sombre et accents selon le niveau FFVL).
-- `courses/` : Fichiers PDF officiels classés par niveau de brevet.
+- `courses/` : documents pédagogiques de la FFVL, **absents du dépôt** (propriété de la FFVL et de leurs auteurs, voir `NOTICE`) ; le site les sert depuis son propre serveur.
 
 ---
 
