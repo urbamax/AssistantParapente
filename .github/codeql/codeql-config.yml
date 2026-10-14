@@ -1,7 +1,10 @@
 # Bibliothèques tierces (SDK, cartes) et fichiers générés : analysés par leurs auteurs, pas ici.
+# tests/ : code de développement jamais servi (nginx le bloque) ; il relit nos propres fichiers
+# (index.html, catalogue) et déclenchait de faux positifs « XSS » sur des entrées de confiance.
 paths-ignore:
   - vendor
   - node_modules
   - dist
   - functions/shared
   - js/data
+  - tests
