@@ -121,6 +121,7 @@ const CRITICAL_ASSETS = [
     './js/utils/array_utils.js',
     './js/utils/date_utils.js',
     './js/utils/download.js',
+    './js/utils/emitter.js',
     './js/utils/geo_utils.js',
     './js/utils/i18n.js',
     './js/utils/i18n_dom.js',
