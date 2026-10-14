@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Reproduit la CI GitHub (.github/workflows/ci.yml) en local, le plus fidèlement possible.
 #   scripts/verify.sh          -> job « lint-and-test »
-#   scripts/verify.sh --e2e    -> + job « e2e » (Playwright Chromium + WebKit)
+#   scripts/verify.sh --e2e    -> + job « e2e » (installe les navigateurs Playwright, puis Chromium + WebKit)
 #
 # Ce que ça reproduit comme la CI : un clone propre du commit courant (pas ton dossier de travail),
 # fusionné avec le dernier origin/main (la CI teste le résultat de la fusion), Node 22, `npm ci`,
@@ -62,6 +62,12 @@ run_ci() {
     step "tests python ($(python3 -V))"; python3 -m unittest discover -s tests/scripts
     step "build";                     npm run --silent build
     if [[ "$2" == "1" ]]; then
+        # Comme la CI (« npx playwright install »). Les navigateurs ne sont pas dans node_modules : ils sont
+        # rangés par version de Playwright dans ~/Library/Caches/ms-playwright, donc une mise à jour de
+        # Playwright (Dependabot) en exige de nouveaux. Instantané quand ils sont déjà à la bonne version ;
+        # sinon un téléchargement (quelques centaines de Mo) depuis le CDN officiel de Playwright.
+        step "navigateurs Playwright (Chromium + WebKit)"
+        npx playwright install chromium webkit
         step "e2e (Chromium + WebKit, CI=true : 1 worker, 2 relances)"
         npm run --silent test:e2e
     fi
