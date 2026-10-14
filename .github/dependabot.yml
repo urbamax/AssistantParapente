@@ -27,6 +27,15 @@ updates:
         update-types:
           - minor
           - patch
+    # firebase 13 exige @firebase/rules-unit-testing 6, qui exige Node >= 24.12, alors que la CI et
+    # scripts/verify.sh tournent sur Node 22. Dependabot ne peut proposer que firebase seul (échec à
+    # l'installation). La montée de version est une décision volontaire : passer le projet à Node 24
+    # (CI, verify.sh, functions), puis monter les deux paquets ensemble avec `npm run test:rules`.
+    ignore:
+      - dependency-name: firebase
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@firebase/rules-unit-testing'
+        update-types: ['version-update:semver-major']
 
   # Cloud Function : ses dépendances sont figées à leur version majeure. La CI n'exécute jamais
   # functions/index.js ; une mise à jour majeure (ex. firebase-admin 14 exige Node 22, la fonction
