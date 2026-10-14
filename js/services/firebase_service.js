@@ -8,7 +8,6 @@ import AppRouter from '../core/router.js';
 import GlobalState from '../core/app_state.js';
 import SitesService, { migrateSitePrefs } from './sites_service.js';
 import LogbookService from './logbook_service.js';
-import QuizView from '../views/quiz.js';
 import { t } from '../utils/i18n.js';
 
 // We inject the original code but export the Engine
@@ -808,7 +807,8 @@ export const FirebaseAuthEngine = {
             // l'architecture services/vues (js/core/main.js) — ce rafraîchissement post-sync
             // ne faisait donc plus jamais rien. Corrigé en important directement les modules
             // (SitesService/LogbookService/QuizView).
-            QuizView.renderStats();
+            // Les statistiques ne se rafraîchissent que si l'écran a déjà été chargé (sinon rien n'est affiché).
+            AppRouter.getView('STATS')?.renderStats?.();
 
             // Refresh sites list so that limits, favorites and locations are re-applied
             SitesService.loadUserPreferences();
