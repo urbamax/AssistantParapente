@@ -50,20 +50,23 @@ const isLazy = (entry) => Boolean(entry && entry[LAZY]);
  * vue renvoie null, comme l'ancien `vue[action] ? vue[action](…) : null`.
  * Toujours asynchrone : à attendre quand l'ordre compte.
  * @param {ReturnType<typeof lazyViewModule>} module
+ * @returns {Record<string, (...args: any[]) => Promise<any>>} n'importe quelle méthode de la vue, en asynchrone
  */
 export function viewProxy(module) {
-    return new Proxy(
-        {},
-        {
-            get(_target, property) {
-                // Jamais « then » ni un symbole : le proxy ne doit pas passer pour une promesse.
-                if (typeof property === 'symbol' || property === 'then') return undefined;
-                return async (...args) => {
-                    const view = await module.load();
-                    return typeof view[property] === 'function' ? view[property](...args) : null;
-                };
+    return /** @type {any} */ (
+        new Proxy(
+            {},
+            {
+                get(_target, property) {
+                    // Jamais « then » ni un symbole : le proxy ne doit pas passer pour une promesse.
+                    if (typeof property === 'symbol' || property === 'then') return undefined;
+                    return async (...args) => {
+                        const view = await module.load();
+                        return typeof view[property] === 'function' ? view[property](...args) : null;
+                    };
+                },
             },
-        },
+        )
     );
 }
 
