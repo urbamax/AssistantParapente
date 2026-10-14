@@ -48,6 +48,18 @@ describe('mises à jour automatiques et signalement', () => {
     it('Dependabot surveille aussi le dossier functions', () => {
         expect(dependabot).toContain('directory: /functions');
     });
+    it('regroupe les paquets qui doivent évoluer ensemble (une PR isolée échouerait à l’installation)', () => {
+        expect(dependabot).toMatch(/firebase-test-tools:[\s\S]*?'firebase'[\s\S]*?'@firebase\/\*'/);
+        expect(dependabot).toMatch(/vitest:[\s\S]*?'vitest'[\s\S]*?'@vitest\/\*'/);
+        expect(dependabot).toMatch(/github-actions:\n\s+patterns:\n\s+- '\*'/);
+    });
+    it('ne laisse pas passer de mise à jour majeure de la Cloud Function sans décision (Node 22, émulateur)', () => {
+        for (const name of ['firebase-admin', 'firebase-functions']) {
+            expect(dependabot).toMatch(
+                new RegExp(`dependency-name: ${name}\\n\\s+update-types: \\['version-update:semver-major'\\]`),
+            );
+        }
+    });
     it('SECURITY.md demande un signalement privé', () => {
         expect(read('SECURITY.md')).toMatch(/do not open a public issue/i);
     });
