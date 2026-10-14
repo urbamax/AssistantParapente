@@ -26,7 +26,7 @@ const welcomeModule = lazyViewModule(() => import('../views/welcome.js'));
 const safetyModule = lazyViewModule(() => import('../views/safety.js'));
 
 // Mêmes noms qu'avant pour les gestionnaires de clics ci-dessous : chaque méthode appelée charge l'écran
-// si besoin puis l'exécute (asynchrone ; une méthode absente renvoie null).
+// si besoin puis l'exécute (immédiat si l'écran est déjà chargé, asynchrone sinon ; méthode absente = null).
 const QuizView = viewProxy(quizModule);
 const LogbookView = viewProxy(logbookModule);
 const SitesView = viewProxy(sitesModule);
@@ -55,8 +55,10 @@ async function bootApplication() {
     const globalInput = document.getElementById('global-igc-input');
     if (globalInput) {
         globalInput.addEventListener('change', (e) => {
-            const files = /** @type {HTMLInputElement} */ (e.target).files;
-            if (!files || !files.length) return;
+            // Copie de la liste : `input.files` est vivante, `value = ''` plus bas la vide. L'écran du carnet peut ne
+            // pas être encore chargé, auquel cas _processFiles s'exécute après cet appel et ne verrait plus rien.
+            const files = Array.from(/** @type {HTMLInputElement} */ (e.target).files ?? []);
+            if (!files.length) return;
             // Réutilise le traitement de logbook.js (parsing + remplissage + géolocalisation
             // du site par reverse-geocoding) plutôt qu'une copie qui en divergeait et
             // laissait le site à "Lieu détecté (GPS)" sans jamais le résoudre.

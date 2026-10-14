@@ -32,6 +32,15 @@ describe('chargement à la demande des écrans', () => {
         expect(offenders).toEqual([]);
     });
 
+    it('le champ d’import IGC global copie sa liste de fichiers avant d’appeler le carnet (liste vivante)', () => {
+        const main = read('js/core/main.js');
+        const handler = main.slice(main.indexOf("getElementById('global-igc-input')"));
+        const beforeCall = handler.slice(0, handler.indexOf('LogbookView._processFiles('));
+        expect(beforeCall).toContain('Array.from(');
+        // et ne passe jamais la liste vivante telle quelle
+        expect(beforeCall).not.toMatch(/const files = \/\*\* @type \{HTMLInputElement\} \*\/ \(e\.target\)\.files;/);
+    });
+
     it('les routes enregistrent des écrans à la demande, partagés pour QCM, QCM_BANK et STATS', () => {
         const main = read('js/core/main.js');
         for (const mode of ['QCM', 'QCM_BANK', 'STATS']) {

@@ -190,6 +190,55 @@ describe('viewProxy', () => {
         expect(view.greet).toHaveBeenCalledWith('x', 2);
     });
 
+    it('une vue déjà chargée est appelée tout de suite, de façon synchrone, comme un appel direct', async () => {
+        const order = [];
+        const view = makeView({
+            act: vi.fn(() => {
+                order.push('méthode exécutée');
+                return 'résultat';
+            }),
+        });
+        const module = lazyViewModule(async () => ({ default: view }));
+        const proxy = viewProxy(module);
+        await module.load();
+
+        order.push('avant l’appel');
+        const result = proxy.act();
+        order.push('après l’appel');
+
+        // Pas de promesse, pas d'attente : la méthode a déjà tourné quand l'appel rend la main.
+        expect(order).toEqual(['avant l’appel', 'méthode exécutée', 'après l’appel']);
+        expect(result).toBe('résultat');
+    });
+
+    it('une vue déjà chargée voit encore la liste de fichiers vivante d’un champ, avant qu’on le vide', async () => {
+        // Régression : main.js appelle la vue puis vide le champ (value = ''), ce qui vide aussi input.files.
+        const input = document.createElement('input');
+        input.type = 'file';
+        const live = { items: ['trace.igc'] }; // liste vivante simulée
+        const seen = [];
+        const module = lazyViewModule(async () => ({
+            default: makeView({ importFiles: (list) => seen.push(...list.items) }),
+        }));
+        const proxy = viewProxy(module);
+        await module.load();
+
+        proxy.importFiles(live);
+        live.items = []; // ce que fait « input.value = '' » juste après l'appel
+        expect(seen).toEqual(['trace.igc']);
+        void input;
+    });
+
+    it('le premier appel, avant le chargement, renvoie une promesse et s’exécute une fois la vue chargée', async () => {
+        const view = makeView({ act: vi.fn(() => 'ok') });
+        const proxy = viewProxy(lazyViewModule(async () => ({ default: view })));
+        const pending = proxy.act();
+        expect(pending).toBeInstanceOf(Promise);
+        expect(view.act).not.toHaveBeenCalled();
+        expect(await pending).toBe('ok');
+        expect(view.act).toHaveBeenCalledTimes(1);
+    });
+
     it('une méthode absente de la vue renvoie null (comme l’ancien « vue[action] ? … : null »)', async () => {
         const proxy = viewProxy(lazyViewModule(async () => ({ default: makeView() })));
         expect(await proxy.nexistePas('a')).toBeNull();

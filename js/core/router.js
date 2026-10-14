@@ -48,9 +48,14 @@ const isLazy = (entry) => Boolean(entry && entry[LAZY]);
  * Remplace une vue pas encore chargée dans le code qui l'appelle (gestionnaires de clics de main.js) :
  * chaque méthode appelée charge l'écran si besoin, puis l'exécute. Une méthode qui n'existe pas sur la
  * vue renvoie null, comme l'ancien `vue[action] ? vue[action](…) : null`.
- * Toujours asynchrone : à attendre quand l'ordre compte.
+ *
+ * Si l'écran est déjà chargé, la méthode est appelée TOUT DE SUITE, de façon synchrone, et son résultat
+ * est renvoyé tel quel : même déroulement qu'un appel direct (l'événement du navigateur n'est pas fini,
+ * `e.preventDefault()` agit, une liste de fichiers vivante n'est pas encore vidée). Seul le premier
+ * appel, avant le chargement, est asynchrone : il renvoie alors une promesse (à attendre si l'ordre compte).
+ * Dans ce cas, ne pas s'appuyer sur un objet vivant du navigateur (FileList, événement) : le copier avant.
  * @param {ReturnType<typeof lazyViewModule>} module
- * @returns {Record<string, (...args: any[]) => Promise<any>>} n'importe quelle méthode de la vue, en asynchrone
+ * @returns {Record<string, (...args: any[]) => any>} n'importe quelle méthode de la vue (promesse seulement avant le chargement)
  */
 export function viewProxy(module) {
     return /** @type {any} */ (
@@ -60,9 +65,10 @@ export function viewProxy(module) {
                 get(_target, property) {
                     // Jamais « then » ni un symbole : le proxy ne doit pas passer pour une promesse.
                     if (typeof property === 'symbol' || property === 'then') return undefined;
-                    return async (...args) => {
-                        const view = await module.load();
-                        return typeof view[property] === 'function' ? view[property](...args) : null;
+                    return (...args) => {
+                        const call = (view) => (typeof view[property] === 'function' ? view[property](...args) : null);
+                        const loaded = module.peek();
+                        return loaded ? call(loaded) : module.load().then(call);
                     };
                 },
             },
