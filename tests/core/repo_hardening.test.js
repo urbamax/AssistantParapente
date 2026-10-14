@@ -60,6 +60,13 @@ describe('mises à jour automatiques et signalement', () => {
             );
         }
     });
+    it('ne propose pas firebase 13 seul : il exige rules-unit-testing 6, donc Node 24 (la CI est en Node 22)', () => {
+        for (const name of ['firebase', "'@firebase/rules-unit-testing'"]) {
+            expect(dependabot).toMatch(
+                new RegExp(`dependency-name: ${name}\\n\\s+update-types: \\['version-update:semver-major'\\]`),
+            );
+        }
+    });
     it('SECURITY.md demande un signalement privé', () => {
         expect(read('SECURITY.md')).toMatch(/do not open a public issue/i);
     });
