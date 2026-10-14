@@ -4,7 +4,7 @@
  */
 
 import GlobalState from './app_state.js';
-import AppRouter from './router.js';
+import AppRouter, { lazyViewModule, viewProxy } from './router.js';
 import AppEvents from './events.js';
 import UIManager from './ui_manager.js';
 import StorageService from '../services/storage.js';
@@ -12,15 +12,26 @@ import GdprEngine from '../gdpr_engine.js';
 import SitesService from '../services/sites_service.js';
 import { initAppUpdateNotifier } from './app_update.js';
 
-// Import Views
-import QuizView from '../views/quiz.js';
-import LogbookView from '../views/logbook.js';
-import SitesView from '../views/sites.js';
-import LibraryView from '../views/manual.js';
 import QuizService from '../services/quiz_service.js';
-import WelcomeView from '../views/welcome.js';
-import SafetyView from '../views/safety.js';
 import { resolveStartMode } from './start_mode.js';
+
+// Écrans chargés à la demande (code-splitting) : aucun n'est importé statiquement, donc chacun a son
+// propre fichier, téléchargé au premier passage sur l'écran ou au premier clic sur l'une de ses
+// commandes. Ne pas les réimporter ici ni depuis un service (tests/core/route_code_splitting.test.js).
+const quizModule = lazyViewModule(() => import('../views/quiz.js'));
+const logbookModule = lazyViewModule(() => import('../views/logbook.js'));
+const sitesModule = lazyViewModule(() => import('../views/sites.js'));
+const libraryModule = lazyViewModule(() => import('../views/manual.js'));
+const welcomeModule = lazyViewModule(() => import('../views/welcome.js'));
+const safetyModule = lazyViewModule(() => import('../views/safety.js'));
+
+// Mêmes noms qu'avant pour les gestionnaires de clics ci-dessous : chaque méthode appelée charge l'écran
+// si besoin puis l'exécute (asynchrone ; une méthode absente renvoie null).
+const QuizView = viewProxy(quizModule);
+const LogbookView = viewProxy(logbookModule);
+const SitesView = viewProxy(sitesModule);
+const LibraryView = viewProxy(libraryModule);
+const SafetyView = viewProxy(safetyModule);
 
 async function bootApplication() {
     console.time('BOOT_TOTAL');
@@ -243,13 +254,15 @@ async function bootApplication() {
         if (e.key === 'Escape') closeNavSubMenus();
     });
     AppEvents.register('openLogbookSection', async (section) => {
-        LogbookView.currentTab = section;
+        // La vue doit exister avant d'écrire dans son état : on la charge explicitement.
+        const logbook = await AppRouter.loadView('LOGBOOK');
+        logbook.currentTab = section;
         if (GlobalState.get('mode') !== 'LOGBOOK') await AppRouter.navigate('LOGBOOK');
-        else LogbookView.switchTab(section);
+        else logbook.switchTab(section);
     });
     AppEvents.register('openSafetySection', async (section) => {
         if (GlobalState.get('mode') !== 'SAFETY') await AppRouter.navigate('SAFETY');
-        SafetyView.switchTab(section);
+        await SafetyView.switchTab(section);
     });
     AppEvents.register('importDataFile', (_value, _e, target) => {
         const file = target.files[0];
@@ -320,14 +333,14 @@ async function bootApplication() {
             if (startScreen) startScreen.classList.remove('active');
         },
     });
-    AppRouter.register('QCM', QuizView);
-    AppRouter.register('QCM_BANK', QuizView);
-    AppRouter.register('STATS', QuizView);
-    AppRouter.register('LOGBOOK', LogbookView);
-    AppRouter.register('SITES', SitesView);
-    AppRouter.register('LIBRARY', LibraryView);
-    AppRouter.register('WELCOME', WelcomeView);
-    AppRouter.register('SAFETY', SafetyView);
+    AppRouter.register('QCM', quizModule);
+    AppRouter.register('QCM_BANK', quizModule);
+    AppRouter.register('STATS', quizModule);
+    AppRouter.register('LOGBOOK', logbookModule);
+    AppRouter.register('SITES', sitesModule);
+    AppRouter.register('LIBRARY', libraryModule);
+    AppRouter.register('WELCOME', welcomeModule);
+    AppRouter.register('SAFETY', safetyModule);
 
     // 4. Initialize History API
     AppRouter.initHistory();

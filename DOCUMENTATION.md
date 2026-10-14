@@ -159,6 +159,12 @@ Menus, fields and checkboxes (`SELECT`, `INPUT`, `TEXTAREA`) run their `data-act
 ### 4. Router & Screen Lifecycles (`js/core/router.js`)
 `AppRouter` manages SPA screen transitions and maintains browser history (`window.history.pushState`).
 
+**Screens are loaded on demand (code-splitting).** None of the six screens (`quiz`, `logbook`, `sites`, `manual`, `welcome`, `safety`) is imported statically: `js/core/main.js` declares each with `lazyViewModule(() => import('../views/…'))` and registers it on the router, so the production build emits one file per screen, downloaded the first time it is needed. QCM, QCM_BANK and STATS share one descriptor, so the quiz screen is fetched once. On startup the app's own JavaScript went from 152.5 KB to 66.3 KB gzipped (−57 %); the service worker pre-caches every emitted file, so offline use is unchanged.
+- `AppRouter.getView(mode)` returns the view only once it has been loaded (`undefined` before), so services must treat it as optional (`AppRouter.getView('STATS')?.renderStats?.()`). `AppRouter.loadView(mode)` loads it if needed.
+- `navigate()` starts the download immediately, in parallel with the previous screen's unmount and the view transition, and only awaits it just before `mount()`. If the download fails (offline and not cached), the same crash screen as a failed `mount()` is shown, and the next attempt retries.
+- The click handlers in `main.js` keep the names `QuizView`, `LogbookView`, `SitesView`, `LibraryView`, `SafetyView`, but they are `viewProxy(...)` objects: calling a method loads the screen if needed, then runs it (always asynchronous; a method the view does not have returns `null`). `tests/core/action_wiring.test.js` still reads those names.
+- **Rule**: nothing outside `js/views/` may import a view statically (`tests/core/route_code_splitting.test.js` fails otherwise): one static import puts the whole screen back in the startup file. `SitesService` (46 KB) is still part of the startup file, because `main.js` and `gdpr_engine.js` import it; splitting it is a possible next step.
+
 Each view implementation inherits from `BaseView` (`js/core/base_view.js`) which enforces a standard lifecycle interface and provides built-in UI fallback methods for error handling (e.g. `super.renderErrorState(msg)`):
 ```javascript
 import BaseView from '../core/base_view.js';
@@ -328,7 +334,7 @@ All asynchronous methods in critical services (`firebase_service.js`, `logbook_s
 Views (`js/views/`) must check the `success` flag when mounting or fetching data. If `success === false`, the view must not render a broken or empty state. Instead, it must call a dedicated `renderErrorState(errorMsg)` method to display a user-friendly error block with a "Réessayer" (Retry) action.
 
 ### 3. Global Router Protection
-The `AppRouter` (`js/core/router.js`) protects the global application lifecycle by wrapping the `view.mount()` calls in a `try/catch` block. If a view crashes completely during initialization, the router catches the fatal error and injects a fallback "Crash Critique" interface to prevent a white screen.
+The `AppRouter` (`js/core/router.js`) protects the global application lifecycle by wrapping the view download and the `view.mount()` calls in `try/catch` blocks. If a view cannot be loaded or crashes completely during initialization, the router catches the fatal error and injects a fallback "Crash Critique" interface to prevent a white screen.
 
 ---
 
