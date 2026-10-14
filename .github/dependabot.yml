@@ -1,18 +1,60 @@
-# Mises à jour automatiques : une PR par groupe, la CI et le hook local les vérifient avant fusion.
+# Mises à jour automatiques. Les paquets qui doivent évoluer ensemble sont regroupés : une PR par
+# groupe au lieu d'une PR par paquet, car une mise à jour isolée échoue à l'installation (npm refuse
+# des versions incompatibles entre elles). La CI et le hook local vérifient chaque PR avant fusion.
 version: 2
 updates:
+  # Outils de développement et de test du site.
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      # Le SDK Firebase de test et l'outil de test des règles Firestore se mettent à niveau ensemble
+      # (rules-unit-testing N exige firebase N). Le SDK embarqué dans vendor/ est un autre fichier.
+      firebase-test-tools:
+        patterns:
+          - 'firebase'
+          - '@firebase/*'
+      # vitest et ses modules (ui, coverage) doivent partager la même version majeure.
+      vitest:
+        patterns:
+          - 'vitest'
+          - '@vitest/*'
+      # Le reste des correctifs et mises à jour mineures de développement, en une seule PR.
+      dev-patch-and-minor:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+
+  # Cloud Function : ses dépendances sont figées à leur version majeure. La CI n'exécute jamais
+  # functions/index.js ; une mise à jour majeure (ex. firebase-admin 14 exige Node 22, la fonction
+  # déclare Node 20) ne doit venir que d'une montée de version volontaire, testée avec l'émulateur.
   - package-ecosystem: npm
     directory: /functions
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      functions-minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    ignore:
+      - dependency-name: firebase-admin
+        update-types: ['version-update:semver-major']
+      - dependency-name: firebase-functions
+        update-types: ['version-update:semver-major']
+
+  # Les actions de la CI sont épinglées par empreinte ; toutes leurs mises à jour arrivent dans une
+  # seule PR (elles modifient toutes les mêmes fichiers de workflow, donc se gêneraient une à une).
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      github-actions:
+        patterns:
+          - '*'
