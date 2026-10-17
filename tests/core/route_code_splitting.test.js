@@ -57,3 +57,11 @@ describe('chargement à la demande des écrans', () => {
         }
     });
 });
+
+describe('visualiseur 3D du carnet', () => {
+    it("n'est pas importé statiquement par le carnet : il se télécharge au clic sur « Voir la trace »", () => {
+        const source = readFileSync('js/views/logbook_history.js', 'utf8');
+        expect(source).not.toMatch(/^import .*map_3d\.js/m);
+        expect(source).toMatch(/import\('\.\.\/components\/map_3d\.js'\)/);
+    });
+});
