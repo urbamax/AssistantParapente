@@ -65,3 +65,12 @@ describe('visualiseur 3D du carnet', () => {
         expect(source).toMatch(/import\('\.\.\/components\/map_3d\.js'\)/);
     });
 });
+
+describe('prévisions du service des sites', () => {
+    it('les méthodes réseau sont dans un fichier téléchargé au premier besoin, pas dans le démarrage', () => {
+        const service = readFileSync('js/services/sites_service.js', 'utf8');
+        expect(service).not.toMatch(/^import .*sites_forecast_fetch\.js/m);
+        expect(service).toMatch(/import\('\.\/sites_forecast_fetch\.js'\)/);
+        expect(service).not.toMatch(/api\.open-meteo\.com/);
+    });
+});
