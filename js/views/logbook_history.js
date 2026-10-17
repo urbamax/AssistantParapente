@@ -6,7 +6,6 @@
  */
 import LogbookService from '../services/logbook_service.js';
 import SitesService from '../services/sites_service.js';
-import Map3DComponent from '../components/map_3d.js';
 import { EXTENDED_WIND_DIRECTIONS } from '../data/weather_config.js';
 import { getSpotairWidgetId } from '../data/spotair_widgets.js';
 import { escapeHTML } from '../core/security.js';
@@ -17,6 +16,9 @@ import { saveTextFile } from '../utils/download.js';
 import { printHtml } from '../utils/print.js';
 import { tt, tl } from './logbook_strings.js';
 import { LogbookStatsBase } from './logbook_stats.js';
+
+// Le visualiseur 3D (28 Ko) ne sert qu'au clic sur « Voir la trace » : il est téléchargé à ce moment-là.
+const loadMap3D = () => import('../components/map_3d.js').then((m) => m.default);
 
 export class LogbookHistoryBase extends LogbookStatsBase {
     constructor() {
@@ -398,7 +400,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
 
         if (container.style.display === 'block') {
             container.style.display = 'none';
-            Map3DComponent.clearPlayback();
+            (await loadMap3D()).clearPlayback();
             return;
         }
 
@@ -435,7 +437,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
         container.style.display = 'block';
 
         try {
-            await Map3DComponent.showTrace(sessionId, points, container);
+            await (await loadMap3D()).showTrace(sessionId, points, container);
         } catch (error) {
             console.error('Map3DComponent Error: Erreur lors du dessin de la trace.', error);
             container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-secondary);">${tt('history.trace3dError', { error: error.message })}</div>`;
