@@ -46,8 +46,13 @@ const SCREENS = [
         minKeys: 30,
     },
     // Noms de thèmes du fichier des questions et codes de niveau (données).
-    {
-        file: 'js/views/quiz.js',
+    // quiz.js a été découpé (vue, statistiques, mode vocal) : chaque fichier reste contrôlé.
+    ...[
+        ['js/views/quiz.js', 25],
+        ['js/views/quiz_stats.js', 60],
+        ['js/views/quiz_voice_ui.js', 6],
+    ].map(([file, minKeys]) => ({
+        file,
         spec: '024',
         prefix: 'quiz.',
         helpers: ['tq', 'tqh', 'tql'],
@@ -63,8 +68,8 @@ const SCREENS = [
             'BI',
             'ALL',
         ],
-        minKeys: 60,
-    },
+        minKeys,
+    })),
     {
         file: 'js/views/manual.js',
         spec: '021',
