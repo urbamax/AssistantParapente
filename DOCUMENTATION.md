@@ -57,6 +57,9 @@ AssistantParapente/
 │   │   ├── sites.js            # Sites view controller
 │   │   ├── logbook.js          # Logbook & IGC viewer controller
 │   │   ├── quiz.js             # QCM & exam controller
+│   │   ├── quiz_stats.js       # Quiz stats, exam history, import/export (base class of QuizView)
+│   │   ├── quiz_voice_ui.js    # Quiz voice mode: read aloud, spoken answers (base class of QuizView)
+│   │   ├── quiz_strings.js    # tq / tqh / tql / tv text helpers
 │   │   └── manual.js           # Library & course viewer controller
 │   ├── services/               # Data & Business Logic Layer
 │   │   ├── sites_service.js    # Sites filtering, Open-Meteo weather fetch & limits
