@@ -442,6 +442,12 @@ export const FR = Object.freeze({
             noTrace: 'La trace de ce vol est introuvable.',
             printError: "L'impression n'a pas pu être lancée.",
         }),
+        // Spec 037 : trace d'un vol importé sur un autre appareil, téléchargée depuis le compte à la demande.
+        cloudTrace: Object.freeze({
+            loading: 'Chargement de la trace depuis votre compte…',
+            unavailable:
+                "La trace de ce vol est dans votre compte, mais elle n'a pas pu être récupérée (hors ligne ?). Réessayez avec une connexion.",
+        }),
         equipment: Object.freeze({
             inventory: 'Mon Inventaire',
             empty: 'Aucun équipement enregistré.',
@@ -1491,7 +1497,7 @@ export const FR = Object.freeze({
         }),
         gdprPrivacyModal: Object.freeze({
             politiqueDeConfidentialite: 'Politique de Confidentialité',
-            derniereMiseAJour: 'Dernière mise à jour : 20 mai 2026',
+            derniereMiseAJour: 'Dernière mise à jour : 17 octobre 2026',
             cettePolitiqueDecritLa:
                 "Cette politique décrit la manière dont vos données personnelles sont traitées dans le cadre de l'application éducative <em>Assistant Parapente</em>.",
             n1ResponsableDuTraitement: '1. Responsable du Traitement',
@@ -1505,8 +1511,11 @@ export const FR = Object.freeze({
                 "Vos scores, taux de réussite par thème, et historique d'examens. Ils sont stockés localement sur votre appareil ou synchronisés dans la base Firestore si vous êtes connecté.",
             donneesDeProgressionQcm: 'Données de Progression (QCM) :',
             vosCoordonneesGpsSont:
-                'Vos coordonnées GPS sont traitées temporairement sur votre appareil pour calculer les distances avec les sites de vol. Elles ne sont jamais stockées sur nos serveurs.',
+                "Votre position GPS du moment est traitée temporairement sur votre appareil pour calculer les distances avec les sites de vol. Elle n'est jamais envoyée à nos serveurs.",
             donneesDeGeolocalisation: 'Données de Géolocalisation :',
+            vosVolsMaterielEtTraces:
+                'Vos vols (dates, sites, durées, notes), votre matériel et vos préférences sont conservés sur votre appareil. Si vous êtes connecté et avez accepté la synchronisation, ils sont aussi enregistrés dans la base Firestore, de même que les traces GPS (fichiers IGC) que vous avez vous-même importées avec un vol, afin de les retrouver sur vos autres appareils. Supprimer un vol supprime aussi sa trace.',
+            carnetDeVolEtTraces: 'Carnet de vol et traces GPS (optionnel) :',
             uniquementSiVousLActivez:
                 "uniquement si vous l'activez après avoir lu l'avertissement, votre voix est envoyée au service de reconnaissance vocale de votre navigateur (Google pour Chrome et Edge, Apple pour Safari) pour être transcrite. L'application ne conserve aucun enregistrement. Vous pouvez retirer votre accord à tout moment depuis l'écran du QCM. La lecture à voix haute, elle, reste sur votre appareil.",
             reponsesVocalesAuQcm: 'Réponses vocales au QCM (optionnel) :',

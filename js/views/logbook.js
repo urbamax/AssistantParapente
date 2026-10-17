@@ -907,6 +907,8 @@ class LogbookViewClass extends LogbookIgcImportBase {
             this.currentTraceInfo = null;
             if (this.currentRawIgc) {
                 session.rawIgc = this.currentRawIgc;
+                // Date de la trace : la synchro la renvoie dans le compte si elle est plus récente que l'envoi (spec 037).
+                session.traceUpdatedAt = Date.now();
                 this.currentRawIgc = null; // reset
             }
             session.varioOffInFlight = Boolean(

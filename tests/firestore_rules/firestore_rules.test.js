@@ -86,6 +86,110 @@ describe("les données d'un autre pilote", () => {
     });
 });
 
+// Morceaux de trace de vol (specs/037-sync-flight-traces) : propriétaire seulement, forme et taille contrôlées.
+const part = (overrides = {}) => ({
+    flightId: 'vol-1',
+    index: 0,
+    total: 1,
+    encoding: 'gzip-base64',
+    data: 'H4sIAAAAAAAA',
+    updatedAt: 1,
+    ...overrides,
+});
+const partRef = (db, uid, id = 'vol-1_0') => doc(db, 'users', uid, 'igcTraces', id);
+
+describe('traces de vol (igcTraces) : le propriétaire', () => {
+    it('écrit, relit et supprime un morceau valide', async () => {
+        const ref = partRef(asMe(), ME);
+        await assertSucceeds(setDoc(ref, part()));
+        await assertSucceeds(getDoc(ref));
+        await assertSucceeds(deleteDoc(ref));
+    });
+
+    it('écrit un morceau sans updatedAt, et un vol en plusieurs morceaux', async () => {
+        const withoutDate = part();
+        delete withoutDate.updatedAt;
+        await assertSucceeds(setDoc(partRef(asMe(), ME), withoutDate));
+        await assertSucceeds(setDoc(partRef(asMe(), ME, 'vol-2_0'), part({ flightId: 'vol-2', total: 3 })));
+        await assertSucceeds(setDoc(partRef(asMe(), ME, 'vol-2_2'), part({ flightId: 'vol-2', index: 2, total: 3 })));
+    });
+
+    it('accepte le codage sans compression et un morceau de 700 000 caractères', async () => {
+        await assertSucceeds(setDoc(partRef(asMe(), ME), part({ encoding: 'identity-base64' })));
+        await assertSucceeds(
+            setDoc(partRef(asMe(), ME, 'gros_0'), part({ flightId: 'gros', data: 'A'.repeat(700000) })),
+        );
+    });
+
+    it('remplace un morceau existant (nouvelle trace du même vol)', async () => {
+        await assertSucceeds(setDoc(partRef(asMe(), ME), part()));
+        await assertSucceeds(setDoc(partRef(asMe(), ME), part({ data: 'AAAA', updatedAt: 2 })));
+    });
+});
+
+describe('traces de vol (igcTraces) : ce qui est refusé même au propriétaire', () => {
+    it.each([
+        ['un champ en trop', part({ extra: 'x' })],
+        ['un champ manquant (data)', (({ data: _d, ...rest }) => rest)(part())],
+        ['un champ manquant (total)', (({ total: _t, ...rest }) => rest)(part())],
+        ['un numéro de morceau négatif', part({ index: -1 })],
+        ['un numéro de morceau trop grand (12)', part({ index: 12, total: 12 })],
+        ['un numéro de morceau égal au total', part({ index: 1, total: 1 })],
+        ['un total à zéro', part({ total: 0 })],
+        ['un total trop grand (13)', part({ total: 13 })],
+        ['un numéro décimal', part({ index: 0.5 })],
+        ['un codage inconnu', part({ encoding: 'zip' })],
+        ['des données vides', part({ data: '' })],
+        ['des données qui ne sont pas du texte', part({ data: 12345 })],
+        ['des données de 700 001 caractères', part({ data: 'A'.repeat(700001) })],
+        ['un identifiant de vol vide', part({ flightId: '' })],
+        ['un identifiant de vol de plus de 64 caractères', part({ flightId: 'x'.repeat(65) })],
+        ['un updatedAt qui n’est pas un nombre', part({ updatedAt: 'hier' })],
+    ])('%s', async (_name, body) => {
+        await assertFails(setDoc(partRef(asMe(), ME), body));
+    });
+
+    it('un nom de document qui ne correspond pas au vol et au numéro', async () => {
+        await assertFails(setDoc(partRef(asMe(), ME, 'autre_0'), part()));
+        await assertFails(setDoc(partRef(asMe(), ME, 'vol-1_1'), part({ index: 0 })));
+        await assertFails(setDoc(partRef(asMe(), ME, 'vol-1'), part()));
+    });
+
+    it('une modification qui rend un morceau invalide', async () => {
+        await assertSucceeds(setDoc(partRef(asMe(), ME), part()));
+        await assertFails(setDoc(partRef(asMe(), ME), part({ data: 'A'.repeat(700001) })));
+    });
+});
+
+describe('traces de vol (igcTraces) : les autres', () => {
+    beforeEach(async () => {
+        await env.withSecurityRulesDisabled(async (context) => {
+            await setDoc(partRef(context.firestore(), OTHER), part());
+        });
+    });
+
+    it('un autre pilote ne lit, n’écrit ni ne supprime les traces d’autrui', async () => {
+        await assertFails(getDoc(partRef(asMe(), OTHER)));
+        await assertFails(setDoc(partRef(asMe(), OTHER), part({ data: 'AAAA' })));
+        await assertFails(deleteDoc(partRef(asMe(), OTHER)));
+        await assertFails(getDocs(collection(asMe(), 'users', OTHER, 'igcTraces')));
+    });
+
+    it('les traces ne sont pas lisibles par collectionGroup', async () => {
+        await assertFails(getDocs(collectionGroup(asMe(), 'igcTraces')));
+    });
+
+    it('un visiteur non connecté ne lit ni n’écrit rien', async () => {
+        await assertFails(getDoc(partRef(anonymous(), OTHER)));
+        await assertFails(setDoc(partRef(anonymous(), ME), part()));
+    });
+
+    it('une trace ne peut pas être rangée ailleurs (sous-collection inconnue, ou à la racine)', async () => {
+        await assertFails(setDoc(doc(asMe(), 'users', ME, 'traces', 'vol-1_0'), part()));
+        await assertFails(setDoc(doc(asMe(), 'igcTraces', 'vol-1_0'), part()));
+    });
+});
+
 describe('un visiteur non connecté', () => {
     it.each(APP_DOCS)("ne lit ni n'écrit rien : %s/%s", async (sub, id) => {
         const ref = doc(anonymous(), 'users', ME, sub, id);
