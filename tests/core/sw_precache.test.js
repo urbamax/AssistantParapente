@@ -19,9 +19,13 @@ function jsFiles(dir) {
     });
 }
 
+// Fichiers de js/ que l'application ne charge jamais (tests et future traduction seulement) : inutile de les
+// télécharger chez chaque visiteur.
+const NOT_LOADED_BY_THE_APP = new Set(['js/i18n/fr_html.js']);
+
 describe('pré-cache du service worker (sw.js)', () => {
     it('contient chaque module JavaScript de js/', () => {
-        const missing = jsFiles('js').filter((file) => !precached.has(file));
+        const missing = jsFiles('js').filter((file) => !precached.has(file) && !NOT_LOADED_BY_THE_APP.has(file));
         expect(missing).toEqual([]);
     });
 
@@ -35,5 +39,18 @@ describe('pré-cache du service worker (sw.js)', () => {
             }
         });
         expect(unknown).toEqual([]);
+    });
+});
+
+describe("fichiers de js/ non chargés par l'application", () => {
+    it.each([...NOT_LOADED_BY_THE_APP])("%s n'est importé par aucun module de l'application", (file) => {
+        const name = file.split('/').pop();
+        const importers = jsFiles('js').filter(
+            (other) =>
+                other !== file &&
+                new RegExp(`(from|import\\()\\s*["'][^"']*${name}["']`).test(readFileSync(other, 'utf8')),
+        );
+        expect(importers).toEqual([]);
+        expect(precached.has(file)).toBe(false);
     });
 });
