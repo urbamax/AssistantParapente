@@ -295,6 +295,9 @@ A place typed in the add form that is not in the site database can be placed on 
 
 ---
 
+### 6. Flight traces follow the account (spec 037)
+The flight document in `users/{uid}/logbook/{id}` never carries the IGC text: `stripTrace()` (`js/services/flight_trace_sync.js`) removes `rawIgc` before every write. The trace lives in `users/{uid}/igcTraces/{flightId}_{index}`: `js/utils/trace_codec.js` gzips the text (`CompressionStream`, fallback plain base64), cuts it in parts of at most 700,000 characters (12 parts max, under the 1 MiB document limit) and stores a SHA-256 digest. The flight keeps a small `traceCloud` descriptor (`at`, `parts`, `bytes`, `encoding`, `digest`); `traceUpdatedAt` is set when a new trace is attached, and a trace is uploaded when `traceUpdatedAt > traceCloud.at` (two per sync, so a large backlog is spread over several syncs). On another device the logbook shows the trace buttons from `traceCloud` alone; `LogbookService.getFlightTrace()` reads memory/IndexedDB first, otherwise downloads and verifies the parts, then caches them in IndexedDB. Deleting a flight (or its tombstone) deletes its parts. Flights that still carry a legacy `rawIgc` in the cloud are migrated automatically on the next sync. The `igcTraces` rules (`isTracePart` in `firestore.rules`) are tested in `tests/firestore_rules/`; **publish the rules before deploying the app version that uploads traces**.
+
 ## 📚 FFVL Theory & QCM Engine
 
 ### 1. Modes of Operation (`js/services/quiz_service.js`)

@@ -232,7 +232,8 @@ class LogbookService {
     dataSignature() {
         const shown = ({ syncPending: _syncPending, rawIgc, traceGps, ...rest }) => ({
             ...rest,
-            hasTrace: Boolean(rawIgc) || (Array.isArray(traceGps) && traceGps.length > 0),
+            // `traceCloud` est dans `rest` : une trace qui arrive du cloud change l'empreinte, donc l'affichage.
+            hasTrace: Boolean(rawIgc) || Boolean(rest.traceCloud) || (Array.isArray(traceGps) && traceGps.length > 0),
         });
         return JSON.stringify([this.flights.map(shown), this.equipment.map(shown)]);
     }
@@ -284,11 +285,11 @@ class LogbookService {
     }
 
     /**
-     * Récupère la trace IGC brute d'un vol depuis la mémoire ou depuis IndexedDB.
+     * Trace IGC brute d'un vol, lue sur cet appareil seulement (mémoire puis IndexedDB), sans réseau.
      * @param {string} id
      * @returns {Promise<string|null>}
      */
-    async getFlightTrace(id) {
+    async getLocalFlightTrace(id) {
         const flight = this.getFlightById(id);
         if (flight?.rawIgc) return flight.rawIgc;
         if (IDBStorage.isSupported()) {
@@ -296,6 +297,23 @@ class LogbookService {
             if (trace) return trace;
         }
         return null;
+    }
+
+    /**
+     * Trace IGC brute d'un vol : sur cet appareil si elle y est, sinon téléchargée depuis le compte du
+     * pilote (vol importé sur un autre appareil, specs/037) puis gardée ici pour la prochaine fois.
+     * Rend null si le vol n'a pas de trace, ou si elle n'a pas pu être récupérée (hors ligne).
+     * @param {string} id
+     * @returns {Promise<string|null>}
+     */
+    async getFlightTrace(id) {
+        const local = await this.getLocalFlightTrace(id);
+        if (local) return local;
+        const engine = window.FirebaseAuthEngine;
+        if (!this.getFlightById(id)?.traceCloud || typeof engine?.fetchFlightTrace !== 'function') return null;
+        const downloaded = await engine.fetchFlightTrace(id);
+        if (downloaded && IDBStorage.isSupported()) IDBStorage.saveTrace(id, downloaded).catch(() => {});
+        return downloaded;
     }
 
     // --- EQUIPMENT CRUD ---

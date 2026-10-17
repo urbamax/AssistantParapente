@@ -13,6 +13,20 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == userId;
     }
 
+    // Un morceau de trace : mêmes champs et mêmes limites que js/utils/trace_codec.js
+    // (12 morceaux au plus, 700 000 caractères au plus par morceau, bien sous 1 Mio par document).
+    function isTracePart(partId, data) {
+      return data.keys().hasAll(['flightId', 'index', 'total', 'encoding', 'data'])
+        && data.keys().hasOnly(['flightId', 'index', 'total', 'encoding', 'data', 'updatedAt'])
+        && data.flightId is string && data.flightId.size() > 0 && data.flightId.size() <= 64
+        && data.index is int && data.index >= 0 && data.index < 12
+        && data.total is int && data.total >= 1 && data.total <= 12 && data.index < data.total
+        && data.encoding in ['gzip-base64', 'identity-base64']
+        && data.data is string && data.data.size() > 0 && data.data.size() <= 700000
+        && (!('updatedAt' in data) || data.updatedAt is number)
+        && partId == data.flightId + '_' + string(data.index);
+    }
+
     match /users/{userId} {
       // Le document du compte (jeton de notification fcmToken).
       allow read, write: if isOwner(userId);
@@ -29,6 +43,14 @@ service cloud.firestore {
       }
       match /preferences/{prefId} {
         allow read, write: if isOwner(userId);
+      }
+
+      // Traces de vol (fichiers IGC compressés, voir specs/037-sync-flight-traces) : un document par
+      // morceau, nommé {identifiant du vol}_{numéro}. La forme et la taille sont contrôlées à
+      // l'écriture : un client ne peut pas y ranger autre chose que des morceaux de trace.
+      match /igcTraces/{partId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isTracePart(partId, request.resource.data);
       }
     }
   }

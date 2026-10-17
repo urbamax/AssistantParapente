@@ -308,7 +308,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                             ${Array.isArray(session.pilotes) && session.pilotes.length > 0 ? `<div><strong>${tt('history.pilots')}</strong> ${escapeHTML(session.pilotes.join(', '))}</div>` : ''}
                         </div>
                         ${session.commentaire ? `<div class="session-comment">"${escapeHTML(session.commentaire)}"</div>` : ''}
-                        ${session.rawIgc || (session.traceGps && session.traceGps.length > 0) ? `<button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-orange); color: var(--accent-orange); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="${session.id}"><i class="ri-route-line"></i> ${tt('history.showTrace')}</button><button class="btn-download-trace action-btn-secondary" style="margin-top: 6px; width: 100%; padding: 8px; border-radius: 6px; cursor: pointer;" data-action="downloadTrace" data-args="${session.id}"><i class="ri-download-2-line"></i> ${tt('history.downloadIgc')}</button><div id="trace-container-${session.id}" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>` : ''}
+                        ${session.rawIgc || session.traceCloud || (session.traceGps && session.traceGps.length > 0) ? `<button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-orange); color: var(--accent-orange); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="${session.id}"><i class="ri-route-line"></i> ${tt('history.showTrace')}</button><button class="btn-download-trace action-btn-secondary" style="margin-top: 6px; width: 100%; padding: 8px; border-radius: 6px; cursor: pointer;" data-action="downloadTrace" data-args="${session.id}"><i class="ri-download-2-line"></i> ${tt('history.downloadIgc')}</button><div id="trace-container-${session.id}" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>` : ''}
                         <div data-session-weather="${session.id}">${meteoHtml}</div>
                     </div>
                 </div>
@@ -370,7 +370,8 @@ export class LogbookHistoryBase extends LogbookStatsBase {
         const flight = LogbookService.getFlightById(sessionId);
         const rawIgc = flight ? await LogbookService.getFlightTrace(sessionId) : null;
         if (!rawIgc) {
-            alert(tl('export.noTrace'));
+            // Une trace qui est dans le compte mais n'a pas pu être récupérée n'est pas « introuvable ».
+            alert(tl(flight?.traceCloud ? 'cloudTrace.unavailable' : 'export.noTrace'));
             return;
         }
         saveTextFile(buildIgcFileName(flight), rawIgc, 'application/octet-stream');
@@ -405,10 +406,20 @@ export class LogbookHistoryBase extends LogbookStatsBase {
         if (!session) return;
 
         let rawIgc = session.rawIgc;
-        if (!rawIgc && (!session.traceGps || session.traceGps.length === 0)) {
+        const hasGpsPoints = Boolean(session.traceGps && session.traceGps.length > 0);
+        if (!rawIgc && !hasGpsPoints) {
+            // Trace seulement dans le compte (vol importé sur un autre appareil) : on le dit pendant le téléchargement.
+            const fromCloud = Boolean(session.traceCloud) && !(await LogbookService.getLocalFlightTrace(sessionId));
+            if (fromCloud) {
+                container.style.display = 'block';
+                container.textContent = tl('cloudTrace.loading');
+            }
             rawIgc = await LogbookService.getFlightTrace(sessionId);
+            if (!rawIgc) {
+                if (fromCloud) container.textContent = tl('cloudTrace.unavailable');
+                return;
+            }
         }
-        if (!rawIgc && (!session.traceGps || session.traceGps.length === 0)) return;
 
         let points = session.traceGps;
         if (rawIgc) {

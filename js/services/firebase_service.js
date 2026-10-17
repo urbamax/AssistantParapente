@@ -8,6 +8,15 @@ import AppRouter from '../core/router.js';
 import GlobalState from '../core/app_state.js';
 import SitesService, { migrateSitePrefs } from './sites_service.js';
 import LogbookService from './logbook_service.js';
+import IDBStorage from './idb_storage.js';
+import {
+    TRACE_UPLOADS_PER_SYNC,
+    deleteFlightTraceParts,
+    downloadFlightTrace,
+    needsTraceUpload,
+    stripTrace,
+    uploadFlightTrace,
+} from './flight_trace_sync.js';
 import { t } from '../utils/i18n.js';
 
 // We inject the original code but export the Engine
@@ -538,7 +547,8 @@ export const FirebaseAuthEngine = {
         }
 
         try {
-            const { doc, getDoc, setDoc, collection, getDocs, deleteDoc } = await this._loadFirestore();
+            const firestoreModule = await this._loadFirestore();
+            const { doc, getDoc, setDoc, collection, getDocs, deleteDoc } = firestoreModule;
             const uid = this.currentUser.uid;
 
             // --- Sync Logbook ---
@@ -554,6 +564,7 @@ export const FirebaseAuthEngine = {
                     }
                     const sRef = doc(db, 'users', uid, 'logbook', delId);
                     await setDoc(sRef, deletedFlightMarker(delId));
+                    await this._deleteFlightTrace(firestoreModule, uid, delId);
                 }
                 localStorage.setItem('deleted_flights', '[]');
                 console.log(`Removed ${deletedFlights.length} deleted flights from Cloud.`);
@@ -576,7 +587,7 @@ export const FirebaseAuthEngine = {
             for (const session of pendingLogbook) {
                 const sRef = doc(db, 'users', uid, 'logbook', session.id);
                 delete session.syncPending;
-                await setDoc(sRef, session);
+                await setDoc(sRef, stripTrace(session));
             }
             if (pendingLogbook.length > 0) {
                 StorageService.set(StorageService.KEYS.LOGBOOK_DATA, localLogbook);
@@ -588,12 +599,18 @@ export const FirebaseAuthEngine = {
             const cloudLogbook = [];
             // Vols supprimés sur un autre appareil : id -> date de suppression
             const cloudDeletedAt = new Map();
+            // Traces restées dans d'anciens documents de vol (avant specs/037) : récupérées, puis jamais fusionnées
+            // (elles gonfleraient le stockage local, limité à 5 Mo).
+            const legacyTraces = new Map();
             logbookSnap.forEach((docSnap) => {
                 const data = docSnap.data();
                 // Guard : on n'accepte que les docs avec un ID string valide
                 if (data && data.id && typeof data.id === 'string') {
                     if (data.deleted === true) cloudDeletedAt.set(data.id, data.deletedAt || 0);
-                    else cloudLogbook.push(data);
+                    else {
+                        if (typeof data.rawIgc === 'string' && data.rawIgc) legacyTraces.set(data.id, data.rawIgc);
+                        cloudLogbook.push(stripTrace(data));
+                    }
                 }
             });
 
@@ -641,8 +658,18 @@ export const FirebaseAuthEngine = {
                 const cloudSession = cloudLogbook.find((s) => s.id === session.id);
                 if (!cloudSession) {
                     const sRef = doc(db, 'users', uid, 'logbook', session.id);
-                    await setDoc(sRef, session);
+                    await setDoc(sRef, stripTrace(session));
                 }
+            }
+
+            // Traces de vol : récupération des anciennes, puis envoi de quelques traces à chaque synchro.
+            // Un échec ne bloque jamais la synchro des vols (specs/037, FR-4).
+            try {
+                if (await this._syncFlightTraces({ firestoreModule, uid, flights: mergedLogbook, legacyTraces })) {
+                    StorageService.set(StorageService.KEYS.LOGBOOK_DATA, mergedLogbook);
+                }
+            } catch (traceError) {
+                console.warn('[Sync] Synchro des traces de vol interrompue :', traceError);
             }
 
             // --- Sync Equipment ---
@@ -991,7 +1018,7 @@ export const FirebaseAuthEngine = {
             for (const session of data) {
                 if (deletedIds.has(session.id)) continue;
                 const docRef = doc(db, 'users', uid, 'logbook', session.id);
-                await setDoc(docRef, session);
+                await setDoc(docRef, stripTrace(session));
             }
 
             this.lastSyncTime = new Date().toLocaleTimeString();
@@ -1014,6 +1041,7 @@ export const FirebaseAuthEngine = {
 
             const docRef = doc(db, 'users', uid, 'logbook', id);
             await setDoc(docRef, deletedFlightMarker(id));
+            await this._deleteFlightTrace(await this._loadFirestore(), uid, id);
             console.log(`Logbook entry ${id} deleted from cloud.`);
             return { success: true, data: null, error: null };
         } catch (error) {
@@ -1099,7 +1127,7 @@ export const FirebaseAuthEngine = {
             if (existing.exists() && existing.data()?.deleted === true) {
                 return { success: true, data: null, error: null };
             }
-            await setDoc(docRef, session);
+            await setDoc(docRef, stripTrace(session));
 
             this.lastSyncTime = new Date().toLocaleTimeString();
             this.updateModalUI(); // Toujours rafraîchir l'UI après une synchro partielle
@@ -1108,6 +1136,100 @@ export const FirebaseAuthEngine = {
         } catch (error) {
             console.error('Logbook entry sync failed:', error);
             return { success: false, data: null, error: error.message };
+        }
+    },
+
+    // -----------------------------------------------------------------------
+    // TRACES DE VOL — synchro des fichiers IGC entre appareils (specs/037-sync-flight-traces)
+    // -----------------------------------------------------------------------
+    /**
+     * Supprime les morceaux de trace d'un vol dans le cloud. Sans gravité en cas d'échec (hors ligne,
+     * règles pas encore publiées) : la suppression du vol, elle, est déjà faite.
+     */
+    _deleteFlightTrace: async function (firestore, uid, flightId) {
+        try {
+            await deleteFlightTraceParts({ firestore, db, uid, flightId });
+        } catch (error) {
+            console.warn('[Sync] Morceaux de trace non supprimés du cloud :', flightId, error.message);
+        }
+    },
+
+    /**
+     * 1. Récupère les traces restées dans d'anciens documents de vol (elles sont alors enregistrées sur
+     *    l'appareil si elles n'y sont pas) ; 2. envoie la trace de quelques vols (TRACE_UPLOADS_PER_SYNC).
+     * Le vol n'annonce `traceCloud` qu'une fois TOUS les morceaux écrits (FR-3). Un échec laisse le vol
+     * inchangé : il sera retenté à la synchro suivante.
+     * @returns {Promise<boolean>} vrai si des vols ont été modifiés (à enregistrer)
+     */
+    _syncFlightTraces: async function ({ firestoreModule, uid, flights, legacyTraces }) {
+        const { doc, setDoc } = firestoreModule;
+        this._noTraceKeys ??= new Set();
+        const flightIds = new Set(flights.map((f) => f.id));
+
+        // 1. Anciennes traces : gardées sur l'appareil pour ne pas dépendre du document cloud.
+        for (const [id, raw] of legacyTraces) {
+            if (!flightIds.has(id)) continue;
+            if (!(await LogbookService.getLocalFlightTrace(id))) await IDBStorage.saveTrace(id, raw);
+        }
+
+        // 2. Envois, quelques vols par synchro.
+        let changed = false;
+        let budget = TRACE_UPLOADS_PER_SYNC;
+        for (const flight of flights) {
+            if (budget <= 0) break;
+            if (!needsTraceUpload(flight)) continue;
+            // Un vol sans trace est revérifié seulement si sa trace a changé (traceUpdatedAt).
+            const key = `${flight.id}:${flight.traceUpdatedAt || 0}`;
+            if (this._noTraceKeys.has(key)) continue;
+            const rawIgc = (await LogbookService.getLocalFlightTrace(flight.id)) ?? legacyTraces.get(flight.id);
+            if (!rawIgc) {
+                this._noTraceKeys.add(key);
+                continue;
+            }
+            budget--;
+            try {
+                const traceCloud = await uploadFlightTrace({
+                    firestore: firestoreModule,
+                    db,
+                    uid,
+                    flightId: flight.id,
+                    rawIgc,
+                    previousParts: flight.traceCloud?.parts || 0,
+                });
+                flight.traceCloud = traceCloud;
+                flight.updatedAt = Date.now();
+                // setDoc remplace le document : une éventuelle ancienne trace (rawIgc) en disparaît.
+                await setDoc(doc(db, 'users', uid, 'logbook', flight.id), stripTrace(flight));
+                changed = true;
+            } catch (error) {
+                // Trop volumineuse : inutile de réessayer. Autre cause (hors ligne, règles absentes) : à la prochaine.
+                if (error?.name === 'TraceTooLargeError') this._noTraceKeys.add(key);
+                console.warn(
+                    '[Sync] Trace de vol non envoyée, nouvel essai à la prochaine synchro :',
+                    flight.id,
+                    error.message,
+                );
+            }
+        }
+        return changed;
+    },
+
+    /**
+     * Relit depuis le cloud la trace d'un vol qui n'est pas sur cet appareil. Appelée à la demande du pilote
+     * (LogbookService.getFlightTrace), jamais à l'avance. Rend null si elle est introuvable ou illisible.
+     * @param {string} flightId
+     * @returns {Promise<string|null>}
+     */
+    fetchFlightTrace: async function (flightId) {
+        if (!this.currentUser || !this.enabled) return null;
+        const traceCloud = LogbookService.getFlightById(flightId)?.traceCloud;
+        if (!traceCloud) return null;
+        try {
+            const firestore = await this._loadFirestore();
+            return await downloadFlightTrace({ firestore, db, uid: this.currentUser.uid, flightId, traceCloud });
+        } catch (error) {
+            console.warn('[Sync] Trace de vol non récupérée depuis le cloud :', flightId, error.message);
+            return null;
         }
     },
 
