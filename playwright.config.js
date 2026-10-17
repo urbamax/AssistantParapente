@@ -11,6 +11,9 @@ export default defineConfig({
     use: {
         baseURL: 'http://localhost:8080',
         trace: 'on-first-retry',
+        // Les transitions de vue et animations de la page ne servent à rien dans un test et, sur WebKit en CI,
+        // gardaient parfois un bouton « instable » jusqu'au délai de 30 s (clics qui n'aboutissent pas).
+        reducedMotion: 'reduce',
     },
     projects: [
         {
