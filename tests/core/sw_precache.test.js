@@ -48,7 +48,7 @@ describe("fichiers de js/ non chargés par l'application", () => {
         const importers = jsFiles('js').filter(
             (other) =>
                 other !== file &&
-                new RegExp(`(from|import\\()\\s*['\"][^'\"]*${name}['\"]`).test(readFileSync(other, 'utf8')),
+                new RegExp(`(from|import\\()\\s*["'][^"']*${name}["']`).test(readFileSync(other, 'utf8')),
         );
         expect(importers).toEqual([]);
         expect(precached.has(file)).toBe(false);
