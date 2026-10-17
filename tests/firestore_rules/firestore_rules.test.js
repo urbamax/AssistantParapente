@@ -107,7 +107,8 @@ describe('traces de vol (igcTraces) : le propriétaire', () => {
     });
 
     it('écrit un morceau sans updatedAt, et un vol en plusieurs morceaux', async () => {
-        const { updatedAt: _omit, ...withoutDate } = part();
+        const withoutDate = part();
+        delete withoutDate.updatedAt;
         await assertSucceeds(setDoc(partRef(asMe(), ME), withoutDate));
         await assertSucceeds(setDoc(partRef(asMe(), ME, 'vol-2_0'), part({ flightId: 'vol-2', total: 3 })));
         await assertSucceeds(setDoc(partRef(asMe(), ME, 'vol-2_2'), part({ flightId: 'vol-2', index: 2, total: 3 })));
