@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { t } from '../../js/utils/i18n.js';
+import { FR } from '../../js/i18n/fr.js';
+import { FR_HTML } from '../../js/i18n/fr_html.js';
 import { applyStaticTexts, STATIC_TEXT_ATTRIBUTES } from '../../js/utils/i18n_dom.js';
 
 // Spec 026 (contrainte « Language », écart d'audit C8) : chaque texte fixe de index.html et des
@@ -28,6 +29,14 @@ const asHtml = (html) => {
     const tpl = document.createElement('template');
     tpl.innerHTML = html;
     return norm(tpl.innerHTML);
+};
+/** Texte d'une clé « html.… » du catalogue complet des textes du HTML (js/i18n/fr_html.js). */
+const t = (key) => {
+    const node = key
+        .replace(/^html\./, '')
+        .split('.')
+        .reduce((n, part) => n?.[part], FR_HTML);
+    return typeof node === 'string' ? node : key;
 };
 const known = (key) => t(key) !== key;
 const hasLetters = (s) => /[A-Za-zÀ-ÿ]{2,}/.test(s);
@@ -95,5 +104,18 @@ describe('applyStaticTexts (future translations)', () => {
         const before = norm(root.textContent);
         applyStaticTexts(root, t);
         expect(norm(root.textContent)).toBe(before);
+    });
+});
+
+describe('les clés « html. » que le code lit (js/i18n/fr.js)', () => {
+    const collect = (node, prefix = '') =>
+        Object.entries(node).flatMap(([k, v]) =>
+            typeof v === 'string' ? [[prefix + k, v]] : collect(v, `${prefix}${k}.`),
+        );
+
+    it('sont identiques à celles du catalogue complet', () => {
+        const runtime = collect(FR.html);
+        expect(runtime.length).toBeGreaterThanOrEqual(3);
+        for (const [key, value] of runtime) expect(t(`html.${key}`)).toBe(value);
     });
 });
