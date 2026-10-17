@@ -11,7 +11,8 @@ const SCREENS = [
     // Valeurs enregistrées dans le carnet (données, pas textes d'interface).
     // logbook.js a été découpé (specs 014, puis étapes du découpage) : chaque fichier reste contrôlé.
     ...[
-        ['js/views/logbook.js', 46],
+        ['js/views/logbook.js', 3],
+        ['js/views/logbook_form.js', 50],
         ['js/views/logbook_equipment.js', 25],
         ['js/views/logbook_stats.js', 25],
         ['js/views/logbook_history.js', 50],

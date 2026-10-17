@@ -131,6 +131,7 @@ const CRITICAL_ASSETS = [
     './js/utils/text_utils.js',
     './js/utils/trace_codec.js',
     './js/views/logbook.js',
+    './js/views/logbook_form.js',
     './js/views/logbook_checklists.js',
     './js/views/logbook_coords.js',
     './js/views/logbook_equipment.js',

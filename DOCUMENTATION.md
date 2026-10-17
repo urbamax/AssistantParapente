@@ -56,6 +56,7 @@ AssistantParapente/
 │   ├── views/                  # Screen Controllers & UI Renderers
 │   │   ├── sites.js            # Sites view controller
 │   │   ├── logbook.js          # Logbook & IGC viewer controller
+│   │   ├── logbook_form.js     # Session entry form: layout per flight type, drop-downs, submit, edit (base class of LogbookView)
 │   │   ├── quiz.js             # QCM & exam controller
 │   │   ├── quiz_stats.js       # Quiz stats, exam history, import/export (base class of QuizView)
 │   │   ├── quiz_stats_html.js  # HTML fragments of the stats screen (distribution, themes, questions, gauge)
