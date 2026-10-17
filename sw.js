@@ -144,6 +144,7 @@ const CRITICAL_ASSETS = [
     './js/views/quiz.js',
     './js/views/quiz_strings.js',
     './js/views/quiz_stats.js',
+    './js/views/quiz_stats_html.js',
     './js/views/quiz_voice_ui.js',
     './js/views/sites.js',
     './js/views/sites_forecast.js',

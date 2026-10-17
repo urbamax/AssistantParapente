@@ -58,6 +58,7 @@ AssistantParapente/
 │   │   ├── logbook.js          # Logbook & IGC viewer controller
 │   │   ├── quiz.js             # QCM & exam controller
 │   │   ├── quiz_stats.js       # Quiz stats, exam history, import/export (base class of QuizView)
+│   │   ├── quiz_stats_html.js  # HTML fragments of the stats screen (distribution, themes, questions, gauge)
 │   │   ├── quiz_voice_ui.js    # Quiz voice mode: read aloud, spoken answers (base class of QuizView)
 │   │   ├── quiz_strings.js    # tq / tqh / tql / tv text helpers
 │   │   └── manual.js           # Library & course viewer controller
