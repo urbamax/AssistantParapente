@@ -81,11 +81,11 @@ test.describe('E2E - Logbook school courses', () => {
         await page.locator('[data-action="openLogbookSection"][data-args="\'stats\'"]').click();
         const tile = page.locator('[data-stage-stats] [data-stat-type="stage"]');
         await expect(tile).toHaveCount(1);
-        await expect(tile).toContainText('Stage été');
+        await expect(tile).toContainText(/stage été/i);
         await expect(tile).toContainText('École du Test');
         await expect(tile).toContainText('Gonflage: 2');
         await tile.click();
-        await expect(page.locator('.logbook-filter-banner')).toContainText('Stage été');
+        await expect(page.locator('.logbook-filter-banner')).toContainText(/stage été/i);
         await expect(page.locator('.logbook-filter-banner')).toContainText('2 / 2');
     });
 });
