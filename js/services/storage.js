@@ -20,6 +20,7 @@ const StorageService = {
         QCM_STATS: 'parapente_qcm_stats',
         EXAM_HISTORY: 'parapente_exam_history',
         PENDING_QUIZ: 'pending_quiz',
+        ACCESS: 'parapente_access',
     },
 
     /**

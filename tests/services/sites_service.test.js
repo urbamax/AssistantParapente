@@ -11,6 +11,10 @@ import {
     twoModelHours,
 } from '../fixtures/forecasts.js';
 import { DEFAULT_LOCATION } from '../../js/data/weather_config.js';
+import AccessService from '../../js/services/access_service.js';
+
+// Ces tests couvrent la météo calculée, réservée au rôle « beta » (js/services/access_service.js).
+beforeEach(() => AccessService.setRoles('pilote-test', ['beta']));
 
 function currentHourIso() {
     return nearestHourIso();

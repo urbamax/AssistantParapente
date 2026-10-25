@@ -14,6 +14,16 @@ import { t } from './shared/i18n.mjs';
 const LEGAL_MARGIN_S = 30 * 60;
 
 /**
+ * Le pilote a-t-il le rôle « beta » (météo calculée), ou « owner », qui les a tous ? `profile` est le contenu du document
+ * users/{uid}/access/profile, absent (undefined) pour un compte sans rôle. Même rôle que
+ * js/services/access_service.js : sans lui, ni notification ni calcul pour ce pilote.
+ * @param {{ roles?: unknown } | undefined} profile
+ */
+export function hasBetaRole(profile) {
+    return Array.isArray(profile?.roles) && (profile.roles.includes('beta') || profile.roles.includes('owner'));
+}
+
+/**
  * URL Open-Meteo d'un site. `timeformat=unixtime` : heures, lever et coucher du soleil en
  * secondes UTC, comparables directement à l'heure du serveur (sans ambiguïté de fuseau).
  */
@@ -99,7 +109,7 @@ export function nextState(previous, outcome) {
     return false;
 }
 
-/** Source des prévisions du serveur : point d'accès « forecast » d'Open-Meteo (sélection automatique). */
+/** Source des prévisions du serveur : point d'accès « beta » d'Open-Meteo (sélection automatique). */
 const NOTIFICATION_SOURCE_KEY = 'forecast.models.best_match';
 
 const PARIS_HOUR = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', hourCycle: 'h23' });

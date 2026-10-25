@@ -379,7 +379,8 @@
                         <button type="button" class="welcome-card" data-action="navigate" data-args="SITES">
                             <i class="ri-map-pin-line" aria-hidden="true"></i>
                             <span data-i18n="welcomeScreen.sitesDeVol" class="welcome-card-title">Sites de vol</span>
-                            <span data-i18n="welcomeScreen.meteoEtVolabiliteDes" class="welcome-card-text">Météo et volabilité des sites de vol autour de vous.</span>
+                            <span data-i18n="welcomeScreen.meteoEtVolabiliteDes" data-requires-role="beta" hidden class="welcome-card-text">Météo et volabilité des sites de vol autour de vous.</span>
+                            <span data-i18n="welcomeScreen.carteEtListeDesSites" data-hidden-with-role="beta" class="welcome-card-text">Carte et liste des sites de vol autour de vous.</span>
                         </button>
                         <button type="button" class="welcome-card" data-action="navigate" data-args="LOGBOOK">
                             <i class="ri-book-2-line" aria-hidden="true"></i>
@@ -1124,6 +1125,7 @@
 
                     <!-- 2C. Bouton Accordéon -->
                     <button
+                        data-requires-role="beta" hidden
                         data-action="toggleAdvancedSettings"
                         style="
                             background: transparent;
@@ -1152,6 +1154,7 @@
 
                     <!-- 2D. Contenu de l'Accordéon (LE TIROIR) -->
                     <div
+                        data-requires-role="beta" hidden
                         class="advanced-filters-container hidden"
                         style="flex-direction: column; gap: 15px; padding-top: 10px; display: none"
                     >
@@ -1518,6 +1521,7 @@
                         <i class="ri-star-line"></i> Favoris
                     </button>
                     <button data-i18n-title="sitesScreen.titleComparerMesSites" data-i18n="sitesScreen.comparer"
+                        data-requires-role="beta" hidden
                         id="btn-compare-favorites"
                         class="action-btn-secondary"
                         data-action="toggleSitesComparator"
@@ -1542,7 +1546,7 @@
                 </div>
                 <!-- Choix de l'heure de prévision : toute la liste et la carte affichent la météo de cette
                      heure (synchronisé avec les points horaires de chaque fiche de site). -->
-                <div class="forecast-sticky-container">
+                <div class="forecast-sticky-container" data-requires-role="beta" hidden>
                     <div class="slider-labels">
                         <label data-i18n="sitesScreen.heureDeVol" for="forecast-slider" class="slider-label-left">
                             <i class="ri-time-line" style="color: var(--accent-orange)"></i> Heure de vol :

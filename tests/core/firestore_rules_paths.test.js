@@ -23,7 +23,7 @@ const allowedSubcollections = [...RULES.matchAll(/match \/(\w+)\/\{\w+\}/g)]
 describe("firestore.rules couvre les chemins utilisés par l'application", () => {
     it('le code utilise bien des sous-collections (le motif de recherche fonctionne)', () => {
         expect(new Set(usedSubcollections)).toEqual(
-            new Set(['logbook', 'equipment', 'stats', 'preferences', 'igcTraces']),
+            new Set(['logbook', 'equipment', 'stats', 'preferences', 'igcTraces', 'access']),
         );
     });
 

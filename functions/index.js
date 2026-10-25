@@ -65,6 +65,10 @@ exports.checkFavoriteSitesWeather = onSchedule('every 30 minutes', async () => {
         const user = userDoc.data();
         if (!user.fcmToken) continue;
 
+        // Réservé aux pilotes ayant le rôle « beta » (users/{uid}/access/profile, donné à la main).
+        const accessSnap = await db.collection('users').doc(userDoc.id).collection('access').doc('profile').get();
+        if (!shared.hasBetaRole(accessSnap.exists ? accessSnap.data() : undefined)) continue;
+
         const prefsSnap = await db
             .collection('users')
             .doc(userDoc.id)

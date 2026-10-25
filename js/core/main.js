@@ -10,6 +10,7 @@ import UIManager from './ui_manager.js';
 import StorageService from '../services/storage.js';
 import GdprEngine from '../gdpr_engine.js';
 import SitesService from '../services/sites_service.js';
+import AccessService, { ACCESS_EVENTS, applyRoleVisibility } from '../services/access_service.js';
 import { initAppUpdateNotifier } from './app_update.js';
 
 import QuizService from '../services/quiz_service.js';
@@ -351,6 +352,10 @@ async function bootApplication() {
     const params = new URLSearchParams(window.location.search);
     // Lien direct > dernière page ouverte > écran d'accueil (toute première visite uniquement)
     const startMode = resolveStartMode(params.get('mode'), StorageService.get('LAST_ACTIVE_ROUTE'));
+
+    // Éléments réservés à un rôle (météo calculée) : cachés d'emblée, montrés si le compte a le rôle.
+    applyRoleVisibility();
+    AccessService.on(ACCESS_EVENTS.CHANGED, () => applyRoleVisibility());
 
     AppRouter.navigate(startMode);
 

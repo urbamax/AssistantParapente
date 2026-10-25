@@ -7,6 +7,7 @@ import GlobalState from './app_state.js';
 import StorageService from '../services/storage.js';
 import { escapeHTML } from './security.js';
 import { t } from '../utils/i18n.js';
+import AccessService, { ROLES } from '../services/access_service.js';
 
 const LAZY = Symbol('lazyViewModule');
 
@@ -79,13 +80,16 @@ export function viewProxy(module) {
 /** Écran d'erreur affiché à la place d'une vue qui n'a pas pu être chargée ou montée. */
 function renderCrashScreen(screenEl, mode, error) {
     if (!screenEl) return;
-    const safeError = escapeHTML(error.message || String(error));
+    // Le détail technique de l'erreur n'est montré qu'à la bêta et au propriétaire.
+    const technicalDetails = AccessService.has(ROLES.BETA)
+        ? `<pre style="background: var(--surface-hover, rgba(0,0,0,0.05)); padding: 1rem; border-radius: 8px; text-align: left; max-width: 100%; overflow-x: auto; font-size: 0.8rem; margin-bottom: 2rem; border: 1px solid var(--border-color);">${escapeHTML(error.message || String(error))}</pre>`
+        : '';
     screenEl.innerHTML = `
                         <div class="container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; text-align: center; margin-top: 2rem;">
                             <div class="empty-icon" style="color: var(--danger-color); font-size: 4rem; margin-bottom: 1rem;">🔥</div>
                             <h2 style="margin-bottom: 1rem;">${escapeHTML(t('errors.crashTitle'))}</h2>
                             <p style="margin-bottom: 2rem; color: var(--text-muted);">${escapeHTML(t('errors.crashText')).replace('{module}', `<strong>${escapeHTML(mode)}</strong>`)}</p>
-                            <pre style="background: var(--surface-hover, rgba(0,0,0,0.05)); padding: 1rem; border-radius: 8px; text-align: left; max-width: 100%; overflow-x: auto; font-size: 0.8rem; margin-bottom: 2rem; border: 1px solid var(--border-color);">${safeError}</pre>
+                            ${technicalDetails}
                             <button class="btn btn-primary" data-action="reloadApp">${escapeHTML(t('errors.reloadApp'))}</button>
                         </div>
                     `;

@@ -70,6 +70,7 @@ export const FR_HTML = Object.freeze({
         parOuCommencer: 'Par où commencer ?',
         sitesDeVol: 'Sites de vol',
         meteoEtVolabiliteDes: 'Météo et volabilité des sites de vol autour de vous.',
+        carteEtListeDesSites: 'Carte et liste des sites de vol autour de vous.',
         carnetDeVol: 'Carnet de vol',
         vosVolsLImportDe: "Vos vols, l'import de traces .igc et le suivi du matériel.",
         theorie: 'Théorie',

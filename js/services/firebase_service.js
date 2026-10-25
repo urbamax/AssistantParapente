@@ -18,6 +18,7 @@ import {
     uploadFlightTrace,
 } from './flight_trace_sync.js';
 import { t } from '../utils/i18n.js';
+import AccessService from './access_service.js';
 
 // We inject the original code but export the Engine
 // --- FIREBASE AUTHENTICATION & SYNC ENGINE ---
@@ -205,6 +206,10 @@ export const FirebaseAuthEngine = {
                     this.updateHeaderUI();
                     this.updateModalUI();
 
+                    // Rôles du compte (météo calculée) : lus avant la synchro, qui peut être longue.
+                    AccessService.expectUser(user.uid);
+                    this.refreshAccess();
+
                     // Synchro complète initiale à la connexion
                     await this.syncDataWithCloud();
 
@@ -230,6 +235,7 @@ export const FirebaseAuthEngine = {
                 } else {
                     console.log('User logged out');
                     this.currentUser = null;
+                    AccessService.clear();
                     this._updateSyncStatus(); // déconnecté : plus de voyant
                     // On réinitialise lastSyncTime à la déconnexion pour ne pas afficher
                     // une heure de synchro qui appartient à une autre session.
@@ -251,6 +257,24 @@ export const FirebaseAuthEngine = {
     },
 
     // UI Helpers
+    /**
+     * Lit les rôles du compte dans users/{uid}/access/profile (écrit à la main dans la console
+     * Firebase : les règles refusent toute écriture du client). Hors ligne ou en cas d'erreur, les
+     * rôles déjà connus de l'appareil sont conservés ; document absent = aucun rôle.
+     */
+    refreshAccess: async function () {
+        const user = this.currentUser;
+        if (!user || !this.enabled) return;
+        try {
+            const { doc, getDoc } = await this._loadFirestore();
+            const snap = await getDoc(doc(db, 'users', user.uid, 'access', 'profile'));
+            if (this.currentUser?.uid !== user.uid) return; // déconnecté ou changé de compte entre-temps
+            AccessService.setRoles(user.uid, snap.exists() ? snap.data()?.roles : []);
+        } catch (error) {
+            console.warn('Lecture des rôles impossible, rôles de l’appareil conservés :', error?.message || error);
+        }
+    },
+
     openAuthModal: function () {
         const overlay = /** @type {HTMLDialogElement & { _cancelBound?: boolean }} */ (
             document.getElementById('auth-modal-overlay')

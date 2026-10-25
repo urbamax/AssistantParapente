@@ -215,6 +215,8 @@ export class SitesListBase extends SitesMapBase {
         const activeSites = SitesService.getFilteredAndSortedSites(SitesService.getSites());
         this.renderLocationContext();
 
+        // Le comparateur ne montre que de la météo calculée : sans le rôle « beta », retour à la liste.
+        if (this.state.showComparator && !SitesService.canUseForecast()) this.state.showComparator = false;
         if (this.state.showComparator) {
             this.renderComparator(activeSites);
             return;
@@ -263,7 +265,11 @@ export class SitesListBase extends SitesMapBase {
                     `;
                 }
 
-                const flyableHoursHtml = `
+                // Sans le rôle « beta », la fiche ne montre rien de calculé (voir access_service.js).
+                const withForecast = SitesService.canUseForecast();
+                const flyableHoursHtml = !withForecast
+                    ? ''
+                    : `
                     <span class="site-coords-badge" style="background: ${site.flyableHours > 0 ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.03)'}; border-color: ${site.flyableHours > 0 ? 'rgba(34,197,94,0.3)' : 'var(--border-color)'}; color: ${site.flyableHours > 0 ? 'var(--accent-green)' : 'var(--text-muted)'}; font-weight: 700;">
                         <i class="ri-time-line"></i> ${tt('list.flyableHours', { hours: site.flyableHours || 0 })} ${(site.maxConsecutiveHours || 0) > 0 ? tt('list.consecutive', { hours: site.maxConsecutiveHours }) : ''}
                     </span>
@@ -284,7 +290,9 @@ export class SitesListBase extends SitesMapBase {
                 if (forecasts && forecasts[SitesService.state.forecastOffset]) {
                     weather = forecasts[SitesService.state.forecastOffset];
                 }
-                if (weather) {
+                if (!withForecast) {
+                    weatherHtml = '';
+                } else if (weather) {
                     const status = SitesService.isForecastFlyable(site, weather);
                     weatherHtml = `
                         <div class="site-weather-row ${status.class}" style="display: flex; flex-direction: column; gap: 6px; margin-top: 12px; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 500;">
@@ -333,7 +341,9 @@ export class SitesListBase extends SitesMapBase {
                 }
 
                 let slotsTextHtml = '';
-                if (site.flyableSlots && site.flyableSlots.length > 0) {
+                if (!withForecast) {
+                    slotsTextHtml = '';
+                } else if (site.flyableSlots && site.flyableSlots.length > 0) {
                     const groupedByDay = {};
                     site.flyableSlots.forEach((slot) => {
                         if (!groupedByDay[slot.dayLabel]) groupedByDay[slot.dayLabel] = [];
@@ -369,7 +379,7 @@ export class SitesListBase extends SitesMapBase {
                 let timelineBarsHtml = '';
                 const maxRange = SitesService.state.forecastMaxRange || 120;
                 const forecastsToUse = forecasts.slice(0, maxRange);
-                for (let j = 0; j < maxRange; j++) {
+                for (let j = 0; withForecast && j < maxRange; j++) {
                     const w = forecastsToUse[j];
                     let barColor = 'rgba(255,255,255,0.05)';
                     let statusLabel = tl('list.unknownStatus');
@@ -435,6 +445,7 @@ export class SitesListBase extends SitesMapBase {
                         timelineBarsHtml,
                         slotsTextHtml,
                         isMinimized,
+                        withForecast,
                     ) +
                     `</div>`;
             }
@@ -488,6 +499,7 @@ export class SitesListBase extends SitesMapBase {
         timelineBarsHtml,
         slotsTextHtml,
         isMinimized,
+        withForecast = true,
     ) {
         const isFav =
             SitesService.state.userPreferences && SitesService.state.userPreferences.favoriteSites.includes(site.id);
@@ -564,7 +576,9 @@ export class SitesListBase extends SitesMapBase {
                 isMinimized
                     ? ''
                     : `
-            ${weatherHtml}
+            ${
+                withForecast
+                    ? `${weatherHtml}
             <div style="margin-top: 14px;">
                 <div class="timeline-labels">
                     <span>${tt('list.now')}</span><span>${tt('list.forecasts', { hours: SitesService.state.forecastMaxRange || 120 })}</span><span>${tt('list.inDays', { days: (SitesService.state.forecastMaxRange || 120) / 24 })}</span>
@@ -582,7 +596,9 @@ export class SitesListBase extends SitesMapBase {
                     <span class="legend-item"><span class="legend-color legend-color--incomplete"></span> ${escapeHTML(t('weather.legendIncomplete'))}</span>
                 </div>
             </div>
-            ${slotsTextHtml}
+            ${slotsTextHtml}`
+                    : ''
+            }
             ${(() => {
                 const showConv = this.isFieldFilled(site.conventionnement);
                 const showPrat = this.isFieldFilled(site.praticabilite);

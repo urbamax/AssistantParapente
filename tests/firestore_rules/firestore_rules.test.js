@@ -206,6 +206,38 @@ describe('un visiteur non connecté', () => {
     });
 });
 
+// Rôles du pilote (js/services/access_service.js) : donnés à la main, jamais par l'application.
+describe('rôles du pilote (access)', () => {
+    beforeEach(async () => {
+        await env.withSecurityRulesDisabled(async (context) => {
+            for (const uid of [ME, OTHER]) {
+                await setDoc(doc(context.firestore(), 'users', uid, 'access', 'profile'), { roles: ['beta'] });
+            }
+        });
+    });
+    const profile = (db, uid) => doc(db, 'users', uid, 'access', 'profile');
+
+    it('le pilote lit ses propres rôles', async () => {
+        await assertSucceeds(getDoc(profile(asMe(), ME)));
+    });
+
+    it('ne peut ni se donner un rôle, ni modifier ou supprimer les siens', async () => {
+        await assertFails(setDoc(profile(asMe(), ME), { roles: ['beta', 'admin'] }));
+        await assertFails(setDoc(doc(asMe(), 'users', ME, 'access', 'autre'), { roles: ['beta'] }));
+        await assertFails(setDoc(profile(asMe(), ME), { roles: [] }, { merge: true }));
+        await assertFails(deleteDoc(profile(asMe(), ME)));
+    });
+
+    it("ne lit pas les rôles d'un autre pilote", async () => {
+        await assertFails(getDoc(profile(asMe(), OTHER)));
+        await assertFails(setDoc(profile(asMe(), OTHER), { roles: ['beta'] }));
+    });
+
+    it('un visiteur non connecté ne lit rien', async () => {
+        await assertFails(getDoc(profile(anonymous(), ME)));
+    });
+});
+
 describe("tout ce que l'application n'utilise pas est refusé", () => {
     it('pushState est réservé à la Cloud Function (même pour son propriétaire)', async () => {
         const ref = doc(asMe(), 'users', ME, 'pushState', 'favoriteSitesFlyable');

@@ -12,6 +12,7 @@ import { evaluateSpotForecast, getSiteOrientations } from '../weatherScoring.js'
 import { toSorted } from '../utils/array_utils.js';
 import { t } from '../utils/i18n.js';
 import { createEmitter } from '../utils/emitter.js';
+import AccessService, { ACCESS_EVENTS } from './access_service.js';
 
 const sitesView = () => AppRouter.getView('SITES');
 
@@ -64,6 +65,8 @@ class SitesService {
     constructor() {
         /** @type {number | undefined} Fin de la pause imposée après un refus d'Open-Meteo (posée par sites_forecast_fetch.js). */
         this._weatherCooldownUntil = undefined;
+        /** @type {Map<string, {timestamp: number, results: any}> | undefined} Réponses Open-Meteo gardées 10 min (sites_forecast_fetch.js). */
+        this._weatherCache = undefined;
         /** @type {Map<string, {at: number, value: any}> | undefined} Heures de run des modèles (sites_forecast_fetch.js). */
         this._runTimeCache = undefined;
         this.PREFERENCE_KEYS = [
@@ -89,6 +92,9 @@ class SitesService {
         this._sites = [];
 
         this._events = createEmitter();
+
+        // Le rôle « beta » (météo calculée) peut arriver ou disparaître en cours de session.
+        AccessService.on(ACCESS_EVENTS.CHANGED, () => this.onAccessChanged());
 
         this.state = {
             filterWind: [],
@@ -372,8 +378,44 @@ class SitesService {
         return this.state.weatherModel === 'gfs' ? 'meteofrance' : 'gfs';
     }
 
+    /**
+     * Le pilote a-t-il droit à la météo calculée par l'application (rôle « beta », voir
+     * access_service.js) ? Sans ce droit, aucune prévision n'est demandée ni gardée : tout le reste
+     * de l'écran (liste, carte, recherche, filtres) fonctionne sans.
+     */
+    canUseForecast() {
+        return AccessService.canUseForecast();
+    }
+
+    /**
+     * Les rôles ont changé. Perte du droit : les prévisions en mémoire sont retirées (celles de
+     * l'appareil restent, sans être lues : voir restoreForecastSnapshot, et elles servent encore
+     * hors ligne si le droit revient). Gain du droit : les prévisions sont chargées comme à l'ouverture de l'écran.
+     */
+    onAccessChanged() {
+        if (this.canUseForecast()) {
+            this.scheduleWeatherRescopeIfNeeded();
+        } else {
+            this._dropForecasts();
+        }
+        this.updateForecastLabel();
+        this.renderList();
+        this.updateMapMarkers();
+    }
+
+    _dropForecasts() {
+        this.state.weatherForecasts = {};
+        this.state.weatherForecastsSecondary = {};
+        this.state.forecastProvenance = {};
+        this.state.forecastSource = undefined;
+        this.state.forecastOffset = 0;
+        clearTimeout(this._weatherRescopeTimer);
+        this._weatherCache?.clear();
+    }
+
     /** Voir sites_forecast_fetch.js (chargé à la demande). */
     async fetchSecondaryModel(...args) {
+        if (!this.canUseForecast()) return { success: true };
         return (await forecastFetch()).fetchSecondaryModel.apply(this, args);
     }
 
@@ -445,6 +487,7 @@ class SitesService {
 
     /** Voir sites_forecast_fetch.js (chargé à la demande). */
     async restoreForecastSnapshot(...args) {
+        if (!this.canUseForecast()) return 0;
         return (await forecastFetch()).restoreForecastSnapshot.apply(this, args);
     }
 
@@ -470,6 +513,8 @@ class SitesService {
 
     /** Voir sites_forecast_fetch.js (chargé à la demande). */
     async fetchWeatherForSites(...args) {
+        // Appel sans effet, comme un appel annulé par un plus récent : aucune bannière ni spinner.
+        if (!this.canUseForecast()) return { success: null, denied: true };
         return (await forecastFetch()).fetchWeatherForSites.apply(this, args);
     }
 
@@ -481,6 +526,7 @@ class SitesService {
     // un fetch que si des sites du périmètre manquent vraiment de données.
     scheduleWeatherRescopeIfNeeded() {
         clearTimeout(this._weatherRescopeTimer);
+        if (!this.canUseForecast()) return;
         this._weatherRescopeTimer = setTimeout(() => {
             const allSites = this.getSites();
             if (allSites.length === 0) return;
@@ -513,6 +559,7 @@ class SitesService {
 
     /** Voir sites_forecast_fetch.js (chargé à la demande). */
     async fetchModelRunTime(...args) {
+        if (!this.canUseForecast()) return null;
         return (await forecastFetch()).fetchModelRunTime.apply(this, args);
     }
 

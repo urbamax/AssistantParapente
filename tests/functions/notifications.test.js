@@ -4,6 +4,7 @@ import { describe, it, expect } from 'vitest';
 import {
     buildHourlyForecast,
     buildNotification,
+    hasBetaRole,
     nextState,
     shouldNotify,
     toScoringPrefs,
@@ -178,5 +179,25 @@ describe('server: notification wording (spec 005, audit A3)', () => {
     it('buildHourlyForecast returns the time of the selected hour', () => {
         const w = buildHourlyForecast(payload({ now: NOW }), NOW * 1000);
         expect(w.timeMs).toBe(NOW * 1000);
+    });
+});
+
+describe('rôle « beta » (météo calculée réservée, js/services/access_service.js)', () => {
+    it('accepte un profil dont les rôles contiennent « beta »', () => {
+        expect(hasBetaRole({ roles: ['beta'] })).toBe(true);
+        expect(hasBetaRole({ roles: ['autre', 'beta'] })).toBe(true);
+    });
+
+    it('accepte le propriétaire (rôle « owner »), qui a tous les droits', () => {
+        expect(hasBetaRole({ roles: ['owner'] })).toBe(true);
+    });
+
+    it('refuse un compte sans profil, sans rôle ou avec un profil illisible', () => {
+        expect(hasBetaRole(undefined)).toBe(false);
+        expect(hasBetaRole({})).toBe(false);
+        expect(hasBetaRole({ roles: [] })).toBe(false);
+        expect(hasBetaRole({ roles: ['autre'] })).toBe(false);
+        expect(hasBetaRole({ roles: 'beta' })).toBe(false);
+        expect(hasBetaRole({ roles: null })).toBe(false);
     });
 });
