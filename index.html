@@ -2745,6 +2745,38 @@
             </div>
         </dialog>
 
+        <!-- Import de plusieurs vols (spec 039) : les textes sont posés par le script (FR.logbook.batch) -->
+        <dialog
+            id="logbook-batch-modal"
+            class="gdpr-modal-overlay"
+            aria-labelledby="logbook-batch-title"
+            style="display: none"
+        >
+            <div class="gdpr-modal gdpr-modal--large" style="width: 96vw; max-width: 1440px; max-height: 92vh; display: flex; flex-direction: column">
+                <div class="gdpr-modal-header">
+                    <div class="gdpr-modal-title">
+                        <i class="ri-upload-cloud-line"></i>
+                        <span id="logbook-batch-title"></span>
+                    </div>
+                    <button type="button" id="logbook-batch-close" class="gdpr-modal-close-btn" data-action="closeBatchImport">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+                <div class="gdpr-modal-body batch-body">
+                    <p id="logbook-batch-intro" class="batch-intro"></p>
+                    <p id="logbook-batch-progress" class="batch-progress" role="status"></p>
+                    <div id="logbook-batch-table" class="batch-table-wrap"></div>
+                    <div id="logbook-batch-sensors" class="batch-sensors"></div>
+                </div>
+                <div class="batch-footer">
+                    <span id="logbook-batch-summary" class="batch-summary"></span>
+                    <span id="logbook-batch-live" class="batch-live" aria-live="polite"></span>
+                    <button type="button" id="logbook-batch-cancel" class="action-btn-secondary" data-action="closeBatchImport"></button>
+                    <button type="button" id="logbook-batch-import" class="action-btn-primary" data-action="importBatch"></button>
+                </div>
+            </div>
+        </dialog>
+
         <dialog id="manual-modal" class="gdpr-modal-overlay" data-backdrop-action="hideManual" style="display: none">
             <div class="gdpr-modal gdpr-modal--large" style="max-width: 1100px; max-height: 92vh; display: flex; flex-direction: column">
                 <div class="gdpr-modal-header">
@@ -3553,7 +3585,7 @@
                                     margin-bottom: 16px;
                                 "
                             >
-                                <li data-i18n-html="manualModal.importerTraceIgc" style="margin-bottom: 8px"><strong>Importer une trace GPS (.igc) :</strong> Glissez-déposez ou sélectionnez le fichier IGC de votre vario. L'application repère le vrai décollage et le vrai atterrissage (ni le parking, ni la marche du retour, même avec des virages serrés en approche), puis calcule la date, la durée, l'altitude max, le gain, la distance, le vario max et les vitesses. Un <strong>départ au treuil</strong> est reconnu tout seul (montée régulière en ligne droite dès le décollage) : le type de vol passe alors à <strong>Treuil</strong>. Si votre vario était mal calé (par exemple une altitude d'atterrissage négative), elle vous le signale et vous pouvez corriger les altitudes en saisissant l'altitude réelle du décollage ou de l'atterrissage.</li>
+                                <li data-i18n-html="manualModal.importerTraceIgc" style="margin-bottom: 8px"><strong>Importer une trace GPS (.igc) :</strong> Glissez-déposez ou sélectionnez le fichier IGC de votre vario. L'application repère le vrai décollage et le vrai atterrissage (ni le parking, ni la marche du retour, même avec des virages serrés en approche), puis calcule la date, la durée, l'altitude max, le gain, la distance, le vario max et les vitesses. Un <strong>départ au treuil</strong> est reconnu tout seul (montée régulière en ligne droite dès le décollage) : le type de vol passe alors à <strong>Treuil</strong>. Si votre vario était mal calé (par exemple une altitude d'atterrissage négative), elle vous le signale et vous pouvez corriger les altitudes en saisissant l'altitude réelle du décollage ou de l'atterrissage. <strong>Plusieurs vols d'un coup :</strong> sélectionnez ou déposez plusieurs fichiers ensemble (avec leurs fichiers .sdf si vous en avez) : un tableau s'ouvre avec une ligne par vol, rangée par date. Chaque ligne part de la trace et de vos habitudes ; corrigez-la directement (date, site, durée, voile, sellette, type de vol, école et stage, pilotes), ou recopiez une colonne sur les autres lignes avec « Appliquer à toutes ». Un fichier illisible, un doublon ou un vol déjà dans le carnet est signalé et décoché. Rien n'est ajouté avant de cliquer sur « Importer ».</li>
                                 <li data-i18n-html="manualModal.capteursSyride" style="margin-bottom: 8px"><strong>Capteurs Syride (.sdf) :</strong> Avec un vario Syride, ajoutez le fichier <strong>.sdf</strong> exporté avec le .igc (sélectionnez ou glissez les deux fichiers ensemble). Il apporte ce que l'IGC ne contient pas : le <strong>facteur de charge</strong> (G) mesuré par l'accéléromètre, y compris au largage du treuil. Vous pouvez aussi l'ajouter plus tard en modifiant le vol. L'application vérifie qu'il s'agit bien du même vol : sa trace doit suivre celle du .igc sur toute sa longueur, sinon il est refusé.</li>
                                 <li data-i18n-html="manualModal.uneProposeLesSites" style="margin-bottom: 8px"><strong>Site de vol :</strong> Une <strong>autocomplétion</strong> propose les sites de la base officielle FFVL, vos sites habituels en tête. À l'import d'une trace, l'application choisit le site connu le plus proche du décollage, dans un rayon de 500 m ; si plusieurs sites sont possibles, ils s'affichent en boutons sous le champ pour changer d'un clic. Pour un lieu absent de la base, le bouton <strong>"Placer sur la carte"</strong> permet de le pointer sur une carte (vue carte ou satellite) ou de coller des coordonnées, y compris un lien Google Maps. La position est ensuite reprise automatiquement lors de vos prochaines sessions à ce lieu.</li>
                                 <li data-i18n-html="manualModal.materielSession" style="margin-bottom: 8px"><strong>Matériel :</strong> Associez la voile et la sellette utilisées, choisies parmi vos équipements enregistrés ou saisies librement (les saisies précédentes sont proposées).</li>

@@ -35,6 +35,17 @@ export function instructorsOf(session) {
 }
 
 /**
+ * Accompagnateurs d'une session, en liste. Ils peuvent être plusieurs ; les sessions plus
+ * anciennes n'en gardaient qu'un, en texte.
+ * @param {any} session
+ * @returns {string[]}
+ */
+export function companionsOf(session) {
+    const value = session ? session.accompagnateur : null;
+    return (Array.isArray(value) ? value : [value]).map(text).filter(Boolean);
+}
+
+/**
  * Identifiant d'un stage : son nom sans espaces autour ni majuscules ; vide sans nom.
  * @param {any} session
  */
