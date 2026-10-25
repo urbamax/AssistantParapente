@@ -8,6 +8,7 @@ import LogbookService from '../services/logbook_service.js';
 import { escapeHTML } from '../core/security.js';
 import { formatDuration, formatDateOnly } from '../utils/date_utils.js';
 import { toSorted } from '../utils/array_utils.js';
+import { courseStats } from '../services/logbook_courses.js';
 import { tt, tl } from './logbook_strings.js';
 import { LogbookEquipmentBase } from './logbook_equipment.js';
 
@@ -433,6 +434,36 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
                         <div class="equip-details">
                             <span style="color: var(--accent-orange)">${tt('stats.wingFlights', { count: st.vols, duration: formatDuration(st.timeVols) })}</span>
                             <span style="color: #f59e0b">${tt('stats.wingGround', { count: st.gonflages, duration: formatDuration(st.timeGonflages) })}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            html += `</div></div></div>`;
+        }
+
+        // Stages (sessions d'école rattachées à un stage), du plus fréquenté au moins fréquenté
+        const courses = courseStats(LogbookService.getFlights());
+        if (courses.length > 0) {
+            const courseSessions = courses.reduce((sum, course) => sum + course.sessions, 0);
+            html += `
+                <div class="chart-card chart-card-wide" data-stage-stats>
+                    <div class="chart-card-header">
+                        <h3 class="chart-card-title"><i class="ri-calendar-event-line" style="color: var(--accent-orange)"></i> ${tt('stats.courses')}</h3>
+                        <span class="chart-card-subtitle" style="font-size: 0.85rem; color: var(--text-secondary);">${tt('stats.courseShare', { count: courseSessions, total: totalVols + totalGonflages })}</span>
+                    </div>
+                    <div class="chart-card-body">
+                        <div class="equip-list">`;
+            for (const course of courses) {
+                const named = course.key !== '';
+                const label = named ? course.name : tl('history.unnamedCourse');
+                const details = [course.school, course.specialty].filter(Boolean).map(escapeHTML).join(' · ');
+                html += `
+                    <div class="equip-card" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="${named ? 'stage' : 'stageUnnamed'}" data-stat-value="${escapeHTML(label)}" title="${tt('stats.filterBy', { name: label })}">
+                        <div class="equip-name">${escapeHTML(label)}</div>
+                        ${details ? `<div style="font-size: 0.8rem; color: var(--text-secondary);">${details}</div>` : ''}
+                        <div class="equip-details">
+                            <span style="color: var(--accent-orange)">${tt('stats.wingFlights', { count: course.flights, duration: formatDuration(course.flightMinutes) })}</span>
+                            <span style="color: #f59e0b">${tt('stats.wingGround', { count: course.groundSessions, duration: formatDuration(course.groundMinutes) })}</span>
                         </div>
                     </div>
                 `;

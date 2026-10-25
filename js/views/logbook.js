@@ -99,6 +99,15 @@ class LogbookViewClass extends LogbookFormBase {
                 if (button) LogbookView.removeChecklistItem(button);
             });
 
+            // Stage choisi dans la liste déroulante : ses détails sont repris tout de suite, sans
+            // attendre que le champ perde le focus
+            container.addEventListener('input', (e) => {
+                const target = /** @type {HTMLInputElement} */ (e.target);
+                if (target.id !== 'lb-stage-nom') return;
+                const picked = !(e instanceof InputEvent) || e.inputType === 'insertReplacementText';
+                if (picked) LogbookView.onLearnedFieldChanged('stage');
+            });
+
             // Valeur choisie dans la liste déroulante d'un champ « Ajouter » : ajoutée tout de suite
             container.addEventListener('input', (e) => {
                 const target = /** @type {HTMLInputElement} */ (e.target);

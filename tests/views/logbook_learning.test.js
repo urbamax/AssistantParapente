@@ -39,6 +39,10 @@ const addCompanion = (name) => {
     $('lb-accompagnateur-new').value = name;
     LogbookView.addChecklistItem('accompagnateur');
 };
+const addInstructor = (name) => {
+    $('lb-moniteur-new').value = name;
+    LogbookView.addChecklistItem('moniteur');
+};
 
 function setup(flights) {
     LogbookService.flights = flights;
@@ -178,19 +182,19 @@ describe('logbook: instructor of a school session', () => {
         $('lb-ecole-check').checked = true;
         $('lb-ecole-check').dispatchEvent(new Event('change', { bubbles: true }));
         $('lb-ecole').value = 'ÉCOLE TEST';
-        $('lb-moniteur').value = 'Gilbert';
+        addInstructor('Gilbert');
         LogbookView.submitForm();
-        expect(LogbookService.getFlights()[0]).toMatchObject({ ecole: 'ÉCOLE TEST', moniteur: 'Gilbert' });
+        expect(LogbookService.getFlights()[0]).toMatchObject({ ecole: 'ÉCOLE TEST', moniteur: ['Gilbert'] });
 
         LogbookView.renderHistory();
-        expect(document.getElementById('logbook-history-list')?.innerHTML).toContain('Moniteur :</strong> Gilbert');
+        expect(document.getElementById('logbook-history-list')?.innerHTML).toContain('Moniteurs :</strong> Gilbert');
 
         // Nouvelle session au même endroit : école et moniteur proposés
         LogbookView.resetForm();
         change('lb-site', 'Plaine');
         expect($('lb-ecole-check').checked).toBe(true);
-        expect($('lb-moniteur').value).toBe('Gilbert');
-        const options = Array.from(document.querySelectorAll('#moniteurs-list option')).map(
+        expect(LogbookView.getChecklistValues('moniteur')).toEqual(['Gilbert']);
+        const options = Array.from(document.querySelectorAll('#lb-moniteur-options option')).map(
             (o) => /** @type {HTMLOptionElement} */ (o).value,
         );
         expect(options).toEqual(['Gilbert']);
@@ -205,12 +209,12 @@ describe('logbook: instructor of a school session', () => {
         $('lb-ecole-check').checked = true;
         $('lb-ecole-check').dispatchEvent(new Event('change', { bubbles: true }));
         $('lb-ecole').value = 'ÉCOLE TEST';
-        $('lb-moniteur').value = 'Gilbert';
+        addInstructor('Gilbert');
         addCompanion('Sophie');
         addCompanion('Jérémie');
         LogbookView.submitForm();
         expect(LogbookService.getFlights()[0]).toMatchObject({
-            moniteur: 'Gilbert',
+            moniteur: ['Gilbert'],
             accompagnateur: ['Sophie', 'Jérémie'],
         });
         LogbookView.renderHistory();
@@ -255,10 +259,10 @@ describe('logbook: instructor of a school session', () => {
         $('lb-site').value = 'Plaine';
         /** @type {HTMLSelectElement} */ (document.getElementById('lb-voile')).value = 'Voile école';
         $('lb-duree').value = '5';
-        $('lb-moniteur').value = 'Gilbert';
+        addInstructor('Gilbert');
         addCompanion('Sophie');
         LogbookView.submitForm();
-        expect(LogbookService.getFlights()[0].moniteur).toBe('');
+        expect(LogbookService.getFlights()[0].moniteur).toEqual([]);
         expect(LogbookService.getFlights()[0].accompagnateur).toEqual([]);
     });
 });

@@ -9,6 +9,7 @@ import SitesService from '../services/sites_service.js';
 import { EXTENDED_WIND_DIRECTIONS } from '../data/weather_config.js';
 import { getSpotairWidgetId } from '../data/spotair_widgets.js';
 import { escapeHTML } from '../core/security.js';
+import { instructorsOf, isCourseSession, courseKey } from '../services/logbook_courses.js';
 import { formatDuration, formatDateTime, addMinutesToDatetimeLocal } from '../utils/date_utils.js';
 import { t } from '../utils/i18n.js';
 import { buildIgcFileName, buildLogbookReportHtml } from '../services/logbook_export.js';
@@ -188,6 +189,8 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                 }
                 if (type === 'voile') return s.voile === value;
                 if (type === 'ecole') return s.ecole === value;
+                if (type === 'stage') return isCourseSession(s) && courseKey(s) === value.trim().toLowerCase();
+                if (type === 'stageUnnamed') return isCourseSession(s) && courseKey(s) === '';
                 if (type === 'type') return s.type === value;
                 return true;
             });
@@ -303,7 +306,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                             ${session.ecole ? `<div><strong>${tt('history.school')}</strong> ${[this.getCourseLabel(session), escapeHTML(session.ecole)].filter(Boolean).join(' | ')}</div>` : ''}
                             ${session.ecole && session.stageSpecialty ? `<div><strong>${tt('history.specialty')}</strong> ${escapeHTML(session.stageSpecialty)}</div>` : ''}
                             ${isVol && session.typeVol === 'Treuil' && session.treuilleur ? `<div><strong>${tt('history.winchOperator')}</strong> ${escapeHTML(session.treuilleur)}</div>` : ''}
-                            ${session.ecole && session.moniteur ? `<div><strong>${tt('history.instructor')}</strong> ${escapeHTML(session.moniteur)}</div>` : ''}
+                            ${session.ecole && instructorsOf(session).length > 0 ? `<div><strong>${tt('history.instructor')}</strong> ${escapeHTML(instructorsOf(session).join(', '))}</div>` : ''}
                             ${session.ecole && LogbookHistoryBase.companionsOf(session).length > 0 ? `<div><strong>${tt('history.companion')}</strong> ${escapeHTML(LogbookHistoryBase.companionsOf(session).join(', '))}</div>` : ''}
                             ${session.instrument && (session.instrument.brand || session.instrument.model) ? `<div><strong>${tt('history.instrument')}</strong> ${escapeHTML([session.instrument.brand, session.instrument.model].filter(Boolean).join(' '))}${session.instrument.firmware ? ` ${tt('history.firmware', { version: session.instrument.firmware })}` : ''}</div>` : ''}
                             ${isVol && Array.isArray(session.typeExercice) && session.typeExercice.length > 0 ? `<div><strong>${tt('history.exercises')}</strong> ${escapeHTML(session.typeExercice.join(', '))}</div>` : ''}
