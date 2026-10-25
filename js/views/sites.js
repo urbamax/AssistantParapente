@@ -610,9 +610,6 @@ class SitesViewClass extends SitesListBase {
         if (this.state.map) {
             this.updateMapMarkers();
         }
-
-        const screen = document.getElementById('sites-screen');
-        if (screen) screen.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     filterByType(type) {
@@ -630,9 +627,6 @@ class SitesViewClass extends SitesListBase {
         if (this.state.map) {
             this.updateMapMarkers();
         }
-
-        const screen = document.getElementById('sites-screen');
-        if (screen) screen.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     updateMapTogglesVisibility() {
