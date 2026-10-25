@@ -12,7 +12,7 @@ const MANUAL = INDEX.slice(
 
 // Mots qui n'existent que dans la partie météo calculée (verdict, réglages, modèles, créneaux).
 const CALCULATED_WEATHER =
-    /prévision|volab|AROME|ICON|GFS|ECMWF|Open-Meteo|rafale|créneau|CAPE\b|Comparer|Mon Matériel|Paramètres de Calcul/i;
+    /prévision|volab|AROME|ICON|GFS|ECMWF|rafale|créneau|CAPE\b|Comparer|Mon Matériel|Paramètres de Calcul/i;
 
 let root;
 beforeEach(() => {
@@ -38,7 +38,15 @@ describe('mode d’emploi sans le rôle « beta »', () => {
     beforeEach(() => applyRoleVisibility(root));
 
     it('ne mentionne rien de la météo calculée', () => {
+        // La capture automatique de la météo d'un vol (carnet) reste visible de tous : elle est décrite.
+        root.querySelector('.ri-cloud-windy-line').parentElement.remove();
         expect(visibleText().match(CALCULATED_WEATHER)?.[0] ?? null).toBeNull();
+    });
+
+    it('décrit toujours la météo enregistrée avec un vol, visible de tous dans le carnet', () => {
+        const text = visibleText();
+        expect(text).toContain('Capture Météo Automatique (Open-Meteo)');
+        expect(text).toContain('météo du jour enregistrée automatiquement');
     });
 
     it("n'a ni l'onglet ni la section « Calcul Volabilité »", () => {

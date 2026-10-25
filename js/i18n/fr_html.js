@@ -459,8 +459,6 @@ export const FR_HTML = Object.freeze({
             'Elle regroupe les <strong>cours, manuels et fiches synthèse</strong> du brevet de pilote dans une bibliothèque consultable et téléchargeable.',
         elleTientVotreImport:
             "Elle tient votre <strong>carnet de vol</strong> (import de traces .igc, météo du jour enregistrée automatiquement) et suit l'<strong>usure de votre matériel</strong>.",
-        elleTientVotreCarnet:
-            "Elle tient votre <strong>carnet de vol</strong> (import de traces .igc) et suit l'<strong>usure de votre matériel</strong>.",
         elleRassembleSurUn:
             "Elle rassemble sur un écran <strong>Sécurité</strong> la conduite à tenir en cas d'accident, votre position GPS et les check-lists avant le décollage.",
         elleSuitVotreEt:
