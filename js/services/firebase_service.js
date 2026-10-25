@@ -183,11 +183,24 @@ export const FirebaseAuthEngine = {
         try {
             // Import Firebase SDKs dynamically from CDN
             const { initializeApp } = await loadAppModule();
-            const { getAuth, onAuthStateChanged } = await loadAuthModule();
+            const {
+                initializeAuth,
+                onAuthStateChanged,
+                indexedDBLocalPersistence,
+                browserLocalPersistence,
+                browserSessionPersistence,
+            } = await loadAuthModule();
             const { initializeFirestore, terminate } = await loadFirestoreModule();
 
             app = initializeApp(FIREBASE_CONFIG);
-            auth = getAuth(app);
+            // `getAuth` brancherait aussi le résolveur de connexion par fenêtre/redirection, qui charge
+            // au démarrage https://apis.google.com/js/api.js (sans `crossorigin`) et une iframe
+            // firebaseapp.com : l'application n'utilise que email/mot de passe, et dans Safari ces
+            // deux chargements échouent (ITP), ce qui remontait en « Script error. :0:0 ». Même
+            // persistance que le défaut de `getAuth`, sans le résolveur.
+            auth = initializeAuth(app, {
+                persistence: [indexedDBLocalPersistence, browserLocalPersistence, browserSessionPersistence],
+            });
             // Fix Safari CORS/ITP issues with WebChannel by forcing Long Polling
             db = initializeFirestore(app, {
                 experimentalForceLongPolling: true,
