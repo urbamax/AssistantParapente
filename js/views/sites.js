@@ -10,6 +10,7 @@ import { SitesListBase } from './sites_list.js';
 import AppEvents, { FORM_FIELDS } from '../core/events.js';
 import { t } from '../utils/i18n.js';
 
+import { applyRoleVisibility } from '../services/access_service.js';
 import { forecastContextInner, radiusLabel, setRefreshFailure, getRefreshFailure } from './sites_forecast.js';
 import { tt, tl } from './sites_strings.js';
 // Utilisés ailleurs (tests, autres écrans) : on les ré-exporte depuis ici.
@@ -326,6 +327,7 @@ class SitesViewClass extends SitesListBase {
         );
     }
     show() {
+        applyRoleVisibility();
         if (!this.initialized) {
             this.setupDropdowns();
 
@@ -377,7 +379,7 @@ class SitesViewClass extends SitesListBase {
             console.time('SITES_FETCH_WEATHER');
             // Show local loading state before fetching weather
             const container = document.getElementById('sites-list-container');
-            if (container && !document.getElementById('weather-loading-indicator')) {
+            if (SitesService.canUseForecast() && container && !document.getElementById('weather-loading-indicator')) {
                 const loadingHtml = `
                 <div id="weather-loading-indicator" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px; margin-bottom: 16px; font-size: 1rem; color: var(--text-secondary); background: rgba(255,255,255,0.03); border-radius: 8px;">
                     <i class="ri-loader-4-line" style="animation: spin 1s linear infinite; font-size: 1.2rem;"></i>

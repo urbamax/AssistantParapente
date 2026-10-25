@@ -113,6 +113,7 @@ const CRITICAL_ASSETS = [
     './js/services/review_scheduler.js',
     './js/services/sdf_parser.js',
     './js/services/quiz_service.js',
+    './js/services/access_service.js',
     './js/services/sites_service.js',
     './js/services/sites_forecast_fetch.js',
     './js/services/storage.js',

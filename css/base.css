@@ -200,3 +200,10 @@ button {
         animation: none !important;
     }
 }
+
+/* Éléments réservés à un rôle (data-requires-role, data-hidden-with-role, voir js/services/access_service.js) :
+   `hidden` doit l'emporter sur le display posé par leur style. */
+[data-requires-role][hidden],
+[data-hidden-with-role][hidden] {
+    display: none !important;
+}

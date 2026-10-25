@@ -2,6 +2,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import SitesService, { SITES_EVENTS } from '../../js/services/sites_service.js';
 import AppRouter from '../../js/core/router.js';
 import SitesView from '../../js/views/sites.js';
+import AccessService from '../../js/services/access_service.js';
+
+// Ces tests couvrent la météo calculée, réservée au rôle « beta » (js/services/access_service.js).
+beforeEach(() => AccessService.setRoles('pilote-test', ['beta']));
 
 // Audit : SitesService appelait directement l'écran des sites (AppRouter.getView('SITES').renderList()…).
 // Un service « sans état d'affichage » doit seulement annoncer ce qui change ; l'écran, s'il est ouvert, s'y abonne.

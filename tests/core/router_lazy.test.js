@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import AppRouter, { lazyViewModule, viewProxy } from '../../js/core/router.js';
+import AccessService from '../../js/services/access_service.js';
 
 // Code-splitting : les écrans ne sont téléchargés qu'au premier besoin. Le routeur doit les charger
 // sans rien changer pour l'utilisateur : même ordre démontage/montage, même écran d'erreur.
@@ -16,12 +17,17 @@ const addScreen = (mode) => {
 };
 
 beforeEach(() => {
+    // Le détail technique de l'écran d'erreur n'est montré qu'à la bêta (tests/core/error_visibility.test.js).
+    AccessService.setRoles('pilote-test', ['beta']);
     document.body.innerHTML = '';
     vi.spyOn(console, 'time').mockImplementation(() => {});
     vi.spyOn(console, 'timeEnd').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
 });
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+    vi.restoreAllMocks();
+    AccessService.clear();
+});
 
 describe('lazyViewModule', () => {
     it('ne télécharge rien avant le premier besoin, puis une seule fois', async () => {

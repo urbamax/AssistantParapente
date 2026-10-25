@@ -45,6 +45,14 @@ service cloud.firestore {
         allow read, write: if isOwner(userId);
       }
 
+      // Rôles du pilote (ex. { roles: ['beta'] } dans le document « profile ») : donnés à la main
+      // dans la console Firebase ou par le SDK admin, jamais par l'application. Le pilote peut les
+      // lire pour savoir quoi afficher, mais ne peut ni les créer, ni les modifier, ni les supprimer.
+      match /access/{docId} {
+        allow read: if isOwner(userId);
+        allow write: if false;
+      }
+
       // Traces de vol (fichiers IGC compressés, voir specs/037-sync-flight-traces) : un document par
       // morceau, nommé {identifiant du vol}_{numéro}. La forme et la taille sont contrôlées à
       // l'écriture : un client ne peut pas y ranger autre chose que des morceaux de trace.

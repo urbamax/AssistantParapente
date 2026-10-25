@@ -2,6 +2,10 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import SitesView, { radiusLabel, formatForecastContext, formatAge } from '../../js/views/sites.js';
 import SitesService from '../../js/services/sites_service.js';
 import { completeHourWith, SITE_SOUTH } from '../fixtures/forecasts.js';
+import AccessService from '../../js/services/access_service.js';
+
+// Ces tests couvrent la météo calculée, réservée au rôle « beta » (js/services/access_service.js).
+beforeEach(() => AccessService.setRoles('pilote-test', ['beta']));
 
 // Spec 001, US3 (FR-010b) + constitution principe II : chaque affichage d'un verdict rappelle
 // que c'est une estimation à partir de prévisions et que la décision revient au pilote.

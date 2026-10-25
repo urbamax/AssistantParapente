@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { aromeTailResponse, nearestHourIso, metaJson } from '../fixtures/forecasts.js';
+import { grantBetaRole } from '../helpers/e2e_beta_role.js';
 
 /**
  * Ferme la bannière RGPD si aucun consentement n'est enregistré. La bannière apparaît avec un léger
@@ -68,6 +69,7 @@ test.describe('E2E - Sites Flow', () => {
     // Le service worker fait lui-même les appels Open-Meteo, que page.route() ne voit pas :
     // on le bloque pour que les prévisions simulées soient réellement utilisées.
     test.use({ serviceWorkers: 'block' });
+    test.beforeEach(async ({ page }) => grantBetaRole(page));
 
     test("L'utilisateur peut rechercher un site, filtrer et voir les résultats", async ({ page }) => {
         // Intercept API call to open-meteo to mock weather response
@@ -462,5 +464,35 @@ test.describe('E2E - Sites Flow', () => {
         await expect(sortMode).toHaveValue('AZ');
 
         expect(warnings).toEqual([]);
+    });
+});
+
+test.describe('E2E - Sites sans le rôle « beta »', () => {
+    test.use({ serviceWorkers: 'block' });
+
+    test('la liste et la carte restent visibles, sans aucune météo calculée', async ({ page }) => {
+        const openMeteoCalls = [];
+        await page.route('https://api.open-meteo.com/**', (route) => {
+            openMeteoCalls.push(route.request().url());
+            return route.fulfill({ json: [] });
+        });
+        await useRadius200(page);
+        await page.goto('/?bypassGdpr=true');
+        await acceptGdprIfAsked(page);
+        await page.locator('.nav-menu-btn[data-target="SITES"]').click();
+
+        await expect(page.locator('#site-search')).toBeVisible();
+        await expect(page.locator('#sites-map-view')).toBeVisible();
+        await expect(page.locator('.site-card').first()).toBeVisible();
+
+        await expect(page.locator('.forecast-sticky-container')).toBeHidden();
+        await expect(page.locator('[data-action="toggleAdvancedSettings"]')).toBeHidden();
+        await expect(page.locator('#btn-compare-favorites')).toBeHidden();
+        await expect(page.locator('.site-weather-row')).toHaveCount(0);
+        await expect(page.locator('.ranking-timeline')).toHaveCount(0);
+        await expect(page.locator('.weather-loading')).toHaveCount(0);
+
+        await page.waitForTimeout(800);
+        expect(openMeteoCalls).toEqual([]);
     });
 });

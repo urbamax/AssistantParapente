@@ -6,6 +6,10 @@ import GlobalState from '../../js/core/app_state.js';
 import GdprEngine from '../../js/gdpr_engine.js';
 import SitesView from '../../js/views/sites.js';
 import { completeHourWith } from '../fixtures/forecasts.js';
+import AccessService from '../../js/services/access_service.js';
+
+// Ces tests couvrent la météo calculée, réservée au rôle « beta » (js/services/access_service.js).
+beforeEach(() => AccessService.setRoles('pilote-test', ['beta']));
 
 // Spec 015 : les textes de l'écran des sites passent dans le catalogue sans rien changer à
 // l'affichage. Ces instantanés ont été enregistrés AVANT le déplacement ; ils doivent rester identiques.
