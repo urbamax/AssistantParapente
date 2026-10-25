@@ -54,16 +54,16 @@ export class LogbookChecklistsBase extends LogbookSitesBase {
                         <label for="lb-ecole">${tt('form.schoolName')} <span class="required">*</span></label>
                         <input type="text" id="lb-ecole" list="ecoles-list" placeholder="${tt('form.schoolPlaceholder')}" autocomplete="off" style="width: 100%;">
                         <datalist id="ecoles-list"></datalist>
-                        <label for="lb-moniteur" style="display:block; margin-top: 10px;">${tt('form.instructor')}</label>
-                        <input type="text" id="lb-moniteur" list="moniteurs-list" placeholder="${tt('form.instructorPlaceholder')}" autocomplete="off" style="width: 100%;">
-                        <datalist id="moniteurs-list"></datalist>
+                        <label style="display:block; margin-top: 10px;">${tt('form.instructor')}</label>
+                        ${this.renderChecklist('moniteur', [], this.getUsedValues('moniteur'), tt('form.instructorPlaceholder'))}
 
                         <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-top: 10px;">
                             <input type="checkbox" id="lb-stage-check" aria-controls="lb-stage-group"> ${tt('form.isCourse')}
                         </label>
                         <div id="lb-stage-group" hidden style="margin-top: 6px;">
                             <label for="lb-stage-nom" style="display:block;">${tt('form.courseName')}</label>
-                            <input type="text" id="lb-stage-nom" placeholder="${tt('form.courseNamePlaceholder')}" autocomplete="off" style="width: 100%;">
+                            <input type="text" id="lb-stage-nom" list="stages-list" placeholder="${tt('form.courseNamePlaceholder')}" autocomplete="off" style="width: 100%;">
+                            <datalist id="stages-list"></datalist>
                             <label for="lb-stage-specialite" style="display:block; margin-top: 10px;">${tt('form.specialty')}</label>
                             <select id="lb-stage-specialite" style="width: 100%;">
                                 <option value="">${tt('form.specialtySelect')}</option>

@@ -7,6 +7,7 @@
  */
 import LogbookService from '../services/logbook_service.js';
 import PilotHabits from '../services/pilot_habits.js';
+import { instructorsOf, isCourseSession, latestOfCourse, preferPlace } from '../services/logbook_courses.js';
 import { escapeHTML } from '../core/security.js';
 import { tl } from './logbook_strings.js';
 import { LogbookChecklistsBase } from './logbook_checklists.js';
@@ -20,7 +21,9 @@ export class LogbookLearnedBase extends LogbookChecklistsBase {
         'lb-sellette': 'sellette',
         'lb-ecole-check': 'ecole',
         'lb-ecole': 'ecole',
-        'lb-moniteur': 'moniteur',
+        'lb-stage-check': 'stage',
+        'lb-stage-nom': 'stage',
+        'lb-stage-specialite': 'specialite',
         'lb-treuilleur': 'treuilleur',
         'lb-site': 'site',
         'lb-lieu': 'lieu',
@@ -136,7 +139,10 @@ export class LogbookLearnedBase extends LogbookChecklistsBase {
                     reason: gear.reason === 'place' ? 'gearPlace' : 'gearLatest',
                 });
         }
-        if (can('ecole')) {
+        // Stage : celui dont le pilote a saisi le nom, ou celui d'une session proche ; il apporte
+        // l'école, la spécialité, les moniteurs, les accompagnateurs et les pilotes
+        const fromCourse = editing ? new Set() : this.applyCourseDefaults(sessions, place, can);
+        if (can('ecole') && !fromCourse.has('ecole')) {
             const ecole = PilotHabits.suggest(sessions, 'ecole', {
                 sessionType,
                 context: { place },
@@ -153,32 +159,35 @@ export class LogbookLearnedBase extends LogbookChecklistsBase {
                 this.learnedFields.delete('ecole');
             }
         }
-        // Moniteur : le dernier de cette école sur ce site, sinon le dernier de cette école
-        const instructorInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
+        // Moniteurs : ceux de la dernière session de cette école sur ce site, sinon de cette école
         const school = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole-check'))?.checked
             ? value('lb-ecole').trim().toLowerCase()
             : '';
-        if (instructorInput && can('moniteur')) {
-            const instructor = school
-                ? PilotHabits.latest(
-                      sessions.filter((s) => typeof s.ecole === 'string' && s.ecole.trim().toLowerCase() === school),
-                      'moniteur',
-                      { place },
+        if (document.getElementById('lb-moniteur-group') && can('moniteur') && !fromCourse.has('moniteur')) {
+            const withInstructor = school
+                ? sessions.filter(
+                      (s) =>
+                          typeof s.ecole === 'string' &&
+                          s.ecole.trim().toLowerCase() === school &&
+                          instructorsOf(s).length > 0,
                   )
-                : null;
-            if (instructor) {
-                instructorInput.value = instructor.value;
-                this.learnedFields.set(
-                    'moniteur',
-                    instructor.reason === 'place' ? 'instructorPlace' : 'instructorLatest',
-                );
+                : [];
+            const reference = preferPlace(withInstructor, place);
+            if (reference) {
+                this.setChecklistValues('moniteur', instructorsOf(reference));
+                const here = place.trim() && PilotHabits.placeOf(reference) === place.trim().toLowerCase();
+                this.learnedFields.set('moniteur', here ? 'instructorPlace' : 'instructorLatest');
             } else if (this.learnedFields.has('moniteur')) {
-                instructorInput.value = '';
+                this.setChecklistValues('moniteur', []);
                 this.learnedFields.delete('moniteur');
             }
         }
         // Accompagnateurs : ceux d'une session de moins de 3 h ici, sinon les derniers de cette école ici
-        if (document.getElementById('lb-accompagnateur-group') && can('accompagnateur')) {
+        if (
+            document.getElementById('lb-accompagnateur-group') &&
+            can('accompagnateur') &&
+            !fromCourse.has('accompagnateur')
+        ) {
             const withCompanion = school
                 ? sessions.filter(
                       (s) =>
@@ -204,7 +213,7 @@ export class LogbookLearnedBase extends LogbookChecklistsBase {
         if (isVol) this.refreshWinchOperatorList(sessions, place, value('lb-datetime'));
 
         // Pilotes : ceux d'une session au même endroit à moins de 3 h (plusieurs vols d'affilée)
-        if (can('pilotes')) {
+        if (can('pilotes') && !fromCourse.has('pilotes')) {
             const nearby = this.findNearbySession(sessions, place, value('lb-datetime'));
             if (nearby) {
                 this.setChecklistValues('pilotes', nearby.pilotes);
@@ -215,6 +224,83 @@ export class LogbookLearnedBase extends LogbookChecklistsBase {
             }
         }
         this.renderLearnedSummary();
+    }
+
+    /**
+     * Pré-remplissage par le stage (spec 038). La session de référence est :
+     *  - si le pilote a choisi le stage (case cochée ou nom saisi) : la dernière session du stage
+     *    dont il a saisi le nom ;
+     *  - sinon : la session la plus proche, au même endroit et à moins de 3 h, si elle fait partie
+     *    d'un stage (la case, le nom et la spécialité sont alors proposés).
+     * Seuls les champs que le pilote n'a pas touchés sont remplis ; une liste vide dans la session de
+     * référence ne vide rien. Retourne les champs remplis, que les autres règles laissent alors.
+     */
+    applyCourseDefaults(sessions, place, can) {
+        const filled = new Set();
+        const check = /** @type {HTMLInputElement|null} */ (document.getElementById('lb-stage-check'));
+        const nameInput = /** @type {HTMLInputElement|null} */ (document.getElementById('lb-stage-nom'));
+        const specialtySelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-stage-specialite'));
+        const group = document.getElementById('lb-stage-group');
+        if (!check || !nameInput || !specialtySelect || !group) return filled;
+
+        const chosen = this.touchedFields.has('stage');
+        let reference;
+        if (chosen) {
+            reference = check.checked ? latestOfCourse(sessions, nameInput.value) : null;
+        } else {
+            const datetime = /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime'))?.value || '';
+            const nearest = this.findNearbySession(sessions, place, datetime, 'datetime');
+            reference = nearest && isCourseSession(nearest) ? nearest : null;
+            if (reference) {
+                check.checked = true;
+                group.hidden = false;
+                nameInput.value = typeof reference.stageName === 'string' ? reference.stageName.trim() : '';
+                this.learnedFields.set('stage', 'nearbySession');
+            } else if (this.learnedFields.has('stage')) {
+                // Proposé pour une autre heure ou un autre site : le stage et ce qu'il avait rempli sont retirés
+                check.checked = false;
+                group.hidden = true;
+                nameInput.value = '';
+                this.learnedFields.delete('stage');
+                this.clearCourseFields(can);
+            }
+        }
+        if (!reference) return filled;
+
+        const fill = (field, apply) => {
+            if (!can(field)) return;
+            apply();
+            this.learnedFields.set(field, 'course');
+            filled.add(field);
+        };
+        const school = typeof reference.ecole === 'string' ? reference.ecole.trim() : '';
+        if (school) fill('ecole', () => this.setSchoolField(true, school));
+        const specialty = typeof reference.stageSpecialty === 'string' ? reference.stageSpecialty : '';
+        if (specialty && Array.from(specialtySelect.options).some((o) => o.value === specialty)) {
+            fill('specialite', () => (specialtySelect.value = specialty));
+        }
+        const lists = {
+            moniteur: instructorsOf(reference),
+            accompagnateur: LogbookLearnedBase.companionsOf(reference),
+            pilotes: Array.isArray(reference.pilotes) ? reference.pilotes : [],
+        };
+        for (const [field, names] of Object.entries(lists)) {
+            if (names.length) fill(field, () => this.setChecklistValues(field, names));
+        }
+        return filled;
+    }
+
+    /** Retire ce que le stage avait rempli (le pilote n'y a pas touché). */
+    clearCourseFields(can) {
+        for (const [field, reason] of [...this.learnedFields.entries()]) {
+            if (reason !== 'course' || !can(field)) continue;
+            if (field === 'ecole') this.setSchoolField(false);
+            else if (field === 'specialite') {
+                const select = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-stage-specialite'));
+                if (select) select.value = '';
+            } else this.setChecklistValues(field, []);
+            this.learnedFields.delete(field);
+        }
     }
 
     /**

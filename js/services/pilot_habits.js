@@ -110,13 +110,18 @@ const PilotHabits = {
         return usable.length ? { value: usable[0][field].trim(), reason: 'latest' } : null;
     },
 
-    /** Valeurs triées par usage (récence comprise), les plus utilisées d'abord. */
+    /**
+     * Valeurs triées par usage (récence comprise), les plus utilisées d'abord. `valueOf` rend une
+     * valeur, ou une liste quand une session en porte plusieurs (moniteurs) : chacune compte.
+     */
     rankByUse(sessions, valueOf) {
         const scores = new Map();
         (sessions || []).forEach((s, rank) => {
-            const v = valueOf(s);
-            if (!v) return;
-            scores.set(v, (scores.get(v) || 0) + 0.5 ** (rank / this.RECENCY_HALF_LIFE));
+            const raw = valueOf(s);
+            for (const v of Array.isArray(raw) ? raw : [raw]) {
+                if (!v) continue;
+                scores.set(v, (scores.get(v) || 0) + 0.5 ** (rank / this.RECENCY_HALF_LIFE));
+            }
         });
         return [...scores.entries()].sort((a, b) => b[1] - a[1]).map(([v]) => v);
     },

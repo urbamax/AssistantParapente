@@ -109,6 +109,7 @@ const CRITICAL_ASSETS = [
     './js/services/flight_classifier.js',
     './js/services/logbook_service.js',
     './js/services/logbook_export.js',
+    './js/services/logbook_courses.js',
     './js/services/pilot_habits.js',
     './js/services/review_scheduler.js',
     './js/services/sdf_parser.js',

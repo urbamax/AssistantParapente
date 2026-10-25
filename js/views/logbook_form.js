@@ -5,6 +5,7 @@
  */
 import LogbookService from '../services/logbook_service.js';
 import PilotHabits from '../services/pilot_habits.js';
+import { instructorsOf, courseNames } from '../services/logbook_courses.js';
 import StorageService from '../services/storage.js'; // Retained just for custom select lists
 import SitesService from '../services/sites_service.js';
 import { escapeHTML } from '../core/security.js';
@@ -58,7 +59,7 @@ export class LogbookFormBase extends LogbookIgcImportBase {
         const commentaire = /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire'))?.value || '';
         const ecoleChecked = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole-check'))?.checked;
         const ecole = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole'))?.value || '';
-        const moniteur = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'))?.value || '';
+        const moniteurs = this.getChecklistValues('moniteur');
         const accompagnateurs = this.getChecklistValues('accompagnateur');
         const pilotes = this.getChecklistValues('pilotes');
 
@@ -124,8 +125,7 @@ export class LogbookFormBase extends LogbookIgcImportBase {
             if (el) el.value = commentaire;
         }
         if (ecoleChecked) this.setSchoolField(true, ecole);
-        const instructorField = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
-        if (instructorField && moniteur) instructorField.value = moniteur;
+        this.setChecklistValues('moniteur', moniteurs);
         this.setChecklistValues('accompagnateur', accompagnateurs);
         this.setChecklistValues('pilotes', pilotes);
 
@@ -396,12 +396,20 @@ export class LogbookFormBase extends LogbookIgcImportBase {
         }
 
         // Moniteurs déjà saisis, les plus fréquents d'abord
-        const instructorList = document.getElementById('moniteurs-list');
+        const instructorList = document.getElementById('lb-moniteur-options');
         if (instructorList) {
-            const instructors = PilotHabits.rankByUse(LogbookService.getFlights(), (session) =>
-                typeof session.moniteur === 'string' ? session.moniteur.trim() : '',
-            );
-            instructorList.innerHTML = instructors.map((name) => `<option value="${escapeHTML(name)}">`).join('');
+            const instructors = PilotHabits.rankByUse(LogbookService.getFlights(), instructorsOf);
+            instructorList.innerHTML = instructors
+                .map((name) => `<option value="${escapeHTML(name)}"></option>`)
+                .join('');
+        }
+
+        // Stages déjà saisis, les plus fréquents d'abord
+        const courseList = document.getElementById('stages-list');
+        if (courseList) {
+            courseList.innerHTML = courseNames(LogbookService.getFlights())
+                .map((name) => `<option value="${escapeHTML(name)}"></option>`)
+                .join('');
         }
 
         // Populate Sites
@@ -574,8 +582,6 @@ export class LogbookFormBase extends LogbookIgcImportBase {
         const ecoleInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole'));
         // Vide hors école : en modification, la valeur vide efface l'école enregistrée.
         const ecole = ecoleCheck?.checked && ecoleInput ? ecoleInput.value.trim() : '';
-        const moniteurInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
-        const moniteur = ecole && moniteurInput ? moniteurInput.value.trim() : '';
 
         // Nouveaux champs de stage
         const stageCheck = /** @type {HTMLInputElement} */ (document.getElementById('lb-stage-check'));
@@ -602,7 +608,7 @@ export class LogbookFormBase extends LogbookIgcImportBase {
             duree: duree,
             commentaire: commentaire,
             ecole: ecole,
-            moniteur: moniteur,
+            moniteur: ecole ? this.getChecklistValues('moniteur') : [],
             stageName: stageName,
             stageSpecialty: stageSpecialty,
             accompagnateur: ecole ? this.getChecklistValues('accompagnateur') : [],
@@ -806,8 +812,7 @@ export class LogbookFormBase extends LogbookIgcImportBase {
         const techSelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-tech-decollage'));
         if (techSelect) techSelect.selectedIndex = 0;
         this.setSchoolField(false);
-        const instructorEdit = /** @type {HTMLInputElement} */ (document.getElementById('lb-moniteur'));
-        if (instructorEdit) instructorEdit.value = session.moniteur || '';
+        this.setChecklistValues('moniteur', instructorsOf(session));
         this.setChecklistValues('accompagnateur', this.statics().companionsOf(session));
         /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime')).value = session.datetime;
 

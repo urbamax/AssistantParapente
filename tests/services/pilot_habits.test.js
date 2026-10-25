@@ -106,4 +106,16 @@ describe('PilotHabits.latest and rankByUse', () => {
     it('ranks places by use', () => {
         expect(PilotHabits.rankByUse(sessions, (s) => s.site)).toEqual(['Dune', 'Plaine']);
     });
+
+    it('counts every value when a session has several, and ignores empty ones', () => {
+        const crews = [
+            { crew: ['Marie', 'Gilbert'] },
+            { crew: ['Gilbert', ''] },
+            { crew: [] },
+            { crew: ['Marie'] },
+            { crew: ['Gilbert'] },
+        ];
+        expect(PilotHabits.rankByUse(crews, (s) => s.crew)).toEqual(['Gilbert', 'Marie']);
+        expect(PilotHabits.rankByUse([{ crew: [] }], (s) => s.crew)).toEqual([]);
+    });
 });

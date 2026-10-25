@@ -318,16 +318,22 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <label for="lb-ecole">Nom de l'école <span class="required">*</span></label>
                         <input type="text" id="lb-ecole" list="ecoles-list" placeholder="Choisir ou saisir le nom" autocomplete="off" style="width: 100%;">
                         <datalist id="ecoles-list"></datalist>
-                        <label for="lb-moniteur" style="display:block; margin-top: 10px;">Moniteur</label>
-                        <input type="text" id="lb-moniteur" list="moniteurs-list" placeholder="Nom du moniteur" autocomplete="off" style="width: 100%;">
-                        <datalist id="moniteurs-list"></datalist>
+                        <label style="display:block; margin-top: 10px;">Moniteurs</label>
+                        
+                        <div id="lb-moniteur-group" class="lb-chips"></div>
+                        <datalist id="lb-moniteur-options"></datalist>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <input type="text" id="lb-moniteur-new" list="lb-moniteur-options" data-checklist="moniteur" placeholder="Nom du moniteur…" autocomplete="off" style="flex:1; min-width:0;">
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'moniteur'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
+                        </div>
 
                         <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-top: 10px;">
                             <input type="checkbox" id="lb-stage-check" aria-controls="lb-stage-group"> C'est un stage
                         </label>
                         <div id="lb-stage-group" hidden="" style="margin-top: 6px;">
                             <label for="lb-stage-nom" style="display:block;">Nom du stage</label>
-                            <input type="text" id="lb-stage-nom" placeholder="Ex: Stage perf estival" autocomplete="off" style="width: 100%;">
+                            <input type="text" id="lb-stage-nom" list="stages-list" placeholder="Ex: Stage perf estival" autocomplete="off" style="width: 100%;">
+                            <datalist id="stages-list"></datalist>
                             <label for="lb-stage-specialite" style="display:block; margin-top: 10px;">Spécialité</label>
                             <select id="lb-stage-specialite" style="width: 100%;">
                                 <option value="">Sélectionner...</option>
@@ -437,16 +443,22 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <label for="lb-ecole">Nom de l'école <span class="required">*</span></label>
                         <input type="text" id="lb-ecole" list="ecoles-list" placeholder="Choisir ou saisir le nom" autocomplete="off" style="width: 100%;">
                         <datalist id="ecoles-list"></datalist>
-                        <label for="lb-moniteur" style="display:block; margin-top: 10px;">Moniteur</label>
-                        <input type="text" id="lb-moniteur" list="moniteurs-list" placeholder="Nom du moniteur" autocomplete="off" style="width: 100%;">
-                        <datalist id="moniteurs-list"></datalist>
+                        <label style="display:block; margin-top: 10px;">Moniteurs</label>
+                        
+                        <div id="lb-moniteur-group" class="lb-chips"></div>
+                        <datalist id="lb-moniteur-options"></datalist>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <input type="text" id="lb-moniteur-new" list="lb-moniteur-options" data-checklist="moniteur" placeholder="Nom du moniteur…" autocomplete="off" style="flex:1; min-width:0;">
+                            <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'moniteur'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
+                        </div>
 
                         <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-top: 10px;">
                             <input type="checkbox" id="lb-stage-check" aria-controls="lb-stage-group"> C'est un stage
                         </label>
                         <div id="lb-stage-group" hidden="" style="margin-top: 6px;">
                             <label for="lb-stage-nom" style="display:block;">Nom du stage</label>
-                            <input type="text" id="lb-stage-nom" placeholder="Ex: Stage perf estival" autocomplete="off" style="width: 100%;">
+                            <input type="text" id="lb-stage-nom" list="stages-list" placeholder="Ex: Stage perf estival" autocomplete="off" style="width: 100%;">
+                            <datalist id="stages-list"></datalist>
                             <label for="lb-stage-specialite" style="display:block; margin-top: 10px;">Spécialité</label>
                             <select id="lb-stage-specialite" style="width: 100%;">
                                 <option value="">Sélectionner...</option>

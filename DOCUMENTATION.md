@@ -71,6 +71,7 @@ AssistantParapente/
 │   │   ├── igc_parser.js       # Native IGC GPS file parser (B-records, flight detection, analysis, winch)
 │   │   ├── sdf_parser.js       # Syride .sdf sensor file (load factor, temperature)
 │   │   ├── pilot_habits.js     # What the add form learns from the pilot's logbook
+│   │   ├── logbook_courses.js  # Courses (stages) and instructors: pure rules, course names, course statistics
 │   │   ├── storage.js          # LocalStorage wrapper & fallback keys
 │   │   └── idb_storage.js      # Native IndexedDB wrapper for heavy flights & IGC traces
 │   ├── components/
@@ -302,6 +303,8 @@ The IGC has no accelerometer. Syride varios export a binary `.sdf` next to the `
 
 ### 3. Pre-filling learned from the pilot (`js/services/pilot_habits.js`)
 For a new session, `LogbookView.applyLearnedDefaults()` fills the fields the pilot has not touched from the logbook: every past session is evidence weighted by recency (half-life of 15 sessions) and by similarity (same site, same launch mode). General rules are priors worth a couple of sessions (back-facing launch at the winch). Flight type, takeoff technique, school and ground handling place use `suggest`; wing and harness use `latest` (last used on this site, otherwise last used); site suggestions are ordered by `rankByUse`. A field changed by the pilot is never overridden and an edited session is never filled in.
+
+**Courses and instructors (spec 038, `js/services/logbook_courses.js`).** A course (stage) is not a record: it is what its sessions have in common, identified by its name compared without case or surrounding spaces (`courseKey`); a session belongs to one when it has a school and a course name or a specialty (`isCourseSession`). `moniteur` holds a list of names (the form's checklist); sessions saved before 2026-10 hold a single text, so every reader goes through `instructorsOf()` (list of one), exactly like `accompagnateur` through `companionsOf`. In `applyLearnedDefaults()` the course step runs first (`applyCourseDefaults`): if the pilot chose the course (box ticked, known name typed or picked in `#stages-list`) the reference is the latest session of that course; otherwise it is the nearest session at the same place less than 3 h away, if it belongs to a course (the course box, name and specialty are then proposed too). From the reference, only the untouched fields are filled (school, specialty `specialite`, instructors, companions, pilots; an empty list fills nothing) with the reason `course`; the school / instructor / companion / pilots habit rules skip a field the course filled. A course proposed by the nearby-session rule is removed, with what it filled, when the place or the time no longer matches; once the pilot touches the course (`stage`) it is kept. The statistics list courses with `courseStats()` (flights, ground sessions and their times; sessions with a specialty but no name form one unnamed course) and touching one filters the history (`stage`, `stageUnnamed`).
 
 ### 4. Wing & Equipment Hours Tracking (`js/services/logbook_service.js`)
 Every logged flight automatically increments the total airtime (hours & minutes) of the associated wing and harness, triggering visual alerts when equipment passes maintenance thresholds (e.g., 100h inspection alert).
