@@ -441,6 +441,8 @@ export const FR_HTML = Object.freeze({
         pourquoiCetteApplication: 'Pourquoi cette application ?',
         laPreparationAuxBrevets:
             'La préparation aux brevets de parapente peut être longue et morcelée : les questions officielles de la FFVL sont dispersées dans des documents PDF peu pratiques sur téléphone, les cours théoriques ne sont pas toujours réunis au même endroit, et la lecture des conditions météo sur un décollage demande de jongler entre plusieurs outils différents (Windy, Météo-Parapente, PiouPiou, les données FFVL...).',
+        laPreparationAuxBrevetsSansMeteo:
+            'La préparation aux brevets de parapente peut être longue et morcelée : les questions officielles de la FFVL sont dispersées dans des documents PDF peu pratiques sur téléphone, et les cours théoriques ne sont pas toujours réunis au même endroit.',
         lEstNeDe:
             "L'<strong>Assistant Parapente</strong> est né de la volonté de regrouper tout cela en un seul endroit, pensé pour fonctionner parfaitement sur mobile depuis le décollage, et adapté à toutes les étapes du parcours d'un pilote — du tout débutant (BI) au confirmé (BPC).",
         uneApplication100Gratuite: 'Une application 100% gratuite & sans publicité',
@@ -451,10 +453,14 @@ export const FR_HTML = Object.freeze({
             'Elle centralise les <strong>questions officielles FFVL</strong> dans un QCM interactif avec correction et explications pédagogiques, accessible à tout moment, même hors ligne.',
         elleCroiseEnTemps:
             'Elle croise en temps réel les <strong>données géographiques des sites de vol</strong> (orientation des décollages, altitude, type) avec les <strong>prévisions météo multi-modèles</strong> (AROME, ICON, GFS…) pour indiquer quels sites sont potentiellement volables et à quelle heure.',
+        elleReunitLesSites:
+            "Elle réunit les <strong>sites de vol</strong> (orientation des décollages, altitude, type) sur une carte et dans une liste, avec recherche et filtres, autour de vous ou de l'endroit de votre choix.",
         elleRegroupeLesDu:
             'Elle regroupe les <strong>cours, manuels et fiches synthèse</strong> du brevet de pilote dans une bibliothèque consultable et téléchargeable.',
         elleTientVotreImport:
             "Elle tient votre <strong>carnet de vol</strong> (import de traces .igc, météo du jour enregistrée automatiquement) et suit l'<strong>usure de votre matériel</strong>.",
+        elleTientVotreCarnet:
+            "Elle tient votre <strong>carnet de vol</strong> (import de traces .igc) et suit l'<strong>usure de votre matériel</strong>.",
         elleRassembleSurUn:
             "Elle rassemble sur un écran <strong>Sécurité</strong> la conduite à tenir en cas d'accident, votre position GPS et les check-lists avant le décollage.",
         elleSuitVotreEt:
@@ -462,6 +468,8 @@ export const FR_HTML = Object.freeze({
         ceQueLApplicationNe: "Ce que l'application ne fait PAS",
         lApplicationEstUn:
             "L'application est un <strong>outil d'accompagnement et d'aide à la décision</strong>, pas un outil de décision. Les prévisions météo affichées proviennent de modèles automatiques et ne remplacent pas une analyse aérologique complète et officielle. <strong>La décision de voler reste toujours et uniquement celle du pilote.</strong>",
+        lApplicationEstUnSansMeteo:
+            "L'application est un <strong>outil d'accompagnement et d'aide à la décision</strong>, pas un outil de décision. <strong>La décision de voler reste toujours et uniquement celle du pilote.</strong>",
         deMemeLaReussite:
             "De même, la réussite aux QCM de l'application ne garantit pas la réussite aux examens officiels organisés par la FFVL.",
         quiLADeveloppee: "Qui l'a développée ?",
@@ -472,6 +480,8 @@ export const FR_HTML = Object.freeze({
         bienvenueSurLAssistantParapente: "Bienvenue sur l'Assistant Parapente",
         lAssistantParapenteEstUne:
             "L'Assistant Parapente est une application tout-en-un conçue pour accompagner les pilotes de vol libre, de l'apprentissage théorique jusqu'à la préparation météo de leurs vols. Voici les concepts clés du fonctionnement général :",
+        lAssistantParapenteEstUneSansMeteo:
+            "L'Assistant Parapente est une application tout-en-un conçue pour accompagner les pilotes de vol libre, de l'apprentissage théorique jusqu'à la préparation de leurs vols. Voici les concepts clés du fonctionnement général :",
         n1ProfilEtNiveau: '1. Profil et Niveau de Pilotage',
         enHautDeLEcran:
             "En haut de l'écran, un menu déroulant vous permet de sélectionner votre niveau actuel (Brevet Initial, Brevet Pilote, Brevet Pilote Confirmé, Treuil, ou Tous les niveaux). Il est proposé dès votre première visite sur l'écran d'accueil, et vous pouvez le changer à tout moment. Ce réglage adapte automatiquement le contenu de l'application : les questions des QCM et les cours de la bibliothèque sont filtrés selon votre niveau, le nombre de questions de l'examen blanc est ajusté, et la couleur dominante de l'interface change pour refléter votre progression (Vert pour BI, Bleu pour BP, Marron pour BPC).",
@@ -494,6 +504,8 @@ export const FR_HTML = Object.freeze({
         carnetDeVol2: 'Carnet de Vol & Équipement :',
         votreNiveauDeBrevet:
             'Votre niveau de brevet sélectionné, vos filtres de recherche météo, votre thème visuel, et vos configurations météo personnalisées (limites de vent, modèle préféré, rayon GPS, tri) sont synchronisés automatiquement.',
+        votreNiveauDeBrevetSansMeteo:
+            'Votre niveau de brevet sélectionné, vos filtres de recherche, votre thème visuel et vos réglages de recherche de sites (rayon GPS) sont synchronisés automatiquement.',
         sauvegardeDeVosPreferences: 'Sauvegarde de vos préférences :',
         unEffacementAccidentelDu:
             "Un effacement accidentel du cache du navigateur, un reset de téléphone, ou un changement d'appareil en urgence ne vous feront plus perdre des semaines de progression.",
@@ -508,13 +520,18 @@ export const FR_HTML = Object.freeze({
         n4HorsLigneEt: '4. Hors ligne et mises à jour',
         lesQcmLeCarnet:
             "les QCM, le carnet de vol et l'écran Sécurité fonctionnent hors ligne. La dernière prévision météo chargée, les cours déjà ouverts et les zones de carte déjà consultées restent disponibles sur l'appareil.",
+        lesQcmLeCarnetSansMeteo:
+            "les QCM, le carnet de vol et l'écran Sécurité fonctionnent hors ligne. Les cours déjà ouverts et les zones de carte déjà consultées restent disponibles sur l'appareil.",
         sansReseau: 'Sans réseau :',
         lorsquUneMiseAJour:
             "lorsqu'une mise à jour de l'application est disponible, un message vous le signale pour que vous puissiez recharger la page.",
         nouvelleVersion: 'Nouvelle version :',
         preparationDesVolsSites: 'Préparation des Vols (Sites & Météo)',
+        preparationDesVolsSitesSeuls: 'Sites de Vol',
         ceModuleCroiseLes:
             'Ce module croise les données géographiques des sites de vol libre (fournies par la FFVL) avec les prévisions de plusieurs modèles météorologiques, pour indiquer quels sites sont potentiellement volables autour de vous et à quelle heure.',
+        ceModulePresenteLesSites:
+            'Ce module présente les sites de vol libre (données fournies par la FFVL) sur une carte et dans une liste, autour de vous.',
         n1PointDeReference: '1. Point de Référence et Rayon de Recherche',
         autorisezLeGpsBouton:
             'Autorisez le GPS (bouton "GPS") pour centrer la recherche sur vous, ou tapez le nom d\'une ville ou d\'une adresse (ex : Annecy) puis cliquez sur "Valider". Sans GPS ni adresse, la recherche est centrée sur Boulogne-sur-Mer et un message vous le rappelle.',
@@ -524,6 +541,8 @@ export const FR_HTML = Object.freeze({
         lieuxEnregistres: 'Lieux enregistrés :',
         leCurseurRayonMaximal:
             'Le curseur "Rayon maximal" définit la zone de recherche autour de ce point, de 10 à 200 km (50 km par défaut). La météo n\'est demandée que pour les sites de cette zone (et vos favoris) ; la carte suit le rayon choisi.',
+        leCurseurRayonMaximalSansMeteo:
+            'Le curseur "Rayon maximal" définit la zone de recherche autour de ce point, de 10 à 200 km (50 km par défaut) ; la carte suit le rayon choisi.',
         leRayon: 'Le Rayon :',
         laBarreDeRecherche:
             'La barre de recherche trouve un site par son nom, sa ville ou son code postal. Les menus "Orientation" et "Type" (site naturel, atterrissage, dune, piste de treuil, gonflage…) affinent la liste.',
@@ -567,9 +586,13 @@ export const FR_HTML = Object.freeze({
             "La dernière prévision chargée reste consultable sans réseau, avec la date de récupération pour rappeler qu'elle peut être dépassée.",
         horsLigne: 'Hors ligne :',
         n5FicheSiteFavoris: '5. Fiche Site, Favoris et Comparateur',
+        n2FicheSiteEtFavoris: '2. Fiche Site et Favoris',
         chaqueFicheSiteAffiche:
             "Chaque fiche site affiche l'altitude, les prochains créneaux volables, et donne accès à la fiche officielle FFVL, au vent en direct de la balise la plus proche (SpotAiR), à l'itinéraire (\"S'y rendre\" avec Waze, Google Maps ou Apple Plans) et aux détails du site (praticabilité, dangers signalés, réglementation…). Un <strong>brief pré-vol</strong> rappelle votre niveau et l'état de révision de votre matériel. Le bouton <strong>Comparer</strong> met vos sites favoris côte à côte : météo de l'heure affichée, heures volables, meilleur créneau et accord entre les deux modèles.",
+        chaqueFicheSiteAfficheSansMeteo:
+            "Chaque fiche site affiche l'altitude et donne accès à la fiche officielle FFVL, au vent en direct de la balise la plus proche (SpotAiR), à l'itinéraire (\"S'y rendre\" avec Waze, Google Maps ou Apple Plans) et aux détails du site (praticabilité, dangers signalés, réglementation…). Un <strong>brief pré-vol</strong> rappelle votre niveau et l'état de révision de votre matériel.",
         n6CartographieCartes: '6. Cartographie & Cartes Externes',
+        n3CartographieCartes: '3. Cartographie & Cartes Externes',
         auDessusDeLaListe:
             "Au-dessus de la liste, la carte interactive affiche les sites autour de vous avec les icônes officielles FFVL. Des onglets permettent d'afficher en un clic des services météo externes : <strong>Windy</strong> (vent animé), <strong>Météo-Parapente</strong> (émagrammes &amp; thermiques), <strong>Paragliding Earth</strong>, <strong>Paraglidable</strong>, les cartes <strong>Fronts &amp; Isobares</strong> de Météo-France, et d'autres cartes via le bouton \"Plus\". Le bouton <strong>Spot It</strong> d'une fiche site centre toutes ces cartes sur ce site.",
         calculDeLaVolabilite: 'Calcul de la Volabilité (Scoring météo)',
@@ -675,6 +698,8 @@ export const FR_HTML = Object.freeze({
         n1EnregistrerSonEquipement: '1. Enregistrer son Équipement',
         pourChaqueMaterielCarnet:
             'Pour chaque matériel (Carnet &gt; Matériel), vous pouvez définir : le type (Voile, Sellette, Parachute de Secours, Accessoire), la marque, le modèle, la taille et la couleur (choisis dans une liste ou saisis librement, le nom du matériel est composé automatiquement), la date d\'achat, ainsi que la date de sa dernière révision en atelier certifié. Pour une voile, renseignez aussi sa <strong>plage de vent</strong> (vent min et max) : elle sert au mode de calcul "Mon Matériel" de l\'écran Sites de vol.',
+        pourChaqueMaterielCarnetSansMeteo:
+            "Pour chaque matériel (Carnet &gt; Matériel), vous pouvez définir : le type (Voile, Sellette, Parachute de Secours, Accessoire), la marque, le modèle, la taille et la couleur (choisis dans une liste ou saisis librement, le nom du matériel est composé automatiquement), la date d'achat, ainsi que la date de sa dernière révision en atelier certifié.",
         n2PeriodiciteCombineeTemps: '2. Périodicité Combinée (Temps et Heures)',
         selectionnezLIntervalleTemporelRecommand:
             "Sélectionnez l'intervalle temporel recommandé par le constructeur (<strong >6 mois</strong >, <strong>12 mois</strong>, <strong>24 mois</strong>, ou aucun contrôle requis) ET la limite d'heures de vol (<strong>50h</strong>, <strong>100h</strong>, <strong>150h</strong>, <strong>200h</strong>, ou non applicable). L'application surveillera les deux compteurs en temps réel grâce au carnet de vol, et déclenchera une alerte au premier des deux termes échu. Un badge sur le bouton <strong>Carnet</strong> de la barre de navigation signale le matériel à réviser.",
@@ -702,6 +727,8 @@ export const FR_HTML = Object.freeze({
         synchronisationCloudFirebase: 'Synchronisation Cloud (Firebase) & Préférences',
         desQueVousEtes:
             "Dès que vous êtes connecté à votre compte, l'application synchronise instantanément en tâche de fond votre <strong>Carnet de Vol</strong>, votre <strong>Équipement</strong>, et l'intégralité de vos configurations : modèles de prévision météo préférés, rayon GPS, tri des sites, limites de vent moyen et de rafales personnalisées. Retrouvez votre espace de pilotage personnalisé sur n'importe quel ordinateur, tablette ou smartphone sans aucune perte de données.",
+        desQueVousEtesSansMeteo:
+            "Dès que vous êtes connecté à votre compte, l'application synchronise instantanément en tâche de fond votre <strong>Carnet de Vol</strong>, votre <strong>Équipement</strong>, et l'intégralité de vos configurations : rayon GPS, tri des sites. Retrouvez votre espace de pilotage personnalisé sur n'importe quel ordinateur, tablette ou smartphone sans aucune perte de données.",
         lEcranSecurite: "L'Écran Sécurité",
         cetEcranReprendDes:
             'Cet écran reprend des contenus officiels de la FFVL (source indiquée sur chaque rubrique). Le bouton <strong>Sécurité</strong> de la barre de navigation ouvre un sous-menu donnant accès à ses trois rubriques.',

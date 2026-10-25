@@ -2786,7 +2786,7 @@
                         >
                             Sites de vol
                         </button>
-                        <button data-i18n="manualModal.calculVolabilite"
+                        <button data-requires-role="beta" hidden data-i18n="manualModal.calculVolabilite"
                             class="manual-tab-btn"
                             data-action="showManualSection"
                             data-args="'scoring'"
@@ -2906,7 +2906,7 @@
                             </div>
 
                             <h5 data-i18n="manualModal.pourquoiCetteApplication" style="margin-top: 0; margin-bottom: 8px">Pourquoi cette application ?</h5>
-                            <p data-i18n="manualModal.laPreparationAuxBrevets"
+                            <p data-requires-role="beta" hidden data-i18n="manualModal.laPreparationAuxBrevets"
                                 style="
                                     color: var(--text-secondary);
                                     line-height: 1.6;
@@ -2920,6 +2920,13 @@
                                 lecture des conditions météo sur un décollage demande de jongler entre plusieurs outils
                                 différents (Windy, Météo-Parapente, PiouPiou, les données FFVL...).
                             </p>
+                            <p data-hidden-with-role="beta" data-i18n="manualModal.laPreparationAuxBrevetsSansMeteo"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 12px;
+                                ">La préparation aux brevets de parapente peut être longue et morcelée : les questions officielles de la FFVL sont dispersées dans des documents PDF peu pratiques sur téléphone, et les cours théoriques ne sont pas toujours réunis au même endroit.</p>
                             <p data-i18n-html="manualModal.lEstNeDe"
                                 style="
                                     color: var(--text-secondary);
@@ -2967,21 +2974,23 @@
                                     interactif avec correction et explications pédagogiques, accessible à tout moment,
                                     même hors ligne.
                                 </li>
-                                <li data-i18n-html="manualModal.elleCroiseEnTemps" style="margin-bottom: 6px">
+                                <li data-requires-role="beta" hidden data-i18n-html="manualModal.elleCroiseEnTemps" style="margin-bottom: 6px">
                                     Elle croise en temps réel les
                                     <strong>données géographiques des sites de vol</strong> (orientation des décollages,
                                     altitude, type) avec les <strong>prévisions météo multi-modèles</strong> (AROME,
                                     ICON, GFS…) pour indiquer quels sites sont potentiellement volables et à quelle
                                     heure.
                                 </li>
+                                <li data-hidden-with-role="beta" data-i18n-html="manualModal.elleReunitLesSites" style="margin-bottom: 6px">Elle réunit les <strong>sites de vol</strong> (orientation des décollages, altitude, type) sur une carte et dans une liste, avec recherche et filtres, autour de vous ou de l'endroit de votre choix.</li>
                                 <li data-i18n-html="manualModal.elleRegroupeLesDu" style="margin-bottom: 6px">
                                     Elle regroupe les <strong>cours, manuels et fiches synthèse</strong> du brevet de
                                     pilote dans une bibliothèque consultable et téléchargeable.
                                 </li>
-                                <li data-i18n-html="manualModal.elleTientVotreImport" style="margin-bottom: 6px">
+                                <li data-requires-role="beta" hidden data-i18n-html="manualModal.elleTientVotreImport" style="margin-bottom: 6px">
                                     Elle tient votre <strong>carnet de vol</strong> (import de traces .igc, météo du
                                     jour enregistrée automatiquement) et suit l'<strong>usure de votre matériel</strong>.
                                 </li>
+                                <li data-hidden-with-role="beta" data-i18n-html="manualModal.elleTientVotreCarnet" style="margin-bottom: 6px">Elle tient votre <strong>carnet de vol</strong> (import de traces .igc) et suit l'<strong>usure de votre matériel</strong>.</li>
                                 <li data-i18n-html="manualModal.elleRassembleSurUn" style="margin-bottom: 6px">
                                     Elle rassemble sur un écran <strong>Sécurité</strong> la conduite à tenir en cas
                                     d'accident, votre position GPS et les check-lists avant le décollage.
@@ -2994,7 +3003,7 @@
                             </ul>
 
                             <h5 data-i18n="manualModal.ceQueLApplicationNe" style="margin-top: 0; margin-bottom: 8px">Ce que l'application ne fait PAS</h5>
-                            <p data-i18n-html="manualModal.lApplicationEstUn"
+                            <p data-requires-role="beta" hidden data-i18n-html="manualModal.lApplicationEstUn"
                                 style="
                                     color: var(--text-secondary);
                                     line-height: 1.6;
@@ -3007,6 +3016,13 @@
                                 automatiques et ne remplacent pas une analyse aérologique complète et officielle.
                                 <strong>La décision de voler reste toujours et uniquement celle du pilote.</strong>
                             </p>
+                            <p data-hidden-with-role="beta" data-i18n-html="manualModal.lApplicationEstUnSansMeteo"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 12px;
+                                ">L'application est un <strong>outil d'accompagnement et d'aide à la décision</strong>, pas un outil de décision. <strong>La décision de voler reste toujours et uniquement celle du pilote.</strong></p>
                             <p data-i18n="manualModal.deMemeLaReussite"
                                 style="
                                     color: var(--text-secondary);
@@ -3045,11 +3061,12 @@
                             <h4 data-i18n="manualModal.bienvenueSurLAssistantParapente" style="margin-top: 0; color: var(--accent-orange)">
                                 Bienvenue sur l'Assistant Parapente
                             </h4>
-                            <p data-i18n="manualModal.lAssistantParapenteEstUne" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                            <p data-requires-role="beta" hidden data-i18n="manualModal.lAssistantParapenteEstUne" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
                                 L'Assistant Parapente est une application tout-en-un conçue pour accompagner les pilotes
                                 de vol libre, de l'apprentissage théorique jusqu'à la préparation météo de leurs vols.
                                 Voici les concepts clés du fonctionnement général :
                             </p>
+                            <p data-hidden-with-role="beta" data-i18n="manualModal.lAssistantParapenteEstUneSansMeteo" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">L'Assistant Parapente est une application tout-en-un conçue pour accompagner les pilotes de vol libre, de l'apprentissage théorique jusqu'à la préparation de leurs vols. Voici les concepts clés du fonctionnement général :</p>
 
                             <h5 data-i18n="manualModal.n1ProfilEtNiveau" style="margin-top: 16px; margin-bottom: 8px">1. Profil et Niveau de Pilotage</h5>
                             <p data-i18n="manualModal.enHautDeLEcran"
@@ -3172,12 +3189,13 @@
                                     gonflage, vos voiles/sellettes enregistrées et l'usure calculée de votre matériel
                                     sont sauvegardés de manière sécurisée.
                                 </li>
-                                <li data-i18n="manualModal.votreNiveauDeBrevet" style="margin-bottom: 8px">
+                                <li data-requires-role="beta" hidden data-i18n="manualModal.votreNiveauDeBrevet" style="margin-bottom: 8px">
                                     <strong data-i18n="manualModal.sauvegardeDeVosPreferences">Sauvegarde de vos préférences :</strong> Votre niveau de brevet sélectionné,
                                     vos filtres de recherche météo, votre thème visuel, et vos configurations météo
                                     personnalisées (limites de vent, modèle préféré, rayon GPS, tri) sont synchronisés
                                     automatiquement.
                                 </li>
+                                <li data-hidden-with-role="beta" data-i18n="manualModal.votreNiveauDeBrevetSansMeteo" style="margin-bottom: 8px">Votre niveau de brevet sélectionné, vos filtres de recherche, votre thème visuel et vos réglages de recherche de sites (rayon GPS) sont synchronisés automatiquement.</li>
                                 <li data-i18n="manualModal.unEffacementAccidentelDu" style="margin-bottom: 8px">
                                     <strong data-i18n="manualModal.protectionContreLaPerte">Protection contre la perte de données :</strong> Un effacement accidentel du
                                     cache du navigateur, un reset de téléphone, ou un changement d'appareil en urgence
@@ -3222,11 +3240,12 @@
                                     margin-bottom: 8px;
                                 "
                             >
-                                <li data-i18n="manualModal.lesQcmLeCarnet" style="margin-bottom: 6px">
+                                <li data-requires-role="beta" hidden data-i18n="manualModal.lesQcmLeCarnet" style="margin-bottom: 6px">
                                     <strong data-i18n="manualModal.sansReseau">Sans réseau :</strong> les QCM, le carnet de vol et l'écran Sécurité
                                     fonctionnent hors ligne. La dernière prévision météo chargée, les cours déjà ouverts
                                     et les zones de carte déjà consultées restent disponibles sur l'appareil.
                                 </li>
+                                <li data-hidden-with-role="beta" data-i18n="manualModal.lesQcmLeCarnetSansMeteo" style="margin-bottom: 6px">les QCM, le carnet de vol et l'écran Sécurité fonctionnent hors ligne. Les cours déjà ouverts et les zones de carte déjà consultées restent disponibles sur l'appareil.</li>
                                 <li data-i18n="manualModal.lorsquUneMiseAJour" style="margin-bottom: 6px">
                                     <strong data-i18n="manualModal.nouvelleVersion">Nouvelle version :</strong> lorsqu'une mise à jour de l'application est
                                     disponible, un message vous le signale pour que vous puissiez recharger la page.
@@ -3235,14 +3254,16 @@
                         </div>
 
                         <div id="manual-section-sites" class="manual-section" style="display: none">
-                            <h4 data-i18n="manualModal.preparationDesVolsSites" style="margin-top: 0; color: var(--accent-orange)">
+                            <h4 data-requires-role="beta" hidden data-i18n="manualModal.preparationDesVolsSites" style="margin-top: 0; color: var(--accent-orange)">
                                 Préparation des Vols (Sites &amp; Météo)
                             </h4>
-                            <p data-i18n="manualModal.ceModuleCroiseLes" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                            <h4 data-hidden-with-role="beta" data-i18n="manualModal.preparationDesVolsSitesSeuls" style="margin-top: 0; color: var(--accent-orange)">Sites de Vol</h4>
+                            <p data-requires-role="beta" hidden data-i18n="manualModal.ceModuleCroiseLes" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
                                 Ce module croise les données géographiques des sites de vol libre (fournies par la FFVL)
                                 avec les prévisions de plusieurs modèles météorologiques, pour indiquer quels sites sont
                                 potentiellement volables autour de vous et à quelle heure.
                             </p>
+                            <p data-hidden-with-role="beta" data-i18n="manualModal.ceModulePresenteLesSites" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">Ce module présente les sites de vol libre (données fournies par la FFVL) sur une carte et dans une liste, autour de vous.</p>
 
                             <h5 data-i18n="manualModal.n1PointDeReference" style="margin-top: 16px; margin-bottom: 8px">
                                 1. Point de Référence et Rayon de Recherche
@@ -3265,11 +3286,12 @@
                                     <strong data-i18n="manualModal.lieuxEnregistres">Lieux enregistrés :</strong> L'étoile à côté du champ d'adresse mémorise le
                                     lieu courant pour le recharger en un clic plus tard.
                                 </li>
-                                <li data-i18n="manualModal.leCurseurRayonMaximal" style="margin-bottom: 8px">
+                                <li data-requires-role="beta" hidden data-i18n="manualModal.leCurseurRayonMaximal" style="margin-bottom: 8px">
                                     <strong data-i18n="manualModal.leRayon">Le Rayon :</strong> Le curseur "Rayon maximal" définit la zone de recherche
                                     autour de ce point, de 10 à 200 km (50 km par défaut). La météo n'est demandée que
                                     pour les sites de cette zone (et vos favoris) ; la carte suit le rayon choisi.
                                 </li>
+                                <li data-hidden-with-role="beta" data-i18n="manualModal.leCurseurRayonMaximalSansMeteo" style="margin-bottom: 8px"><strong data-i18n="manualModal.leRayon">Le Rayon :</strong> Le curseur "Rayon maximal" définit la zone de recherche autour de ce point, de 10 à 200 km (50 km par défaut) ; la carte suit le rayon choisi.</li>
                                 <li data-i18n="manualModal.laBarreDeRecherche" style="margin-bottom: 8px">
                                     <strong data-i18n="manualModal.rechercheEtFiltres">Recherche et filtres :</strong> La barre de recherche trouve un site par son
                                     nom, sa ville ou son code postal. Les menus "Orientation" et "Type" (site naturel,
@@ -3277,7 +3299,8 @@
                                 </li>
                             </ul>
 
-                            <h5 data-i18n="manualModal.n2ParametresDeCalcul" style="margin-top: 16px; margin-bottom: 8px">2. Paramètres de Calcul Météo</h5>
+                            <div data-requires-role="beta" hidden>
+<h5 data-i18n="manualModal.n2ParametresDeCalcul" style="margin-top: 16px; margin-bottom: 8px">2. Paramètres de Calcul Météo</h5>
                             <ul
                                 style="
                                     color: var(--text-secondary);
@@ -3373,8 +3396,11 @@
                                 </li>
                             </ul>
 
-                            <h5 data-i18n="manualModal.n5FicheSiteFavoris" style="margin-top: 16px; margin-bottom: 8px">5. Fiche Site, Favoris et Comparateur</h5>
-                            <p data-i18n-html="manualModal.chaqueFicheSiteAffiche" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                            </div>
+<h5 data-requires-role="beta" hidden data-i18n="manualModal.n5FicheSiteFavoris" style="margin-top: 16px; margin-bottom: 8px">5. Fiche Site, Favoris et Comparateur</h5>
+
+                            <h5 data-hidden-with-role="beta" data-i18n="manualModal.n2FicheSiteEtFavoris" style="margin-top: 16px; margin-bottom: 8px">2. Fiche Site et Favoris</h5>
+                            <p data-requires-role="beta" hidden data-i18n-html="manualModal.chaqueFicheSiteAffiche" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
                                 Chaque fiche site affiche l'altitude, les prochains créneaux volables, et donne accès à
                                 la fiche officielle FFVL, au vent en direct de la balise la plus proche (SpotAiR), à
                                 l'itinéraire ("S'y rendre" avec Waze, Google Maps ou Apple Plans) et aux détails du
@@ -3383,8 +3409,11 @@
                                 bouton <strong>Comparer</strong> met vos sites favoris côte à côte : météo de l'heure
                                 affichée, heures volables, meilleur créneau et accord entre les deux modèles.
                             </p>
+                            <p data-hidden-with-role="beta" data-i18n-html="manualModal.chaqueFicheSiteAfficheSansMeteo" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">Chaque fiche site affiche l'altitude et donne accès à la fiche officielle FFVL, au vent en direct de la balise la plus proche (SpotAiR), à l'itinéraire ("S'y rendre" avec Waze, Google Maps ou Apple Plans) et aux détails du site (praticabilité, dangers signalés, réglementation…). Un <strong>brief pré-vol</strong> rappelle votre niveau et l'état de révision de votre matériel.</p>
 
-                            <h5 data-i18n="manualModal.n6CartographieCartes" style="margin-top: 16px; margin-bottom: 8px">6. Cartographie &amp; Cartes Externes</h5>
+                            <h5 data-requires-role="beta" hidden data-i18n="manualModal.n6CartographieCartes" style="margin-top: 16px; margin-bottom: 8px">6. Cartographie &amp; Cartes Externes</h5>
+
+                            <h5 data-hidden-with-role="beta" data-i18n="manualModal.n3CartographieCartes" style="margin-top: 16px; margin-bottom: 8px">3. Cartographie &amp; Cartes Externes</h5>
                             <p data-i18n-html="manualModal.auDessusDeLaListe" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
                                 Au-dessus de la liste, la carte interactive affiche les sites autour de vous avec les
                                 icônes officielles FFVL. Des onglets permettent d'afficher en un clic des services
@@ -3396,7 +3425,7 @@
                             </p>
                         </div>
 
-                        <div id="manual-section-scoring" class="manual-section" style="display: none">
+                        <div data-requires-role="beta" hidden id="manual-section-scoring" class="manual-section" style="display: none">
                             <h4 data-i18n="manualModal.calculDeLaVolabilite" style="margin-top: 0; color: var(--accent-orange)">
                                 Calcul de la Volabilité (Scoring météo)
                             </h4>
@@ -3642,7 +3671,7 @@
                             <p data-i18n-html="manualModal.statistiquesEtRecords" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">La partie Statistiques résume votre activité : nombre et temps de vol, sessions de gonflage, altitude maximale et gain cumulé, utilisation de chaque voile et heures restantes avant révision, lieux les plus fréquentés, part des sessions en école, types de vols, techniques de décollage et exercices de gonflage. La section <strong>Records personnels</strong> donne vos meilleurs vols (plus long, plus haut, distance libre, meilleur thermique, meilleure finesse, plus haut largage au treuil, facteur de charge…) avec leur date et leur site, et les cumuls de vos vols avec trace. Le bouton <strong>Tout recalculer</strong>, à côté d’<strong>Ajouter une session</strong> (ou sous les records), recalcule tous vos vols depuis leur trace : date, durée, altitude max, gain, position du décollage et statistiques. Vos saisies sont gardées : site, type de vol, matériel, école, pilotes, commentaire et correction d’altitude.</p>
 
                             <!-- CAPTURE METEO AUTOMATIQUE -->
-                            <div
+                            <div data-requires-role="beta" hidden
                                 style="
                                     margin-top: 24px;
                                     padding: 16px 20px;
@@ -3707,7 +3736,7 @@
                             </p>
 
                             <h5 data-i18n="manualModal.n1EnregistrerSonEquipement" style="margin-top: 16px; margin-bottom: 8px">1. Enregistrer son Équipement</h5>
-                            <p data-i18n-html="manualModal.pourChaqueMaterielCarnet" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                            <p data-requires-role="beta" hidden data-i18n-html="manualModal.pourChaqueMaterielCarnet" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
                                 Pour chaque matériel (Carnet &gt; Matériel), vous pouvez définir : le type (Voile,
                                 Sellette, Parachute de Secours, Accessoire), la marque, le modèle, la taille et la
                                 couleur (choisis dans une liste ou saisis librement, le nom du matériel est composé
@@ -3715,6 +3744,7 @@
                                 certifié. Pour une voile, renseignez aussi sa <strong>plage de vent</strong> (vent min
                                 et max) : elle sert au mode de calcul "Mon Matériel" de l'écran Sites de vol.
                             </p>
+                            <p data-hidden-with-role="beta" data-i18n-html="manualModal.pourChaqueMaterielCarnetSansMeteo" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">Pour chaque matériel (Carnet &gt; Matériel), vous pouvez définir : le type (Voile, Sellette, Parachute de Secours, Accessoire), la marque, le modèle, la taille et la couleur (choisis dans une liste ou saisis librement, le nom du matériel est composé automatiquement), la date d'achat, ainsi que la date de sa dernière révision en atelier certifié.</p>
 
                             <h5 data-i18n="manualModal.n2PeriodiciteCombineeTemps" style="margin-top: 16px; margin-bottom: 8px">
                                 2. Périodicité Combinée (Temps et Heures)
@@ -3880,7 +3910,7 @@
                                     >
                                         Synchronisation Cloud (Firebase) &amp; Préférences
                                     </h5>
-                                    <p data-i18n-html="manualModal.desQueVousEtes"
+                                    <p data-requires-role="beta" hidden data-i18n-html="manualModal.desQueVousEtes"
                                         style="
                                             margin: 0;
                                             color: var(--text-secondary);
@@ -3895,6 +3925,13 @@
                                         rafales personnalisées. Retrouvez votre espace de pilotage personnalisé sur
                                         n'importe quel ordinateur, tablette ou smartphone sans aucune perte de données.
                                     </p>
+                                    <p data-hidden-with-role="beta" data-i18n-html="manualModal.desQueVousEtesSansMeteo"
+                                        style="
+                                            margin: 0;
+                                            color: var(--text-secondary);
+                                            font-size: 0.88rem;
+                                            line-height: 1.5;
+                                        ">Dès que vous êtes connecté à votre compte, l'application synchronise instantanément en tâche de fond votre <strong>Carnet de Vol</strong>, votre <strong>Équipement</strong>, et l'intégralité de vos configurations : rayon GPS, tri des sites. Retrouvez votre espace de pilotage personnalisé sur n'importe quel ordinateur, tablette ou smartphone sans aucune perte de données.</p>
                                 </div>
                             </div>
                         </div>
