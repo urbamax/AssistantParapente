@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { grantBetaRole } from '../helpers/e2e_beta_role.js';
+import { disableBackdropBlur } from '../helpers/e2e_no_backdrop_blur.js';
 
 // Spec 019 : ouvrir un menu déroulant ne change aucun réglage ; seul le choix d'une option compte.
 test.use({ serviceWorkers: 'block' });
@@ -18,6 +19,7 @@ test.beforeEach(async ({ page }) => {
         );
     });
     await page.route('https://api.open-meteo.com/**', (route) => route.fulfill({ json: [] }));
+    await disableBackdropBlur(page);
 });
 
 test('Spec 019 : ouvrir le menu des niveaux garde le niveau, même après rechargement', async ({ page }) => {

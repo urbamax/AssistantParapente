@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { disableBackdropBlur } from '../helpers/e2e_no_backdrop_blur.js';
 
 // Spec 010 (audit C7) : les éléments cliquables non natifs s'utilisent au clavier.
 test.use({ serviceWorkers: 'block' });
@@ -17,6 +18,7 @@ test.beforeEach(async ({ page }) => {
         );
     });
     await page.route('https://api.open-meteo.com/**', (route) => route.fulfill({ json: [] }));
+    await disableBackdropBlur(page);
 });
 
 test('Spec 010 : un lien du pied de page s’ouvre avec Entrée', async ({ page }) => {

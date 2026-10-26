@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { aromeTailResponse, nearestHourIso, metaJson } from '../fixtures/forecasts.js';
 import { grantBetaRole } from '../helpers/e2e_beta_role.js';
+import { disableBackdropBlur } from '../helpers/e2e_no_backdrop_blur.js';
 
 /**
  * Ferme la bannière RGPD si aucun consentement n'est enregistré. La bannière apparaît avec un léger
@@ -69,7 +70,10 @@ test.describe('E2E - Sites Flow', () => {
     // Le service worker fait lui-même les appels Open-Meteo, que page.route() ne voit pas :
     // on le bloque pour que les prévisions simulées soient réellement utilisées.
     test.use({ serviceWorkers: 'block' });
-    test.beforeEach(async ({ page }) => grantBetaRole(page));
+    test.beforeEach(async ({ page }) => {
+        await grantBetaRole(page);
+        await disableBackdropBlur(page);
+    });
 
     test("L'utilisateur peut rechercher un site, filtrer et voir les résultats", async ({ page }) => {
         // Intercept API call to open-meteo to mock weather response
