@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { aromeTailResponse, nearestHourIso, metaJson } from '../fixtures/forecasts.js';
 import { grantBetaRole } from '../helpers/e2e_beta_role.js';
+import { clickWhenVisible } from '../helpers/e2e_stable_wait.js';
 
 /**
  * Ferme la bannière RGPD si aucun consentement n'est enregistré. La bannière apparaît avec un léger
@@ -12,7 +13,7 @@ async function acceptGdprIfAsked(page) {
     if (hasConsent) return;
     const banner = page.locator('#gdpr-banner.active');
     await banner.waitFor({ state: 'visible', timeout: 5000 });
-    await page.locator('[data-action="acceptAll"]').click();
+    await clickWhenVisible(page.locator('[data-action="acceptAll"]'));
     await expect(page.locator('#gdpr-banner')).not.toHaveClass(/active/);
 }
 
@@ -49,7 +50,7 @@ async function openSitesAndSearch(page, name) {
     await useRadius200(page);
     await page.goto('/?bypassGdpr=true');
     await acceptGdprIfAsked(page);
-    await page.locator('.nav-menu-btn[data-target="SITES"]').click();
+    await clickWhenVisible(page.locator('.nav-menu-btn[data-target="SITES"]'));
     const searchInput = page.locator('#site-search');
     await expect(searchInput).toBeVisible();
     await searchInput.fill(name);
@@ -95,12 +96,12 @@ test.describe('E2E - Sites Flow', () => {
         // Accept GDPR to enable network/features
         const gdprBanner = page.locator('#gdpr-banner');
         if (await gdprBanner.isVisible()) {
-            await page.locator('[data-action="acceptAll"]').click();
+            await clickWhenVisible(page.locator('[data-action="acceptAll"]'));
             await expect(gdprBanner).not.toHaveClass(/active/);
         }
 
         // Navigate to SITES tab
-        await page.locator('.nav-menu-btn[data-target="SITES"]').click();
+        await clickWhenVisible(page.locator('.nav-menu-btn[data-target="SITES"]'));
 
         // Verify search bar is visible
         const searchInput = page.locator('#site-search');
@@ -208,7 +209,7 @@ test.describe('E2E - Sites Flow', () => {
         await page.goto('/?bypassGdpr=true');
         const gdprBanner = page.locator('#gdpr-banner');
         if (await gdprBanner.isVisible()) await page.locator('[data-action="refuseAll"]').first().click();
-        await page.locator('.nav-menu-btn[data-target="SITES"]').click();
+        await clickWhenVisible(page.locator('.nav-menu-btn[data-target="SITES"]'));
 
         const notice = page.locator('#default-location-notice');
         await expect(notice).toBeVisible();
@@ -228,7 +229,7 @@ test.describe('E2E - Sites Flow', () => {
         await expect.poll(() => requestedLocations[0]).toBe(kept.count);
 
         await page.locator('#address-input').fill('Annecy');
-        await page.locator('[data-action="SitesvalidateAddress"]').click();
+        await clickWhenVisible(page.locator('[data-action="SitesvalidateAddress"]'));
         await expect(notice).toBeHidden();
     });
 
@@ -240,7 +241,7 @@ test.describe('E2E - Sites Flow', () => {
         await expect(context).toContainText('AROME (Météo-France) · récupérée à');
         await expect(context).toContainText('run AROME');
 
-        await page.locator('[data-action="toggleAdvancedSettings"]').click();
+        await clickWhenVisible(page.locator('[data-action="toggleAdvancedSettings"]'));
         await page.locator('#weather-model-select').selectOption('best_match');
         const refreshed = page.locator('.site-card:not(.minimized)', { hasText: 'AUTEUIL' }).first();
         await expect(refreshed.locator('.forecast-context')).toContainText(
@@ -335,7 +336,7 @@ test.describe('E2E - Sites Flow', () => {
         await page.goto('/?bypassGdpr=true');
         const gdprBanner = page.locator('#gdpr-banner');
         if (await gdprBanner.isVisible()) await page.locator('[data-action="refuseAll"]').first().click();
-        await page.locator('.nav-menu-btn[data-target="SITES"]').click();
+        await clickWhenVisible(page.locator('.nav-menu-btn[data-target="SITES"]'));
 
         const openDetails = async (name) => {
             const card = page.locator('#sites-list-container .site-card', { hasText: name }).first();
@@ -369,7 +370,7 @@ test.describe('E2E - Sites Flow', () => {
         await page.goto('/?bypassGdpr=true');
         const gdprBanner = page.locator('#gdpr-banner');
         if (await gdprBanner.isVisible()) await page.locator('[data-action="refuseAll"]').first().click();
-        await page.locator('.nav-menu-btn[data-target="SITES"]').click();
+        await clickWhenVisible(page.locator('.nav-menu-btn[data-target="SITES"]'));
         await expect(page.locator('#sites-map-canvas')).toBeVisible();
     }
     const mapState = (page) =>
@@ -458,7 +459,7 @@ test.describe('E2E - Sites Flow', () => {
         await expect(favorites).toHaveClass(wasActive ? /^(?!.*\bactive\b)/ : /\bactive\b/);
         await favorites.click();
 
-        await page.locator('[data-action="toggleAdvancedSettings"]').click();
+        await clickWhenVisible(page.locator('[data-action="toggleAdvancedSettings"]'));
         const sortMode = page.locator('select[data-action="changeSortMode"]');
         await sortMode.selectOption('AZ');
         await expect(sortMode).toHaveValue('AZ');
@@ -479,7 +480,7 @@ test.describe('E2E - Sites sans le rôle « beta »', () => {
         await useRadius200(page);
         await page.goto('/?bypassGdpr=true');
         await acceptGdprIfAsked(page);
-        await page.locator('.nav-menu-btn[data-target="SITES"]').click();
+        await clickWhenVisible(page.locator('.nav-menu-btn[data-target="SITES"]'));
 
         await expect(page.locator('#site-search')).toBeVisible();
         await expect(page.locator('#sites-map-view')).toBeVisible();

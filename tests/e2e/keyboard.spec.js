@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { scrollIntoViewWhenVisible } from '../helpers/e2e_stable_wait.js';
 
 // Spec 010 (audit C7) : les éléments cliquables non natifs s'utilisent au clavier.
 test.use({ serviceWorkers: 'block' });
@@ -23,7 +24,7 @@ test('Spec 010 : un lien du pied de page s’ouvre avec Entrée', async ({ page 
     await page.goto('/?mode=SITES');
     // Chaque écran a son pied de page : on prend celui de l'écran affiché.
     const legal = page.locator('.app-footer [data-args="gdpr-legal-modal"]').filter({ visible: true }).first();
-    await legal.scrollIntoViewIfNeeded();
+    await scrollIntoViewWhenVisible(legal);
     await expect(legal).toHaveAttribute('role', 'button');
     await legal.focus();
     await expect(legal).toBeFocused();

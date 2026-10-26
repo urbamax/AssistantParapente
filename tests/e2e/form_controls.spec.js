@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { grantBetaRole } from '../helpers/e2e_beta_role.js';
+import { clickWhenVisible } from '../helpers/e2e_stable_wait.js';
 
 // Spec 019 : ouvrir un menu déroulant ne change aucun réglage ; seul le choix d'une option compte.
 test.use({ serviceWorkers: 'block' });
@@ -37,7 +38,7 @@ test('Spec 019 : ouvrir le menu des niveaux garde le niveau, même après rechar
 test('Spec 019 : ouvrir le menu de tri des sites garde le tri ; choisir « A-Z » l’applique', async ({ page }) => {
     await grantBetaRole(page); // le menu de tri est dans les réglages du calcul météo
     await page.goto('/?mode=SITES');
-    await page.locator('[data-action="toggleAdvancedSettings"]').click();
+    await clickWhenVisible(page.locator('[data-action="toggleAdvancedSettings"]'));
     const sort = page.locator('#select-sort-mode');
     await expect(sort).toBeVisible();
     const sortMode = () =>
