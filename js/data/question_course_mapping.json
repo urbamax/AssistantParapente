@@ -2,14 +2,14 @@
   "A1B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 122,
-    "verifiedAt": "2026-09-22"
+    "verifiedPage": 53,
+    "verifiedAt": "2026-10-26"
   },
   "A2M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 123,
-    "verifiedAt": "2026-09-22"
+    "verifiedPage": 122,
+    "verifiedAt": "2026-10-26"
   },
   "A4B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -44,62 +44,78 @@
   "A12B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 46,
-    "verifiedAt": "2026-09-22"
+    "verifiedPage": 43,
+    "verifiedAt": "2026-10-26"
   },
   "A16M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
-    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 42,
-    "verifiedAt": "2026-09-22"
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit"
   },
   "A17B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 46,
-    "verifiedAt": "2026-09-22"
+    "verifiedAt": "2026-10-26"
   },
   "A18M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 29,
-    "verifiedAt": "2026-09-22"
+    "verifiedAt": "2026-10-26"
   },
   "A19B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 45,
-    "verifiedAt": "2026-09-22"
+    "verifiedAt": "2026-10-26",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 48
+      }
+    ]
   },
   "A20B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 42,
-    "verifiedAt": "2026-09-22"
+    "verifiedAt": "2026-10-26",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 45
+      }
+    ]
   },
   "A21V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 53,
-    "verifiedAt": "2026-09-22"
+    "verifiedAt": "2026-10-26"
   },
   "A22V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 53,
-    "verifiedAt": "2026-09-22"
+    "verifiedPage": 42,
+    "verifiedAt": "2026-10-26",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 53
+      }
+    ]
   },
   "A23B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 46,
-    "verifiedAt": "2026-09-22"
+    "verifiedPage": 42,
+    "verifiedAt": "2026-10-26"
   },
   "A25B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 41,
-    "verifiedAt": "2026-09-22"
+    "verifiedAt": "2026-10-26"
   },
   "A27B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -111,31 +127,31 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 55,
-    "verifiedAt": "2026-09-22"
+    "verifiedAt": "2026-10-26"
   },
   "A29B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 55,
-    "verifiedAt": "2026-09-22"
+    "verifiedAt": "2026-10-26"
   },
   "A30B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 42,
-    "verifiedAt": "2026-09-22"
+    "verifiedPage": 50,
+    "verifiedAt": "2026-10-26"
   },
   "A32B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 118,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-26"
   },
   "A33B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 118,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-26"
   },
   "A37B": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -516,8 +532,14 @@
   "A101M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 52,
-    "verifiedAt": "2026-09-23"
+    "verifiedPage": 48,
+    "verifiedAt": "2026-10-26",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 55
+      }
+    ]
   },
   "A102B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -529,7 +551,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 53,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-26"
   },
   "A104B": {
     "course_id": "brevet-initial---vert/developpement-durable-0/milieux-naturels2022/milieux-naturels2022",
@@ -539,14 +561,20 @@
   "A105B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 42,
-    "verifiedAt": "2026-09-23"
+    "verifiedPage": 50,
+    "verifiedAt": "2026-10-26"
   },
   "A107B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 46,
-    "verifiedAt": "2026-09-23"
+    "verifiedPage": 54,
+    "verifiedAt": "2026-10-26",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 156
+      }
+    ]
   },
   "A109B": {
     "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/15-les-brises2021/15-les-brises2021",
@@ -5294,43 +5322,49 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 46,
-    "verifiedAt": "2026-09-22"
+    "verifiedAt": "2026-10-26"
   },
   "A13B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 46,
-    "verifiedAt": "2026-09-22"
+    "verifiedAt": "2026-10-26"
   },
   "A14B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 42,
-    "verifiedAt": "2026-09-22"
+    "verifiedAt": "2026-10-26"
   },
   "A15B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 46,
-    "verifiedAt": "2026-09-22"
+    "verifiedAt": "2026-10-26"
   },
   "A24B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 53,
-    "verifiedAt": "2026-09-22"
+    "verifiedAt": "2026-10-26",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 46
+      }
+    ]
   },
   "A26B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 46,
-    "verifiedAt": "2026-09-22"
+    "verifiedAt": "2026-10-26"
   },
   "A31B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 124,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-26"
   },
   "A34B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -5366,13 +5400,13 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 148,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-26"
   },
   "A108B": {
-    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
-    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 53,
-    "verifiedAt": "2026-09-23"
+    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 29,
+    "verifiedAt": "2026-10-26"
   },
   "L11M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
