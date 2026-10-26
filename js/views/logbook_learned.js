@@ -8,6 +8,7 @@
 import LogbookService from '../services/logbook_service.js';
 import PilotHabits from '../services/pilot_habits.js';
 import { instructorsOf, isCourseSession, latestOfCourse, preferPlace } from '../services/logbook_courses.js';
+import { findNearbySession } from '../services/logbook_defaults.js';
 import { escapeHTML } from '../core/security.js';
 import { tl } from './logbook_strings.js';
 import { LogbookChecklistsBase } from './logbook_checklists.js';
@@ -308,21 +309,7 @@ export class LogbookLearnedBase extends LogbookChecklistsBase {
      * a des pilotes : un vol de la même série (treuil, plusieurs ploufs dans la journée…).
      */
     findNearbySession(sessions, place, datetime, field = 'pilotes') {
-        const key = (place || '').trim().toLowerCase();
-        const t = new Date(datetime).getTime();
-        if (!key || !Number.isFinite(t)) return null;
-        let best = null;
-        let bestGap = 3 * 3600 * 1000;
-        for (const s of sessions) {
-            const v = s[field];
-            if (!v || (Array.isArray(v) && !v.length) || PilotHabits.placeOf(s) !== key) continue;
-            const gap = Math.abs(new Date(s.datetime).getTime() - t);
-            if (gap <= bestGap) {
-                best = s;
-                bestGap = gap;
-            }
-        }
-        return best;
+        return findNearbySession(sessions, place, datetime, field);
     }
 
     /** Treuilleurs proposés : ceux du même jour sur ce site d'abord, puis les plus fréquents. */

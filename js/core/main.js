@@ -148,6 +148,8 @@ async function bootApplication() {
         'closeSessionModal',
         'filterHistoryByStat',
         'clearHistoryFilter',
+        'closeBatchImport',
+        'importBatch',
     ].forEach((action) => {
         AppEvents.register('Logbook' + action, (args, e, t) =>
             LogbookView[action] ? LogbookView[action](args || e, e, t) : null,

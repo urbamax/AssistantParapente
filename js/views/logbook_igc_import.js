@@ -12,9 +12,9 @@ import { formatCoordinates } from '../utils/geo_utils.js';
 import { classifyFlight } from '../services/flight_classifier.js';
 import { addMinutesToDatetimeLocal } from '../utils/date_utils.js';
 import { tt, th, tl } from './logbook_strings.js';
-import { LogbookLearnedBase } from './logbook_learned.js';
+import { LogbookBatchImportBase } from './logbook_batch_import.js';
 
-export class LogbookIgcImportBase extends LogbookLearnedBase {
+export class LogbookIgcImportBase extends LogbookBatchImportBase {
     currentTraceData = null;
 
     currentRawIgc = null;
@@ -61,6 +61,11 @@ export class LogbookIgcImportBase extends LogbookLearnedBase {
     async _processFiles(fileList) {
         const files = Array.from(fileList || []);
         const isSdf = (f) => /\.sdf$/i.test(f.name);
+        // Deux fichiers de vol ou plus : un tableau d'une ligne par vol, au lieu du formulaire d'un seul vol
+        if (files.filter((f) => !isSdf(f)).length >= 2) {
+            await this.openBatchImport(files);
+            return;
+        }
         const trace = files.find((f) => !isSdf(f));
         const sdf = files.find(isSdf);
         if (trace) await this._processIgcFile(trace);

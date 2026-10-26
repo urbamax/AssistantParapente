@@ -9,7 +9,7 @@ import SitesService from '../services/sites_service.js';
 import { EXTENDED_WIND_DIRECTIONS } from '../data/weather_config.js';
 import { getSpotairWidgetId } from '../data/spotair_widgets.js';
 import { escapeHTML } from '../core/security.js';
-import { instructorsOf, isCourseSession, courseKey } from '../services/logbook_courses.js';
+import { companionsOf, instructorsOf, isCourseSession, courseKey } from '../services/logbook_courses.js';
 import { formatDuration, formatDateTime, addMinutesToDatetimeLocal } from '../utils/date_utils.js';
 import { t } from '../utils/i18n.js';
 import { buildIgcFileName, buildLogbookReportHtml } from '../services/logbook_export.js';
@@ -54,10 +54,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
      * @returns {string[]}
      */
     static companionsOf(session) {
-        const value = session ? session.accompagnateur : null;
-        return (Array.isArray(value) ? value : [value])
-            .filter((name) => typeof name === 'string' && name.trim())
-            .map((name) => name.trim());
+        return companionsOf(session);
     }
 
     scrollToSession(id) {

@@ -160,6 +160,37 @@ class LogbookService {
         return flight;
     }
 
+    /**
+     * Ajoute plusieurs vols d'un coup (import de plusieurs traces) : une seule sauvegarde et une
+     * seule synchro au lieu d'une par vol. Si la sauvegarde échoue, le carnet est remis comme il
+     * était et rien n'est ajouté.
+     * @param {Object[]} flights
+     * @returns {{success: boolean, data: Object[], error: string|null}}
+     */
+    addFlights(flights) {
+        const list = Array.isArray(flights) ? flights : [];
+        if (list.length === 0) return { success: true, data: [], error: null };
+        const before = this.flights.slice();
+        try {
+            for (const flight of list) {
+                flight.id =
+                    typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+                        ? crypto.randomUUID()
+                        : `${Date.now()}-${this.flights.length}`;
+                flight.updatedAt = Date.now();
+                flight.syncPending = true;
+                normalizeFlight(flight);
+                this.flights.push(flight);
+            }
+            this.flights.sort((a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime());
+            this.saveFlights();
+            return { success: true, data: list, error: null };
+        } catch (error) {
+            this.flights = before;
+            return { success: false, data: [], error: error instanceof Error ? error.message : String(error) };
+        }
+    }
+
     updateFlight(id, updatedData) {
         const index = this.flights.findIndex((f) => f.id === id);
         if (index !== -1) {

@@ -885,3 +885,201 @@ html.dark-theme .bar-track {
     border-color: #ef4444;
 }
 
+
+/* --- Import de plusieurs vols : tableau modifiable (spec 039) --- */
+.batch-body {
+    padding-top: 12px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.batch-intro,
+.batch-progress {
+    margin: 0 0 8px;
+    font-size: 0.9rem;
+    color: var(--text-secondary, #666);
+}
+
+.batch-table-wrap {
+    overflow-x: auto;
+}
+
+.batch-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+
+.batch-table th,
+.batch-table td {
+    padding: 6px 4px;
+    border-bottom: 1px solid var(--border-light, #ddd);
+    text-align: left;
+    vertical-align: top;
+}
+
+.batch-table th {
+    position: sticky;
+    top: 0;
+    background: var(--bg-card, #fff);
+}
+
+.batch-table input[type='text'],
+.batch-table input[type='number'],
+.batch-table input[type='datetime-local'],
+.batch-table select {
+    width: 7.5rem;
+    box-sizing: border-box;
+}
+
+.batch-table select {
+    width: 7rem;
+}
+
+.batch-table input[type='datetime-local'] {
+    width: 10rem;
+    font-size: 0.78rem;
+}
+
+.batch-table input[data-batch-field='site'] {
+    width: 9rem;
+}
+
+.batch-table input[type='number'] {
+    width: 4.5rem;
+}
+
+.batch-table input[aria-invalid='true'],
+.batch-table select[aria-invalid='true'] {
+    border-color: #ef4444;
+    outline: 1px solid #ef4444;
+}
+
+.batch-apply {
+    display: block;
+    max-width: 6.5rem;
+    margin: 2px 0 0;
+    padding: 0 6px;
+    white-space: normal;
+    line-height: 1.15;
+    text-align: left;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.batch-file {
+    min-width: 9.5rem;
+}
+
+.batch-name {
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+.batch-status {
+    display: inline-block;
+    margin-top: 2px;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    background: rgba(16, 185, 129, 0.15);
+    color: #047857;
+}
+
+.batch-fix .batch-status {
+    background: rgba(245, 158, 11, 0.2);
+    color: #b45309;
+}
+
+.batch-duplicate .batch-status,
+.batch-known .batch-status,
+.batch-unreadable .batch-status,
+.batch-unsupported .batch-status {
+    background: rgba(107, 114, 128, 0.2);
+    color: var(--text-secondary, #4b5563);
+}
+
+.batch-reason,
+.batch-sensor {
+    margin-top: 2px;
+    font-size: 0.78rem;
+    color: var(--text-secondary, #666);
+}
+
+.batch-other {
+    margin-top: 4px;
+}
+
+.batch-sensors {
+    margin-top: 12px;
+    font-size: 0.85rem;
+}
+
+.batch-sensors:empty {
+    display: none;
+}
+
+.batch-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-light, #ddd);
+}
+
+.batch-summary {
+    flex: 1;
+    font-weight: bold;
+}
+
+.batch-live {
+    flex-basis: 100%;
+    order: 5;
+    font-size: 0.85rem;
+    color: #b45309;
+}
+
+.batch-live:empty {
+    display: none;
+}
+
+@media (max-width: 760px) {
+    /* Sur téléphone, chaque vol devient une carte : les champs se lisent les uns sous les autres */
+    .batch-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    .batch-table,
+    .batch-table tbody,
+    .batch-table tr,
+    .batch-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .batch-table tr {
+        margin-bottom: 12px;
+        border: 1px solid var(--border-light, #ddd);
+        border-radius: 8px;
+        padding: 6px;
+    }
+
+    .batch-table td {
+        border-bottom: none;
+    }
+
+    .batch-table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 0.72rem;
+        color: var(--text-secondary, #666);
+    }
+}

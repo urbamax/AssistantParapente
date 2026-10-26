@@ -25,6 +25,50 @@ describe('LogbookService - Core Functions', () => {
         vi.restoreAllMocks();
     });
 
+    describe('addFlights (import of several flights at once)', () => {
+        const flight = (site, datetime) => ({ type: 'vol', site, datetime, duree: 10 });
+
+        it('adds every flight with its own id, one single save, newest first', () => {
+            LogbookService.flights = [flight('Ancien', '2026-08-01T10:00')];
+            const save = vi.spyOn(LogbookService, 'saveFlights');
+
+            const result = LogbookService.addFlights([
+                flight('A', '2026-09-01T10:00'),
+                flight('B', '2026-09-03T10:00'),
+                flight('C', '2026-09-02T10:00'),
+            ]);
+
+            expect(result.success).toBe(true);
+            expect(result.data).toHaveLength(3);
+            expect(save).toHaveBeenCalledTimes(1);
+            expect(LogbookService.getFlights().map((f) => f.site)).toEqual(['B', 'C', 'A', 'Ancien']);
+            const ids = result.data.map((f) => f.id);
+            expect(new Set(ids).size).toBe(3);
+            expect(result.data.every((f) => f.updatedAt && f.syncPending === true)).toBe(true);
+            expect(StorageService.get(StorageService.KEYS.LOGBOOK_DATA)).toHaveLength(4);
+        });
+
+        it('does nothing for an empty list', () => {
+            const save = vi.spyOn(LogbookService, 'saveFlights');
+            expect(LogbookService.addFlights([])).toEqual({ success: true, data: [], error: null });
+            expect(save).not.toHaveBeenCalled();
+        });
+
+        it('puts the logbook back as it was when the save fails, and says so', () => {
+            LogbookService.flights = [flight('Ancien', '2026-08-01T10:00')];
+            vi.spyOn(LogbookService, 'saveFlights').mockImplementation(() => {
+                throw new Error('quota');
+            });
+
+            const result = LogbookService.addFlights([flight('A', '2026-09-01T10:00')]);
+
+            expect(result.success).toBe(false);
+            expect(result.error).toBe('quota');
+            expect(result.data).toEqual([]);
+            expect(LogbookService.getFlights().map((f) => f.site)).toEqual(['Ancien']);
+        });
+    });
+
     it('addFlight adds syncPending flag, saves to storage, and syncs cloud', () => {
         const flight = { datetime: '2026-08-21T10:00:00Z', site: 'Test Site' };
 
