@@ -51,7 +51,9 @@ export function buildFeedbackSpeech(result) {
     }
 
     const verdict = t(verdictKey);
-    const explanation = String(result.question?.explication || '').trim();
+    const explanation = String(result.question?.explication || '')
+        .replace(/\s*\n+\s*/g, ' ')
+        .trim();
     return explanation ? `${verdict} ${withFinalStop(explanation)}` : verdict;
 }
 

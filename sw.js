@@ -149,6 +149,7 @@ const CRITICAL_ASSETS = [
     './js/views/manual.js',
     './js/views/quiz.js',
     './js/views/quiz_course_links.js',
+    './js/views/quiz_explanation.js',
     './js/views/quiz_strings.js',
     './js/views/quiz_stats.js',
     './js/views/quiz_stats_html.js',

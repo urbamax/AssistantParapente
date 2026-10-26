@@ -58,3 +58,32 @@ describe('extra course sources (several correct answers, several courses)', () =
         expect(bad).toEqual([]);
     });
 });
+
+// Les boutons « voir dans le cours » donnent la source et la couleur des réponses donne le verdict :
+// l'explication ne cite pas son document entre parenthèses, ne conclut pas par « donc cette réponse
+// est juste/fausse », et sépare chaque réponse par un retour à la ligne (« \n » dans le CSV).
+describe('explanation layout', () => {
+    const rows = readFileSync('js/data/qcm_ffvl_explanations.csv', 'utf8')
+        .replace(/\r\n/g, '\n')
+        .split('\n')
+        .slice(1)
+        .filter((l) => l.split(';').length >= 3)
+        .map((l) => ({ code: l.split(';')[0], text: l.split(';').slice(2).join(';') }))
+        .filter((r) => !/^[HRX]/.test(r.code));
+    const SOURCE_IN_PARENS = /\([^()]*(?:manuel|livret|dossier Tracté|affiche|fiche d|référentiel|BPC)[^()]*\)/i;
+    const VERDICT_TAIL =
+        /(?:,|:|\bet)\s*(?:donc\s+)?(?:cette|la)\s+(?:réponse|proposition|affirmation|formulation|option)\s+(?:est\s+)?(?:juste|fausse?)\s*[.!]?(?:\\n|$)/i;
+
+    it('does not cite its source in parentheses', () => {
+        expect(rows.filter((r) => SOURCE_IN_PARENS.test(r.text)).map((r) => r.code)).toEqual([]);
+    });
+
+    it('does not end a sentence by repeating the verdict', () => {
+        expect(rows.filter((r) => VERDICT_TAIL.test(r.text)).map((r) => r.code)).toEqual([]);
+    });
+
+    it('has one line per answer, written with a literal \\n', () => {
+        expect(rows.filter((r) => /\n|\r/.test(r.text)).map((r) => r.code)).toEqual([]);
+        expect(rows.filter((r) => !r.text.includes('\\n')).length).toBeLessThan(5);
+    });
+});
