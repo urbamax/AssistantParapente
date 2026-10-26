@@ -192,7 +192,8 @@ is attached and, after import, the flight has its sensor statistics.
   share of matching points), never by file name or selection order; a `.sdf` MUST be attached only to a trace
   it matches, saved with that flight only, and shown on the row; a `.sdf` matching no trace MUST be listed as
   not attached, and one matching several traces (or a trace matching several `.sdf`) MUST be attached to none
-  and listed as ambiguous.
+  and listed as ambiguous. A flight selected twice counts as one trace for this rule: its `.sdf` MUST be
+  attached to the kept row, never to the flagged copy, and MUST NOT be listed as ambiguous because of the copy.
 - **FR-014**: Every row MUST be built from its own file alone: nothing read from one file (trace, statistics,
   sensor data, site, altitude) may reach another row, whatever the number of files or their order, and the
   table MUST be identical for any order or naming of the same selection (except the file order of equal dates).
