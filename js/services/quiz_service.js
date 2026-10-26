@@ -194,6 +194,14 @@ class QuizService {
                 // ne doit jamais être présenté tel quel comme une source fiable.
                 const mapping = courseMapping[code];
                 const coursePage = mapping && mapping.verifiedPage ? mapping : null;
+                // Quand plusieurs bonnes réponses relèvent de cours différents (ou de pages
+                // différentes), le mapping garde les sources supplémentaires dans « others ».
+                const extraCourses =
+                    coursePage && Array.isArray(mapping.others)
+                        ? mapping.others
+                              .filter((o) => o && o.course_id && o.verifiedPage)
+                              .map((o) => ({ courseId: o.course_id, coursePage: o.verifiedPage }))
+                        : [];
 
                 questions.push({
                     code,
@@ -205,6 +213,7 @@ class QuizService {
                     explication: explications[code] || '',
                     courseId: coursePage ? coursePage.course_id : null,
                     coursePage: coursePage ? coursePage.verifiedPage : null,
+                    extraCourses,
                 });
             }
             return questions;

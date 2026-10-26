@@ -897,6 +897,7 @@ export const FR = Object.freeze({
             validate: 'VALIDER',
             next: 'QUESTION SUIVANTE',
             seeCourse: 'VOIR DANS LE COURS',
+            seeCourseAt: 'VOIR : {title} (p. {page})',
         }),
         results: Object.freeze({
             invalidated: 'INVALIDÉ',

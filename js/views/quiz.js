@@ -8,6 +8,7 @@ import VoiceService from '../services/voice_service.js';
 
 import { optionLetter } from '../services/quiz_voice.js';
 import { tq, tql } from './quiz_strings.js';
+import { courseLinksHtml } from './quiz_course_links.js';
 import { QuizVoiceBase } from './quiz_voice_ui.js';
 
 /**
@@ -715,14 +716,14 @@ class QuizViewClass extends QuizVoiceBase {
             <button class="next-btn" data-action="next-question" style="flex:1;">${tq('question.next')} <i class="ri-arrow-right-line"></i></button>
         `;
 
-        const courseUrl = this.getCourseUrl(result.question.code);
+        const courseLinks = this.getCourseLinks(result.question.code);
 
         const feedbackDiv = document.getElementById('qcm-feedback');
         feedbackDiv.style.display = 'block';
         feedbackDiv.innerHTML = `
             <div class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}">
                 <div>${escapeHTML(result.question.explication)}</div>
-                ${courseUrl ? `<button data-action="openUrl" data-url="${escapeHTML(courseUrl)}" style="margin-top:10px; background:var(--accent-orange); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> ${tq('question.seeCourse')}</button>` : ''}
+                ${courseLinksHtml(courseLinks)}
             </div>
         `;
 
