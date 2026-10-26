@@ -549,6 +549,46 @@ describe('sensor files (.sdf) are paired with their flight by content', () => {
         expect(sensors).toEqual([expect.objectContaining({ name: 'x.sdf', status: 'ambiguous' })]);
     });
 
+    it('attaches a .sdf to the row that is kept when the same flight is selected twice', () => {
+        const x = makeFlight({ start: '09:00:00', gPeak: 3.2 });
+        const entries = [igc('x.igc', x), igc('x-copie.igc', x), sdf('x.sdf', x)];
+        const reference = prepareBatch(entries, env());
+        for (const order of shuffles(entries)) {
+            const { rows, sensors } = prepareBatch(order, env());
+            const kept = rows.find((r) => r.flag !== 'duplicate');
+            const copy = rows.find((r) => r.flag === 'duplicate');
+            expect(sensors).toEqual([]);
+            expect(kept.sensor.stats.gMax).toBe(3.2);
+            expect(kept.included).toBe(true);
+            expect(copy.sensor).toBeNull();
+        }
+        expect(reference.rows).toHaveLength(2);
+    });
+
+    it('keeps the .sdf of a duplicated flight apart from the other flights of the day', () => {
+        const [a, b] = [morning(), noon()];
+        const { rows, sensors } = prepareBatch(
+            [igc('a.igc', a), igc('a2.igc', a), igc('b.igc', b), sdf('a.sdf', a), sdf('b.sdf', b)],
+            env(),
+        );
+        expect(sensors).toEqual([]);
+        const sensorOf = (flight) =>
+            rows.find((r) => r.trace.rawIgc === flight.igc && r.flag !== 'duplicate').sensor.stats.gMax;
+        expect(sensorOf(a)).toBe(a.gPeak);
+        expect(sensorOf(b)).toBe(b.gPeak);
+    });
+
+    it('still lists a .sdf as ambiguous when it matches a duplicated flight and a different one', () => {
+        const x = makeFlight({ start: '09:00:00' });
+        const y = makeFlight({ start: '15:00:00' }); // même forme, une autre heure : un autre vol
+        const { rows, sensors } = prepareBatch(
+            [igc('x.igc', x), igc('x-copie.igc', x), igc('y.igc', y), sdf('x.sdf', x)],
+            env(),
+        );
+        expect(rows.every((r) => r.sensor === null)).toBe(true);
+        expect(sensors).toEqual([expect.objectContaining({ name: 'x.sdf', status: 'ambiguous' })]);
+    });
+
     it('attaches none of two .sdf matching the same trace, and lists both', () => {
         const x = makeFlight({ start: '09:00:00' });
         const { rows, sensors } = prepareBatch([igc('x.igc', x), sdf('a.sdf', x), sdf('b.sdf', x)], env());

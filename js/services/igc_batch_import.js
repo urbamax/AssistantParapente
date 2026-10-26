@@ -346,7 +346,8 @@ function sensorStatsFor(records, parsed, offset) {
  * avec la vérification du formulaire d'un vol (SdfParser.alignToTrace puis matchesTrace). Il n'est
  * rattaché qu'à une trace qui lui correspond, et seulement si aucun autre ne correspond à la même
  * trace ni à lui : sinon il est signalé « ambigu » et rattaché à aucune. Un .sdf sans trace est
- * « non rattaché ».
+ * « non rattaché ». Les lignes reçues sont celles qui comptent : la copie d'un vol choisi deux fois n'en fait
+ * pas partie (voir prepareBatch).
  * @returns {Array<{name: string, status: 'notAttached'|'ambiguous'|'unreadable'}>} les fichiers non rattachés
  */
 function pairSensors(rows, sensorEntries) {
@@ -491,7 +492,11 @@ export function prepareBatch(entries, env) {
         }
     }
 
-    const sensors = pairSensors(readable, sensorEntries);
+    // Un vol choisi deux fois n'a qu'une ligne gardée : le capteur se rattache à elle, pas à sa copie
+    const sensors = pairSensors(
+        readable.filter((row) => row.flag !== 'duplicate'),
+        sensorEntries,
+    );
     rows.forEach(refreshRow);
     return { rows, sensors };
 }
