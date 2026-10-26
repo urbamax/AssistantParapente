@@ -134,7 +134,8 @@ class QuizService {
             const parts = this.parseDelimitedLine(row, ';');
             if (parts.length >= 3) {
                 const id = parts[0];
-                const expl = parts.slice(2).join(';').trim();
+                // « \n » dans le CSV sépare les explications de chaque réponse : retour à la ligne à l'affichage.
+                const expl = parts.slice(2).join(';').trim().replace(/\\n/g, '\n');
                 data[id] = expl;
             }
         }

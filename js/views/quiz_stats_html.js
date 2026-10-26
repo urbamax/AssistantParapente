@@ -7,6 +7,7 @@ import { escapeHTML } from '../core/security.js';
 import { toSorted } from '../utils/array_utils.js';
 import { truncate } from '../utils/text_utils.js';
 import { tq, tqh, tql } from './quiz_strings.js';
+import { explanationHtml } from './quiz_explanation.js';
 
 /** Cartes de répartition des questions par niveau de maîtrise (filtre au clic). */
 export function buildDistributionHtml(
@@ -362,7 +363,7 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats 
                     answersHtml += `
                                 <div style="margin-top:12px; padding:12px; background:rgba(251, 146, 60, 0.15); border-left:3px solid #fb923c; font-size:0.9rem; color:var(--text-main); border-radius:8px;">
                                     <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">${tq('explanation')}</div>
-                                    ${escapeHTML(qObj.explication)}
+                                    ${explanationHtml(qObj.explication)}
                                 </div>
                             `;
                 }

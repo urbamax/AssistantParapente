@@ -9,6 +9,7 @@ import VoiceService from '../services/voice_service.js';
 import { optionLetter } from '../services/quiz_voice.js';
 import { tq, tql } from './quiz_strings.js';
 import { courseLinksHtml } from './quiz_course_links.js';
+import { explanationHtml } from './quiz_explanation.js';
 import { QuizVoiceBase } from './quiz_voice_ui.js';
 
 /**
@@ -381,7 +382,7 @@ class QuizViewClass extends QuizVoiceBase {
                             )
                             .join('')}
                     </div>
-                    ${q.explication ? `<div class="bank-item-explication">${escapeHTML(q.explication)}</div>` : ''}
+                    ${q.explication ? `<div class="bank-item-explication">${explanationHtml(q.explication)}</div>` : ''}
                 </div>
             `;
         });
@@ -722,7 +723,7 @@ class QuizViewClass extends QuizVoiceBase {
         feedbackDiv.style.display = 'block';
         feedbackDiv.innerHTML = `
             <div class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}">
-                <div>${escapeHTML(result.question.explication)}</div>
+                <div>${explanationHtml(result.question.explication)}</div>
                 ${courseLinksHtml(courseLinks)}
             </div>
         `;
@@ -846,7 +847,7 @@ class QuizViewClass extends QuizVoiceBase {
                                 })
                                 .join('')}
                         </div>
-                        ${r.question.explication ? `<div class="bank-item-explication" style="margin-top: 20px; font-size: 0.95rem; color: var(--text-main); background: rgba(251, 146, 60, 0.1); border-left:4px solid #fb923c; padding: 16px; border-radius: 0 8px 8px 0;"><div style="font-weight:bold; color:#ea580c; margin-bottom:4px; font-size:0.8rem; text-transform:uppercase;"><i class="ri-information-fill" style="margin-right: 4px;"></i>${tq('explanation')}</div>${escapeHTML(r.question.explication)}</div>` : ''}
+                        ${r.question.explication ? `<div class="bank-item-explication" style="margin-top: 20px; font-size: 0.95rem; color: var(--text-main); background: rgba(251, 146, 60, 0.1); border-left:4px solid #fb923c; padding: 16px; border-radius: 0 8px 8px 0;"><div style="font-weight:bold; color:#ea580c; margin-bottom:4px; font-size:0.8rem; text-transform:uppercase;"><i class="ri-information-fill" style="margin-right: 4px;"></i>${tq('explanation')}</div>${explanationHtml(r.question.explication)}</div>` : ''}
                     </div>
                 `,
                               )
