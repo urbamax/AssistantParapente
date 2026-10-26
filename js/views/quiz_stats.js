@@ -766,13 +766,32 @@ export class QuizStatsBase extends BaseView {
     }
 
     getCourseUrl(questionCode) {
+        const links = this.getCourseLinks(questionCode);
+        return links.length ? links[0].url : null;
+    }
+
+    /**
+     * Tous les endroits du cours qui justifient la réponse : la source principale, puis les sources
+     * supplémentaires quand plusieurs bonnes réponses relèvent de cours (ou de pages) différents.
+     * Convention déjà utilisée pour ouvrir un PDF (manual.js openCourse) : chemin relatif ouvert par
+     * le navigateur, qui supporte nativement l'ancre #page=N pour sauter à la bonne page sans avoir
+     * à construire un lecteur PDF dédié.
+     */
+    getCourseLinks(questionCode) {
         const q = this.getQuestionByCode(questionCode);
-        if (!q || !q.courseId || !q.coursePage) return null;
-        const course = COURSES_DATA[q.courseId];
-        if (!course || !course.pdf) return null;
-        // Convention déjà utilisée pour ouvrir un PDF (manual.js openCourse) : chemin relatif
-        // ouvert par le navigateur, qui supporte nativement l'ancre #page=N pour sauter à la
-        // bonne page sans avoir à construire un lecteur PDF dédié.
-        return `${course.pdf}#page=${q.coursePage}`;
+        if (!q) return [];
+        const candidates = [{ courseId: q.courseId, coursePage: q.coursePage }, ...(q.extraCourses || [])];
+        const seen = new Set();
+        const links = [];
+        for (const { courseId, coursePage } of candidates) {
+            if (!courseId || !coursePage) continue;
+            const course = COURSES_DATA[courseId];
+            if (!course || !course.pdf) continue;
+            const url = `${course.pdf}#page=${coursePage}`;
+            if (seen.has(url)) continue;
+            seen.add(url);
+            links.push({ url, title: course.title || courseId, page: coursePage });
+        }
+        return links;
     }
 }

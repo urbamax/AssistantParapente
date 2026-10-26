@@ -37,3 +37,24 @@ describe('quiz sources are declared (spec 031)', () => {
         expect(offending).toEqual([]);
     });
 });
+
+// Quand plusieurs bonnes réponses relèvent de cours différents, le mapping garde les sources
+// supplémentaires dans « others » : elles doivent pointer vers de vrais cours et de vraies pages.
+describe('extra course sources (several correct answers, several courses)', () => {
+    const courses = readFileSync('js/data/courses_data.js', 'utf8');
+    it('each extra source is a known course, a positive page, distinct from the main one', () => {
+        const bad = [];
+        for (const [code, m] of Object.entries(mapping)) {
+            if (!m.others) continue;
+            if (!m.verifiedPage || m.others.length > 2) bad.push(`${code}: extras without a main page or too many`);
+            for (const o of m.others) {
+                const known = courses.includes(`'${o.course_id}'`);
+                if (!known || !Number.isInteger(o.verifiedPage) || o.verifiedPage < 1)
+                    bad.push(`${code}: ${o.course_id}`);
+                if (o.course_id === m.course_id && o.verifiedPage === m.verifiedPage)
+                    bad.push(`${code}: duplicate of the main source`);
+            }
+        }
+        expect(bad).toEqual([]);
+    });
+});
