@@ -80,6 +80,16 @@
     }
 }
 
+.next-btn:disabled,
+.next-btn:disabled:hover {
+    background: var(--bg-input) !important;
+    color: var(--text-secondary) !important;
+    box-shadow: none;
+    filter: none;
+    transform: none;
+    cursor: not-allowed;
+}
+
 .qcm-option.selected {
     background: rgba(255, 255, 255, 0.15);
     border-color: rgba(255, 255, 255, 0.5);

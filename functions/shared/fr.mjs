@@ -815,6 +815,8 @@ export const FR = Object.freeze({
                 'Mode Entraînement : Choisissez votre thème et volume. Correction immédiate après chaque question.',
             themeLabel: 'THÈME SPÉCIFIQUE (OPTIONNEL)',
             themeLabelMastery: 'NIVEAU (TOUT) OU THÈME CIBLÉ',
+            masteryCurrent: 'Maîtrise actuelle : {current}%.',
+            masteryAtMax: "Vous avez déjà atteint 100% sur ce périmètre : il n'y a plus rien à perfectionner.",
             labels: Object.freeze({
                 EXAM: 'MODE EXAMEN',
                 REVISION: 'MODE RÉVISION',

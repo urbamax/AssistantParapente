@@ -81,6 +81,7 @@ class QuizViewClass extends QuizVoiceBase {
                     // Le résumé du mode Révision reste caché tant que les questions ne sont pas chargées :
                     // si le mode a été choisi entre-temps, il faut l'afficher maintenant.
                     this.updateRevisionSummary();
+                    this.refreshMasterySlider();
 
                     // Re-render the correct screen based on routing mode if needed
                     const mode = GlobalState.get('mode');
@@ -120,6 +121,8 @@ class QuizViewClass extends QuizVoiceBase {
 
             // Subscribe to level changes to re-render dynamic content (QCM Bank, Stats)
             this._unsubscribeLevel = GlobalState.subscribe('level', () => {
+                this.refreshMasterySlider();
+
                 const bankScreen = document.getElementById('qcm-bank-screen');
                 if (bankScreen && bankScreen.classList.contains('active')) {
                     this.showBankScreen();
@@ -274,6 +277,7 @@ class QuizViewClass extends QuizVoiceBase {
         if (e.target.id === 'qcm-theme-select') {
             QuizService.setTheme(e.target.value);
             this.updateRevisionSummary();
+            this.refreshMasterySlider();
         } else if (e.target.id === 'bank-theme-filter' || e.target.id === 'bank-search') {
             const select = /** @type {HTMLSelectElement} */ (document.getElementById('bank-theme-filter'));
             this.renderBankContent(select ? select.value : 'ALL');
@@ -440,6 +444,7 @@ class QuizViewClass extends QuizVoiceBase {
 
         const masteryOptions = document.getElementById('mastery-options');
         if (masteryOptions) masteryOptions.style.display = mode === 'MASTERY' ? '' : 'none';
+        this.refreshMasterySlider();
     }
 
     // Mode Révision : combien de questions sont à réviser, et pourquoi la session peut proposer des
@@ -469,16 +474,44 @@ class QuizViewClass extends QuizVoiceBase {
         el.hidden = false;
     }
 
-    updateMasteryTargetUI(target, targetBtn) {
-        const container = document.getElementById('mastery-options');
-        if (!container) return;
-        container.querySelectorAll('.count-btn').forEach((btn) => btn.classList.remove('active'));
-        if (targetBtn) {
-            targetBtn.classList.add('active');
-        } else {
-            const btn = container.querySelector(`[data-args="${target}"]`);
-            if (btn) btn.classList.add('active');
-        }
+    // Appelé quand le pilote déplace le curseur du palier objectif.
+    updateMasteryTargetUI(target) {
+        this._masteryTargetChoice = Number(target);
+        this.showMasteryTarget(target);
+    }
+
+    showMasteryTarget(target) {
+        const output = document.getElementById('mastery-target-value');
+        if (output) output.textContent = `${target}%`;
+        const slider = /** @type {HTMLInputElement | null} */ (document.getElementById('mastery-target-slider'));
+        if (slider) slider.setAttribute('aria-valuetext', `${target}%`);
+    }
+
+    // Le curseur du palier va de 1 point au-dessus de la maîtrise actuelle du périmètre (niveau et
+    // thème choisis) jusqu'à 100 %. À recalculer quand le niveau, le thème ou les statistiques changent.
+    // Tant que le pilote n'a pas touché au curseur, il se place sur 75 % (ou sur son minimum si la
+    // maîtrise actuelle est déjà plus haute) ; ensuite son choix est conservé, ramené dans la plage
+    // (il revient tel quel si la plage s'élargit de nouveau, par exemple en changeant de thème).
+    refreshMasterySlider() {
+        const slider = /** @type {HTMLInputElement | null} */ (document.getElementById('mastery-target-slider'));
+        if (!slider) return;
+        const level = (typeof GlobalState !== 'undefined' && GlobalState.get('level')) || 'BI';
+        const { current, min, max, complete } = QuizService.getMasteryTargetBounds(level);
+
+        const wanted = this._masteryTargetChoice ?? 75;
+        const value = Math.min(Math.max(wanted, min), max);
+        slider.min = String(min);
+        slider.max = String(max);
+        slider.value = String(value);
+        slider.disabled = min >= max;
+        QuizService.setMasteryTarget(value);
+        this.showMasteryTarget(value);
+
+        // Déjà à 100 % sur ce périmètre : rien à perfectionner, on ne laisse pas lancer de série.
+        const hint = document.getElementById('mastery-target-hint');
+        if (hint) hint.textContent = complete ? tql('modes.masteryAtMax') : tql('modes.masteryCurrent', { current });
+        const startBtn = /** @type {HTMLButtonElement | null} */ (document.getElementById('qcm-start-btn'));
+        if (startBtn) startBtn.disabled = complete && QuizService.state.qcmConfig.mode === 'MASTERY';
     }
 
     updateCountUI(countVal, targetBtn) {
@@ -509,6 +542,7 @@ class QuizViewClass extends QuizVoiceBase {
     showSetupScreen() {
         document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
         document.getElementById('qcm-setup-screen').classList.add('active');
+        this.refreshMasterySlider();
     }
 
     startSession() {
