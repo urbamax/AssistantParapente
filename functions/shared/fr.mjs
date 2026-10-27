@@ -1179,7 +1179,7 @@ export const FR = Object.freeze({
             summaryWeak: 'À renforcer en priorité : {plates}.',
         }),
     }),
-    // Spec 021 : messages du compte (connexion, synchronisation, alertes, sauvegarde) affichés par
+    // Spec 021 : messages du compte (connexion, synchronisation, alertes) affichés par
     // js/services/firebase_service.js. Les codes d'erreur renvoyés au code ('Not logged in'…) n'y sont pas.
     account: Object.freeze({
         syncDot: Object.freeze({
@@ -1232,16 +1232,30 @@ export const FR = Object.freeze({
             enabled: 'Alertes météo activées sur cet appareil !',
             failed: "Échec de l'activation des alertes{detail}.",
         }),
-        backup: Object.freeze({
-            noFile: 'Aucun fichier sélectionné.',
-            invalidFile: "Fichier invalide : ce n'est pas un backup AssistantParapente.",
-            restoring: 'Restauration en cours...',
-            restored: 'Données restaurées localement. Connectez-vous pour les synchroniser avec le cloud.',
-            readError: "Erreur de lecture du fichier. Vérifiez qu'il s'agit d'un fichier JSON valide.",
-            downloaded: 'Backup téléchargé : {filename}',
-            confirmImport:
-                'Importer le backup du {date} ?\n\nATTENTION : vos données locales actuelles seront remplacées par celles du backup.',
-        }),
+    }),
+    // Sauvegarde locale (js/core/backup_ui.js) : export / import d'un fichier, sans compte ni cloud.
+    backup: Object.freeze({
+        downloaded: 'Sauvegarde téléchargée : {filename}',
+        exportFailed: "La sauvegarde n'a pas pu être créée.",
+        reading: 'Lecture du fichier...',
+        noFile: 'Aucun fichier sélectionné.',
+        notJson: "Fichier illisible. Vérifiez qu'il s'agit d'une sauvegarde AssistantParapente (.json).",
+        notBackup: "Fichier invalide : ce n'est pas une sauvegarde AssistantParapente.",
+        tooLarge: 'Fichier trop volumineux pour être une sauvegarde AssistantParapente.',
+        unsupportedVersion:
+            "Cette sauvegarde vient d'une version plus récente de l'application. Mettez l'application à jour, puis réessayez.",
+        badData: "Sauvegarde endommagée : certaines données ont un format inattendu. Rien n'a été modifié.",
+        empty: 'Cette sauvegarde ne contient aucune donnée à restaurer.',
+        confirmImport:
+            'Restaurer la sauvegarde du {date} ?\n\nATTENTION : les données de cet appareil couvertes par la sauvegarde (carnet de vol, équipement, statistiques, préférences) seront remplacées.',
+        confirmImportUnknownDate:
+            'Restaurer cette sauvegarde ?\n\nATTENTION : les données de cet appareil couvertes par la sauvegarde (carnet de vol, équipement, statistiques, préférences) seront remplacées.',
+        restoring: 'Restauration en cours...',
+        restored: "Données restaurées. L'application se recharge...",
+        statsSkipped:
+            " Les statistiques du QCM n'ont pas été restaurées : le stockage des statistiques est désactivé dans vos options de confidentialité.",
+        restoreFailed: "La restauration a échoué (stockage de l'appareil plein ou indisponible).",
+        syncFailed: ' La synchronisation avec le cloud a échoué : elle sera retentée plus tard.',
     }),
     // Spec 021 : textes de la bibliothèque des cours (js/views/manual.js). Les codes de niveau (BI, BP…)
     // et les catégories des cours (« Autre » par défaut) sont des données.

@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { FirebaseAuthEngine } from '../../js/services/firebase_service.js';
+import { exportBackup, parseBackup, applyBackup } from '../../js/services/backup_service.js';
 import LogbookService from '../../js/services/logbook_service.js';
 import SitesService from '../../js/services/sites_service.js';
 import StorageService from '../../js/services/storage.js';
@@ -139,36 +140,22 @@ describe('Pending equipment deletions in backup and restore (spec 015)', () => {
         });
         vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
         vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
-        vi.spyOn(FirebaseAuthEngine, 'showAlert').mockImplementation(() => {});
 
-        FirebaseAuthEngine.exportAllData();
+        exportBackup();
 
         const payload = JSON.parse(await blob.text());
         expect(payload.deleted_equipment).toEqual(['wing-old']);
     });
 
-    it('restores pending equipment deletions', async () => {
+    it('restores pending equipment deletions', () => {
         localStorage.clear();
-        const originalFileReader = global.FileReader;
-        global.FileReader = class {
-            readAsText(file) {
-                this.onload({ target: { result: file.content } });
-            }
-        };
-        const originalConfirm = window.confirm;
-        window.confirm = vi.fn(() => true);
-        vi.spyOn(FirebaseAuthEngine, 'showAlert').mockImplementation(() => {});
-        vi.spyOn(FirebaseAuthEngine, 'showStatus').mockImplementation(() => {});
-        FirebaseAuthEngine.currentUser = null;
-
         const content = JSON.stringify({
             _meta: { appName: 'AssistantParapente', exportedAt: new Date().toISOString() },
             deleted_equipment: ['wing-old'],
         });
-        FirebaseAuthEngine.importAllData(/** @type {any} */ ({ name: 'backup.json', content }));
-        await new Promise((resolve) => setTimeout(resolve, 0));
-        global.FileReader = originalFileReader;
-        window.confirm = originalConfirm;
+        const parsed = parseBackup(content);
+        expect(parsed.ok).toBe(true);
+        applyBackup(parsed.ok ? parsed.backup : {});
 
         expect(JSON.parse(localStorage.getItem('deleted_equipment'))).toEqual(['wing-old']);
     });

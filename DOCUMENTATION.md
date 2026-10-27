@@ -52,6 +52,7 @@ AssistantParapente/
 │   │   ├── app_state.js        # Reactive State Management (Pub/Sub)
 │   │   ├── router.js           # Client-side Router & History API
 │   │   ├── events.js           # Event Delegator (data-action handlers)
+│   │   ├── backup_ui.js        # Export / Import buttons: file picker, confirmation, status, reload
 │   │   └── ui_manager.js       # Component injection & Theme Manager
 │   ├── views/                  # Screen Controllers & UI Renderers
 │   │   ├── sites.js            # Sites view controller
@@ -68,6 +69,7 @@ AssistantParapente/
 │   │   ├── logbook_service.js  # Flight records CRUD & wing maintenance calculations
 │   │   ├── quiz_service.js     # Question randomization, scoring & streak tracking
 │   │   ├── firebase_service.js # Authentication & Cloud Firestore synchronization
+│   │   ├── backup_service.js   # Local backup file: build, validate, restore (no account, no cloud)
 │   │   ├── igc_parser.js       # Native IGC GPS file parser (B-records, flight detection, analysis, winch)
 │   │   ├── sdf_parser.js       # Syride .sdf sensor file (load factor, temperature)
 │   │   ├── pilot_habits.js     # What the add form learns from the pilot's logbook
@@ -356,6 +358,13 @@ Calculates overall success percentage, subject mastery radar, active day streak,
 ### 1. Hybrid Storage Strategy (`js/services/firebase_service.js`)
 - **Offline Mode (Guest)**: Data is immediately written to `LocalStorage` using `StorageService`.
 - **Authenticated Mode**: Automatically merges local data with Cloud Firestore (`users/{uid}/data`). Supports Google Auth and Email/Password sign-in.
+
+### 2. Local backup file, without an account (spec 041, `js/services/backup_service.js`, `js/core/backup_ui.js`)
+- **Where**: "Exporter" / "Importer" in the "Espace Synchro" dialog (always visible, even when the Firebase consent is refused) and in the privacy options. They never need an account or consent: the file stays on the device.
+- **Format**: `{ _meta: { appName, exportVersion: '1.0', exportedAt, exportedBy }, <localStorage key>: <value>, deleted_flights, deleted_equipment, ... }`. Files of any `1.x` version, or exported before versions were checked, are accepted; a higher major version is refused.
+- **Import** parses with `JSON.parse` only (nothing is evaluated), checks the shape of every known key and writes nothing if one is malformed, asks for confirmation, writes the values as they are (`QCM_STATS` is copied whole, no field filtered), then reloads the page so every view and service restarts on the restored data. Keys absent from the file are left untouched.
+- **Not restored**: `parapente_access` (roles come from the server only), `LAST_ACTIVE_ROUTE` and `firebase_last_sync` (describe the exporting device). The QCM statistics and exam history are skipped when the "Statistiques" consent is refused. GPS traces kept in IndexedDB are not in the file.
+- **Cloud**: the import calls nothing remote. Only when a pilot is signed in, the usual silent `syncDataWithCloud(true)` runs after the restore.
 
 ---
 
