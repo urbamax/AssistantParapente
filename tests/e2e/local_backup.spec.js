@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
+import { disableBackdropBlur } from '../helpers/e2e_no_backdrop_blur.js';
 
 // Sauvegarde locale : export / import d'un fichier sans compte et sans consentement Firebase.
 
@@ -15,6 +16,8 @@ const FLIGHT = { id: 'vol-1', datetime: '2026-09-01T10:00:00Z', site: 'Annecy', 
 
 test.describe('Sauvegarde locale sans compte', () => {
     test.beforeEach(async ({ page }) => {
+        // Le flou de l'écran Sites fige parfois WebKit sous Linux en CI (voir le helper).
+        await disableBackdropBlur(page);
         // Une seule fois : l'import recharge la page, les données restaurées ne doivent pas être effacées.
         await page.addInitScript(
             ({ consent, flight }) => {
