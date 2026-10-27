@@ -9,6 +9,7 @@ import AppEvents from './events.js';
 import UIManager from './ui_manager.js';
 import StorageService from '../services/storage.js';
 import GdprEngine from '../gdpr_engine.js';
+import { exportBackupAction, importBackupAction } from './backup_ui.js';
 import SitesService from '../services/sites_service.js';
 import AccessService, { ACCESS_EVENTS, applyRoleVisibility } from '../services/access_service.js';
 import { initAppUpdateNotifier } from './app_update.js';
@@ -269,11 +270,13 @@ async function bootApplication() {
         if (GlobalState.get('mode') !== 'SAFETY') await AppRouter.navigate('SAFETY');
         await SafetyView.switchTab(section);
     });
-    AppEvents.register('importDataFile', (_value, _e, target) => {
-        const file = target.files[0];
-        if (!file || !window.FirebaseAuthEngine) return;
-        window.FirebaseAuthEngine.importAllData(file);
-        target.value = '';
+    // Sauvegarde locale : fonctionne sans compte ni consentement Firebase.
+    AppEvents.register('exportBackup', () => exportBackupAction());
+    AppEvents.register('importBackupFile', async (_value, _e, target) => {
+        const input = /** @type {HTMLInputElement} */ (target);
+        const file = input.files?.[0];
+        input.value = ''; // permet de rechoisir le même fichier
+        await importBackupAction(file);
     });
     AppEvents.register('openGdprSettingsFromAuth', () => {
         GdprEngine.showModal('gdpr-settings-modal');
@@ -290,8 +293,6 @@ async function bootApplication() {
         'syncDataWithCloud',
         'closeAuthModal',
         'openAuthModal',
-        'exportAllData',
-        'importAllData',
         'enablePushNotifications',
     ].forEach((action) => {
         AppEvents.register('FirebaseAuth' + action, (args, e, t) =>

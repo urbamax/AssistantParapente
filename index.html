@@ -2232,34 +2232,6 @@
                         </button>
                     </div>
 
-                    <!-- Ligne Export / Import -->
-                    <div class="auth-action-row" style="margin-top: 8px">
-                        <button data-i18n-title="authLoggedInView.titleTelechargerUnFichier" data-i18n="authLoggedInView.exporter"
-                            class="action-btn secondary"
-                            data-action="FirebaseAuthexportAllData"
-                            title="Télécharger un fichier backup de toutes vos données"
-                        >
-                            <i class="ri-download-2-line"></i> Exporter
-                        </button>
-                        <!-- Le bouton "Importer" ouvre l'input fichier caché -->
-                        <button data-i18n-title="authLoggedInView.titleRestaurerToutesVos" data-i18n="authLoggedInView.importer"
-                            class="action-btn secondary"
-                            data-action="triggerClick"
-                            data-args="import-data-input"
-                            title="Restaurer toutes vos données depuis un fichier backup"
-                        >
-                            <i class="ri-upload-2-line"></i> Importer
-                        </button>
-                        <!-- Input fichier caché : déclenche importAllData dès qu'un fichier est choisi -->
-                        <input
-                            type="file"
-                            id="import-data-input"
-                            accept=".json"
-                            style="display: none"
-                            data-change-action="importDataFile"
-                        />
-                    </div>
-
                     <!-- Alertes météo push (FCM) sur les sites favoris -->
                     <div class="auth-action-row" style="margin-top: 8px">
                         <button data-i18n-title="authLoggedInView.titleRecevoirUneNotification" data-i18n="authLoggedInView.activerLesAlertesMeteo"
@@ -2271,6 +2243,28 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- Sauvegarde locale : accessible sans compte ni consentement Firebase -->
+                <section id="auth-backup-block" class="backup-block">
+                    <div data-i18n="localBackup.titre" class="backup-block-title">Sauvegarde sur cet appareil</div>
+                    <p data-i18n="localBackup.texte" class="backup-block-text">
+                        Sans compte ni connexion : enregistrez toutes vos données (carnet de vol, équipement,
+                        statistiques, préférences) dans un fichier, puis restaurez-les quand vous voulez.
+                    </p>
+                    <div class="auth-action-row">
+                        <button data-i18n="localBackup.exporter" class="action-btn secondary" data-action="exportBackup">
+                            <i class="ri-download-2-line"></i> Exporter
+                        </button>
+                        <button data-i18n="localBackup.importer"
+                            class="action-btn secondary"
+                            data-action="triggerClick"
+                            data-args="backup-import-input"
+                        >
+                            <i class="ri-upload-2-line"></i> Importer
+                        </button>
+                    </div>
+                    <div class="backup-status" role="status" aria-live="polite"></div>
+                </section>
             </div>
         </dialog>
 
@@ -2322,6 +2316,9 @@
         </div>
 
         <!-- ================= GDPR / RGPD SYSTEM (FRANCE 2026) ================= -->
+
+        <!-- Sélecteur du fichier de sauvegarde (boutons « Importer » de l'Espace Synchro et des options de confidentialité) -->
+        <input type="file" id="backup-import-input" accept=".json,application/json" hidden data-change-action="importBackupFile" />
 
         <!-- GDPR Banner -->
         <div id="gdpr-banner" class="gdpr-banner">
@@ -2446,6 +2443,29 @@
                                 <input type="checkbox" id="gdpr-toggle-gps" />
                                 <span class="gdpr-slider"></span>
                             </label>
+                        </div>
+                    </div>
+                    <!-- Sauvegarde locale : un fichier, sans compte ni cloud -->
+                    <div class="gdpr-option-card">
+                        <div class="gdpr-option-info">
+                            <div data-i18n="localBackup.titre" class="gdpr-option-title">Sauvegarde sur cet appareil</div>
+                            <div data-i18n="localBackup.texte" class="gdpr-option-desc">
+                                Sans compte ni connexion : enregistrez toutes vos données (carnet de vol, équipement,
+                                statistiques, préférences) dans un fichier, puis restaurez-les quand vous voulez.
+                            </div>
+                            <div class="auth-action-row">
+                                <button data-i18n="localBackup.exporter" class="action-btn secondary" data-action="exportBackup">
+                                    <i class="ri-download-2-line"></i> Exporter
+                                </button>
+                                <button data-i18n="localBackup.importer"
+                                    class="action-btn secondary"
+                                    data-action="triggerClick"
+                                    data-args="backup-import-input"
+                                >
+                                    <i class="ri-upload-2-line"></i> Importer
+                                </button>
+                            </div>
+                            <div class="backup-status" role="status" aria-live="polite"></div>
                         </div>
                     </div>
                 </div>
@@ -3257,8 +3277,8 @@
                                 Une fois connecté, un petit point dans l'en-tête indique qu'une synchronisation
                                 est en cours ou que des modifications n'ont pas encore pu être envoyées (hors ligne) :
                                 l'application réessaie automatiquement. Les boutons <strong>Exporter</strong> et
-                                <strong>Importer</strong> de l'Espace Synchro permettent aussi de garder une copie de
-                                vos données dans un fichier.
+                                <strong>Importer</strong> de l'Espace Synchro, disponibles aussi sans compte, permettent de
+                                garder une copie de vos données dans un fichier et de les restaurer plus tard.
                             </p>
 
                             <h5 data-i18n="manualModal.n4HorsLigneEt" style="margin-top: 16px; margin-bottom: 8px">4. Hors ligne et mises à jour</h5>

@@ -491,3 +491,37 @@ body.light-mode .auth-sync-status {
     color: white;
     font-size: 11px;
 }
+/* Local backup (Export / Import) : available without an account */
+.backup-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+}
+
+.backup-block-title {
+    color: var(--text-main);
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.backup-block-text {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.backup-status {
+    display: none;
+    margin-top: 8px;
+}
+
+.backup-status.auth-alert.info {
+    display: block;
+    background: rgba(148, 163, 184, 0.1);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    color: var(--text-secondary);
+}

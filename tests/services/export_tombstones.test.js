@@ -3,6 +3,7 @@ import { FirebaseAuthEngine } from '../../js/services/firebase_service.js';
 import LogbookService from '../../js/services/logbook_service.js';
 import SitesService from '../../js/services/sites_service.js';
 import StorageService from '../../js/services/storage.js';
+import { exportBackup } from '../../js/services/backup_service.js';
 import QuizView from '../../js/views/quiz.js';
 import { createFakeFirestore } from '../fixtures/fake_firestore.js';
 
@@ -24,7 +25,6 @@ describe('Full backup with unreadable deletion lists (spec 024)', () => {
         });
         vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
         vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
-        vi.spyOn(FirebaseAuthEngine, 'showAlert').mockImplementation(() => {});
     });
 
     afterEach(() => {
@@ -32,7 +32,7 @@ describe('Full backup with unreadable deletion lists (spec 024)', () => {
     });
 
     const exportPayload = async () => {
-        FirebaseAuthEngine.exportAllData();
+        exportBackup();
         expect(blob).toBeDefined();
         return JSON.parse(await blob.text());
     };

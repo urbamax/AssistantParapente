@@ -296,12 +296,14 @@ export const FR_HTML = Object.freeze({
         jamais: 'Jamais',
         synchro: 'Synchro',
         deconnexion: 'Déconnexion',
-        exporter: 'Exporter',
-        titleTelechargerUnFichier: 'Télécharger un fichier backup de toutes vos données',
-        importer: 'Importer',
-        titleRestaurerToutesVos: 'Restaurer toutes vos données depuis un fichier backup',
         activerLesAlertesMeteo: 'Activer les alertes météo',
         titleRecevoirUneNotification: 'Recevoir une notification quand un site favori devient volable, même app fermée',
+    }),
+    localBackup: Object.freeze({
+        titre: 'Sauvegarde sur cet appareil',
+        texte: 'Sans compte ni connexion : enregistrez toutes vos données (carnet de vol, équipement, statistiques, préférences) dans un fichier, puis restaurez-les quand vous voulez.',
+        exporter: 'Exporter',
+        importer: 'Importer',
     }),
     moreMapsBottomSheet: Object.freeze({
         cartesExternes: 'CARTES EXTERNES',
@@ -514,7 +516,7 @@ export const FR_HTML = Object.freeze({
             "elles sont hébergées sur l'infrastructure Firebase (Google Ireland, serveurs européens) et ne sont jamais partagées ni vendues. Vous pouvez les supprimer à tout moment depuis l'Espace Synchro ou en contactant l'éditeur.",
         vosDonneesRestentLes: 'Vos données restent les vôtres :',
         uneFoisConnecteUn:
-            "Une fois connecté, un petit point dans l'en-tête indique qu'une synchronisation est en cours ou que des modifications n'ont pas encore pu être envoyées (hors ligne) : l'application réessaie automatiquement. Les boutons <strong>Exporter</strong> et <strong>Importer</strong> de l'Espace Synchro permettent aussi de garder une copie de vos données dans un fichier.",
+            "Une fois connecté, un petit point dans l'en-tête indique qu'une synchronisation est en cours ou que des modifications n'ont pas encore pu être envoyées (hors ligne) : l'application réessaie automatiquement. Les boutons <strong>Exporter</strong> et <strong>Importer</strong> de l'Espace Synchro, disponibles aussi sans compte, permettent de garder une copie de vos données dans un fichier et de les restaurer plus tard.",
         n4HorsLigneEt: '4. Hors ligne et mises à jour',
         lesQcmLeCarnet:
             "les QCM, le carnet de vol et l'écran Sécurité fonctionnent hors ligne. La dernière prévision météo chargée, les cours déjà ouverts et les zones de carte déjà consultées restent disponibles sur l'appareil.",
