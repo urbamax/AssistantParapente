@@ -440,7 +440,7 @@ export class SitesListBase extends SitesMapBase {
                 const isMinimized = isFav ? userToggled : !userToggled;
 
                 html +=
-                    `<div class="site-card ${isMinimized ? 'minimized' : ''}">` +
+                    `<div id="site-card-${site.id}" class="site-card ${isMinimized ? 'minimized' : ''}">` +
                     this.buildSiteCardHtml(
                         site,
                         windTags,

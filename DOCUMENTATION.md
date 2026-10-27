@@ -61,6 +61,7 @@ AssistantParapente/
 │   │   ├── quiz.js             # QCM & exam controller
 │   │   ├── quiz_stats.js       # Quiz stats, exam history, import/export (base class of QuizView)
 │   │   ├── quiz_stats_html.js  # HTML fragments of the stats screen (distribution, themes, questions, gauge)
+│   │   ├── quiz_axes_html.js   # HTML of the revision-axes screen (cards, steps 1-3, filters)
 │   │   ├── quiz_voice_ui.js    # Quiz voice mode: read aloud, spoken answers (base class of QuizView)
 │   │   ├── quiz_strings.js    # tq / tqh / tql / tv text helpers
 │   │   └── manual.js           # Library & course viewer controller
@@ -71,6 +72,7 @@ AssistantParapente/
 │   │   ├── firebase_service.js # Authentication & Cloud Firestore synchronization
 │   │   ├── backup_service.js   # Local backup file: build, validate, restore (no account, no cloud)
 │   │   ├── brevet_service.js   # FFVL pilot certifications (BI, BP, BPC, TREUIL), theory exam & progression dissociation
+│   │   ├── revision_axes.js    # 21 revision axes (sub-chapters): status, verified course pages, key points, workshop picker
 │   │   ├── igc_parser.js       # Native IGC GPS file parser (B-records, flight detection, analysis, winch)
 │   │   ├── sdf_parser.js       # Syride .sdf sensor file (load factor, temperature)
 │   │   ├── pilot_habits.js     # What the add form learns from the pilot's logbook
@@ -368,11 +370,12 @@ Calculates overall success percentage, subject mastery radar, active day streak,
 - **Offline Mode (Guest)**: Data is immediately written to `LocalStorage` using `StorageService`.
 - **Authenticated Mode**: Automatically merges local data with Cloud Firestore (`users/{uid}/data`). Supports Google Auth and Email/Password sign-in.
 
-### 2. Local backup file, without an account (spec 041, `js/services/backup_service.js`, `js/core/backup_ui.js`)
+### 2. Local backup file, without an account (specs 041 and 042, `js/services/backup_service.js`, `js/core/backup_ui.js`)
 - **Where**: "Exporter" / "Importer" in the "Espace Synchro" dialog (always visible, even when the Firebase consent is refused) and in the privacy options. They never need an account or consent: the file stays on the device.
 - **Format**: `{ _meta: { appName, exportVersion: '1.0', exportedAt, exportedBy }, <localStorage key>: <value>, deleted_flights, deleted_equipment, ... }`. Files of any `1.x` version, or exported before versions were checked, are accepted; a higher major version is refused.
 - **Import** parses with `JSON.parse` only (nothing is evaluated), checks the shape of every known key and writes nothing if one is malformed, asks for confirmation, writes the values as they are (`QCM_STATS` is copied whole, no field filtered), then reloads the page so every view and service restarts on the restored data. Keys absent from the file are left untouched.
-- **Not restored**: `parapente_access` (roles come from the server only), `LAST_ACTIVE_ROUTE` and `firebase_last_sync` (describe the exporting device). The QCM statistics and exam history are skipped when the "Statistiques" consent is refused. GPS traces kept in IndexedDB are not in the file.
+- **Not restored**: `parapente_access` (roles come from the server only), `LAST_ACTIVE_ROUTE` and `firebase_last_sync` (describe the exporting device). The QCM statistics and exam history are skipped when the "Statistiques" consent is refused.
+- **GPS traces** (spec 042): the raw IGC of each flight lives in IndexedDB, so the export reads it with `IDBStorage` and stores it under `igc_traces` (`{ <flight id>: { encoding, data } }`, gzip + base64 through `trace_codec`). The import validates the key like any other, then writes back, after the usual restore, the traces of the flights the backup lists; an undecodable trace is skipped and counted. Files exported before spec 042 have no `igc_traces` and import as before. Size limit of a file: 64 MB.
 - **Cloud**: the import calls nothing remote. Only when a pilot is signed in, the usual silent `syncDataWithCloud(true)` runs after the restore.
 
 ---

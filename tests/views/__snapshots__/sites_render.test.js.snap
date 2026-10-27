@@ -297,7 +297,7 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
 `;
 
 exports[`sites renders (spec 015: identical before and after moving the texts) > site list 1`] = `
-"<div class="site-card ">
+"<div id="site-card-arbas-665" class="site-card ">
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
@@ -504,7 +504,7 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
                     </details>
                 
             
-        </div><div class="site-card ">
+        </div><div id="site-card-2" class="site-card ">
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
@@ -615,7 +615,7 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
                     </details>
                 
             
-        </div><div class="site-card minimized">
+        </div><div id="site-card-3" class="site-card minimized">
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
@@ -654,7 +654,7 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
                 </div>
             </div>
             
-        </div><div class="site-card ">
+        </div><div id="site-card-4" class="site-card ">
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
@@ -758,7 +758,7 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
 `;
 
 exports[`sites renders (spec 015: identical before and after moving the texts) > site list offline, card without saved forecast 1`] = `
-"<div class="site-card ">
+"<div id="site-card-3" class="site-card ">
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
@@ -876,7 +876,7 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
                     <strong>Météo indisponible :</strong> Erreur réseau
                     <button id="weather-retry-btn" data-action="fetchWeatherForSites" class="action-btn-primary" style="margin-left: 12px; padding: 4px 12px; font-size: 0.8rem; border-radius: var(--radius-pill);">Réessayer</button>
                 </div>
-                <div class="site-card ">
+                <div id="site-card-arbas-665" class="site-card ">
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
@@ -1068,7 +1068,7 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
                     </details>
                 
             
-        </div><div class="site-card ">
+        </div><div id="site-card-2" class="site-card ">
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
@@ -1168,7 +1168,7 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
                     </details>
                 
             
-        </div><div class="site-card minimized">
+        </div><div id="site-card-3" class="site-card minimized">
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
@@ -1207,7 +1207,7 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
                 </div>
             </div>
             
-        </div><div class="site-card ">
+        </div><div id="site-card-4" class="site-card ">
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
@@ -1316,7 +1316,7 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
                     <strong>Météo indisponible :</strong> 429
                     <button id="weather-retry-btn" data-action="fetchWeatherForSites" class="action-btn-primary" style="margin-left: 12px; padding: 4px 12px; font-size: 0.8rem; border-radius: var(--radius-pill); opacity: 0.5; cursor: not-allowed;" disabled="">Réessayer dans 2 min</button>
                 </div>
-                <div class="site-card ">
+                <div id="site-card-arbas-665" class="site-card ">
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
@@ -1508,7 +1508,7 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
                     </details>
                 
             
-        </div><div class="site-card ">
+        </div><div id="site-card-2" class="site-card ">
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
@@ -1608,7 +1608,7 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
                     </details>
                 
             
-        </div><div class="site-card minimized">
+        </div><div id="site-card-3" class="site-card minimized">
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
@@ -1647,7 +1647,7 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
                 </div>
             </div>
             
-        </div><div class="site-card ">
+        </div><div id="site-card-4" class="site-card ">
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">

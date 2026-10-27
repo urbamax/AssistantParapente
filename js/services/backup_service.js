@@ -11,14 +11,20 @@
  *   { _meta: { appName, exportVersion, exportedAt, exportedBy }, <localStorage key>: <value>, ... }
  */
 import StorageService from './storage.js';
+import IDBStorage from './idb_storage.js';
 import GdprEngine from '../gdpr_engine.js';
 import { saveTextFile } from '../utils/download.js';
+import { ENCODING_GZIP, ENCODING_PLAIN, decodeTrace, encodeTrace } from '../utils/trace_codec.js';
 
 export const BACKUP_APP_NAME = 'AssistantParapente';
 /** Version written by this app. Older files without a version, and any 1.x file, are accepted. */
 export const BACKUP_VERSION = '1.0';
-/** A backup is a few hundred KB at most; anything bigger is not one. */
-export const BACKUP_MAX_BYTES = 20 * 1024 * 1024;
+/** Compressed GPS traces make up most of a backup (about 50 KB per flight); anything bigger is not one. */
+export const BACKUP_MAX_BYTES = 64 * 1024 * 1024;
+/** Key of the GPS traces kept in IndexedDB: { <flight id>: { encoding, data } }, `data` is base64. */
+export const BACKUP_TRACES_KEY = 'igc_traces';
+/** A single compressed trace is far below this; it only bounds what a damaged file can ask for. */
+const TRACE_MAX_CHARS = 12 * 1024 * 1024;
 
 const KEYS = StorageService.KEYS;
 
@@ -76,13 +82,49 @@ export function buildBackup(exportedBy = 'anonymous') {
 }
 
 /**
- * Downloads the backup file.
- * @param {string} [exportedBy]
- * @returns {string} the file name
+ * The GPS trace (raw IGC text) of every logged flight, compressed. They live in IndexedDB, not in
+ * localStorage, so buildBackup() cannot read them. Flights without a trace are left out.
+ * @returns {Promise<Record<string, { encoding: string, data: string }>>}
  */
-export function exportBackup(exportedBy) {
+export async function collectTraces() {
+    const flights = StorageService.get(KEYS.LOGBOOK_DATA);
+    const traces = {};
+    if (!Array.isArray(flights) || !IDBStorage.isSupported()) return traces;
+    for (const flight of flights) {
+        const id = flight?.id;
+        if (typeof id !== 'string' || id === '') continue;
+        try {
+            const raw = (await IDBStorage.getTrace(id)) || (await IDBStorage.getFlight(id))?.rawIgc;
+            if (typeof raw !== 'string' || raw === '') continue;
+            // One part, whatever its size: the Firestore limit on a document does not apply to a file.
+            const { encoding, parts } = await encodeTrace(raw, { partChars: Infinity });
+            traces[id] = { encoding, data: parts[0] };
+        } catch (error) {
+            console.warn(`[Backup] Trace of flight ${id} left out:`, error);
+        }
+    }
+    return traces;
+}
+
+/**
+ * Like buildBackup(), with the GPS traces.
+ * @param {string} [exportedBy]
+ */
+export async function buildFullBackup(exportedBy) {
+    const payload = buildBackup(exportedBy);
+    const traces = await collectTraces();
+    if (Object.keys(traces).length) payload[BACKUP_TRACES_KEY] = traces;
+    return payload;
+}
+
+/**
+ * Downloads the backup file (data and GPS traces).
+ * @param {string} [exportedBy]
+ * @returns {Promise<string>} the file name
+ */
+export async function exportBackup(exportedBy) {
     const filename = `parapente_backup_${new Date().toISOString().slice(0, 10)}.json`;
-    saveTextFile(filename, JSON.stringify(buildBackup(exportedBy), null, 2), 'application/json');
+    saveTextFile(filename, JSON.stringify(await buildFullBackup(exportedBy), null, 2), 'application/json');
     return filename;
 }
 
@@ -121,6 +163,20 @@ export function parseBackup(text) {
         if (data[key] !== undefined && data[key] !== null && !Array.isArray(data[key])) {
             return { ok: false, error: 'badData' };
         }
+    }
+
+    const traces = data[BACKUP_TRACES_KEY];
+    if (traces !== undefined && traces !== null) {
+        const valid =
+            isPlainObject(traces) &&
+            Object.values(traces).every(
+                (t) =>
+                    isPlainObject(t) &&
+                    (t.encoding === ENCODING_GZIP || t.encoding === ENCODING_PLAIN) &&
+                    typeof t.data === 'string' &&
+                    t.data.length <= TRACE_MAX_CHARS,
+            );
+        if (!valid) return { ok: false, error: 'badData' };
     }
 
     const hasData =
@@ -167,6 +223,34 @@ export function applyBackup(backup, { statsAllowed = GdprEngine.isConsentGranted
 }
 
 /**
+ * Writes the GPS traces of a validated backup into IndexedDB, for the flights the backup lists.
+ * A trace that cannot be decoded is skipped; the rest is restored.
+ * @param {Record<string, any>} backup result of parseBackup()
+ * @returns {Promise<{ restored: number, failed: number }>}
+ */
+export async function applyBackupTraces(backup) {
+    const traces = backup[BACKUP_TRACES_KEY];
+    const flights = backup[KEYS.LOGBOOK_DATA];
+    let restored = 0;
+    let failed = 0;
+    if (!isPlainObject(traces) || !Array.isArray(flights) || !IDBStorage.isSupported()) return { restored, failed };
+
+    const flightIds = new Set(flights.map((f) => f.id).filter((id) => typeof id === 'string'));
+    for (const [id, trace] of Object.entries(traces)) {
+        if (!flightIds.has(id)) continue;
+        try {
+            const raw = await decodeTrace([trace.data], trace.encoding);
+            if (raw && (await IDBStorage.saveTrace(id, raw))) restored++;
+            else failed++;
+        } catch (error) {
+            console.warn(`[Backup] Trace of flight ${id} could not be restored:`, error);
+            failed++;
+        }
+    }
+    return { restored, failed };
+}
+
+/**
  * Reads a file chosen by the user.
  * @param {Blob} file
  * @returns {Promise<ParsedBackup>}
@@ -176,5 +260,13 @@ export async function readBackupFile(file) {
     return parseBackup(await file.text());
 }
 
-const BackupService = { buildBackup, exportBackup, parseBackup, applyBackup, readBackupFile };
+const BackupService = {
+    buildBackup,
+    buildFullBackup,
+    exportBackup,
+    parseBackup,
+    applyBackup,
+    applyBackupTraces,
+    readBackupFile,
+};
 export default BackupService;

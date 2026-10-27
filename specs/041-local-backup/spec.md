@@ -56,9 +56,9 @@ The pilot touches "Importer", picks a backup file, confirms the overwrite, and f
 
 - A file carrying roles (`parapente_access`), a route or a sync date: roles, the exporting device's
   last route and its last sync date are never restored.
-- A file bigger than 20 MB is refused without being read.
+- A file bigger than the size limit (20 MB here, 64 MB since spec 042) is refused without being read.
 - Text in the file (a flight site name with markup) is stored as data and never interpreted.
-- GPS traces stored in IndexedDB are not part of the file (same limit as before).
+- GPS traces stored in IndexedDB were not part of the file; spec 042 adds them.
 
 ## Requirements *(mandatory)*
 

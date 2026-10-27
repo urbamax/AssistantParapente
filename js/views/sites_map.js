@@ -20,6 +20,12 @@ import { tt, th, tl } from './sites_strings.js';
 import BaseView from '../core/base_view.js';
 
 export class SitesMapBase extends BaseView {
+    // À fournir par SitesListBase (fait défiler jusqu'à la fiche d'un site).
+    /** @param {string|number} _siteId */
+    jumpToSiteCard(_siteId) {
+        throw new Error('SitesListBase must implement jumpToSiteCard()');
+    }
+
     constructor() {
         super();
         this.state = {
@@ -220,12 +226,7 @@ export class SitesMapBase extends BaseView {
             });
             marker.bindTooltip(site.nom, { direction: 'top', offset: [0, -15], opacity: 0.9 });
             marker.on('click', (e) => {
-                this.spotSite(
-                    parseFloat(site.latitude || site.lat),
-                    parseFloat(site.longitude || site.lon),
-                    site.nom,
-                    site.reference_terrain || site.id || '',
-                );
+                this.jumpToSiteCard(site.id);
             });
             this.state.markersGroup.addLayer(marker);
         });

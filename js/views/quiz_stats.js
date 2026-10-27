@@ -14,6 +14,8 @@ import GdprEngine from '../gdpr_engine.js';
 import BaseView from '../core/base_view.js';
 import { tq, tql } from './quiz_strings.js';
 import { explanationHtml } from './quiz_explanation.js';
+import { buildRevisionAxes } from '../services/revision_axes.js';
+import { buildRevisionAxesDashboardHtml, buildStatsAxesShortcutHtml } from './quiz_axes_html.js';
 import {
     buildDistributionHtml,
     buildThemesHtml,
@@ -27,6 +29,9 @@ export class QuizStatsBase extends BaseView {
         super();
         /** @type {any} Posé par QuizView (filtres, tri, session) : ces méthodes le lisent. */
         this.state = null;
+        this._axesStatusFilter = 'ALL';
+        this._expandedAxisTakeaways = new Set();
+        this._activeWorkshopAxisId = null;
     }
 
     /**
@@ -44,10 +49,101 @@ export class QuizStatsBase extends BaseView {
         this.renderStats();
     }
 
+    showRevisionAxesScreen() {
+        document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
+        const axesScreen = document.getElementById('revision-axes-screen');
+        if (axesScreen) axesScreen.classList.add('active');
+        this.renderRevisionAxes();
+    }
+
+    setAxesFilter(filter) {
+        this._axesStatusFilter = filter || 'ALL';
+        this.renderRevisionAxes();
+    }
+
+    toggleAxisTakeaways(axisId) {
+        if (!axisId) return;
+        if (!(this._expandedAxisTakeaways instanceof Set)) {
+            this._expandedAxisTakeaways = new Set();
+        }
+        if (this._expandedAxisTakeaways.has(axisId)) {
+            this._expandedAxisTakeaways.delete(axisId);
+        } else {
+            this._expandedAxisTakeaways.add(axisId);
+        }
+        this.renderRevisionAxes();
+    }
+
+    renderRevisionAxes() {
+        const container = document.getElementById('revision-axes-content');
+        if (!container) return;
+
+        if (!GdprEngine.isConsentGranted('stats')) {
+            container.innerHTML = `
+                <div style="padding:40px; text-align:center; color:var(--text-main); max-width: 500px; margin: 0 auto; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <i class="ri-shield-user-line" style="font-size:3.5rem; color:var(--accent-orange); display:block; margin-bottom:20px;"></i>
+                    <h2 style="margin-bottom:12px; font-weight: 800; font-size: 1.4rem;">${tq('stats.disabledTitle')}</h2>
+                    <p style="opacity:0.7; font-size:0.9rem; line-height: 1.6; margin-bottom: 24px;">
+                        ${tq('stats.disabledText')}
+                    </p>
+                    <button data-action="GdprshowModal" data-args="gdpr-settings-modal" style="background:var(--accent-orange); color:white; border:none; padding:12px 24px; border-radius:14px; cursor:pointer; font-weight:700; transition:all 0.2s; font-size:0.9rem;">
+                        ${tq('stats.enable')}
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        if (!QuizService.state.isLoaded) {
+            container.innerHTML = `
+                <div style="padding:40px; text-align:center; color:var(--text-main); opacity:0.7;">
+                    <i class="ri-loader-4-line ri-spin" style="font-size:3rem; margin-bottom:20px; display:block;"></i>
+                    <p>${tq('stats.loading')}</p>
+                </div>
+            `;
+            return;
+        }
+
+        if (QuizService.state.loadingError) {
+            container.innerHTML = `
+                <div style="padding:40px; text-align:center; color:var(--text-main); max-width: 500px; margin: 0 auto;">
+                    <i class="ri-error-warning-line" style="font-size:3rem; color:#b91c1c; display:block; margin-bottom:20px;"></i>
+                    <h2 style="margin-bottom:12px; font-weight: 800; font-size: 1.4rem;">${tq('stats.loadErrorTitle')}</h2>
+                    <p style="opacity:0.7;">${tq('stats.loadErrorText')}<br>${tq('stats.loadErrorDetail', { detail: QuizService.state.loadingError })}</p>
+                </div>
+            `;
+            return;
+        }
+
+        const questions = QuizService.getQuestions();
+        if (!questions || !questions.length) {
+            container.innerHTML = `
+                <div style="padding:40px; text-align:center; color:white;">
+                    <i class="ri-error-warning-line" style="font-size:3rem; color:#b91c1c; display:block; margin-bottom:20px;"></i>
+                    <h2 style="margin-bottom:10px;">${tq('stats.noDataTitle')}</h2>
+                    <p style="opacity:0.7;">${tq('stats.noDataText')}</p>
+                </div>
+            `;
+            return;
+        }
+
+        let currentLevel = typeof GlobalState !== 'undefined' ? GlobalState.get('level') : 'BI';
+        if (!currentLevel) currentLevel = 'BI';
+
+        const stats = QuizService.getPersistentStats();
+        const report = buildRevisionAxes(questions, stats, COURSES_DATA, { level: currentLevel });
+        container.innerHTML = buildRevisionAxesDashboardHtml(report, {
+            statusFilter: this._axesStatusFilter || 'ALL',
+            expandedIds: this._expandedAxisTakeaways,
+        });
+    }
+
     renderStats() {
         console.log('QuizEngine.renderStats v4.4 - Starting');
         const container = document.getElementById('stats-content');
         if (!container) return;
+        const axesBannerSlot = document.getElementById('stats-axes-banner');
+        if (axesBannerSlot) axesBannerSlot.innerHTML = '';
 
         if (!GdprEngine.isConsentGranted('stats')) {
             container.innerHTML = `
@@ -274,6 +370,9 @@ export class QuizStatsBase extends BaseView {
                 BrevetService.getBrevet(currentLevel),
                 'data-stats-brevet-banner',
             );
+            if (axesBannerSlot) {
+                axesBannerSlot.innerHTML = buildStatsAxesShortcutHtml();
+            }
             container.innerHTML = `
             ${officialTheoryBannerHtml}
             ${successGaugeHtml}

@@ -51,14 +51,14 @@ describe('Local backup: export', () => {
         expect(buildBackup()).not.toHaveProperty(K.ACCESS);
     });
 
-    it('downloads parapente_backup_<date>.json without any account or network', () => {
+    it('downloads parapente_backup_<date>.json without any account or network', async () => {
         let blob;
         vi.spyOn(URL, 'createObjectURL').mockImplementation((b) => ((blob = b), 'blob:x'));
         vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
         const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
         const fetchSpy = vi.spyOn(globalThis, 'fetch');
 
-        const name = exportBackup();
+        const name = await exportBackup();
 
         expect(name).toMatch(/^parapente_backup_\d{4}-\d{2}-\d{2}\.json$/);
         expect(click).toHaveBeenCalledOnce();

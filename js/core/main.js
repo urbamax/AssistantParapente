@@ -349,6 +349,7 @@ async function bootApplication() {
     });
     AppRouter.register('QCM', quizModule);
     AppRouter.register('QCM_BANK', quizModule);
+    AppRouter.register('REVISION_AXES', quizModule);
     AppRouter.register('STATS', quizModule);
     AppRouter.register('LOGBOOK', logbookModule);
     AppRouter.register('SITES', sitesModule);

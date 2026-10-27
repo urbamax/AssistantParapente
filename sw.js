@@ -9,7 +9,7 @@
 //   2. CACHE_NAME est versionné (synchronisé par bump.py avec le ?v= du reste du site) et
 //      activate() supprime systématiquement tout cache dont le nom ne correspond pas à la
 //      version courante.
-const CACHE_NAME = 'parapente-app-v2026.10.05_v23';
+const CACHE_NAME = 'parapente-app-v2026.10.27_v1';
 
 // La météo ne doit jamais être servie depuis le cache : une donnée de vent vieille de
 // plusieurs heures mais présentée comme "en direct" est un vrai risque sécurité pour un
@@ -116,6 +116,7 @@ const CRITICAL_ASSETS = [
     './js/services/pilot_habits.js',
     './js/services/mastery.js',
     './js/services/review_scheduler.js',
+    './js/services/revision_axes.js',
     './js/services/sdf_parser.js',
     './js/services/quiz_service.js',
     './js/services/access_service.js',
@@ -152,6 +153,7 @@ const CRITICAL_ASSETS = [
     './js/views/logbook_strings.js',
     './js/views/manual.js',
     './js/views/quiz.js',
+    './js/views/quiz_axes_html.js',
     './js/views/quiz_course_links.js',
     './js/views/quiz_explanation.js',
     './js/views/quiz_strings.js',
