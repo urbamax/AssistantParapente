@@ -5,6 +5,7 @@ import {
     pushAttempt,
     masteryRatio,
     masteryRatioAfterCorrect,
+    successRate,
 } from '../../js/services/mastery.js';
 
 describe('mastery (fenêtre glissante)', () => {
@@ -14,7 +15,19 @@ describe('mastery (fenêtre glissante)', () => {
     });
 
     it('uses the recorded recent answers when they exist', () => {
-        expect(masteryRatio({ total: 40, correct: 20, recent: [0, 1, 1, 1] })).toBe(0.75);
+        expect(masteryRatio({ total: 40, correct: 20, recent: [0, 1, 1, 1] })).toBe(0.3);
+    });
+
+    it('is not 100 % before a full cycle of MASTERY_WINDOW correct answers', () => {
+        expect(masteryRatio({ total: 2, correct: 2, recent: [1, 1] })).toBe(0.2);
+        expect(masteryRatio({ total: 9, correct: 9, recent: Array(9).fill(1) })).toBe(0.9);
+        expect(masteryRatio({ total: 10, correct: 10, recent: Array(10).fill(1) })).toBe(1);
+    });
+
+    it('successRate only looks at the attempts actually made', () => {
+        expect(successRate(undefined)).toBe(0);
+        expect(successRate({ total: 2, correct: 2, recent: [1, 1] })).toBe(1);
+        expect(successRate({ total: 40, correct: 20, recent: [0, 1, 1, 1] })).toBe(0.75);
     });
 
     it('an old mistake leaves the window after MASTERY_WINDOW correct answers in a row', () => {
@@ -35,7 +48,7 @@ describe('mastery (fenêtre glissante)', () => {
 
     it('reconstructs a plausible window for stats recorded before `recent` existed', () => {
         // jamais d'erreur : tout juste
-        expect(masteryRatio({ total: 3, correct: 3, streak: 0 })).toBe(1);
+        expect(masteryRatio({ total: 3, correct: 3, streak: 0 })).toBe(0.3);
         expect(masteryRatio({ total: 40, correct: 40, streak: 40 })).toBe(1);
         // une erreur juste avant la série en cours de 4 : 9 juste sur 10
         const recent = recentAttempts({ total: 5, correct: 4, streak: 4 });
@@ -56,8 +69,8 @@ describe('mastery (fenêtre glissante)', () => {
 
     it('masteryRatioAfterCorrect simulates further correct answers without changing the stat', () => {
         const stat = { total: 2, correct: 1, recent: [0, 1] };
-        expect(masteryRatioAfterCorrect(stat)).toBeCloseTo(2 / 3);
-        expect(masteryRatioAfterCorrect(stat, 2)).toBeCloseTo(3 / 4);
+        expect(masteryRatioAfterCorrect(stat)).toBeCloseTo(0.2);
+        expect(masteryRatioAfterCorrect(stat, 2)).toBeCloseTo(0.3);
         expect(stat.recent).toEqual([0, 1]);
     });
 });
