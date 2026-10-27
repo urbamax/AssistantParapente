@@ -573,8 +573,10 @@ class QuizViewClass extends QuizVoiceBase {
     renderThemeOptions() {
         const select = document.getElementById('qcm-theme-select');
         if (!select) return;
-        const themes = QuizService.getThemes();
-        themes.forEach((t) => {
+        // La vue est montée à chaque visite de l'écran : sans ce nettoyage, les thèmes
+        // s'empilent dans la liste à chaque passage.
+        select.querySelectorAll('option:not([value="ALL"])').forEach((opt) => opt.remove());
+        QuizService.getThemes().forEach((t) => {
             const opt = document.createElement('option');
             opt.value = t;
             opt.innerText = t;
