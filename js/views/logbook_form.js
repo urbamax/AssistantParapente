@@ -19,6 +19,9 @@ import { tt, tl } from './logbook_strings.js';
 
 import { LogbookIgcImportBase } from './logbook_igc_import.js';
 
+// Prises de terrain proposées (clés de form.landingApproaches) ; « Autre » ajoute les siennes.
+const LANDING_APPROACHES = ['En U', 'En S', 'En huit', 'Directe'];
+
 export class LogbookFormBase extends LogbookIgcImportBase {
     /** À fournir par LogbookView : ferme la fenêtre de saisie. */
     closeSessionModal() {
@@ -254,6 +257,29 @@ export class LogbookFormBase extends LogbookIgcImportBase {
                         <option value="Autre">${tt('form.other')}</option>
                     </select>
                     <input type="text" id="lb-tech-decollage-autre" placeholder="${tt('form.techniquePlaceholder')}" style="display:none; margin-top: 5px; width: 100%;">
+                </div>
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label for="lb-prise-terrain" style="display:block; margin-bottom:5px;">${tt('form.landingApproach')}</label>
+                    <select id="lb-prise-terrain" style="width:100%; padding:8px;" data-change-action="toggleOtherField" data-toggle-id="lb-prise-terrain-autre">
+                        <option value="">${tt('form.select')}</option>
+                        <option value="En U">${tt('form.landingApproaches.En U')}</option>
+                        <option value="En S">${tt('form.landingApproaches.En S')}</option>
+                        <option value="En huit">${tt('form.landingApproaches.En huit')}</option>
+                        <option value="Directe">${tt('form.landingApproaches.Directe')}</option>
+                        ${(() => {
+                            const parsed = StorageService.get('customLandingApproaches');
+                            if (Array.isArray(parsed))
+                                return parsed
+                                    .map((t) => `<option value="${escapeHTML(t)}">${escapeHTML(t)}</option>`)
+                                    .join('');
+                            return '';
+                        })()}
+                        <option value="Autre">${tt('form.other')}</option>
+                    </select>
+                    <input type="text" id="lb-prise-terrain-autre" placeholder="${tt('form.approachPlaceholder')}" style="display:none; margin-top: 5px; width: 100%;">
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-top: 8px;">
+                        <input type="checkbox" id="lb-vache"> ${tt('form.landedOut')}
+                    </label>
                 </div>
                 <div class="form-group" id="lb-treuilleur-group" hidden>
                     <label for="lb-treuilleur">${tt('form.winchOperator')}</label>
@@ -668,6 +694,31 @@ export class LogbookFormBase extends LogbookIgcImportBase {
                 }
                 session.techDecollage = techDecollage;
             }
+
+            const approachEl = /** @type {HTMLSelectElement} */ (document.getElementById('lb-prise-terrain'));
+            if (approachEl) {
+                let priseTerrain = approachEl.value;
+                if (priseTerrain === 'Autre') {
+                    const approachAutreInput = /** @type {HTMLInputElement} */ (
+                        document.getElementById('lb-prise-terrain-autre')
+                    );
+                    const rawApproach = approachAutreInput
+                        ? capitalizeFirstLetter(approachAutreInput.value.trim())
+                        : '';
+                    priseTerrain = rawApproach;
+                    if (rawApproach) {
+                        let customApproaches = StorageService.get('customLandingApproaches') || [];
+                        if (!Array.isArray(customApproaches)) customApproaches = [];
+                        if (!customApproaches.includes(rawApproach) && !LANDING_APPROACHES.includes(rawApproach)) {
+                            customApproaches.push(rawApproach);
+                            StorageService.set('customLandingApproaches', customApproaches);
+                        }
+                    }
+                }
+                session.priseTerrain = priseTerrain;
+            }
+            const landedOutBox = /** @type {HTMLInputElement} */ (document.getElementById('lb-vache'));
+            if (landedOutBox) session.vache = landedOutBox.checked;
             session.typeExercice = ecole ? this.getChecklistValues('typeExercice') : [];
 
             const altMax = /** @type {HTMLInputElement} */ (document.getElementById('lb-altMax')).value;
@@ -897,6 +948,9 @@ export class LogbookFormBase extends LogbookIgcImportBase {
             }
 
             setSelectOrAutre('lb-tech-decollage', 'lb-tech-decollage-autre', session.techDecollage);
+            setSelectOrAutre('lb-prise-terrain', 'lb-prise-terrain-autre', session.priseTerrain);
+            const landedOutEdit = /** @type {HTMLInputElement} */ (document.getElementById('lb-vache'));
+            if (landedOutEdit) landedOutEdit.checked = Boolean(session.vache);
 
             if (session.altitudeMax)
                 /** @type {HTMLInputElement} */ (document.getElementById('lb-altMax')).value = session.altitudeMax;

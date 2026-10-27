@@ -241,6 +241,12 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                     const decoInfo = session.techDecollage
                         ? `<span style="${badgeStyle}" title="${tt('history.takeoffTitle')}"><i class="ri-takeaway-line"></i> ${tt('history.takeoff', { technique: session.techDecollage })}</span>`
                         : '';
+                    const landingInfo = session.priseTerrain
+                        ? `<span style="${badgeStyle}" title="${tt('history.landingTitle')}"><i class="ri-arrow-left-down-line"></i> ${tt('history.landingApproach', { approach: session.priseTerrain })}</span>`
+                        : '';
+                    const landedOutInfo = session.vache
+                        ? `<span style="${badgeStyle}" title="${tt('history.landedOutTitle')}"><i class="ri-map-pin-line"></i> ${tt('history.landedOut')}</span>`
+                        : '';
                     const altInfo = session.altitudeMax
                         ? `<span style="${badgeStyle}" title="${tt('history.altMaxTitle')}">${tt('history.altMax', { value: session.altitudeMax })}</span>`
                         : '';
@@ -258,9 +264,18 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                         ? `<span style="${badgeStyle}" title="${tt('history.speedTitle')}">${tt('history.speed', { max: session.maxSpeedKmh, avg: session.avgSpeedKmh })}</span>`
                         : '';
 
-                    if (decoInfo || altInfo || gainInfo || distanceInfo || climbInfo || speedInfo) {
+                    if (
+                        decoInfo ||
+                        landingInfo ||
+                        landedOutInfo ||
+                        altInfo ||
+                        gainInfo ||
+                        distanceInfo ||
+                        climbInfo ||
+                        speedInfo
+                    ) {
                         extraInfo = `<div class="session-extra-info" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; font-size: 0.82rem; color: var(--text-secondary);">
-                        ${decoInfo}
+                        ${decoInfo}${landingInfo}${landedOutInfo}
                         ${altInfo}
                         ${gainInfo}
                         ${distanceInfo}

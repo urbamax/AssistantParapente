@@ -146,6 +146,15 @@ export const FR = Object.freeze({
             takeoffTechnique: 'Technique de décollage :',
             takeoffTechniques: Object.freeze({ 'Face voile': 'Face voile', 'Dos voile': 'Dos voile' }),
             techniquePlaceholder: 'Spécifiez la technique...',
+            landingApproach: 'Prise de terrain :',
+            landingApproaches: Object.freeze({
+                'En U': 'En U',
+                'En S': 'En S',
+                'En huit': 'En huit',
+                Directe: 'Directe',
+            }),
+            approachPlaceholder: 'Spécifiez la prise de terrain...',
+            landedOut: 'Vaché (posé hors de la zone d’atterrissage prévue)',
             // Ce que l'app a pré-rempli d'après les habitudes du pilote, et pourquoi
             learned: Object.freeze({
                 summary: "Pré-rempli d'après tes vols : {items}. Tout reste modifiable.",
@@ -392,6 +401,10 @@ export const FR = Object.freeze({
             school: 'École :',
             specialty: 'Spécialité :',
             rescueDeployed: 'Secours ouvert :',
+            landingTitle: 'Atterrissage',
+            landingApproach: 'Prise de terrain : {approach}',
+            landedOutTitle: 'Atterrissage hors de la zone prévue',
+            landedOut: 'Vaché',
             course: 'Stage',
             unnamedCourse: 'Stage sans nom',
             yes: 'Oui',
