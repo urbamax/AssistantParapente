@@ -253,7 +253,8 @@ describe('revision_axes — buildRevisionAxes (diagnostic, cours vérifiés, poi
         expect(report.axes[2].unattemptedCount).toBe(1);
 
         expect(report.axes[3].status).toBe('MASTERED');
-        expect(report.axes[3].masteryPct).toBe(100);
+        // 2 bonnes réponses sur 2 tentatives : 2/10 d'un cycle de maîtrise, pas 100 %
+        expect(report.axes[3].masteryPct).toBe(20);
 
         expect(report.counts).toEqual({
             ALL: 4,

@@ -9,7 +9,7 @@
  * les dernières réponses sert à départager, et retarde un peu l'échéance d'une question bien réussie).
  */
 
-import { masteryRatio } from './mastery.js';
+import { successRate } from './mastery.js';
 
 /** Intervalle (jours) avant la prochaine révision, selon la série de bonnes réponses. */
 export const REVIEW_INTERVALS_DAYS = [0, 1, 3, 7, 14, 30];
@@ -36,7 +36,7 @@ export function reviewIntervalDays(streak) {
  */
 export function dueScore(stat, now = Date.now()) {
     if (!stat || !stat.total) return Infinity;
-    const ratio = masteryRatio(stat);
+    const ratio = successRate(stat);
     if (!stat.lastSeen) {
         // Statistique antérieure au suivi temporel : on garde l'ancien critère de seuil de ratio
         // pour ne pas casser l'historique tant que la question n'a pas été retentée.
@@ -59,7 +59,7 @@ export function isDue(stat, now = Date.now()) {
  */
 export function nextDueAt(stat) {
     if (!stat || !stat.total || !stat.lastSeen) return null;
-    const ratio = masteryRatio(stat);
+    const ratio = successRate(stat);
     return stat.lastSeen + (reviewIntervalDays(stat.streak) + ratio) * DAY_MS;
 }
 

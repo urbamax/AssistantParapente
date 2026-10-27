@@ -5,6 +5,11 @@
  * fenêtre glissante, une erreur sort de la fenêtre après `MASTERY_WINDOW` bonnes réponses de suite.
  * Les statistiques gardent `total` et `correct` (affichage, synchro), plus `recent` : les dernières
  * réponses, de la plus ancienne à la plus récente (1 = juste, 0 = fausse).
+ *
+ * Une question n'est maîtrisée à 100 % qu'après `MASTERY_WINDOW` bonnes réponses : les places encore
+ * vides de la fenêtre comptent comme des points manquants (2 bonnes réponses sur 2 tentatives = 2/10).
+ * `successRate` donne à part le taux de réussite sur les seules tentatives faites, pour juger si une
+ * question est fragile (planification, classement) sans pénaliser celles qui viennent d'être vues.
  */
 
 export const MASTERY_WINDOW = 10;
@@ -50,17 +55,27 @@ export function pushAttempt(stat, isCorrect) {
     return [...recentAttempts(stat), isCorrect ? 1 : 0].slice(-MASTERY_WINDOW);
 }
 
-/** Maîtrise (0 à 1) à partir d'une fenêtre de réponses ; 0 si la question n'a jamais été tentée. */
+/** Maîtrise (0 à 1) à partir d'une fenêtre de réponses : bonnes réponses sur `MASTERY_WINDOW`. */
 function ratioOf(window) {
-    return window.length === 0 ? 0 : window.reduce((sum, v) => sum + v, 0) / window.length;
+    return window.reduce((sum, v) => sum + v, 0) / MASTERY_WINDOW;
 }
 
 /**
- * Maîtrise actuelle (0 à 1) d'une question, 0 si elle n'a jamais été tentée.
+ * Maîtrise actuelle (0 à 1) d'une question, 0 si elle n'a jamais été tentée. Elle n'atteint 1 qu'après
+ * `MASTERY_WINDOW` bonnes réponses sans erreur.
  * @param {QuestionStat | undefined} stat
  */
 export function masteryRatio(stat) {
     return ratioOf(recentAttempts(stat));
+}
+
+/**
+ * Taux de réussite (0 à 1) sur les dernières tentatives réellement faites, 0 si jamais tentée.
+ * @param {QuestionStat | undefined} stat
+ */
+export function successRate(stat) {
+    const window = recentAttempts(stat);
+    return window.length === 0 ? 0 : window.reduce((sum, v) => sum + v, 0) / window.length;
 }
 
 /**

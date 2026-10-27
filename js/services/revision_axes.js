@@ -7,7 +7,7 @@
  * PDF vérifiées (Principe III de la Constitution : uniquement les pages vérifiées > 0), extrait les
  * points clés à retenir sans exposer les choix QCM, et construit des ateliers ciblés équilibrés.
  */
-import { masteryRatio } from './mastery.js';
+import { masteryRatio, successRate } from './mastery.js';
 import { isDue } from './review_scheduler.js';
 import { FR } from '../i18n/fr.js';
 
@@ -168,7 +168,7 @@ export function classifyQuestionForAxis(stat, now = Date.now()) {
     const total = stat?.total || 0;
     if (total <= 0) return 'unattempted';
 
-    const ratio = masteryRatio(stat);
+    const ratio = successRate(stat);
     const streak = typeof stat?.streak === 'number' ? stat.streak : 0;
 
     if (ratio < 0.5 || (total >= 2 && streak === 0)) {
