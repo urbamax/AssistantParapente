@@ -186,6 +186,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                 }
                 if (type === 'voile') return s.voile === value;
                 if (type === 'ecole') return s.ecole === value;
+                if (type === 'brevet') return Boolean(s.ecole?.trim()) && s.brevetPrepare === value;
                 if (type === 'stage') return isCourseSession(s) && courseKey(s) === value.trim().toLowerCase();
                 if (type === 'stageUnnamed') return isCourseSession(s) && courseKey(s) === '';
                 if (type === 'type') return s.type === value;
@@ -316,6 +317,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                             ${session.sellette ? `<div><strong>${tt('history.harness')}</strong> ${escapeHTML(session.sellette)}</div>` : ''}
                             ${session.rescueDeployed ? `<div style="color: #ef4444;"><strong>${tt('history.rescueDeployed')}</strong> ${escapeHTML(session.rescueId || tt('history.yes'))}</div>` : ''}
                             ${session.ecole ? `<div><strong>${tt('history.school')}</strong> ${[this.getCourseLabel(session), escapeHTML(session.ecole)].filter(Boolean).join(' | ')}</div>` : ''}
+                            ${session.ecole && session.brevetPrepare ? `<div><strong>${tt('history.brevetPrepare')}</strong> ${tt(`form.brevetOptions.${session.brevetPrepare}`)}</div>` : ''}
                             ${session.ecole && session.stageSpecialty ? `<div><strong>${tt('history.specialty')}</strong> ${escapeHTML(session.stageSpecialty)}</div>` : ''}
                             ${isVol && session.typeVol === 'Treuil' && session.treuilleur ? `<div><strong>${tt('history.winchOperator')}</strong> ${escapeHTML(session.treuilleur)}</div>` : ''}
                             ${session.ecole && instructorsOf(session).length > 0 ? `<div><strong>${tt('history.instructor')}</strong> ${escapeHTML(instructorsOf(session).join(', '))}</div>` : ''}

@@ -10,6 +10,7 @@
  */
 import PilotHabits from './pilot_habits.js';
 import { companionsOf, instructorsOf, isCourseSession, latestOfCourse, preferPlace } from './logbook_courses.js';
+import BrevetService, { resolveSuggestedBrevet } from './brevet_service.js';
 
 const THREE_HOURS_MS = 3 * 3600 * 1000;
 const FLIGHT_TYPES = ['Plouf', 'Thermique', 'Soaring', 'Restit', 'Cross', 'Treuil'];
@@ -133,6 +134,15 @@ export function suggestDefaults(sessions, context) {
         const schoolOfCourse = typeof reference.ecole === 'string' ? reference.ecole.trim() : '';
         if (schoolOfCourse) fromCourse('ecole', schoolOfCourse);
         if (specialty) fromCourse('stageSpecialty', specialty);
+        const courseBrevet = typeof reference.brevetPrepare === 'string' ? reference.brevetPrepare.trim() : '';
+        if (courseBrevet && can('brevetPrepare')) {
+            const resolved = resolveSuggestedBrevet(courseBrevet, undefined, datetime);
+            if (resolved) {
+                values.brevetPrepare = resolved;
+                reasons.brevetPrepare = resolved !== courseBrevet ? 'brevetNext' : 'course';
+                filled.add('brevetPrepare');
+            }
+        }
         const lists = {
             moniteur: instructorsOf(reference),
             accompagnateur: companionsOf(reference),
@@ -157,6 +167,35 @@ export function suggestDefaults(sessions, context) {
 
     // Moniteurs : ceux de la dernière session de cette école sur ce site, sinon de cette école
     const school = typeof values.ecole === 'string' ? values.ecole.trim().toLowerCase() : '';
+    if (can('brevetPrepare') && !filled.has('brevetPrepare') && school) {
+        const withBrevet = list.filter(
+            (s) =>
+                typeof s.ecole === 'string' &&
+                s.ecole.trim().toLowerCase() === school &&
+                typeof s.brevetPrepare === 'string' &&
+                s.brevetPrepare.trim(),
+        );
+        const brevetRef = preferPlace(withBrevet, place);
+        if (brevetRef) {
+            const rawBrevet = brevetRef.brevetPrepare.trim();
+            const resolved = resolveSuggestedBrevet(rawBrevet, undefined, datetime);
+            if (resolved) {
+                values.brevetPrepare = resolved;
+                reasons.brevetPrepare =
+                    resolved !== rawBrevet
+                        ? 'brevetNext'
+                        : placeKey && PilotHabits.placeOf(brevetRef) === placeKey
+                          ? 'instructorPlace'
+                          : 'instructorLatest';
+            }
+        } else if (BrevetService.hasAnyBrevetData()) {
+            const target = BrevetService.getTargetSchoolBrevet(undefined, datetime);
+            if (target) {
+                values.brevetPrepare = target;
+                reasons.brevetPrepare = 'brevetInProgress';
+            }
+        }
+    }
     if (can('moniteur') && !filled.has('moniteur') && school) {
         const withInstructor = list.filter(
             (s) =>
