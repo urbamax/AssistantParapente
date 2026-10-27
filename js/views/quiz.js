@@ -78,6 +78,9 @@ class QuizViewClass extends QuizVoiceBase {
                 .then(() => {
                     console.log('QuizView: QuizService initialized successfully.');
                     if (this.renderThemeOptions) this.renderThemeOptions();
+                    // Le résumé du mode Révision reste caché tant que les questions ne sont pas chargées :
+                    // si le mode a été choisi entre-temps, il faut l'afficher maintenant.
+                    this.updateRevisionSummary();
 
                     // Re-render the correct screen based on routing mode if needed
                     const mode = GlobalState.get('mode');
