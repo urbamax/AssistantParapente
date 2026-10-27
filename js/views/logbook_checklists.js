@@ -7,6 +7,7 @@
 import LogbookService from '../services/logbook_service.js';
 import { BREVET_CODES } from '../services/brevet_service.js';
 import { escapeHTML } from '../core/security.js';
+import { capitalizeFirstLetter } from '../utils/text_utils.js';
 import { tt } from './logbook_strings.js';
 import { LogbookSitesBase } from './logbook_sites.js';
 
@@ -72,10 +73,11 @@ export class LogbookChecklistsBase extends LogbookSitesBase {
                             <input type="text" id="lb-stage-nom" list="stages-list" placeholder="${tt('form.courseNamePlaceholder')}" autocomplete="off" style="width: 100%;">
                             <datalist id="stages-list"></datalist>
                             <label for="lb-stage-specialite" style="display:block; margin-top: 10px;">${tt('form.specialty')}</label>
-                            <select id="lb-stage-specialite" style="width: 100%;">
+                            <select id="lb-stage-specialite" style="width: 100%;" data-change-action="toggleOtherField" data-toggle-id="lb-stage-specialite-autre">
                                 <option value="">${tt('form.specialtySelect')}</option>
-                                ${LogbookChecklistsBase.STAGE_SPECIALTIES.map((name) => `<option value="${name}">${tt(`form.specialties.${name}`)}</option>`).join('')}
+                                ${this.getSpecialtyOptions()}
                             </select>
+                            <input type="text" id="lb-stage-specialite-autre" placeholder="${tt('form.specialtyPlaceholder')}" autocomplete="off" style="display:none; margin-top: 5px; width: 100%;">
                         </div>
 
                         <label style="display:block; margin-top: 10px;">${tt('form.companion')}</label>
@@ -199,5 +201,44 @@ export class LogbookChecklistsBase extends LogbookSitesBase {
         input.required = checked;
         if (name) input.value = name;
         if (checked && !name) input.focus();
+    }
+
+    // Spécialités proposées : celles par défaut, puis celles saisies sous « Autre » et déjà utilisées
+    // dans le carnet, puis « Autre ».
+    getSpecialtyOptions() {
+        const fixed = LogbookChecklistsBase.STAGE_SPECIALTIES.filter((name) => name !== 'Autre');
+        const known = new Set(fixed.map((name) => name.toLowerCase()).concat('autre'));
+        const custom = this.getUsedValues('stageSpecialty').filter((name) => !known.has(name.toLowerCase()));
+        return [
+            ...fixed.map((name) => `<option value="${name}">${tt(`form.specialties.${name}`)}</option>`),
+            ...custom.map((name) => `<option value="${escapeHTML(name)}">${escapeHTML(name)}</option>`),
+            `<option value="Autre">${tt('form.specialties.Autre')}</option>`,
+        ].join('');
+    }
+
+    // Spécialité du stage : une valeur hors liste s'affiche sous « Autre », dans son champ de saisie.
+    setSpecialtyField(value = '') {
+        const select = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-stage-specialite'));
+        const other = /** @type {HTMLInputElement|null} */ (document.getElementById('lb-stage-specialite-autre'));
+        if (!select) return;
+        const listed = Array.from(select.options).some((o) => o.value === value && value !== 'Autre');
+        select.value = !value ? '' : listed ? value : 'Autre';
+        if (other) {
+            other.value = value && !listed && value !== 'Autre' ? value : '';
+            other.style.display = select.value === 'Autre' ? 'block' : 'none';
+        }
+    }
+
+    // Valeur à enregistrer : le texte saisi sous « Autre » (« Autre » seul s'il reste vide).
+    getSpecialtyField() {
+        const select = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-stage-specialite'));
+        const other = /** @type {HTMLInputElement|null} */ (document.getElementById('lb-stage-specialite-autre'));
+        if (!select) return '';
+        if (select.value !== 'Autre') return select.value;
+        const typed = capitalizeFirstLetter(other?.value.trim() || '');
+        if (!typed) return 'Autre';
+        // Déjà dans la liste (à la casse près) : on reprend l'entrée existante plutôt qu'un doublon.
+        const existing = Array.from(select.options).find((o) => o.value.toLowerCase() === typed.toLowerCase());
+        return existing && existing.value !== 'Autre' ? existing.value : typed;
     }
 }

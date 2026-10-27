@@ -618,10 +618,9 @@ export class LogbookFormBase extends LogbookIgcImportBase {
         // Nouveaux champs de stage
         const stageCheck = /** @type {HTMLInputElement} */ (document.getElementById('lb-stage-check'));
         const stageNameInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-stage-nom'));
-        const stageSpecialtySelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-stage-specialite'));
         const isStage = ecoleCheck?.checked && stageCheck?.checked;
         const stageName = isStage && stageNameInput ? stageNameInput.value.trim() : '';
-        const stageSpecialty = isStage && stageSpecialtySelect ? stageSpecialtySelect.value : '';
+        const stageSpecialty = isStage ? this.getSpecialtyField() : '';
         const brevetSelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-brevet-prepare'));
         const brevetPrepare = ecole && brevetSelect ? brevetSelect.value : '';
 
@@ -930,10 +929,7 @@ export class LogbookFormBase extends LogbookIgcImportBase {
             }
             const stageNameInput = /** @type {HTMLInputElement} */ (document.getElementById('lb-stage-nom'));
             if (stageNameInput && session.stageName) stageNameInput.value = session.stageName;
-            const stageSpecialtySelect = /** @type {HTMLSelectElement} */ (
-                document.getElementById('lb-stage-specialite')
-            );
-            if (stageSpecialtySelect && session.stageSpecialty) stageSpecialtySelect.value = session.stageSpecialty;
+            if (session.stageSpecialty) this.setSpecialtyField(session.stageSpecialty);
         }
 
         this.setChecklistValues('pilotes', session.pilotes || []);

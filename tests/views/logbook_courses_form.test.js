@@ -395,3 +395,58 @@ describe('logbook: a session close to a course session starts in that course', (
         expect($('lb-learned-summary').hidden).toBe(true);
     });
 });
+
+describe('logbook: course specialty "Autre"', () => {
+    it('shows a text field, saves what is typed and selects it again when editing', () => {
+        setup([]);
+        fillRequired();
+        toggle('lb-ecole-check', true);
+        $('lb-ecole').value = 'ÉCOLE TEST';
+        toggle('lb-stage-check', true);
+        expect($('lb-stage-specialite-autre').style.display).toBe('none');
+
+        change('lb-stage-specialite', 'Autre'); // le champ s'affiche via l'action toggleOtherField (main.js)
+        $('lb-stage-specialite-autre').value = 'Acro';
+        LogbookView.submitForm();
+        expect(lastFlight().stageSpecialty).toBe('Acro');
+
+        LogbookView.editEntry(lastFlight().id);
+        expect($('lb-stage-specialite').value).toBe('Acro'); // elle est maintenant dans la liste
+        expect($('lb-stage-specialite-autre').style.display).toBe('none');
+    });
+
+    it('is proposed again for the next session of the same course', () => {
+        setup([course({ stageSpecialty: 'Acro' })]);
+        toggle('lb-stage-check', true);
+        change('lb-stage-nom', 'Stage été');
+        expect($('lb-stage-specialite').value).toBe('Acro');
+    });
+
+    it('adds what was typed to the list of specialties, once', () => {
+        setup([course({ stageSpecialty: 'Acro' })]);
+        const options = () => Array.from($('lb-stage-specialite').options).map((o) => o.value);
+        expect(options()).toEqual([
+            '',
+            'Initiation',
+            'Perfectionnement',
+            'Progression',
+            'SIV',
+            'Cross',
+            'Acro',
+            'Autre',
+        ]);
+
+        fillRequired();
+        toggle('lb-ecole-check', true);
+        $('lb-ecole').value = 'ÉCOLE TEST';
+        toggle('lb-stage-check', true);
+        change('lb-stage-specialite', 'Autre');
+        $('lb-stage-specialite-autre').value = 'acro'; // même mot, autre casse : pas de doublon
+        LogbookView.submitForm();
+        expect(lastFlight().stageSpecialty).toBe('Acro');
+        expect(options().filter((v) => v === 'Acro')).toHaveLength(1);
+
+        LogbookView.editEntry(lastFlight().id);
+        expect($('lb-stage-specialite').value).toBe('Acro'); // choisie dans la liste, plus sous « Autre »
+    });
+});
