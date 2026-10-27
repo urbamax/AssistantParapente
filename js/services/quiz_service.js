@@ -348,18 +348,36 @@ class QuizService {
             .slice(0, Math.min(5, pool.length));
     }
 
-    // Appelé après chaque réponse. Une bonne réponse ne fait pas forcément passer une question à
-    // 100 % (l'ancienne erreur reste dans la fenêtre), donc la série doit parfois se prolonger :
-    // quand la dernière question vient d'être répondue et que l'objectif n'est pas atteint, on
-    // ajoute un nouveau tour des questions encore faibles. Rien n'est cumulé d'une réponse à
-    // l'autre : tout est recalculé depuis les statistiques réelles, donc aucune dérive possible.
+    // Appelé après chaque réponse : recalcule combien de questions restent nécessaires pour atteindre
+    // l'objectif, et ajuste la fin de la série en conséquence. Une erreur, ou une bonne réponse qui ne
+    // fait pas passer la question à 100 % (l'ancienne erreur reste dans la fenêtre), rallonge la série
+    // tout de suite ; la série se raccourcit si moins de questions suffisent. Rien n'est cumulé d'une
+    // réponse à l'autre : tout est recalculé depuis les statistiques réelles, donc aucune dérive possible.
     advanceMasteryProgress() {
         if (!this._masteryPool) return;
-        const upcoming = this.state.qcmSessionData.length - (this.state.qcmIndex + 1);
-        if (upcoming > 0) return;
+        const session = this.state.qcmSessionData;
+        const answered = this.state.qcmIndex + 1;
+        const upcoming = session.slice(answered);
 
-        const picked = this.pickWeakestForTarget(this._masteryPool, this.getPersistentStats(), this._masteryTargetSum);
-        this.state.qcmSessionData.push(...picked.map((q) => this.shuffleQuestionChoices(q)));
+        const stats = this.getPersistentStats();
+        const needed = this.pickWeakestForTarget(this._masteryPool, stats, this._masteryTargetSum).length;
+        if (needed === upcoming.length) return;
+
+        if (needed < upcoming.length) {
+            session.length = answered + needed;
+            return;
+        }
+
+        // Questions à ajouter : les moins maîtrisées qui ne sont pas déjà au programme. La question
+        // qui vient d'être répondue passe en dernier, pour ne pas la reposer aussitôt.
+        const planned = new Set(upcoming.map((q) => q.code));
+        const justAnswered = session[this.state.qcmIndex]?.code;
+        const candidates = this.shuffle(this._masteryPool)
+            .filter((q) => !planned.has(q.code) && this.getMasteryRatio(q, stats) < 1)
+            .sort((a, b) => this.getMasteryRatio(a, stats) - this.getMasteryRatio(b, stats))
+            .sort((a, b) => Number(a.code === justAnswered) - Number(b.code === justAnswered));
+        const extra = candidates.slice(0, needed - upcoming.length);
+        session.push(...extra.map((q) => this.shuffleQuestionChoices(q)));
     }
 
     // Progression actuelle vers l'objectif du mode Perfectionnement, pour affichage en direct.
