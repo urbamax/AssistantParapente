@@ -65,15 +65,15 @@ test.describe('E2E - Brevets & Progression FFVL', () => {
         const brevetsBox = page.locator('[data-brevets-stats]');
         await expect(brevetsBox).toBeVisible();
 
-        const batchBtn = brevetsBox.locator('[data-action="openBrevetBatchModal"]');
+        // Chaque carte de brevet propose son propre bouton de rattachement : on cible celui du BI.
+        const batchBtn = brevetsBox.locator('[data-action="openBrevetBatchModal"][data-args="BI"]');
         await expect(batchBtn).toBeVisible();
         await batchBtn.click();
         await expect(page.locator('#lb-brevet-batch-modal')).toBeVisible();
-        await page.selectOption('#lb-brevet-batch-target', 'BI');
         await page.locator('[data-action="applyBrevetBatchAssign"]').click();
 
         const biCard = brevetsBox.locator('[data-brevet-card="BI"]');
-        await expect(biCard).toContainText('2 sessions école');
+        await expect(biCard).toContainText('Voir les 2 sessions (BI)');
 
         await biCard.locator('[data-action="openBrevetModal"]').click();
         await expect(page.locator('#lb-brevet-modal')).toBeVisible();
@@ -81,21 +81,24 @@ test.describe('E2E - Brevets & Progression FFVL', () => {
         await page.fill('#lb-brevet-theory-date', '2026-04-10');
         await page.fill('#lb-brevet-theory-score', '56');
         await page.fill('#lb-brevet-theory-total', '60');
-        await page.check('#lb-brevet-obtained');
-        await page.fill('#lb-brevet-obtained-date', '2026-04-18');
-        await page.fill('#lb-brevet-school', 'École Horizon');
+        await page.check('#lb-brevet-practical-validated');
+        await page.fill('#lb-brevet-practical-date', '2026-04-18');
+        await page.fill('#lb-brevet-practical-school', 'École Horizon');
         await page.locator('[data-action="saveBrevetModal"]').click();
 
         await expect(biCard).toContainText('Brevet validé');
         await expect(biCard).toContainText('56/60');
 
         // 4. QCM : le niveau théorique actif avance automatiquement sur BP, et revenir sur BI affiche le badge officiel + mode REVISION
-        await page.locator('.nav-menu-btn[data-target="QCM"]').first().click();
-        await page.locator('[data-action="openTheorySection"][data-args="\'qcm\'"]').click();
-        await expect(page.locator('#qcm-setup-screen .level-tab[data-level="BP"]')).toHaveClass(/active/);
+        await page.locator('.nav-menu-btn[data-target="THEORY"]').first().click();
+        await page.locator('#theory-sub-bar .nav-menu-btn[data-target="QCM"]').click();
+        await expect(page.locator('#qcm-setup-screen')).toHaveClass(/active/);
+        await expect(page.locator('#global-level-select')).toHaveValue('BP');
 
-        await page.locator('#qcm-setup-screen .level-tab[data-level="BI"]').click();
-        await expect(page.locator('#qcm-brevet-status-banner')).toContainText('Examen théorique BI validé');
-        await expect(page.locator('#qcm-setup-screen .mode-card[data-mode="REVISION"]')).toHaveClass(/selected/);
+        await page.locator('#global-level-select').selectOption('BI');
+        await expect(page.locator('#qcm-setup-screen [data-quiz-brevet-banner]')).toContainText(
+            'Examen théorique BI validé',
+        );
+        await expect(page.locator('#mode-revision')).toHaveClass(/active/);
     });
 });
