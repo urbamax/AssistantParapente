@@ -62,4 +62,44 @@ describe('sites: filtering from a card keeps the scroll position (spec 040)', ()
         SitesView.scrollToTop();
         expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
     });
+
+    it('scrolls to the site card and highlights it when clicking a map marker', () => {
+        const markerHandlers = {};
+        const fakeMarker = {
+            bindTooltip: vi.fn().mockReturnThis(),
+            on: vi.fn((event, handler) => {
+                markerHandlers[event] = handler;
+                return fakeMarker;
+            }),
+        };
+        globalThis.L = {
+            marker: vi.fn(() => fakeMarker),
+            divIcon: vi.fn(() => ({})),
+        };
+        SitesView.state.map = {};
+        SitesView.state.markersGroup = {
+            clearLayers: vi.fn(),
+            addLayer: vi.fn(),
+        };
+        SitesView.state.ignoreNextFitBounds = true;
+        vi.spyOn(SitesService, 'getSites').mockReturnValue([
+            { id: 'arbas-665', nom: 'Arbas', latitude: 42.98, longitude: 0.88 },
+        ]);
+        vi.spyOn(SitesService, 'getFilteredAndSortedSites').mockReturnValue([
+            { id: 'arbas-665', nom: 'Arbas', latitude: 42.98, longitude: 0.88 },
+        ]);
+        vi.spyOn(SitesView, 'updateMapMarkers').mockRestore();
+
+        document.body.innerHTML += '<div id="site-card-arbas-665" class="site-card"></div>';
+        const card = document.getElementById('site-card-arbas-665');
+        const cardScrollIntoView = vi.fn();
+        /** @type {any} */ (card).scrollIntoView = cardScrollIntoView;
+
+        SitesView.updateMapMarkers();
+        expect(markerHandlers.click).toBeTypeOf('function');
+
+        markerHandlers.click();
+        expect(cardScrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' });
+        expect(card.classList.contains('highlight-glow')).toBe(true);
+    });
 });
