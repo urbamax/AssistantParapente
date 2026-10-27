@@ -444,7 +444,7 @@ class QuizViewClass extends QuizVoiceBase {
 
         const masteryOptions = document.getElementById('mastery-options');
         if (masteryOptions) masteryOptions.style.display = mode === 'MASTERY' ? '' : 'none';
-        if (mode === 'MASTERY') this.refreshMasterySlider();
+        this.refreshMasterySlider();
     }
 
     // Mode Révision : combien de questions sont à réviser, et pourquoi la session peut proposer des
@@ -496,7 +496,7 @@ class QuizViewClass extends QuizVoiceBase {
         const slider = /** @type {HTMLInputElement | null} */ (document.getElementById('mastery-target-slider'));
         if (!slider) return;
         const level = (typeof GlobalState !== 'undefined' && GlobalState.get('level')) || 'BI';
-        const { current, min, max } = QuizService.getMasteryTargetBounds(level);
+        const { current, min, max, complete } = QuizService.getMasteryTargetBounds(level);
 
         const wanted = this._masteryTargetChoice ?? 75;
         const value = Math.min(Math.max(wanted, min), max);
@@ -507,10 +507,11 @@ class QuizViewClass extends QuizVoiceBase {
         QuizService.setMasteryTarget(value);
         this.showMasteryTarget(value);
 
+        // Déjà à 100 % sur ce périmètre : rien à perfectionner, on ne laisse pas lancer de série.
         const hint = document.getElementById('mastery-target-hint');
-        if (hint) {
-            hint.textContent = current >= 100 ? tql('modes.masteryAtMax') : tql('modes.masteryCurrent', { current });
-        }
+        if (hint) hint.textContent = complete ? tql('modes.masteryAtMax') : tql('modes.masteryCurrent', { current });
+        const startBtn = /** @type {HTMLButtonElement | null} */ (document.getElementById('qcm-start-btn'));
+        if (startBtn) startBtn.disabled = complete && QuizService.state.qcmConfig.mode === 'MASTERY';
     }
 
     updateCountUI(countVal, targetBtn) {

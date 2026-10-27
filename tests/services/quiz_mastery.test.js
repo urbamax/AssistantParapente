@@ -115,21 +115,46 @@ describe('QuizService - mode MASTERY (fenêtre glissante)', () => {
 
     it('offers targets from one point above the current mastery up to 100 %', () => {
         // 14 à 100 %, 6 à 90 % : moyenne 97 %
-        expect(QuizService.getMasteryTargetBounds('BI', 'ALL')).toEqual({ current: 97, min: 98, max: 100 });
+        expect(QuizService.getMasteryTargetBounds('BI', 'ALL')).toEqual({
+            current: 97,
+            min: 98,
+            max: 100,
+            complete: false,
+        });
     });
 
     it('measures the mastery of the chosen theme only', () => {
         QuizService.setQuestions(questions.map((q, i) => ({ ...q, theme: i < 14 ? 'Météo' : 'Pilotage' })));
-        expect(QuizService.getMasteryTargetBounds('BI', 'Météo')).toEqual({ current: 100, min: 100, max: 100 });
-        expect(QuizService.getMasteryTargetBounds('BI', 'Pilotage')).toEqual({ current: 90, min: 91, max: 100 });
+        expect(QuizService.getMasteryTargetBounds('BI', 'Météo')).toEqual({
+            current: 100,
+            min: 100,
+            max: 100,
+            complete: true,
+        });
+        expect(QuizService.getMasteryTargetBounds('BI', 'Pilotage')).toEqual({
+            current: 90,
+            min: 91,
+            max: 100,
+            complete: false,
+        });
     });
 
     it('never offers a minimum above 100 %, and starts at 1 % without any history', () => {
         StorageService.set(StorageService.KEYS.QCM_STATS, { themes: {}, questions: {} });
-        expect(QuizService.getMasteryTargetBounds('BI', 'ALL')).toEqual({ current: 0, min: 1, max: 100 });
+        expect(QuizService.getMasteryTargetBounds('BI', 'ALL')).toEqual({
+            current: 0,
+            min: 1,
+            max: 100,
+            complete: false,
+        });
         const stats = { themes: {}, questions: {} };
         questions.forEach((q) => (stats.questions[q.code] = { total: 12, correct: 12, recent: full() }));
         StorageService.set(StorageService.KEYS.QCM_STATS, stats);
-        expect(QuizService.getMasteryTargetBounds('BI', 'ALL')).toEqual({ current: 100, min: 100, max: 100 });
+        expect(QuizService.getMasteryTargetBounds('BI', 'ALL')).toEqual({
+            current: 100,
+            min: 100,
+            max: 100,
+            complete: true,
+        });
     });
 });

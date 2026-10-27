@@ -24,6 +24,7 @@ const seed = (weak) => {
 };
 
 const slider = () => /** @type {HTMLInputElement} */ (document.getElementById('mastery-target-slider'));
+const startBtn = () => /** @type {HTMLButtonElement} */ (document.getElementById('qcm-start-btn'));
 const text = (id) => document.getElementById(id).textContent;
 
 beforeEach(() => {
@@ -32,11 +33,13 @@ beforeEach(() => {
             <output id="mastery-target-value"></output>
             <input type="range" id="mastery-target-slider" min="1" max="100" value="75" />
             <p id="mastery-target-hint"></p>
-        </div>`;
+        </div>
+        <button id="qcm-start-btn">COMMENCER</button>`;
     vi.spyOn(GlobalState, 'get').mockImplementation((key) => (key === 'level' ? 'BI' : undefined));
     vi.spyOn(QuizService, 'getQuestions').mockReturnValue(QUESTIONS);
     Object.assign(QuizService.state, { isLoaded: true });
     QuizService.state.qcmConfig.theme = 'ALL';
+    QuizService.state.qcmConfig.mode = 'MASTERY';
     QuizService.state.qcmConfig.masteryTarget = 75;
     QuizView._masteryTargetChoice = undefined;
 });
@@ -96,5 +99,37 @@ describe('mastery target slider', () => {
         seed(8); // la plage s'élargit de nouveau : le choix du pilote revient
         QuizView.refreshMasterySlider();
         expect(slider().value).toBe('99');
+    });
+
+    it('greys out the start button once the whole scope is already at 100 %', () => {
+        seed(4);
+        QuizView.refreshMasterySlider();
+        expect(startBtn().disabled).toBe(false);
+
+        seed(0);
+        QuizView.refreshMasterySlider();
+        expect(startBtn().disabled).toBe(true);
+        expect(text('mastery-target-hint')).toBe(
+            "Vous avez déjà atteint 100% sur ce périmètre : il n'y a plus rien à perfectionner.",
+        );
+
+        // un autre mode n'est pas concerné
+        QuizService.state.qcmConfig.mode = 'TRAINING';
+        QuizView.refreshMasterySlider();
+        expect(startBtn().disabled).toBe(false);
+    });
+
+    it('keeps the start button enabled when only the rounding reaches 100 %', () => {
+        // 300 questions dont une seule à 90 % : 99,97 % s'arrondit à 100, mais tout n'est pas maîtrisé
+        const many = Array.from({ length: 300 }, (_, i) => ({ code: `L${i + 1}V`, theme: 'Météo', question: 'q' }));
+        const stats = { themes: {}, questions: {} };
+        many.forEach(
+            (q, i) => (stats.questions[q.code] = { total: 12, correct: 12, recent: i === 0 ? stale() : full() }),
+        );
+        vi.spyOn(QuizService, 'getQuestions').mockReturnValue(many);
+        vi.spyOn(QuizService, 'getPersistentStats').mockReturnValue(stats);
+        QuizView.refreshMasterySlider();
+        expect(startBtn().disabled).toBe(false);
+        expect(text('mastery-target-hint')).toBe('Maîtrise actuelle : 100%.');
     });
 });

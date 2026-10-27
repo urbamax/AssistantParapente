@@ -382,13 +382,13 @@ class QuizService {
 
     // Maîtrise actuelle (0 à 100, arrondie comme l'écran Statistiques) du périmètre choisi, et plage
     // des paliers proposables : de 1 point au-dessus de la maîtrise actuelle jusqu'à 100 %.
+    // `complete` : toutes les questions du périmètre sont à 100 % (l'arrondi peut afficher 100 avant).
     getMasteryTargetBounds(level = 'BI', theme = this.state.qcmConfig.theme) {
         const pool = this.getMasteryScope(level, theme);
-        const current =
-            pool.length === 0
-                ? 0
-                : Math.round((this.getMasteryScore(pool, this.getPersistentStats()) / pool.length) * 100);
-        return { current, min: Math.min(current + 1, 100), max: 100 };
+        const score = this.getMasteryScore(pool, this.getPersistentStats());
+        const current = pool.length === 0 ? 0 : Math.round((score / pool.length) * 100);
+        const complete = pool.length > 0 && score >= pool.length - MASTERY_EPSILON;
+        return { current, min: Math.min(current + 1, 100), max: 100, complete };
     }
 
     // Questions proposables pour un niveau (BI, BP, BPC, TREUIL ou tout), sans filtre de thème.
