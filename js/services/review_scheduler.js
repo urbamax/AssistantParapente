@@ -5,9 +5,11 @@
  * Chaque question mémorise sa série de bonnes réponses consécutives (`streak`) et la date de sa
  * dernière présentation (`lastSeen`, en ms). L'intervalle avant la prochaine révision grandit avec
  * la série et repart de zéro à la moindre erreur. Une question jamais vue passe toujours en
- * premier ; parmi les autres, la plus en retard sur son échéance passe d'abord (le ratio de
- * réussite sert à départager, et retarde un peu l'échéance d'une question bien réussie).
+ * premier ; parmi les autres, la plus en retard sur son échéance passe d'abord (la maîtrise sur
+ * les dernières réponses sert à départager, et retarde un peu l'échéance d'une question bien réussie).
  */
+
+import { masteryRatio } from './mastery.js';
 
 /** Intervalle (jours) avant la prochaine révision, selon la série de bonnes réponses. */
 export const REVIEW_INTERVALS_DAYS = [0, 1, 3, 7, 14, 30];
@@ -17,7 +19,7 @@ export const DAY_MS = 24 * 60 * 60 * 1000;
 const LEGACY_SUCCESS_THRESHOLD = 0.75;
 
 /**
- * @typedef {{total?: number, correct?: number, streak?: number, lastSeen?: number}} QuestionStat
+ * @typedef {{total?: number, correct?: number, streak?: number, lastSeen?: number, recent?: number[]}} QuestionStat
  */
 
 /** @param {number|undefined} streak */
@@ -34,7 +36,7 @@ export function reviewIntervalDays(streak) {
  */
 export function dueScore(stat, now = Date.now()) {
     if (!stat || !stat.total) return Infinity;
-    const ratio = (stat.correct || 0) / stat.total;
+    const ratio = masteryRatio(stat);
     if (!stat.lastSeen) {
         // Statistique antérieure au suivi temporel : on garde l'ancien critère de seuil de ratio
         // pour ne pas casser l'historique tant que la question n'a pas été retentée.
@@ -57,7 +59,7 @@ export function isDue(stat, now = Date.now()) {
  */
 export function nextDueAt(stat) {
     if (!stat || !stat.total || !stat.lastSeen) return null;
-    const ratio = (stat.correct || 0) / stat.total;
+    const ratio = masteryRatio(stat);
     return stat.lastSeen + (reviewIntervalDays(stat.streak) + ratio) * DAY_MS;
 }
 

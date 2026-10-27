@@ -1469,13 +1469,23 @@ export const FirebaseAuthEngine = {
     // qui a vu la question le plus récemment. Prendre le max des streaks effacerait une erreur
     // récente (streak remis à 0 sur le téléphone, 4 dans le cloud), et ne pas recopier lastSeen
     // faisait retomber le mode Révision sur l'ancien critère de ratio après chaque synchro.
+    // Les dernières réponses (`recent`, qui fondent la maîtrise) suivent la même règle : elles
+    // viennent de l'appareil le plus récent, et on n'écrit jamais de champ indéfini (Firestore le refuse).
     _latestReviewState: function (a, b) {
         const aSeen = a.lastSeen || 0;
         const bSeen = b.lastSeen || 0;
-        if (!aSeen && !bSeen) return { streak: Math.max(a.streak || 0, b.streak || 0) };
-        if (aSeen === bSeen) return { streak: Math.max(a.streak || 0, b.streak || 0), lastSeen: aSeen };
+        const withRecent = (state, source) =>
+            Array.isArray(source.recent) ? { ...state, recent: source.recent } : state;
+        if (!aSeen && !bSeen) {
+            const longest = (a.recent?.length || 0) >= (b.recent?.length || 0) ? a : b;
+            return withRecent({ streak: Math.max(a.streak || 0, b.streak || 0) }, longest);
+        }
+        if (aSeen === bSeen) {
+            const longest = (a.recent?.length || 0) >= (b.recent?.length || 0) ? a : b;
+            return withRecent({ streak: Math.max(a.streak || 0, b.streak || 0), lastSeen: aSeen }, longest);
+        }
         const latest = aSeen > bSeen ? a : b;
-        return { streak: latest.streak || 0, lastSeen: latest.lastSeen };
+        return withRecent({ streak: latest.streak || 0, lastSeen: latest.lastSeen }, latest);
     },
 
     mergeQcmStats: function (local, cloud) {

@@ -40,4 +40,15 @@ describe('FirebaseAuthEngine.mergeQcmStats (révision espacée)', () => {
         });
         expect(merged.questions.W1V).toEqual({ total: 1, correct: 0, streak: 0, lastSeen: 10 });
     });
+
+    it('keeps the recent answers (mastery window) of the most recent device', () => {
+        const local = stats({ total: 5, correct: 4, streak: 0, lastSeen: 3000, recent: [1, 1, 1, 1, 0] });
+        const cloud = stats({ total: 4, correct: 4, streak: 4, lastSeen: 1000, recent: [1, 1, 1, 1] });
+        expect(merge(local, cloud).recent).toEqual([1, 1, 1, 1, 0]);
+    });
+
+    it('never writes an undefined `recent` (Firestore refuses undefined fields)', () => {
+        const merged = merge(stats({ total: 2, correct: 2, streak: 2, lastSeen: 5 }), stats({ total: 1, correct: 1 }));
+        expect('recent' in merged).toBe(false);
+    });
 });
