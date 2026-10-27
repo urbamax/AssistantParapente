@@ -7,6 +7,7 @@
  */
 import LogbookService from '../services/logbook_service.js';
 import PilotHabits from '../services/pilot_habits.js';
+import BrevetService, { resolveSuggestedBrevet } from '../services/brevet_service.js';
 import { instructorsOf, isCourseSession, latestOfCourse, preferPlace } from '../services/logbook_courses.js';
 import { findNearbySession } from '../services/logbook_defaults.js';
 import { escapeHTML } from '../core/security.js';
@@ -25,6 +26,7 @@ export class LogbookLearnedBase extends LogbookChecklistsBase {
         'lb-stage-check': 'stage',
         'lb-stage-nom': 'stage',
         'lb-stage-specialite': 'specialite',
+        'lb-brevet-prepare': 'brevetPrepare',
         'lb-treuilleur': 'treuilleur',
         'lb-site': 'site',
         'lb-lieu': 'lieu',
@@ -164,6 +166,42 @@ export class LogbookLearnedBase extends LogbookChecklistsBase {
         const school = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole-check'))?.checked
             ? value('lb-ecole').trim().toLowerCase()
             : '';
+        if (document.getElementById('lb-brevet-prepare') && can('brevetPrepare') && !fromCourse.has('brevetPrepare')) {
+            const datetime = value('lb-datetime');
+            const withBrevet = school
+                ? sessions.filter(
+                      (s) =>
+                          typeof s.ecole === 'string' &&
+                          s.ecole.trim().toLowerCase() === school &&
+                          typeof s.brevetPrepare === 'string' &&
+                          s.brevetPrepare.trim(),
+                  )
+                : [];
+            const brevetRef = preferPlace(withBrevet, place);
+            if (brevetRef) {
+                const rawBrevet = brevetRef.brevetPrepare.trim();
+                const resolved = resolveSuggestedBrevet(rawBrevet, undefined, datetime);
+                if (resolved) {
+                    const here = place.trim() && PilotHabits.placeOf(brevetRef) === place.trim().toLowerCase();
+                    setSelect('lb-brevet-prepare', 'brevetPrepare', {
+                        value: resolved,
+                        reason: resolved !== rawBrevet ? 'brevetNext' : here ? 'instructorPlace' : 'instructorLatest',
+                    });
+                }
+            } else if (school && BrevetService.hasAnyBrevetData()) {
+                const target = BrevetService.getTargetSchoolBrevet(undefined, datetime);
+                if (target) {
+                    setSelect('lb-brevet-prepare', 'brevetPrepare', {
+                        value: target,
+                        reason: 'brevetInProgress',
+                    });
+                }
+            } else if (this.learnedFields.has('brevetPrepare')) {
+                const select = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-brevet-prepare'));
+                if (select) select.value = '';
+                this.learnedFields.delete('brevetPrepare');
+            }
+        }
         if (document.getElementById('lb-moniteur-group') && can('moniteur') && !fromCourse.has('moniteur')) {
             const withInstructor = school
                 ? sessions.filter(
@@ -280,6 +318,17 @@ export class LogbookLearnedBase extends LogbookChecklistsBase {
         if (specialty && Array.from(specialtySelect.options).some((o) => o.value === specialty)) {
             fill('specialite', () => (specialtySelect.value = specialty));
         }
+        const brevetSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-brevet-prepare'));
+        const courseBrevet = typeof reference.brevetPrepare === 'string' ? reference.brevetPrepare.trim() : '';
+        if (brevetSelect && courseBrevet && can('brevetPrepare')) {
+            const datetime = /** @type {HTMLInputElement} */ (document.getElementById('lb-datetime'))?.value || '';
+            const resolved = resolveSuggestedBrevet(courseBrevet, undefined, datetime);
+            if (resolved && Array.from(brevetSelect.options).some((o) => o.value === resolved)) {
+                brevetSelect.value = resolved;
+                this.learnedFields.set('brevetPrepare', resolved !== courseBrevet ? 'brevetNext' : 'course');
+                filled.add('brevetPrepare');
+            }
+        }
         const lists = {
             moniteur: instructorsOf(reference),
             accompagnateur: LogbookLearnedBase.companionsOf(reference),
@@ -298,6 +347,9 @@ export class LogbookLearnedBase extends LogbookChecklistsBase {
             if (field === 'ecole') this.setSchoolField(false);
             else if (field === 'specialite') {
                 const select = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-stage-specialite'));
+                if (select) select.value = '';
+            } else if (field === 'brevetPrepare') {
+                const select = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-brevet-prepare'));
                 if (select) select.value = '';
             } else this.setChecklistValues(field, []);
             this.learnedFields.delete(field);

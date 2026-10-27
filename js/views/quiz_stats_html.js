@@ -4,11 +4,65 @@
  * getCourseUrl…) et les chiffres déjà calculés, et rend un fragment HTML. Aucun accès au DOM.
  */
 import { escapeHTML } from '../core/security.js';
+import { BREVET_CODES } from '../services/brevet_service.js';
 import { masteryRatio } from '../services/mastery.js';
 import { toSorted } from '../utils/array_utils.js';
+import { formatDateOnly } from '../utils/date_utils.js';
 import { truncate } from '../utils/text_utils.js';
 import { tq, tqh, tql } from './quiz_strings.js';
 import { explanationHtml } from './quiz_explanation.js';
+
+/**
+ * Encart du statut officiel de l'examen théorique FFVL (affiché dans #qcm-setup-screen et #stats-screen).
+ * @param {string} level
+ * @param {any} entry
+ * @param {string} [attrName]
+ */
+export function buildOfficialTheoryBannerHtml(level, entry, attrName = 'data-quiz-brevet-banner') {
+    if (!BREVET_CODES.includes(level) || !entry) return '';
+    const th = entry.theory || {};
+    const pr = entry.practical || {};
+    const isValidated = Boolean(th.passed || pr.validated);
+
+    if (isValidated) {
+        const rawDate = th.date || pr.date || '';
+        const title = rawDate
+            ? tq('officialTheory.validatedWithDate', { level, date: formatDateOnly(rawDate) })
+            : tq('officialTheory.validatedBadge', { level });
+        const scorePart =
+            th.score !== null && th.total !== null
+                ? tq('officialTheory.scoreBadge', { score: th.score, total: th.total, pct: th.percentage ?? 0 })
+                : th.percentage !== null
+                  ? tq('officialTheory.pctBadge', { pct: th.percentage })
+                  : '';
+        const hintHtml =
+            attrName === 'data-quiz-brevet-banner'
+                ? `<div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">${tq('officialTheory.revisionHint')}</div>`
+                : '';
+
+        return `
+            <div ${attrName} style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 14px; padding: 12px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                <div>
+                    <div style="font-weight: 700; color: #10b981; font-size: 0.92rem; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                        <i class="ri-medal-fill"></i> <span>${title}</span>
+                        ${scorePart ? `<span style="color: var(--text-main); font-weight: 600;">— ${scorePart}</span>` : ''}
+                    </div>
+                    ${hintHtml}
+                </div>
+                <button type="button" data-action="openBrevetModal" data-args="${escapeHTML(level)}" style="background: transparent; border: 1px solid rgba(16, 185, 129, 0.5); color: #10b981; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                    <i class="ri-edit-line"></i> ${tq('officialTheory.editBtn')}
+                </button>
+            </div>`;
+    }
+
+    return `
+        <div ${attrName} style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> ${tq('officialTheory.promptUnvalidated', { level })}</span>
+            <button type="button" data-action="openBrevetModal" data-args="${escapeHTML(level)}" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> ${tq('officialTheory.recordBtn')}
+            </button>
+        </div>`;
+}
 
 /** Cartes de répartition des questions par niveau de maîtrise (filtre au clic). */
 export function buildDistributionHtml(

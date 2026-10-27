@@ -40,6 +40,9 @@ export const FR_HTML = Object.freeze({
         vosStatistiquesDeRevision:
             'Vos statistiques de révision sont stockées localement. <a href="#" data-action="FirebaseAuthopenAuthModal" data-prevent-default style="color: var(--accent-orange); text-decoration: underline" >Créez un compte (100% gratuit)</a > pour les synchroniser sur tous vos appareils.',
     }),
+    revisionAxesScreen: Object.freeze({
+        axesDeRevision: 'AXES DE RÉVISION',
+    }),
     qcmBankScreen: Object.freeze({
         banqueDeQuestions: 'BANQUE DE QUESTIONS',
         placeholderRechercherParMotCle: 'Rechercher par mot-clé (ex: cumulus)...',
@@ -241,6 +244,7 @@ export const FR_HTML = Object.freeze({
         espaceSynchro: 'ESPACE SYNCHRO',
         theorie: 'Théorie',
         qcm: 'QCM',
+        axesDeRevision: 'Axes de révision',
         biblio: 'Biblio',
         stats: 'Stats',
         sites: 'Sites',

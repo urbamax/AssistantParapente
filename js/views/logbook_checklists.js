@@ -5,6 +5,7 @@
  * logbook.js stays smaller; behaviour is unchanged.
  */
 import LogbookService from '../services/logbook_service.js';
+import { BREVET_CODES } from '../services/brevet_service.js';
 import { escapeHTML } from '../core/security.js';
 import { tt } from './logbook_strings.js';
 import { LogbookSitesBase } from './logbook_sites.js';
@@ -56,6 +57,12 @@ export class LogbookChecklistsBase extends LogbookSitesBase {
                         <datalist id="ecoles-list"></datalist>
                         <label style="display:block; margin-top: 10px;">${tt('form.instructor')}</label>
                         ${this.renderChecklist('moniteur', [], this.getUsedValues('moniteur'), tt('form.instructorPlaceholder'))}
+
+                        <label for="lb-brevet-prepare" style="display:block; margin-top: 10px;">${tt('form.brevetPrepare')}</label>
+                        <select id="lb-brevet-prepare" style="width: 100%;">
+                            <option value="">${tt('form.brevetNone')}</option>
+                            ${BREVET_CODES.map((code) => `<option value="${code}">${tt(`form.brevetOptions.${code}`)}</option>`).join('')}
+                        </select>
 
                         <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-top: 10px;">
                             <input type="checkbox" id="lb-stage-check" aria-controls="lb-stage-group"> ${tt('form.isCourse')}

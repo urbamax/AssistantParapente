@@ -151,6 +151,14 @@ async function bootApplication() {
         'clearHistoryFilter',
         'closeBatchImport',
         'importBatch',
+        'openBrevetModal',
+        'closeBrevetModal',
+        'saveBrevetModal',
+        'updateBrevetModalPct',
+        'openBrevetBatchModal',
+        'closeBrevetBatchModal',
+        'toggleAllBrevetBatchSessions',
+        'applyBrevetBatchAssign',
     ].forEach((action) => {
         AppEvents.register('Logbook' + action, (args, e, t) =>
             LogbookView[action] ? LogbookView[action](args || e, e, t) : null,
@@ -341,6 +349,7 @@ async function bootApplication() {
     });
     AppRouter.register('QCM', quizModule);
     AppRouter.register('QCM_BANK', quizModule);
+    AppRouter.register('REVISION_AXES', quizModule);
     AppRouter.register('STATS', quizModule);
     AppRouter.register('LOGBOOK', logbookModule);
     AppRouter.register('SITES', sitesModule);

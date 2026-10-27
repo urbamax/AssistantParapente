@@ -7,6 +7,7 @@
 import GlobalState from '../core/app_state.js';
 import SitesService from '../services/sites_service.js';
 import LogbookService from '../services/logbook_service.js';
+import BrevetService from '../services/brevet_service.js';
 import { getSpotairWidgetId } from '../data/spotair_widgets.js';
 import { FR } from '../i18n/fr.js';
 import { escapeHTML, renderSiteText, safeHttpUrl } from '../core/security.js';
@@ -461,7 +462,7 @@ export class SitesListBase extends SitesMapBase {
     // compatible/incompatible fabriqué ici) et l'état du matériel du pilote, en réutilisant
     // LogbookService.computeEquipmentWear() (déjà utilisé pour le badge de révision du Carnet).
     buildPreFlightBriefHtml() {
-        const level = GlobalState.get('level') || 'ALL';
+        const level = BrevetService.getPracticalPilotLevel() || GlobalState.get('level') || 'ALL';
         const levelLabel = FR.sites.brief.levels[level] || level;
 
         let equipmentHtml = `<span style="color: var(--text-muted);">${tt('brief.noEquipment')}</span>`;

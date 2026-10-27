@@ -609,6 +609,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 exports[`quiz renders (spec 024: identical before and after moving the texts) > statistics for a level without questions 1`] = `
 "
             
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel TREUIL en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="TREUIL" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
+            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -737,6 +744,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
     "Par série",
   ],
   "none": "
+            
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -976,6 +984,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 {
   "ALL": "
             
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
+            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -983,13 +998,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <!-- Background track -->
                         <circle cx="70" cy="70" r="55" fill="none" stroke="var(--border-color)" stroke-width="8"></circle>
                         <!-- Progress bar -->
-                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="238.4468824074653" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
+                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="317.9291765432871" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
                     </svg>
                     
                     <!-- Internal Content -->
                     <div style="position:absolute; text-align:center; transform: rotate(0deg); display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%;">
                         <div style="font-size:4.5rem; font-weight:900; color:#f87171; line-height:1; letter-spacing:-2px; font-family:'Inter', sans-serif;">
-                            31<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
+                            8<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
                         </div>
                         <div style="font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; margin-top:8px; line-height:1.2;">
                             RÉUSSITE<br>GLOBALE
@@ -1010,7 +1025,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="background:rgba(74, 222, 128, 0.03); border:1px solid rgba(74, 222, 128, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Maîtrisées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(100%)</div>
                 </div>
@@ -1030,7 +1045,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.65rem; opacity:0.4;">(50-74%)</div>
                 </div>
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
@@ -1099,7 +1114,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">⚙️</span>
                         <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            25%
+                            10%
                         </div>
                     </div>
 
@@ -1108,7 +1123,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:25%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
+                        <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -1125,8 +1140,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <!-- Top row: emoji (left) + badge % (right) — never overlaps -->
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">🌦️</span>
-                        <div style="background:rgba(74,222,128,0.15); color:#4ade80; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            100%
+                        <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
+                            20%
                         </div>
                     </div>
 
@@ -1135,7 +1150,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:100%; background:#4ade80; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #4ade80;"></div>
+                        <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -1336,7 +1351,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         </div>
                     </div>
                 
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="25" data-total="4" data-streak="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="10" data-total="4" data-streak="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -1373,12 +1388,12 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                             </div>
                             </div>
                             <div style="text-align:right; min-width:60px;">
-                                <div style="font-size:1.3rem; font-weight:700; color:#f87171;">25%</div>
+                                <div style="font-size:1.3rem; font-weight:700; color:#f87171;">10%</div>
                             </div>
                         </div>
                     </div>
                 
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="100" data-total="2" data-streak="3" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -1415,7 +1430,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                             </div>
                             </div>
                             <div style="text-align:right; min-width:60px;">
-                                <div style="font-size:1.3rem; font-weight:700; color:#4ade80;">100%</div>
+                                <div style="font-size:1.3rem; font-weight:700; color:#f87171;">20%</div>
                             </div>
                         </div>
                     </div>
@@ -1437,6 +1452,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "EXCELLENT": "
             
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
+            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -1444,13 +1466,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <!-- Background track -->
                         <circle cx="70" cy="70" r="55" fill="none" stroke="var(--border-color)" stroke-width="8"></circle>
                         <!-- Progress bar -->
-                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="238.4468824074653" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
+                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="317.9291765432871" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
                     </svg>
                     
                     <!-- Internal Content -->
                     <div style="position:absolute; text-align:center; transform: rotate(0deg); display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%;">
                         <div style="font-size:4.5rem; font-weight:900; color:#f87171; line-height:1; letter-spacing:-2px; font-family:'Inter', sans-serif;">
-                            31<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
+                            8<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
                         </div>
                         <div style="font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; margin-top:8px; line-height:1.2;">
                             RÉUSSITE<br>GLOBALE
@@ -1471,7 +1493,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="background:rgba(74, 222, 128, 0.03); border:1px solid rgba(74, 222, 128, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Maîtrisées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(100%)</div>
                 </div>
@@ -1491,7 +1513,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.65rem; opacity:0.4;">(50-74%)</div>
                 </div>
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
@@ -1560,7 +1582,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">⚙️</span>
                         <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            25%
+                            10%
                         </div>
                     </div>
 
@@ -1569,7 +1591,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:25%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
+                        <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -1586,8 +1608,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <!-- Top row: emoji (left) + badge % (right) — never overlaps -->
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">🌦️</span>
-                        <div style="background:rgba(74,222,128,0.15); color:#4ade80; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            100%
+                        <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
+                            20%
                         </div>
                     </div>
 
@@ -1596,7 +1618,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:100%; background:#4ade80; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #4ade80;"></div>
+                        <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -1777,6 +1799,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "FAILED": "
             
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
+            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -1784,13 +1813,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <!-- Background track -->
                         <circle cx="70" cy="70" r="55" fill="none" stroke="var(--border-color)" stroke-width="8"></circle>
                         <!-- Progress bar -->
-                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="238.4468824074653" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
+                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="317.9291765432871" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
                     </svg>
                     
                     <!-- Internal Content -->
                     <div style="position:absolute; text-align:center; transform: rotate(0deg); display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%;">
                         <div style="font-size:4.5rem; font-weight:900; color:#f87171; line-height:1; letter-spacing:-2px; font-family:'Inter', sans-serif;">
-                            31<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
+                            8<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
                         </div>
                         <div style="font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; margin-top:8px; line-height:1.2;">
                             RÉUSSITE<br>GLOBALE
@@ -1811,7 +1840,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="background:rgba(74, 222, 128, 0.03); border:1px solid rgba(74, 222, 128, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Maîtrisées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(100%)</div>
                 </div>
@@ -1831,7 +1860,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.65rem; opacity:0.4;">(50-74%)</div>
                 </div>
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
@@ -1900,7 +1929,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">⚙️</span>
                         <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            25%
+                            10%
                         </div>
                     </div>
 
@@ -1909,7 +1938,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:25%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
+                        <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -1926,8 +1955,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <!-- Top row: emoji (left) + badge % (right) — never overlaps -->
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">🌦️</span>
-                        <div style="background:rgba(74,222,128,0.15); color:#4ade80; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            100%
+                        <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
+                            20%
                         </div>
                     </div>
 
@@ -1936,7 +1965,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:100%; background:#4ade80; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #4ade80;"></div>
+                        <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -2154,6 +2183,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "GOOD": "
             
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
+            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -2161,13 +2197,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <!-- Background track -->
                         <circle cx="70" cy="70" r="55" fill="none" stroke="var(--border-color)" stroke-width="8"></circle>
                         <!-- Progress bar -->
-                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="238.4468824074653" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
+                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="317.9291765432871" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
                     </svg>
                     
                     <!-- Internal Content -->
                     <div style="position:absolute; text-align:center; transform: rotate(0deg); display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%;">
                         <div style="font-size:4.5rem; font-weight:900; color:#f87171; line-height:1; letter-spacing:-2px; font-family:'Inter', sans-serif;">
-                            31<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
+                            8<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
                         </div>
                         <div style="font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; margin-top:8px; line-height:1.2;">
                             RÉUSSITE<br>GLOBALE
@@ -2188,7 +2224,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="background:rgba(74, 222, 128, 0.03); border:1px solid rgba(74, 222, 128, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Maîtrisées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(100%)</div>
                 </div>
@@ -2208,7 +2244,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.65rem; opacity:0.4;">(50-74%)</div>
                 </div>
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
@@ -2277,7 +2313,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">⚙️</span>
                         <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            25%
+                            10%
                         </div>
                     </div>
 
@@ -2286,7 +2322,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:25%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
+                        <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -2303,8 +2339,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <!-- Top row: emoji (left) + badge % (right) — never overlaps -->
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">🌦️</span>
-                        <div style="background:rgba(74,222,128,0.15); color:#4ade80; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            100%
+                        <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
+                            20%
                         </div>
                     </div>
 
@@ -2313,7 +2349,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:100%; background:#4ade80; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #4ade80;"></div>
+                        <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -2494,6 +2530,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "NOT_ATTEMPTED": "
             
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
+            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -2501,13 +2544,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <!-- Background track -->
                         <circle cx="70" cy="70" r="55" fill="none" stroke="var(--border-color)" stroke-width="8"></circle>
                         <!-- Progress bar -->
-                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="238.4468824074653" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
+                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="317.9291765432871" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
                     </svg>
                     
                     <!-- Internal Content -->
                     <div style="position:absolute; text-align:center; transform: rotate(0deg); display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%;">
                         <div style="font-size:4.5rem; font-weight:900; color:#f87171; line-height:1; letter-spacing:-2px; font-family:'Inter', sans-serif;">
-                            31<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
+                            8<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
                         </div>
                         <div style="font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; margin-top:8px; line-height:1.2;">
                             RÉUSSITE<br>GLOBALE
@@ -2528,7 +2571,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="background:rgba(74, 222, 128, 0.03); border:1px solid rgba(74, 222, 128, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Maîtrisées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(100%)</div>
                 </div>
@@ -2548,7 +2591,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.65rem; opacity:0.4;">(50-74%)</div>
                 </div>
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
@@ -2617,7 +2660,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">⚙️</span>
                         <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            25%
+                            10%
                         </div>
                     </div>
 
@@ -2626,7 +2669,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:25%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
+                        <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -2643,8 +2686,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <!-- Top row: emoji (left) + badge % (right) — never overlaps -->
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">🌦️</span>
-                        <div style="background:rgba(74,222,128,0.15); color:#4ade80; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            100%
+                        <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
+                            20%
                         </div>
                     </div>
 
@@ -2653,7 +2696,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:100%; background:#4ade80; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #4ade80;"></div>
+                        <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -2876,6 +2919,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "PERFECT": "
             
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
+            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -2883,13 +2933,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <!-- Background track -->
                         <circle cx="70" cy="70" r="55" fill="none" stroke="var(--border-color)" stroke-width="8"></circle>
                         <!-- Progress bar -->
-                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="238.4468824074653" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
+                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="317.9291765432871" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
                     </svg>
                     
                     <!-- Internal Content -->
                     <div style="position:absolute; text-align:center; transform: rotate(0deg); display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%;">
                         <div style="font-size:4.5rem; font-weight:900; color:#f87171; line-height:1; letter-spacing:-2px; font-family:'Inter', sans-serif;">
-                            31<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
+                            8<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
                         </div>
                         <div style="font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; margin-top:8px; line-height:1.2;">
                             RÉUSSITE<br>GLOBALE
@@ -2910,7 +2960,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="background:rgba(74, 222, 128, 0.15); border:1px solid rgba(74, 222, 128, 0.6); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; box-shadow: 0 0 20px rgba(74, 222, 128, 0.2);">
-                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Maîtrisées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(100%)</div>
                 </div>
@@ -2930,7 +2980,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.65rem; opacity:0.4;">(50-74%)</div>
                 </div>
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
@@ -2999,7 +3049,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">⚙️</span>
                         <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            25%
+                            10%
                         </div>
                     </div>
 
@@ -3008,7 +3058,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:25%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
+                        <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -3025,8 +3075,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <!-- Top row: emoji (left) + badge % (right) — never overlaps -->
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">🌦️</span>
-                        <div style="background:rgba(74,222,128,0.15); color:#4ade80; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            100%
+                        <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
+                            20%
                         </div>
                     </div>
 
@@ -3035,7 +3085,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:100%; background:#4ade80; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #4ade80;"></div>
+                        <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -3181,7 +3231,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
-                        <span style="font-weight:700; color:var(--text-main);">1</span> questions 
+                        <span style="font-weight:700; color:var(--text-main);">0</span> questions 
                         <span style="opacity:0.6;">(Questions Maîtrisées (100%))</span>
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
@@ -3198,49 +3248,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
-            
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="100" data-total="2" data-streak="3" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
-                        <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
-                            <div style="flex:1;">
-                                <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-                                    <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#A1V</span>
-                                    <button data-action="openUrl" data-url="courses/5b7d1610914c.pdf#page=3" style="background:var(--accent-orange); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>
-                                    <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Météo</span>
-                                    <span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 3</span>
-                                    <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-A1V"></i>
-                                </div>
-                                <div style="font-size:0.9rem; line-height:1.4;">Qu’est-ce qu’un front ?</div>
-                                <div style="font-size:0.75rem; opacity:0.6; margin-top:4px;">
-                                    2/2 corrects • 2 tentatives • Série en cours : 3
-                                </div>
-                                <div class="question-answers" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">
-                            <div style="padding:8px 12px; margin-bottom:6px; border-radius:6px; background:rgba(74, 222, 128, 0.1); border-left:3px solid #4ade80; display:flex; align-items:center; gap:8px; font-size:0.85rem;">
-                                <i class="ri-checkbox-circle-fill" style="color:#4ade80;"></i>
-                                <span style="flex:1;">A1V bonne</span>
-                            </div>
-                        
-                            <div style="padding:8px 12px; margin-bottom:6px; border-radius:6px; background:rgba(255,255,255,0.02); display:flex; align-items:center; gap:8px; font-size:0.85rem;">
-                                
-                                <span style="flex:1;">A1V fausse</span>
-                            </div>
-                        
-                            <div style="padding:8px 12px; margin-bottom:6px; border-radius:6px; background:rgba(255,255,255,0.02); display:flex; align-items:center; gap:8px; font-size:0.85rem;">
-                                
-                                <span style="flex:1;">A1V neutre</span>
-                            </div>
-                        
-                                <div style="margin-top:12px; padding:12px; background:rgba(251, 146, 60, 0.15); border-left:3px solid #fb923c; font-size:0.9rem; color:var(--text-main); border-radius:8px;">
-                                    <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">Explication</div>
-                                    Un front sépare deux masses d’air.
-                                </div>
-                            </div>
-                            </div>
-                            <div style="text-align:right; min-width:60px;">
-                                <div style="font-size:1.3rem; font-weight:700; color:#4ade80;">100%</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            </div>
                 </div>
             </div>
 
@@ -3258,6 +3266,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "POOR": "
             
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
+            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -3265,13 +3280,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <!-- Background track -->
                         <circle cx="70" cy="70" r="55" fill="none" stroke="var(--border-color)" stroke-width="8"></circle>
                         <!-- Progress bar -->
-                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="238.4468824074653" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
+                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="317.9291765432871" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
                     </svg>
                     
                     <!-- Internal Content -->
                     <div style="position:absolute; text-align:center; transform: rotate(0deg); display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%;">
                         <div style="font-size:4.5rem; font-weight:900; color:#f87171; line-height:1; letter-spacing:-2px; font-family:'Inter', sans-serif;">
-                            31<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
+                            8<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
                         </div>
                         <div style="font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; margin-top:8px; line-height:1.2;">
                             RÉUSSITE<br>GLOBALE
@@ -3292,7 +3307,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="background:rgba(74, 222, 128, 0.03); border:1px solid rgba(74, 222, 128, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Maîtrisées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(100%)</div>
                 </div>
@@ -3312,7 +3327,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.65rem; opacity:0.4;">(50-74%)</div>
                 </div>
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.15); border:1px solid rgba(251, 146, 60, 0.6); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; box-shadow: 0 0 20px rgba(251, 146, 60, 0.2);">
-                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
@@ -3381,7 +3396,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">⚙️</span>
                         <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            25%
+                            10%
                         </div>
                     </div>
 
@@ -3390,7 +3405,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:25%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
+                        <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -3407,8 +3422,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <!-- Top row: emoji (left) + badge % (right) — never overlaps -->
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">🌦️</span>
-                        <div style="background:rgba(74,222,128,0.15); color:#4ade80; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            100%
+                        <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
+                            20%
                         </div>
                     </div>
 
@@ -3417,7 +3432,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:100%; background:#4ade80; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #4ade80;"></div>
+                        <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -3563,7 +3578,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
-                        <span style="font-weight:700; color:var(--text-main);">1</span> questions 
+                        <span style="font-weight:700; color:var(--text-main);">2</span> questions 
                         <span style="opacity:0.6;">(Questions À travailler (1-49%))</span>
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
@@ -3581,7 +3596,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="25" data-total="4" data-streak="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="10" data-total="4" data-streak="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -3618,7 +3633,49 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                             </div>
                             </div>
                             <div style="text-align:right; min-width:60px;">
-                                <div style="font-size:1.3rem; font-weight:700; color:#f87171;">25%</div>
+                                <div style="font-size:1.3rem; font-weight:700; color:#f87171;">10%</div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
+                        <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
+                            <div style="flex:1;">
+                                <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+                                    <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#A1V</span>
+                                    <button data-action="openUrl" data-url="courses/5b7d1610914c.pdf#page=3" style="background:var(--accent-orange); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>
+                                    <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Météo</span>
+                                    <span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 3</span>
+                                    <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-A1V"></i>
+                                </div>
+                                <div style="font-size:0.9rem; line-height:1.4;">Qu’est-ce qu’un front ?</div>
+                                <div style="font-size:0.75rem; opacity:0.6; margin-top:4px;">
+                                    2/2 corrects • 2 tentatives • Série en cours : 3
+                                </div>
+                                <div class="question-answers" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">
+                            <div style="padding:8px 12px; margin-bottom:6px; border-radius:6px; background:rgba(74, 222, 128, 0.1); border-left:3px solid #4ade80; display:flex; align-items:center; gap:8px; font-size:0.85rem;">
+                                <i class="ri-checkbox-circle-fill" style="color:#4ade80;"></i>
+                                <span style="flex:1;">A1V bonne</span>
+                            </div>
+                        
+                            <div style="padding:8px 12px; margin-bottom:6px; border-radius:6px; background:rgba(255,255,255,0.02); display:flex; align-items:center; gap:8px; font-size:0.85rem;">
+                                
+                                <span style="flex:1;">A1V fausse</span>
+                            </div>
+                        
+                            <div style="padding:8px 12px; margin-bottom:6px; border-radius:6px; background:rgba(255,255,255,0.02); display:flex; align-items:center; gap:8px; font-size:0.85rem;">
+                                
+                                <span style="flex:1;">A1V neutre</span>
+                            </div>
+                        
+                                <div style="margin-top:12px; padding:12px; background:rgba(251, 146, 60, 0.15); border-left:3px solid #fb923c; font-size:0.9rem; color:var(--text-main); border-radius:8px;">
+                                    <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">Explication</div>
+                                    Un front sépare deux masses d’air.
+                                </div>
+                            </div>
+                            </div>
+                            <div style="text-align:right; min-width:60px;">
+                                <div style="font-size:1.3rem; font-weight:700; color:#f87171;">20%</div>
                             </div>
                         </div>
                     </div>
@@ -3640,6 +3697,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "VERY_GOOD": "
             
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
+            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -3647,13 +3711,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <!-- Background track -->
                         <circle cx="70" cy="70" r="55" fill="none" stroke="var(--border-color)" stroke-width="8"></circle>
                         <!-- Progress bar -->
-                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="238.4468824074653" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
+                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="317.9291765432871" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
                     </svg>
                     
                     <!-- Internal Content -->
                     <div style="position:absolute; text-align:center; transform: rotate(0deg); display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%;">
                         <div style="font-size:4.5rem; font-weight:900; color:#f87171; line-height:1; letter-spacing:-2px; font-family:'Inter', sans-serif;">
-                            31<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
+                            8<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
                         </div>
                         <div style="font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; margin-top:8px; line-height:1.2;">
                             RÉUSSITE<br>GLOBALE
@@ -3674,7 +3738,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="background:rgba(74, 222, 128, 0.03); border:1px solid rgba(74, 222, 128, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Maîtrisées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(100%)</div>
                 </div>
@@ -3694,7 +3758,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.65rem; opacity:0.4;">(50-74%)</div>
                 </div>
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
@@ -3763,7 +3827,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">⚙️</span>
                         <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            25%
+                            10%
                         </div>
                     </div>
 
@@ -3772,7 +3836,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:25%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
+                        <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -3789,8 +3853,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <!-- Top row: emoji (left) + badge % (right) — never overlaps -->
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">🌦️</span>
-                        <div style="background:rgba(74,222,128,0.15); color:#4ade80; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            100%
+                        <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
+                            20%
                         </div>
                     </div>
 
@@ -3799,7 +3863,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:100%; background:#4ade80; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #4ade80;"></div>
+                        <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -3980,6 +4044,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "theme": "
             
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
+            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -3987,13 +4058,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <!-- Background track -->
                         <circle cx="70" cy="70" r="55" fill="none" stroke="var(--border-color)" stroke-width="8"></circle>
                         <!-- Progress bar -->
-                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="238.4468824074653" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
+                        <circle cx="70" cy="70" r="55" fill="none" stroke="#f87171" stroke-width="8" stroke-dasharray="345.57519189487726" stroke-dashoffset="317.9291765432871" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 12px #f87171);"></circle>
                     </svg>
                     
                     <!-- Internal Content -->
                     <div style="position:absolute; text-align:center; transform: rotate(0deg); display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%;">
                         <div style="font-size:4.5rem; font-weight:900; color:#f87171; line-height:1; letter-spacing:-2px; font-family:'Inter', sans-serif;">
-                            31<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
+                            8<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
                         </div>
                         <div style="font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; margin-top:8px; line-height:1.2;">
                             RÉUSSITE<br>GLOBALE
@@ -4014,7 +4085,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="background:rgba(74, 222, 128, 0.03); border:1px solid rgba(74, 222, 128, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Maîtrisées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(100%)</div>
                 </div>
@@ -4034,7 +4105,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="font-size:0.65rem; opacity:0.4;">(50-74%)</div>
                 </div>
                 <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">1</div>
+                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
@@ -4130,7 +4201,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">⚙️</span>
                         <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            25%
+                            10%
                         </div>
                     </div>
 
@@ -4139,7 +4210,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:25%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
+                        <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -4149,15 +4220,15 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Météo']" style="cursor:pointer; padding:16px 18px; border-radius:16px; border:2px solid #4ade80; box-shadow:0 0 20px -4px rgba(74,222,128,0.4); background:rgba(74,222,128,0.08); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Météo']" style="cursor:pointer; padding:16px 18px; border-radius:16px; border:2px solid #f87171; box-shadow:0 0 20px -4px rgba(248,113,113,0.4); background:rgba(248,113,113,0.08); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden;">
                     <!-- Subtle background glow for active -->
-                    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at top left, rgba(74,222,128,0.08) 0%, transparent 70%);pointer-events:none;"></div>
+                    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at top left, rgba(248,113,113,0.08) 0%, transparent 70%);pointer-events:none;"></div>
 
                     <!-- Top row: emoji (left) + badge % (right) — never overlaps -->
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:1.4rem; line-height:1;">🌦️</span>
-                        <div style="background:rgba(74,222,128,0.15); color:#4ade80; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            100%
+                        <div style="background:rgba(248,113,113,0.15); color:#f87171; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
+                            20%
                         </div>
                     </div>
 
@@ -4166,7 +4237,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
-                        <div style="height:100%; width:100%; background:#4ade80; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #4ade80;"></div>
+                        <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
                     <!-- Footer: question count -->
@@ -4303,7 +4374,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="100" data-total="2" data-streak="3" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -4340,7 +4411,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                             </div>
                             </div>
                             <div style="text-align:right; min-width:60px;">
-                                <div style="font-size:1.3rem; font-weight:700; color:#4ade80;">100%</div>
+                                <div style="font-size:1.3rem; font-weight:700; color:#f87171;">20%</div>
                             </div>
                         </div>
                     </div>

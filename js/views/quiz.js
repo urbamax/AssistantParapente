@@ -1,15 +1,18 @@
 import GlobalState from '../core/app_state.js';
 import AppRouter from '../core/router.js';
 import QuizService from '../services/quiz_service.js';
+import BrevetService from '../services/brevet_service.js';
 import { escapeHTML } from '../core/security.js';
 import { formatDateOnly } from '../utils/date_utils.js';
 import AppEvents from '../core/events.js';
 import VoiceService from '../services/voice_service.js';
 
 import { optionLetter } from '../services/quiz_voice.js';
+import { pickWorkshopQuestions } from '../services/revision_axes.js';
 import { tq, tql } from './quiz_strings.js';
 import { courseLinksHtml } from './quiz_course_links.js';
 import { explanationHtml } from './quiz_explanation.js';
+import { buildOfficialTheoryBannerHtml } from './quiz_stats_html.js';
 import { QuizVoiceBase } from './quiz_voice_ui.js';
 
 /**
@@ -87,6 +90,8 @@ class QuizViewClass extends QuizVoiceBase {
                     const mode = GlobalState.get('mode');
                     if (mode === 'STATS') {
                         this.renderStats();
+                    } else if (mode === 'REVISION_AXES') {
+                        this.renderRevisionAxes();
                     } else if (mode === 'QCM_BANK') {
                         this.showBankScreen();
                     }
@@ -99,6 +104,8 @@ class QuizViewClass extends QuizVoiceBase {
             const mode = GlobalState.get('mode');
             if (mode === 'STATS') {
                 this.showStatsScreen();
+            } else if (mode === 'REVISION_AXES') {
+                this.showRevisionAxesScreen();
             } else if (mode === 'QCM_BANK') {
                 this.showBankScreen();
             } else {
@@ -121,6 +128,7 @@ class QuizViewClass extends QuizVoiceBase {
 
             // Subscribe to level changes to re-render dynamic content (QCM Bank, Stats)
             this._unsubscribeLevel = GlobalState.subscribe('level', () => {
+                this.syncOfficialTheoryForLevel();
                 this.refreshMasterySlider();
 
                 const bankScreen = document.getElementById('qcm-bank-screen');
@@ -132,7 +140,21 @@ class QuizViewClass extends QuizVoiceBase {
                 if (statsScreen && statsScreen.classList.contains('active')) {
                     this.renderStats();
                 }
+
+                const axesScreen = document.getElementById('revision-axes-screen');
+                if (axesScreen && axesScreen.classList.contains('active')) {
+                    this.renderRevisionAxes();
+                }
             });
+
+            this._onBrevetsUpdated = () => {
+                this.syncOfficialTheoryForLevel();
+                const statsScreen = document.getElementById('stats-screen');
+                if (statsScreen && statsScreen.classList.contains('active')) {
+                    this.renderStats();
+                }
+            };
+            window.addEventListener('brevets:updated', this._onBrevetsUpdated);
         } catch (e) {
             console.error('QuizView: Error in mount', e);
             this.renderErrorState(tql('dialogs.loadFailed', { error: e.message || tql('dialogs.unknownError') }));
@@ -148,6 +170,10 @@ class QuizViewClass extends QuizVoiceBase {
             this._unsubscribeLevel();
             this._unsubscribeLevel = null;
         }
+        if (this._onBrevetsUpdated) {
+            window.removeEventListener('brevets:updated', this._onBrevetsUpdated);
+            this._onBrevetsUpdated = null;
+        }
 
         const themeSelect = document.getElementById('qcm-theme-select');
         if (themeSelect && this._handleChange) themeSelect.removeEventListener('change', this._handleChange);
@@ -159,7 +185,7 @@ class QuizViewClass extends QuizVoiceBase {
         if (bankSearch && this._handleChange) bankSearch.removeEventListener('input', this._handleChange);
 
         // Cache les écrans
-        const screens = ['qcm-setup-screen', 'qcm-screen', 'stats-screen', 'qcm-bank-screen'];
+        const screens = ['qcm-setup-screen', 'qcm-screen', 'stats-screen', 'revision-axes-screen', 'qcm-bank-screen'];
         screens.forEach((id) => {
             const el = document.getElementById(id);
             if (el) el.classList.remove('active');
@@ -194,6 +220,23 @@ class QuizViewClass extends QuizVoiceBase {
         // setQcmMode, setQcmCount, setMasteryTarget and goBack are registered in js/core/main.js:
         // handling them here too would run them twice per click (spec 018).
         switch (action) {
+            case 'QuizshowRevisionAxes':
+                this._activeWorkshopAxisId = null;
+                if (AppRouter.routes && AppRouter.routes.has('REVISION_AXES')) {
+                    AppRouter.navigate('REVISION_AXES');
+                } else {
+                    this.showRevisionAxesScreen();
+                }
+                break;
+            case 'QuizsetAxesFilter':
+                this.setAxesFilter(args[0]);
+                break;
+            case 'QuiztoggleAxisTakeaways':
+                this.toggleAxisTakeaways(args[0]);
+                break;
+            case 'QuizstartAxisWorkshop':
+                this.startAxisWorkshop(args[0]);
+                break;
             case 'QuizsetThemeSort':
                 this.setThemeSort(args[0]);
                 break;
@@ -542,11 +585,45 @@ class QuizViewClass extends QuizVoiceBase {
     showSetupScreen() {
         document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
         document.getElementById('qcm-setup-screen').classList.add('active');
+        this.syncOfficialTheoryForLevel();
         this.refreshMasterySlider();
+    }
+
+    syncOfficialTheoryForLevel() {
+        const level = (typeof GlobalState !== 'undefined' && GlobalState.get('level')) || 'BI';
+        const isValidated = BrevetService.isTheoryValidated(level);
+        if (
+            isValidated &&
+            (QuizService.state.qcmConfig.mode === 'TRAINING' || QuizService.state.qcmConfig.mode === 'EXAM')
+        ) {
+            QuizService.setMode('REVISION');
+            this.updateModeUI('REVISION');
+        }
+        this.renderOfficialTheoryBanner(level);
+    }
+
+    renderOfficialTheoryBanner(levelArg) {
+        const setupScreen = document.getElementById('qcm-setup-screen');
+        if (!setupScreen) return;
+        const level = levelArg || (typeof GlobalState !== 'undefined' && GlobalState.get('level')) || 'BI';
+        let slot = document.getElementById('qcm-brevet-banner-slot');
+        if (!slot) {
+            const grid = setupScreen.querySelector('.setup-grid');
+            if (!grid || !grid.parentNode) return;
+            slot = document.createElement('div');
+            slot.id = 'qcm-brevet-banner-slot';
+            grid.parentNode.insertBefore(slot, grid);
+        }
+        slot.innerHTML = buildOfficialTheoryBannerHtml(
+            level,
+            BrevetService.getBrevet(level),
+            'data-quiz-brevet-banner',
+        );
     }
 
     startSession() {
         try {
+            this._activeWorkshopAxisId = null;
             const level = typeof GlobalState !== 'undefined' ? GlobalState.get('level') : 'BI';
             const firstQuestion = QuizService.startSession(level);
 
@@ -557,6 +634,34 @@ class QuizViewClass extends QuizVoiceBase {
         } catch (e) {
             alert(e.message);
         }
+    }
+
+    startAxisWorkshop(axisId) {
+        if (!axisId) return;
+        const level = (typeof GlobalState !== 'undefined' && GlobalState.get('level')) || 'BI';
+        const stats = QuizService.getPersistentStats();
+        const picked = pickWorkshopQuestions(QuizService.getQuestions(), stats, {
+            axisId,
+            level,
+            targetCount: 6,
+        });
+        if (!picked.length) return;
+
+        const sessionQuestions = QuizService.shuffle(picked).map((q) => QuizService.shuffleQuestionChoices(q));
+        this._activeWorkshopAxisId = axisId;
+        QuizService._masteryPool = null;
+        QuizService.state.qcmConfig.mode = 'TRAINING';
+        QuizService.state.qcmIndex = 0;
+        QuizService.state.qcmSessionData = sessionQuestions;
+        QuizService.state.currentQcmSelection = new Set();
+        QuizService.state.examResults = [];
+        QuizService.state.invalidated = false;
+
+        document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
+        const qcmScreen = document.getElementById('qcm-screen');
+        if (qcmScreen) qcmScreen.classList.add('active');
+
+        this.renderQuestion(sessionQuestions[0]);
     }
 
     renderQuestion(q) {
@@ -590,10 +695,16 @@ class QuizViewClass extends QuizVoiceBase {
 
         const modeLabelEl = document.getElementById('qcm-mode-label');
         if (modeLabelEl) {
-            const mode = QuizService.state.qcmConfig.mode;
-            modeLabelEl.innerText = tql(
-                `modes.labels.${['EXAM', 'REVISION', 'MASTERY'].includes(mode) ? mode : 'TRAINING'}`,
-            );
+            if (this._activeWorkshopAxisId) {
+                modeLabelEl.innerText = tql('modes.labels.AXIS_WORKSHOP', {
+                    title: tql(`axes.catalog.${this._activeWorkshopAxisId}.title`),
+                });
+            } else {
+                const mode = QuizService.state.qcmConfig.mode;
+                modeLabelEl.innerText = tql(
+                    `modes.labels.${['EXAM', 'REVISION', 'MASTERY'].includes(mode) ? mode : 'TRAINING'}`,
+                );
+            }
         }
 
         this.refreshMasteryProgress();
@@ -789,9 +900,11 @@ class QuizViewClass extends QuizVoiceBase {
     renderExamResults() {
         const isExam = QuizService.state.qcmConfig.mode === 'EXAM';
         const sessionMode = QuizService.state.qcmConfig.mode;
-        const modeTitle = tql(
-            `modes.labels.${['EXAM', 'REVISION', 'MASTERY'].includes(sessionMode) ? sessionMode : 'TRAINING'}`,
-        );
+        const modeTitle = this._activeWorkshopAxisId
+            ? tql('modes.labels.AXIS_WORKSHOP', {
+                  title: tql(`axes.catalog.${this._activeWorkshopAxisId}.title`),
+              })
+            : tql(`modes.labels.${['EXAM', 'REVISION', 'MASTERY'].includes(sessionMode) ? sessionMode : 'TRAINING'}`);
 
         if (isExam) {
             const level = typeof GlobalState !== 'undefined' ? GlobalState.get('level') : 'BI';
@@ -909,7 +1022,11 @@ class QuizViewClass extends QuizVoiceBase {
         `;
 
         choicesDiv.innerHTML = '';
-        actionsDiv.innerHTML = `<button class="next-btn" data-action="finish-session" style="width:100%;">${tq('results.finish')}</button>`;
+        if (this._activeWorkshopAxisId) {
+            actionsDiv.innerHTML = `<button class="next-btn" data-action="QuizshowRevisionAxes" style="width:100%;"><i class="ri-compass-3-line"></i> ${tq('axes.backToAxesBtn')}</button>`;
+        } else {
+            actionsDiv.innerHTML = `<button class="next-btn" data-action="finish-session" style="width:100%;">${tq('results.finish')}</button>`;
+        }
     }
 
     // --- STATISTICS MANAGEMENT ---

@@ -1,6 +1,8 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { readFileSync } from 'node:fs';
 import SitesView from '../../js/views/sites.js';
+import BrevetService from '../../js/services/brevet_service.js';
+import GlobalState from '../../js/core/app_state.js';
 
 // Spec 003 : les fiches abîmées s'affichent en entier, avec leurs liens sûrs.
 const SITES = JSON.parse(readFileSync('js/data/sites_data.json', 'utf8')); // racine du projet
@@ -51,5 +53,21 @@ describe('site details in the card (spec 003, US1)', () => {
         expect(cardText(site).querySelector('.ffvl-btn')?.getAttribute('href')).toBe(
             'https://federation.ffvl.fr/terrain/602',
         );
+    });
+
+    it('uses the highest validated practical brevet in Pre-Flight Brief even when QCM level has advanced to BP (spec 042)', () => {
+        localStorage.clear();
+        GlobalState.init();
+        BrevetService.saveBrevet('BI', {
+            theory: { passed: true, date: '2026-10-15', score: 28, total: 30 },
+            practical: { validated: true, date: '2026-10-26' },
+        });
+        // QCM level advanced to BP, but practical pilot level is BI
+        expect(GlobalState.get('level')).toBe('BP');
+
+        const briefHtml = SitesView.buildPreFlightBriefHtml();
+        expect(briefHtml).toContain('Brevet Initial');
+        expect(briefHtml).not.toContain('Brevet Pilote');
+        localStorage.clear();
     });
 });

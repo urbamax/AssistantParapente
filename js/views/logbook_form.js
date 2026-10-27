@@ -62,6 +62,8 @@ export class LogbookFormBase extends LogbookIgcImportBase {
         const commentaire = /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire'))?.value || '';
         const ecoleChecked = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole-check'))?.checked;
         const ecole = /** @type {HTMLInputElement} */ (document.getElementById('lb-ecole'))?.value || '';
+        const brevetPrepare =
+            /** @type {HTMLSelectElement} */ (document.getElementById('lb-brevet-prepare'))?.value || '';
         const moniteurs = this.getChecklistValues('moniteur');
         const accompagnateurs = this.getChecklistValues('accompagnateur');
         const pilotes = this.getChecklistValues('pilotes');
@@ -128,6 +130,10 @@ export class LogbookFormBase extends LogbookIgcImportBase {
             if (el) el.value = commentaire;
         }
         if (ecoleChecked) this.setSchoolField(true, ecole);
+        if (brevetPrepare) {
+            const el = /** @type {HTMLSelectElement} */ (document.getElementById('lb-brevet-prepare'));
+            if (el) el.value = brevetPrepare;
+        }
         this.setChecklistValues('moniteur', moniteurs);
         this.setChecklistValues('accompagnateur', accompagnateurs);
         this.setChecklistValues('pilotes', pilotes);
@@ -616,6 +622,8 @@ export class LogbookFormBase extends LogbookIgcImportBase {
         const isStage = ecoleCheck?.checked && stageCheck?.checked;
         const stageName = isStage && stageNameInput ? stageNameInput.value.trim() : '';
         const stageSpecialty = isStage && stageSpecialtySelect ? stageSpecialtySelect.value : '';
+        const brevetSelect = /** @type {HTMLSelectElement} */ (document.getElementById('lb-brevet-prepare'));
+        const brevetPrepare = ecole && brevetSelect ? brevetSelect.value : '';
 
         const editId = document.getElementById('lb-id-edit')
             ? /** @type {HTMLInputElement} */ (document.getElementById('lb-id-edit')).value
@@ -634,6 +642,7 @@ export class LogbookFormBase extends LogbookIgcImportBase {
             duree: duree,
             commentaire: commentaire,
             ecole: ecole,
+            brevetPrepare: brevetPrepare,
             moniteur: ecole ? this.getChecklistValues('moniteur') : [],
             stageName: stageName,
             stageSpecialty: stageSpecialty,
@@ -907,6 +916,9 @@ export class LogbookFormBase extends LogbookIgcImportBase {
         /** @type {HTMLTextAreaElement} */ (document.getElementById('lb-commentaire')).value =
             session.commentaire || '';
         if (session.ecole) this.setSchoolField(true, session.ecole);
+        const brevetSelectEdit = /** @type {HTMLSelectElement} */ (document.getElementById('lb-brevet-prepare'));
+        if (brevetSelectEdit)
+            brevetSelectEdit.value = session.ecole && session.brevetPrepare ? session.brevetPrepare : '';
 
         // Load Stage info
         if (session.stageName || session.stageSpecialty) {
