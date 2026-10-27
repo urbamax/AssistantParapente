@@ -50,6 +50,7 @@ const SCREENS = [
     // quiz.js a été découpé (vue, statistiques, mode vocal) : chaque fichier reste contrôlé.
     ...[
         ['js/views/quiz.js', 25],
+        ['js/views/quiz_axes_html.js', 15],
         ['js/views/quiz_stats.js', 35],
         ['js/views/quiz_stats_html.js', 30],
         ['js/views/quiz_voice_ui.js', 6],

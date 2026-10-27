@@ -41,9 +41,9 @@ describe('chargement à la demande des écrans', () => {
         expect(beforeCall).not.toMatch(/const files = \/\*\* @type \{HTMLInputElement\} \*\/ \(e\.target\)\.files;/);
     });
 
-    it('les routes enregistrent des écrans à la demande, partagés pour QCM, QCM_BANK et STATS', () => {
+    it('les routes enregistrent des écrans à la demande, partagés pour QCM, QCM_BANK, REVISION_AXES et STATS', () => {
         const main = read('js/core/main.js');
-        for (const mode of ['QCM', 'QCM_BANK', 'STATS']) {
+        for (const mode of ['QCM', 'QCM_BANK', 'REVISION_AXES', 'STATS']) {
             expect(main).toContain(`AppRouter.register('${mode}', quizModule)`);
         }
         for (const [mode, module] of [
