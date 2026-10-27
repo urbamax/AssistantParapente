@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import LogbookService from '../../js/services/logbook_service.js';
 import SitesService from '../../js/services/sites_service.js';
+import BrevetService from '../../js/services/brevet_service.js';
 import LogbookView from '../../js/views/logbook.js';
 import { suggestDefaults, findNearbySession } from '../../js/services/logbook_defaults.js';
 
@@ -192,6 +193,46 @@ describe('suggestDefaults', () => {
         expect(Object.values(values).every((v) => v === undefined)).toBe(true);
         expect(stage).toBe(false);
     });
+
+    it('learns brevetPrepare from school or course sessions and advances BI -> BP after BI validation date (spec 042)', () => {
+        const sessions = [
+            school('PLAINE', { datetime: '2026-10-20T10:00', brevetPrepare: 'BI' }),
+            school('PLAINE', { datetime: '2026-10-19T10:00', brevetPrepare: 'BI' }),
+        ];
+
+        // Before BI is validated: suggests BI from school habit
+        const before = suggestDefaults(sessions, {
+            place: 'Plaine',
+            datetime: '2026-10-25T10:00',
+            options: OPTIONS,
+        });
+        expect(before.values.brevetPrepare).toBe('BI');
+        expect(before.reasons.brevetPrepare).toBe('instructorPlace');
+
+        // Validate BI on 2026-10-26
+        BrevetService.saveBrevet('BI', {
+            theory: { passed: true, date: '2026-10-15' },
+            practical: { validated: true, date: '2026-10-26' },
+        });
+
+        // Session on 2026-10-26 (same day as validation) still suggests BI
+        const sameDay = suggestDefaults(sessions, {
+            place: 'Plaine',
+            datetime: '2026-10-26T16:00',
+            options: OPTIONS,
+        });
+        expect(sameDay.values.brevetPrepare).toBe('BI');
+
+        // Session on 2026-10-27 (after BI validation) automatically advances to BP!
+        const nextDay = suggestDefaults(sessions, {
+            place: 'Plaine',
+            datetime: '2026-10-27T10:00',
+            options: OPTIONS,
+        });
+        expect(nextDay.values.brevetPrepare).toBe('BP');
+        expect(nextDay.reasons.brevetPrepare).toBe('brevetNext');
+        localStorage.clear();
+    });
 });
 
 describe('findNearbySession', () => {
@@ -239,6 +280,7 @@ describe('parity with the session form', () => {
         /** @type {HTMLElement} */ (document.getElementById('lb-stage-group')).hidden = true;
         $('lb-stage-nom').value = '';
         $('lb-stage-specialite').value = '';
+        if ($('lb-brevet-prepare')) $('lb-brevet-prepare').value = '';
         for (const name of ['moniteur', 'accompagnateur', 'pilotes']) LogbookView.setChecklistValues(name, []);
     }
 
@@ -267,6 +309,7 @@ describe('parity with the session form', () => {
             ecole: ticked ? $('lb-ecole').value : '',
             stageName: stageTicked ? $('lb-stage-nom').value : '',
             stageSpecialty: stageTicked ? $('lb-stage-specialite').value : '',
+            brevetPrepare: ticked && $('lb-brevet-prepare') ? $('lb-brevet-prepare').value : '',
             moniteur: LogbookView.getChecklistValues('moniteur'),
             accompagnateur: LogbookView.getChecklistValues('accompagnateur'),
             pilotes: LogbookView.getChecklistValues('pilotes'),
@@ -284,6 +327,7 @@ describe('parity with the session form', () => {
             ecole: values.ecole ?? '',
             stageName: values.stageName ?? '',
             stageSpecialty: values.stageSpecialty ?? '',
+            brevetPrepare: values.brevetPrepare ?? '',
             moniteur: values.moniteur ?? [],
             accompagnateur: values.accompagnateur ?? [],
             pilotes: values.pilotes ?? [],

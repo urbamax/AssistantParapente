@@ -1,6 +1,7 @@
 import GlobalState from '../core/app_state.js';
 import AppRouter from '../core/router.js';
 import QuizService from '../services/quiz_service.js';
+import BrevetService from '../services/brevet_service.js';
 import { escapeHTML } from '../core/security.js';
 import { formatDateOnly } from '../utils/date_utils.js';
 import AppEvents from '../core/events.js';
@@ -10,6 +11,7 @@ import { optionLetter } from '../services/quiz_voice.js';
 import { tq, tql } from './quiz_strings.js';
 import { courseLinksHtml } from './quiz_course_links.js';
 import { explanationHtml } from './quiz_explanation.js';
+import { buildOfficialTheoryBannerHtml } from './quiz_stats_html.js';
 import { QuizVoiceBase } from './quiz_voice_ui.js';
 
 /**
@@ -121,6 +123,7 @@ class QuizViewClass extends QuizVoiceBase {
 
             // Subscribe to level changes to re-render dynamic content (QCM Bank, Stats)
             this._unsubscribeLevel = GlobalState.subscribe('level', () => {
+                this.syncOfficialTheoryForLevel();
                 this.refreshMasterySlider();
 
                 const bankScreen = document.getElementById('qcm-bank-screen');
@@ -133,6 +136,15 @@ class QuizViewClass extends QuizVoiceBase {
                     this.renderStats();
                 }
             });
+
+            this._onBrevetsUpdated = () => {
+                this.syncOfficialTheoryForLevel();
+                const statsScreen = document.getElementById('stats-screen');
+                if (statsScreen && statsScreen.classList.contains('active')) {
+                    this.renderStats();
+                }
+            };
+            window.addEventListener('brevets:updated', this._onBrevetsUpdated);
         } catch (e) {
             console.error('QuizView: Error in mount', e);
             this.renderErrorState(tql('dialogs.loadFailed', { error: e.message || tql('dialogs.unknownError') }));
@@ -147,6 +159,10 @@ class QuizViewClass extends QuizVoiceBase {
         if (this._unsubscribeLevel) {
             this._unsubscribeLevel();
             this._unsubscribeLevel = null;
+        }
+        if (this._onBrevetsUpdated) {
+            window.removeEventListener('brevets:updated', this._onBrevetsUpdated);
+            this._onBrevetsUpdated = null;
         }
 
         const themeSelect = document.getElementById('qcm-theme-select');
@@ -542,7 +558,40 @@ class QuizViewClass extends QuizVoiceBase {
     showSetupScreen() {
         document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
         document.getElementById('qcm-setup-screen').classList.add('active');
+        this.syncOfficialTheoryForLevel();
         this.refreshMasterySlider();
+    }
+
+    syncOfficialTheoryForLevel() {
+        const level = (typeof GlobalState !== 'undefined' && GlobalState.get('level')) || 'BI';
+        const isValidated = BrevetService.isTheoryValidated(level);
+        if (
+            isValidated &&
+            (QuizService.state.qcmConfig.mode === 'TRAINING' || QuizService.state.qcmConfig.mode === 'EXAM')
+        ) {
+            QuizService.setMode('REVISION');
+            this.updateModeUI('REVISION');
+        }
+        this.renderOfficialTheoryBanner(level);
+    }
+
+    renderOfficialTheoryBanner(levelArg) {
+        const setupScreen = document.getElementById('qcm-setup-screen');
+        if (!setupScreen) return;
+        const level = levelArg || (typeof GlobalState !== 'undefined' && GlobalState.get('level')) || 'BI';
+        let slot = document.getElementById('qcm-brevet-banner-slot');
+        if (!slot) {
+            const grid = setupScreen.querySelector('.setup-grid');
+            if (!grid || !grid.parentNode) return;
+            slot = document.createElement('div');
+            slot.id = 'qcm-brevet-banner-slot';
+            grid.parentNode.insertBefore(slot, grid);
+        }
+        slot.innerHTML = buildOfficialTheoryBannerHtml(
+            level,
+            BrevetService.getBrevet(level),
+            'data-quiz-brevet-banner',
+        );
     }
 
     startSession() {

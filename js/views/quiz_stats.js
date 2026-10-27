@@ -4,6 +4,7 @@
  */
 import GlobalState from '../core/app_state.js';
 import QuizService from '../services/quiz_service.js';
+import BrevetService from '../services/brevet_service.js';
 import StorageService from '../services/storage.js';
 import { masteryRatio } from '../services/mastery.js';
 import { escapeHTML } from '../core/security.js';
@@ -13,7 +14,13 @@ import GdprEngine from '../gdpr_engine.js';
 import BaseView from '../core/base_view.js';
 import { tq, tql } from './quiz_strings.js';
 import { explanationHtml } from './quiz_explanation.js';
-import { buildDistributionHtml, buildThemesHtml, buildQuestionsHtml, buildGaugeHtml } from './quiz_stats_html.js';
+import {
+    buildDistributionHtml,
+    buildThemesHtml,
+    buildQuestionsHtml,
+    buildGaugeHtml,
+    buildOfficialTheoryBannerHtml,
+} from './quiz_stats_html.js';
 
 export class QuizStatsBase extends BaseView {
     constructor() {
@@ -262,7 +269,13 @@ export class QuizStatsBase extends BaseView {
             const { themesHtml, sortControlsHtml } = buildThemesHtml(this, levelThemes);
             const allQuestionsHtml = buildQuestionsHtml(this, { levelQs, levelQuestionEntries, stats });
             const successGaugeHtml = buildGaugeHtml({ color, currentLevel, globalPct, stats });
+            const officialTheoryBannerHtml = buildOfficialTheoryBannerHtml(
+                currentLevel,
+                BrevetService.getBrevet(currentLevel),
+                'data-stats-brevet-banner',
+            );
             container.innerHTML = `
+            ${officialTheoryBannerHtml}
             ${successGaugeHtml}
 
             <div style="margin-top:48px;">

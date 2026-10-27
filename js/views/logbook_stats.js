@@ -5,6 +5,12 @@
  * sessions; behaviour is unchanged.
  */
 import LogbookService from '../services/logbook_service.js';
+import BrevetService, {
+    BREVET_CODES,
+    brevetSummary,
+    computeTheoryPercentage,
+    unassignedSchoolSessionsFor,
+} from '../services/brevet_service.js';
 import { escapeHTML } from '../core/security.js';
 import { formatDuration, formatDateOnly } from '../utils/date_utils.js';
 import { toSorted } from '../utils/array_utils.js';
@@ -208,12 +214,367 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
         this.renderHistory();
     }
 
+    renderBrevetsSection(flights) {
+        const brevets = BrevetService.getBrevets();
+        const unassignedCount = unassignedSchoolSessionsFor(BREVET_CODES[0], flights, brevets).length;
+
+        const cardsHtml = BREVET_CODES.map((code) => {
+            const sum = brevetSummary(code, flights, brevets);
+            const { entry } = sum;
+            const pr = entry.practical;
+            const th = entry.theory;
+
+            let statusBadge;
+            if (pr.validated) {
+                const label = pr.date
+                    ? tt('stats.brevets.statusValidatedOn', { date: formatDateOnly(pr.date) })
+                    : tt('stats.brevets.statusValidated');
+                statusBadge = `<span style="background: rgba(16,185,129,0.14); color: #10b981; padding: 3px 8px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><i class="ri-medal-fill"></i> ${label}</span>`;
+            } else if (th.passed || sum.sessions > 0) {
+                statusBadge = `<span style="background: rgba(245,158,11,0.14); color: #f59e0b; padding: 3px 8px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><i class="ri-time-line"></i> ${tt('stats.brevets.statusInProgress')}</span>`;
+            } else {
+                statusBadge = `<span style="background: rgba(148,163,184,0.14); color: var(--text-muted); padding: 3px 8px; border-radius: 999px; font-size: 0.78rem; font-weight: 500;">${tt('stats.brevets.statusNotStarted')}</span>`;
+            }
+
+            let theoryBadge = '';
+            if (th.passed) {
+                const thLabel = th.date
+                    ? tt('stats.brevets.statusTheoryPassedOn', { date: formatDateOnly(th.date) })
+                    : tt('stats.brevets.statusTheoryPassed');
+                const scoreDetail =
+                    th.score !== null && th.total !== null
+                        ? tt('stats.brevets.theoryScoreDetail', {
+                              score: th.score,
+                              total: th.total,
+                              pct: th.percentage ?? 0,
+                          })
+                        : th.percentage !== null
+                          ? tt('stats.brevets.theoryPctOnly', { pct: th.percentage })
+                          : '';
+                theoryBadge = `<div style="margin-top: 6px; font-size: 0.82rem; color: #0ea5e9; font-weight: 600;"><i class="ri-checkbox-circle-line"></i> ${thLabel}${scoreDetail ? ` — ${scoreDetail}` : ''}</div>`;
+            }
+
+            const metaParts = [];
+            const schoolName = pr.school || th.school || sum.schools.join(', ');
+            if (schoolName) metaParts.push(tt('stats.brevets.schoolMeta', { school: schoolName }));
+            const instructorName = pr.instructor || sum.instructors.join(', ');
+            if (instructorName) metaParts.push(tt('stats.brevets.instructorMeta', { instructor: instructorName }));
+            if (th.examiner) metaParts.push(tt('stats.brevets.examinerMeta', { examiner: th.examiner }));
+
+            const sessionsBlock =
+                sum.sessions > 0
+                    ? `
+                    <div class="equip-details" style="margin-top: 8px;">
+                        <span style="color: var(--accent-orange)">${tt('stats.wingFlights', { count: sum.flights, duration: formatDuration(sum.flightMinutes) })}</span>
+                        <span style="color: #f59e0b">${tt('stats.wingGround', { count: sum.groundSessions, duration: formatDuration(sum.groundMinutes) })}</span>
+                    </div>
+                    <button type="button" class="action-btn-secondary" data-action="filterHistoryByStat" data-stat-type="brevet" data-stat-value="${escapeHTML(code)}" style="margin-top: 8px; padding: 4px 10px; font-size: 0.78rem; border-radius: 6px; cursor: pointer;">
+                        <i class="ri-filter-3-line"></i> ${tt('stats.brevets.filterSessions', { count: sum.sessions, code })}
+                    </button>`
+                    : `<div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">${tt('stats.brevets.noSessionsLinked')}</div>`;
+
+            const batchBtn =
+                unassignedCount > 0
+                    ? `<button type="button" class="action-btn-secondary" data-action="openBrevetBatchModal" data-args="${escapeHTML(code)}" style="padding: 5px 10px; font-size: 0.78rem; border-radius: 6px; cursor: pointer;">
+                        <i class="ri-links-line"></i> ${tt('stats.brevets.batchAssignBtn', { count: unassignedCount })}
+                    </button>`
+                    : '';
+
+            const hasConfig = pr.validated || th.passed;
+            return `
+                <div class="equip-card" data-brevet-card="${escapeHTML(code)}" style="display: flex; flex-direction: column; justify-content: space-between; gap: 6px;">
+                    <div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                            <div class="equip-name" style="margin: 0;">${escapeHTML(code)} — ${tt(`stats.brevets.names.${code}`)}</div>
+                            ${statusBadge}
+                        </div>
+                        ${theoryBadge}
+                        ${metaParts.length > 0 ? `<div style="margin-top: 4px; font-size: 0.8rem; color: var(--text-secondary);">${metaParts.join(' · ')}</div>` : ''}
+                        ${pr.notes ? `<div style="margin-top: 4px; font-size: 0.78rem; color: var(--text-muted); font-style: italic;">${escapeHTML(pr.notes)}</div>` : ''}
+                        ${sessionsBlock}
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-light, rgba(0,0,0,0.06));">
+                        <button type="button" class="action-btn-secondary" data-action="openBrevetModal" data-args="${escapeHTML(code)}" style="padding: 5px 10px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; border: 1px solid var(--accent-orange); color: var(--accent-orange); background: transparent; font-weight: 600;">
+                            <i class="ri-award-line"></i> ${tt(hasConfig ? 'stats.brevets.editBtn' : 'stats.brevets.configureBtn')}
+                        </button>
+                        ${batchBtn}
+                    </div>
+                </div>`;
+        }).join('');
+
+        return `
+            <div class="stats-section-box" data-brevets-stats style="margin-bottom: 16px;">
+                <h3 class="stats-section-title"><i class="ri-medal-line" style="color: var(--accent-orange)"></i> ${tt('stats.brevets.title')}</h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 12px;">${tt('stats.brevets.subtitle')}</p>
+                <div class="equip-list">${cardsHtml}</div>
+            </div>`;
+    }
+
+    openBrevetModal(codeArg) {
+        const code = typeof codeArg === 'string' && BREVET_CODES.includes(codeArg) ? codeArg : BREVET_CODES[0];
+        this._editingBrevetCode = code;
+        const entry = BrevetService.getBrevet(code);
+        const pr = entry.practical;
+        const th = entry.theory;
+
+        let modal = document.getElementById('lb-brevet-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'lb-brevet-modal';
+            modal.className = 'gdpr-modal-overlay active';
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+            modal.setAttribute('data-backdrop-action', 'closeBrevetModal');
+            document.body.appendChild(modal);
+        }
+        modal.hidden = false;
+        modal.style.display = 'flex';
+        modal.className = 'gdpr-modal-overlay active';
+
+        modal.innerHTML = `
+            <div class="gdpr-modal" style="max-width: 560px; width: 95%; padding: 20px 22px;">
+                <div class="gdpr-modal-header" style="display: flex; align-items: center; justify-content: space-between;">
+                    <h3 style="margin: 0;"><i class="ri-medal-line" style="color: var(--accent-orange);"></i> ${tt('stats.brevets.modalTitle', { code, name: tl(`stats.brevets.names.${code}`) })}</h3>
+                    <button type="button" class="gdpr-modal-close-btn" data-action="closeBrevetModal">&times;</button>
+                </div>
+                <div class="gdpr-modal-body" style="max-height: 75vh; overflow-y: auto; padding: 14px 16px;">
+                    <input type="hidden" id="lb-brevet-code" value="${escapeHTML(code)}">
+
+                    <div style="padding: 12px; border: 1px solid var(--border-light, #ddd); border-radius: 8px; margin-bottom: 14px;">
+                        <h4 style="margin: 0 0 10px; font-size: 0.95rem;"><i class="ri-book-open-line" style="color: #0ea5e9;"></i> ${tt('stats.brevets.theorySection')}</h4>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; margin-bottom: 10px;">
+                            <input type="checkbox" id="lb-brevet-theory-passed" ${th.passed ? 'checked' : ''}> ${tt('stats.brevets.theoryPassedLabel')}
+                        </label>
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+                            <div class="form-group" style="margin: 0;">
+                                <label for="lb-brevet-theory-date">${tt('stats.brevets.theoryDateLabel')}</label>
+                                <input type="date" id="lb-brevet-theory-date" value="${escapeHTML(th.date)}" style="width: 100%;">
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label for="lb-brevet-theory-school">${tt('stats.brevets.theorySchoolLabel')}</label>
+                                <input type="text" id="lb-brevet-theory-school" value="${escapeHTML(th.school)}" placeholder="${tt('stats.brevets.practicalSchoolPlaceholder')}" style="width: 100%;">
+                            </div>
+                        </div>
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+                            <div class="form-group" style="margin: 0;">
+                                <label for="lb-brevet-theory-score">${tt('stats.brevets.theoryScoreLabel')}</label>
+                                <input type="number" id="lb-brevet-theory-score" min="0" step="1" data-input-action="updateBrevetModalPct" value="${th.score !== null ? escapeHTML(String(th.score)) : ''}" placeholder="${tt('stats.brevets.theoryScorePlaceholder')}" style="width: 100%;">
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label for="lb-brevet-theory-total">${tt('stats.brevets.theoryTotalLabel')}</label>
+                                <input type="number" id="lb-brevet-theory-total" min="1" step="1" data-input-action="updateBrevetModalPct" value="${th.total !== null ? escapeHTML(String(th.total)) : ''}" placeholder="${tt('stats.brevets.theoryTotalPlaceholder')}" style="width: 100%;">
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label for="lb-brevet-theory-pct">${tt('stats.brevets.theoryPctLabel')}</label>
+                                <input type="number" id="lb-brevet-theory-pct" min="0" max="100" step="1" value="${th.percentage !== null ? escapeHTML(String(th.percentage)) : ''}" placeholder="${tt('stats.brevets.theoryPctPlaceholder')}" style="width: 100%;">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin: 0;">
+                            <label for="lb-brevet-theory-examiner">${tt('stats.brevets.theoryExaminerLabel')}</label>
+                            <input type="text" id="lb-brevet-theory-examiner" value="${escapeHTML(th.examiner)}" placeholder="${tt('stats.brevets.theoryExaminerPlaceholder')}" style="width: 100%;">
+                        </div>
+                    </div>
+
+                    <div style="padding: 12px; border: 1px solid var(--border-light, #ddd); border-radius: 8px;">
+                        <h4 style="margin: 0 0 10px; font-size: 0.95rem;"><i class="ri-medal-fill" style="color: #10b981;"></i> ${tt('stats.brevets.practicalSection')}</h4>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; margin-bottom: 10px;">
+                            <input type="checkbox" id="lb-brevet-practical-validated" ${pr.validated ? 'checked' : ''}> ${tt('stats.brevets.practicalValidatedLabel')}
+                        </label>
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+                            <div class="form-group" style="margin: 0;">
+                                <label for="lb-brevet-practical-date">${tt('stats.brevets.practicalDateLabel')}</label>
+                                <input type="date" id="lb-brevet-practical-date" value="${escapeHTML(pr.date)}" style="width: 100%;">
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label for="lb-brevet-practical-school">${tt('stats.brevets.practicalSchoolLabel')}</label>
+                                <input type="text" id="lb-brevet-practical-school" value="${escapeHTML(pr.school)}" placeholder="${tt('stats.brevets.practicalSchoolPlaceholder')}" style="width: 100%;">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 8px;">
+                            <label for="lb-brevet-practical-instructor">${tt('stats.brevets.practicalInstructorLabel')}</label>
+                            <input type="text" id="lb-brevet-practical-instructor" value="${escapeHTML(pr.instructor)}" placeholder="${tt('stats.brevets.practicalInstructorPlaceholder')}" style="width: 100%;">
+                        </div>
+                        <div class="form-group" style="margin: 0;">
+                            <label for="lb-brevet-practical-notes">${tt('stats.brevets.practicalNotesLabel')}</label>
+                            <input type="text" id="lb-brevet-practical-notes" value="${escapeHTML(pr.notes)}" placeholder="${tt('stats.brevets.practicalNotesPlaceholder')}" style="width: 100%;">
+                        </div>
+                    </div>
+                </div>
+                <div class="gdpr-modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 12px 16px;">
+                    <button type="button" class="action-btn-secondary" data-action="closeBrevetModal" style="padding: 8px 14px; border-radius: 6px; cursor: pointer;">${tt('stats.brevets.cancelBtn')}</button>
+                    <button type="button" class="action-btn-primary" data-action="saveBrevetModal" style="padding: 8px 16px; border-radius: 6px; cursor: pointer; background: var(--accent-orange); color: #fff; border: none; font-weight: 600;">${tt('stats.brevets.saveBtn')}</button>
+                </div>
+            </div>`;
+    }
+
+    updateBrevetModalPct() {
+        const scoreEl = /** @type {HTMLInputElement|null} */ (document.getElementById('lb-brevet-theory-score'));
+        const totalEl = /** @type {HTMLInputElement|null} */ (document.getElementById('lb-brevet-theory-total'));
+        const pctEl = /** @type {HTMLInputElement|null} */ (document.getElementById('lb-brevet-theory-pct'));
+        if (!scoreEl || !totalEl || !pctEl) return;
+        const computed = computeTheoryPercentage(scoreEl.value, totalEl.value, null);
+        if (computed !== null) {
+            pctEl.value = String(computed);
+        }
+    }
+
+    closeBrevetModal() {
+        const modal = document.getElementById('lb-brevet-modal');
+        if (!modal) return;
+        modal.hidden = true;
+        modal.style.display = 'none';
+        modal.classList.remove('active');
+    }
+
+    saveBrevetModal() {
+        const codeEl = /** @type {HTMLInputElement|null} */ (document.getElementById('lb-brevet-code'));
+        const code = codeEl?.value || this._editingBrevetCode || BREVET_CODES[0];
+        const val = (id) => /** @type {HTMLInputElement|null} */ (document.getElementById(id))?.value || '';
+        const checked = (id) => Boolean(/** @type {HTMLInputElement|null} */ (document.getElementById(id))?.checked);
+
+        const practicalValidated = checked('lb-brevet-practical-validated');
+        const theoryPassed = checked('lb-brevet-theory-passed') || practicalValidated;
+
+        BrevetService.saveBrevet(code, {
+            theory: {
+                passed: theoryPassed,
+                date: val('lb-brevet-theory-date'),
+                score: val('lb-brevet-theory-score'),
+                total: val('lb-brevet-theory-total'),
+                percentage: val('lb-brevet-theory-pct'),
+                school: val('lb-brevet-theory-school') || val('lb-brevet-practical-school'),
+                examiner: val('lb-brevet-theory-examiner'),
+            },
+            practical: {
+                validated: practicalValidated,
+                date: val('lb-brevet-practical-date'),
+                school: val('lb-brevet-practical-school'),
+                instructor: val('lb-brevet-practical-instructor'),
+                notes: val('lb-brevet-practical-notes'),
+            },
+        });
+
+        this.closeBrevetModal();
+        if (document.getElementById('logbook-stats-container')) {
+            this.renderStats();
+        }
+        if (document.getElementById('logbook-history-list')) {
+            this.renderHistory();
+        }
+    }
+
+    openBrevetBatchModal(codeArg) {
+        const code = typeof codeArg === 'string' && BREVET_CODES.includes(codeArg) ? codeArg : BREVET_CODES[0];
+        this._batchBrevetCode = code;
+        const candidates = unassignedSchoolSessionsFor(code, LogbookService.getFlights(), BrevetService.getBrevets());
+
+        let modal = document.getElementById('lb-brevet-batch-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'lb-brevet-batch-modal';
+            modal.className = 'gdpr-modal-overlay active';
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+            modal.setAttribute('data-backdrop-action', 'closeBrevetBatchModal');
+            document.body.appendChild(modal);
+        }
+        modal.hidden = false;
+        modal.style.display = 'flex';
+        modal.className = 'gdpr-modal-overlay active';
+
+        const rowsHtml =
+            candidates.length > 0
+                ? candidates
+                      .map((s) => {
+                          const place = s.type === 'vol' ? s.site : s.lieu;
+                          const badge = tl(s.type === 'vol' ? 'history.badgeFlight' : 'history.badgeGround');
+                          return `
+                        <label style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-bottom: 1px solid var(--border-light, rgba(0,0,0,0.06)); cursor: pointer; font-size: 0.86rem;">
+                            <input type="checkbox" data-brevet-batch-item value="${escapeHTML(String(s.id))}" ${s.preselected ? 'checked' : ''}>
+                            <span style="font-weight: 600;">${escapeHTML(formatDateOnly(s.datetime || s.date))}</span>
+                            <span style="color: var(--accent-orange); font-weight: 600;">${escapeHTML(badge)}</span>
+                            <span>${escapeHTML(place || '')}</span>
+                            <span style="color: var(--text-secondary);">(${escapeHTML(s.ecole || '')} · ${formatDuration(s.duree)})</span>
+                        </label>`;
+                      })
+                      .join('')
+                : `<p style="color: var(--text-muted); font-size: 0.88rem;">${tt('stats.brevets.batchEmpty')}</p>`;
+
+        modal.innerHTML = `
+            <div class="gdpr-modal" style="max-width: 560px; width: 95%; padding: 20px 22px;">
+                <div class="gdpr-modal-header" style="display: flex; align-items: center; justify-content: space-between;">
+                    <h3 style="margin: 0;"><i class="ri-links-line" style="color: var(--accent-orange);"></i> ${tt('stats.brevets.batchTitle', { code, name: tl(`stats.brevets.names.${code}`) })}</h3>
+                    <button type="button" class="gdpr-modal-close-btn" data-action="closeBrevetBatchModal">&times;</button>
+                </div>
+                <div class="gdpr-modal-body" style="max-height: 70vh; overflow-y: auto; padding: 14px 16px;">
+                    <input type="hidden" id="lb-brevet-batch-code" value="${escapeHTML(code)}">
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 10px;">${tt('stats.brevets.batchIntro')}</p>
+                    ${
+                        candidates.length > 0
+                            ? `<button type="button" class="action-btn-secondary" data-action="toggleAllBrevetBatchSessions" style="margin-bottom: 8px; padding: 4px 10px; font-size: 0.78rem; border-radius: 6px; cursor: pointer;">${tt('stats.brevets.batchToggleAll')}</button>`
+                            : ''
+                    }
+                    <div style="border: 1px solid var(--border-light, #ddd); border-radius: 8px; max-height: 320px; overflow-y: auto;">
+                        ${rowsHtml}
+                    </div>
+                </div>
+                <div class="gdpr-modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 12px 16px;">
+                    <button type="button" class="action-btn-secondary" data-action="closeBrevetBatchModal" style="padding: 8px 14px; border-radius: 6px; cursor: pointer;">${tt('stats.brevets.cancelBtn')}</button>
+                    <button type="button" class="action-btn-primary" data-action="applyBrevetBatchAssign" style="padding: 8px 16px; border-radius: 6px; cursor: pointer; background: var(--accent-orange); color: #fff; border: none; font-weight: 600;">${tt('stats.brevets.batchApplyBtn')}</button>
+                </div>
+            </div>`;
+    }
+
+    toggleAllBrevetBatchSessions() {
+        const boxes = Array.from(
+            /** @type {NodeListOf<HTMLInputElement>} */ (
+                document.querySelectorAll('#lb-brevet-batch-modal input[data-brevet-batch-item]')
+            ),
+        );
+        if (boxes.length === 0) return;
+        const allChecked = boxes.every((b) => b.checked);
+        boxes.forEach((b) => {
+            b.checked = !allChecked;
+        });
+    }
+
+    closeBrevetBatchModal() {
+        const modal = document.getElementById('lb-brevet-batch-modal');
+        if (!modal) return;
+        modal.hidden = true;
+        modal.style.display = 'none';
+        modal.classList.remove('active');
+    }
+
+    applyBrevetBatchAssign() {
+        const codeEl = /** @type {HTMLInputElement|null} */ (document.getElementById('lb-brevet-batch-code'));
+        const code = codeEl?.value || this._batchBrevetCode || BREVET_CODES[0];
+        const selectedIds = Array.from(
+            /** @type {NodeListOf<HTMLInputElement>} */ (
+                document.querySelectorAll('#lb-brevet-batch-modal input[data-brevet-batch-item]:checked')
+            ),
+        ).map((b) => b.value);
+
+        BrevetService.batchAssignBrevet(code, selectedIds);
+        this.closeBrevetBatchModal();
+        if (document.getElementById('logbook-stats-container')) {
+            this.renderStats();
+        }
+        if (document.getElementById('logbook-history-list')) {
+            this.renderHistory();
+        }
+    }
+
     renderStats() {
         const container = document.getElementById('logbook-stats-container');
         if (!container) return;
 
-        if (LogbookService.getFlights().length === 0) {
+        const allFlights = LogbookService.getFlights();
+        const brevetsHtml = this.renderBrevetsSection(allFlights);
+
+        if (allFlights.length === 0) {
             container.innerHTML = `
+                ${brevetsHtml}
                 <div class="empty-state">
                     <p>${tt('stats.empty')}</p>
                 </div>
@@ -311,6 +672,7 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
 
         // Building HTML
         let html = `
+            ${brevetsHtml}
             <div class="stats-grid">
                 <!-- KPI: Vols -->
                 <div class="kpi-card" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="type" data-stat-value="vol" title="${tt('stats.filterBy', { name: tl('history.badgeFlight') })}">

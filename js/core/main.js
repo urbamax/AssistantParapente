@@ -151,6 +151,14 @@ async function bootApplication() {
         'clearHistoryFilter',
         'closeBatchImport',
         'importBatch',
+        'openBrevetModal',
+        'closeBrevetModal',
+        'saveBrevetModal',
+        'updateBrevetModalPct',
+        'openBrevetBatchModal',
+        'closeBrevetBatchModal',
+        'toggleAllBrevetBatchSessions',
+        'applyBrevetBatchAssign',
     ].forEach((action) => {
         AppEvents.register('Logbook' + action, (args, e, t) =>
             LogbookView[action] ? LogbookView[action](args || e, e, t) : null,

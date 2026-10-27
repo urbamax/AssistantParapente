@@ -609,6 +609,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 exports[`quiz renders (spec 024: identical before and after moving the texts) > statistics for a level without questions 1`] = `
 "
             
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel TREUIL en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="TREUIL" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
+            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -737,6 +744,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
     "Par série",
   ],
   "none": "
+            
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -975,6 +983,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 exports[`quiz renders (spec 024: identical before and after moving the texts) > statistics with every filter label 1`] = `
 {
   "ALL": "
+            
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -1437,6 +1452,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "EXCELLENT": "
             
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
+            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -1776,6 +1798,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             </div>
         ",
   "FAILED": "
+            
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -2154,6 +2183,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "GOOD": "
             
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
+            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -2493,6 +2529,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             </div>
         ",
   "NOT_ATTEMPTED": "
+            
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -2876,6 +2919,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "PERFECT": "
             
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
+            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -3257,6 +3307,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             </div>
         ",
   "POOR": "
+            
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -3640,6 +3697,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "VERY_GOOD": "
             
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
+            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -3979,6 +4043,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             </div>
         ",
   "theme": "
+            
+        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
+            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
+            </button>
+        </div>
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">

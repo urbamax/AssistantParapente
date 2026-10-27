@@ -91,6 +91,7 @@ const blankValues = () => ({
     ecole: '',
     stageName: '',
     stageSpecialty: '',
+    brevetPrepare: '',
     moniteur: [],
     accompagnateur: [],
     pilotes: [],
@@ -191,7 +192,7 @@ const COLUMN_FIELDS = {
     voile: ['voile'],
     sellette: ['sellette'],
     typeVol: ['typeVol'],
-    course: ['stageName', 'ecole', 'stageSpecialty', 'moniteur', 'accompagnateur'],
+    course: ['stageName', 'ecole', 'stageSpecialty', 'moniteur', 'accompagnateur', 'brevetPrepare'],
     pilotes: ['pilotes'],
 };
 
@@ -222,6 +223,7 @@ export function applyCourse(row, name, sessions) {
         const proposed = {
             ecole: text(reference.ecole),
             stageSpecialty: text(reference.stageSpecialty),
+            brevetPrepare: text(reference.brevetPrepare),
             moniteur: instructorsOf(reference),
             accompagnateur: companionsOf(reference),
             pilotes: Array.isArray(reference.pilotes) ? reference.pilotes : [],
@@ -526,6 +528,7 @@ export function buildFlight(row) {
         moniteur: school ? instructorsOf({ moniteur: v.moniteur }) : [],
         stageName: school ? text(v.stageName) : '',
         stageSpecialty: school ? text(v.stageSpecialty) : '',
+        brevetPrepare: school ? text(v.brevetPrepare) : '',
         accompagnateur: school ? companionsOf({ accompagnateur: v.accompagnateur }) : [],
         pilotes: [...(v.pilotes || [])],
         site: text(v.site),

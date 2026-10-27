@@ -70,6 +70,7 @@ AssistantParapente/
 │   │   ├── quiz_service.js     # Question randomization, scoring & streak tracking
 │   │   ├── firebase_service.js # Authentication & Cloud Firestore synchronization
 │   │   ├── backup_service.js   # Local backup file: build, validate, restore (no account, no cloud)
+│   │   ├── brevet_service.js   # FFVL pilot certifications (BI, BP, BPC, TREUIL), theory exam & progression dissociation
 │   │   ├── igc_parser.js       # Native IGC GPS file parser (B-records, flight detection, analysis, winch)
 │   │   ├── sdf_parser.js       # Syride .sdf sensor file (load factor, temperature)
 │   │   ├── pilot_habits.js     # What the add form learns from the pilot's logbook
@@ -320,6 +321,14 @@ Two or more flight files selected or dropped in the add form (`LogbookIgcImportB
 - **Sensor files.** Each `.sdf` is tried against each trace with `SdfParser.alignToTrace` then `matchesTrace`, never by name or order; it is attached only to a trace it alone matches. A `.sdf` matching no trace is "not attached", one matching several traces (or a trace matching several `.sdf`) is "ambiguous" and attached to none.
 - **Editing.** `setValue`, `applyCourse` (spec 038 rules, edited fields kept), `applyToOthers` (copies a column from the first ticked row to the rows not edited in that column), `validateRow` (date, site, wing, duration). A field changed by the pilot is in `row.edited` and never overwritten by suggestions.
 - **Import.** `buildFlight(row)` builds the flight the form would store; `LogbookService.addFlights()` adds them with one save and one sync (the logbook is put back as it was when the save fails); the weather of each flight is then fetched one after the other. The import button is disabled as soon as it starts, so a double click adds once.
+
+### 3c. FFVL Brevets & Progression Dissociation (spec 042, `js/services/brevet_service.js`)
+Tracks the pilot's official FFVL certifications (`BI`, `BP`, `BPC`, `TREUIL`) in `USER_PREFS.brevets` (with monotonic LWW Firestore merge via `BrevetService.mergeBrevets` and automatic inclusion in local JSON backups):
+- **School Sessions (`brevetPrepare`)**: Both flight and ground-handling school sessions can record `brevetPrepare` (`'' | 'BI' | 'BP' | 'BPC' | 'TREUIL'`). Learned defaults (`suggestDefaults` / `applyLearnedDefaults`) propose `brevetPrepare` from the course or recent school habits, and automatically advance `BI` → `BP` for sessions after the `BI` practical validation date.
+- **Dashboard & Retroactive Batch Assignment (`Carnet > Statistiques`)**: `[data-brevets-stats]` displays the 4 brevet cards with status badges, theory score/percentage, attached school sessions count/duration (clickable to filter history by `brevet`), and a batch modal (`#lb-brevet-batch-modal`) to retroactively attach unassigned school sessions (`ecole && !brevetPrepare`) in a single save.
+- **Flight Level vs. Theory Level Dissociation**:
+  - **In Flight (`SitesView.buildPreFlightBriefHtml`)**: Uses `BrevetService.getPracticalPilotLevel()` (highest obtained practical brevet `BPC` > `BP` > `BI`, fallback to `GlobalState.get('level')`) so a newly certified `BI` pilot receives `BI` pre-flight safety advice even while studying `BP` theory.
+  - **In QCM (`QuizView`)**: Once official theory for a level is validated (`theoryPassed === true`), `BrevetService.getTargetTheoryLevel()` advances the active QCM theory level along `BI` → `BP` → `BPC`. Selecting a level whose official theory is already passed shows the `#qcm-brevet-status-banner` badge and automatically switches from `EXAM`/`TRAINING` to `REVISION` mode.
 
 
 

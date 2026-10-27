@@ -343,6 +343,12 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'moniteur'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
                         </div>
 
+                        <label for="lb-brevet-prepare" style="display:block; margin-top: 10px;">Brevet préparé</label>
+                        <select id="lb-brevet-prepare" style="width: 100%;">
+                            <option value="">— Aucun / Non précisé —</option>
+                            <option value="BI">BI — Brevet Initial</option><option value="BP">BP — Brevet de Pilote</option><option value="BPC">BPC — Brevet de Pilote Confirmé</option><option value="TREUIL">Qualification Treuil</option>
+                        </select>
+
                         <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-top: 10px;">
                             <input type="checkbox" id="lb-stage-check" aria-controls="lb-stage-group"> C'est un stage
                         </label>
@@ -468,6 +474,12 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             <button type="button" class="action-btn-secondary" data-action="addChecklistItem" data-args="'moniteur'" style="padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="ri-add-line"></i> Ajouter</button>
                         </div>
 
+                        <label for="lb-brevet-prepare" style="display:block; margin-top: 10px;">Brevet préparé</label>
+                        <select id="lb-brevet-prepare" style="width: 100%;">
+                            <option value="">— Aucun / Non précisé —</option>
+                            <option value="BI">BI — Brevet Initial</option><option value="BP">BP — Brevet de Pilote</option><option value="BPC">BPC — Brevet de Pilote Confirmé</option><option value="TREUIL">Qualification Treuil</option>
+                        </select>
+
                         <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-top: 10px;">
                             <input type="checkbox" id="lb-stage-check" aria-controls="lb-stage-group"> C'est un stage
                         </label>
@@ -545,6 +557,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         <div class="session-equip">
                             <div><strong>Voile :</strong> OZONE | RUSH 6 | BLEU | M</div>
                             <div><strong>Sellette :</strong> SUPAIR | ACCESS</div>
+                            
                             
                             
                             
@@ -636,6 +649,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             
                             
                             
+                            
                         </div>
                         
                         
@@ -682,6 +696,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             
                             
                             
+                            
                         </div>
                         
                         
@@ -707,6 +722,84 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
 
 exports[`logbook renders (spec 014: identical before and after moving the texts) > statistics 1`] = `
 "
+            
+            <div class="stats-section-box" data-brevets-stats="" style="margin-bottom: 16px;">
+                <h3 class="stats-section-title"><i class="ri-medal-line" style="color: var(--accent-orange)"></i> Mes Brevets &amp; Progression</h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 12px;">Suivi officiel de vos brevets FFVL, examens théoriques et sessions école rattachées.</p>
+                <div class="equip-list">
+                <div class="equip-card" data-brevet-card="BI" style="display: flex; flex-direction: column; justify-content: space-between; gap: 6px;">
+                    <div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                            <div class="equip-name" style="margin: 0;">BI — Brevet Initial</div>
+                            <span style="background: rgba(148,163,184,0.14); color: var(--text-muted); padding: 3px 8px; border-radius: 999px; font-size: 0.78rem; font-weight: 500;">Non renseigné</span>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">Aucune session école rattachée</div>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-light, rgba(0,0,0,0.06));">
+                        <button type="button" class="action-btn-secondary" data-action="openBrevetModal" data-args="BI" style="padding: 5px 10px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; border: 1px solid var(--accent-orange); color: var(--accent-orange); background: transparent; font-weight: 600;">
+                            <i class="ri-award-line"></i> Configurer / Valider
+                        </button>
+                        
+                    </div>
+                </div>
+                <div class="equip-card" data-brevet-card="BP" style="display: flex; flex-direction: column; justify-content: space-between; gap: 6px;">
+                    <div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                            <div class="equip-name" style="margin: 0;">BP — Brevet de Pilote</div>
+                            <span style="background: rgba(148,163,184,0.14); color: var(--text-muted); padding: 3px 8px; border-radius: 999px; font-size: 0.78rem; font-weight: 500;">Non renseigné</span>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">Aucune session école rattachée</div>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-light, rgba(0,0,0,0.06));">
+                        <button type="button" class="action-btn-secondary" data-action="openBrevetModal" data-args="BP" style="padding: 5px 10px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; border: 1px solid var(--accent-orange); color: var(--accent-orange); background: transparent; font-weight: 600;">
+                            <i class="ri-award-line"></i> Configurer / Valider
+                        </button>
+                        
+                    </div>
+                </div>
+                <div class="equip-card" data-brevet-card="BPC" style="display: flex; flex-direction: column; justify-content: space-between; gap: 6px;">
+                    <div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                            <div class="equip-name" style="margin: 0;">BPC — Brevet de Pilote Confirmé</div>
+                            <span style="background: rgba(148,163,184,0.14); color: var(--text-muted); padding: 3px 8px; border-radius: 999px; font-size: 0.78rem; font-weight: 500;">Non renseigné</span>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">Aucune session école rattachée</div>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-light, rgba(0,0,0,0.06));">
+                        <button type="button" class="action-btn-secondary" data-action="openBrevetModal" data-args="BPC" style="padding: 5px 10px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; border: 1px solid var(--accent-orange); color: var(--accent-orange); background: transparent; font-weight: 600;">
+                            <i class="ri-award-line"></i> Configurer / Valider
+                        </button>
+                        
+                    </div>
+                </div>
+                <div class="equip-card" data-brevet-card="TREUIL" style="display: flex; flex-direction: column; justify-content: space-between; gap: 6px;">
+                    <div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                            <div class="equip-name" style="margin: 0;">TREUIL — Qualification Treuil</div>
+                            <span style="background: rgba(148,163,184,0.14); color: var(--text-muted); padding: 3px 8px; border-radius: 999px; font-size: 0.78rem; font-weight: 500;">Non renseigné</span>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">Aucune session école rattachée</div>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-light, rgba(0,0,0,0.06));">
+                        <button type="button" class="action-btn-secondary" data-action="openBrevetModal" data-args="TREUIL" style="padding: 5px 10px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; border: 1px solid var(--accent-orange); color: var(--accent-orange); background: transparent; font-weight: 600;">
+                            <i class="ri-award-line"></i> Configurer / Valider
+                        </button>
+                        
+                    </div>
+                </div></div>
+            </div>
             <div class="stats-grid">
                 <!-- KPI: Vols -->
                 <div class="kpi-card" role="button" tabindex="0" data-action="filterHistoryByStat" data-stat-type="type" data-stat-value="vol" title="Filtrer par VOL">
@@ -910,6 +1003,84 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
 
 exports[`logbook renders (spec 014: identical before and after moving the texts) > statistics, empty 1`] = `
 "
+                
+            <div class="stats-section-box" data-brevets-stats="" style="margin-bottom: 16px;">
+                <h3 class="stats-section-title"><i class="ri-medal-line" style="color: var(--accent-orange)"></i> Mes Brevets &amp; Progression</h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 12px;">Suivi officiel de vos brevets FFVL, examens théoriques et sessions école rattachées.</p>
+                <div class="equip-list">
+                <div class="equip-card" data-brevet-card="BI" style="display: flex; flex-direction: column; justify-content: space-between; gap: 6px;">
+                    <div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                            <div class="equip-name" style="margin: 0;">BI — Brevet Initial</div>
+                            <span style="background: rgba(148,163,184,0.14); color: var(--text-muted); padding: 3px 8px; border-radius: 999px; font-size: 0.78rem; font-weight: 500;">Non renseigné</span>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">Aucune session école rattachée</div>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-light, rgba(0,0,0,0.06));">
+                        <button type="button" class="action-btn-secondary" data-action="openBrevetModal" data-args="BI" style="padding: 5px 10px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; border: 1px solid var(--accent-orange); color: var(--accent-orange); background: transparent; font-weight: 600;">
+                            <i class="ri-award-line"></i> Configurer / Valider
+                        </button>
+                        
+                    </div>
+                </div>
+                <div class="equip-card" data-brevet-card="BP" style="display: flex; flex-direction: column; justify-content: space-between; gap: 6px;">
+                    <div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                            <div class="equip-name" style="margin: 0;">BP — Brevet de Pilote</div>
+                            <span style="background: rgba(148,163,184,0.14); color: var(--text-muted); padding: 3px 8px; border-radius: 999px; font-size: 0.78rem; font-weight: 500;">Non renseigné</span>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">Aucune session école rattachée</div>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-light, rgba(0,0,0,0.06));">
+                        <button type="button" class="action-btn-secondary" data-action="openBrevetModal" data-args="BP" style="padding: 5px 10px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; border: 1px solid var(--accent-orange); color: var(--accent-orange); background: transparent; font-weight: 600;">
+                            <i class="ri-award-line"></i> Configurer / Valider
+                        </button>
+                        
+                    </div>
+                </div>
+                <div class="equip-card" data-brevet-card="BPC" style="display: flex; flex-direction: column; justify-content: space-between; gap: 6px;">
+                    <div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                            <div class="equip-name" style="margin: 0;">BPC — Brevet de Pilote Confirmé</div>
+                            <span style="background: rgba(148,163,184,0.14); color: var(--text-muted); padding: 3px 8px; border-radius: 999px; font-size: 0.78rem; font-weight: 500;">Non renseigné</span>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">Aucune session école rattachée</div>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-light, rgba(0,0,0,0.06));">
+                        <button type="button" class="action-btn-secondary" data-action="openBrevetModal" data-args="BPC" style="padding: 5px 10px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; border: 1px solid var(--accent-orange); color: var(--accent-orange); background: transparent; font-weight: 600;">
+                            <i class="ri-award-line"></i> Configurer / Valider
+                        </button>
+                        
+                    </div>
+                </div>
+                <div class="equip-card" data-brevet-card="TREUIL" style="display: flex; flex-direction: column; justify-content: space-between; gap: 6px;">
+                    <div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                            <div class="equip-name" style="margin: 0;">TREUIL — Qualification Treuil</div>
+                            <span style="background: rgba(148,163,184,0.14); color: var(--text-muted); padding: 3px 8px; border-radius: 999px; font-size: 0.78rem; font-weight: 500;">Non renseigné</span>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">Aucune session école rattachée</div>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-light, rgba(0,0,0,0.06));">
+                        <button type="button" class="action-btn-secondary" data-action="openBrevetModal" data-args="TREUIL" style="padding: 5px 10px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; border: 1px solid var(--accent-orange); color: var(--accent-orange); background: transparent; font-weight: 600;">
+                            <i class="ri-award-line"></i> Configurer / Valider
+                        </button>
+                        
+                    </div>
+                </div></div>
+            </div>
                 <div class="empty-state">
                     <p>Aucune donnée pour afficher des statistiques.</p>
                 </div>

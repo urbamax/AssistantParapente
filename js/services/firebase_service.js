@@ -19,6 +19,7 @@ import {
 } from './flight_trace_sync.js';
 import { t } from '../utils/i18n.js';
 import AccessService from './access_service.js';
+import { mergeBrevets } from './brevet_service.js';
 
 // We inject the original code but export the Engine
 // --- FIREBASE AUTHENTICATION & SYNC ENGINE ---
@@ -1440,6 +1441,10 @@ export const FirebaseAuthEngine = {
         (cloud.savedLocations || []).forEach((loc) => mergedLocsMap.set(loc.name, loc));
         (local.savedLocations || []).forEach((loc) => mergedLocsMap.set(loc.name, loc));
         merged.savedLocations = Array.from(mergedLocsMap.values());
+
+        if (local.brevets || cloud.brevets) {
+            merged.brevets = mergeBrevets(local.brevets, cloud.brevets);
+        }
 
         // Réglages retirés ou renommés (spec 002) : rayon « Illimité », modèle « meteoblue ».
         return migrateSitePrefs(merged);
