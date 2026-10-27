@@ -249,6 +249,7 @@ export const FR = Object.freeze({
             courseNamePlaceholder: 'Ex: Stage perf estival',
             specialty: 'Spécialité',
             specialtySelect: 'Sélectionner...',
+            specialtyPlaceholder: 'Précisez la spécialité...',
             specialties: Object.freeze({
                 Initiation: 'Initiation',
                 Perfectionnement: 'Perfectionnement',

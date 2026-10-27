@@ -26,6 +26,7 @@ export class LogbookLearnedBase extends LogbookChecklistsBase {
         'lb-stage-check': 'stage',
         'lb-stage-nom': 'stage',
         'lb-stage-specialite': 'specialite',
+        'lb-stage-specialite-autre': 'specialite',
         'lb-brevet-prepare': 'brevetPrepare',
         'lb-treuilleur': 'treuilleur',
         'lb-site': 'site',
@@ -278,7 +279,7 @@ export class LogbookLearnedBase extends LogbookChecklistsBase {
         const filled = new Set();
         const check = /** @type {HTMLInputElement|null} */ (document.getElementById('lb-stage-check'));
         const nameInput = /** @type {HTMLInputElement|null} */ (document.getElementById('lb-stage-nom'));
-        const specialtySelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-stage-specialite'));
+        const specialtySelect = document.getElementById('lb-stage-specialite');
         const group = document.getElementById('lb-stage-group');
         if (!check || !nameInput || !specialtySelect || !group) return filled;
 
@@ -315,9 +316,7 @@ export class LogbookLearnedBase extends LogbookChecklistsBase {
         const school = typeof reference.ecole === 'string' ? reference.ecole.trim() : '';
         if (school) fill('ecole', () => this.setSchoolField(true, school));
         const specialty = typeof reference.stageSpecialty === 'string' ? reference.stageSpecialty : '';
-        if (specialty && Array.from(specialtySelect.options).some((o) => o.value === specialty)) {
-            fill('specialite', () => (specialtySelect.value = specialty));
-        }
+        if (specialty) fill('specialite', () => this.setSpecialtyField(specialty));
         const brevetSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-brevet-prepare'));
         const courseBrevet = typeof reference.brevetPrepare === 'string' ? reference.brevetPrepare.trim() : '';
         if (brevetSelect && courseBrevet && can('brevetPrepare')) {
@@ -346,8 +345,7 @@ export class LogbookLearnedBase extends LogbookChecklistsBase {
             if (reason !== 'course' || !can(field)) continue;
             if (field === 'ecole') this.setSchoolField(false);
             else if (field === 'specialite') {
-                const select = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-stage-specialite'));
-                if (select) select.value = '';
+                this.setSpecialtyField('');
             } else if (field === 'brevetPrepare') {
                 const select = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-brevet-prepare'));
                 if (select) select.value = '';

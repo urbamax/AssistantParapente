@@ -395,3 +395,32 @@ describe('logbook: a session close to a course session starts in that course', (
         expect($('lb-learned-summary').hidden).toBe(true);
     });
 });
+
+describe('logbook: course specialty "Autre"', () => {
+    it('shows a text field, saves what is typed and shows it again when editing', () => {
+        setup([]);
+        fillRequired();
+        toggle('lb-ecole-check', true);
+        $('lb-ecole').value = 'ÉCOLE TEST';
+        toggle('lb-stage-check', true);
+        expect($('lb-stage-specialite-autre').style.display).toBe('none');
+
+        change('lb-stage-specialite', 'Autre'); // le champ s'affiche via l'action toggleOtherField (main.js)
+        $('lb-stage-specialite-autre').value = 'Acro';
+        LogbookView.submitForm();
+        expect(lastFlight().stageSpecialty).toBe('Acro');
+
+        LogbookView.editEntry(lastFlight().id);
+        expect($('lb-stage-specialite').value).toBe('Autre');
+        expect($('lb-stage-specialite-autre').value).toBe('Acro');
+        expect($('lb-stage-specialite-autre').style.display).toBe('block');
+    });
+
+    it('is proposed again for the next session of the same course', () => {
+        setup([course({ stageSpecialty: 'Acro' })]);
+        toggle('lb-stage-check', true);
+        change('lb-stage-nom', 'Stage été');
+        expect($('lb-stage-specialite').value).toBe('Autre');
+        expect($('lb-stage-specialite-autre').value).toBe('Acro');
+    });
+});

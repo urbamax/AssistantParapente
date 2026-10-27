@@ -72,10 +72,11 @@ export class LogbookChecklistsBase extends LogbookSitesBase {
                             <input type="text" id="lb-stage-nom" list="stages-list" placeholder="${tt('form.courseNamePlaceholder')}" autocomplete="off" style="width: 100%;">
                             <datalist id="stages-list"></datalist>
                             <label for="lb-stage-specialite" style="display:block; margin-top: 10px;">${tt('form.specialty')}</label>
-                            <select id="lb-stage-specialite" style="width: 100%;">
+                            <select id="lb-stage-specialite" style="width: 100%;" data-change-action="toggleOtherField" data-toggle-id="lb-stage-specialite-autre">
                                 <option value="">${tt('form.specialtySelect')}</option>
                                 ${LogbookChecklistsBase.STAGE_SPECIALTIES.map((name) => `<option value="${name}">${tt(`form.specialties.${name}`)}</option>`).join('')}
                             </select>
+                            <input type="text" id="lb-stage-specialite-autre" placeholder="${tt('form.specialtyPlaceholder')}" autocomplete="off" style="display:none; margin-top: 5px; width: 100%;">
                         </div>
 
                         <label style="display:block; margin-top: 10px;">${tt('form.companion')}</label>
@@ -199,5 +200,27 @@ export class LogbookChecklistsBase extends LogbookSitesBase {
         input.required = checked;
         if (name) input.value = name;
         if (checked && !name) input.focus();
+    }
+
+    // Spécialité du stage : une valeur hors liste s'affiche sous « Autre », dans son champ de saisie.
+    setSpecialtyField(value = '') {
+        const select = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-stage-specialite'));
+        const other = /** @type {HTMLInputElement|null} */ (document.getElementById('lb-stage-specialite-autre'));
+        if (!select) return;
+        const listed = Array.from(select.options).some((o) => o.value === value && value !== 'Autre');
+        select.value = !value ? '' : listed ? value : 'Autre';
+        if (other) {
+            other.value = value && !listed && value !== 'Autre' ? value : '';
+            other.style.display = select.value === 'Autre' ? 'block' : 'none';
+        }
+    }
+
+    // Valeur à enregistrer : le texte saisi sous « Autre » (« Autre » seul s'il reste vide).
+    getSpecialtyField() {
+        const select = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-stage-specialite'));
+        const other = /** @type {HTMLInputElement|null} */ (document.getElementById('lb-stage-specialite-autre'));
+        if (!select) return '';
+        if (select.value !== 'Autre') return select.value;
+        return other?.value.trim() || 'Autre';
     }
 }

@@ -357,10 +357,11 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             <input type="text" id="lb-stage-nom" list="stages-list" placeholder="Ex: Stage perf estival" autocomplete="off" style="width: 100%;">
                             <datalist id="stages-list"></datalist>
                             <label for="lb-stage-specialite" style="display:block; margin-top: 10px;">Spécialité</label>
-                            <select id="lb-stage-specialite" style="width: 100%;">
+                            <select id="lb-stage-specialite" style="width: 100%;" data-change-action="toggleOtherField" data-toggle-id="lb-stage-specialite-autre">
                                 <option value="">Sélectionner...</option>
                                 <option value="Initiation">Initiation</option><option value="Perfectionnement">Perfectionnement</option><option value="Progression">Progression</option><option value="SIV">SIV (Simulation d'Incidents de Vol)</option><option value="Cross">Cross</option><option value="Autre">Autre</option>
                             </select>
+                            <input type="text" id="lb-stage-specialite-autre" placeholder="Précisez la spécialité..." autocomplete="off" style="display:none; margin-top: 5px; width: 100%;">
                         </div>
 
                         <label style="display:block; margin-top: 10px;">Accompagnateurs</label>
@@ -488,10 +489,11 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             <input type="text" id="lb-stage-nom" list="stages-list" placeholder="Ex: Stage perf estival" autocomplete="off" style="width: 100%;">
                             <datalist id="stages-list"></datalist>
                             <label for="lb-stage-specialite" style="display:block; margin-top: 10px;">Spécialité</label>
-                            <select id="lb-stage-specialite" style="width: 100%;">
+                            <select id="lb-stage-specialite" style="width: 100%;" data-change-action="toggleOtherField" data-toggle-id="lb-stage-specialite-autre">
                                 <option value="">Sélectionner...</option>
                                 <option value="Initiation">Initiation</option><option value="Perfectionnement">Perfectionnement</option><option value="Progression">Progression</option><option value="SIV">SIV (Simulation d'Incidents de Vol)</option><option value="Cross">Cross</option><option value="Autre">Autre</option>
                             </select>
+                            <input type="text" id="lb-stage-specialite-autre" placeholder="Précisez la spécialité..." autocomplete="off" style="display:none; margin-top: 5px; width: 100%;">
                         </div>
 
                         <label style="display:block; margin-top: 10px;">Accompagnateurs</label>
