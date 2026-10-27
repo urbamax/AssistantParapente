@@ -94,11 +94,30 @@ describe('Local backup UI (no account, no Firebase consent)', () => {
         expect(status()[0]).toContain('statistiques');
     });
 
-    it('exports with a confirmation message and no sign-in', () => {
+    it('exports with a confirmation message and no sign-in', async () => {
         vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:x');
         vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
         vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
-        exportBackupAction();
+        await exportBackupAction();
         expect(status()[0]).toMatch(/parapente_backup_\d{4}-\d{2}-\d{2}\.json/);
+    });
+
+    it('restores the GPS traces and reports how many', async () => {
+        const IDBStorage = (await import('../../js/services/idb_storage.js')).default;
+        const { encodeTrace } = await import('../../js/utils/trace_codec.js');
+        vi.spyOn(IDBStorage, 'isSupported').mockReturnValue(true);
+        const saveTrace = vi.spyOn(IDBStorage, 'saveTrace').mockResolvedValue(true);
+        const encoded = await encodeTrace('AXXX demo\n', { partChars: Infinity });
+
+        await importBackupAction(
+            backupFile({
+                [K.LOGBOOK_DATA]: [{ id: 'f1' }],
+                igc_traces: { f1: { encoding: encoded.encoding, data: encoded.parts[0] } },
+            }),
+            { confirm, reload },
+        );
+
+        expect(saveTrace).toHaveBeenCalledWith('f1', 'AXXX demo\n');
+        expect(status()[0]).toContain('Traces GPS restaurées : 1');
     });
 });

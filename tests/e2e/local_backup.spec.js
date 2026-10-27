@@ -37,6 +37,8 @@ test.describe('Sauvegarde locale sans compte', () => {
 
     const openSyncSpace = async (page) => {
         await page.goto('/?mode=SITES');
+        // The button does nothing until the sync module is loaded (it is imported after the first paint).
+        await page.waitForFunction(() => Boolean(window.FirebaseAuthEngine));
         await page.locator('[data-action="FirebaseAuthopenAuthModal"]:visible').first().click();
         await expect(page.locator('#auth-modal-overlay')).toBeVisible();
     };
@@ -141,5 +143,38 @@ test.describe('Sauvegarde locale sans compte', () => {
         await expect(card).toBeVisible();
         const [download] = await Promise.all([page.waitForEvent('download'), card.click()]);
         expect(download.suggestedFilename()).toMatch(/^parapente_backup_/);
+    });
+
+    test('carries the GPS traces kept in IndexedDB through an export and an import', async ({ page }) => {
+        const IGC = 'AXXX demo\nHFDTE280926\nB1200004500000N00600000EA0100001000\n';
+        page.on('dialog', (dialog) => dialog.accept());
+        await openSyncSpace(page);
+
+        await page.evaluate(async (igc) => {
+            const { default: IDB } = await import('/js/services/idb_storage.js');
+            await IDB.saveTrace('vol-1', igc);
+        }, IGC);
+
+        const [download] = await Promise.all([
+            page.waitForEvent('download'),
+            page.locator('#auth-backup-block [data-action="exportBackup"]').click(),
+        ]);
+        const exported = JSON.parse(readFileSync(await download.path(), 'utf8'));
+        expect(Object.keys(exported.igc_traces)).toEqual(['vol-1']);
+
+        await page.evaluate(async () => {
+            const { default: IDB } = await import('/js/services/idb_storage.js');
+            await IDB.deleteTrace('vol-1');
+        });
+        const reloaded = page.waitForEvent('load');
+        await page.locator('#backup-import-input').setInputFiles(await download.path());
+        await expect(page.locator('#auth-backup-block .backup-status')).toContainText('Traces GPS restaurées : 1');
+        await reloaded;
+
+        const restored = await page.evaluate(async () => {
+            const { default: IDB } = await import('/js/services/idb_storage.js');
+            return IDB.getTrace('vol-1');
+        });
+        expect(restored).toBe(IGC);
     });
 });

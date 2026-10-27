@@ -1248,13 +1248,15 @@ export const FR = Object.freeze({
         badData: "Sauvegarde endommagée : certaines données ont un format inattendu. Rien n'a été modifié.",
         empty: 'Cette sauvegarde ne contient aucune donnée à restaurer.',
         confirmImport:
-            'Restaurer la sauvegarde du {date} ?\n\nATTENTION : les données de cet appareil couvertes par la sauvegarde (carnet de vol, équipement, statistiques, préférences) seront remplacées.',
+            'Restaurer la sauvegarde du {date} ?\n\nATTENTION : les données de cet appareil couvertes par la sauvegarde (carnet de vol et traces GPS, équipement, statistiques, préférences) seront remplacées.',
         confirmImportUnknownDate:
-            'Restaurer cette sauvegarde ?\n\nATTENTION : les données de cet appareil couvertes par la sauvegarde (carnet de vol, équipement, statistiques, préférences) seront remplacées.',
+            'Restaurer cette sauvegarde ?\n\nATTENTION : les données de cet appareil couvertes par la sauvegarde (carnet de vol et traces GPS, équipement, statistiques, préférences) seront remplacées.',
         restoring: 'Restauration en cours...',
         restored: "Données restaurées. L'application se recharge...",
         statsSkipped:
             " Les statistiques du QCM n'ont pas été restaurées : le stockage des statistiques est désactivé dans vos options de confidentialité.",
+        tracesRestored: ' Traces GPS restaurées : {count}.',
+        tracesFailed: ' Traces GPS illisibles, ignorées : {count}.',
         restoreFailed: "La restauration a échoué (stockage de l'appareil plein ou indisponible).",
         syncFailed: ' La synchronisation avec le cloud a échoué : elle sera retentée plus tard.',
     }),

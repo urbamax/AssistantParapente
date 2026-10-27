@@ -32,7 +32,7 @@ describe('Full backup with unreadable deletion lists (spec 024)', () => {
     });
 
     const exportPayload = async () => {
-        exportBackup();
+        await exportBackup();
         expect(blob).toBeDefined();
         return JSON.parse(await blob.text());
     };

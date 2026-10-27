@@ -141,7 +141,7 @@ describe('Pending equipment deletions in backup and restore (spec 015)', () => {
         vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
         vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
 
-        exportBackup();
+        await exportBackup();
 
         const payload = JSON.parse(await blob.text());
         expect(payload.deleted_equipment).toEqual(['wing-old']);

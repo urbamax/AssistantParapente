@@ -5,7 +5,7 @@
  * the restored data is then pushed through the usual cloud sync (the only cloud call, and only
  * for someone already connected).
  */
-import { exportBackup, applyBackup, readBackupFile } from '../services/backup_service.js';
+import { exportBackup, applyBackup, applyBackupTraces, readBackupFile } from '../services/backup_service.js';
 import { t } from '../utils/i18n.js';
 
 /** Time to read the confirmation message before the page reloads with the restored data. */
@@ -24,10 +24,10 @@ function showBackupStatus(message, type) {
     });
 }
 
-export function exportBackupAction() {
+export async function exportBackupAction() {
     try {
         const email = window.FirebaseAuthEngine?.currentUser?.email;
-        showBackupStatus(t('backup.downloaded', { filename: exportBackup(email || undefined) }), 'success');
+        showBackupStatus(t('backup.downloaded', { filename: await exportBackup(email || undefined) }), 'success');
     } catch (error) {
         console.error('[Backup] Export failed:', error);
         showBackupStatus(t('backup.exportFailed'), 'error');
@@ -79,6 +79,14 @@ export async function importBackupAction(
 
     let message = t('backup.restored');
     if (result.skipped.length) message += t('backup.statsSkipped');
+
+    try {
+        const traces = await applyBackupTraces(parsed.backup);
+        if (traces.restored) message += t('backup.tracesRestored', { count: traces.restored });
+        if (traces.failed) message += t('backup.tracesFailed', { count: traces.failed });
+    } catch (error) {
+        console.warn('[Backup] GPS traces not restored:', error);
+    }
 
     // Signed-in only: the restored data goes up with the normal merge sync.
     const cloud = window.FirebaseAuthEngine;
