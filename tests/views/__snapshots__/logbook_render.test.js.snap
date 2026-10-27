@@ -294,6 +294,22 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     </select>
                     <input type="text" id="lb-tech-decollage-autre" placeholder="Spécifiez la technique..." style="display: none; margin-top: 5px; width: 100%;">
                 </div>
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label for="lb-prise-terrain" style="display:block; margin-bottom:5px;">Prise de terrain :</label>
+                    <select id="lb-prise-terrain" style="width:100%; padding:8px;" data-change-action="toggleOtherField" data-toggle-id="lb-prise-terrain-autre">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="En U">En U</option>
+                        <option value="En S">En S</option>
+                        <option value="En huit">En huit</option>
+                        <option value="Directe">Directe</option>
+                        
+                        <option value="Autre">Autre...</option>
+                    </select>
+                    <input type="text" id="lb-prise-terrain-autre" placeholder="Spécifiez la prise de terrain..." style="display:none; margin-top: 5px; width: 100%;">
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-top: 8px;">
+                        <input type="checkbox" id="lb-vache"> Vaché (posé hors de la zone d’atterrissage prévue)
+                    </label>
+                </div>
                 <div class="form-group" id="lb-treuilleur-group" hidden="">
                     <label for="lb-treuilleur">Treuilleur</label>
                     <input type="text" id="lb-treuilleur" list="treuilleurs-list" placeholder="Nom du treuilleur" autocomplete="off" style="width: 100%;">

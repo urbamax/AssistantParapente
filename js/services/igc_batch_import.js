@@ -533,6 +533,8 @@ export function buildFlight(row) {
         treuilleur: '',
         rescueDeployed: false,
         rescueId: '',
+        priseTerrain: '',
+        vache: false,
         techDecollage: v.techDecollage,
         typeExercice: [],
         lat: parsed.points[0].lat,
