@@ -61,6 +61,7 @@ AssistantParapente/
 │   │   ├── quiz.js             # QCM & exam controller
 │   │   ├── quiz_stats.js       # Quiz stats, exam history, import/export (base class of QuizView)
 │   │   ├── quiz_stats_html.js  # HTML fragments of the stats screen (distribution, themes, questions, gauge)
+│   │   ├── quiz_axes_html.js   # HTML of the revision-axes screen (cards, steps 1-3, filters)
 │   │   ├── quiz_voice_ui.js    # Quiz voice mode: read aloud, spoken answers (base class of QuizView)
 │   │   ├── quiz_strings.js    # tq / tqh / tql / tv text helpers
 │   │   └── manual.js           # Library & course viewer controller
@@ -71,6 +72,7 @@ AssistantParapente/
 │   │   ├── firebase_service.js # Authentication & Cloud Firestore synchronization
 │   │   ├── backup_service.js   # Local backup file: build, validate, restore (no account, no cloud)
 │   │   ├── brevet_service.js   # FFVL pilot certifications (BI, BP, BPC, TREUIL), theory exam & progression dissociation
+│   │   ├── revision_axes.js    # 21 revision axes (sub-chapters): status, verified course pages, key points, workshop picker
 │   │   ├── igc_parser.js       # Native IGC GPS file parser (B-records, flight detection, analysis, winch)
 │   │   ├── sdf_parser.js       # Syride .sdf sensor file (load factor, temperature)
 │   │   ├── pilot_habits.js     # What the add form learns from the pilot's logbook

@@ -191,7 +191,7 @@ class UIManager {
             });
 
             // Handle sub-modes that map to parent modes
-            if (['QCM', 'QCM_BANK', 'LIBRARY', 'COURSE', 'STATS', 'ADVENTURE'].includes(currentMode)) {
+            if (['QCM', 'QCM_BANK', 'REVISION_AXES', 'LIBRARY', 'COURSE', 'STATS', 'ADVENTURE'].includes(currentMode)) {
                 const theoryBtn = document.querySelector('.desktop-main-nav .nav-menu-btn[data-target="THEORY"]');
                 if (theoryBtn) theoryBtn.classList.add('active');
             }
