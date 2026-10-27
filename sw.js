@@ -113,6 +113,7 @@ const CRITICAL_ASSETS = [
     './js/services/logbook_defaults.js',
     './js/services/igc_batch_import.js',
     './js/services/pilot_habits.js',
+    './js/services/mastery.js',
     './js/services/review_scheduler.js',
     './js/services/sdf_parser.js',
     './js/services/quiz_service.js',

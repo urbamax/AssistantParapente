@@ -4,6 +4,7 @@
  * getCourseUrl…) et les chiffres déjà calculés, et rend un fragment HTML. Aucun accès au DOM.
  */
 import { escapeHTML } from '../core/security.js';
+import { masteryRatio } from '../services/mastery.js';
 import { toSorted } from '../utils/array_utils.js';
 import { truncate } from '../utils/text_utils.js';
 import { tq, tqh, tql } from './quiz_strings.js';
@@ -216,8 +217,8 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats 
     if (levelQuestionEntries.length > 0) {
         // Sort by success rate (worst first) immutably using ES2023 toSorted
         const sortedQuestions = toSorted(levelQuestionEntries, (a, b) => {
-            const pctA = a[1].total > 0 ? a[1].correct / a[1].total : 0;
-            const pctB = b[1].total > 0 ? b[1].correct / b[1].total : 0;
+            const pctA = masteryRatio(a[1]);
+            const pctB = masteryRatio(b[1]);
             return pctA - pctB;
         });
 
@@ -238,7 +239,7 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats 
             });
         } else {
             visibleQuestions = sortedQuestions.filter(([, data]) => {
-                const pct = Math.round((data.correct / data.total) * 100);
+                const pct = Math.round(masteryRatio(data) * 100);
                 if (view.state.masteryFilter === 'PERFECT') return pct === 100;
                 if (view.state.masteryFilter === 'EXCELLENT') return pct >= 90 && pct < 100;
                 if (view.state.masteryFilter === 'VERY_GOOD') return pct >= 75 && pct < 90;
@@ -335,7 +336,7 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats 
                 theme = map[letter] || 'Autre';
             }
 
-            const pct = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
+            const pct = Math.round(masteryRatio(data) * 100);
             const qColor = pct >= 90 ? '#4ade80' : pct >= 75 ? '#38bdf8' : pct >= 50 ? '#facc15' : '#f87171';
             const streak = data.streak || 0;
 

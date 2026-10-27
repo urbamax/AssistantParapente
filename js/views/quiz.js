@@ -562,21 +562,7 @@ class QuizViewClass extends QuizVoiceBase {
             );
         }
 
-        const masteryProgressEl = document.getElementById('qcm-mastery-progress');
-        if (masteryProgressEl) {
-            if (QuizService.state.qcmConfig.mode === 'MASTERY') {
-                const progress = QuizService.getMasteryProgress();
-                masteryProgressEl.style.display = progress ? 'block' : 'none';
-                if (progress) {
-                    masteryProgressEl.innerText = tql('question.masteryProgress', {
-                        target: progress.target,
-                        current: progress.current,
-                    });
-                }
-            } else {
-                masteryProgressEl.style.display = 'none';
-            }
-        }
+        this.refreshMasteryProgress();
 
         let badgeHtml = '';
         if (QuizService.state.qcmConfig.mode === 'REVISION') {
@@ -675,6 +661,34 @@ class QuizViewClass extends QuizVoiceBase {
         }
     }
 
+    // Objectif du mode Perfectionnement et longueur de la série : ils changent dès qu'une réponse
+    // est validée (la série peut se prolonger), pas seulement à la question suivante.
+    refreshMasteryProgress() {
+        const masteryProgressEl = document.getElementById('qcm-mastery-progress');
+        if (masteryProgressEl) {
+            if (QuizService.state.qcmConfig.mode === 'MASTERY') {
+                const progress = QuizService.getMasteryProgress();
+                masteryProgressEl.style.display = progress ? 'block' : 'none';
+                if (progress) {
+                    masteryProgressEl.innerText = tql('question.masteryProgress', {
+                        target: progress.target,
+                        current: progress.current,
+                    });
+                }
+            } else {
+                masteryProgressEl.style.display = 'none';
+            }
+        }
+
+        const counterEl = document.querySelector('.quiz-progress');
+        if (counterEl) {
+            counterEl.textContent = tq('question.progress', {
+                index: QuizService.state.qcmIndex + 1,
+                total: QuizService.state.qcmSessionData.length,
+            });
+        }
+    }
+
     validateQuestion() {
         const result = QuizService.validate();
         if (!result) return;
@@ -685,6 +699,7 @@ class QuizViewClass extends QuizVoiceBase {
             this.renderQuestion(QuizService.nextQuestion());
         } else {
             this.showAnswerFeedback(result, QuizService.state.qcmIndex > 0);
+            this.refreshMasteryProgress();
             if (VoiceService.getPrefs().autoRead) this.readAloud({ auto: true });
         }
     }

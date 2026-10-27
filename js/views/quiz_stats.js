@@ -5,6 +5,7 @@
 import GlobalState from '../core/app_state.js';
 import QuizService from '../services/quiz_service.js';
 import StorageService from '../services/storage.js';
+import { masteryRatio } from '../services/mastery.js';
 import { escapeHTML } from '../core/security.js';
 import { formatDateTime } from '../utils/date_utils.js';
 import { COURSES_DATA } from '../data/courses_data.js';
@@ -184,7 +185,7 @@ export class QuizStatsBase extends BaseView {
 
             levelQuestionEntries.forEach(([, data]) => {
                 if (data.total === 0) return;
-                const pct = Math.round((data.correct / data.total) * 100);
+                const pct = Math.round(masteryRatio(data) * 100);
 
                 if (pct === 100) perfect++;
                 else if (pct >= 90)
@@ -220,7 +221,7 @@ export class QuizStatsBase extends BaseView {
                     for (const q of questions) {
                         const qStat = stats.questions[q.code];
                         if (qStat && qStat.total > 0) {
-                            mastery += qStat.correct / qStat.total;
+                            mastery += masteryRatio(qStat);
                             attemptedCount++;
                         }
                     }
@@ -236,7 +237,7 @@ export class QuizStatsBase extends BaseView {
             levelQs.forEach((q) => {
                 const stat = stats.questions[q.code];
                 if (stat && stat.total > 0) {
-                    accumulatedMastery += stat.correct / stat.total;
+                    accumulatedMastery += masteryRatio(stat);
                 } else {
                     // Unattempted or 0 total attempts = 0% mastery
                     accumulatedMastery += 0;

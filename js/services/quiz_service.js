@@ -2,6 +2,10 @@ import StorageService from './storage.js';
 import { toSorted } from '../utils/array_utils.js';
 import { t } from '../utils/i18n.js';
 import { dueScore, summarizeReviews } from './review_scheduler.js';
+import { masteryRatio, masteryRatioAfterCorrect, pushAttempt } from './mastery.js';
+
+// Tolérance sur la somme des maîtrises (flottants) pour décider que l'objectif est atteint.
+const MASTERY_EPSILON = 1e-9;
 
 class QuizService {
     constructor() {
@@ -298,116 +302,76 @@ class QuizService {
         this.state.qcmConfig.masteryTarget = target;
     }
 
-    // Ratio de maîtrise d'une question (0 à 1) : correct/total, ou 0 si jamais tentée.
-    // C'est la même formule que celle utilisée par l'écran Statistiques pour la "Réussite globale",
-    // ce qui garantit que le mode Perfectionnement vise le même chiffre que celui affiché au pilote.
+    // Maîtrise d'une question (0 à 1) : part de bonnes réponses sur ses dernières tentatives
+    // (fenêtre glissante, voir mastery.js), 0 si jamais tentée. L'écran Statistiques utilise la
+    // même mesure, pour que le mode Perfectionnement vise le chiffre affiché au pilote.
     getMasteryRatio(question, stats) {
-        const s = stats.questions[question.code];
-        return s && s.total > 0 ? s.correct / s.total : 0;
+        return masteryRatio(stats.questions[question.code]);
     }
 
-    // Sélectionne, parmi `pool`, les questions les moins maîtrisées en priorité, jusqu'à ce que
-    // le gain projeté (au mieux : bonne réponse à chacune, donc ratio -> 1) suffise à amener la
-    // moyenne du périmètre au palier cible. C'est une projection optimiste : on mémorise le gain
-    // supposé de chaque question choisie (_masteryAssumedGains) pour pouvoir, question par
-    // question, corriger cette hypothèse par le résultat réel dans advanceMasteryProgress() —
-    // sans quoi on recompterait comme "manquantes" des questions déjà en file mais pas encore
-    // répondues, et la série s'allongerait après quasiment chaque réponse.
+    getMasteryScore(pool, stats) {
+        return pool.reduce((sum, q) => sum + this.getMasteryRatio(q, stats), 0);
+    }
+
+    // Questions les moins maîtrisées du périmètre, chacune une seule fois, en nombre suffisant pour
+    // que la moyenne atteigne `targetSum` si le pilote répond juste à chacune. Une question déjà
+    // à 100 % ne peut plus rien apporter : elle n'est jamais choisie. Renvoie une liste vide quand
+    // l'objectif est atteint.
+    pickWeakestForTarget(pool, stats, targetSum) {
+        const ranked = this.shuffle(pool)
+            .map((q) => ({ q, ratio: this.getMasteryRatio(q, stats) }))
+            .filter((x) => x.ratio < 1)
+            .sort((a, b) => a.ratio - b.ratio);
+
+        let projected = this.getMasteryScore(pool, stats);
+        const picked = [];
+        for (const { q, ratio } of ranked) {
+            if (projected >= targetSum - MASTERY_EPSILON) break;
+            picked.push(q);
+            projected += masteryRatioAfterCorrect(stats.questions[q.code]) - ratio;
+        }
+        return picked;
+    }
+
     buildMasterySelection(pool, stats, targetPct) {
-        const poolSize = pool.length;
-        const currentSum = pool.reduce((sum, q) => sum + this.getMasteryRatio(q, stats), 0);
-        const targetSum = (targetPct / 100) * poolSize;
-        const deficit = targetSum - currentSum;
-
-        const sorted = this.shuffle(pool).sort(
-            (a, b) => this.getMasteryRatio(a, stats) - this.getMasteryRatio(b, stats),
-        );
-
-        const assumedGains = new Map();
-        const selected = [];
-        let projectedGain = 0;
-        for (const q of sorted) {
-            if (projectedGain >= deficit) break;
-            const gain = 1 - this.getMasteryRatio(q, stats);
-            selected.push(q);
-            assumedGains.set(q.code, gain);
-            projectedGain += gain;
-        }
-        // Objectif déjà atteint : on propose quand même une petite série de consolidation
-        // sur les questions les plus fragiles, plutôt qu'une session vide.
-        if (selected.length === 0) {
-            sorted.slice(0, Math.min(5, sorted.length)).forEach((q) => {
-                selected.push(q);
-                assumedGains.set(q.code, 1 - this.getMasteryRatio(q, stats));
-            });
-        }
-
         this._masteryPool = pool;
         this._masteryTargetPct = targetPct;
-        this._masteryTargetSum = targetSum;
-        this._masteryProjectedSum = currentSum + projectedGain;
-        this._masteryAssumedGains = assumedGains;
-        return selected;
+        this._masteryTargetSum = (targetPct / 100) * pool.length;
+
+        const picked = this.pickWeakestForTarget(pool, stats, this._masteryTargetSum);
+        if (picked.length > 0) return picked;
+
+        // Objectif déjà atteint : on propose quand même une petite série de consolidation
+        // sur les questions les plus fragiles, plutôt qu'une session vide.
+        return this.shuffle(pool)
+            .sort((a, b) => this.getMasteryRatio(a, stats) - this.getMasteryRatio(b, stats))
+            .slice(0, Math.min(5, pool.length));
     }
 
-    // Recalcul dynamique en temps réel : appelé après chaque réponse avec le ratio de maîtrise
-    // de la question AVANT cette réponse. On retire l'hypothèse optimiste posée à la sélection
-    // (assumedGain) et on la remplace par le gain réellement observé ; si la somme projetée
-    // repasse sous l'objectif (typiquement après une mauvaise réponse), on rallonge la série avec
-    // de nouvelles questions faibles (en évitant les doublons tant que le périmètre n'est pas
-    // épuisé, puis en autorisant la répétition) pour garantir qu'à la fin, le palier choisi soit
-    // atteint.
-    advanceMasteryProgress(question, ratioBefore) {
-        if (this._masteryProjectedSum === undefined || !this._masteryPool) return;
+    // Appelé après chaque réponse. Une bonne réponse ne fait pas forcément passer une question à
+    // 100 % (l'ancienne erreur reste dans la fenêtre), donc la série doit parfois se prolonger :
+    // quand la dernière question vient d'être répondue et que l'objectif n'est pas atteint, on
+    // ajoute un nouveau tour des questions encore faibles. Rien n'est cumulé d'une réponse à
+    // l'autre : tout est recalculé depuis les statistiques réelles, donc aucune dérive possible.
+    advanceMasteryProgress() {
+        if (!this._masteryPool) return;
+        const upcoming = this.state.qcmSessionData.length - (this.state.qcmIndex + 1);
+        if (upcoming > 0) return;
 
-        const statsNow = this.getPersistentStats();
-        const ratioAfter = this.getMasteryRatio(question, statsNow);
-        const assumedGain = this._masteryAssumedGains.get(question.code) || 0;
-        const actualGain = ratioAfter - ratioBefore;
-
-        this._masteryProjectedSum += actualGain - assumedGain;
-        this._masteryAssumedGains.delete(question.code);
-
-        const deficit = this._masteryTargetSum - this._masteryProjectedSum;
-        if (deficit <= 0.0001) return;
-
-        const alreadyScheduled = new Set(this.state.qcmSessionData.map((q) => q.code));
-        let candidates = this._masteryPool.filter((q) => !alreadyScheduled.has(q.code));
-        if (candidates.length === 0) candidates = this._masteryPool.slice();
-
-        const sorted = this.shuffle(candidates).sort(
-            (a, b) => this.getMasteryRatio(a, statsNow) - this.getMasteryRatio(b, statsNow),
-        );
-
-        const toAdd = [];
-        let gained = 0;
-        for (const q of sorted) {
-            if (gained >= deficit) break;
-            const gain = 1 - this.getMasteryRatio(q, statsNow);
-            toAdd.push(q);
-            this._masteryAssumedGains.set(q.code, gain);
-            gained += gain;
-        }
-        if (toAdd.length === 0 && sorted.length > 0) {
-            const q = sorted[0];
-            toAdd.push(q);
-            this._masteryAssumedGains.set(q.code, 1 - this.getMasteryRatio(q, statsNow));
-        }
-
-        this._masteryProjectedSum += gained;
-        this.state.qcmSessionData.push(...toAdd.map((q) => this.shuffleQuestionChoices(q)));
+        const picked = this.pickWeakestForTarget(this._masteryPool, this.getPersistentStats(), this._masteryTargetSum);
+        this.state.qcmSessionData.push(...picked.map((q) => this.shuffleQuestionChoices(q)));
     }
 
     // Progression actuelle vers l'objectif du mode Perfectionnement, pour affichage en direct.
     getMasteryProgress() {
         const pool = this._masteryPool;
         if (!pool || pool.length === 0) return null;
-        const stats = this.getPersistentStats();
-        const currentSum = pool.reduce((sum, q) => sum + this.getMasteryRatio(q, stats), 0);
-        return {
-            current: Math.round((currentSum / pool.length) * 100),
-            target: this._masteryTargetPct || 75,
-        };
+        const score = this.getMasteryScore(pool, this.getPersistentStats());
+        const target = this._masteryTargetPct || 75;
+        // Un arrondi ne doit pas afficher l'objectif tant qu'il n'est pas réellement atteint.
+        const reached = score >= this._masteryTargetSum - MASTERY_EPSILON;
+        const rounded = Math.round((score / pool.length) * 100);
+        return { current: reached ? Math.max(rounded, target) : Math.min(rounded, target - 1), target };
     }
 
     // Questions proposables pour un niveau (BI, BP, BPC, TREUIL ou tout), sans filtre de thème.
@@ -545,10 +509,8 @@ class QuizService {
         this.state.examResults[this.state.qcmIndex] = resultData;
 
         if (this.state.qcmConfig.mode !== 'EXAM') {
-            const isMastery = this.state.qcmConfig.mode === 'MASTERY';
-            const ratioBefore = isMastery ? this.getMasteryRatio(question, this.getPersistentStats()) : null;
             this.updateStats(question, isCorrect);
-            if (isMastery) this.advanceMasteryProgress(question, ratioBefore);
+            if (this.state.qcmConfig.mode === 'MASTERY') this.advanceMasteryProgress();
         }
 
         return resultData;
@@ -584,6 +546,7 @@ class QuizService {
             stats.questions[question.code] = { total: 0, correct: 0, streak: 0 };
         }
         const qStat = stats.questions[question.code];
+        qStat.recent = pushAttempt(qStat, isCorrect);
         qStat.total++;
         if (isCorrect) {
             qStat.correct++;
