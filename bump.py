@@ -7,7 +7,7 @@ files_to_update = [
     "js/core/main.js" # sometimes module has imports
 ]
 version_regex = re.compile(r'\?v=[0-9\._a-zA-Z]+')
-new_version = "?v=2026.10.05_v23"
+new_version = "?v=2026.10.27_v1"
 
 for file_path in files_to_update:
     if not os.path.exists(file_path):
