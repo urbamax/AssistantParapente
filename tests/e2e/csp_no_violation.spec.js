@@ -53,5 +53,9 @@ test('an inline script is blocked and reported', async ({ page }) => {
         document.head.appendChild(s);
     });
     expect(await page.evaluate(() => window.__injected)).toBeUndefined();
-    expect((await violations(page)).join('\n')).toContain('script-src');
+    // Le navigateur signale la violation dans une tâche différée : sur WebKit en CI elle peut arriver
+    // plusieurs millisecondes après le retour de page.evaluate, donc on attend l'événement au lieu de le lire tout de suite.
+    await expect
+        .poll(async () => (await violations(page)).join('\n'), { message: 'a script-src violation is reported' })
+        .toContain('script-src');
 });
