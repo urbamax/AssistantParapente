@@ -51,12 +51,25 @@ describe('QuizService - mode MASTERY (fenêtre glissante)', () => {
         expect(codes.toSorted()).toEqual(weak.map((q) => q.code).toSorted());
     });
 
-    it('does not lengthen the series while questions are still waiting, even after a wrong answer', () => {
+    it('keeps the series length after a right answer', () => {
         QuizService.startSession('BI');
         answer(true);
         QuizService.nextQuestion();
-        answer(false);
+        answer(true);
         expect(QuizService.state.qcmSessionData).toHaveLength(weak.length);
+    });
+
+    it('lengthens the series as soon as a wrong answer is validated, not only on the last question', () => {
+        QuizService.startSession('BI');
+        answer(true);
+        QuizService.nextQuestion();
+        const missed = QuizService.getCurrentQuestion().code;
+        answer(false);
+        const session = QuizService.state.qcmSessionData;
+        expect(session).toHaveLength(weak.length + 1);
+        // la question ratée revient en fin de série, pas tout de suite
+        expect(session.at(-1).code).toBe(missed);
+        expect(session.slice(QuizService.state.qcmIndex + 1, -1).some((q) => q.code === missed)).toBe(false);
     });
 
     it('never pulls a question already at 100 % into the series', () => {
