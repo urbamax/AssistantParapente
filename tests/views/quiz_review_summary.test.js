@@ -90,4 +90,23 @@ describe('quiz: spaced-repetition summary in Révision mode', () => {
         setup({});
         expect(document.getElementById('mode-description').innerText).toContain('espacée');
     });
+
+    it('appears once the questions finish loading when Révision was chosen before that', async () => {
+        let finishLoading;
+        vi.spyOn(QuizService, 'init').mockReturnValue(new Promise((resolve) => (finishLoading = resolve)));
+        vi.spyOn(QuizService, 'getQuestions').mockReturnValue(QUESTIONS);
+        vi.spyOn(QuizService, 'getPersistentStats').mockReturnValue({ themes: {}, questions: {} });
+        QuizService.state.isLoaded = false;
+        QuizService.state.qcmConfig.mode = 'REVISION';
+        QuizService.state.qcmConfig.theme = 'ALL';
+        await QuizView.mount();
+        QuizView.updateModeUI('REVISION', null);
+        expect(line().hidden).toBe(true);
+
+        QuizService.state.isLoaded = true;
+        finishLoading();
+        await vi.waitFor(() => expect(line().hidden).toBe(false));
+        expect(line().textContent).toBe('À réviser : 0 · Nouvelles : 4');
+        await QuizView.unmount();
+    });
 });
