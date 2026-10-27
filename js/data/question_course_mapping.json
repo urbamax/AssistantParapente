@@ -629,7 +629,13 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 29,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-27",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 108
+      }
+    ]
   },
   "E2V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -641,13 +647,11 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 93,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-27"
   },
   "E4V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
-    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 92,
-    "verifiedAt": "2026-09-23"
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit"
   },
   "E5V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -713,13 +717,13 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 18,
-    "verifiedAt": "2026-09-22"
+    "verifiedAt": "2026-10-27"
   },
   "E15B": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 24,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-27"
   },
   "E16B": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -749,7 +753,7 @@
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 24,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-27"
   },
   "E19B": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -759,27 +763,31 @@
   },
   "E20M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
-    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 18,
-    "verifiedAt": "2026-09-23"
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit"
   },
   "E21B": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 24,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-27"
   },
   "E22V": {
-    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
-    "verifiedPage": 24,
-    "verifiedAt": "2026-09-23"
+    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/06-mecanique-du-vol2021/06-mecanique-du-vol2021",
+    "title": "Mécanique du vol et angles",
+    "verifiedPage": 1,
+    "verifiedAt": "2026-10-27",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+        "verifiedPage": 24
+      }
+    ]
   },
   "E23B": {
-    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
-    "verifiedPage": 24,
-    "verifiedAt": "2026-09-23"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 32,
+    "verifiedAt": "2026-10-27"
   },
   "E24V": {
     "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/03-la-dynamique-du-vol2019/03-la-dynamique-du-vol2019",
@@ -813,7 +821,7 @@
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 26,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-27"
   },
   "E32M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -837,7 +845,7 @@
     "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/06-mecanique-du-vol2021/06-mecanique-du-vol2021",
     "title": "Mécanique du vol et angles",
     "verifiedPage": 1,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-27"
   },
   "E35V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -852,22 +860,22 @@
     "verifiedAt": "2026-10-12"
   },
   "E37B": {
-    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/06-mecanique-du-vol2021/06-mecanique-du-vol2021",
-    "title": "Mécanique du vol et angles",
-    "verifiedPage": 1,
-    "verifiedAt": "2026-09-23"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 20,
+    "verifiedAt": "2026-10-27"
   },
   "E38B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 20,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-27"
   },
   "E39B": {
-    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/06-mecanique-du-vol2021/06-mecanique-du-vol2021",
-    "title": "Mécanique du vol et angles",
-    "verifiedPage": 1,
-    "verifiedAt": "2026-09-23"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 20,
+    "verifiedAt": "2026-10-27"
   },
   "E40B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -894,16 +902,22 @@
     ]
   },
   "E42M": {
+    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 24,
+    "verifiedAt": "2026-10-27",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/11-rafales2019/11-rafales2019",
+        "verifiedPage": 1
+      }
+    ]
+  },
+  "E43M": {
     "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/11-rafales2019/11-rafales2019",
     "title": "Rafales - Effets instantanés des rafales sur l’incidence et la vitesse de vol",
     "verifiedPage": 1,
-    "verifiedAt": "2026-09-23"
-  },
-  "E43M": {
-    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
-    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 149,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-27"
   },
   "E44M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -912,10 +926,10 @@
     "verifiedAt": "2026-10-12"
   },
   "E45M": {
-    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
-    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 149,
-    "verifiedAt": "2026-09-23"
+    "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/11-rafales2019/11-rafales2019",
+    "title": "Rafales - Effets instantanés des rafales sur l’incidence et la vitesse de vol",
+    "verifiedPage": 1,
+    "verifiedAt": "2026-10-27"
   },
   "E46M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -925,9 +939,7 @@
   },
   "E47B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
-    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 18,
-    "verifiedAt": "2026-09-23"
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit"
   },
   "E48M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -939,67 +951,73 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 146,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-27"
   },
   "E50V": {
     "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/06-mecanique-du-vol2021/06-mecanique-du-vol2021",
     "title": "Mécanique du vol et angles",
     "verifiedPage": 1,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-27"
   },
   "E51V": {
     "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/06-mecanique-du-vol2021/06-mecanique-du-vol2021",
     "title": "Mécanique du vol et angles",
     "verifiedPage": 1,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-27"
   },
   "E52V": {
-    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/06-mecanique-du-vol2021/06-mecanique-du-vol2021",
-    "title": "Mécanique du vol et angles",
-    "verifiedPage": 1,
-    "verifiedAt": "2026-09-23"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 112,
+    "verifiedAt": "2026-10-27"
   },
   "E53B": {
-    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/06-mecanique-du-vol2021/06-mecanique-du-vol2021",
-    "title": "Mécanique du vol et angles",
-    "verifiedPage": 1,
-    "verifiedAt": "2026-09-23"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 88,
+    "verifiedAt": "2026-10-27"
   },
   "E54V": {
-    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/06-mecanique-du-vol2021/06-mecanique-du-vol2021",
-    "title": "Mécanique du vol et angles",
-    "verifiedPage": 1,
-    "verifiedAt": "2026-09-23"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 95,
+    "verifiedAt": "2026-10-27"
   },
   "E55B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 76,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-27"
   },
   "E56B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 145,
-    "verifiedAt": "2026-09-23"
+    "verifiedPage": 17,
+    "verifiedAt": "2026-10-27"
   },
   "E57B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 146,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-27"
   },
   "E58B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 146,
-    "verifiedAt": "2026-09-23"
+    "verifiedPage": 19,
+    "verifiedAt": "2026-10-27",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 146
+      }
+    ]
   },
   "E59M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 25,
-    "verifiedAt": "2026-09-23"
+    "verifiedAt": "2026-10-27"
   },
   "E60M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
