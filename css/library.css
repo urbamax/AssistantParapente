@@ -153,6 +153,29 @@ body.light-mode .library-section-header {
     margin-bottom: 24px;
 }
 
+.mastery-target-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+}
+
+.mastery-target-value {
+    color: var(--accent-orange);
+    font-weight: 700;
+}
+
+.mastery-target-slider {
+    width: 100%;
+    accent-color: var(--accent-orange);
+}
+
+.mastery-target-hint {
+    margin: 8px 0 24px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
 .mode-toggle-btn,
 .count-btn {
     flex: 1;

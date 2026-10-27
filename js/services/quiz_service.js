@@ -374,6 +374,23 @@ class QuizService {
         return { current: reached ? Math.max(rounded, target) : Math.min(rounded, target - 1), target };
     }
 
+    // Périmètre du mode Perfectionnement : le niveau, restreint au thème choisi.
+    getMasteryScope(level = 'BI', theme = this.state.qcmConfig.theme) {
+        const questions = this.getLevelQuestions(level);
+        return theme && theme !== 'ALL' ? questions.filter((q) => q.theme === theme) : questions;
+    }
+
+    // Maîtrise actuelle (0 à 100, arrondie comme l'écran Statistiques) du périmètre choisi, et plage
+    // des paliers proposables : de 1 point au-dessus de la maîtrise actuelle jusqu'à 100 %.
+    getMasteryTargetBounds(level = 'BI', theme = this.state.qcmConfig.theme) {
+        const pool = this.getMasteryScope(level, theme);
+        const current =
+            pool.length === 0
+                ? 0
+                : Math.round((this.getMasteryScore(pool, this.getPersistentStats()) / pool.length) * 100);
+        return { current, min: Math.min(current + 1, 100), max: 100 };
+    }
+
     // Questions proposables pour un niveau (BI, BP, BPC, TREUIL ou tout), sans filtre de thème.
     getLevelQuestions(level = 'BI') {
         let sourceData = this.getQuestions();
@@ -436,7 +453,7 @@ class QuizService {
 
             questions = filteredData.slice(0, count);
         } else if (this.state.qcmConfig.mode === 'MASTERY') {
-            if (selectedTheme !== 'ALL') sourceData = sourceData.filter((q) => q.theme === selectedTheme);
+            sourceData = this.getMasteryScope(level, selectedTheme);
             const stats = this.getPersistentStats();
             const target = this.state.qcmConfig.masteryTarget || 75;
             questions = this.buildMasterySelection(sourceData, stats, target);

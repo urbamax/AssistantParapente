@@ -180,12 +180,21 @@
 
                     <!-- MASTERY (PERFECTIONNEMENT) OPTIONS (Only shown in Mastery Mode) -->
                     <div id="mastery-options" class="setup-group setup-group-margin" style="display: none">
-                        <label data-i18n="qcmSetupScreen.palierObjectif" class="setup-label">PALIER OBJECTIF</label>
-                        <div class="count-selector">
-                            <button class="count-btn" data-action="setMasteryTarget" data-args="50">50%</button>
-                            <button class="count-btn active" data-action="setMasteryTarget" data-args="75">75%</button>
-                            <button class="count-btn" data-action="setMasteryTarget" data-args="100">100%</button>
+                        <div class="mastery-target-row">
+                            <label data-i18n="qcmSetupScreen.palierObjectif" class="setup-label" for="mastery-target-slider">PALIER OBJECTIF</label>
+                            <output id="mastery-target-value" for="mastery-target-slider" class="mastery-target-value">75%</output>
                         </div>
+                        <input
+                            type="range"
+                            id="mastery-target-slider"
+                            class="mastery-target-slider"
+                            min="1"
+                            max="100"
+                            value="75"
+                            step="1"
+                            data-input-action="setMasteryTarget"
+                        />
+                        <p id="mastery-target-hint" class="mastery-target-hint" role="status"></p>
                     </div>
 
                     <!-- START BUTTON -->
