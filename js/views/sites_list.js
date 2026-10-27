@@ -213,6 +213,10 @@ export class SitesListBase extends SitesMapBase {
         const listDiv = document.getElementById('sites-list-container');
         if (!listDiv) return;
 
+        // Position de lecture : tout re-rendu de la liste (« + » d'une fiche, favori, synchro…) doit la garder.
+        const screen = document.getElementById('sites-screen');
+        const keptScrollTop = screen ? screen.scrollTop : 0;
+
         const activeSites = SitesService.getFilteredAndSortedSites(SitesService.getSites());
         this.renderLocationContext();
 
@@ -223,7 +227,8 @@ export class SitesListBase extends SitesMapBase {
             return;
         }
 
-        listDiv.innerHTML = '';
+        // Pas de vidage préalable : un conteneur vide, s'il est mesuré avant le remplissage,
+        // ramène l'écran tout en haut.
         if (activeSites.length === 0) {
             listDiv.style.display = 'block';
             listDiv.innerHTML =
@@ -454,6 +459,7 @@ export class SitesListBase extends SitesMapBase {
         }
 
         this.updateBadges();
+        if (screen && screen.scrollTop !== keptScrollTop) screen.scrollTop = keptScrollTop;
     }
 
     // Brief pré-vol : rappelle le niveau de brevet actuellement sélectionné (à confronter avec
