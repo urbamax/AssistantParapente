@@ -7,10 +7,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             <button class="next-btn" data-action="next-question" style="flex:1;">QUESTION SUIVANTE <i class="ri-arrow-right-line"></i></button>
         ",
   "feedback": "
-            <div class="instructor-feedback feedback-success">
+            <details class="instructor-feedback feedback-success">
+                <summary>Explication</summary>
                 <div>Un front sépare deux masses d’air.</div>
                 <button data-action="openUrl" data-url="courses/5b7d1610914c.pdf#page=3" style="margin-top:10px; background:var(--accent-orange); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;"><i class="ri-book-open-line"></i> VOIR DANS LE COURS</button>
-            </div>
+            </details>
         ",
 }
 `;

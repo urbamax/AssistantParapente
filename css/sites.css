@@ -871,7 +871,7 @@ body.light-mode .leaflet-tile-pane {
 }
 
 @media (max-width: 500px) {
-    .library-toolbar {
+    #qcm-bank-screen .library-toolbar {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
         gap: 8px !important;

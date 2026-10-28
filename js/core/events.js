@@ -40,7 +40,18 @@ class EventDelegator {
         return args;
     }
 
+    // Verrouille le zoom de la page. Android (Chrome) respecte la balise viewport ; iOS Safari l'ignore et
+    // n'obéit qu'aux événements de geste, d'où ces écouteurs. Les cartes (Leaflet) zooment avec leurs
+    // propres événements tactiles, qui ne sont pas des gestes Safari : elles ne sont pas touchées.
+    _lockPageZoom() {
+        for (const type of ['gesturestart', 'gesturechange', 'gestureend']) {
+            document.addEventListener(type, (e) => e.preventDefault(), { passive: false });
+        }
+    }
+
     init() {
+        this._lockPageZoom();
+
         // Global click delegator
         document.addEventListener('click', (e) => {
             // data-backdrop-action: fires only when the overlay itself (not its content) is clicked.

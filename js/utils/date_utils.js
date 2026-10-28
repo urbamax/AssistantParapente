@@ -35,7 +35,7 @@ const relativeTimeFormatter = new Intl.RelativeTimeFormat('fr-FR', {
 
 /**
  * Format a date string into a localized short date (DD/MM/YYYY).
- * @param {string|Date} dateStr
+ * @param {string|number|Date} dateStr a date string, a Date or a timestamp in milliseconds
  * @returns {string}
  */
 export function formatDateOnly(dateStr) {

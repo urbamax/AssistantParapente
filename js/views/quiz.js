@@ -116,6 +116,9 @@ class QuizViewClass extends QuizVoiceBase {
             this._handleClick = this.handleClick.bind(this);
             document.body.addEventListener('click', this._handleClick);
 
+            this._handleKeydown = this.handleKeydown.bind(this);
+            document.addEventListener('keydown', this._handleKeydown);
+
             this._handleChange = this.handleChange.bind(this);
             const themeSelect = document.getElementById('qcm-theme-select');
             if (themeSelect) themeSelect.addEventListener('change', this._handleChange);
@@ -165,6 +168,7 @@ class QuizViewClass extends QuizVoiceBase {
         await super.unmount();
         this.stopVoice();
         if (this._handleClick) document.body.removeEventListener('click', this._handleClick);
+        if (this._handleKeydown) document.removeEventListener('keydown', this._handleKeydown);
 
         if (this._unsubscribeLevel) {
             this._unsubscribeLevel();
@@ -190,6 +194,41 @@ class QuizViewClass extends QuizVoiceBase {
             const el = document.getElementById(id);
             if (el) el.classList.remove('active');
         });
+    }
+
+    // --- KEYBOARD SHORTCUTS (question screen) ---
+    // A-D or 1-4 tick an answer, Enter validates (or moves on once corrected), arrows go back/forward.
+    // Each shortcut clicks the matching on-screen button so the click handler stays the only code path.
+    handleKeydown(e) {
+        if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+        const screen = document.getElementById('qcm-screen');
+        if (!screen || !screen.classList.contains('active')) return;
+
+        const target = /** @type {HTMLElement | null} */ (e.target);
+        if (target?.closest('input, select, textarea, [contenteditable="true"], dialog, [role="dialog"], .modal'))
+            return;
+        // Other buttons (Lire, Répondre à la voix…) keep their native Enter/Space behaviour.
+        const onOtherButton = target?.closest('button, a[href]') && !target.closest('.qcm-option');
+
+        const press = (selector) => {
+            const btn = /** @type {HTMLButtonElement | null} */ (screen.querySelector(selector));
+            if (!btn || btn.disabled) return false;
+            e.preventDefault();
+            btn.click();
+            return true;
+        };
+
+        if (e.key === 'Enter') {
+            if (onOtherButton) return;
+            if (!press('[data-action="validate-question"]')) press('[data-action="next-question"]');
+        } else if (e.key === 'ArrowLeft') {
+            press('[data-action="prev-question"]');
+        } else if (e.key === 'ArrowRight') {
+            press('[data-action="next-question"]');
+        } else if (/^[a-dA-D1-4]$/.test(e.key)) {
+            const idx = /\d/.test(e.key) ? Number(e.key) - 1 : e.key.toLowerCase().charCodeAt(0) - 97;
+            press(`.qcm-option[data-idx="${idx}"]`);
+        }
     }
 
     // --- EVENT DELEGATION ---
@@ -887,10 +926,11 @@ class QuizViewClass extends QuizVoiceBase {
         const feedbackDiv = document.getElementById('qcm-feedback');
         feedbackDiv.style.display = 'block';
         feedbackDiv.innerHTML = `
-            <div class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}">
+            <details class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}"${result.isCorrect ? '' : ' open'}>
+                <summary>${tq('question.explanation')}</summary>
                 <div>${explanationHtml(result.question.explication)}</div>
                 ${courseLinksHtml(courseLinks)}
-            </div>
+            </details>
         `;
 
         this._voiceFeedback = result;

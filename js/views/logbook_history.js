@@ -10,7 +10,7 @@ import { EXTENDED_WIND_DIRECTIONS } from '../data/weather_config.js';
 import { getSpotairWidgetId } from '../data/spotair_widgets.js';
 import { escapeHTML } from '../core/security.js';
 import { companionsOf, instructorsOf, isCourseSession, courseKey } from '../services/logbook_courses.js';
-import { formatDuration, formatDateTime, addMinutesToDatetimeLocal } from '../utils/date_utils.js';
+import { formatDuration, formatDateTime, formatDateOnly, addMinutesToDatetimeLocal } from '../utils/date_utils.js';
 import { t } from '../utils/i18n.js';
 import { buildIgcFileName, buildLogbookReportHtml } from '../services/logbook_export.js';
 import { saveTextFile } from '../utils/download.js';
@@ -158,6 +158,25 @@ export class LogbookHistoryBase extends LogbookStatsBase {
         return session.stageSpecialty ? tt('history.course') : '';
     }
 
+    /**
+     * Imports dont il reste des vols au carnet (export FFVL, spec 046) : date, nombre de vols et bouton
+     * pour annuler l'import. Vide s'il n'y en a pas.
+     */
+    renderImportsHtml() {
+        const batches = LogbookService.importBatches();
+        if (batches.length === 0) return '';
+        const lines = batches
+            .map(
+                (batch) => `
+                <div class="logbook-import-line">
+                    <span class="logbook-import-text">${tt(batch.count === 1 ? 'ffvl.imports.lineOne' : 'ffvl.imports.lineMany', { date: formatDateOnly(batch.importedAt), count: batch.count })}</span>
+                    <button type="button" class="action-btn-secondary" data-action="undoFfvlImport" data-args="${escapeHTML(batch.batchId)}"><i class="ri-arrow-go-back-line"></i> ${tt('ffvl.imports.undo')}</button>
+                </div>`,
+            )
+            .join('');
+        return `<div class="logbook-imports"><h3>${tt('ffvl.imports.heading')}</h3>${lines}</div>`;
+    }
+
     renderHistory() {
         const container = document.getElementById('logbook-history-list');
         if (!container) return;
@@ -217,7 +236,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
             return;
         }
 
-        let html = filterBannerHtml;
+        let html = filterBannerHtml + this.renderImportsHtml();
         flights.forEach((session) => {
             try {
                 const isVol = session.type === 'vol';
@@ -295,7 +314,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                         <div class="session-badge" style="background-color: ${typeColor}22; color: ${typeColor};">
                             <i class="${icon}"></i> ${tt(isVol ? 'history.badgeFlight' : 'history.badgeGround')}
                         </div>
-                        <div class="session-date">${formatDateTime(session.datetime)}</div>
+                        <div class="session-date">${session.dateOnly ? formatDateOnly(session.datetime) : formatDateTime(session.datetime)}</div>
                         <div style="display: flex; gap: 8px;">
                             <button class="edit-btn" data-action="editEntry" data-args="${session.id}" title="${tt('history.edit')}" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
                                 <i class="ri-edit-line"></i>
@@ -308,8 +327,8 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                     <div class="logbook-card-body">
                         <div class="session-location">${escapeHTML(location)}</div>
                         <div class="session-details">
-                            <span class="detail-item"><i class="ri-time-line"></i> ${formatDuration(session.duree)}</span>
-                            <span class="detail-item"><i class="${subtitle.toLowerCase().includes('treuil') ? 'ri-arrow-up-double-line' : subtitle.toLowerCase().includes('thermique') ? 'ri-fire-line' : subtitle.toLowerCase().includes('cross') ? 'ri-route-line' : subtitle.toLowerCase().includes('plouf') ? 'ri-arrow-left-down-line' : subtitle.toLowerCase().includes('restit') || subtitle.toLowerCase().includes('soaring') ? 'ri-sun-cloudy-line' : subtitle.toLowerCase().includes('gonflage') ? 'ri-footprint-line' : 'ri-price-tag-3-line'}"></i> ${escapeHTML(subtitle)}</span>
+                            <span class="detail-item"><i class="ri-time-line"></i> ${formatDuration(session.duree)}</span>${session.import ? `<span class="detail-item session-import-badge" title="${tt('ffvl.badgeTitle', { date: formatDateOnly(session.import.importedAt) })}"><i class="ri-file-excel-2-line"></i> ${tt('ffvl.badge')}</span>` : ''}
+                            ${subtitle ? `<span class="detail-item"><i class="${subtitle.toLowerCase().includes('treuil') ? 'ri-arrow-up-double-line' : subtitle.toLowerCase().includes('thermique') ? 'ri-fire-line' : subtitle.toLowerCase().includes('cross') ? 'ri-route-line' : subtitle.toLowerCase().includes('plouf') ? 'ri-arrow-left-down-line' : subtitle.toLowerCase().includes('restit') || subtitle.toLowerCase().includes('soaring') ? 'ri-sun-cloudy-line' : subtitle.toLowerCase().includes('gonflage') ? 'ri-footprint-line' : 'ri-price-tag-3-line'}"></i> ${escapeHTML(subtitle)}</span>` : ''}
                         </div>
                         ${extraInfo}
                         <div class="session-equip">
