@@ -625,7 +625,7 @@ body.light-mode .library-list-item {
     flex: 1;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
-    /* Défilement seulement : le pincement est géré par la visionneuse, pas par la page de l'application. */
+    /* Défilement seulement : le pincement est géré par la visionneuse (Android laisserait sinon `manipulation` zoomer). */
     touch-action: pan-x pan-y;
     overscroll-behavior: contain; /* le défilement ne passe pas à l'écran dessous */
     padding: 8px;

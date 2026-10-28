@@ -235,8 +235,9 @@ export async function openCourseViewer(url) {
 
     /**
      * Zoom au pincement : pendant le geste la page est seulement agrandie à l'écran (fluide) ; le
-     * redessin net se fait une fois les doigts levés. Le zoom natif du navigateur est désactivé ici
-     * (touch-action et gesturestart) : seule la visionneuse zoome, pas l'application.
+     * redessin net se fait une fois les doigts levés. Seules les pages du cours zooment : la barre et
+     * l'application restent à leur taille (le zoom de la page est verrouillé dans toute l'application,
+     * voir js/core/events.js ; ces événements tactiles ne sont pas des gestes de page).
      */
     function enablePinchZoom() {
         const distance = (touches) =>
@@ -280,9 +281,6 @@ export async function openCourseViewer(url) {
         };
         scroller.addEventListener('touchend', end);
         scroller.addEventListener('touchcancel', end);
-        // Safari iOS : sans cela, le pincement zoomerait toute la page de l'application.
-        overlay.addEventListener('gesturestart', (event) => event.preventDefault());
-        overlay.addEventListener('gesturechange', (event) => event.preventDefault());
     }
 
     /** La page qui touche le haut de l'écran de lecture. */
