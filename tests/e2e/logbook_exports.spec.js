@@ -45,6 +45,8 @@ test.describe('E2E - Logbook exports', () => {
             LogbookView.renderHistory();
         }, IGC);
 
+        // Les cartes sont repliées à l'ouverture du carnet : on déplie celle du vol.
+        await page.locator('.logbook-card-toggle').first().click();
         const downloadPromise = page.waitForEvent('download');
         await page.locator('[data-action="downloadTrace"]').first().click();
         const download = await downloadPromise;
