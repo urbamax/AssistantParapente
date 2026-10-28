@@ -23,6 +23,12 @@ export function isNearKnownTakeoff(sites, lat, lon, maxKm) {
         if (!isTakeoffSite(site)) return false;
         const sLat = site.latitude ?? site.lat;
         const sLon = site.longitude ?? site.lon;
-        return sLat != null && sLon != null && calculateDistance(lat, lon, sLat, sLon) <= maxKm;
+        return (
+            sLat !== null &&
+            sLat !== undefined &&
+            sLon !== null &&
+            sLon !== undefined &&
+            calculateDistance(lat, lon, sLat, sLon) <= maxKm
+        );
     });
 }
