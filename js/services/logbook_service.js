@@ -573,10 +573,10 @@ class LogbookService {
 
     // Un vario qui enregistre dès le décollage (Syride, détection automatique…) donne une trace
     // dont le 1er point est déjà à vitesse de vol, mais posé sur le décollage : ce n'est pas un
-    // vario allumé en vol. Rayon serré (150 m) : on ne rate que le pilote qui allume son vario
+    // vario allumé en vol. Rayon serré (120 m) : on ne rate que le pilote qui allume son vario
     // en vol juste devant le déco, bien moins gênant qu'une fausse alerte à chaque vol.
     _startsAtKnownTakeoff(first) {
-        return Boolean(first) && isNearKnownTakeoff(SitesService.getSites(), first.lat, first.lon, 0.15);
+        return Boolean(first) && isNearKnownTakeoff(SitesService.getSites(), first.lat, first.lon, 0.12);
     }
 
     async reverseGeocode(lat, lon) {
