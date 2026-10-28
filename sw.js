@@ -108,6 +108,7 @@ const CRITICAL_ASSETS = [
     './js/services/flight_trace_sync.js',
     './js/services/igc_parser.js',
     './js/services/flight_classifier.js',
+    './js/services/landing_approach.js',
     './js/services/logbook_service.js',
     './js/services/logbook_export.js',
     './js/services/logbook_courses.js',

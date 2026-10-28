@@ -556,6 +556,8 @@ class LogbookService {
                         // Vario allumé / éteint en vol : la trace commence ou finit en l'air
                         startsAirborne: Boolean(parsed.startsAirborne),
                         endsAirborne: Boolean(parsed.endsAirborne),
+                        // Prise de terrain lue dans la trace (suggestion), null si elle ne permet pas de conclure
+                        landingApproach: parsed.landingApproach || null,
                         // Altitudes au vrai décollage / atterrissage (pas au parking)
                         takeoffAlt: (points[parsed.takeoffIndex] || points[0]).alt,
                         landingAlt: (points[parsed.landingIndex] || points[points.length - 1]).alt,

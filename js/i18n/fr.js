@@ -160,6 +160,7 @@ export const FR = Object.freeze({
                 fields: Object.freeze({
                     typeVol: 'type de vol',
                     techDecollage: 'technique de décollage',
+                    priseTerrain: 'prise de terrain',
                     voile: 'voile',
                     sellette: 'sellette',
                     ecole: 'école',
@@ -181,6 +182,7 @@ export const FR = Object.freeze({
                     traceCross: 'thermiques et grande distance repérés dans la trace',
                     traceSoaring: 'allers-retours sans thermique repérés dans la trace',
                     tracePlouf: 'descente directe repérée dans la trace',
+                    traceApproach: 'forme de la dernière descente repérée dans la trace',
                     gearPlace: 'utilisée la dernière fois ici',
                     gearLatest: 'la dernière utilisée',
                     nearbySession: 'comme ta session de moins de 3 h ici',

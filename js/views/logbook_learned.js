@@ -19,6 +19,7 @@ export class LogbookLearnedBase extends LogbookChecklistsBase {
     static LEARNED_FIELD_IDS = {
         'lb-typeVol': 'typeVol',
         'lb-tech-decollage': 'techDecollage',
+        'lb-prise-terrain': 'priseTerrain',
         'lb-voile': 'voile',
         'lb-sellette': 'sellette',
         'lb-ecole-check': 'ecole',
