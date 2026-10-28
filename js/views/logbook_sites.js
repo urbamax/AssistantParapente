@@ -8,13 +8,14 @@ import SitesService from '../services/sites_service.js';
 import { escapeHTML } from '../core/security.js';
 import { tt } from './logbook_strings.js';
 import { LogbookCoordsBase } from './logbook_coords.js';
+import { TAKEOFF_SITE_TYPES, isTakeoffSite } from '../services/launch_sites.js';
 
 export class LogbookSitesBase extends LogbookCoordsBase {
     // Site officiel le plus proche d'un point GPS (ex: décollage détecté depuis une trace
     // IGC), dans un rayon raisonnable. Retourne null si aucun site officiel n'est assez proche.
     // Types de sites d'où l'on décolle. Un site uniquement ATTERRO, KITE, GONFLAGE, INTERDIT…
     // ne doit jamais être proposé comme lieu d'un vol importé.
-    static TAKEOFF_SITE_TYPES = ['NATUREL', 'TREUIL', 'SOARING', 'THERMIQUE', 'DUNE', 'PENTE-ÉCOLE', 'MARCHE ET VOL'];
+    static TAKEOFF_SITE_TYPES = TAKEOFF_SITE_TYPES;
 
     // Plusieurs sites connus près du décollage d'une trace (deux décos voisins, treuil et
     // pente…) : le plus proche est pré-rempli, les autres sont proposés en boutons.
@@ -80,9 +81,7 @@ export class LogbookSitesBase extends LogbookCoordsBase {
     }
 
     isTakeoffSite(site) {
-        if (!site || site.affiche === false) return false;
-        const types = Array.isArray(site.type) ? site.type : [site.type];
-        return types.some((t) => LogbookSitesBase.TAKEOFF_SITE_TYPES.includes(t));
+        return isTakeoffSite(site);
     }
 
     // Rayon de 500 m : au-delà, le site connu le plus proche est souvent un autre décollage

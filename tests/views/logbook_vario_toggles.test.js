@@ -188,3 +188,33 @@ describe('LogbookService: vario switched on or off during the flight', () => {
         }
     });
 });
+
+describe('LogbookService: trace recorded from the take-off', () => {
+    // Un vario qui enregistre dès le décollage (Syride) : 1er point déjà à vitesse de vol, mais
+    // posé sur le décollage. Les points synthétiques partent de 45.9 N / 6°52' E.
+    const launch = (overrides) => ({
+        id: 'test-1',
+        nom: 'DECO TEST',
+        latitude: 45.9,
+        longitude: 6 + 52 / 60,
+        type: ['NATUREL'],
+        affiche: true,
+        ...overrides,
+    });
+    const startsAirborneWith = (sites) => {
+        vi.spyOn(SitesService, 'getSites').mockReturnValue(sites);
+        return LogbookService.parseIGC(buildIgc([FLIGHT_10MIN, GROUND])).data.startsAirborne;
+    };
+
+    it('is not a vario switched on in flight when the first point sits on a known take-off', () => {
+        expect(startsAirborneWith([launch()])).toBe(false);
+    });
+
+    it('still flags a trace starting in the air away from any take-off', () => {
+        expect(startsAirborneWith([launch({ latitude: 45.95 })])).toBe(true);
+    });
+
+    it('ignores sites that are not take-offs (landing field)', () => {
+        expect(startsAirborneWith([launch({ type: ['ATTERRO'] })])).toBe(true);
+    });
+});
