@@ -254,6 +254,8 @@ class Router {
 
     initHistory() {
         window.addEventListener('popstate', (e) => {
+            // Retour qui ferme la visionneuse de cours : l'écran en dessous reste tel quel (pas de remontage).
+            if (document.body.classList.contains('course-viewer-open')) return;
             if (e.state && e.state.mode) {
                 this.navigate(e.state.mode, { ...e.state.params, pushState: false });
             } else {

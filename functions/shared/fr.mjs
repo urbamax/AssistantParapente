@@ -1586,6 +1586,18 @@ export const FR = Object.freeze({
         restoreFailed: "La restauration a échoué (stockage de l'appareil plein ou indisponible).",
         syncFailed: ' La synchronisation avec le cloud a échoué : elle sera retentée plus tard.',
     }),
+    // Visionneuse de cours de l'application installée (js/views/course_viewer.js).
+    courseViewer: Object.freeze({
+        back: 'Retour',
+        backLabel: "Fermer le cours et revenir à l'application",
+        fallbackTitle: 'Cours',
+        pageOf: 'p. {page} / {total}',
+        zoomIn: 'Agrandir',
+        zoomOut: 'Réduire',
+        loading: 'Chargement du cours…',
+        loadError: "Impossible d'afficher ce cours ici.",
+        openDirect: 'Ouvrir le PDF directement',
+    }),
     // Spec 021 : textes de la bibliothèque des cours (js/views/manual.js). Les codes de niveau (BI, BP…)
     // et les catégories des cours (« Autre » par défaut) sont des données.
     library: Object.freeze({

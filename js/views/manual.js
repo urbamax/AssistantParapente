@@ -4,6 +4,7 @@
  */
 import GlobalState from '../core/app_state.js';
 import { escapeHTML } from '../core/security.js';
+import { openLink } from '../core/course_link.js';
 import { COURSES_DATA } from '../data/courses_data.js';
 import { toSorted } from '../utils/array_utils.js';
 import { t } from '../utils/i18n.js';
@@ -239,8 +240,8 @@ class LibraryViewClass extends BaseView {
             targetUrl = targetUrl.normalize('NFC');
         }
 
-        // OPEN IN NEW TAB with reverse tabnabbing protection
-        window.open(targetUrl, '_blank', 'noopener,noreferrer');
+        // Nouvel onglet (sans lien avec la page) ; application installée : visionneuse avec bouton « Retour »
+        openLink(targetUrl);
     }
 
     formatTitle(title) {

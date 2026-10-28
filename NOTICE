@@ -13,7 +13,8 @@ make the training of paragliding pilots easier, free of charge and without profi
   attribution "Source : FFVL"; completed with ParaglidingEarth data (Creative Commons
   BY-SA 3.0).
 - Weather forecasts: Open-Meteo (CC BY 4.0). Maps: their respective providers.
-- Libraries in vendor/ keep their own licences.
+- Libraries in vendor/ keep their own licences (for example pdf.js by Mozilla, Apache-2.0,
+  used to display the courses inside the installed application).
 
 Removal requests: contact the author of the application, the content is withdrawn or
 modified on request.
