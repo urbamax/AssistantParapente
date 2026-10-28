@@ -253,23 +253,25 @@ export class QuizVoiceBase extends QuizStatsBase {
         }
         main.innerHTML = `
             <div class="qcm-voice-controls">
-                ${
-                    canSpeak
-                        ? `<button type="button" class="qcm-voice-btn" data-action="quiz-voice-read" aria-pressed="${speaking}" aria-label="${tv(readLabel)}">
-                    <i class="${speaking ? 'ri-stop-circle-line' : 'ri-volume-up-line'}" aria-hidden="true"></i> ${tv('read')}
-                </button>
-                <button type="button" class="qcm-voice-btn" data-action="quiz-voice-auto" aria-pressed="${autoRead}" aria-label="${tv('autoLabel')}">
-                    <i class="ri-play-list-line" aria-hidden="true"></i> ${tv('auto')}
-                </button>`
-                        : ''
-                }
-                ${
-                    canListen
-                        ? `<button type="button" class="qcm-voice-btn" data-action="quiz-voice-mic" aria-pressed="${listening}"${listening ? ` aria-label="${tv('micStopLabel')}"` : ''}>
-                    <i class="${listening ? 'ri-mic-fill' : 'ri-mic-line'}" aria-hidden="true"></i> ${tv('mic')}
-                </button>`
-                        : ''
-                }
+                <div class="qcm-voice-buttons">
+                    ${
+                        canSpeak
+                            ? `<button type="button" class="qcm-voice-btn" data-action="quiz-voice-read" aria-pressed="${speaking}" aria-label="${tv(readLabel)}">
+                        <i class="${speaking ? 'ri-stop-circle-line' : 'ri-volume-up-line'}" aria-hidden="true"></i> ${tv('read')}
+                    </button>
+                    <button type="button" class="qcm-voice-btn" data-action="quiz-voice-auto" aria-pressed="${autoRead}" aria-label="${tv('autoLabel')}">
+                        <i class="ri-play-list-line" aria-hidden="true"></i> ${tv('auto')}
+                    </button>`
+                            : ''
+                    }
+                    ${
+                        canListen
+                            ? `<button type="button" class="qcm-voice-btn" data-action="quiz-voice-mic" aria-pressed="${listening}"${listening ? ` aria-label="${tv('micStopLabel')}"` : ''}>
+                        <i class="${listening ? 'ri-mic-fill' : 'ri-mic-line'}" aria-hidden="true"></i> ${tv('mic')}
+                    </button>`
+                            : ''
+                    }
+                </div>
                 ${canListen && voiceConsent ? `<button type="button" class="qcm-voice-link" data-action="quiz-voice-revoke">${tv('revoke')}</button>` : ''}
             </div>
             ${

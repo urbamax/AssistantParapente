@@ -189,6 +189,21 @@ describe('US1 - read aloud (spec 016)', () => {
         expect(document.getElementById('qcm-voice-status').getAttribute('aria-live')).toBe('polite');
     });
 
+    it('spec 047: groups the three voice action buttons in .qcm-voice-buttons with revoke link placed below', () => {
+        mockVoice();
+        VoiceService.setPrefs({ voiceConsent: true });
+        startSession();
+        const container = bar().querySelector('.qcm-voice-buttons');
+        expect(container).not.toBeNull();
+        expect(container.contains(btn('quiz-voice-read'))).toBe(true);
+        expect(container.contains(btn('quiz-voice-auto'))).toBe(true);
+        expect(container.contains(btn('quiz-voice-mic'))).toBe(true);
+
+        const revokeLink = bar().querySelector('.qcm-voice-link');
+        expect(revokeLink).not.toBeNull();
+        expect(container.contains(revokeLink)).toBe(false);
+    });
+
     it('keeps the focus on the pressed control after an update', () => {
         mockVoice();
         startSession();
