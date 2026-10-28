@@ -12,9 +12,9 @@ import { formatCoordinates } from '../utils/geo_utils.js';
 import { classifyFlight } from '../services/flight_classifier.js';
 import { addMinutesToDatetimeLocal } from '../utils/date_utils.js';
 import { tt, th, tl } from './logbook_strings.js';
-import { LogbookBatchImportBase } from './logbook_batch_import.js';
+import { LogbookFfvlImportBase } from './logbook_ffvl_import.js';
 
-export class LogbookIgcImportBase extends LogbookBatchImportBase {
+export class LogbookIgcImportBase extends LogbookFfvlImportBase {
     currentTraceData = null;
 
     currentRawIgc = null;

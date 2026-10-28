@@ -194,6 +194,7 @@ export const FR_HTML = Object.freeze({
         carnetDeVol: 'CARNET DE VOL',
         ajouterUneSession: 'Ajouter une session',
         toutRecalculer: 'Tout recalculer',
+        importerFfvl: 'Importer un export FFVL',
         exporterEnPdf: 'Exporter en PDF',
         ajouterUnEquipement: 'Ajouter un Équipement',
         type: 'Type :',
@@ -654,6 +655,8 @@ export const FR_HTML = Object.freeze({
         n1AjouterUnVol: '1. Ajouter un Vol',
         importerTraceIgc:
             "<strong>Importer une trace GPS (.igc) :</strong> Glissez-déposez ou sélectionnez le fichier IGC de votre vario. L'application repère le vrai décollage et le vrai atterrissage (ni le parking, ni la marche du retour, même avec des virages serrés en approche), puis calcule la date, la durée, l'altitude max, le gain, la distance, le vario max et les vitesses. Un <strong>départ au treuil</strong> est reconnu tout seul (montée régulière en ligne droite dès le décollage) : le type de vol passe alors à <strong>Treuil</strong>. Si votre vario était mal calé (par exemple une altitude d'atterrissage négative), elle vous le signale et vous pouvez corriger les altitudes en saisissant l'altitude réelle du décollage ou de l'atterrissage. <strong>Plusieurs vols d'un coup :</strong> sélectionnez ou déposez plusieurs fichiers ensemble (avec leurs fichiers .sdf si vous en avez) : un tableau s'ouvre avec une ligne par vol, rangée par date. Chaque ligne part de la trace et de vos habitudes ; corrigez-la directement (date, site, durée, voile, sellette, type de vol, école et stage, pilotes), ou recopiez une colonne sur les autres lignes avec « Appliquer à toutes ». Un fichier illisible, un doublon ou un vol déjà dans le carnet est signalé et décoché. Rien n'est ajouté avant de cliquer sur « Importer ».",
+        importerFfvl:
+            "<strong>Importer votre carnet FFVL (Excel) :</strong> Dans l'historique, « Importer un export FFVL » lit le fichier Excel du carnet de vols de l'Intranet FFVL (Passeport, Carnet de vols, Export Excel). Un tableau s'ouvre avec une ligne par vol ; rien n'est ajouté avant de cliquer sur « Importer ». L'export ne donne ni l'heure, ni la voile, ni le type de vol : ils restent vides et le vol s'affiche avec sa date seule ; complétez-les en modifiant le vol. Le dénivelé, l'analyse et le formateur sont recopiés dans le commentaire (le formateur devient moniteur si vous indiquez l'école). Un vol importé porte la mention « Importé FFVL ». Importer le même export une seconde fois ne crée aucun doublon (les vols déjà importés sont signalés et décochés), et « Annuler cet import », en haut de l'historique, retire tous les vols de cet import, et eux seuls.",
         capteursSyride:
             "<strong>Capteurs Syride (.sdf) :</strong> Avec un vario Syride, ajoutez le fichier <strong>.sdf</strong> exporté avec le .igc (sélectionnez ou glissez les deux fichiers ensemble). Il apporte ce que l'IGC ne contient pas : le <strong>facteur de charge</strong> (G) mesuré par l'accéléromètre, y compris au largage du treuil. Vous pouvez aussi l'ajouter plus tard en modifiant le vol. L'application vérifie qu'il s'agit bien du même vol : sa trace doit suivre celle du .igc sur toute sa longueur, sinon il est refusé.",
         uneProposeLesSites:

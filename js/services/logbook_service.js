@@ -165,9 +165,11 @@ class LogbookService {
      * seule synchro au lieu d'une par vol. Si la sauvegarde échoue, le carnet est remis comme il
      * était et rien n'est ajouté.
      * @param {Object[]} flights
+     * @param {number} [now] date d'ajout, commune à tous les vols (`updatedAt`) : un vol importé qui n'a pas
+     *   été modifié depuis a `updatedAt` égal à la date de son import
      * @returns {{success: boolean, data: Object[], error: string|null}}
      */
-    addFlights(flights) {
+    addFlights(flights, now = Date.now()) {
         const list = Array.isArray(flights) ? flights : [];
         if (list.length === 0) return { success: true, data: [], error: null };
         const before = this.flights.slice();
@@ -177,7 +179,7 @@ class LogbookService {
                     typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
                         ? crypto.randomUUID()
                         : `${Date.now()}-${this.flights.length}`;
-                flight.updatedAt = Date.now();
+                flight.updatedAt = now;
                 flight.syncPending = true;
                 normalizeFlight(flight);
                 this.flights.push(flight);
@@ -194,7 +196,12 @@ class LogbookService {
     updateFlight(id, updatedData) {
         const index = this.flights.findIndex((f) => f.id === id);
         if (index !== -1) {
-            this.flights[index] = { ...this.flights[index], ...updatedData, updatedAt: Date.now(), syncPending: true };
+            const before = this.flights[index];
+            this.flights[index] = { ...before, ...updatedData, updatedAt: Date.now(), syncPending: true };
+            // Un vol importé sans heure (l'export FFVL n'en a pas) reçoit une vraie heure : il n'est plus « sans heure »
+            if (before.dateOnly && updatedData.datetime && updatedData.datetime !== before.datetime) {
+                this.flights[index].dateOnly = false;
+            }
             normalizeFlight(this.flights[index]);
             this.flights.sort((a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime());
             this.saveFlights();
@@ -225,18 +232,37 @@ class LogbookService {
     }
 
     deleteFlight(id) {
-        this.flights = this.flights.filter((f) => f.id !== id);
+        this._removeFlights([id]);
+    }
+
+    /**
+     * Supprime plusieurs vols d'un coup (annulation d'un import) : une seule sauvegarde, avec les mêmes
+     * marques de suppression que pour un vol seul. Les identifiants inconnus sont ignorés.
+     * @param {string[]} ids
+     * @returns {number} nombre de vols supprimés
+     */
+    deleteFlights(ids) {
+        const known = new Set(this.flights.map((f) => f.id));
+        const gone = [...new Set(ids || [])].filter((id) => known.has(id));
+        if (gone.length > 0) this._removeFlights(gone);
+        return gone.length;
+    }
+
+    _removeFlights(ids) {
+        const gone = new Set(ids);
+        this.flights = this.flights.filter((f) => !gone.has(f.id));
         this.saveFlights();
         if (IDBStorage.isSupported()) {
-            IDBStorage.deleteFlight(id).catch(() => {});
+            ids.forEach((id) => IDBStorage.deleteFlight(id).catch(() => {}));
         }
 
         let deleted = [];
         try {
             deleted = JSON.parse(localStorage.getItem('deleted_flights') || '[]');
         } catch {}
-        if (!deleted.includes(id)) {
-            deleted.push(id);
+        const pending = ids.filter((id) => !deleted.includes(id));
+        if (pending.length > 0) {
+            deleted.push(...pending);
             localStorage.setItem('deleted_flights', JSON.stringify(deleted));
         }
 
@@ -245,8 +271,46 @@ class LogbookService {
             window.FirebaseAuthEngine.currentUser &&
             typeof window.FirebaseAuthEngine.deleteLogbookEntry === 'function'
         ) {
-            window.FirebaseAuthEngine.deleteLogbookEntry(id).catch(console.error);
+            ids.forEach((id) => window.FirebaseAuthEngine.deleteLogbookEntry(id).catch(console.error));
         }
+    }
+
+    /**
+     * Les imports dont il reste des vols au carnet (export FFVL…), le plus récent d'abord. `editedCount` :
+     * vols modifiés depuis l'import (leur `updatedAt` n'est plus la date de l'import).
+     * @returns {Array<{batchId: string, source: string, importedAt: number, ids: string[], count: number, editedCount: number}>}
+     */
+    importBatches() {
+        const batches = new Map();
+        for (const flight of this.flights) {
+            const mark = flight.import;
+            if (!mark || !mark.batchId) continue;
+            if (!batches.has(mark.batchId)) {
+                batches.set(mark.batchId, {
+                    batchId: mark.batchId,
+                    source: mark.source,
+                    importedAt: mark.importedAt,
+                    ids: [],
+                    count: 0,
+                    editedCount: 0,
+                });
+            }
+            const batch = batches.get(mark.batchId);
+            batch.ids.push(flight.id);
+            batch.count++;
+            if (flight.updatedAt !== mark.importedAt) batch.editedCount++;
+        }
+        return [...batches.values()].sort((a, b) => b.importedAt - a.importedAt);
+    }
+
+    /**
+     * Annule un import : retire du carnet tous les vols de cet import, et seulement ceux-là.
+     * @param {string} batchId
+     * @returns {number} nombre de vols retirés
+     */
+    undoImport(batchId) {
+        const batch = this.importBatches().find((b) => b.batchId === batchId);
+        return batch ? this.deleteFlights(batch.ids) : 0;
     }
 
     getFlights() {
