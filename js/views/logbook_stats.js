@@ -606,7 +606,8 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
                 // Location
                 sitesStats[s.site] = (sitesStats[s.site] || 0) + 1;
                 // Type
-                volTypes[s.typeVol] = (volTypes[s.typeVol] || 0) + 1;
+                // Un vol importé n'a pas de type : il ne compte dans aucune barre plutôt que dans une barre sans nom
+                if (s.typeVol) volTypes[s.typeVol] = (volTypes[s.typeVol] || 0) + 1;
                 // Deco
                 if (s.techDecollage) {
                     decoTypes[s.techDecollage] = (decoTypes[s.techDecollage] || 0) + 1;

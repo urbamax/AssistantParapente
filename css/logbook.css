@@ -989,13 +989,16 @@ html.dark-theme .bar-track {
     color: #047857;
 }
 
-.batch-fix .batch-status {
+.batch-fix .batch-status,
+.batch-similar .batch-status {
     background: rgba(245, 158, 11, 0.2);
     color: #b45309;
 }
 
 .batch-duplicate .batch-status,
 .batch-known .batch-status,
+.batch-imported .batch-status,
+.batch-invalid .batch-status,
 .batch-unreadable .batch-status,
 .batch-unsupported .batch-status {
     background: rgba(107, 114, 128, 0.2);
@@ -1082,4 +1085,61 @@ html.dark-theme .bar-track {
         font-size: 0.72rem;
         color: var(--text-secondary, #666);
     }
+}
+
+
+/* --- Import de l'export FFVL (spec 046) --- */
+.ffvl-school {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0 0 12px;
+    max-width: 22rem;
+    font-size: 0.85rem;
+}
+
+.ffvl-school label {
+    font-weight: bold;
+}
+
+.ffvl-school input {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.ffvl-school small {
+    color: var(--text-secondary, #666);
+}
+
+/* Imports FFVL en tête de l'historique : date, nombre de vols, annulation */
+.logbook-imports {
+    margin-bottom: 20px;
+    padding: 12px 18px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-card, 16px);
+    background: var(--bg-card);
+    font-size: 0.9rem;
+}
+
+.logbook-imports h3 {
+    margin: 0 0 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary, #666);
+}
+
+.logbook-import-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    padding: 4px 0;
+}
+
+.logbook-import-line + .logbook-import-line {
+    border-top: 1px solid var(--border-light, #ddd);
+}
+
+.logbook-import-line button {
+    cursor: pointer;
 }
