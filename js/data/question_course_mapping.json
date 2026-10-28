@@ -678,16 +678,16 @@
     "verifiedAt": "2026-10-27"
   },
   "E8M": {
-    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
-    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 147,
-    "verifiedAt": "2026-09-23"
+    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 24,
+    "verifiedAt": "2026-10-28"
   },
   "E9B": {
-    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
-    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 113,
-    "verifiedAt": "2026-09-23"
+    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 24,
+    "verifiedAt": "2026-10-28"
   },
   "E10B": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -1216,32 +1216,44 @@
   "E85M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 27,
-    "verifiedAt": "2026-09-24"
+    "verifiedPage": 108,
+    "verifiedAt": "2026-10-28",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 27
+      }
+    ]
   },
   "E86M": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 41,
-    "verifiedAt": "2026-09-24"
+    "verifiedAt": "2026-10-28"
   },
   "E87M": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 41,
-    "verifiedAt": "2026-09-24"
+    "verifiedAt": "2026-10-28"
   },
   "F1BM": {
-    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
-    "verifiedPage": 10,
-    "verifiedAt": "2026-09-22"
+    "course_id": "general/2014-livret-ffvl-9bd",
+    "title": "Le guide des bonnes pratiques chez les libéristes",
+    "verifiedPage": 17,
+    "verifiedAt": "2026-10-28",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+        "verifiedPage": 10
+      }
+    ]
   },
   "F2B": {
     "course_id": "brevet-de-pilote-confirme---marron/fiche-eval-2025/2025-fiche-cval-bpc-4-modules/2025-fiche-cval-bpc-4-modules",
-    "title": "brevet-de-pilote-confirme---marron/fiche-eval-2025/2025-fiche-cval-bpc-4-modules/2025-fiche-cval-bpc-4-modules",
+    "title": "Fiche d'évaluation - Brevet de Pilote Confirmé",
     "verifiedPage": 2,
-    "verifiedAt": "2026-09-24"
+    "verifiedAt": "2026-10-28"
   },
   "F3B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
@@ -1289,103 +1301,133 @@
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 10,
-    "verifiedAt": "2026-09-24"
+    "verifiedAt": "2026-10-28"
   },
   "F11BM": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
-    "verifiedPage": 9,
-    "verifiedAt": "2026-09-24"
+    "verifiedPage": 34,
+    "verifiedAt": "2026-10-28",
+    "others": [
+      {
+        "course_id": "general/2014-livret-ffvl-9bd",
+        "verifiedPage": 12
+      }
+    ]
   },
   "F12B": {
     "course_id": "general/2014-livret-ffvl-9bd",
     "title": "Le guide des bonnes pratiques chez les libéristes",
     "verifiedPage": 11,
-    "verifiedAt": "2026-09-24"
+    "verifiedAt": "2026-10-28"
   },
   "F13BM": {
-    "course_id": "general/2014-livret-ffvl-9bd",
-    "title": "Le guide des bonnes pratiques chez les libéristes",
-    "verifiedPage": 26,
-    "verifiedAt": "2026-09-24"
+    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/02-facteurs-humains2019/02-facteurs-humains2019",
+    "title": "Facteurs humains - par JG Charrier",
+    "verifiedPage": 1,
+    "verifiedAt": "2026-10-28"
   },
   "F14BM": {
     "course_id": "general/2014-livret-ffvl-9bd",
     "title": "Le guide des bonnes pratiques chez les libéristes",
     "verifiedPage": 22,
-    "verifiedAt": "2026-09-24"
+    "verifiedAt": "2026-10-28",
+    "others": [
+      {
+        "course_id": "general/2014-livret-ffvl-9bd",
+        "verifiedPage": 11
+      },
+      {
+        "course_id": "general/2014-livret-ffvl-9bd",
+        "verifiedPage": 29
+      }
+    ]
   },
   "F15VBM": {
     "course_id": "general/facteurs-humains/1-fh-check-list/1-fh-check-list",
     "title": "Facteurs Humains 04 - Votre check-list",
     "verifiedPage": 1,
-    "verifiedAt": "2026-09-24"
+    "verifiedAt": "2026-10-28"
   },
   "F16VBM": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 9,
-    "verifiedAt": "2026-09-24"
+    "verifiedAt": "2026-10-28"
   },
   "F17BM": {
-    "course_id": "general/facteurs-humains/1-fh-check-list/1-fh-check-list",
-    "title": "Facteurs Humains 04 - Votre check-list",
+    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/02-facteurs-humains2019/02-facteurs-humains2019",
+    "title": "Facteurs humains - par JG Charrier",
     "verifiedPage": 1,
-    "verifiedAt": "2026-09-24"
+    "verifiedAt": "2026-10-28",
+    "others": [
+      {
+        "course_id": "general/2014-livret-ffvl-9bd",
+        "verifiedPage": 29
+      },
+      {
+        "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
+        "verifiedPage": 16
+      }
+    ]
   },
   "F18VBM": {
     "course_id": "general/2014-livret-ffvl-9bd",
     "title": "Le guide des bonnes pratiques chez les libéristes",
     "verifiedPage": 22,
-    "verifiedAt": "2026-09-24"
+    "verifiedAt": "2026-10-28"
   },
   "F19BM": {
     "course_id": "general/2014-livret-ffvl-9bd",
     "title": "Le guide des bonnes pratiques chez les libéristes",
     "verifiedPage": 19,
-    "verifiedAt": "2026-09-24"
+    "verifiedAt": "2026-10-28"
   },
   "F20VBM": {
-    "course_id": "general/2014-livret-ffvl-9bd",
-    "title": "Le guide des bonnes pratiques chez les libéristes",
-    "verifiedPage": 19,
-    "verifiedAt": "2026-09-24"
+    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 9,
+    "verifiedAt": "2026-10-28"
   },
   "F21VBM": {
-    "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/17-facteurs-humains2023/17-facteurs-humains2023",
-    "title": "Facteurs Humains",
+    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/02-facteurs-humains2019/02-facteurs-humains2019",
+    "title": "Facteurs humains - par JG Charrier",
     "verifiedPage": 1,
-    "verifiedAt": "2026-09-24"
+    "verifiedAt": "2026-10-28"
   },
   "F22VBM": {
     "course_id": "general/facteurs-humains/1-fh-check-list/1-fh-check-list",
     "title": "Facteurs Humains 04 - Votre check-list",
     "verifiedPage": 1,
-    "verifiedAt": "2026-09-24"
+    "verifiedAt": "2026-10-28"
   },
   "F23VBM": {
     "course_id": "general/2014-livret-ffvl-9bd",
     "title": "Le guide des bonnes pratiques chez les libéristes",
-    "verifiedPage": 12,
-    "verifiedAt": "2026-09-24"
+    "verifiedPage": 25,
+    "verifiedAt": "2026-10-28"
   },
   "F24BM": {
     "course_id": "general/2014-livret-ffvl-9bd",
     "title": "Le guide des bonnes pratiques chez les libéristes",
-    "verifiedPage": 39,
-    "verifiedAt": "2026-09-24"
+    "verifiedPage": 40,
+    "verifiedAt": "2026-10-28"
   },
   "F25VBM": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
-    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
-    "verifiedPage": 9,
-    "verifiedAt": "2026-09-24"
+    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial"
   },
   "F26VBM": {
-    "course_id": "general/2014-livret-ffvl-9bd",
-    "title": "Le guide des bonnes pratiques chez les libéristes",
-    "verifiedPage": 36,
-    "verifiedAt": "2026-09-24"
+    "course_id": "general/facteurs-humains/2-fh-le-vol-de-didier/2-fh-le-vol-de-didier",
+    "title": "Facteurs Humains 05 - Le vol de Didier",
+    "verifiedPage": 6,
+    "verifiedAt": "2026-10-28",
+    "others": [
+      {
+        "course_id": "general/2014-livret-ffvl-9bd",
+        "verifiedPage": 23
+      }
+    ]
   },
   "F27VBM": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -1396,38 +1438,54 @@
   "F28V": {
     "course_id": "general/2014-livret-ffvl-9bd",
     "title": "Le guide des bonnes pratiques chez les libéristes",
-    "verifiedPage": 12,
-    "verifiedAt": "2026-09-24"
+    "verifiedPage": 23,
+    "verifiedAt": "2026-10-28"
   },
   "F29V": {
     "course_id": "general/2014-livret-ffvl-9bd",
     "title": "Le guide des bonnes pratiques chez les libéristes",
     "verifiedPage": 26,
-    "verifiedAt": "2026-09-24"
+    "verifiedAt": "2026-10-28",
+    "others": [
+      {
+        "course_id": "general/2014-livret-ffvl-9bd",
+        "verifiedPage": 11
+      },
+      {
+        "course_id": "general/2014-livret-ffvl-9bd",
+        "verifiedPage": 40
+      }
+    ]
   },
   "F30V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 26,
-    "verifiedAt": "2026-09-24"
+    "verifiedAt": "2026-10-28",
+    "others": [
+      {
+        "course_id": "general/2014-livret-ffvl-9bd",
+        "verifiedPage": 12
+      }
+    ]
   },
   "F31BM": {
-    "course_id": "general/facteurs-humains/1-fh-check-list/1-fh-check-list",
-    "title": "Facteurs Humains 04 - Votre check-list",
-    "verifiedPage": 2,
-    "verifiedAt": "2026-09-24"
+    "course_id": "general/2014-livret-ffvl-9bd",
+    "title": "Le guide des bonnes pratiques chez les libéristes",
+    "verifiedPage": 39,
+    "verifiedAt": "2026-10-28"
   },
   "F32V": {
     "course_id": "general/2014-livret-ffvl-9bd",
     "title": "Le guide des bonnes pratiques chez les libéristes",
-    "verifiedPage": 12,
-    "verifiedAt": "2026-09-24"
+    "verifiedPage": 11,
+    "verifiedAt": "2026-10-28"
   },
   "F33B": {
-    "course_id": "general/facteurs-humains/2-fh-le-vol-de-didier/2-fh-le-vol-de-didier",
-    "title": "Facteurs Humains 05 - Le vol de Didier",
-    "verifiedPage": 7,
-    "verifiedAt": "2026-09-24"
+    "course_id": "general/2014-livret-ffvl-9bd",
+    "title": "Le guide des bonnes pratiques chez les libéristes",
+    "verifiedPage": 12,
+    "verifiedAt": "2026-10-28"
   },
   "F34M": {
     "course_id": "general/2014-livret-ffvl-9bd",
