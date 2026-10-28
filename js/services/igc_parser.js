@@ -2,6 +2,8 @@
  * IGCParser Service
  * Module autonome pour analyser et extraire les données d'un fichier de trace GPS au format IGC.
  */
+import { detectLandingApproach } from './landing_approach.js';
+
 const IGCParser = {
     /**
      * Parse le contenu texte d'un fichier IGC et retourne un objet standardisé.
@@ -111,6 +113,7 @@ const IGCParser = {
 
         const { distanceKm, maxClimbRate, maxSpeedKmh, avgSpeedKmh } = this._computeFlightStats(flight, duration);
         const analysis = this.analyzeFlight(flight);
+        const endsAirborne = landingIndex === trace.length - 1 && this.isAirborneAtEnd(trace);
 
         console.log('Points IGC extraits avec succès :', trace.length);
 
@@ -118,7 +121,8 @@ const IGCParser = {
             points: trace,
             takeoffIndex: takeoffIndex,
             startsAirborne: takeoffIndex === 0 && this.isAirborneAtStart(trace),
-            endsAirborne: landingIndex === trace.length - 1 && this.isAirborneAtEnd(trace),
+            endsAirborne: endsAirborne,
+            landingApproach: detectLandingApproach(flight, { endsAirborne }),
             landingIndex: trace.length > 0 ? landingIndex : 0,
             dateStr: dateStr,
             duration: duration,

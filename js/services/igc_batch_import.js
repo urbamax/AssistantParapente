@@ -536,7 +536,8 @@ export function buildFlight(row) {
         treuilleur: '',
         rescueDeployed: false,
         rescueId: '',
-        priseTerrain: '',
+        // Comme le formulaire : la forme de la dernière descente, vide quand elle est ambiguë
+        priseTerrain: parsed.landingApproach ? parsed.landingApproach.pattern : '',
         vache: false,
         techDecollage: v.techDecollage,
         typeExercice: [],

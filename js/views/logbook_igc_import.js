@@ -256,6 +256,26 @@ export class LogbookIgcImportBase extends LogbookFfvlImportBase {
             // doute aussi par défaut : on la réévalue.
             this.applyLearnedDefaults({ force: editing ? ['techDecollage'] : [] });
         }
+        this._suggestLandingApproach(parsed.landingApproach);
+    }
+
+    // Prise de terrain lue dans la trace : une suggestion, jamais à la place d'un choix du pilote.
+    // Une trace qui n'en donne pas efface celle d'une trace importée juste avant.
+    _suggestLandingApproach(detected) {
+        const select = /** @type {HTMLSelectElement|null} */ (document.getElementById('lb-prise-terrain'));
+        if (!select || this.touchedFields.has('priseTerrain')) return;
+        const suggested = this.learnedFields.has('priseTerrain');
+        if (!suggested && select.value) return;
+        const other = document.getElementById('lb-prise-terrain-autre');
+        if (other) other.style.display = 'none';
+        if (detected && Array.from(select.options).some((o) => o.value === detected.pattern)) {
+            select.value = detected.pattern;
+            this.learnedFields.set('priseTerrain', 'traceApproach');
+        } else if (suggested) {
+            select.value = '';
+            this.learnedFields.delete('priseTerrain');
+        }
+        this.renderLearnedSummary();
     }
 
     // Édition d'un vol : refait les calculs à partir de la trace IGC déjà enregistrée (après
