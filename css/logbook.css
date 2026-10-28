@@ -107,6 +107,35 @@
     gap: 8px;
 }
 
+.logbook-card-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.logbook-card-chevron {
+    font-size: 1.4rem;
+    color: var(--text-muted);
+    transition: transform 0.2s ease;
+    transform: rotate(180deg);
+}
+
+.logbook-card.is-collapsed .logbook-card-chevron {
+    transform: none;
+}
+
+.logbook-card-more {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.logbook-card.is-collapsed .logbook-card-more {
+    display: none;
+}
+
 .session-location {
     font-size: 1.2rem;
     font-weight: 700;

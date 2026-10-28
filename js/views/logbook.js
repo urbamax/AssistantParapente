@@ -258,6 +258,7 @@ class LogbookViewClass extends LogbookFormBase {
 
     async mount(params) {
         await super.mount(params);
+        this.expandedSessionIds.clear();
         console.log('Mounting LogbookView with params', params);
         try {
             await SitesService.ensureSitesLoaded();

@@ -527,7 +527,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
 
 exports[`logbook renders (spec 014: identical before and after moving the texts) > history 1`] = `
 "
-                <div class="logbook-card" data-session-id="f1">
+                <div class="logbook-card is-collapsed" data-session-id="f1">
                     <div class="logbook-card-header">
                         <div class="session-badge" style="background-color: var(--accent-orange)22; color: var(--accent-orange);">
                             <i class="ri-windy-line"></i> VOL
@@ -543,15 +543,20 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                     </div>
                     <div class="logbook-card-body">
-                        <div class="session-location">Mont Lambert</div>
+                        <div class="logbook-card-toggle" role="button" tabindex="0" data-action="toggleSessionCard" data-args="f1" aria-expanded="false" title="Afficher ou masquer le détail de la session">
+                            <div class="session-location">Mont Lambert</div>
+                            <i class="ri-arrow-down-s-line logbook-card-chevron" aria-hidden="true"></i>
+                        </div>
                         <div class="session-details">
                             <span class="detail-item"><i class="ri-time-line"></i> 1h 15min</span>
                             <span class="detail-item"><i class="ri-fire-line"></i> Thermique</span>
                         </div>
+                        <div class="logbook-card-more">
                         <div class="session-extra-info" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; font-size: 0.82rem; color: var(--text-secondary);">
                         <span style="background: var(--bg-card-hover, rgba(0,0,0,0.05)); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-light, rgba(0,0,0,0.05)); font-weight: 500; display: inline-flex; align-items: center; gap: 4px;" title="Décollage"><i class="ri-takeaway-line"></i> Décollage : Face voile</span>
                         <span style="background: var(--bg-card-hover, rgba(0,0,0,0.05)); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-light, rgba(0,0,0,0.05)); font-weight: 500; display: inline-flex; align-items: center; gap: 4px;" title="Alt Max">⛰️ Alt Max : 1250m</span>
                         <span style="background: var(--bg-card-hover, rgba(0,0,0,0.05)); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-light, rgba(0,0,0,0.05)); font-weight: 500; display: inline-flex; align-items: center; gap: 4px;" title="Gain">📈 Gain : 800m</span>
+                        
                         <span style="background: var(--bg-card-hover, rgba(0,0,0,0.05)); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-light, rgba(0,0,0,0.05)); font-weight: 500; display: inline-flex; align-items: center; gap: 4px;" title="Distance parcourue">📏 Distance : 12.4km</span>
                         <span style="background: var(--bg-card-hover, rgba(0,0,0,0.05)); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-light, rgba(0,0,0,0.05)); font-weight: 500; display: inline-flex; align-items: center; gap: 4px;" title="Vario max">🔼 Vario max : +3.2m/s</span>
                         <span style="background: var(--bg-card-hover, rgba(0,0,0,0.05)); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-light, rgba(0,0,0,0.05)); font-weight: 500; display: inline-flex; align-items: center; gap: 4px;" title="Vitesse max / moyenne">💨 Vitesse : 48km/h max (31km/h moy.)</span>
@@ -614,10 +619,11 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                 </a>
             </div>
         </details></div>
+                        </div>
                     </div>
                 </div>
             
-                <div class="logbook-card" data-session-id="g1">
+                <div class="logbook-card is-collapsed" data-session-id="g1">
                     <div class="logbook-card-header">
                         <div class="session-badge" style="background-color: #f59e0b22; color: #f59e0b;">
                             <i class="ri-footprint-line"></i> GONFLAGE
@@ -633,11 +639,15 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                     </div>
                     <div class="logbook-card-body">
-                        <div class="session-location">Pente école</div>
+                        <div class="logbook-card-toggle" role="button" tabindex="0" data-action="toggleSessionCard" data-args="g1" aria-expanded="false" title="Afficher ou masquer le détail de la session">
+                            <div class="session-location">Pente école</div>
+                            <i class="ri-arrow-down-s-line logbook-card-chevron" aria-hidden="true"></i>
+                        </div>
                         <div class="session-details">
                             <span class="detail-item"><i class="ri-time-line"></i> 45min</span>
                             <span class="detail-item"><i class="ri-price-tag-3-line"></i> Face voile, Vent fort</span>
                         </div>
+                        <div class="logbook-card-more">
                         
                         <div class="session-equip">
                             <div><strong>Voile :</strong> OZONE | RUSH 6 | BLEU | M</div>
@@ -661,10 +671,11 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <i class="ri-refresh-line"></i> Récupérer la météo
                 </button>
             </div></div>
+                        </div>
                     </div>
                 </div>
             
-                <div class="logbook-card" data-session-id="n1">
+                <div class="logbook-card is-collapsed" data-session-id="n1">
                     <div class="logbook-card-header">
                         <div class="session-badge" style="background-color: var(--accent-orange)22; color: var(--accent-orange);">
                             <i class="ri-windy-line"></i> VOL
@@ -680,11 +691,15 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                     </div>
                     <div class="logbook-card-body">
-                        <div class="session-location">Zzz inconnu</div>
+                        <div class="logbook-card-toggle" role="button" tabindex="0" data-action="toggleSessionCard" data-args="n1" aria-expanded="false" title="Afficher ou masquer le détail de la session">
+                            <div class="session-location">Zzz inconnu</div>
+                            <i class="ri-arrow-down-s-line logbook-card-chevron" aria-hidden="true"></i>
+                        </div>
                         <div class="session-details">
                             <span class="detail-item"><i class="ri-time-line"></i> 20min</span>
                             <span class="detail-item"><i class="ri-arrow-left-down-line"></i> Plouf</span>
                         </div>
+                        <div class="logbook-card-more">
                         
                         <div class="session-equip">
                             
@@ -708,6 +723,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                     <i class="ri-refresh-line"></i> Récupérer la météo
                 </button>
             </div></div>
+                        </div>
                     </div>
                 </div>
             "

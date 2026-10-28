@@ -25,6 +25,8 @@ export class LogbookHistoryBase extends LogbookStatsBase {
     constructor() {
         super();
         this.activeFilter = null;
+        // Cartes dépliées par le pilote : toutes sont repliées à l'ouverture du carnet.
+        this.expandedSessionIds = new Set();
     }
 
     // À fournir par LogbookView (onglets, formulaire et aides de recherche de sites).
@@ -61,6 +63,8 @@ export class LogbookHistoryBase extends LogbookStatsBase {
         if (this.activeFilter) {
             this.activeFilter = null;
         }
+        // La session cherchée est dépliée, les autres restent repliées.
+        this.expandedSessionIds.add(String(id));
         this.switchTab('history');
         // Let the tab display before trying to scroll
         setTimeout(() => {
@@ -97,6 +101,21 @@ export class LogbookHistoryBase extends LogbookStatsBase {
     clearHistoryFilter() {
         this.activeFilter = null;
         this.renderHistory();
+    }
+
+    // Plie ou déplie une carte de l'historique, sans reconstruire la liste (une trace 3D ouverte
+    // dans une autre carte y resterait).
+    toggleSessionCard(id) {
+        const key = String(id);
+        const card = [...document.querySelectorAll('.logbook-card[data-session-id]')].find(
+            (el) => /** @type {HTMLElement} */ (el).dataset.sessionId === key,
+        );
+        if (!card) return;
+        const expanded = card.classList.contains('is-collapsed');
+        card.classList.toggle('is-collapsed', !expanded);
+        card.querySelector('.logbook-card-toggle')?.setAttribute('aria-expanded', String(expanded));
+        if (expanded) this.expandedSessionIds.add(key);
+        else this.expandedSessionIds.delete(key);
     }
 
     deleteEntry(id) {
@@ -255,6 +274,13 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                         session.gain !== undefined && session.gain !== null && session.gain !== ''
                             ? `<span style="${badgeStyle}" title="${tt('history.gainTitle')}">${tt('history.gain', { value: session.gain })}</span>`
                             : '';
+                    // Dénivelé : altitude au décollage moins altitude à l'atterrissage, connues
+                    // seulement pour un vol avec trace GPS.
+                    const stats = session.igcStats;
+                    const descentInfo =
+                        stats && Number.isFinite(stats.takeoffAlt) && Number.isFinite(stats.landingAlt)
+                            ? `<span style="${badgeStyle}" title="${tt('history.descentTitle')}">${tt('history.descent', { value: stats.takeoffAlt - stats.landingAlt })}</span>`
+                            : '';
                     const distanceInfo = session.distanceKm
                         ? `<span style="${badgeStyle}" title="${tt('history.distanceTitle')}">${tt('history.distance', { value: session.distanceKm })}</span>`
                         : '';
@@ -271,6 +297,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                         landedOutInfo ||
                         altInfo ||
                         gainInfo ||
+                        descentInfo ||
                         distanceInfo ||
                         climbInfo ||
                         speedInfo
@@ -279,6 +306,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                         ${decoInfo}${landingInfo}${landedOutInfo}
                         ${altInfo}
                         ${gainInfo}
+                        ${descentInfo}
                         ${distanceInfo}
                         ${climbInfo}
                         ${speedInfo}
@@ -288,9 +316,10 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                 }
 
                 const meteoHtml = this.renderSessionWeatherHtml(session);
+                const expanded = this.expandedSessionIds.has(String(session.id));
 
                 html += `
-                <div class="logbook-card" data-session-id="${escapeHTML(session.id)}">
+                <div class="logbook-card${expanded ? '' : ' is-collapsed'}" data-session-id="${escapeHTML(session.id)}">
                     <div class="logbook-card-header">
                         <div class="session-badge" style="background-color: ${typeColor}22; color: ${typeColor};">
                             <i class="${icon}"></i> ${tt(isVol ? 'history.badgeFlight' : 'history.badgeGround')}
@@ -306,11 +335,15 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                         </div>
                     </div>
                     <div class="logbook-card-body">
-                        <div class="session-location">${escapeHTML(location)}</div>
+                        <div class="logbook-card-toggle" role="button" tabindex="0" data-action="toggleSessionCard" data-args="${escapeHTML(session.id)}" aria-expanded="${expanded}" title="${tt('history.toggle')}">
+                            <div class="session-location">${escapeHTML(location)}</div>
+                            <i class="ri-arrow-down-s-line logbook-card-chevron" aria-hidden="true"></i>
+                        </div>
                         <div class="session-details">
                             <span class="detail-item"><i class="ri-time-line"></i> ${formatDuration(session.duree)}</span>
                             <span class="detail-item"><i class="${subtitle.toLowerCase().includes('treuil') ? 'ri-arrow-up-double-line' : subtitle.toLowerCase().includes('thermique') ? 'ri-fire-line' : subtitle.toLowerCase().includes('cross') ? 'ri-route-line' : subtitle.toLowerCase().includes('plouf') ? 'ri-arrow-left-down-line' : subtitle.toLowerCase().includes('restit') || subtitle.toLowerCase().includes('soaring') ? 'ri-sun-cloudy-line' : subtitle.toLowerCase().includes('gonflage') ? 'ri-footprint-line' : 'ri-price-tag-3-line'}"></i> ${escapeHTML(subtitle)}</span>
                         </div>
+                        <div class="logbook-card-more">
                         ${extraInfo}
                         <div class="session-equip">
                             ${session.voile ? `<div><strong>${tt('history.wing')}</strong> ${escapeHTML(session.voile)}</div>` : ''}
@@ -329,6 +362,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                         ${session.commentaire ? `<div class="session-comment">"${escapeHTML(session.commentaire)}"</div>` : ''}
                         ${session.rawIgc || session.traceCloud || (session.traceGps && session.traceGps.length > 0) ? `<button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-orange); color: var(--accent-orange); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="${session.id}"><i class="ri-route-line"></i> ${tt('history.showTrace')}</button><button class="btn-download-trace action-btn-secondary" style="margin-top: 6px; width: 100%; padding: 8px; border-radius: 6px; cursor: pointer;" data-action="downloadTrace" data-args="${session.id}"><i class="ri-download-2-line"></i> ${tt('history.downloadIgc')}</button><div id="trace-container-${session.id}" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>` : ''}
                         <div data-session-weather="${session.id}">${meteoHtml}</div>
+                        </div>
                     </div>
                 </div>
             `;
