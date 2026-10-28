@@ -127,6 +127,10 @@ body {
     height: 100vh;
     height: 100dvh;
     overflow: hidden;
+    /* Pas de zoom de la page (double-tap) : voir aussi la balise viewport et js/core/events.js. */
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
     -webkit-font-smoothing: antialiased;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -185,6 +189,14 @@ button {
 
     .mode-screen {
         padding: 0 8px 80px 8px !important;
+    }
+
+    /* Un champ de saisie sous 16 px fait zoomer iOS à la prise de focus, et la page ne se dézoome pas
+       toute seule : on garde 16 px minimum. */
+    input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']),
+    select,
+    textarea {
+        font-size: max(16px, 1em) !important;
     }
 
     body:has(.gdpr-banner.active) .mode-screen {

@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeAll, afterEach } from 'vitest';
+import { readFileSync } from 'node:fs';
 import AppEvents from '../../js/core/events.js';
 
 // Spec 010 : Entrée et Espace sur un « bouton » non natif déclenchent son action une fois ; Espace
@@ -37,5 +38,21 @@ describe('keyboard activation of role=button elements (spec 010, FR-002)', () =>
         document.body.innerHTML = `<div role="button" tabindex="0" data-action="spec010Action">Filtre</div>`;
         press(document.querySelector('div'), 'a');
         expect(calls).toEqual([]);
+    });
+});
+
+// iOS Safari ignore user-scalable=no : seuls les événements de geste permettent d'empêcher le zoom de la page.
+describe('page zoom lock', () => {
+    beforeAll(() => AppEvents.init());
+
+    it.each([['gesturestart'], ['gesturechange'], ['gestureend']])('%s is cancelled', (type) => {
+        const event = new Event(type, { bubbles: true, cancelable: true });
+        document.body.dispatchEvent(event);
+        expect(event.defaultPrevented).toBe(true);
+    });
+
+    it('the viewport meta forbids user scaling', () => {
+        const html = readFileSync('index.html', 'utf8');
+        expect(html).toMatch(/name="viewport"[^>]*maximum-scale=1\.0[^>]*user-scalable=no/);
     });
 });

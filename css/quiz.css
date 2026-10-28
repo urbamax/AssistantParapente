@@ -539,6 +539,15 @@ body.light-mode .bank-item-explication {
 
 
 
+    /* Explication après une réponse : 1,1rem était trop grand pour un écran de téléphone et le texte
+       remplissait deux écrans (sites.css charge après ce fichier, d'où le sélecteur par identifiant). */
+    #qcm-screen .qcm-feedback {
+        font-size: 0.95rem;
+        line-height: 1.55;
+        margin-top: 16px;
+        padding: 12px;
+    }
+
     /* Review Overlay Mobile */
     .review-overlay {
         padding: 16px 8px;
