@@ -16,6 +16,7 @@ import { initAppUpdateNotifier } from './app_update.js';
 
 import QuizService from '../services/quiz_service.js';
 import { resolveStartMode } from './start_mode.js';
+import { installCourseLinkInterception, openLink } from './course_link.js';
 
 // Écrans chargés à la demande (code-splitting) : aucun n'est importé statiquement, donc chacun a son
 // propre fichier, téléchargé au premier passage sur l'écran ou au premier clic sur l'une de ses
@@ -234,9 +235,8 @@ async function bootApplication() {
 
     // Generic UI helpers
     AppEvents.register('reloadApp', () => window.location.reload());
-    AppEvents.register('openUrl', (_args, _e, target) =>
-        window.open(target.dataset.url, '_blank', 'noopener,noreferrer'),
-    );
+    AppEvents.register('openUrl', (_args, _e, target) => openLink(target.dataset.url));
+    installCourseLinkInterception();
     AppEvents.register('triggerClick', (id) => document.getElementById(id)?.click());
     AppEvents.register('toggleOtherField', (value, _e, target) => {
         const other = document.getElementById(target.dataset.toggleId);

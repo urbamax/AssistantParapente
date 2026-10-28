@@ -40,6 +40,9 @@ describe('hosted libraries are the audited versions (spec 009, FR-003)', () => {
     it.each([
         ['sha256', 'vendor/leaflet-1.9.4/leaflet.css', 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='],
         ['sha256', 'vendor/leaflet-1.9.4/leaflet.js', 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo='],
+        // pdf.js 6.4.299, build « legacy » (navigateurs plus anciens), fichiers .mjs d'origine renommés en .js
+        ['sha256', 'vendor/pdfjs-6.4.299/pdf.min.js', 'sha256-vMwk6nEduORFA2KVGZBKUpLXO52qohS7583MKCsPQlk='],
+        ['sha256', 'vendor/pdfjs-6.4.299/pdf.worker.min.js', 'sha256-FF0t06sMhhUQEdupWs+i1TNuKszVk4jqQ9vuDv3arsY='],
         [
             'sha384',
             'vendor/remixicon-3.5.0/remixicon.css',

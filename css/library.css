@@ -161,8 +161,9 @@ body.light-mode .library-section-header {
 }
 
 .mastery-target-value {
-    color: var(--accent-orange);
+    color: #fff;
     font-weight: 700;
+    text-decoration: underline;
 }
 
 .mastery-target-slider {
@@ -557,4 +558,119 @@ body.light-mode .library-list-item {
     line-height: 1.4;
     color: var(--text-muted);
     opacity: 0.8;
+}
+
+/* --- Visionneuse de cours de l'application installée (js/views/course_viewer.js) --- */
+.course-viewer-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 300000; /* au-dessus de l'en-tête, de la barre de navigation et des écrans plein cadre (≤ 200000) */
+    display: flex;
+    flex-direction: column;
+    /* Barre et fond sombres quel que soit le thème de l'application, comme une visionneuse PDF. */
+    background: #0f172a;
+    color: #f8fafc;
+}
+
+.cv-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: calc(env(safe-area-inset-top, 0px) + 8px) 12px 8px;
+    background: #0f172a;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.cv-bar button {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.cv-bar button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.cv-bar .cv-back {
+    background: var(--accent-orange);
+    border-color: transparent;
+    color: #fff;
+}
+
+.cv-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 700;
+}
+
+.cv-page {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    white-space: nowrap;
+}
+
+.cv-scroll {
+    position: relative;
+    flex: 1;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    /* Défilement seulement : le pincement est géré par la visionneuse, pas par la page de l'application. */
+    touch-action: pan-x pan-y;
+    overscroll-behavior: contain; /* le défilement ne passe pas à l'écran dessous */
+    padding: 8px;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+    background: #3a3f47;
+}
+
+.cv-pages {
+    width: max-content;
+    min-width: 100%;
+}
+
+.cv-page-box {
+    margin: 0 auto 8px;
+    background: #fff;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+.cv-page-box canvas {
+    display: block;
+}
+
+.cv-status {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0 24px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.cv-status[hidden] {
+    display: none;
+}
+
+.cv-status-error {
+    pointer-events: auto;
+}
+
+.cv-direct {
+    display: block;
+    margin-top: 12px;
+    color: #fff;
+    font-weight: 700;
+    text-decoration: underline;
 }
