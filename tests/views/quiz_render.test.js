@@ -268,6 +268,8 @@ describe('quiz renders (spec 024: identical before and after moving the texts)',
     it('dialogs', async () => {
         vi.spyOn(QuizView, 'renderExamResults').mockImplementation(() => {});
         QuizView.invalidateExam();
+        // L'alerte est montrée au retour de l'élève sur la page.
+        document.dispatchEvent(new Event('visibilitychange'));
         vi.spyOn(QuizView, 'renderStats').mockImplementation(() => {});
         QuizView.resetStats();
         globalThis.URL.createObjectURL = () => 'blob:x';

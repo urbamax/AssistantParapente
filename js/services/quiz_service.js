@@ -21,6 +21,7 @@ class QuizService {
             qcmSessionData: [],
             currentQcmSelection: new Set(),
             examResults: [],
+            examSaved: false,
             isLoaded: false,
             loadingError: null,
         };
@@ -495,6 +496,8 @@ class QuizService {
         this.state.qcmSessionData = questions;
         this.state.qcmIndex = 0;
         this.state.examResults = [];
+        this.state.examSaved = false;
+        this.state.invalidated = false;
         this.state.currentQcmSelection = new Set();
         return this.getCurrentQuestion();
     }
@@ -607,7 +610,11 @@ class QuizService {
         }
     }
 
+    // Une session d'examen ne produit qu'une entrée d'historique, même si l'écran de résultats
+    // est rendu plusieurs fois (invalidation puis fin de série, nouveau rendu...).
     saveExamHistory(level) {
+        if (this.state.examSaved) return;
+        this.state.examSaved = true;
         const results = this.state.examResults;
         const total =
             this.state.qcmSessionData && this.state.qcmSessionData.length > 0

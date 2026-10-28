@@ -20,6 +20,9 @@ import { QuizVoiceBase } from './quiz_voice_ui.js';
  * S'occupe uniquement du rendu HTML et de l'écoute des événements (Event Delegation)
  */
 
+// Durée hors de la page au-delà de laquelle l'examen est invalidé.
+const EXAM_LEAVE_GRACE_MS = 15000;
+
 class QuizViewClass extends QuizVoiceBase {
     constructor() {
         super();
@@ -39,30 +42,42 @@ class QuizViewClass extends QuizVoiceBase {
         });
 
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                const qcmScreen = document.getElementById('qcm-screen');
-                const isQcmScreenActive = qcmScreen && qcmScreen.classList.contains('active');
-
-                if (
-                    isQcmScreenActive &&
-                    typeof QuizService !== 'undefined' &&
-                    QuizService.state &&
-                    QuizService.state.qcmConfig.mode === 'EXAM'
-                ) {
-                    const totalQuestions = QuizService.state.qcmSessionData.length;
-                    const answeredQuestions = QuizService.state.examResults.length;
-
-                    if (answeredQuestions < totalQuestions && !QuizService.state.invalidated) {
-                        this.invalidateExam();
-                    }
+            if (!document.hidden) {
+                clearTimeout(this._examLeaveTimer);
+                this._examLeaveTimer = null;
+                if (this._examInvalidatedNotice) {
+                    this._examInvalidatedNotice = false;
+                    alert(tql('dialogs.examInvalidated'));
                 }
+                return;
             }
+            if (!this.isExamInProgress()) return;
+            // Un appel entrant ou un changement d'appli très court ne doit pas annuler l'examen.
+            clearTimeout(this._examLeaveTimer);
+            this._examLeaveTimer = setTimeout(() => {
+                this._examLeaveTimer = null;
+                if (document.hidden && this.isExamInProgress()) this.invalidateExam();
+            }, EXAM_LEAVE_GRACE_MS);
         });
     }
 
+    isExamInProgress() {
+        const qcmScreen = document.getElementById('qcm-screen');
+        const state = QuizService.state;
+        return (
+            !!qcmScreen &&
+            qcmScreen.classList.contains('active') &&
+            state.qcmConfig.mode === 'EXAM' &&
+            !state.invalidated &&
+            !state.examSaved &&
+            state.examResults.length < state.qcmSessionData.length
+        );
+    }
+
+    // Invalidation silencieuse : la page est masquée, l'alerte est montrée au retour de l'élève.
     invalidateExam() {
-        alert(tql('dialogs.examInvalidated'));
         QuizService.state.invalidated = true;
+        this._examInvalidatedNotice = true;
         this.renderExamResults();
     }
 
@@ -384,21 +399,8 @@ class QuizViewClass extends QuizVoiceBase {
         const searchInput = /** @type {HTMLInputElement} */ (document.getElementById('bank-search'));
         const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-        let sourceData = QuizService.getQuestions();
-
-        // Filter by selected level
-        const level = GlobalState.get('level') || 'BI';
-        const hasLevel = (code, letter) => code.replace(/^[a-zA-Z]+\d+/, '').includes(letter);
-
-        if (level === 'BI') {
-            sourceData = sourceData.filter((q) => hasLevel(q.code, 'V'));
-        } else if (level === 'BP') {
-            sourceData = sourceData.filter((q) => hasLevel(q.code, 'B'));
-        } else if (level === 'BPC') {
-            sourceData = sourceData.filter((q) => hasLevel(q.code, 'M'));
-        } else if (level === 'TREUIL') {
-            sourceData = sourceData.filter((q) => hasLevel(q.code, 'T'));
-        }
+        // Même périmètre que les sessions : niveau choisi, sans les préfixes exclus du quiz.
+        let sourceData = QuizService.getLevelQuestions(GlobalState.get('level') || 'BI');
 
         if (themeFilter && themeFilter !== 'ALL') {
             sourceData = sourceData.filter((q) => q.theme === themeFilter);
@@ -412,10 +414,6 @@ class QuizViewClass extends QuizVoiceBase {
                     (q.explication && q.explication.toLowerCase().includes(searchTerm)),
             );
         }
-
-        // Exclude specific prefixes that were skipped in actual quiz
-        const excludedPrefixes = ['H', 'R', 'X'];
-        sourceData = sourceData.filter((q) => !excludedPrefixes.includes(q.code.charAt(0)));
 
         if (sourceData.length === 0) {
             container.innerHTML = `<p style="text-align:center; opacity:0.6; padding: 2rem;">${tq('bank.empty')}</p>`;
