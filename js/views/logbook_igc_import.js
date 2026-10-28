@@ -127,6 +127,9 @@ export class LogbookIgcImportBase extends LogbookFfvlImportBase {
             const text = e.target.result;
             this.currentRawIgc = text;
 
+            // Les sites servent déjà au parsing (une trace qui démarre sur un décollage connu n'est
+            // pas un vario allumé en vol) : ils doivent être chargés avant.
+            await SitesService.ensureSitesLoaded().catch(() => null);
             const flightStats = LogbookService.parseIGC(text);
             if (flightStats.success) {
                 const parsed = flightStats.data;

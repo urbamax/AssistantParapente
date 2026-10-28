@@ -107,6 +107,7 @@ const CRITICAL_ASSETS = [
     './js/services/firebase_service.js',
     './js/services/flight_trace_sync.js',
     './js/services/igc_parser.js',
+    './js/services/launch_sites.js',
     './js/services/flight_classifier.js',
     './js/services/logbook_service.js',
     './js/services/logbook_export.js',

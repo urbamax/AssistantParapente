@@ -1,6 +1,8 @@
 import StorageService from './storage.js';
 import IDBStorage from './idb_storage.js';
 import IGCParser from './igc_parser.js';
+import SitesService from './sites_service.js';
+import { isNearKnownTakeoff } from './launch_sites.js';
 import { t } from '../utils/i18n.js';
 
 // Garantit que les champs consommés directement par un rendu (ex: subtitle.toLowerCase()
@@ -618,7 +620,7 @@ class LogbookService {
                         points,
                         takeoffIndex: parsed.takeoffIndex || 0,
                         // Vario allumé / éteint en vol : la trace commence ou finit en l'air
-                        startsAirborne: Boolean(parsed.startsAirborne),
+                        startsAirborne: Boolean(parsed.startsAirborne) && !this._startsAtKnownTakeoff(points[0]),
                         endsAirborne: Boolean(parsed.endsAirborne),
                         // Altitudes au vrai décollage / atterrissage (pas au parking)
                         takeoffAlt: (points[parsed.takeoffIndex] || points[0]).alt,
@@ -631,6 +633,14 @@ class LogbookService {
         } catch (e) {
             return { success: false, data: null, error: e.message };
         }
+    }
+
+    // Un vario qui enregistre dès le décollage (Syride, détection automatique…) donne une trace
+    // dont le 1er point est déjà à vitesse de vol, mais posé sur le décollage : ce n'est pas un
+    // vario allumé en vol. Rayon serré (120 m) : on ne rate que le pilote qui allume son vario
+    // en vol juste devant le déco, bien moins gênant qu'une fausse alerte à chaque vol.
+    _startsAtKnownTakeoff(first) {
+        return Boolean(first) && isNearKnownTakeoff(SitesService.getSites(), first.lat, first.lon, 0.12);
     }
 
     async reverseGeocode(lat, lon) {
