@@ -205,7 +205,8 @@ class QuizViewClass extends QuizVoiceBase {
         if (!screen || !screen.classList.contains('active')) return;
 
         const target = /** @type {HTMLElement | null} */ (e.target);
-        if (target?.closest('input, select, textarea, [contenteditable="true"], dialog, [role="dialog"], .modal')) return;
+        if (target?.closest('input, select, textarea, [contenteditable="true"], dialog, [role="dialog"], .modal'))
+            return;
         // Other buttons (Lire, Répondre à la voix…) keep their native Enter/Space behaviour.
         const onOtherButton = target?.closest('button, a[href]') && !target.closest('.qcm-option');
 

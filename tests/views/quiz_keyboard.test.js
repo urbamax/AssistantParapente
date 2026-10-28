@@ -17,9 +17,9 @@ describe('QCM keyboard shortcuts', () => {
                 <input id="field" />
                 <div id="qcm-actions-container">${actions}</div>
             </div>`;
-        document.querySelectorAll('button').forEach((b) =>
-            b.addEventListener('click', () => clicks.push(b.dataset.action || b.id)),
-        );
+        document
+            .querySelectorAll('button')
+            .forEach((b) => b.addEventListener('click', () => clicks.push(b.dataset.action || b.id)));
     };
 
     const press = (key, target = document.body, init = {}) => {
