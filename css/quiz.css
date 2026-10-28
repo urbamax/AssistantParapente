@@ -38,12 +38,16 @@
     display: block;
     margin-bottom: 16px;
 
-    &:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: var(--accent-orange);
-        color: var(--text-main);
-        transform: translateY(-2px);
-        box-shadow: 0 10px 30px -10px rgba(14, 165, 233, 0.3);
+    /* Pointer devices only: on a touch screen :hover sticks to the last tapped answer and its
+       coloured frame looks like a selection. */
+    @media (hover: hover) {
+        &:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-orange);
+            color: var(--text-main);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(14, 165, 233, 0.3);
+        }
     }
 
     body.light-mode & {
@@ -88,6 +92,34 @@
     filter: none;
     transform: none;
     cursor: not-allowed;
+}
+
+/* Explanation fold: shut after a complete correct answer, open otherwise (see showAnswerFeedback). */
+.instructor-feedback > summary {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    list-style: none;
+}
+
+.instructor-feedback > summary::-webkit-details-marker {
+    display: none;
+}
+
+.instructor-feedback > summary::before {
+    content: '▸';
+    display: inline-block;
+    width: 1.1em;
+    transition: transform 0.2s;
+}
+
+.instructor-feedback[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+.instructor-feedback[open] > summary {
+    margin-bottom: 10px;
 }
 
 .qcm-option.selected {
@@ -219,6 +251,13 @@ body.course-open #course-pdf-frame {
     color: var(--text-main);
     align-self: center;
     /* Center "MODE EXAMEN" pill */
+}
+
+/* Under the centred mode pill: left-aligned, it ran under the floating logo's dangling pilot. */
+#qcm-mastery-progress {
+    align-self: center;
+    text-align: center;
+    margin: -20px 0 20px !important;
 }
 
 .level-BI {

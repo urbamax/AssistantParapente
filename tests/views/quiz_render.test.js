@@ -228,6 +228,16 @@ describe('quiz renders (spec 024: identical before and after moving the texts)',
         expect({ actions: html('qcm-actions-container'), feedback: html('qcm-feedback') }).toMatchSnapshot();
     });
 
+    it('explanation fold: shut after a complete correct answer, open after a miss or a wrong answer', () => {
+        QuizView.renderQuestion(QUESTIONS[0]);
+        const show = (isCorrect) => {
+            QuizView.showAnswerFeedback({ selected: [], isCorrect, question: QUESTIONS[0] }, true);
+            return document.querySelector('#qcm-feedback details.instructor-feedback');
+        };
+        expect(show(true).hasAttribute('open')).toBe(false);
+        expect(show(false).hasAttribute('open')).toBe(true);
+    });
+
     it('results: training with errors, exam passed, failed and invalidated, no error', () => {
         const out = {};
         const results = [

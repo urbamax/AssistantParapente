@@ -1145,6 +1145,7 @@ export const FR = Object.freeze({
             progress: 'Question {index} / {total}',
             validate: 'VALIDER',
             next: 'QUESTION SUIVANTE',
+            explanation: 'Explication',
             seeCourse: 'VOIR DANS LE COURS',
             seeCourseAt: 'VOIR : {title} (p. {page})',
         }),
