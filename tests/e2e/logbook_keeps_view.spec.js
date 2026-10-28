@@ -35,6 +35,8 @@ test.beforeEach(async ({ page }) => {
 });
 
 const card = (page, i) => page.locator(`.logbook-card[data-session-id="f${i}"]`);
+// Les cartes sont repliées à l'ouverture du carnet : le pilote déplie celle qu'il veut lire.
+const unfold = (page, i) => card(page, i).locator('.logbook-card-toggle').click();
 const scrollTop = (page) => page.evaluate(() => document.getElementById('logbook-screen').scrollTop);
 const rerender = (page) =>
     page.evaluate(async () => {
@@ -43,6 +45,7 @@ const rerender = (page) =>
     });
 
 test('a re-render keeps open details, open traces and the position in the list', async ({ page }) => {
+    for (let i = 0; i < 8; i++) await unfold(page, i);
     await card(page, 4).locator('details.flight-analysis summary').click();
     await card(page, 4).locator('[data-action="showTrace"]').click();
     await expect(page.locator('#trace-container-f4')).toBeVisible();
@@ -58,6 +61,7 @@ test('a re-render keeps open details, open traces and the position in the list',
 });
 
 test('saving an edited session keeps the position in the list', async ({ page }) => {
+    for (let i = 0; i < 8; i++) await unfold(page, i);
     await card(page, 5).scrollIntoViewIfNeeded();
     const before = await scrollTop(page);
     expect(before).toBeGreaterThan(0);
@@ -74,4 +78,20 @@ test('saving an edited session keeps the position in the list', async ({ page })
     );
     await expect(page.locator('#logbook-session-modal')).toBeHidden();
     await expect.poll(() => scrollTop(page)).toBe(before);
+});
+
+test('cards start folded, stay unfolded across a re-render and fold again on reopening', async ({ page }) => {
+    await expect(card(page, 2).locator('.session-equip')).toBeHidden();
+    await unfold(page, 2);
+    await expect(card(page, 2).locator('.session-equip')).toBeVisible();
+
+    await rerender(page);
+    await expect(card(page, 2).locator('.session-equip')).toBeVisible();
+    await expect(card(page, 3).locator('.session-equip')).toBeHidden();
+
+    await page.reload();
+    await page.locator('.nav-menu-btn[data-target="LOGBOOK"]').first().click();
+    await page.locator('[data-action="openLogbookSection"][data-args="\'history\'"]').click();
+    await expect(page.locator('.logbook-card').nth(5)).toBeVisible();
+    await expect(card(page, 2).locator('.session-equip')).toBeHidden();
 });

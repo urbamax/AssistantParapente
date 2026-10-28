@@ -140,6 +140,7 @@ async function bootApplication() {
         'toggleEquipmentStatus',
         'triggerIgcUpload',
         'scrollToSession',
+        'toggleSessionCard',
         'recalculateFromTrace',
         'addChecklistItem',
         'pickSiteChoice',

@@ -46,6 +46,7 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
         const altitudes =
             row('takeoffAlt', `${a.takeoffAlt + offset} m`, num(a.takeoffAlt)) +
             row('landingAlt', `${a.landingAlt + offset} m`, num(a.landingAlt)) +
+            row('descent', `${a.takeoffAlt - a.landingAlt} m`, num(a.takeoffAlt) && num(a.landingAlt)) +
             row('minAlt', `${a.minAlt + offset} m`, num(a.minAlt)) +
             row('maxAboveTakeoff', `${a.maxAltAboveTakeoff} m`, num(a.maxAltAboveTakeoff)) +
             row('cumulativeClimb', `${a.cumulativeClimb} m`, num(a.cumulativeClimb));
