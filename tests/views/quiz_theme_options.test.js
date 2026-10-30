@@ -34,4 +34,27 @@ describe('theme select options', () => {
         QuizView.renderThemeOptions();
         expect(optionValues()).toEqual(['ALL', 'Matériel', 'Météo', 'Pilotage']);
     });
+
+    it('synchronizes select value with active theme', () => {
+        QuizService.state.qcmConfig.theme = 'Météo';
+        QuizView.renderThemeOptions();
+        const select = /** @type {HTMLSelectElement} */ (document.getElementById('qcm-theme-select'));
+        expect(select.value).toBe('Météo');
+    });
+
+    it('falls back to ALL if active theme is not in available options', () => {
+        QuizService.state.qcmConfig.theme = 'Inexistant';
+        QuizView.renderThemeOptions();
+        const select = /** @type {HTMLSelectElement} */ (document.getElementById('qcm-theme-select'));
+        expect(select.value).toBe('ALL');
+        expect(QuizService.state.qcmConfig.theme).toBe('ALL');
+    });
+
+    it('updateThemeUI keeps DOM select in sync with QuizService state', () => {
+        QuizView.renderThemeOptions();
+        QuizService.state.qcmConfig.theme = 'Pilotage';
+        QuizView.updateThemeUI();
+        const select = /** @type {HTMLSelectElement} */ (document.getElementById('qcm-theme-select'));
+        expect(select.value).toBe('Pilotage');
+    });
 });

@@ -96,6 +96,7 @@ class QuizViewClass extends QuizVoiceBase {
                 .then(() => {
                     console.log('QuizView: QuizService initialized successfully.');
                     if (this.renderThemeOptions) this.renderThemeOptions();
+                    this.updateThemeUI();
                     // Le résumé du mode Révision reste caché tant que les questions ne sont pas chargées :
                     // si le mode a été choisi entre-temps, il faut l'afficher maintenant.
                     this.updateRevisionSummary();
@@ -136,7 +137,10 @@ class QuizViewClass extends QuizVoiceBase {
 
             this._handleChange = this.handleChange.bind(this);
             const themeSelect = document.getElementById('qcm-theme-select');
-            if (themeSelect) themeSelect.addEventListener('change', this._handleChange);
+            if (themeSelect) {
+                themeSelect.addEventListener('change', this._handleChange);
+                themeSelect.addEventListener('input', this._handleChange);
+            }
 
             const bankFilter = document.getElementById('bank-theme-filter');
             if (bankFilter) bankFilter.addEventListener('change', this._handleChange);
@@ -147,6 +151,8 @@ class QuizViewClass extends QuizVoiceBase {
             // Subscribe to level changes to re-render dynamic content (QCM Bank, Stats)
             this._unsubscribeLevel = GlobalState.subscribe('level', () => {
                 this.syncOfficialTheoryForLevel();
+                this.updateThemeUI();
+                this.updateRevisionSummary();
                 this.refreshMasterySlider();
 
                 const bankScreen = document.getElementById('qcm-bank-screen');
@@ -167,6 +173,9 @@ class QuizViewClass extends QuizVoiceBase {
 
             this._onBrevetsUpdated = () => {
                 this.syncOfficialTheoryForLevel();
+                this.updateThemeUI();
+                this.updateRevisionSummary();
+                this.refreshMasterySlider();
                 const statsScreen = document.getElementById('stats-screen');
                 if (statsScreen && statsScreen.classList.contains('active')) {
                     this.renderStats();
@@ -195,7 +204,10 @@ class QuizViewClass extends QuizVoiceBase {
         }
 
         const themeSelect = document.getElementById('qcm-theme-select');
-        if (themeSelect && this._handleChange) themeSelect.removeEventListener('change', this._handleChange);
+        if (themeSelect && this._handleChange) {
+            themeSelect.removeEventListener('change', this._handleChange);
+            themeSelect.removeEventListener('input', this._handleChange);
+        }
 
         const bankFilter = document.getElementById('bank-theme-filter');
         if (bankFilter && this._handleChange) bankFilter.removeEventListener('change', this._handleChange);
@@ -373,6 +385,7 @@ class QuizViewClass extends QuizVoiceBase {
     handleChange(e) {
         if (e.target.id === 'qcm-theme-select') {
             QuizService.setTheme(e.target.value);
+            this.updateThemeUI(e.target.value);
             this.updateRevisionSummary();
             this.refreshMasterySlider();
         } else if (e.target.id === 'bank-theme-filter' || e.target.id === 'bank-search') {
@@ -524,6 +537,7 @@ class QuizViewClass extends QuizVoiceBase {
 
         const masteryOptions = document.getElementById('mastery-options');
         if (masteryOptions) masteryOptions.style.display = mode === 'MASTERY' ? '' : 'none';
+        this.updateThemeUI();
         this.refreshMasterySlider();
     }
 
@@ -607,6 +621,19 @@ class QuizViewClass extends QuizVoiceBase {
         }
     }
 
+    updateThemeUI(theme = QuizService.state.qcmConfig.theme) {
+        const select = /** @type {HTMLSelectElement | null} */ (document.getElementById('qcm-theme-select'));
+        if (!select) return;
+        const currentTheme = theme || 'ALL';
+        const hasOption = Array.from(select.options).some((opt) => opt.value === currentTheme);
+        if (hasOption) {
+            select.value = currentTheme;
+        } else {
+            select.value = 'ALL';
+            QuizService.setTheme('ALL');
+        }
+    }
+
     renderThemeOptions() {
         const select = document.getElementById('qcm-theme-select');
         if (!select) return;
@@ -619,12 +646,15 @@ class QuizViewClass extends QuizVoiceBase {
             opt.innerText = t;
             select.appendChild(opt);
         });
+        this.updateThemeUI();
     }
 
     showSetupScreen() {
         document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
         document.getElementById('qcm-setup-screen').classList.add('active');
         this.syncOfficialTheoryForLevel();
+        this.updateThemeUI();
+        this.updateRevisionSummary();
         this.refreshMasterySlider();
     }
 
