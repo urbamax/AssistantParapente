@@ -499,8 +499,7 @@ export function buildGaugeHtml({ color, currentLevel, globalPct, stats }) {
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">${tq('stats.level', { level: currentLevel === 'ALL' ? tql('stats.allLevels') : currentLevel })}</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">${tq('stats.activity', { count: stats.totalQuestions })}</div>
-                    <div style="font-size:0.7rem; opacity:0.3; margin-top:4px; font-style:italic;">${tq('stats.averageNote')}</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">${tq('stats.activity', { count: stats.totalQuestions || 0 })}</div>
                 </div>
             </div>
         `;

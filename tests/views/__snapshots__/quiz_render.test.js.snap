@@ -641,7 +641,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : TREUIL</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
-                    <div style="font-size:0.7rem; opacity:0.3; margin-top:4px; font-style:italic;">(Moyenne cumulée de tous vos scores)</div>
                 </div>
             </div>
         
@@ -771,7 +770,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : TOUS LES NIVEAUX</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 0 réponses enregistrées</div>
-                    <div style="font-size:0.7rem; opacity:0.3; margin-top:4px; font-style:italic;">(Moyenne cumulée de tous vos scores)</div>
                 </div>
             </div>
         
@@ -1016,7 +1014,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
-                    <div style="font-size:0.7rem; opacity:0.3; margin-top:4px; font-style:italic;">(Moyenne cumulée de tous vos scores)</div>
                 </div>
             </div>
         
@@ -1484,7 +1481,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
-                    <div style="font-size:0.7rem; opacity:0.3; margin-top:4px; font-style:italic;">(Moyenne cumulée de tous vos scores)</div>
                 </div>
             </div>
         
@@ -1831,7 +1827,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
-                    <div style="font-size:0.7rem; opacity:0.3; margin-top:4px; font-style:italic;">(Moyenne cumulée de tous vos scores)</div>
                 </div>
             </div>
         
@@ -2215,7 +2210,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
-                    <div style="font-size:0.7rem; opacity:0.3; margin-top:4px; font-style:italic;">(Moyenne cumulée de tous vos scores)</div>
                 </div>
             </div>
         
@@ -2562,7 +2556,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
-                    <div style="font-size:0.7rem; opacity:0.3; margin-top:4px; font-style:italic;">(Moyenne cumulée de tous vos scores)</div>
                 </div>
             </div>
         
@@ -2951,7 +2944,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
-                    <div style="font-size:0.7rem; opacity:0.3; margin-top:4px; font-style:italic;">(Moyenne cumulée de tous vos scores)</div>
                 </div>
             </div>
         
@@ -3298,7 +3290,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
-                    <div style="font-size:0.7rem; opacity:0.3; margin-top:4px; font-style:italic;">(Moyenne cumulée de tous vos scores)</div>
                 </div>
             </div>
         
@@ -3729,7 +3720,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
-                    <div style="font-size:0.7rem; opacity:0.3; margin-top:4px; font-style:italic;">(Moyenne cumulée de tous vos scores)</div>
                 </div>
             </div>
         
@@ -4076,7 +4066,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
-                    <div style="font-size:0.7rem; opacity:0.3; margin-top:4px; font-style:italic;">(Moyenne cumulée de tous vos scores)</div>
                 </div>
             </div>
         
