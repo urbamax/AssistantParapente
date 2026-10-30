@@ -51,4 +51,22 @@ describe('FirebaseAuthEngine.mergeQcmStats (révision espacée)', () => {
         const merged = merge(stats({ total: 2, correct: 2, streak: 2, lastSeen: 5 }), stats({ total: 1, correct: 1 }));
         expect('recent' in merged).toBe(false);
     });
+
+    it('heals lagging totalQuestions and totalCorrect from questions and themes totals', () => {
+        const local = {
+            totalQuestions: 234,
+            totalCorrect: 192,
+            themes: { Pilotage: { total: 613, correct: 539 } },
+            questions: { A1V: { total: 10, correct: 8 } },
+        };
+        const cloud = {
+            totalQuestions: 234,
+            totalCorrect: 192,
+            themes: { Pilotage: { total: 613, correct: 539 } },
+            questions: { A1V: { total: 10, correct: 8 } },
+        };
+        const merged = FirebaseAuthEngine.mergeQcmStats(local, cloud);
+        expect(merged.totalQuestions).toBe(613);
+        expect(merged.totalCorrect).toBe(539);
+    });
 });

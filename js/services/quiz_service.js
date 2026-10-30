@@ -7,6 +7,98 @@ import { masteryRatio, masteryRatioAfterCorrect, pushAttempt } from './mastery.j
 // Tolérance sur la somme des maîtrises (flottants) pour décider que l'objectif est atteint.
 const MASTERY_EPSILON = 1e-9;
 
+export function isExamBloated(exam) {
+    if (!exam || !Array.isArray(exam.results)) return false;
+    return exam.results.some(
+        (r) =>
+            r &&
+            ((r.question && typeof r.question === 'object') ||
+                (Array.isArray(r.selected) && r.selected.some((s) => s && typeof s === 'object'))),
+    );
+}
+
+export function compactExamResult(r, questionLookup) {
+    if (!r || typeof r !== 'object') return r;
+    const qObj = r.question;
+    const code =
+        (qObj && typeof qObj === 'object'
+            ? qObj.code || qObj.id
+            : r.code || r.questionCode || (typeof qObj === 'string' ? qObj : '')) || '';
+    const theme = r.theme || (qObj && typeof qObj === 'object' ? qObj.theme : '') || '';
+    const isCorrect = r.isCorrect !== undefined ? Boolean(r.isCorrect) : false;
+
+    const canonicalQ = code && typeof questionLookup === 'function' ? questionLookup(code) : null;
+    const rawSelected = r.selected || [];
+    const selected = Array.isArray(rawSelected)
+        ? rawSelected.map((s) => {
+              if (typeof s === 'number') return s;
+              const text = typeof s === 'string' ? s : s?.text;
+              if (canonicalQ && Array.isArray(canonicalQ.choices) && text !== undefined) {
+                  const idx = canonicalQ.choices.findIndex((c) => c && c.text === text);
+                  if (idx !== -1) return idx;
+              }
+              if (qObj && Array.isArray(qObj.choices) && text !== undefined) {
+                  const idx = qObj.choices.findIndex((c) => c && c.text === text);
+                  if (idx !== -1) return idx;
+              }
+              return text !== undefined ? text : s;
+          })
+        : [];
+
+    return {
+        code,
+        theme,
+        isCorrect,
+        selected,
+    };
+}
+
+export function compactExam(exam, questionLookup) {
+    if (!exam || typeof exam !== 'object') return exam;
+    const results = Array.isArray(exam.results) ? exam.results.map((r) => compactExamResult(r, questionLookup)) : [];
+    return {
+        id: exam.id,
+        date: exam.date,
+        level: exam.level,
+        score: exam.score !== undefined ? exam.score : 0,
+        total: exam.total !== undefined ? exam.total : results.length,
+        percentage: exam.percentage !== undefined ? exam.percentage : 0,
+        passed: exam.passed !== undefined ? exam.passed : false,
+        invalidated: Boolean(exam.invalidated),
+        results,
+    };
+}
+
+export function recalculateGlobalCounters(stats) {
+    if (!stats || typeof stats !== 'object') return stats;
+    let questionsTotal = 0;
+    let questionsCorrect = 0;
+    if (stats.questions && typeof stats.questions === 'object') {
+        for (const q of Object.values(stats.questions)) {
+            if (q && typeof q === 'object') {
+                questionsTotal += Number(q.total) || 0;
+                questionsCorrect += Number(q.correct) || 0;
+            }
+        }
+    }
+    let themesTotal = 0;
+    let themesCorrect = 0;
+    if (stats.themes && typeof stats.themes === 'object') {
+        for (const t of Object.values(stats.themes)) {
+            if (t && typeof t === 'object') {
+                themesTotal += Number(t.total) || 0;
+                themesCorrect += Number(t.correct) || 0;
+            }
+        }
+    }
+    const realTotal = Math.max(Number(stats.totalQuestions) || 0, questionsTotal, themesTotal);
+    const realCorrect = Math.max(Number(stats.totalCorrect) || 0, questionsCorrect, themesCorrect);
+
+    stats.totalQuestions = realTotal;
+    stats.totalCorrect = realCorrect;
+    return stats;
+}
+
 class QuizService {
     constructor() {
         this.state = {
@@ -570,7 +662,17 @@ class QuizService {
 
     getPersistentStats() {
         const s = StorageService.get(StorageService.KEYS.QCM_STATS, { themes: {}, questions: {} });
-        if (!s || typeof s !== 'object' || !s.themes) return { themes: {}, questions: {} };
+        if (!s || typeof s !== 'object' || !s.themes)
+            return { totalQuestions: 0, totalCorrect: 0, themes: {}, questions: {} };
+        const prevTotal = s.totalQuestions;
+        const prevCorrect = s.totalCorrect;
+        recalculateGlobalCounters(s);
+        if (s.totalQuestions !== prevTotal || s.totalCorrect !== prevCorrect) {
+            StorageService.set(StorageService.KEYS.QCM_STATS, s);
+            if (typeof window !== 'undefined' && window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
+                window.FirebaseAuthEngine.saveStatsToCloud();
+            }
+        }
         return s;
     }
 
@@ -602,12 +704,35 @@ class QuizService {
         tStat.total++;
         if (isCorrect) tStat.correct++;
 
+        // Global counters
+        stats.totalQuestions = (stats.totalQuestions || 0) + 1;
+        if (isCorrect) {
+            stats.totalCorrect = (stats.totalCorrect || 0) + 1;
+        }
+
         StorageService.set(StorageService.KEYS.QCM_STATS, stats);
 
         // Synchronisation immédiate vers Firebase si disponible
         if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
             window.FirebaseAuthEngine.saveStatsToCloud();
         }
+    }
+
+    compactExamResult(r) {
+        return compactExamResult(r, (code) => this.getQuestionByCode(code));
+    }
+
+    compactExamResults(results) {
+        if (!Array.isArray(results)) return [];
+        return results.map((r) => this.compactExamResult(r));
+    }
+
+    compactExam(exam) {
+        return compactExam(exam, (code) => this.getQuestionByCode(code));
+    }
+
+    isExamBloated(exam) {
+        return isExamBloated(exam);
     }
 
     // Une session d'examen ne produit qu'une entrée d'historique, même si l'écran de résultats
@@ -634,12 +759,7 @@ class QuizService {
             percentage: isInvalidated ? 0 : Math.round((score / total) * 100),
             passed: isInvalidated ? false : score >= total * 0.75, // 75% pour réussir
             invalidated: isInvalidated,
-            results: results.map((r) => ({
-                question: r.question,
-                isCorrect: r.isCorrect,
-                theme: r.question.theme,
-                selected: r.selected,
-            })),
+            results: this.compactExamResults(results),
         });
 
         // Garder que les 20 derniers
@@ -657,14 +777,32 @@ class QuizService {
     getExamHistory() {
         const h = StorageService.get(StorageService.KEYS.EXAM_HISTORY, []);
 
+        let exams = [];
         // Handle legacy format: { exams: [...] }
         if (h && typeof h === 'object' && !Array.isArray(h) && Array.isArray(h.exams)) {
-            return h.exams.filter((e) => e && typeof e === 'object' && e.date);
+            exams = h.exams.filter((e) => e && typeof e === 'object' && e.date);
+        } else if (Array.isArray(h)) {
+            exams = h.filter((e) => e && typeof e === 'object' && e.date);
         }
 
-        // Handle new format: [...]
-        if (!Array.isArray(h)) return [];
-        return h.filter((e) => e && typeof e === 'object' && e.date);
+        // Migration automatique des historiques d'examens volumineux
+        let needsMigration = false;
+        const compacted = exams.map((exam) => {
+            if (this.isExamBloated(exam)) {
+                needsMigration = true;
+                return this.compactExam(exam);
+            }
+            return exam;
+        });
+
+        if (needsMigration && this.questions && this.questions.length > 0) {
+            StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: compacted });
+            if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
+                window.FirebaseAuthEngine.saveHistoryToCloud();
+            }
+        }
+
+        return compacted;
     }
 }
 
