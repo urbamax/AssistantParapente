@@ -599,7 +599,7 @@ export class QuizStatsBase extends BaseView {
                     html += `
                         <div class="card error-card" style="border-left: 3px solid #ef4444; padding: 15px; border-radius: 8px; background: var(--bg-card, #fff); box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                             <div style="margin-bottom: 10px;">
-                                <strong style="color: var(--text-main, #333);">${escapeHTML(q.code)} - ${escapeHTML(err.theme || q.theme)}</strong><br>
+                                <strong style="color: var(--text-main, #333);">${escapeHTML(q.code)} - ${escapeHTML(q.theme || err.theme || QuizService.getThemeForCode(q.code))}</strong><br>
                                 <p style="margin: 8px 0; color: var(--text-main, #333);">${escapeHTML(q.question)}</p>
                             </div>
                             <div style="font-size: 0.9em; background: var(--bg-secondary, #f9f9f9); padding: 10px; border-radius: 6px;">
