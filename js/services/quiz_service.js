@@ -12,7 +12,8 @@ export function isExamBloated(exam) {
     return exam.results.some(
         (r) =>
             r &&
-            ((r.question && typeof r.question === 'object') ||
+            (r.theme !== undefined ||
+                (r.question && typeof r.question === 'object') ||
                 (Array.isArray(r.selected) && r.selected.some((s) => s && typeof s === 'object'))),
     );
 }
@@ -24,7 +25,6 @@ export function compactExamResult(r, questionLookup) {
         (qObj && typeof qObj === 'object'
             ? qObj.code || qObj.id
             : r.code || r.questionCode || (typeof qObj === 'string' ? qObj : '')) || '';
-    const theme = r.theme || (qObj && typeof qObj === 'object' ? qObj.theme : '') || '';
     const isCorrect = r.isCorrect !== undefined ? Boolean(r.isCorrect) : false;
 
     const canonicalQ = code && typeof questionLookup === 'function' ? questionLookup(code) : null;
@@ -47,7 +47,6 @@ export function compactExamResult(r, questionLookup) {
 
     return {
         code,
-        theme,
         isCorrect,
         selected,
     };

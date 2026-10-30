@@ -58,12 +58,12 @@ describe('Quiz Exam History Compaction & Migration', () => {
 
         expect(compacted).toEqual({
             code: 'E52V',
-            theme: 'Mécavol',
             isCorrect: true,
             selected: [0], // Index 0 in canonical choices
         });
 
         // Ensure heavy fields are completely gone
+        expect(compacted.theme).toBeUndefined();
         expect(compacted.question).toBeUndefined();
         expect(compacted.choices).toBeUndefined();
         expect(compacted.explication).toBeUndefined();
@@ -84,6 +84,7 @@ describe('Quiz Exam History Compaction & Migration', () => {
         const compacted = compactExamResult(result, (code) => QuizService.getQuestionByCode(code));
         expect(compacted.selected).toEqual([2, 0]);
         expect(compacted.isCorrect).toBe(false);
+        expect(compacted.theme).toBeUndefined();
     });
 
     it('compactExam reduces payload size by ~90% for typical exams', () => {
@@ -117,24 +118,30 @@ describe('Quiz Exam History Compaction & Migration', () => {
 
         expect(afterJson.length).toBeLessThan(beforeJson.length * 0.2); // At least 80% reduction
         expect(compacted.results[0].question).toBeUndefined();
+        expect(compacted.results[0].theme).toBeUndefined();
         expect(compacted.results[0].code).toBe('E0V');
     });
 
-    it('isExamBloated detects legacy bloated results with full question objects or choice objects', () => {
+    it('isExamBloated detects legacy bloated results with full question objects, choice objects, or redundant themes', () => {
         const cleanExam = {
             id: '1',
+            results: [{ code: 'E52V', isCorrect: true, selected: [0] }],
+        };
+        const bloatedThemeExam = {
+            id: '2',
             results: [{ code: 'E52V', theme: 'Mécavol', isCorrect: true, selected: [0] }],
         };
         const bloatedQuestionExam = {
-            id: '2',
+            id: '3',
             results: [{ question: mockQuestions[0], selected: [0], isCorrect: true }],
         };
         const bloatedSelectedExam = {
-            id: '3',
+            id: '4',
             results: [{ code: 'E52V', selected: [{ text: 'opt', pts: 6 }], isCorrect: true }],
         };
 
         expect(isExamBloated(cleanExam)).toBe(false);
+        expect(isExamBloated(bloatedThemeExam)).toBe(true);
         expect(isExamBloated(bloatedQuestionExam)).toBe(true);
         expect(isExamBloated(bloatedSelectedExam)).toBe(true);
     });
@@ -161,8 +168,8 @@ describe('Quiz Exam History Compaction & Migration', () => {
         expect(exam.score).toBe(1);
         expect(exam.total).toBe(2);
         expect(exam.results).toEqual([
-            { code: 'E52V', theme: 'Mécavol', isCorrect: true, selected: [0] },
-            { code: 'P10B', theme: 'Pilotage', isCorrect: false, selected: [1] },
+            { code: 'E52V', isCorrect: true, selected: [0] },
+            { code: 'P10B', isCorrect: false, selected: [1] },
         ]);
     });
 
@@ -188,7 +195,6 @@ describe('Quiz Exam History Compaction & Migration', () => {
         expect(history).toHaveLength(1);
         expect(history[0].results[0]).toEqual({
             code: 'E52V',
-            theme: 'Mécavol',
             isCorrect: true,
             selected: [0],
         });
@@ -196,6 +202,7 @@ describe('Quiz Exam History Compaction & Migration', () => {
         // Verify StorageService was updated in place
         const updatedStorage = StorageService.get(StorageService.KEYS.EXAM_HISTORY);
         expect(updatedStorage.exams[0].results[0].question).toBeUndefined();
+        expect(updatedStorage.exams[0].results[0].theme).toBeUndefined();
     });
 
     it('FirebaseAuthEngine.mergeExamHistory compacts cloud and local exams and limits to 20', () => {
@@ -219,7 +226,7 @@ describe('Quiz Exam History Compaction & Migration', () => {
                 {
                     id: 'exam_local',
                     date: '2026-10-21T12:00:00.000Z',
-                    results: [{ code: 'P10B', theme: 'Pilotage', isCorrect: true, selected: [0] }],
+                    results: [{ code: 'P10B', isCorrect: true, selected: [0] }],
                 },
             ],
         };
@@ -231,11 +238,11 @@ describe('Quiz Exam History Compaction & Migration', () => {
         // Cloud exam has been compacted
         expect(merged.exams[1].results[0]).toEqual({
             code: 'E52V',
-            theme: 'Mécavol',
             isCorrect: true,
             selected: [0],
         });
         expect(merged.exams[1].results[0].question).toBeUndefined();
+        expect(merged.exams[1].results[0].theme).toBeUndefined();
     });
 
     it('QuizView.renderExamHistory renders questions and explanations by looking up question code', () => {
@@ -247,7 +254,7 @@ describe('Quiz Exam History Compaction & Migration', () => {
                 level: 'BI',
                 score: 1,
                 total: 1,
-                results: [{ code: 'E52V', theme: 'Mécavol', isCorrect: true, selected: [0] }],
+                results: [{ code: 'E52V', isCorrect: true, selected: [0] }],
             },
         ]);
 
@@ -268,7 +275,7 @@ describe('Quiz Exam History Compaction & Migration', () => {
                 level: 'BI',
                 score: 0,
                 total: 1,
-                results: [{ code: 'E52V', theme: 'Mécavol', isCorrect: false, selected: [1] }],
+                results: [{ code: 'E52V', isCorrect: false, selected: [1] }],
             },
         ]);
 
