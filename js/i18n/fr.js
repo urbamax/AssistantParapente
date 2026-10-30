@@ -1200,7 +1200,6 @@ export const FR = Object.freeze({
             level: 'NIVEAU : {level}',
             allLevels: 'TOUS LES NIVEAUX',
             activity: 'Activité : {count} réponses enregistrées',
-            averageNote: '(Moyenne cumulée de tous vos scores)',
             distributionTitle: 'RÉPARTITION PAR MAÎTRISE',
             themesTitle: 'STATISTIQUES PAR THÈME',
             noData: 'Aucune donnée.',

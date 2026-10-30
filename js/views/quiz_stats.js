@@ -462,20 +462,24 @@ export class QuizStatsBase extends BaseView {
             questionsHtml += '<div style="display:flex; flex-direction:column; gap:16px;">';
 
             exam.results.forEach((r, idx) => {
-                let q = r.question;
-
-                // Fallback: If question was saved as a string code (bug from early ES6 engine)
-                if (typeof q === 'string') {
-                    q = this.getQuestionByCode(r.question);
-                }
+                const q =
+                    r.question && typeof r.question === 'object' && r.question.question
+                        ? r.question
+                        : this.getQuestionByCode(
+                              r.code || r.questionCode || (typeof r.question === 'string' ? r.question : null),
+                          );
 
                 if (!q) return; // Skip if question couldn't be resolved
 
                 const selectedOptions = r.selected || [];
                 let optionsHtml = '';
 
-                (q.choices || q.ans || []).forEach((opt) => {
-                    const wasSelected = selectedOptions.some((s) => s.text === opt.text);
+                (q.choices || q.ans || []).forEach((opt, optIdx) => {
+                    const wasSelected = selectedOptions.some((s) => {
+                        if (typeof s === 'number') return s === optIdx;
+                        if (typeof s === 'string') return s === opt.text;
+                        return Boolean(s && s.text === opt.text);
+                    });
                     const pts = parseInt(opt.pts || 0);
                     let statusClass;
                     let icon = '';
@@ -585,9 +589,12 @@ export class QuizStatsBase extends BaseView {
             html += `<div style="display: flex; flex-direction: column; gap: 15px;">`;
 
             errors.forEach((err) => {
-                // Exam history stores the full question object already (see QuizService.saveExamToHistory),
-                // no lookup by code needed or possible: results never carried a `code` field.
-                const q = err.question;
+                const q =
+                    err.question && typeof err.question === 'object' && err.question.choices
+                        ? err.question
+                        : this.getQuestionByCode(
+                              err.code || err.questionCode || (typeof err.question === 'string' ? err.question : null),
+                          );
                 if (q) {
                     html += `
                         <div class="card error-card" style="border-left: 3px solid #ef4444; padding: 15px; border-radius: 8px; background: var(--bg-card, #fff); box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
@@ -606,7 +613,7 @@ export class QuizStatsBase extends BaseView {
                         </div>
                     `;
                 } else {
-                    html += `<div class="card error-card" style="border-left: 3px solid #ef4444; padding: 15px; border-radius: 8px;">${tq('review.missing', { code: err.code })}</div>`;
+                    html += `<div class="card error-card" style="border-left: 3px solid #ef4444; padding: 15px; border-radius: 8px;">${tq('review.missing', { code: err.code || (typeof err.question === 'string' ? err.question : '') })}</div>`;
                 }
             });
             html += `</div>`;
@@ -764,11 +771,11 @@ export class QuizStatsBase extends BaseView {
                 score: score,
                 total: total,
                 percentage: Math.round((score / total) * 100),
-                results: results,
+                results: QuizService.compactExamResults(results),
             };
 
             history.exams.unshift(exam); // Add to beginning
-            history.exams = history.exams.slice(0, 10); // Keep only last 10
+            history.exams = history.exams.slice(0, 20); // Keep only last 20
 
             StorageService.set(StorageService.KEYS.EXAM_HISTORY, history);
             if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
@@ -800,7 +807,10 @@ export class QuizStatsBase extends BaseView {
                 if (confirm(tql('dialogs.importConfirm'))) {
                     // Save directly to localStorage
                     StorageService.set(StorageService.KEYS.QCM_STATS, data.stats);
-                    StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: data.examHistory });
+                    const compactedExams = Array.isArray(data.examHistory)
+                        ? data.examHistory.map((e) => QuizService.compactExam(e))
+                        : data.examHistory;
+                    StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: compactedExams });
 
                     // Force update of current runtime stats if needed?
                     // Actually getPersistentStats reads from localStorage so it's fine.

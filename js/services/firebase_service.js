@@ -20,6 +20,7 @@ import {
 import { t } from '../utils/i18n.js';
 import AccessService from './access_service.js';
 import { mergeBrevets } from './brevet_service.js';
+import { compactExam } from './quiz_service.js';
 
 // We inject the original code but export the Engine
 // --- FIREBASE AUTHENTICATION & SYNC ENGINE ---
@@ -1375,8 +1376,23 @@ export const FirebaseAuthEngine = {
         });
 
         // Global metrics
-        merged.totalQuestions = Math.max(local.totalQuestions || 0, cloud.totalQuestions || 0);
-        merged.totalCorrect = Math.max(local.totalCorrect || 0, cloud.totalCorrect || 0);
+        const questionsTotal = Object.values(merged.questions).reduce((sum, q) => sum + (q.total || 0), 0);
+        const questionsCorrect = Object.values(merged.questions).reduce((sum, q) => sum + (q.correct || 0), 0);
+        const themesTotal = Object.values(merged.themes).reduce((sum, t) => sum + (t.total || 0), 0);
+        const themesCorrect = Object.values(merged.themes).reduce((sum, t) => sum + (t.correct || 0), 0);
+
+        merged.totalQuestions = Math.max(
+            local.totalQuestions || 0,
+            cloud.totalQuestions || 0,
+            questionsTotal,
+            themesTotal,
+        );
+        merged.totalCorrect = Math.max(
+            local.totalCorrect || 0,
+            cloud.totalCorrect || 0,
+            questionsCorrect,
+            themesCorrect,
+        );
 
         return merged;
     },
@@ -1400,7 +1416,7 @@ export const FirebaseAuthEngine = {
             examMap.set(key, exam);
         });
 
-        // Convert map back to list, sort descending by date (newest first), and limit to 10
+        // Convert map back to list, sort descending by date (newest first), and limit to 20
         const mergedExams = Array.from(examMap.values());
         mergedExams.sort((a, b) => {
             const dateA = new Date(a.date).getTime();
@@ -1408,8 +1424,10 @@ export const FirebaseAuthEngine = {
             return dateB - dateA;
         });
 
+        const compactedExams = mergedExams.slice(0, 20).map((exam) => compactExam(exam));
+
         return {
-            exams: mergedExams.slice(0, 10),
+            exams: compactedExams,
         };
     },
 
@@ -1459,9 +1477,10 @@ export const FirebaseAuthEngine = {
 
     getLocalExamHistory: function () {
         const saved = StorageService.get(StorageService.KEYS.EXAM_HISTORY);
-        if (Array.isArray(saved)) return { exams: saved };
-        if (saved && typeof saved === 'object' && saved.exams) return saved;
-        return { exams: [] };
+        let exams = [];
+        if (Array.isArray(saved)) exams = saved;
+        else if (saved && typeof saved === 'object' && Array.isArray(saved.exams)) exams = saved.exams;
+        return { exams: exams.map((exam) => compactExam(exam)) };
     },
 
     getLocalPreferences: function () {

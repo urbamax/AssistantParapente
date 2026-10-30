@@ -221,3 +221,46 @@ describe('QuizService - Révision espacée (échéances)', () => {
         expect(QuizService.getReviewSummary('BI')).toMatchObject({ total: 1, fresh: 1, due: 0 });
     });
 });
+
+describe('QuizService - Compteurs globaux et auto-guérison', () => {
+    beforeEach(() => {
+        StorageService.remove(StorageService.KEYS.QCM_STATS);
+    });
+
+    it('updateStats incrémente totalQuestions et totalCorrect', () => {
+        const q1 = { code: 'A01V', theme: 'Météo' };
+        QuizService.updateStats(q1, true);
+        let s = QuizService.getPersistentStats();
+        expect(s.totalQuestions).toBe(1);
+        expect(s.totalCorrect).toBe(1);
+
+        QuizService.updateStats(q1, false);
+        s = QuizService.getPersistentStats();
+        expect(s.totalQuestions).toBe(2);
+        expect(s.totalCorrect).toBe(1);
+    });
+
+    it('getPersistentStats auto-guérit les compteurs figés si les questions détaillées ont des totaux supérieurs', () => {
+        StorageService.set(StorageService.KEYS.QCM_STATS, {
+            totalQuestions: 234,
+            totalCorrect: 192,
+            themes: {
+                Pilotage: { total: 613, correct: 539 },
+                Météo: { total: 384, correct: 333 },
+            },
+            questions: {
+                A01V: { total: 500, correct: 450 },
+                P01V: { total: 497, correct: 422 },
+            },
+        });
+
+        const healed = QuizService.getPersistentStats();
+        expect(healed.totalQuestions).toBe(997);
+        expect(healed.totalCorrect).toBe(872);
+
+        // Vérifie que la valeur guérie a bien été réécrite dans StorageService
+        const stored = StorageService.get(StorageService.KEYS.QCM_STATS);
+        expect(stored.totalQuestions).toBe(997);
+        expect(stored.totalCorrect).toBe(872);
+    });
+});
