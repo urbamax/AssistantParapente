@@ -264,3 +264,54 @@ describe('QuizService - Compteurs globaux et auto-guérison', () => {
         expect(stored.totalCorrect).toBe(872);
     });
 });
+
+describe('QuizService - Choix cochés (pickedChoices)', () => {
+    const makeQuestion = () => ({
+        code: 'P1V',
+        theme: 'Météo',
+        question: 'Q',
+        choices: [
+            { text: 'vrai', pts: 6 },
+            { text: 'piège', pts: -6 },
+            { text: 'neutre', pts: 3 },
+        ],
+    });
+    const stored = () => StorageService.get(StorageService.KEYS.QCM_STATS).questions.P1V;
+
+    beforeEach(() => {
+        StorageService.set(StorageService.KEYS.QCM_STATS, { themes: {}, questions: {} });
+        QuizService.state.examResults = [];
+        QuizService.state.qcmIndex = 0;
+        QuizService.state.currentQcmSelection = new Set();
+    });
+
+    const answer = (mode, question, picks) => {
+        QuizService.state.qcmConfig.mode = mode;
+        QuizService.state.qcmSessionData = [question];
+        QuizService.state.currentQcmSelection = new Set(picks.map((i) => question.choices[i]));
+        QuizService.validate();
+    };
+
+    it('compte les choix cochés en entraînement', () => {
+        const q = makeQuestion();
+        answer('TRAINING', q, [0, 1]);
+        QuizService.state.examResults = [];
+        answer('TRAINING', q, [1]);
+        expect(stored().pickedChoices).toEqual([1, 2, 0]);
+        expect(stored().total).toBe(2);
+    });
+
+    it('compte aussi les choix en examen, sans toucher aux compteurs de réussite', () => {
+        const q = makeQuestion();
+        answer('EXAM', q, [1, 2]);
+        expect(stored()).toMatchObject({ pickedChoices: [0, 1, 1], total: 0, correct: 0, streak: 0 });
+        expect(StorageService.get(StorageService.KEYS.QCM_STATS).totalQuestions || 0).toBe(0);
+    });
+
+    it('remplace la réponse précédente quand on corrige en examen', () => {
+        const q = makeQuestion();
+        answer('EXAM', q, [1]);
+        answer('EXAM', q, [0]);
+        expect(stored().pickedChoices).toEqual([1, 0, 0]);
+    });
+});

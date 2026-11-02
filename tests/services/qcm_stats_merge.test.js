@@ -70,3 +70,25 @@ describe('FirebaseAuthEngine.mergeQcmStats (révision espacée)', () => {
         expect(merged.totalCorrect).toBe(539);
     });
 });
+
+describe('FirebaseAuthEngine.mergeQcmStats (pickedChoices)', () => {
+    it('takes the max per choice instead of adding both sides', () => {
+        const merged = merge(
+            stats({ total: 2, correct: 1, pickedChoices: [2, 1, 0] }),
+            stats({ total: 3, correct: 1, pickedChoices: [1, 3, 1, 1] }),
+        );
+        expect(merged.pickedChoices).toEqual([2, 3, 1, 1]);
+    });
+
+    it('keeps pickedChoices recorded on only one side', () => {
+        expect(
+            merge(stats({ total: 1, correct: 0 }), stats({ total: 1, correct: 0, pickedChoices: [0, 2] })),
+        ).toMatchObject({ pickedChoices: [0, 2] });
+    });
+
+    it('never writes the field when neither side has it', () => {
+        const merged = merge(stats({ total: 1, correct: 1 }), stats({ total: 1, correct: 1 }));
+        expect('pickedChoices' in merged).toBe(false);
+        expect(JSON.stringify(merged)).not.toContain('undefined');
+    });
+});
