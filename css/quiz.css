@@ -555,6 +555,8 @@ body.light-mode .bank-item-explication {
     box-sizing: border-box !important;
     min-width: 0 !important;
     overflow: hidden !important;
+    /* overflow:hidden zeroes the auto min-height; without this the rows get squashed in the capped flex column */
+    flex-shrink: 0 !important;
 }
 
 .question-stat-item > div {
