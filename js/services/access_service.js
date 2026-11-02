@@ -57,6 +57,10 @@ const AccessService = {
         return currentRoles.has(role) || currentRoles.has(ROLES.OWNER);
     },
 
+    isOwner() {
+        return this.has(ROLES.OWNER);
+    },
+
     canUseForecast() {
         return this.has(ROLES.BETA);
     },
