@@ -324,6 +324,10 @@ class QuizViewClass extends QuizVoiceBase {
             case 'QuizclearAllFilters':
                 this.clearAllFilters();
                 break;
+            case 'QuizdeleteExam':
+                if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+                this.deleteExam(args[0]);
+                break;
             case 'QuiztoggleExamDetails':
                 this.toggleExamDetails(args[0]);
                 break;

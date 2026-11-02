@@ -1413,19 +1413,27 @@ export const FirebaseAuthEngine = {
     },
 
     mergeExamHistory: function (local, cloud) {
-        const localExams = local.exams || [];
-        const cloudExams = cloud.exams || [];
+        const localExams = local?.exams || [];
+        const cloudExams = cloud?.exams || [];
+        const deletedIds = new Set([
+            ...(Array.isArray(local?.deletedExamIds) ? local.deletedExamIds : []),
+            ...(Array.isArray(cloud?.deletedExamIds) ? cloud.deletedExamIds : []),
+        ]);
 
         // Use a Map keyed by exam ID or ISO string date to remove duplicates
         const examMap = new Map();
 
         localExams.forEach((exam) => {
+            if (!exam) return;
             const key = exam.id || exam.date;
+            if (deletedIds.has(String(exam.id)) || deletedIds.has(String(exam.date)) || exam.deleted === true) return;
             examMap.set(key, exam);
         });
 
         cloudExams.forEach((exam) => {
+            if (!exam) return;
             const key = exam.id || exam.date;
+            if (deletedIds.has(String(exam.id)) || deletedIds.has(String(exam.date)) || exam.deleted === true) return;
             // In case of conflict, we keep the one already present or cloud.
             // Since exam logs are read-only historic records, duplicates are identical.
             examMap.set(key, exam);
@@ -1443,6 +1451,7 @@ export const FirebaseAuthEngine = {
 
         return {
             exams: compactedExams,
+            deletedExamIds: Array.from(deletedIds).slice(-50),
         };
     },
 
@@ -1493,9 +1502,17 @@ export const FirebaseAuthEngine = {
     getLocalExamHistory: function () {
         const saved = StorageService.get(StorageService.KEYS.EXAM_HISTORY);
         let exams = [];
-        if (Array.isArray(saved)) exams = saved;
-        else if (saved && typeof saved === 'object' && Array.isArray(saved.exams)) exams = saved.exams;
-        return { exams: exams.map((exam) => compactExam(exam)) };
+        let deletedExamIds = [];
+        if (Array.isArray(saved)) {
+            exams = saved;
+        } else if (saved && typeof saved === 'object') {
+            if (Array.isArray(saved.exams)) exams = saved.exams;
+            if (Array.isArray(saved.deletedExamIds)) deletedExamIds = saved.deletedExamIds;
+        }
+        return {
+            exams: exams.map((exam) => compactExam(exam)),
+            deletedExamIds,
+        };
     },
 
     getLocalPreferences: function () {

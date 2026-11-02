@@ -1212,6 +1212,8 @@ export const FR = Object.freeze({
         }),
         history: Object.freeze({
             empty: 'Aucun examen complété pour le moment pour ce niveau.',
+            delete: 'Supprimer cet examen',
+            deleteConfirm: 'Voulez-vous vraiment supprimer cet examen de votre historique ?',
             levels: Object.freeze({
                 BI: 'Brevet Initial',
                 BP: 'Brevet de Pilote',

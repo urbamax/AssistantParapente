@@ -801,7 +801,9 @@ class QuizService {
         // Garder que les 20 derniers
         if (history.length > 20) history.pop();
 
-        StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: history });
+        const raw = StorageService.get(StorageService.KEYS.EXAM_HISTORY, { exams: [] });
+        const deletedExamIds = raw && typeof raw === 'object' && Array.isArray(raw.deletedExamIds) ? raw.deletedExamIds : [];
+        StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: history, deletedExamIds });
         this.state.invalidated = false;
 
         // Synchronisation vers Firebase si disponible
@@ -832,13 +834,43 @@ class QuizService {
         });
 
         if (needsMigration && this.questions && this.questions.length > 0) {
-            StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: compacted });
+            const deletedExamIds = h && typeof h === 'object' && Array.isArray(h.deletedExamIds) ? h.deletedExamIds : [];
+            StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: compacted, deletedExamIds });
             if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
                 window.FirebaseAuthEngine.saveHistoryToCloud();
             }
         }
 
         return compacted;
+    }
+
+    deleteExam(examId) {
+        if (!examId) return null;
+        const raw = StorageService.get(StorageService.KEYS.EXAM_HISTORY, { exams: [] });
+        const history = Array.isArray(raw) ? raw : raw.exams || [];
+        const target = history.find((e) => String(e.id) === String(examId) || String(e.date) === String(examId));
+        const filtered = history.filter((e) => String(e.id) !== String(examId) && String(e.date) !== String(examId));
+
+        const deletedIds = raw && typeof raw === 'object' && Array.isArray(raw.deletedExamIds) ? [...raw.deletedExamIds] : [];
+        if (target) {
+            if (target.id && !deletedIds.includes(String(target.id))) deletedIds.push(String(target.id));
+            if (target.date && !deletedIds.includes(String(target.date))) deletedIds.push(String(target.date));
+        } else if (!deletedIds.includes(String(examId))) {
+            deletedIds.push(String(examId));
+        }
+
+        const newHistory = {
+            exams: filtered,
+            deletedExamIds: deletedIds.slice(-50),
+        };
+
+        StorageService.set(StorageService.KEYS.EXAM_HISTORY, newHistory);
+
+        if (typeof window !== 'undefined' && window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
+            window.FirebaseAuthEngine.saveHistoryToCloud();
+        }
+
+        return newHistory;
     }
 }
 

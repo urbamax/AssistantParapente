@@ -6,6 +6,7 @@ import GlobalState from '../core/app_state.js';
 import QuizService from '../services/quiz_service.js';
 import BrevetService from '../services/brevet_service.js';
 import StorageService from '../services/storage.js';
+import AccessService, { ROLES } from '../services/access_service.js';
 import { masteryRatio } from '../services/mastery.js';
 import { escapeHTML } from '../core/security.js';
 import { formatDateTime } from '../utils/date_utils.js';
@@ -427,6 +428,7 @@ export class QuizStatsBase extends BaseView {
 
     renderExamHistory() {
         let exams = QuizService.getExamHistory();
+        const isOwner = AccessService.has(ROLES.OWNER);
 
         // FILTER EXAMS BY CURRENT LEVEL
         let currentLevel = typeof GlobalState !== 'undefined' ? GlobalState.get('level') : 'BI';
@@ -536,6 +538,17 @@ export class QuizStatsBase extends BaseView {
 
             questionsHtml += '</div></div>';
 
+            const rightBlockHtml = isOwner
+                ? `<div style="display:flex; align-items:center; gap:12px;">
+                <div style="font-size:1.5rem; font-weight:700; color:${color};">${pct}%</div>
+                <button type="button" class="action-btn-text exam-delete-btn" data-action="QuizdeleteExam" data-args="['${exam.id}']" data-prevent-default title="${tq('history.delete')}" style="color:#f87171; background:rgba(248, 113, 113, 0.1); border:1px solid rgba(248, 113, 113, 0.25); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:1rem; display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s;" aria-label="${tq('history.delete')}">
+                    <i class="ri-delete-bin-line"></i>
+                </button>
+            </div>`
+                : `<div style="text-align:right;">
+                <div style="font-size:1.5rem; font-weight:700; color:${color};">${pct}%</div>
+            </div>`;
+
             html += `
     <div role="button" tabindex="0" data-exam-id="${exam.id}" style="background:var(--bg-card); padding:16px; border-radius:12px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleExamDetails" data-args="['${exam.id}']" >
         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -550,9 +563,7 @@ export class QuizStatsBase extends BaseView {
                     <span style="color:${color}; font-weight:700; font-size:1.1rem;">${exam.score}/${exam.total}</span>
                 </div>
             </div>
-            <div style="text-align:right;">
-                <div style="font-size:1.5rem; font-weight:700; color:${color};">${pct}%</div>
-            </div>
+            ${rightBlockHtml}
         </div>
                     ${questionsHtml}
                 </div >
@@ -561,6 +572,25 @@ export class QuizStatsBase extends BaseView {
 
         html += '</div>';
         return html;
+    }
+
+    deleteExam(examIdArgs) {
+        let examId = examIdArgs;
+        if (Array.isArray(examIdArgs)) {
+            examId = examIdArgs[0];
+        }
+        if (!examId) return;
+
+        if (!AccessService.has(ROLES.OWNER)) {
+            console.warn('[QuizStats] Suppression interdite : rôle owner requis.');
+            return;
+        }
+
+        const confirmMsg = tql('history.deleteConfirm');
+        if (typeof confirm === 'function' && !confirm(confirmMsg)) return;
+
+        QuizService.deleteExam(examId);
+        this.renderStats();
     }
 
     reviewExam(examIdArgs) {
@@ -809,11 +839,19 @@ export class QuizStatsBase extends BaseView {
                     StorageService.set(StorageService.KEYS.QCM_STATS, data.stats);
                     const compactedExams = Array.isArray(data.examHistory)
                         ? data.examHistory.map((e) => QuizService.compactExam(e))
-                        : data.examHistory;
-                    StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: compactedExams });
+                        : (data.examHistory && Array.isArray(data.examHistory.exams)
+                            ? data.examHistory.exams.map((e) => QuizService.compactExam(e))
+                            : []);
+                    const deletedExamIds = data.examHistory && Array.isArray(data.examHistory.deletedExamIds)
+                        ? data.examHistory.deletedExamIds
+                        : [];
+                    StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: compactedExams, deletedExamIds });
 
-                    // Force update of current runtime stats if needed?
-                    // Actually getPersistentStats reads from localStorage so it's fine.
+                    // Synchronisation immédiate vers Firebase si disponible
+                    if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
+                        window.FirebaseAuthEngine.saveStatsToCloud();
+                        window.FirebaseAuthEngine.saveHistoryToCloud();
+                    }
 
                     alert(tql('dialogs.importDone'));
 
