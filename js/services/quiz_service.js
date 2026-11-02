@@ -802,7 +802,8 @@ class QuizService {
         if (history.length > 20) history.pop();
 
         const raw = StorageService.get(StorageService.KEYS.EXAM_HISTORY, { exams: [] });
-        const deletedExamIds = raw && typeof raw === 'object' && Array.isArray(raw.deletedExamIds) ? raw.deletedExamIds : [];
+        const deletedExamIds =
+            raw && typeof raw === 'object' && Array.isArray(raw.deletedExamIds) ? raw.deletedExamIds : [];
         StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: history, deletedExamIds });
         this.state.invalidated = false;
 
@@ -834,7 +835,8 @@ class QuizService {
         });
 
         if (needsMigration && this.questions && this.questions.length > 0) {
-            const deletedExamIds = h && typeof h === 'object' && Array.isArray(h.deletedExamIds) ? h.deletedExamIds : [];
+            const deletedExamIds =
+                h && typeof h === 'object' && Array.isArray(h.deletedExamIds) ? h.deletedExamIds : [];
             StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: compacted, deletedExamIds });
             if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
                 window.FirebaseAuthEngine.saveHistoryToCloud();
@@ -851,7 +853,8 @@ class QuizService {
         const target = history.find((e) => String(e.id) === String(examId) || String(e.date) === String(examId));
         const filtered = history.filter((e) => String(e.id) !== String(examId) && String(e.date) !== String(examId));
 
-        const deletedIds = raw && typeof raw === 'object' && Array.isArray(raw.deletedExamIds) ? [...raw.deletedExamIds] : [];
+        const deletedIds =
+            raw && typeof raw === 'object' && Array.isArray(raw.deletedExamIds) ? [...raw.deletedExamIds] : [];
         if (target) {
             if (target.id && !deletedIds.includes(String(target.id))) deletedIds.push(String(target.id));
             if (target.date && !deletedIds.includes(String(target.date))) deletedIds.push(String(target.date));

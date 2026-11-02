@@ -839,12 +839,13 @@ export class QuizStatsBase extends BaseView {
                     StorageService.set(StorageService.KEYS.QCM_STATS, data.stats);
                     const compactedExams = Array.isArray(data.examHistory)
                         ? data.examHistory.map((e) => QuizService.compactExam(e))
-                        : (data.examHistory && Array.isArray(data.examHistory.exams)
-                            ? data.examHistory.exams.map((e) => QuizService.compactExam(e))
-                            : []);
-                    const deletedExamIds = data.examHistory && Array.isArray(data.examHistory.deletedExamIds)
-                        ? data.examHistory.deletedExamIds
-                        : [];
+                        : data.examHistory && Array.isArray(data.examHistory.exams)
+                          ? data.examHistory.exams.map((e) => QuizService.compactExam(e))
+                          : [];
+                    const deletedExamIds =
+                        data.examHistory && Array.isArray(data.examHistory.deletedExamIds)
+                            ? data.examHistory.deletedExamIds
+                            : [];
                     StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: compactedExams, deletedExamIds });
 
                     // Synchronisation immédiate vers Firebase si disponible

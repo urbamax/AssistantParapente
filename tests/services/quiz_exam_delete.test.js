@@ -55,9 +55,7 @@ describe('Quiz Exam Deletion & Owner Access', () => {
             deletedExamIds: [],
         };
         const cloud = {
-            exams: [
-                { id: 'exam_good', date: '2026-05-20T12:09:00.000Z', score: 29, total: 30 },
-            ],
+            exams: [{ id: 'exam_good', date: '2026-05-20T12:09:00.000Z', score: 29, total: 30 }],
             deletedExamIds: ['exam_zombie'],
         };
 
@@ -84,7 +82,7 @@ describe('Quiz Exam Deletion & Owner Access', () => {
         AccessService.setRoles('admin_uid', [ROLES.OWNER]);
         html = QuizView.renderExamHistory();
         expect(html).toContain('QuizdeleteExam');
-        expect(html).toContain("data-args=\"['exam_1']\"");
+        expect(html).toContain('data-args="[\'exam_1\']"');
         expect(html).toContain('ri-delete-bin-line');
     });
 
