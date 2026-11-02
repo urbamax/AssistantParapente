@@ -7,6 +7,19 @@ import { masteryRatio, masteryRatioAfterCorrect, pushAttempt } from './mastery.j
 // Tolérance sur la somme des maîtrises (flottants) pour décider que l'objectif est atteint.
 const MASTERY_EPSILON = 1e-9;
 
+// Compte, pour une question, combien de fois chaque choix a été coché (index = position dans
+// `question.choices`). `sign` à -1 retire une réponse déjà comptée (examen : réponse modifiée).
+// Tableau plat d'entiers : sérialisable par Firestore et simple à fusionner.
+export function addPickedChoices(qStat, question, selected, sign = 1) {
+    const choices = question.choices || [];
+    const counts = Array.from({ length: choices.length }, (_, i) => Number(qStat.pickedChoices?.[i]) || 0);
+    (selected || []).forEach((choice) => {
+        const idx = choices.indexOf(choice);
+        if (idx >= 0) counts[idx] = Math.max(0, counts[idx] + sign);
+    });
+    qStat.pickedChoices = counts;
+}
+
 export function isExamBloated(exam) {
     if (!exam || !Array.isArray(exam.results)) return false;
     return exam.results.some(
@@ -635,11 +648,16 @@ class QuizService {
             maxPoints: maxScore,
         };
 
+        // En examen on peut revenir en arrière et corriger : la réponse précédente est retirée
+        // du décompte avant d'ajouter la nouvelle, pour ne pas compter deux fois la question.
+        const previous = this.state.examResults[this.state.qcmIndex];
         this.state.examResults[this.state.qcmIndex] = resultData;
 
         if (this.state.qcmConfig.mode !== 'EXAM') {
-            this.updateStats(question, isCorrect);
+            this.updateStats(question, isCorrect, selectedOptions);
             if (this.state.qcmConfig.mode === 'MASTERY') this.advanceMasteryProgress();
+        } else {
+            this.recordExamPicks(question, selectedOptions, previous);
         }
 
         return resultData;
@@ -675,7 +693,30 @@ class QuizService {
         return s;
     }
 
-    updateStats(question, isCorrect) {
+    // Les choix cochés en examen alimentent le diagnostic des erreurs, mais l'examen ne touche
+    // ni aux compteurs de réussite ni à la révision espacée : seul `pickedChoices` est écrit.
+    recordExamPicks(question, selected, previous) {
+        const stats = this.getPersistentStats();
+        if (!stats.questions) stats.questions = {};
+        if (!stats.questions[question.code]) {
+            stats.questions[question.code] = { total: 0, correct: 0, streak: 0 };
+        }
+        const qStat = stats.questions[question.code];
+        if (previous && Array.isArray(previous.selected)) addPickedChoices(qStat, question, previous.selected, -1);
+        addPickedChoices(qStat, question, selected);
+        this._persistStats(stats);
+    }
+
+    _persistStats(stats) {
+        StorageService.set(StorageService.KEYS.QCM_STATS, stats);
+
+        // Synchronisation immédiate vers Firebase si disponible
+        if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
+            window.FirebaseAuthEngine.saveStatsToCloud();
+        }
+    }
+
+    updateStats(question, isCorrect, selected = []) {
         const stats = this.getPersistentStats();
         if (!stats.questions) stats.questions = {};
         if (!stats.themes) stats.themes = {};
@@ -685,6 +726,7 @@ class QuizService {
             stats.questions[question.code] = { total: 0, correct: 0, streak: 0 };
         }
         const qStat = stats.questions[question.code];
+        addPickedChoices(qStat, question, selected);
         qStat.recent = pushAttempt(qStat, isCorrect);
         qStat.total++;
         if (isCorrect) {
@@ -709,12 +751,7 @@ class QuizService {
             stats.totalCorrect = (stats.totalCorrect || 0) + 1;
         }
 
-        StorageService.set(StorageService.KEYS.QCM_STATS, stats);
-
-        // Synchronisation immédiate vers Firebase si disponible
-        if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
-            window.FirebaseAuthEngine.saveStatsToCloud();
-        }
+        this._persistStats(stats);
     }
 
     compactExamResult(r) {
