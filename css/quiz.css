@@ -738,6 +738,26 @@ body.light-mode .bank-item-explication {
         gap: 8px !important;
     }
 
+    /* Choix et pli d'explication, version compacte : le choix touche sa case, la flèche est centrée sur sa ligne. */
+    .qcm-option-group {
+        margin-bottom: 8px;
+    }
+
+    .qcm-option-group > .qcm-option {
+        margin-bottom: 0 !important;
+        padding-right: 44px !important;
+    }
+
+    .qcm-option-explanation > summary {
+        top: 2px;
+        right: 6px;
+    }
+
+    .qcm-option-explanation[open] {
+        padding: 10px 14px 12px;
+        border-radius: 0 0 10px 10px;
+    }
+
     /* Quiz Question Text Compact Sizing */
     .quiz-question-text {
         font-size: 1.05rem !important;
@@ -1154,49 +1174,61 @@ body.light-mode .bank-choice.correct {
     color: var(--text-main);
 }
 
-/* Explication de chaque choix, collée sous lui après la correction : ouverte sous une faute, repliée sinon. */
-.qcm-option.has-explanation {
-    /* La réponse cochée est agrandie : sans cela elle déborde de son explication. */
-    transform: none;
+/* Explication de chaque choix : un petit pli au bout de la ligne du choix. Fermé, il ne prend aucune place
+   (juste la flèche, dans le choix) ; ouvert, une case s'ouvre sous le choix. */
+.qcm-option-group {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.qcm-option-group > .qcm-option {
     margin-bottom: 0;
+    /* Laisse la place de la flèche, et la réponse cochée (agrandie par ailleurs) reste alignée sur sa case. */
+    padding-right: 56px;
+    transform: none;
+}
+
+.qcm-option-group:has(> details[open]) > .qcm-option {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
 
 .qcm-option-explanation {
-    position: relative;
-    margin: 0 0 16px;
-    padding: 12px 20px 14px;
-    border: 1px solid var(--border-color);
-    border-top: none;
-    border-radius: 0 0 16px 16px;
-    background: var(--bg-card);
+    padding: 0;
     color: var(--text-main);
     font-size: 0.93rem;
     line-height: 1.5;
 }
 
-.qcm-option-explanation[data-kind='incorrect'] {
+.qcm-option-explanation[open] {
+    padding: 12px 20px 14px;
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    background: var(--bg-card);
+}
+
+.qcm-option-explanation[open][data-kind='incorrect'] {
     border-color: var(--accent-red);
     background: rgba(248, 113, 113, 0.08);
 }
 
-.qcm-option-explanation[data-kind='missed'] {
+.qcm-option-explanation[open][data-kind='missed'] {
     border-color: #f97316;
     background: rgba(249, 115, 22, 0.08);
 }
 
-.qcm-option-explanation:not([open]) {
-    padding-top: 4px;
-    padding-bottom: 4px;
-}
-
-/* Le pli n'a qu'une petite flèche à droite : fermé, une fine barre ; ouvert, la flèche se pose dans
-   le coin et le texte commence tout en haut. */
+/* La flèche reste toujours au même endroit, en haut à droite de la ligne du choix. */
 .qcm-option-explanation > summary {
+    position: absolute;
+    top: 14px;
+    right: 12px;
+    z-index: 2;
     display: flex;
-    justify-content: flex-end;
-    min-height: 1.4rem;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
     cursor: pointer;
     color: var(--text-secondary);
     list-style: none;
@@ -1209,21 +1241,9 @@ body.light-mode .bank-choice.correct {
 .qcm-option-explanation > summary::before {
     content: '▸';
     font-size: 1.1rem;
-    line-height: 1.4rem;
     transition: transform 0.2s;
-}
-
-.qcm-option-explanation[open] > summary {
-    position: absolute;
-    top: 8px;
-    right: 14px;
-    min-height: 0;
 }
 
 .qcm-option-explanation[open] > summary::before {
     transform: rotate(90deg);
-}
-
-.qcm-option-explanation > div:first-of-type {
-    padding-right: 24px;
 }

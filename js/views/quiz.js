@@ -1022,17 +1022,23 @@ class QuizViewClass extends QuizVoiceBase {
         const original = QuizService.getQuestionByCode(result.question.code) || result.question;
         const perOption = optionExplanations(original);
         document.querySelectorAll('#qcm-choices .qcm-option-explanation').forEach((el) => el.remove());
-        btns.forEach((btn) => btn.classList.remove('has-explanation'));
         if (perOption) {
             btns.forEach((btn) => {
                 const opt = this._currentChoices[parseInt(btn.getAttribute('data-idx'))];
                 const text = perOption[choiceIndex(original, opt)];
                 if (!text) return;
-                btn.classList.add('has-explanation');
+                // Le choix et son pli vont dans un même groupe : la flèche se pose sur la ligne du choix.
+                let group = btn.closest('.qcm-option-group');
+                if (!group) {
+                    group = document.createElement('div');
+                    group.className = 'qcm-option-group';
+                    btn.replaceWith(group);
+                    group.appendChild(btn);
+                }
                 // Les boutons du cours sont rattachés aux bonnes réponses, où se trouve ce que dit le cours.
                 const links = opt.pts > 0 ? choiceCourseLinksHtml(courseLinks) : '';
-                btn.insertAdjacentHTML(
-                    'afterend',
+                group.insertAdjacentHTML(
+                    'beforeend',
                     optionExplanationHtml(
                         text,
                         optionOutcome(opt, result.selected.includes(opt)),

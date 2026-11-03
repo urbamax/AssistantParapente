@@ -255,6 +255,10 @@ describe('quiz renders (spec 024: identical before and after moving the texts)',
         expect(folds()[2].querySelector('[data-action="openUrl"]')).toBeNull();
         expect(document.querySelector('#qcm-feedback [data-action="openUrl"]')).toBeNull();
 
+        // Chaque pli est dans le même groupe que son choix (la flèche se pose sur la ligne du choix).
+        expect(folds().every((f) => f.parentElement.classList.contains('qcm-option-group'))).toBe(true);
+        expect(folds().every((f) => f.previousElementSibling.classList.contains('qcm-option'))).toBe(true);
+
         // On peut replier ce qui est ouvert.
         folds()[1].removeAttribute('open');
         expect(state()[1]).toBe('incorrect:shut');
