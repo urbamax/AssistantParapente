@@ -3,7 +3,7 @@ import { toSorted } from '../utils/array_utils.js';
 import { t } from '../utils/i18n.js';
 import { dueScore, summarizeReviews } from './review_scheduler.js';
 import { masteryRatio, masteryRatioAfterCorrect, pushAttempt } from './mastery.js';
-import { appendAnswer, choiceIndex, pickMask, removeLastAnswer } from './answer_log.js';
+import { appendAnswer, choiceIndex, flattenAnswerLogs, pickMask, removeLastAnswer } from './answer_log.js';
 
 // Tolérance sur la somme des maîtrises (flottants) pour décider que l'objectif est atteint.
 const MASTERY_EPSILON = 1e-9;
@@ -698,7 +698,8 @@ class QuizService {
         const prevTotal = s.totalQuestions;
         const prevCorrect = s.totalCorrect;
         recalculateGlobalCounters(s);
-        if (s.totalQuestions !== prevTotal || s.totalCorrect !== prevCorrect) {
+        const flattened = flattenAnswerLogs(s);
+        if (flattened || s.totalQuestions !== prevTotal || s.totalCorrect !== prevCorrect) {
             StorageService.set(StorageService.KEYS.QCM_STATS, s);
             if (typeof window !== 'undefined' && window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
                 window.FirebaseAuthEngine.saveStatsToCloud();

@@ -4,7 +4,11 @@
  *
  * Pour chaque question, on garde les dernières réponses sous la forme `[jour, masque]` :
  * `jour` est le nombre de jours depuis 1970 (UTC), `masque` a le bit i à 1 si le choix i
- * (position dans les choix du CSV) était coché. Les compteurs `choicePicks` disent combien
+ * (position dans les choix du CSV) était coché.
+ *
+ * Stockage : Firestore refuse les tableaux imbriqués, donc chaque réponse est enregistrée comme un
+ * seul entier `jour * 1024 + masque` dans un tableau plat. En mémoire on manipule des couples
+ * `[jour, masque]` (`readAnswerLog`) ; les couples de la première version du journal restent lisibles. Les compteurs `choicePicks` disent combien
  * de fois un piège a été coché ; ce journal dit quand, et si la réponse suivante l'a évité.
  * Tableau plat de petits entiers : sérialisable par Firestore, quelques dizaines d'octets par question.
  */
@@ -13,6 +17,9 @@ import { DAY_MS } from './review_scheduler.js';
 
 /** Nombre de réponses conservées par question. */
 export const ANSWER_LOG_SIZE = 6;
+
+/** Un masque tient sur 10 bits (5 choix au plus dans le QCM) : l'entier stocké est `jour * 1024 + masque`. */
+const MASK_SPACE = 1024;
 
 /** @param {number} [now] */
 export function dayNumber(now = Date.now()) {
@@ -48,16 +55,33 @@ export function pickMask(question, selected) {
 }
 
 /** @param {unknown} v */
-function isEntry(v) {
+function isPair(v) {
     return Array.isArray(v) && v.length === 2 && Number.isInteger(v[0]) && Number.isInteger(v[1]);
 }
 
 /**
+ * Journal stocké -> couples `[jour, masque]`. Les entrées illisibles sont ignorées.
  * @param {unknown} log
  * @returns {Array<[number, number]>}
  */
 export function readAnswerLog(log) {
-    return Array.isArray(log) ? log.filter(isEntry).map((e) => [e[0], e[1]]) : [];
+    if (!Array.isArray(log)) return [];
+    /** @type {Array<[number, number]>} */
+    const out = [];
+    for (const e of log) {
+        if (Number.isInteger(e) && e >= 0) out.push([Math.floor(e / MASK_SPACE), e % MASK_SPACE]);
+        else if (isPair(e)) out.push([e[0], e[1]]);
+    }
+    return out;
+}
+
+/**
+ * Couples `[jour, masque]` -> journal à stocker (tableau plat d'entiers, compatible Firestore).
+ * @param {Array<[number, number]>} entries
+ * @returns {number[]}
+ */
+export function encodeAnswerLog(entries) {
+    return entries.map(([day, mask]) => day * MASK_SPACE + (mask % MASK_SPACE));
 }
 
 /**
@@ -65,9 +89,10 @@ export function readAnswerLog(log) {
  * @param {unknown} log
  * @param {number} mask
  * @param {number} [now]
+ * @returns {number[]}
  */
 export function appendAnswer(log, mask, now = Date.now()) {
-    return [...readAnswerLog(log), [dayNumber(now), mask]].slice(-ANSWER_LOG_SIZE);
+    return encodeAnswerLog([...readAnswerLog(log), [dayNumber(now), mask]].slice(-ANSWER_LOG_SIZE));
 }
 
 /**
@@ -84,7 +109,7 @@ export function removeLastAnswer(log, mask) {
             break;
         }
     }
-    return entries;
+    return encodeAnswerLog(entries);
 }
 
 /**
@@ -93,7 +118,7 @@ export function removeLastAnswer(log, mask) {
  * le plus grand nombre d'occurrences vu d'un côté ou de l'autre.
  * @param {unknown} a
  * @param {unknown} b
- * @returns {Array<[number, number]>}
+ * @returns {number[]}
  */
 export function mergeAnswerLogs(a, b) {
     const count = (entries) => {
@@ -111,5 +136,21 @@ export function mergeAnswerLogs(a, b) {
         const n = Math.max(ca.get(key) || 0, cb.get(key) || 0);
         for (let i = 0; i < n; i++) out.push([d, m]);
     }
-    return out.sort((x, y) => x[0] - y[0]).slice(-ANSWER_LOG_SIZE);
+    return encodeAnswerLog(out.sort((x, y) => x[0] - y[0]).slice(-ANSWER_LOG_SIZE));
+}
+
+/**
+ * Remet à plat les journaux enregistrés par la première version (couples `[jour, masque]`), que
+ * Firestore refuse. Modifie `stats` en place ; renvoie `true` si quelque chose a changé.
+ * @param {{ questions?: Record<string, any> } | null | undefined} stats
+ */
+export function flattenAnswerLogs(stats) {
+    let changed = false;
+    for (const q of Object.values(stats?.questions || {})) {
+        if (q && Array.isArray(q.answers) && q.answers.some((e) => typeof e !== 'number')) {
+            q.answers = encodeAnswerLog(readAnswerLog(q.answers));
+            changed = true;
+        }
+    }
+    return changed;
 }
