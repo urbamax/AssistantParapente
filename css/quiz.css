@@ -799,6 +799,15 @@ body.light-mode .bank-item-explication {
         padding: 0 12px calc(85px + env(safe-area-inset-bottom, 0px)) 12px !important;
     }
 
+    /* Même gain de place en haut des axes de révision et du choix du mode : le titre se calait
+       à 134 px alors que l'en-tête flottant s'arrête à 58 px. */
+    #revision-axes-screen .course-container,
+    #qcm-setup-screen .course-container,
+    #library-screen .library-container {
+        padding: 8px 6px !important;
+        margin: calc(var(--header-height, 62px) + 8px) 0 30px 0 !important;
+    }
+
     #stats-screen .course-container {
         padding: 8px 6px !important;
         margin: calc(var(--header-height, 62px) + 8px) 0 30px 0 !important;
