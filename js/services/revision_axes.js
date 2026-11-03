@@ -10,6 +10,7 @@
 import { masteryRatio, successRate } from './mastery.js';
 import { isDue } from './review_scheduler.js';
 import { FR } from '../i18n/fr.js';
+import { diagnoseQuestionErrors, TRAP_STATUS_RANK } from './error_diagnostic.js';
 
 /**
  * Catalogue ordonné des 21 axes pédagogiques couvrant les 7 thèmes officiels FFVL.
@@ -479,6 +480,7 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
 
         /** @type {Array<{ q: any, key: string, bucket: 'unattempted' | 'struggling' | 'hesitant' | 'due' | 'mastered', ratio: number }>} */
         const classified = [];
+        const traps = { active: 0, consolidating: 0, overcome: 0, items: /** @type {any[]} */ ([]) };
 
         for (const q of axisQuestions) {
             const key = getQuestionKey(q);
@@ -498,7 +500,18 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
             }
 
             classified.push({ q, key, bucket, ratio });
+
+            for (const trap of diagnoseQuestionErrors(q, stat).traps) {
+                traps[trap.status] += 1;
+                traps.items.push({ ...trap, questionId: key });
+            }
         }
+        traps.items.sort(
+            (a, b) =>
+                TRAP_STATUS_RANK[a.status] - TRAP_STATUS_RANK[b.status] ||
+                Number(b.relapse) - Number(a.relapse) ||
+                b.count - a.count,
+        );
 
         const totalQuestions = axisQuestions.length;
         const attemptedCount = totalQuestions - unattemptedCount;
@@ -507,7 +520,8 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
 
         /** @type {'BLOCKER' | 'REFRESH' | 'EXPLORE' | 'MASTERED'} */
         let status = 'MASTERED';
-        if (strugglingCount > 0 || hesitantCount > 0) {
+        // Un piège actif bloque l'axe même avec un bon taux de réussite : la fausse croyance persiste.
+        if (strugglingCount > 0 || hesitantCount > 0 || traps.active > 0) {
             status = 'BLOCKER';
         } else if (dueCount > 0) {
             status = 'REFRESH';
@@ -542,6 +556,7 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
             courseReadings,
             takeaways,
             workshopSize,
+            traps,
             questionIds: classified.map((c) => c.key),
         });
     }
@@ -559,8 +574,8 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
         if (sDiff !== 0) return sDiff;
 
         if (a.status === 'BLOCKER') {
-            const scoreA = a.strugglingCount * 3 + a.hesitantCount * 1.5;
-            const scoreB = b.strugglingCount * 3 + b.hesitantCount * 1.5;
+            const scoreA = a.strugglingCount * 3 + a.hesitantCount * 1.5 + a.traps.active * 2;
+            const scoreB = b.strugglingCount * 3 + b.hesitantCount * 1.5 + b.traps.active * 2;
             if (scoreB !== scoreA) return scoreB - scoreA;
             if (a.attemptedMasteryPct !== b.attemptedMasteryPct) return a.attemptedMasteryPct - b.attemptedMasteryPct;
         } else if (a.status === 'REFRESH') {
@@ -583,6 +598,12 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
         axes,
         counts,
     };
+}
+
+/** Poids d'une question à piège actif : rechute > nombre de fois piégé. */
+function trapPriority(stat, q) {
+    const [top] = diagnoseQuestionErrors(q, stat).traps.filter((t) => t.status === 'active');
+    return top ? (top.relapse ? 1000 : 0) + top.count : 0;
 }
 
 /**
@@ -635,8 +656,14 @@ export function pickWorkshopQuestions(questions, stats = {}, options) {
     struggling.sort((a, b) => masteryRatio(getStat(a)) - masteryRatio(getStat(b)));
     hesitant.sort((a, b) => masteryRatio(getStat(a)) - masteryRatio(getStat(b)));
 
-    const focusCandidates = [...struggling, ...hesitant, ...due];
-    const consolidationCandidates = [...mastered, ...unattempted];
+    // Les questions où un piège est actif passent avant tout, même si le taux de réussite est bon.
+    const trapFirst = pool
+        .filter((q) => diagnoseQuestionErrors(q, getStat(q)).hasActive)
+        .sort((a, b) => trapPriority(getStat(b), b) - trapPriority(getStat(a), a));
+    const trapKeys = new Set(trapFirst.map(getQuestionKey));
+    const notTrap = (q) => !trapKeys.has(getQuestionKey(q));
+    const focusCandidates = [...trapFirst, ...[...struggling, ...hesitant, ...due].filter(notTrap)];
+    const consolidationCandidates = [...mastered, ...unattempted].filter(notTrap);
 
     /** @type {any[]} */
     const selected = [];
