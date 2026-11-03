@@ -9,9 +9,9 @@ import VoiceService from '../services/voice_service.js';
 
 import { optionLetter } from '../services/quiz_voice.js';
 import { pickWorkshopQuestions, resolveAxisIdForQuestion } from '../services/revision_axes.js';
-import { pickAntiTrapQuestions, summarizeSessionTraps, summarizeTraps } from '../services/error_diagnostic.js';
+import { pickAntiTrapQuestions, summarizeSessionTraps } from '../services/error_diagnostic.js';
 import GdprEngine from '../gdpr_engine.js';
-import { buildResultsTrapsHtml, buildTrapsNudgeHtml } from './quiz_traps_html.js';
+import { buildResultsTrapsHtml } from './quiz_traps_html.js';
 import { tq, tql } from './quiz_strings.js';
 import { courseLinksHtml } from './quiz_course_links.js';
 import { explanationHtml, highlightedExplanationHtml } from './quiz_explanation.js';
@@ -110,7 +110,6 @@ class QuizViewClass extends QuizVoiceBase {
                     // Le résumé du mode Révision reste caché tant que les questions ne sont pas chargées :
                     // si le mode a été choisi entre-temps, il faut l'afficher maintenant.
                     this.updateRevisionSummary();
-                    this.updateTrapsNudge();
                     this.refreshMasterySlider();
 
                     // Re-render the correct screen based on routing mode if needed
@@ -164,7 +163,6 @@ class QuizViewClass extends QuizVoiceBase {
                 this.syncOfficialTheoryForLevel();
                 this.updateThemeUI();
                 this.updateRevisionSummary();
-                this.updateTrapsNudge();
                 this.refreshMasterySlider();
 
                 const bankScreen = document.getElementById('qcm-bank-screen');
@@ -187,7 +185,6 @@ class QuizViewClass extends QuizVoiceBase {
                 this.syncOfficialTheoryForLevel();
                 this.updateThemeUI();
                 this.updateRevisionSummary();
-                this.updateTrapsNudge();
                 this.refreshMasterySlider();
                 const statsScreen = document.getElementById('stats-screen');
                 if (statsScreen && statsScreen.classList.contains('active')) {
@@ -407,7 +404,6 @@ class QuizViewClass extends QuizVoiceBase {
             QuizService.setTheme(e.target.value);
             this.updateThemeUI(e.target.value);
             this.updateRevisionSummary();
-            this.updateTrapsNudge();
             this.refreshMasterySlider();
         } else if (e.target.id === 'bank-theme-filter' || e.target.id === 'bank-search') {
             const select = /** @type {HTMLSelectElement} */ (document.getElementById('bank-theme-filter'));
@@ -536,7 +532,6 @@ class QuizViewClass extends QuizVoiceBase {
         }
 
         this.updateRevisionSummary();
-        this.updateTrapsNudge();
 
         const trainingOptions = document.getElementById('training-options');
         if (trainingOptions) {
@@ -561,23 +556,6 @@ class QuizViewClass extends QuizVoiceBase {
         if (masteryOptions) masteryOptions.style.display = mode === 'MASTERY' ? '' : 'none';
         this.updateThemeUI();
         this.refreshMasterySlider();
-    }
-
-    // Bandeau de l'accueil : pièges actifs à corriger, avec accès direct à l'atelier. Caché sans statistiques
-    // (consentement refusé), tant que les questions ne sont pas chargées, ou s'il n'y a aucun piège actif.
-    updateTrapsNudge() {
-        const el = document.getElementById('traps-nudge');
-        if (!el) return;
-        const ready = QuizService.state.isLoaded && GdprEngine.isConsentGranted('stats');
-        const level = (typeof GlobalState !== 'undefined' && GlobalState.get('level')) || 'BI';
-        const totals = ready
-            ? summarizeTraps(QuizService.getLevelQuestions(level), QuizService.getPersistentStats(), (q) =>
-                  resolveAxisIdForQuestion(q),
-              )
-            : { active: 0, axes: 0 };
-        const html = buildTrapsNudgeHtml(totals);
-        el.innerHTML = html;
-        el.hidden = html === '';
     }
 
     // Mode Révision : combien de questions sont à réviser, et pourquoi la session peut proposer des
@@ -694,7 +672,6 @@ class QuizViewClass extends QuizVoiceBase {
         this.syncOfficialTheoryForLevel();
         this.updateThemeUI();
         this.updateRevisionSummary();
-        this.updateTrapsNudge();
         this.refreshMasterySlider();
     }
 
@@ -763,7 +740,6 @@ class QuizViewClass extends QuizVoiceBase {
         const sessionQuestions = QuizService.shuffle(picked).map((q) => QuizService.shuffleQuestionChoices(q));
         this._activeWorkshopAxisId = workshopId;
         QuizService._masteryPool = null;
-        QuizService._trapRetried = new Set();
         QuizService.state.qcmConfig.mode = 'TRAINING';
         QuizService.state.qcmIndex = 0;
         QuizService.state.qcmSessionData = sessionQuestions;
@@ -862,9 +838,6 @@ class QuizViewClass extends QuizVoiceBase {
             } else {
                 badgeHtml = `<div class="quiz-theme-tag" style="background:#f87171; color:#fff; border-color:#f87171; margin-left: 8px;"><i class="ri-refresh-line"></i> ${tq('question.toReview')}</div>`;
             }
-        }
-        if (q.trapRetry) {
-            badgeHtml += `<div class="quiz-theme-tag" style="background:#f59e0b; color:#fff; border-color:#f59e0b; margin-left: 8px;"><i class="ri-repeat-line"></i> ${tq('diagnostic.retryBadge')}</div>`;
         }
 
         const letters = q.code.replace(/^[a-zA-Z]+\d+/, '');

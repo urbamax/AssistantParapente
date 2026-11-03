@@ -268,28 +268,6 @@ export function buildTrapFeedback(question, selected, before, after) {
 }
 
 /**
- * Totaux des pièges sur un ensemble de questions : combien sont actifs, en consolidation ou
- * surmontés, et dans combien de chapitres au moins un piège est actif.
- *
- * @param {any[]} questions
- * @param {Record<string, any>} stats
- * @param {(q: any) => string | null} [axisOf]
- */
-export function summarizeTraps(questions, stats, axisOf) {
-    const map = questionStats(stats);
-    const totals = { active: 0, consolidating: 0, overcome: 0, axes: 0 };
-    const axesWithActive = new Set();
-    for (const q of Array.isArray(questions) ? questions : []) {
-        for (const trap of diagnoseQuestionErrors(q, map[q.code]).traps) {
-            totals[trap.status] += 1;
-            if (trap.status === 'active') axesWithActive.add(axisOf ? axisOf(q) : q.code);
-        }
-    }
-    totals.axes = axesWithActive.size;
-    return totals;
-}
-
-/**
  * Pièges rencontrés pendant une série : réponses fausses cochées, avec le nombre de fois où chacune
  * l'a été (statistiques déjà à jour, la série comprise). Une question rejouée compte une seule fois,
  * d'après sa dernière réponse.
