@@ -275,8 +275,12 @@ describe("document de stats QCM (forme écrite par l'application)", () => {
     });
 
     it('refuse un journal en tableaux imbriqués (ancien format), côté SDK avant même les règles', async () => {
-        await expect(setDoc(doc(asMe(), 'users', ME, 'stats', 'qcm_stats'), statsDoc([[20400, 2]]))).rejects.toThrow(
-            /Nested arrays/,
+        // Le SDK peut lever l'erreur tout de suite ou par la promesse : l'async la ramène toujours à un rejet.
+        const error = await (async () =>
+            setDoc(doc(asMe(), 'users', ME, 'stats', 'qcm_stats'), statsDoc([[20400, 2]])))().then(
+            () => null,
+            (e) => e,
         );
+        expect(String(error?.message)).toMatch(/Nested arrays/);
     });
 });

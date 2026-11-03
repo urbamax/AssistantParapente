@@ -92,7 +92,9 @@ export function encodeAnswerLog(entries) {
  * @returns {number[]}
  */
 export function appendAnswer(log, mask, now = Date.now()) {
-    return encodeAnswerLog([...readAnswerLog(log), [dayNumber(now), mask]].slice(-ANSWER_LOG_SIZE));
+    /** @type {Array<[number, number]>} */
+    const entries = [...readAnswerLog(log), [dayNumber(now), mask]];
+    return encodeAnswerLog(entries.slice(-ANSWER_LOG_SIZE));
 }
 
 /**
