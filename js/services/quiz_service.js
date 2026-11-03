@@ -3,22 +3,24 @@ import { toSorted } from '../utils/array_utils.js';
 import { t } from '../utils/i18n.js';
 import { dueScore, summarizeReviews } from './review_scheduler.js';
 import { masteryRatio, masteryRatioAfterCorrect, pushAttempt } from './mastery.js';
-import { appendAnswer, pickMask, removeLastAnswer } from './answer_log.js';
+import { appendAnswer, choiceIndex, pickMask, removeLastAnswer } from './answer_log.js';
 
 // Tolérance sur la somme des maîtrises (flottants) pour décider que l'objectif est atteint.
 const MASTERY_EPSILON = 1e-9;
 
-// Compte, pour une question, combien de fois chaque choix a été coché (index = position dans
-// `question.choices`). `sign` à -1 retire une réponse déjà comptée (examen : réponse modifiée).
-// Tableau plat d'entiers : sérialisable par Firestore et simple à fusionner.
+// Compte, pour une question, combien de fois chaque choix a été coché (index = position dans les
+// choix d'origine du CSV, voir `choiceIndex`). `sign` à -1 retire une réponse déjà comptée (examen :
+// réponse modifiée). Tableau plat d'entiers : sérialisable par Firestore et simple à fusionner.
+// Champ `choicePicks` : l'ancien `pickedChoices` indexait les choix mélangés de la séance, donc ses
+// valeurs ne sont pas exploitables et il est ignoré.
 export function addPickedChoices(qStat, question, selected, sign = 1) {
     const choices = question.choices || [];
-    const counts = Array.from({ length: choices.length }, (_, i) => Number(qStat.pickedChoices?.[i]) || 0);
+    const counts = Array.from({ length: choices.length }, (_, i) => Number(qStat.choicePicks?.[i]) || 0);
     (selected || []).forEach((choice) => {
-        const idx = choices.indexOf(choice);
+        const idx = choiceIndex(question, choice);
         if (idx >= 0) counts[idx] = Math.max(0, counts[idx] + sign);
     });
-    qStat.pickedChoices = counts;
+    qStat.choicePicks = counts;
 }
 
 // Enregistre une réponse dans les deux suivis du diagnostic : compteurs par choix et journal daté.
@@ -706,8 +708,10 @@ class QuizService {
     }
 
     // Les choix cochés en examen alimentent le diagnostic des erreurs, mais l'examen ne touche
-    // ni aux compteurs de réussite ni à la révision espacée : seuls `pickedChoices` et `answers` sont écrits.
-    recordExamPicks(question, selected, previous) {
+    // ni aux compteurs de réussite ni à la révision espacée : seuls `choicePicks` et `answers` sont écrits.
+    recordExamPicks(shownQuestion, selected, previous) {
+        // La copie de séance a ses choix mélangés : les index se comptent sur la question d'origine.
+        const question = this.getQuestionByCode(shownQuestion.code) || shownQuestion;
         const stats = this.getPersistentStats();
         if (!stats.questions) stats.questions = {};
         if (!stats.questions[question.code]) {
@@ -727,7 +731,8 @@ class QuizService {
         }
     }
 
-    updateStats(question, isCorrect, selected = []) {
+    updateStats(shownQuestion, isCorrect, selected = []) {
+        const question = this.getQuestionByCode(shownQuestion.code) || shownQuestion;
         const stats = this.getPersistentStats();
         if (!stats.questions) stats.questions = {};
         if (!stats.themes) stats.themes = {};

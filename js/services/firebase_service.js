@@ -1344,14 +1344,14 @@ export const FirebaseAuthEngine = {
     // Nombre de fois où chaque choix a été coché. Comme `total` et `correct`, on prend le max par
     // choix : additionner local et cloud compterait deux fois chaque réponse déjà synchronisée.
     // Retourne un objet vide si aucune des deux versions n'en a (jamais de champ indéfini).
-    _mergePickedChoices: function (a, b) {
+    _mergeChoicePicks: function (a, b) {
         const valid = (v) => (Array.isArray(v) ? v : null);
         const la = valid(a);
         const lb = valid(b);
         if (!la && !lb) return {};
         const length = Math.max(la?.length || 0, lb?.length || 0);
         return {
-            pickedChoices: Array.from({ length }, (_, i) => Math.max(Number(la?.[i]) || 0, Number(lb?.[i]) || 0)),
+            choicePicks: Array.from({ length }, (_, i) => Math.max(Number(la?.[i]) || 0, Number(lb?.[i]) || 0)),
         };
     },
 
@@ -1380,7 +1380,7 @@ export const FirebaseAuthEngine = {
                 total: Math.max(lQ.total, cQ.total),
                 correct: Math.max(lQ.correct, cQ.correct),
                 ...this._latestReviewState(lQ, cQ),
-                ...this._mergePickedChoices(lQ.pickedChoices, cQ.pickedChoices),
+                ...this._mergeChoicePicks(lQ.choicePicks, cQ.choicePicks),
                 ...this._mergeAnswers(lQ.answers, cQ.answers),
             };
         });

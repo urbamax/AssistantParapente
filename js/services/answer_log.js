@@ -4,7 +4,7 @@
  *
  * Pour chaque question, on garde les dernières réponses sous la forme `[jour, masque]` :
  * `jour` est le nombre de jours depuis 1970 (UTC), `masque` a le bit i à 1 si le choix i
- * (position dans `question.choices`) était coché. Les compteurs `pickedChoices` disent combien
+ * (position dans les choix du CSV) était coché. Les compteurs `choicePicks` disent combien
  * de fois un piège a été coché ; ce journal dit quand, et si la réponse suivante l'a évité.
  * Tableau plat de petits entiers : sérialisable par Firestore, quelques dizaines d'octets par question.
  */
@@ -20,15 +20,28 @@ export function dayNumber(now = Date.now()) {
 }
 
 /**
+ * Position d'un choix dans les choix de la question telle qu'elle est dans le CSV. Les choix sont
+ * mélangés à chaque séance : `question` doit être la question d'origine, jamais la copie mélangée,
+ * sinon l'index changerait d'une séance à l'autre. Repli sur le texte si l'objet n'est pas le même.
  * @param {{ choices?: any[] }} question
- * @param {any[]} selected choix cochés (objets de `question.choices`)
+ * @param {any} choice
+ */
+export function choiceIndex(question, choice) {
+    const choices = question.choices || [];
+    const idx = choices.indexOf(choice);
+    if (idx >= 0 || !choice || typeof choice.text !== 'string') return idx;
+    return choices.findIndex((c) => c && c.text === choice.text);
+}
+
+/**
+ * @param {{ choices?: any[] }} question question d'origine (ordre du CSV)
+ * @param {any[]} selected choix cochés
  * @returns {number}
  */
 export function pickMask(question, selected) {
-    const choices = question.choices || [];
     let mask = 0;
     for (const choice of selected || []) {
-        const idx = choices.indexOf(choice);
+        const idx = choiceIndex(question, choice);
         if (idx >= 0) mask |= 1 << idx;
     }
     return mask;
