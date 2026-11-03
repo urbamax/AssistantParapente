@@ -38,9 +38,33 @@ export function buildQuestionSpeech(q) {
 }
 
 /**
- * Verdict puis explication.
+ * Phrases lues sur les pièges (récurrent, rechute, évité, surmonté), comme le feedback affiché mais
+ * sans guillemets ni exposant, que la synthèse vocale lit mal.
+ * @param {{ recurrent?: any[], avoided?: any[], overcome?: any[] } | undefined} feedback
+ * @returns {string[]}
+ */
+export function buildTrapSpeech(feedback) {
+    if (!feedback) return [];
+    const spoken = (item) =>
+        String(item.text || '')
+            .trim()
+            .replace(/[.!?…:;]+$/, '');
+    return [
+        ...(feedback.recurrent || []).map((r) =>
+            t(r.relapse ? 'quiz.voice.speech.trapRelapse' : 'quiz.voice.speech.trapRecurrent', {
+                count: r.count,
+                text: spoken(r),
+            }),
+        ),
+        ...(feedback.overcome || []).map((r) => t('quiz.voice.speech.trapOvercome', { text: spoken(r) })),
+        ...(feedback.avoided || []).map((r) => t('quiz.voice.speech.trapAvoided', { text: spoken(r) })),
+    ];
+}
+
+/**
+ * Verdict, pièges éventuels, puis explication.
  * Verdict « incomplète » : des points gagnés, aucune réponse fausse cochée, mais pas toutes les bonnes.
- * @param {{ isCorrect: boolean, question: { explication?: string }, userPoints?: number, selected?: { pts: number }[] }} result
+ * @param {{ isCorrect: boolean, question: { explication?: string }, userPoints?: number, selected?: { pts: number }[], trapFeedback?: any }} result
  */
 export function buildFeedbackSpeech(result) {
     let verdictKey = 'quiz.voice.speech.incorrect';
@@ -50,7 +74,7 @@ export function buildFeedbackSpeech(result) {
         verdictKey = 'quiz.voice.speech.incomplete';
     }
 
-    const verdict = t(verdictKey);
+    const verdict = [t(verdictKey), ...buildTrapSpeech(result.trapFeedback)].join(' ');
     const explanation = String(result.question?.explication || '')
         .replace(/\s*\n+\s*/g, ' ')
         .trim();
@@ -60,10 +84,12 @@ export function buildFeedbackSpeech(result) {
 /**
  * Lecture automatique après validation (spec 022) : le verdict seul pour une bonne réponse,
  * le verdict et l'explication après une erreur ou une réponse incomplète.
- * @param {{ isCorrect: boolean, question: { explication?: string } }} result
+ * @param {{ isCorrect: boolean, question: { explication?: string }, trapFeedback?: any }} result
  */
 export function buildAutoFeedbackSpeech(result) {
-    return result.isCorrect ? t('quiz.voice.speech.correct') : buildFeedbackSpeech(result);
+    return result.isCorrect
+        ? [t('quiz.voice.speech.correct'), ...buildTrapSpeech(result.trapFeedback)].join(' ')
+        : buildFeedbackSpeech(result);
 }
 
 /**

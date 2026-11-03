@@ -4,6 +4,7 @@ import {
     buildQuestionSpeech,
     buildFeedbackSpeech,
     buildAutoFeedbackSpeech,
+    buildTrapSpeech,
     describeSelection,
     parseVoiceCommand,
     looksLikeEcho,
@@ -177,5 +178,47 @@ describe('looksLikeEcho (spec 022, FR-006)', () => {
         ['valider', false],
     ])('« %s » → %s', (text, expected) => {
         expect(looksLikeEcho(text)).toBe(expected);
+    });
+});
+
+describe('spoken trap messages', () => {
+    const fail = (trapFeedback) => ({
+        isCorrect: false,
+        question: { explication: 'Explication.' },
+        userPoints: 0,
+        selected: [{ pts: -6 }],
+        trapFeedback,
+    });
+
+    it('says nothing without trap feedback', () => {
+        expect(buildTrapSpeech(undefined)).toEqual([]);
+        expect(buildTrapSpeech({ recurrent: [], avoided: [], overcome: [] })).toEqual([]);
+        expect(buildFeedbackSpeech(fail(undefined))).toBe('Mauvaise réponse. Explication.');
+    });
+
+    it('speaks a recurring trap between the verdict and the explanation, without quotes or superscripts', () => {
+        const speech = buildFeedbackSpeech(fail({ recurrent: [{ count: 3, text: '12 h', relapse: false }] }));
+        expect(speech).toBe('Mauvaise réponse. C’est la 3ème fois que vous choisissez la réponse 12 h. Explication.');
+    });
+
+    it('says a relapse differently, and strips the final punctuation of the choice', () => {
+        expect(buildTrapSpeech({ recurrent: [{ count: 2, text: 'Oui.', relapse: true }] })).toEqual([
+            'Ce piège était surmonté et il est revenu : Oui.',
+        ]);
+    });
+
+    it('congratulates an avoided or overcome trap, even for a correct answer read automatically', () => {
+        const result = {
+            isCorrect: true,
+            question: { explication: 'Explication.' },
+            trapFeedback: { avoided: [{ text: '12 h' }], overcome: [{ text: '14 h' }] },
+        };
+        expect(buildAutoFeedbackSpeech(result)).toBe(
+            'Bonne réponse. Piège surmonté : vous ne tombez plus dans la réponse 14 h. Cette fois, vous avez évité le piège : 12 h.',
+        );
+    });
+
+    it('keeps the verdict alone for a correct answer without trap feedback', () => {
+        expect(buildAutoFeedbackSpeech({ isCorrect: true, question: { explication: 'x' } })).toBe('Bonne réponse.');
     });
 });
