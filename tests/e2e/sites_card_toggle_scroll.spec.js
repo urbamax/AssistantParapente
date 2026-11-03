@@ -27,6 +27,24 @@ test.describe("Sites - le + et le − d'une fiche gardent la position de lecture
     test('toggling a card twice leaves the scroll position unchanged', async ({ page }) => {
         await page.goto('/?mode=SITES');
         await expect(page.locator('.site-card').nth(4)).toBeVisible();
+        // Avec le rôle, la météo se charge (ici refusée) et la liste est redessinée à la fin : on mesure
+        // une fois qu'elle est restée stable.
+        await page.evaluate(
+            () =>
+                new Promise((resolve) => {
+                    let timer;
+                    const settle = () => {
+                        clearTimeout(timer);
+                        timer = setTimeout(() => resolve(undefined), 800);
+                    };
+                    new MutationObserver(settle).observe(document.getElementById('sites-list-container'), {
+                        childList: true,
+                        subtree: true,
+                    });
+                    settle();
+                }),
+        );
+        await expect(page.locator('#weather-loading-indicator')).toHaveCount(0);
 
         const scrollTop = () => page.evaluate(() => document.getElementById('sites-screen').scrollTop);
         const toggle = () => page.locator('.minimize-toggle-btn').nth(4);
