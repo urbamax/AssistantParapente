@@ -2200,7 +2200,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 92,
-    "verifiedAt": "2026-09-24"
+    "verifiedAt": "2026-11-03"
   },
   "N10V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -2647,7 +2647,7 @@
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
     "title": "Référentiel - Brevet de Pilote",
     "verifiedPage": 3,
-    "verifiedAt": "2026-09-26"
+    "verifiedAt": "2026-11-03"
   },
   "P3V": {
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
@@ -2659,31 +2659,29 @@
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
     "title": "Référentiel - Brevet de Pilote",
     "verifiedPage": 3,
-    "verifiedAt": "2026-09-26"
+    "verifiedAt": "2026-11-03"
   },
   "P5V": {
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
     "title": "Vol libre et milieux naturels - Référentiel de connaissances",
     "verifiedPage": 4,
-    "verifiedAt": "2026-09-30"
+    "verifiedAt": "2026-11-03"
   },
   "P6BM": {
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
     "title": "Référentiel - Brevet de Pilote",
     "verifiedPage": 4,
-    "verifiedAt": "2026-09-26"
+    "verifiedAt": "2026-11-03"
   },
   "P7V": {
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
     "title": "Vol libre et milieux naturels - Référentiel de connaissances",
     "verifiedPage": 4,
-    "verifiedAt": "2026-09-30"
+    "verifiedAt": "2026-11-03"
   },
   "P8BM": {
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
-    "title": "Référentiel - Brevet de Pilote",
-    "verifiedPage": 4,
-    "verifiedAt": "2026-09-26"
+    "title": "Référentiel - Brevet de Pilote"
   },
   "P9V": {
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
@@ -2700,8 +2698,8 @@
   "P10BM": {
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
     "title": "Référentiel - Brevet de Pilote",
-    "verifiedPage": 5,
-    "verifiedAt": "2026-09-30"
+    "verifiedPage": 4,
+    "verifiedAt": "2026-11-03"
   },
   "P11V": {
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
@@ -2719,37 +2717,43 @@
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
     "title": "Référentiel - Brevet de Pilote",
     "verifiedPage": 5,
-    "verifiedAt": "2026-09-30"
+    "verifiedAt": "2026-11-03"
   },
   "P13V": {
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
     "title": "Vol libre et milieux naturels - Référentiel de connaissances",
     "verifiedPage": 5,
-    "verifiedAt": "2026-09-30"
+    "verifiedAt": "2026-11-03"
   },
   "P14BM": {
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
     "title": "Référentiel - Brevet de Pilote",
     "verifiedPage": 5,
-    "verifiedAt": "2026-09-30"
+    "verifiedAt": "2026-11-03"
   },
   "P15V": {
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
     "title": "Vol libre et milieux naturels - Référentiel de connaissances",
-    "verifiedPage": 6,
-    "verifiedAt": "2026-09-30"
+    "verifiedPage": 5,
+    "verifiedAt": "2026-11-03",
+    "others": [
+      {
+        "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
+        "verifiedPage": 6
+      }
+    ]
   },
   "P16BM": {
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
     "title": "Référentiel - Brevet de Pilote",
     "verifiedPage": 5,
-    "verifiedAt": "2026-09-30"
+    "verifiedAt": "2026-11-03"
   },
   "P17V": {
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
     "title": "Vol libre et milieux naturels - Référentiel de connaissances",
     "verifiedPage": 6,
-    "verifiedAt": "2026-09-30"
+    "verifiedAt": "2026-11-03"
   },
   "P18BM": {
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
@@ -2761,25 +2765,25 @@
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
     "title": "Vol libre et milieux naturels - Référentiel de connaissances",
     "verifiedPage": 7,
-    "verifiedAt": "2026-09-30"
+    "verifiedAt": "2026-11-03"
   },
   "P20BM": {
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
     "title": "Référentiel - Brevet de Pilote",
     "verifiedPage": 6,
-    "verifiedAt": "2026-09-30"
+    "verifiedAt": "2026-11-03"
   },
   "P21V": {
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
     "title": "Vol libre et milieux naturels - Référentiel de connaissances",
     "verifiedPage": 8,
-    "verifiedAt": "2026-09-30"
+    "verifiedAt": "2026-11-03"
   },
   "P22BM": {
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
     "title": "Référentiel - Brevet de Pilote",
     "verifiedPage": 7,
-    "verifiedAt": "2026-09-30"
+    "verifiedAt": "2026-11-03"
   },
   "P23V": {
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
@@ -2803,7 +2807,7 @@
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
     "title": "Référentiel - Brevet de Pilote",
     "verifiedPage": 11,
-    "verifiedAt": "2026-09-30"
+    "verifiedAt": "2026-11-03"
   },
   "P27V": {
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
@@ -2821,13 +2825,13 @@
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
     "title": "Référentiel - Brevet de Pilote",
     "verifiedPage": 11,
-    "verifiedAt": "2026-09-30"
+    "verifiedAt": "2026-11-03"
   },
   "P29V": {
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
     "title": "Vol libre et milieux naturels - Référentiel de connaissances",
     "verifiedPage": 4,
-    "verifiedAt": "2026-09-30"
+    "verifiedAt": "2026-11-03"
   },
   "P30V": {
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
