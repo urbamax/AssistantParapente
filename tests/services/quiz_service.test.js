@@ -265,7 +265,7 @@ describe('QuizService - Compteurs globaux et auto-guérison', () => {
     });
 });
 
-describe('QuizService - Choix cochés (pickedChoices)', () => {
+describe('QuizService - Choix cochés (choicePicks)', () => {
     const makeQuestion = () => ({
         code: 'P1V',
         theme: 'Météo',
@@ -297,14 +297,14 @@ describe('QuizService - Choix cochés (pickedChoices)', () => {
         answer('TRAINING', q, [0, 1]);
         QuizService.state.examResults = [];
         answer('TRAINING', q, [1]);
-        expect(stored().pickedChoices).toEqual([1, 2, 0]);
+        expect(stored().choicePicks).toEqual([1, 2, 0]);
         expect(stored().total).toBe(2);
     });
 
     it('compte aussi les choix en examen, sans toucher aux compteurs de réussite', () => {
         const q = makeQuestion();
         answer('EXAM', q, [1, 2]);
-        expect(stored()).toMatchObject({ pickedChoices: [0, 1, 1], total: 0, correct: 0, streak: 0 });
+        expect(stored()).toMatchObject({ choicePicks: [0, 1, 1], total: 0, correct: 0, streak: 0 });
         expect(StorageService.get(StorageService.KEYS.QCM_STATS).totalQuestions || 0).toBe(0);
     });
 
@@ -312,7 +312,7 @@ describe('QuizService - Choix cochés (pickedChoices)', () => {
         const q = makeQuestion();
         answer('EXAM', q, [1]);
         answer('EXAM', q, [0]);
-        expect(stored().pickedChoices).toEqual([1, 0, 0]);
+        expect(stored().choicePicks).toEqual([1, 0, 0]);
         expect(stored().answers.map((e) => e[1])).toEqual([0b001]);
     });
 
@@ -323,5 +323,18 @@ describe('QuizService - Choix cochés (pickedChoices)', () => {
         answer('EXAM', q, [2]);
         expect(stored().answers.map((e) => e[1])).toEqual([0b011, 0b100]);
         expect(stored().answers[0][0]).toBe(Math.floor(Date.now() / 86_400_000));
+    });
+
+    it("enregistre l'index canonique du choix même quand les choix sont mélangés pour la séance", () => {
+        const q = makeQuestion();
+        QuizService.setQuestions([q]);
+        const shuffledCopy = { ...q, choices: [q.choices[2], q.choices[1], q.choices[0]] };
+        answer('TRAINING', shuffledCopy, [1]);
+        QuizService.state.examResults = [];
+        const another = { ...q, choices: [q.choices[1], q.choices[0], q.choices[2]] };
+        answer('TRAINING', another, [0]);
+        expect(stored().choicePicks).toEqual([0, 2, 0]);
+        expect(stored().answers.map((e) => e[1])).toEqual([0b010, 0b010]);
+        QuizService.setQuestions([]);
     });
 });
