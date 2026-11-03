@@ -269,14 +269,21 @@ describe('données réelles : découpage des explications par choix', () => {
         QuizService.parseExplicationsCSV(readFileSync('js/data/qcm_ffvl_explanations.csv', 'utf8')),
     );
 
-    // Plafond à ne jamais dépasser : ces questions ont une explication qui ne se découpe pas
-    // proprement, le diagnostic y affiche l'explication entière. À faire baisser lors des lots d'audit.
-    const MAX_UNSPLITTABLE = 88;
+    // Les questions Delta (codes H, R, X) ne sont jamais proposées dans l'application parapente
+    // (`parapente: false`) : leurs explications n'ont pas été reprises et ne se découpent pas par choix.
+    // Toutes les autres se découpent : ce test échoue dès qu'une explication parapente perd un paragraphe.
+    const isParapente = (x) => x.parapente !== false;
+    const unsplittable = (list) => list.filter((x) => splitOptionExplanations(x).some((p) => p === null));
 
-    it('maps a paragraph to each choice for almost every question', () => {
-        const unsplittable = questions.filter((x) => splitOptionExplanations(x).some((p) => p === null));
-        expect(questions.length).toBeGreaterThan(800);
-        expect(unsplittable.length).toBeLessThanOrEqual(MAX_UNSPLITTABLE);
+    it('maps a paragraph to each choice for every parapente question', () => {
+        const parapente = questions.filter(isParapente);
+        expect(parapente.length).toBeGreaterThan(700);
+        expect(unsplittable(parapente).map((x) => x.code)).toEqual([]);
+    });
+
+    it('only leaves Delta questions without a split, and those are not parapente', () => {
+        const left = unsplittable(questions);
+        expect(left.every((x) => !isParapente(x) && /^[HRX]/.test(x.code))).toBe(true);
     });
 });
 
