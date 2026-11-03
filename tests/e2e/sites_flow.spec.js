@@ -471,10 +471,10 @@ test.describe('E2E - Sites Flow', () => {
     });
 });
 
-test.describe('E2E - Sites sans le rôle « beta »', () => {
+test.describe('E2E - Sites sans le rôle « owner »', () => {
     test.use({ serviceWorkers: 'block' });
 
-    test('la liste et la carte restent visibles, sans aucune météo calculée', async ({ page }) => {
+    test('la page des sites est introuvable : ni bouton, ni accès direct, aucune météo demandée', async ({ page }) => {
         const openMeteoCalls = [];
         await page.route('https://api.open-meteo.com/**', (route) => {
             openMeteoCalls.push(route.request().url());
@@ -483,18 +483,12 @@ test.describe('E2E - Sites sans le rôle « beta »', () => {
         await useRadius200(page);
         await page.goto('/?bypassGdpr=true');
         await acceptGdprIfAsked(page);
-        await page.locator('.nav-menu-btn[data-target="SITES"]').click();
 
-        await expect(page.locator('#site-search')).toBeVisible();
-        await expect(page.locator('#sites-map-view')).toBeVisible();
-        await expect(page.locator('.site-card').first()).toBeVisible();
+        await expect(page.locator('.nav-menu-btn[data-target="SITES"]')).toBeHidden();
 
-        await expect(page.locator('.forecast-sticky-container')).toBeHidden();
-        await expect(page.locator('[data-action="toggleAdvancedSettings"]')).toBeHidden();
-        await expect(page.locator('#btn-compare-favorites')).toBeHidden();
-        await expect(page.locator('.site-weather-row')).toHaveCount(0);
-        await expect(page.locator('.ranking-timeline')).toHaveCount(0);
-        await expect(page.locator('.weather-loading')).toHaveCount(0);
+        await page.goto('/?mode=SITES&bypassGdpr=true');
+        await expect(page.locator('#sites-screen')).not.toHaveClass(/active/);
+        await expect(page.locator('#welcome-screen')).toHaveClass(/active/);
 
         await page.waitForTimeout(800);
         expect(openMeteoCalls).toEqual([]);

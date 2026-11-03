@@ -1,10 +1,12 @@
 import { test, expect } from '@playwright/test';
+import { grantBetaRole } from '../helpers/e2e_beta_role.js';
 import { disableBackdropBlur } from '../helpers/e2e_no_backdrop_blur.js';
 
 // Spec 010 (audit C7) : les éléments cliquables non natifs s'utilisent au clavier.
 test.use({ serviceWorkers: 'block' });
 
 test.beforeEach(async ({ page }) => {
+    await grantBetaRole(page);
     await page.addInitScript(() => {
         localStorage.setItem(
             'parapente_gdpr_consent',

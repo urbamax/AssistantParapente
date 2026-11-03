@@ -1,10 +1,12 @@
 import { test, expect } from '@playwright/test';
+import { grantBetaRole } from '../helpers/e2e_beta_role.js';
 import { disableBackdropBlur } from '../helpers/e2e_no_backdrop_blur.js';
 
 // Spec 045 : le « + » / « − » d'une fiche de site re-rend la liste ; l'écran ne doit pas bouger.
 // Sur WebKit (Safari), vider la liste avant de la remplir faisait remonter l'écran d'environ 200 px.
 test.describe("Sites - le + et le − d'une fiche gardent la position de lecture", () => {
     test.beforeEach(async ({ page }) => {
+        await grantBetaRole(page);
         await disableBackdropBlur(page);
         await page.addInitScript(() => {
             window.localStorage.setItem(

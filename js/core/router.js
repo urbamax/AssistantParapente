@@ -11,6 +11,18 @@ import AccessService, { ROLES } from '../services/access_service.js';
 
 const LAZY = Symbol('lazyViewModule');
 
+/** Écrans réservés à un rôle : sans lui, la navigation renvoie à l'écran d'accueil (rien n'est monté ni chargé). */
+const ROUTE_ROLES = Object.freeze({ SITES: ROLES.OWNER });
+
+/** MENU n'a pas d'écran propre (il renvoie vers SITES) : un accès refusé retombe sur l'accueil. */
+const DENIED_ROUTE_FALLBACK = 'WELCOME';
+
+/** @param {string} mode */
+export function canOpenRoute(mode) {
+    const role = ROUTE_ROLES[mode];
+    return !role || AccessService.has(role);
+}
+
 /**
  * Écran chargé à la demande : `importer` est par exemple `() => import('../views/quiz.js')`.
  * Le module n'est téléchargé qu'au premier besoin (premier passage sur l'écran, ou premier clic sur
@@ -124,6 +136,10 @@ class Router {
         if (!this.routes.has(mode)) {
             console.error(`Route not found: ${mode}`);
             this.navigate('MENU');
+            return;
+        }
+        if (!canOpenRoute(mode)) {
+            if (mode !== DENIED_ROUTE_FALLBACK) this.navigate(DENIED_ROUTE_FALLBACK, { ...params, pushState: false });
             return;
         }
         console.time('ROUTER_NAVIGATE_TOTAL_' + mode);

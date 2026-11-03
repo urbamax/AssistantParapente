@@ -460,8 +460,6 @@ export const FR_HTML = Object.freeze({
             'Elle centralise les <strong>questions officielles FFVL</strong> dans un QCM interactif avec correction et explications pédagogiques, accessible à tout moment, même hors ligne.',
         elleCroiseEnTemps:
             'Elle croise en temps réel les <strong>données géographiques des sites de vol</strong> (orientation des décollages, altitude, type) avec les <strong>prévisions météo multi-modèles</strong> (AROME, ICON, GFS…) pour indiquer quels sites sont potentiellement volables et à quelle heure.',
-        elleReunitLesSites:
-            "Elle réunit les <strong>sites de vol</strong> (orientation des décollages, altitude, type) sur une carte et dans une liste, avec recherche et filtres, autour de vous ou de l'endroit de votre choix.",
         elleRegroupeLesDu:
             'Elle regroupe les <strong>cours, manuels et fiches synthèse</strong> du brevet de pilote dans une bibliothèque consultable et téléchargeable.',
         elleTientVotreImport:
