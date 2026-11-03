@@ -1128,6 +1128,10 @@ class QuizViewClass extends QuizVoiceBase {
               )
             : '';
 
+        const exitButtonHtml = this._activeWorkshopAxisId
+            ? `<button class="next-btn" data-action="QuizshowRevisionAxes" style="width:100%;"><i class="ri-compass-3-line"></i> ${tq('axes.backToAxesBtn')}</button>`
+            : `<button class="next-btn" data-action="finish-session" style="width:100%;">${tq('results.finish')}</button>`;
+
         container.innerHTML = `
             <div class="stats-circle-container" style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom: 32px;">
                 <h2 style="margin:0;">${tq('results.title')}</h2>
@@ -1139,7 +1143,9 @@ class QuizViewClass extends QuizVoiceBase {
                     </div>
                 </div>
             </div>
-            
+
+            <div class="qcm-results-exit" style="margin-bottom: 8px;">${exitButtonHtml}</div>
+
             ${trapsHtml}<div style="margin-top: 32px; font-weight: 600; font-size: 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px; color:var(--text-main);">
                 ${tq('results.summary')}
             </div>
@@ -1212,11 +1218,9 @@ class QuizViewClass extends QuizVoiceBase {
         `;
 
         choicesDiv.innerHTML = '';
-        if (this._activeWorkshopAxisId) {
-            actionsDiv.innerHTML = `<button class="next-btn" data-action="QuizshowRevisionAxes" style="width:100%;"><i class="ri-compass-3-line"></i> ${tq('axes.backToAxesBtn')}</button>`;
-        } else {
-            actionsDiv.innerHTML = `<button class="next-btn" data-action="finish-session" style="width:100%;">${tq('results.finish')}</button>`;
-        }
+        // Le bouton de sortie est dans le contenu, avant le récapitulatif : sinon il faut faire défiler
+        // toute la liste d'erreurs pour le trouver.
+        actionsDiv.innerHTML = '';
     }
 
     // --- STATISTICS MANAGEMENT ---

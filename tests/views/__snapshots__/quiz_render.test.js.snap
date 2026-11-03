@@ -347,7 +347,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 exports[`quiz renders (spec 024: identical before and after moving the texts) > results: training with errors, exam passed, failed and invalidated, no error 1`] = `
 {
   "examFailed": {
-    "actions": "<button class="next-btn" data-action="finish-session" style="width:100%;">TERMINER</button>",
+    "actions": "",
     "body": "
             <div class="stats-circle-container" style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom: 32px;">
                 <h2 style="margin:0;">RÉSULTATS</h2>
@@ -359,7 +359,9 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             </div>
-            
+
+            <div class="qcm-results-exit" style="margin-bottom: 8px;"><button class="next-btn" data-action="finish-session" style="width:100%;">TERMINER</button></div>
+
             <div style="margin-top: 32px; font-weight: 600; font-size: 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px; color:var(--text-main);">
                 Récapitulatif des questions
             </div>
@@ -398,7 +400,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
     "label": "MODE EXAMEN",
   },
   "examInvalidated": {
-    "actions": "<button class="next-btn" data-action="finish-session" style="width:100%;">TERMINER</button>",
+    "actions": "",
     "body": "
             <div class="stats-circle-container" style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom: 32px;">
                 <h2 style="margin:0;">RÉSULTATS</h2>
@@ -410,7 +412,9 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             </div>
-            
+
+            <div class="qcm-results-exit" style="margin-bottom: 8px;"><button class="next-btn" data-action="finish-session" style="width:100%;">TERMINER</button></div>
+
             <div style="margin-top: 32px; font-weight: 600; font-size: 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px; color:var(--text-main);">
                 Récapitulatif des questions
             </div>
@@ -425,7 +429,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
     "label": "MODE EXAMEN",
   },
   "examPassed": {
-    "actions": "<button class="next-btn" data-action="finish-session" style="width:100%;">TERMINER</button>",
+    "actions": "",
     "body": "
             <div class="stats-circle-container" style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom: 32px;">
                 <h2 style="margin:0;">RÉSULTATS</h2>
@@ -437,7 +441,9 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             </div>
-            
+
+            <div class="qcm-results-exit" style="margin-bottom: 8px;"><button class="next-btn" data-action="finish-session" style="width:100%;">TERMINER</button></div>
+
             <div style="margin-top: 32px; font-weight: 600; font-size: 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px; color:var(--text-main);">
                 Récapitulatif des questions
             </div>
@@ -452,7 +458,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
     "label": "MODE EXAMEN",
   },
   "mastery": {
-    "actions": "<button class="next-btn" data-action="finish-session" style="width:100%;">TERMINER</button>",
+    "actions": "",
     "body": "
             <div class="stats-circle-container" style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom: 32px;">
                 <h2 style="margin:0;">RÉSULTATS</h2>
@@ -464,7 +470,9 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             </div>
-            
+
+            <div class="qcm-results-exit" style="margin-bottom: 8px;"><button class="next-btn" data-action="finish-session" style="width:100%;">TERMINER</button></div>
+
             <div style="margin-top: 32px; font-weight: 600; font-size: 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px; color:var(--text-main);">
                 Récapitulatif des questions
             </div>
@@ -503,7 +511,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
     "label": "MODE PERFECTIONNEMENT",
   },
   "revision": {
-    "actions": "<button class="next-btn" data-action="finish-session" style="width:100%;">TERMINER</button>",
+    "actions": "",
     "body": "
             <div class="stats-circle-container" style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom: 32px;">
                 <h2 style="margin:0;">RÉSULTATS</h2>
@@ -515,7 +523,9 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             </div>
-            
+
+            <div class="qcm-results-exit" style="margin-bottom: 8px;"><button class="next-btn" data-action="finish-session" style="width:100%;">TERMINER</button></div>
+
             <div style="margin-top: 32px; font-weight: 600; font-size: 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px; color:var(--text-main);">
                 Récapitulatif des questions
             </div>
@@ -554,7 +564,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
     "label": "MODE RÉVISION",
   },
   "training": {
-    "actions": "<button class="next-btn" data-action="finish-session" style="width:100%;">TERMINER</button>",
+    "actions": "",
     "body": "
             <div class="stats-circle-container" style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom: 32px;">
                 <h2 style="margin:0;">RÉSULTATS</h2>
@@ -566,7 +576,9 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             </div>
-            
+
+            <div class="qcm-results-exit" style="margin-bottom: 8px;"><button class="next-btn" data-action="finish-session" style="width:100%;">TERMINER</button></div>
+
             <div style="margin-top: 32px; font-weight: 600; font-size: 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px; color:var(--text-main);">
                 Récapitulatif des questions
             </div>
