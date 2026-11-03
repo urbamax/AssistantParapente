@@ -193,7 +193,9 @@ describe('QuizView — Écran Axes de révision anti-bachotage (Spec 043)', () =
             { isCorrect: true, question: QUESTIONS[0], selected: [QUESTIONS[0].choices[0]] },
         ];
         QuizView.renderExamResults();
-        const actionsHtml = document.getElementById('qcm-actions-container').innerHTML;
-        expect(actionsHtml).toContain('QuizshowRevisionAxes');
+        const resultsHtml = document.getElementById('qcm-question-text').innerHTML;
+        expect(resultsHtml).toContain('QuizshowRevisionAxes');
+        // Le bouton est placé avant le récapitulatif des erreurs
+        expect(resultsHtml.indexOf('QuizshowRevisionAxes')).toBeLessThan(resultsHtml.indexOf('bank-container'));
     });
 });

@@ -31,6 +31,58 @@ const VoiceService = {
     _recognizer: null,
     _recognizerActive: false,
     _wantListen: false,
+    /** @type {any} */
+    _wakeLock: null,
+
+    /**
+     * Sur iPhone, le commutateur « vibreur » coupe la synthèse vocale d'une page web : la voix ne sort que
+     * si la page déclare une session audio de lecture (API Audio Session de Safari). On la déclare juste
+     * avant de parler, en lecture + enregistrement quand l'écoute est active pour ne pas couper le micro,
+     * puis on rend la main au navigateur. Sans cette API (Chrome, Firefox), rien ne change.
+     * @param {'auto' | 'playback' | 'play-and-record'} type
+     */
+    _setAudioSession(type) {
+        const session = typeof navigator !== 'undefined' ? /** @type {any} */ (navigator).audioSession : null;
+        if (!session) return;
+        try {
+            session.type = type;
+        } catch {
+            // type refusé par le navigateur : on parle quand même
+        }
+    },
+
+    /**
+     * Garde l'écran allumé tant que l'écoute est active : l'écran qui s'éteint suspend la page, donc la
+     * lecture et la reconnaissance (téléphone en support dans une voiture, par exemple). Le navigateur
+     * relâche le verrou quand la page passe en arrière-plan : on le reprend au retour. Sans l'API, rien.
+     */
+    async _acquireWakeLock() {
+        const wakeLock = typeof navigator !== 'undefined' ? /** @type {any} */ (navigator).wakeLock : null;
+        if (!wakeLock || this._wakeLock) return;
+        try {
+            const lock = await wakeLock.request('screen');
+            if (!this._wantListen) {
+                lock.release?.();
+                return;
+            }
+            this._wakeLock = lock;
+            lock.addEventListener?.('release', () => {
+                if (this._wakeLock === lock) this._wakeLock = null;
+            });
+        } catch {
+            // refusé (économie d'énergie, page masquée) : on continue sans
+        }
+    },
+
+    _releaseWakeLock() {
+        const lock = this._wakeLock;
+        this._wakeLock = null;
+        try {
+            lock?.release?.();
+        } catch {
+            // déjà relâché
+        }
+    },
 
     canSpeak() {
         return typeof window !== 'undefined' && !!window.speechSynthesis && !!window.SpeechSynthesisUtterance;
@@ -66,6 +118,7 @@ const VoiceService = {
         const id = ++this._speechId;
         this._speaking = true;
         window.speechSynthesis.cancel();
+        this._setAudioSession(this._wantListen ? 'play-and-record' : 'playback');
 
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'fr-FR';
@@ -74,6 +127,7 @@ const VoiceService = {
             if (id !== this._speechId) return; // lecture remplacée ou arrêtée
             this._speaking = false;
             this._lastSpeechEnd = Date.now();
+            if (!this._wantListen) this._setAudioSession('auto');
             if (onEnd) onEnd();
         };
         utterance.onend = finish;
@@ -129,11 +183,13 @@ const VoiceService = {
         this._recognizer = rec;
         this._wantListen = true;
         this._resumeRecognizer();
+        this._acquireWakeLock();
         return true;
     },
 
     stopListening() {
         this._wantListen = false;
+        this._releaseWakeLock();
         const rec = this._recognizer;
         this._recognizer = null;
         this._recognizerActive = false;
@@ -156,20 +212,27 @@ const VoiceService = {
         }
     },
 
-    /** @returns {{ autoRead: boolean, voiceConsent: boolean }} */
+    /** @returns {{ autoRead: boolean, voiceConsent: boolean, chain: boolean }} */
     getPrefs() {
         const stored = StorageService.get(PREFS_KEY, null);
         const prefs = stored && typeof stored === 'object' ? stored : {};
         return {
             autoRead: prefs.autoRead === true,
             voiceConsent: prefs.voiceConsent === true,
+            chain: prefs.chain === true,
         };
     },
 
-    /** @param {Partial<{ autoRead: boolean, voiceConsent: boolean }>} partial */
+    /** @param {Partial<{ autoRead: boolean, voiceConsent: boolean, chain: boolean }>} partial */
     setPrefs(partial) {
         StorageService.set(PREFS_KEY, { ...this.getPrefs(), ...partial });
     },
 };
+
+if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && VoiceService._wantListen) VoiceService._acquireWakeLock();
+    });
+}
 
 export default VoiceService;
