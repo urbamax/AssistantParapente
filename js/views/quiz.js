@@ -1033,16 +1033,17 @@ class QuizViewClass extends QuizVoiceBase {
                 const text = perOption[choiceIndex(original, opt)];
                 if (!text) return;
                 // Le choix et son pli vont dans un même groupe : la flèche se pose sur la ligne du choix.
-                let group = btn.closest('.qcm-option-group');
+                let group = /** @type {HTMLElement | null} */ (btn.closest('.qcm-option-group'));
                 if (!group) {
-                    group = document.createElement('div');
-                    group.className = 'qcm-option-group';
-                    btn.replaceWith(group);
-                    group.appendChild(btn);
+                    const created = document.createElement('div');
+                    created.className = 'qcm-option-group';
+                    btn.replaceWith(created);
+                    created.appendChild(btn);
                     // La flèche se centre sur la hauteur de la ligne du choix, qui varie avec le texte et la largeur.
-                    const syncRowHeight = () => group.style.setProperty('--row-h', `${btn.offsetHeight}px`);
+                    const syncRowHeight = () => created.style.setProperty('--row-h', `${btn.offsetHeight}px`);
                     syncRowHeight();
                     if (typeof ResizeObserver !== 'undefined') new ResizeObserver(syncRowHeight).observe(btn);
+                    group = created;
                 }
                 // Les boutons du cours sont rattachés aux bonnes réponses, où se trouve ce que dit le cours.
                 const links = opt.pts > 0 ? choiceCourseLinksHtml(courseLinks) : '';
