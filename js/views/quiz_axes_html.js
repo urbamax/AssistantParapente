@@ -465,7 +465,7 @@ export function buildRevisionAxisCardHtml(axis, expandedIds) {
 /**
  * Construit le tableau de bord complet de l'écran « Axes de révision ».
  *
- * @param {{ level: string, axes: any[], counts: Record<string, number> }} report
+ * @param {{ level: string, axes: any[], counts: Record<string, number>, trapTotals?: { active: number, consolidating: number, overcome: number, axes: number } }} report
  * @param {{ statusFilter?: string, expandedIds?: Set<string> }} [uiState]
  * @returns {string}
  */
