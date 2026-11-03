@@ -266,3 +266,57 @@ export function buildTrapFeedback(question, selected, before, after) {
     }
     return { recurrent, avoided, overcome };
 }
+
+/**
+ * Totaux des pièges sur un ensemble de questions : combien sont actifs, en consolidation ou
+ * surmontés, et dans combien de chapitres au moins un piège est actif.
+ *
+ * @param {any[]} questions
+ * @param {Record<string, any>} stats
+ * @param {(q: any) => string | null} [axisOf]
+ */
+export function summarizeTraps(questions, stats, axisOf) {
+    const map = questionStats(stats);
+    const totals = { active: 0, consolidating: 0, overcome: 0, axes: 0 };
+    const axesWithActive = new Set();
+    for (const q of Array.isArray(questions) ? questions : []) {
+        for (const trap of diagnoseQuestionErrors(q, map[q.code]).traps) {
+            totals[trap.status] += 1;
+            if (trap.status === 'active') axesWithActive.add(axisOf ? axisOf(q) : q.code);
+        }
+    }
+    totals.axes = axesWithActive.size;
+    return totals;
+}
+
+/**
+ * Pièges rencontrés pendant une série : réponses fausses cochées, avec le nombre de fois où chacune
+ * l'a été (statistiques déjà à jour, la série comprise). Une question rejouée compte une seule fois,
+ * d'après sa dernière réponse.
+ *
+ * @param {Array<{ question: { code: string }, selected: any[] }>} results
+ * @param {(code: string) => any} originalOf question d'origine (ordre du CSV)
+ * @param {Record<string, any>} stats
+ * @returns {{ trapped: Array<{ code: string, count: number, status: TrapStatus, relapse: boolean }>, recurrent: number }}
+ */
+export function summarizeSessionTraps(results, originalOf, stats) {
+    const map = questionStats(stats);
+    const last = new Map();
+    for (const r of Array.isArray(results) ? results : []) if (r?.question) last.set(r.question.code, r);
+
+    /** @type {Array<{ code: string, count: number, status: TrapStatus, relapse: boolean }>} */
+    const trapped = [];
+    for (const [code, r] of last) {
+        const original = originalOf(code);
+        if (!original) continue;
+        const { traps } = diagnoseQuestionErrors(original, map[code]);
+        const picked = new Set((r.selected || []).map((c) => choiceIndex(original, c)));
+        for (const trap of traps) {
+            if (picked.has(trap.choiceIndex)) {
+                trapped.push({ code, count: trap.count, status: trap.status, relapse: trap.relapse });
+            }
+        }
+    }
+    trapped.sort((a, b) => b.count - a.count);
+    return { trapped, recurrent: trapped.filter((t) => t.count >= 2).length };
+}
