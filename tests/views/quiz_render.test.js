@@ -228,6 +228,39 @@ describe('quiz renders (spec 024: identical before and after moving the texts)',
         expect({ actions: html('qcm-actions-container'), feedback: html('qcm-feedback') }).toMatchSnapshot();
     });
 
+    it('puts each choice explanation under the choice: open for a fault, folded for what was done right', () => {
+        const q = Q(
+            'B7V',
+            'Météo',
+            'Question à trois choix',
+            'Pourquoi la bonne.\nPourquoi la fausse est fausse.\nPourquoi la neutre.',
+        );
+        QuizView.renderQuestion(q);
+        const kinds = () =>
+            [...document.querySelectorAll('#qcm-choices .qcm-option-explanation')].map((e) => e.dataset.kind);
+
+        // Fausse cochée, bonne oubliée : deux fautes ouvertes, une explication repliée.
+        QuizView.showAnswerFeedback({ selected: [q.choices[1]], isCorrect: false, question: q }, true);
+        expect(kinds()).toEqual(['missed', 'incorrect', 'ok']);
+        const folded = document.querySelectorAll('#qcm-choices details.qcm-option-explanation');
+        expect(folded).toHaveLength(1);
+        expect(folded[0].hasAttribute('open')).toBe(false);
+        expect(document.querySelector('#qcm-choices .qcm-option-explanation[data-kind="incorrect"]').textContent).toBe(
+            'Pourquoi la fausse est fausse.',
+        );
+        expect(document.querySelector('#qcm-feedback details.instructor-feedback')).toBeNull();
+
+        // Appelé de nouveau (retour sur la question) : pas de doublon.
+        QuizView.showAnswerFeedback({ selected: [q.choices[1]], isCorrect: false, question: q }, true);
+        expect(kinds()).toHaveLength(3);
+
+        // Bonne réponse complète : tout est replié.
+        QuizView.renderQuestion(q);
+        QuizView.showAnswerFeedback({ selected: [q.choices[0]], isCorrect: true, question: q }, true);
+        expect(kinds()).toEqual(['ok', 'ok', 'ok']);
+        expect(document.getElementById('qcm-feedback').style.display).toBe('none');
+    });
+
     it('explanation fold: shut after a complete correct answer, open after a miss or a wrong answer', () => {
         QuizView.renderQuestion(QUESTIONS[0]);
         const show = (isCorrect) => {

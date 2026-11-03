@@ -1154,9 +1154,44 @@ body.light-mode .bank-choice.correct {
     color: var(--text-main);
 }
 
-.explanation-picked {
-    background: rgba(245, 158, 11, 0.25);
-    color: inherit;
-    padding: 1px 3px;
-    border-radius: 4px;
+/* Explication de chaque choix, collée sous lui après la correction : ouverte sous une faute, repliée sinon. */
+.qcm-option.has-explanation {
+    /* La réponse cochée est agrandie : sans cela elle déborde de son explication. */
+    transform: none;
+    margin-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.qcm-option-explanation {
+    margin: 0 0 16px;
+    padding: 12px 20px 14px;
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    background: var(--bg-card);
+    color: var(--text-main);
+    font-size: 0.93rem;
+    line-height: 1.5;
+}
+
+.qcm-option-explanation[data-kind='incorrect'] {
+    border-color: var(--accent-red);
+    background: rgba(248, 113, 113, 0.08);
+}
+
+.qcm-option-explanation[data-kind='missed'] {
+    border-color: #f97316;
+    background: rgba(249, 115, 22, 0.08);
+}
+
+.qcm-option-explanation > summary {
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.qcm-option-explanation[open] > summary {
+    margin-bottom: 8px;
 }
