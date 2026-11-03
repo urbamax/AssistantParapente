@@ -313,5 +313,15 @@ describe('QuizService - Choix cochés (pickedChoices)', () => {
         answer('EXAM', q, [1]);
         answer('EXAM', q, [0]);
         expect(stored().pickedChoices).toEqual([1, 0, 0]);
+        expect(stored().answers.map((e) => e[1])).toEqual([0b001]);
+    });
+
+    it('journalise chaque réponse avec son masque, en entraînement comme en examen', () => {
+        const q = makeQuestion();
+        answer('TRAINING', q, [0, 1]);
+        QuizService.state.examResults = [];
+        answer('EXAM', q, [2]);
+        expect(stored().answers.map((e) => e[1])).toEqual([0b011, 0b100]);
+        expect(stored().answers[0][0]).toBe(Math.floor(Date.now() / 86_400_000));
     });
 });

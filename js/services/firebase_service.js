@@ -19,6 +19,7 @@ import {
 } from './flight_trace_sync.js';
 import { t } from '../utils/i18n.js';
 import AccessService from './access_service.js';
+import { mergeAnswerLogs } from './answer_log.js';
 import { mergeBrevets } from './brevet_service.js';
 import { compactExam } from './quiz_service.js';
 
@@ -1354,6 +1355,12 @@ export const FirebaseAuthEngine = {
         };
     },
 
+    // Journal daté des dernières réponses (voir answer_log.js) : omis si aucune des deux versions n'en a.
+    _mergeAnswers: function (a, b) {
+        if (!Array.isArray(a) && !Array.isArray(b)) return {};
+        return { answers: mergeAnswerLogs(a, b) };
+    },
+
     mergeQcmStats: function (local, cloud) {
         const merged = {
             totalQuestions: 0,
@@ -1374,6 +1381,7 @@ export const FirebaseAuthEngine = {
                 correct: Math.max(lQ.correct, cQ.correct),
                 ...this._latestReviewState(lQ, cQ),
                 ...this._mergePickedChoices(lQ.pickedChoices, cQ.pickedChoices),
+                ...this._mergeAnswers(lQ.answers, cQ.answers),
             };
         });
 

@@ -3,6 +3,7 @@ import { toSorted } from '../utils/array_utils.js';
 import { t } from '../utils/i18n.js';
 import { dueScore, summarizeReviews } from './review_scheduler.js';
 import { masteryRatio, masteryRatioAfterCorrect, pushAttempt } from './mastery.js';
+import { appendAnswer, pickMask, removeLastAnswer } from './answer_log.js';
 
 // Tolérance sur la somme des maîtrises (flottants) pour décider que l'objectif est atteint.
 const MASTERY_EPSILON = 1e-9;
@@ -18,6 +19,17 @@ export function addPickedChoices(qStat, question, selected, sign = 1) {
         if (idx >= 0) counts[idx] = Math.max(0, counts[idx] + sign);
     });
     qStat.pickedChoices = counts;
+}
+
+// Enregistre une réponse dans les deux suivis du diagnostic : compteurs par choix et journal daté.
+// `previous` est la réponse d'origine quand l'utilisateur corrige en examen : on la retire d'abord.
+export function recordPicks(qStat, question, selected, previous) {
+    if (previous) {
+        addPickedChoices(qStat, question, previous, -1);
+        qStat.answers = removeLastAnswer(qStat.answers, pickMask(question, previous));
+    }
+    addPickedChoices(qStat, question, selected);
+    qStat.answers = appendAnswer(qStat.answers, pickMask(question, selected));
 }
 
 export function isExamBloated(exam) {
@@ -694,7 +706,7 @@ class QuizService {
     }
 
     // Les choix cochés en examen alimentent le diagnostic des erreurs, mais l'examen ne touche
-    // ni aux compteurs de réussite ni à la révision espacée : seul `pickedChoices` est écrit.
+    // ni aux compteurs de réussite ni à la révision espacée : seuls `pickedChoices` et `answers` sont écrits.
     recordExamPicks(question, selected, previous) {
         const stats = this.getPersistentStats();
         if (!stats.questions) stats.questions = {};
@@ -702,8 +714,7 @@ class QuizService {
             stats.questions[question.code] = { total: 0, correct: 0, streak: 0 };
         }
         const qStat = stats.questions[question.code];
-        if (previous && Array.isArray(previous.selected)) addPickedChoices(qStat, question, previous.selected, -1);
-        addPickedChoices(qStat, question, selected);
+        recordPicks(qStat, question, selected, Array.isArray(previous?.selected) ? previous.selected : null);
         this._persistStats(stats);
     }
 
@@ -726,7 +737,7 @@ class QuizService {
             stats.questions[question.code] = { total: 0, correct: 0, streak: 0 };
         }
         const qStat = stats.questions[question.code];
-        addPickedChoices(qStat, question, selected);
+        recordPicks(qStat, question, selected);
         qStat.recent = pushAttempt(qStat, isCorrect);
         qStat.total++;
         if (isCorrect) {

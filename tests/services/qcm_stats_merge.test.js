@@ -92,3 +92,36 @@ describe('FirebaseAuthEngine.mergeQcmStats (pickedChoices)', () => {
         expect(JSON.stringify(merged)).not.toContain('undefined');
     });
 });
+
+describe('FirebaseAuthEngine.mergeQcmStats (answers)', () => {
+    it('merges the answer logs without double counting synced answers', () => {
+        const merged = merge(
+            stats({
+                total: 2,
+                correct: 1,
+                answers: [
+                    [1, 2],
+                    [2, 1],
+                ],
+            }),
+            stats({
+                total: 2,
+                correct: 1,
+                answers: [
+                    [2, 1],
+                    [3, 4],
+                ],
+            }),
+        );
+        expect(merged.answers).toEqual([
+            [1, 2],
+            [2, 1],
+            [3, 4],
+        ]);
+    });
+
+    it('never writes the field when neither side has it', () => {
+        const merged = merge(stats({ total: 1, correct: 1 }), stats({ total: 1, correct: 1 }));
+        expect('answers' in merged).toBe(false);
+    });
+});
