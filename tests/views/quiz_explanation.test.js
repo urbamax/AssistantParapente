@@ -65,12 +65,18 @@ describe('optionExplanationHtml', () => {
     it('is always a fold: open under a fault, shut under what was done right', () => {
         const fault = optionExplanationHtml('A <b>faux</b>', 'incorrect', 'Explication');
         expect(fault).toBe(
-            '<details class="qcm-option-explanation" data-kind="incorrect" open><summary>Explication</summary><div>A &lt;b&gt;faux&lt;/b&gt;</div></details>',
+            '<details class="qcm-option-explanation" data-kind="incorrect" open><summary aria-label="Explication" title="Explication"></summary><div>A &lt;b&gt;faux&lt;/b&gt;</div></details>',
         );
         expect(optionExplanationHtml('Oubliée', 'missed', 'Explication')).toContain('data-kind="missed" open');
         const ok = optionExplanationHtml('Juste', 'ok', 'Explication');
-        expect(ok).toContain('data-kind="ok"><summary>');
+        expect(ok).toContain('data-kind="ok"><summary');
         expect(ok).not.toContain(' open');
+    });
+
+    it('shows only an arrow: the label is for screen readers and the tooltip, never written in the fold', () => {
+        const html = optionExplanationHtml('Texte', 'ok', 'Explication');
+        expect(html).toContain('<summary aria-label="Explication" title="Explication"></summary>');
+        expect(html.replace(/<[^>]+>/g, '')).toBe('Texte');
     });
 
     it('puts the ready-made extra html (course buttons) inside the fold, under the text', () => {

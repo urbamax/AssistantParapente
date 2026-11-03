@@ -43,11 +43,11 @@ export function optionOutcome(choice, selected) {
  *
  * @param {string} text
  * @param {'incorrect' | 'missed' | 'ok'} outcome
- * @param {string} summary libellé du pli
+ * @param {string} label nom du pli pour les lecteurs d'écran et l'infobulle : le pli n'affiche qu'une flèche
  * @param {string} [extraHtml] HTML déjà prêt ajouté sous le texte (boutons du cours)
  * @returns {string}
  */
-export function optionExplanationHtml(text, outcome, summary, extraHtml = '') {
+export function optionExplanationHtml(text, outcome, label, extraHtml = '') {
     const open = outcome === 'ok' ? '' : ' open';
-    return `<details class="qcm-option-explanation" data-kind="${outcome}"${open}><summary>${escapeHTML(summary)}</summary><div>${escapeHTML(String(text || ''))}</div>${extraHtml}</details>`;
+    return `<details class="qcm-option-explanation" data-kind="${outcome}"${open}><summary aria-label="${escapeHTML(label)}" title="${escapeHTML(label)}"></summary><div>${escapeHTML(String(text || ''))}</div>${extraHtml}</details>`;
 }

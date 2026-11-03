@@ -1164,6 +1164,7 @@ body.light-mode .bank-choice.correct {
 }
 
 .qcm-option-explanation {
+    position: relative;
     margin: 0 0 16px;
     padding: 12px 20px 14px;
     border: 1px solid var(--border-color);
@@ -1185,11 +1186,19 @@ body.light-mode .bank-choice.correct {
     background: rgba(249, 115, 22, 0.08);
 }
 
+.qcm-option-explanation:not([open]) {
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+/* Le pli n'a qu'une petite flèche à droite : fermé, une fine barre ; ouvert, la flèche se pose dans
+   le coin et le texte commence tout en haut. */
 .qcm-option-explanation > summary {
+    display: flex;
+    justify-content: flex-end;
+    min-height: 1.4rem;
     cursor: pointer;
     color: var(--text-secondary);
-    font-size: 0.85rem;
-    font-weight: 700;
     list-style: none;
 }
 
@@ -1199,15 +1208,22 @@ body.light-mode .bank-choice.correct {
 
 .qcm-option-explanation > summary::before {
     content: '▸';
-    display: inline-block;
-    width: 1.1em;
+    font-size: 1.1rem;
+    line-height: 1.4rem;
     transition: transform 0.2s;
+}
+
+.qcm-option-explanation[open] > summary {
+    position: absolute;
+    top: 8px;
+    right: 14px;
+    min-height: 0;
 }
 
 .qcm-option-explanation[open] > summary::before {
     transform: rotate(90deg);
 }
 
-.qcm-option-explanation[open] > summary {
-    margin-bottom: 8px;
+.qcm-option-explanation > div:first-of-type {
+    padding-right: 24px;
 }
