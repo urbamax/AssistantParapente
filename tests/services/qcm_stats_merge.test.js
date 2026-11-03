@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { FirebaseAuthEngine } from '../../js/services/firebase_service.js';
+import StorageService from '../../js/services/storage.js';
+import { readAnswerLog } from '../../js/services/answer_log.js';
 
 const merge = (local, cloud) => FirebaseAuthEngine.mergeQcmStats(local, cloud).questions.W1V;
 const stats = (q) => ({ themes: {}, questions: { W1V: q } });
@@ -113,7 +115,7 @@ describe('FirebaseAuthEngine.mergeQcmStats (answers)', () => {
                 ],
             }),
         );
-        expect(merged.answers).toEqual([
+        expect(readAnswerLog(merged.answers)).toEqual([
             [1, 2],
             [2, 1],
             [3, 4],
@@ -123,5 +125,39 @@ describe('FirebaseAuthEngine.mergeQcmStats (answers)', () => {
     it('never writes the field when neither side has it', () => {
         const merged = merge(stats({ total: 1, correct: 1 }), stats({ total: 1, correct: 1 }));
         expect('answers' in merged).toBe(false);
+    });
+});
+
+// Firestore refuse les tableaux imbriqués : un document de stats ne doit en contenir aucun.
+const hasNestedArray = (value, insideArray = false) => {
+    if (Array.isArray(value)) return insideArray || value.some((v) => hasNestedArray(v, true));
+    if (value && typeof value === 'object') return Object.values(value).some((v) => hasNestedArray(v, insideArray));
+    return false;
+};
+
+describe('FirebaseAuthEngine stats documents (Firestore)', () => {
+    it('merged stats contain no nested array, even from the first-version journal', () => {
+        const legacy = stats({
+            total: 2,
+            correct: 1,
+            answers: [
+                [1, 2],
+                [2, 1],
+            ],
+            choicePicks: [1, 0],
+        });
+        const cloud = stats({ total: 1, correct: 1, answers: [2049], choicePicks: [0, 1] });
+        expect(hasNestedArray(FirebaseAuthEngine.mergeQcmStats(legacy, cloud))).toBe(false);
+    });
+
+    it('local stats are flattened before any write to the cloud', () => {
+        StorageService.set(StorageService.KEYS.QCM_STATS, {
+            themes: {},
+            questions: { W1V: { total: 1, correct: 0, answers: [[1, 2]] } },
+        });
+        const local = FirebaseAuthEngine.getLocalQcmStats();
+        expect(hasNestedArray(local)).toBe(false);
+        expect(local.questions.W1V.answers).toEqual([1026]);
+        expect(StorageService.get(StorageService.KEYS.QCM_STATS).questions.W1V.answers).toEqual([1026]);
     });
 });

@@ -1,5 +1,5 @@
 // Règles Firestore (firestore.rules) testées sur l'émulateur : npm run test:rules
-import { describe, it, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebase/rules-unit-testing';
 import { doc, getDoc, setDoc, deleteDoc, getDocs, collection, collectionGroup, setLogLevel } from 'firebase/firestore';
@@ -257,5 +257,30 @@ describe("tout ce que l'application n'utilise pas est refusé", () => {
     it('une collection à la racine est refusée', async () => {
         await assertFails(setDoc(doc(asMe(), 'public', 'x'), { a: 1 }));
         await assertFails(getDoc(doc(asMe(), 'public', 'x')));
+    });
+});
+
+// Le document de stats QCM tel que l'application l'écrit : le SDK Firestore refuse les tableaux
+// imbriqués (le journal des réponses est donc un tableau plat d'entiers).
+describe("document de stats QCM (forme écrite par l'application)", () => {
+    const statsDoc = (answers) => ({
+        totalQuestions: 2,
+        totalCorrect: 1,
+        themes: { Météo: { total: 2, correct: 1 } },
+        questions: { A1V: { total: 2, correct: 1, streak: 0, recent: [1, 0], choicePicks: [1, 1, 0], answers } },
+    });
+
+    it('accepte le journal des réponses sous forme de tableau plat', async () => {
+        await assertSucceeds(setDoc(doc(asMe(), 'users', ME, 'stats', 'qcm_stats'), statsDoc([20400 * 1024 + 2])));
+    });
+
+    it('refuse un journal en tableaux imbriqués (ancien format), côté SDK avant même les règles', async () => {
+        // Le SDK peut lever l'erreur tout de suite ou par la promesse : l'async la ramène toujours à un rejet.
+        const error = await (async () =>
+            setDoc(doc(asMe(), 'users', ME, 'stats', 'qcm_stats'), statsDoc([[20400, 2]])))().then(
+            () => null,
+            (e) => e,
+        );
+        expect(String(error?.message)).toMatch(/Nested arrays/);
     });
 });

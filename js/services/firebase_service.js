@@ -19,7 +19,7 @@ import {
 } from './flight_trace_sync.js';
 import { t } from '../utils/i18n.js';
 import AccessService from './access_service.js';
-import { mergeAnswerLogs } from './answer_log.js';
+import { flattenAnswerLogs, mergeAnswerLogs } from './answer_log.js';
 import { mergeBrevets } from './brevet_service.js';
 import { compactExam } from './quiz_service.js';
 
@@ -1503,7 +1503,11 @@ export const FirebaseAuthEngine = {
     // LocalStorage Getters
     getLocalQcmStats: function () {
         const saved = StorageService.get(StorageService.KEYS.QCM_STATS);
-        if (saved && typeof saved === 'object') return saved;
+        if (saved && typeof saved === 'object') {
+            // Firestore refuse les tableaux imbriqués : on remet à plat l'ancien format du journal avant toute écriture.
+            if (flattenAnswerLogs(saved)) StorageService.set(StorageService.KEYS.QCM_STATS, saved);
+            return saved;
+        }
         return { totalQuestions: 0, totalCorrect: 0, themes: {}, questions: {} };
     },
 
