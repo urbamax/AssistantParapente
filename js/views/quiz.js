@@ -378,6 +378,9 @@ class QuizViewClass extends QuizVoiceBase {
             case 'quiz-voice-auto':
                 this.toggleAutoRead();
                 break;
+            case 'quiz-voice-chain':
+                this.toggleChain();
+                break;
             case 'quiz-voice-mic':
                 this.toggleVoiceAnswers();
                 break;
@@ -787,6 +790,7 @@ class QuizViewClass extends QuizVoiceBase {
     }
 
     renderQuestion(q) {
+        this.cancelChainAdvance();
         VoiceService.stopSpeaking();
         this._voiceQuestion = q || null;
         this._voiceFeedback = null;
@@ -801,6 +805,7 @@ class QuizViewClass extends QuizVoiceBase {
         if (!q) {
             // End of quiz
             this.stopVoice();
+            this.speakFinishedIfChained();
             this.renderVoiceBar();
             this.renderExamResults();
             return;

@@ -7,6 +7,7 @@ import {
     buildQuestionSpeech,
     buildFeedbackSpeech,
     buildAutoFeedbackSpeech,
+    buildFinishedSpeech,
     describeSelection,
     parseVoiceCommand,
     looksLikeEcho,
@@ -14,6 +15,10 @@ import {
 import { t } from '../utils/i18n.js';
 import { tv } from './quiz_strings.js';
 import { QuizStatsBase } from './quiz_stats.js';
+
+// Mode enchaîné : pause entre la fin de la correction lue et la question suivante, pour pouvoir
+// dire « répète » ou « stop » avant qu'elle ne passe.
+const CHAIN_PAUSE_MS = 1500;
 
 export class QuizVoiceBase extends QuizStatsBase {
     constructor() {
@@ -51,7 +56,11 @@ export class QuizVoiceBase extends QuizStatsBase {
      */
     currentSpeech({ auto = false } = {}) {
         if (this._voiceFeedback) {
-            return auto ? buildAutoFeedbackSpeech(this._voiceFeedback) : buildFeedbackSpeech(this._voiceFeedback);
+            // Les choix de la séance sont mélangés : les passages de l'explication se retrouvent sur la question d'origine.
+            const original = QuizService.getQuestionByCode(this._voiceFeedback.question?.code);
+            return auto
+                ? buildAutoFeedbackSpeech(this._voiceFeedback, original)
+                : buildFeedbackSpeech(this._voiceFeedback, original);
         }
         return this._voiceQuestion ? buildQuestionSpeech(this._voiceQuestion) : '';
     }
@@ -59,7 +68,51 @@ export class QuizVoiceBase extends QuizStatsBase {
     readAloud({ auto = false } = {}) {
         const text = this.currentSpeech({ auto });
         if (!text || !VoiceService.canSpeak()) return;
-        VoiceService.speak(text, { onEnd: () => this.renderVoiceBar() });
+        const isFeedback = auto && Boolean(this._voiceFeedback);
+        VoiceService.speak(text, {
+            onEnd: () => {
+                this.renderVoiceBar();
+                if (isFeedback) this.scheduleChainAdvance();
+            },
+        });
+        this.renderVoiceBar();
+    }
+
+    /**
+     * Mode enchaîné (mains libres) : une fois la correction lue, passe seul à la question suivante, qui
+     * est lue à son tour. Il faut la lecture automatique. Toute commande entendue, ou tout changement de
+     * question, annule le passage prévu.
+     */
+    scheduleChainAdvance() {
+        this.cancelChainAdvance();
+        const prefs = VoiceService.getPrefs();
+        if (!prefs.chain || !prefs.autoRead) return;
+        const index = QuizService.state.qcmIndex;
+        this._chainTimer = setTimeout(() => {
+            this._chainTimer = null;
+            if (QuizService.state.qcmIndex !== index || !this._voiceFeedback || VoiceService.isSpeaking()) return;
+            this.renderQuestion(QuizService.nextQuestion());
+        }, CHAIN_PAUSE_MS);
+    }
+
+    cancelChainAdvance() {
+        if (this._chainTimer) clearTimeout(this._chainTimer);
+        this._chainTimer = null;
+    }
+
+    /** Fin de série en mode enchaîné : le résultat est dit, l'écran n'est pas forcément regardé. */
+    speakFinishedIfChained() {
+        if (!VoiceService.getPrefs().chain || !VoiceService.canSpeak()) return;
+        const results = QuizService.state.examResults.filter(Boolean);
+        const total = QuizService.state.qcmSessionData.length || results.length;
+        VoiceService.speak(buildFinishedSpeech(results.filter((r) => r.isCorrect).length, total));
+    }
+
+    toggleChain() {
+        const chain = !VoiceService.getPrefs().chain;
+        // Enchaîner suppose de lire automatiquement : on active les deux ensemble.
+        VoiceService.setPrefs(chain ? { chain, autoRead: true } : { chain });
+        if (!chain) this.cancelChainAdvance();
         this.renderVoiceBar();
     }
 
@@ -114,6 +167,7 @@ export class QuizVoiceBase extends QuizStatsBase {
 
     /** Arrête lecture et écoute (changement d'écran, fin de session). */
     stopVoice() {
+        this.cancelChainAdvance();
         VoiceService.stopSpeaking();
         VoiceService.stopListening();
         this._voiceNoticeOpen = false;
@@ -157,7 +211,8 @@ export class QuizVoiceBase extends QuizStatsBase {
             return;
         }
 
-        // Le pilote répond sans attendre la fin de la lecture : on se tait.
+        // Le pilote répond sans attendre la fin de la lecture : on se tait, et on n'enchaîne pas seul.
+        this.cancelChainAdvance();
         if (VoiceService.isSpeaking()) VoiceService.stopSpeaking();
 
         this._voiceStatus = t('quiz.voice.heard', { text: heard.trim() });
@@ -237,7 +292,7 @@ export class QuizVoiceBase extends QuizStatsBase {
 
         const canSpeak = VoiceService.canSpeak();
         const canListen = VoiceService.canListen();
-        const { autoRead, voiceConsent } = VoiceService.getPrefs();
+        const { autoRead, voiceConsent, chain } = VoiceService.getPrefs();
         const speaking = VoiceService.isSpeaking();
         const listening = VoiceService.isListening();
         const readLabel = speaking ? 'stopLabel' : this._voiceFeedback ? 'readFeedbackLabel' : 'readLabel';
@@ -261,6 +316,9 @@ export class QuizVoiceBase extends QuizStatsBase {
                     </button>
                     <button type="button" class="qcm-voice-btn" data-action="quiz-voice-auto" aria-pressed="${autoRead}" aria-label="${tv('autoLabel')}">
                         <i class="ri-play-list-line" aria-hidden="true"></i> ${tv('auto')}
+                    </button>
+                    <button type="button" class="qcm-voice-btn" data-action="quiz-voice-chain" aria-pressed="${chain}" aria-label="${tv('chainLabel')}">
+                        <i class="ri-repeat-line" aria-hidden="true"></i> ${tv('chain')}
                     </button>`
                             : ''
                     }

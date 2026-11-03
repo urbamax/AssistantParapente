@@ -139,6 +139,61 @@ describe('VoiceService (spec 016)', () => {
             expect(synth.current.text).toBe('Deux');
         });
 
+        describe('audio session (iPhone silent switch)', () => {
+            afterEach(() => {
+                delete navigator.audioSession;
+            });
+
+            it('declares a playback session before speaking and gives it back at the end', () => {
+                const synth = installSynthesis();
+                const seen = [];
+                Object.defineProperty(navigator, 'audioSession', {
+                    configurable: true,
+                    value: {
+                        set type(v) {
+                            seen.push(v);
+                        },
+                    },
+                });
+                VoiceService.speak('Bonjour');
+                expect(seen).toEqual(['playback']);
+                synth.finish();
+                expect(seen).toEqual(['playback', 'auto']);
+            });
+
+            it('keeps the microphone usable when listening is active', () => {
+                installSynthesis();
+                window.webkitSpeechRecognition = FakeRecognition;
+                const seen = [];
+                Object.defineProperty(navigator, 'audioSession', {
+                    configurable: true,
+                    value: {
+                        set type(v) {
+                            seen.push(v);
+                        },
+                    },
+                });
+                VoiceService.startListening({ onResult: () => {}, onError: () => {} });
+                VoiceService.speak('Bonjour');
+                expect(seen).toEqual(['play-and-record']);
+            });
+
+            it('speaks normally when the browser has no audio session or refuses the type', () => {
+                const synth = installSynthesis();
+                expect(() => VoiceService.speak('Sans API')).not.toThrow();
+                Object.defineProperty(navigator, 'audioSession', {
+                    configurable: true,
+                    value: {
+                        set type(_v) {
+                            throw new Error('refusé');
+                        },
+                    },
+                });
+                expect(() => VoiceService.speak('Refusé')).not.toThrow();
+                expect(synth.spoken).toHaveLength(2);
+            });
+        });
+
         it('does nothing without synthesis', () => {
             expect(() => VoiceService.speak('Bonjour')).not.toThrow();
             expect(VoiceService.isSpeaking()).toBe(false);
@@ -246,26 +301,75 @@ describe('VoiceService (spec 016)', () => {
         });
     });
 
+    describe('screen wake lock while listening (hands-free in a car)', () => {
+        const installWakeLock = () => {
+            const lock = { release: vi.fn(), addEventListener: vi.fn() };
+            const request = vi.fn(async () => lock);
+            Object.defineProperty(navigator, 'wakeLock', { configurable: true, value: { request } });
+            return { lock, request };
+        };
+
+        afterEach(() => {
+            delete navigator.wakeLock;
+        });
+
+        it('keeps the screen on while listening and releases it when listening stops', async () => {
+            window.webkitSpeechRecognition = FakeRecognition;
+            const { lock, request } = installWakeLock();
+            VoiceService.startListening({ onResult: () => {}, onError: () => {} });
+            await Promise.resolve();
+            await Promise.resolve();
+            expect(request).toHaveBeenCalledWith('screen');
+            VoiceService.stopListening();
+            expect(lock.release).toHaveBeenCalledTimes(1);
+        });
+
+        it('releases a lock granted after listening was already stopped', async () => {
+            window.webkitSpeechRecognition = FakeRecognition;
+            const { lock } = installWakeLock();
+            VoiceService.startListening({ onResult: () => {}, onError: () => {} });
+            VoiceService.stopListening();
+            await Promise.resolve();
+            await Promise.resolve();
+            expect(lock.release).toHaveBeenCalled();
+        });
+
+        it('listens normally without the API or when the lock is refused', async () => {
+            window.webkitSpeechRecognition = FakeRecognition;
+            expect(VoiceService.startListening({ onResult: () => {}, onError: () => {} })).toBe(true);
+            VoiceService.stopListening();
+            Object.defineProperty(navigator, 'wakeLock', {
+                configurable: true,
+                value: { request: vi.fn(async () => Promise.reject(new Error('refusé'))) },
+            });
+            expect(VoiceService.startListening({ onResult: () => {}, onError: () => {} })).toBe(true);
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+    });
+
     describe('prefs (data-model VoicePrefs)', () => {
         it('defaults to everything off', () => {
-            expect(VoiceService.getPrefs()).toEqual({ autoRead: false, voiceConsent: false });
+            expect(VoiceService.getPrefs()).toEqual({ autoRead: false, voiceConsent: false, chain: false });
         });
 
         it('stores partial updates', () => {
             VoiceService.setPrefs({ autoRead: true });
             VoiceService.setPrefs({ voiceConsent: true });
-            expect(VoiceService.getPrefs()).toEqual({ autoRead: true, voiceConsent: true });
+            VoiceService.setPrefs({ chain: true });
+            expect(VoiceService.getPrefs()).toEqual({ autoRead: true, voiceConsent: true, chain: true });
             expect(JSON.parse(localStorage.getItem('parapente_voice_prefs'))).toEqual({
                 autoRead: true,
                 voiceConsent: true,
+                chain: true,
             });
         });
 
         it('falls back to defaults on a corrupt value', () => {
             localStorage.setItem('parapente_voice_prefs', 'oops');
-            expect(VoiceService.getPrefs()).toEqual({ autoRead: false, voiceConsent: false });
+            expect(VoiceService.getPrefs()).toEqual({ autoRead: false, voiceConsent: false, chain: false });
             localStorage.setItem('parapente_voice_prefs', JSON.stringify({ autoRead: 'yes', voiceConsent: 1 }));
-            expect(VoiceService.getPrefs()).toEqual({ autoRead: false, voiceConsent: false });
+            expect(VoiceService.getPrefs()).toEqual({ autoRead: false, voiceConsent: false, chain: false });
         });
     });
 });
