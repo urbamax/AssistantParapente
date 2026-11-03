@@ -5,6 +5,7 @@ import {
     computeTrapStatus,
     diagnoseQuestionErrors,
     getTopTraps,
+    buildTrapFeedback,
     isFullyCorrectMask,
     pickAntiTrapQuestions,
     splitOptionExplanations,
@@ -274,5 +275,81 @@ describe('données réelles : découpage des explications par choix', () => {
         const unsplittable = questions.filter((x) => splitOptionExplanations(x).some((p) => p === null));
         expect(questions.length).toBeGreaterThan(800);
         expect(unsplittable.length).toBeLessThanOrEqual(MAX_UNSPLITTABLE);
+    });
+});
+
+describe('buildTrapFeedback', () => {
+    const question = q('U1V');
+    const run = (beforeLog, afterLog, selected) =>
+        buildTrapFeedback(
+            question,
+            selected.map((i) => choices[i]),
+            diagnoseQuestionErrors(question, stat(beforeLog, [])),
+            diagnoseQuestionErrors(question, stat(afterLog, [])),
+        );
+
+    it('stays silent the first time a trap is ticked', () => {
+        const fb = run([], [[100, TRAP_A]], [1]);
+        expect(fb).toEqual({ recurrent: [], avoided: [], overcome: [] });
+    });
+
+    it('warns when the same trap is ticked again, with its count', () => {
+        const fb = run(
+            [[100, TRAP_A]],
+            [
+                [100, TRAP_A],
+                [101, TRAP_A],
+            ],
+            [1],
+        );
+        expect(fb.recurrent).toEqual([{ choiceIndex: 1, text: 'piège A', count: 2, relapse: false }]);
+    });
+
+    it('flags a relapse of an overcome trap', () => {
+        const before = [
+            [100, TRAP_A],
+            [101, GOOD],
+            [104, GOOD],
+            [108, GOOD],
+        ];
+        const fb = run(before, [...before, [120, TRAP_A]], [1]);
+        expect(fb.recurrent[0]).toMatchObject({ choiceIndex: 1, relapse: true });
+    });
+
+    it('congratulates a fully correct answer that avoids a live trap', () => {
+        const fb = run(
+            [[100, TRAP_A]],
+            [
+                [100, TRAP_A],
+                [101, GOOD],
+            ],
+            [0],
+        );
+        expect(fb.avoided).toEqual([{ choiceIndex: 1, text: 'piège A' }]);
+        expect(fb.overcome).toEqual([]);
+    });
+
+    it('announces a trap that has just been overcome', () => {
+        const before = [
+            [100, TRAP_A],
+            [101, GOOD],
+            [104, GOOD],
+        ];
+        const fb = run(before, [...before, [108, GOOD]], [0]);
+        expect(fb.overcome).toEqual([{ choiceIndex: 1, text: 'piège A' }]);
+        expect(fb.avoided).toEqual([]);
+    });
+
+    it('does not congratulate a partial answer', () => {
+        expect(
+            run(
+                [[100, TRAP_A]],
+                [
+                    [100, TRAP_A],
+                    [101, 0],
+                ],
+                [],
+            ).avoided,
+        ).toEqual([]);
     });
 });

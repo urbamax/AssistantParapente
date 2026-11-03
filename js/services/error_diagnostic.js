@@ -12,7 +12,7 @@
  *  - `consolidating` : au moins 2 réponses entièrement justes depuis, mais pas assez étalées dans le temps ;
  *  - `overcome`      : au moins 3 réponses justes sur 2 jours différents, la dernière à 7 jours ou plus du dernier piège.
  */
-import { readAnswerLog } from './answer_log.js';
+import { choiceIndex, pickMask, readAnswerLog } from './answer_log.js';
 
 export const TRAP_THRESHOLDS = Object.freeze({
     consolidatingClean: 2,
@@ -229,4 +229,40 @@ export function pickAntiTrapQuestions(questions, stats, options = {}) {
     }
     scored.sort((a, b) => compareTraps(a.top, b.top));
     return scored.slice(0, max).map((s) => s.q);
+}
+
+/**
+ * Ce qu'il faut dire au pilote juste après sa réponse, à partir du diagnostic de la question avant
+ * et après cette réponse.
+ *  - `recurrent` : pièges cochés une nouvelle fois (au moins la 2e), avec rechute éventuelle ;
+ *  - `avoided`   : réponse entièrement juste alors qu'un piège actif ou en consolidation existait ;
+ *  - `overcome`  : ce piège vient de passer au statut « surmonté ».
+ *
+ * @param {{ choices?: any[] }} question question d'origine (ordre du CSV)
+ * @param {any[]} selected choix cochés
+ * @param {{ traps: Trap[] }} before diagnostic avant la réponse
+ * @param {{ traps: Trap[] }} after diagnostic après la réponse
+ */
+export function buildTrapFeedback(question, selected, before, after) {
+    const choices = question?.choices || [];
+    const pickedTrapIdx = (selected || [])
+        .map((c) => choiceIndex(question, c))
+        .filter((i) => i >= 0 && choices[i].pts < 0);
+    const afterBy = new Map(after.traps.map((t) => [t.choiceIndex, t]));
+
+    const recurrent = pickedTrapIdx
+        .map((i) => afterBy.get(i))
+        .filter((t) => t && t.count >= 2)
+        .map((t) => ({ choiceIndex: t.choiceIndex, text: t.text, count: t.count, relapse: t.relapse }));
+
+    const avoided = [];
+    const overcome = [];
+    if (isFullyCorrectMask(pickMask(question, selected), choices)) {
+        for (const t of before.traps) {
+            if (t.status === 'overcome') continue;
+            const now = afterBy.get(t.choiceIndex);
+            (now?.status === 'overcome' ? overcome : avoided).push({ choiceIndex: t.choiceIndex, text: t.text });
+        }
+    }
+    return { recurrent, avoided, overcome };
 }

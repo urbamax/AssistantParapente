@@ -4,9 +4,13 @@ import { t } from '../utils/i18n.js';
 import { dueScore, summarizeReviews } from './review_scheduler.js';
 import { masteryRatio, masteryRatioAfterCorrect, pushAttempt } from './mastery.js';
 import { appendAnswer, choiceIndex, flattenAnswerLogs, pickMask, removeLastAnswer } from './answer_log.js';
+import { diagnoseQuestionErrors } from './error_diagnostic.js';
 
 // Tolérance sur la somme des maîtrises (flottants) pour décider que l'objectif est atteint.
 const MASTERY_EPSILON = 1e-9;
+
+// Une question où l'on est tombé dans un piège revient dans la même séance, ce nombre de questions plus tard.
+const TRAP_RETRY_GAP = 3;
 
 // Compte, pour une question, combien de fois chaque choix a été coché (index = position dans les
 // choix d'origine du CSV, voir `choiceIndex`). `sign` à -1 retire une réponse déjà comptée (examen :
@@ -611,6 +615,7 @@ class QuizService {
         // mémoriser un emplacement plutôt que la théorie.
         questions = questions.map((q) => this.shuffleQuestionChoices(q));
 
+        this._trapRetried = new Set();
         this.state.qcmSessionData = questions;
         this.state.qcmIndex = 0;
         this.state.examResults = [];
@@ -670,6 +675,7 @@ class QuizService {
         if (this.state.qcmConfig.mode !== 'EXAM') {
             this.updateStats(question, isCorrect, selectedOptions);
             if (this.state.qcmConfig.mode === 'MASTERY') this.advanceMasteryProgress();
+            else if (hasNegativeEffect) this.scheduleTrapRetry(question);
         } else {
             this.recordExamPicks(question, selectedOptions, previous);
         }
@@ -706,6 +712,27 @@ class QuizService {
             }
         }
         return s;
+    }
+
+    // Diagnostic des pièges d'une question d'après les statistiques enregistrées. Les index se lisent
+    // sur la question d'origine, pas sur la copie mélangée de la séance.
+    getTrapDiagnosis(question) {
+        const original = this.getQuestionByCode(question.code) || question;
+        return diagnoseQuestionErrors(original, this.getPersistentStats().questions?.[question.code]);
+    }
+
+    // Rejoue une fois, quelques questions plus loin, une question où l'on est tombé dans un piège
+    // (avec ses choix remélangés pour ne pas répondre à l'emplacement). Pas en examen, et pas en
+    // Perfectionnement qui gère lui-même la longueur de sa série.
+    scheduleTrapRetry(question) {
+        if (!this._trapRetried) this._trapRetried = new Set();
+        if (this._trapRetried.has(question.code)) return;
+        const session = this.state.qcmSessionData;
+        const at = Math.min(this.state.qcmIndex + 1 + TRAP_RETRY_GAP, session.length);
+        if (this.state.examResults.length > at) return;
+        this._trapRetried.add(question.code);
+        const original = this.getQuestionByCode(question.code) || question;
+        session.splice(at, 0, { ...this.shuffleQuestionChoices(original), trapRetry: true });
     }
 
     // Les choix cochés en examen alimentent le diagnostic des erreurs, mais l'examen ne touche

@@ -11,7 +11,9 @@ import { optionLetter } from '../services/quiz_voice.js';
 import { pickWorkshopQuestions } from '../services/revision_axes.js';
 import { tq, tql } from './quiz_strings.js';
 import { courseLinksHtml } from './quiz_course_links.js';
-import { explanationHtml } from './quiz_explanation.js';
+import { explanationHtml, highlightedExplanationHtml } from './quiz_explanation.js';
+import { buildTrapFeedback } from '../services/error_diagnostic.js';
+import { choiceIndex } from '../services/answer_log.js';
 import { buildOfficialTheoryBannerHtml } from './quiz_stats_html.js';
 import { QuizVoiceBase } from './quiz_voice_ui.js';
 
@@ -792,6 +794,9 @@ class QuizViewClass extends QuizVoiceBase {
                 badgeHtml = `<div class="quiz-theme-tag" style="background:#f87171; color:#fff; border-color:#f87171; margin-left: 8px;"><i class="ri-refresh-line"></i> ${tq('question.toReview')}</div>`;
             }
         }
+        if (q.trapRetry) {
+            badgeHtml += `<div class="quiz-theme-tag" style="background:#f59e0b; color:#fff; border-color:#f59e0b; margin-left: 8px;"><i class="ri-repeat-line"></i> ${tq('diagnostic.retryBadge')}</div>`;
+        }
 
         const letters = q.code.replace(/^[a-zA-Z]+\d+/, '');
         let colorStyle = '';
@@ -908,10 +913,23 @@ class QuizViewClass extends QuizVoiceBase {
     }
 
     validateQuestion() {
+        const isExam = QuizService.state.qcmConfig.mode === 'EXAM';
+        const shown = QuizService.getCurrentQuestion();
+        // Diagnostic avant la réponse : sans lui, impossible de dire qu'un piège vient d'être évité.
+        const before = shown && !isExam ? QuizService.getTrapDiagnosis(shown) : null;
+
         const result = QuizService.validate();
         if (!result) return;
 
-        const isExam = QuizService.state.qcmConfig.mode === 'EXAM';
+        if (before) {
+            const original = QuizService.getQuestionByCode(shown.code) || shown;
+            result.trapFeedback = buildTrapFeedback(
+                original,
+                result.selected,
+                before,
+                QuizService.getTrapDiagnosis(shown),
+            );
+        }
 
         if (isExam) {
             this.renderQuestion(QuizService.nextQuestion());
@@ -955,18 +973,37 @@ class QuizViewClass extends QuizVoiceBase {
 
         const courseLinks = this.getCourseLinks(result.question.code);
 
+        // Surbrillance du passage qui explique la réponse fausse cochée (index lus sur la question d'origine).
+        const original = QuizService.getQuestionByCode(result.question.code) || result.question;
+        const pickedWrong = new Set(result.selected.filter((c) => c.pts < 0).map((c) => choiceIndex(original, c)));
+        pickedWrong.delete(-1);
+        const explanation =
+            highlightedExplanationHtml(original, pickedWrong) ?? explanationHtml(result.question.explication);
+
         const feedbackDiv = document.getElementById('qcm-feedback');
         feedbackDiv.style.display = 'block';
         feedbackDiv.innerHTML = `
-            <details class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}"${result.isCorrect ? '' : ' open'}>
+            ${this.trapAlertsHtml(result.trapFeedback)}<details class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}"${result.isCorrect ? '' : ' open'}>
                 <summary>${tq('question.explanation')}</summary>
-                <div>${explanationHtml(result.question.explication)}</div>
+                <div>${explanation}</div>
                 ${courseLinksHtml(courseLinks)}
             </details>
         `;
 
         this._voiceFeedback = result;
         this.renderVoiceBar();
+    }
+
+    // Messages sur les pièges récurrents (⚠️) et sur les pièges enfin évités (✓), au-dessus de l'explication.
+    trapAlertsHtml(feedback) {
+        if (!feedback) return '';
+        const line = (kind, icon, key, item) =>
+            `<div class="trap-alert trap-alert--${kind}" role="status"><i class="${icon}"></i> ${tq(`diagnostic.${key}`, item)}</div>`;
+        return [
+            ...feedback.recurrent.map((r) => line('warn', 'ri-alert-line', r.relapse ? 'relapse' : 'recurrent', r)),
+            ...feedback.overcome.map((r) => line('good', 'ri-medal-line', 'overcome', r)),
+            ...feedback.avoided.map((r) => line('good', 'ri-check-line', 'avoided', r)),
+        ].join('');
     }
 
     // ------------------------------------------------------------------ mode vocal (spec 016)
