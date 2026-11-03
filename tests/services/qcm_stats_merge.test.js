@@ -71,24 +71,57 @@ describe('FirebaseAuthEngine.mergeQcmStats (révision espacée)', () => {
     });
 });
 
-describe('FirebaseAuthEngine.mergeQcmStats (pickedChoices)', () => {
+describe('FirebaseAuthEngine.mergeQcmStats (choicePicks)', () => {
     it('takes the max per choice instead of adding both sides', () => {
         const merged = merge(
-            stats({ total: 2, correct: 1, pickedChoices: [2, 1, 0] }),
-            stats({ total: 3, correct: 1, pickedChoices: [1, 3, 1, 1] }),
+            stats({ total: 2, correct: 1, choicePicks: [2, 1, 0] }),
+            stats({ total: 3, correct: 1, choicePicks: [1, 3, 1, 1] }),
         );
-        expect(merged.pickedChoices).toEqual([2, 3, 1, 1]);
+        expect(merged.choicePicks).toEqual([2, 3, 1, 1]);
     });
 
-    it('keeps pickedChoices recorded on only one side', () => {
+    it('keeps choicePicks recorded on only one side', () => {
         expect(
-            merge(stats({ total: 1, correct: 0 }), stats({ total: 1, correct: 0, pickedChoices: [0, 2] })),
-        ).toMatchObject({ pickedChoices: [0, 2] });
+            merge(stats({ total: 1, correct: 0 }), stats({ total: 1, correct: 0, choicePicks: [0, 2] })),
+        ).toMatchObject({ choicePicks: [0, 2] });
     });
 
     it('never writes the field when neither side has it', () => {
         const merged = merge(stats({ total: 1, correct: 1 }), stats({ total: 1, correct: 1 }));
-        expect('pickedChoices' in merged).toBe(false);
+        expect('choicePicks' in merged).toBe(false);
         expect(JSON.stringify(merged)).not.toContain('undefined');
+    });
+});
+
+describe('FirebaseAuthEngine.mergeQcmStats (answers)', () => {
+    it('merges the answer logs without double counting synced answers', () => {
+        const merged = merge(
+            stats({
+                total: 2,
+                correct: 1,
+                answers: [
+                    [1, 2],
+                    [2, 1],
+                ],
+            }),
+            stats({
+                total: 2,
+                correct: 1,
+                answers: [
+                    [2, 1],
+                    [3, 4],
+                ],
+            }),
+        );
+        expect(merged.answers).toEqual([
+            [1, 2],
+            [2, 1],
+            [3, 4],
+        ]);
+    });
+
+    it('never writes the field when neither side has it', () => {
+        const merged = merge(stats({ total: 1, correct: 1 }), stats({ total: 1, correct: 1 }));
+        expect('answers' in merged).toBe(false);
     });
 });
