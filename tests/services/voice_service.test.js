@@ -301,26 +301,75 @@ describe('VoiceService (spec 016)', () => {
         });
     });
 
+    describe('screen wake lock while listening (hands-free in a car)', () => {
+        const installWakeLock = () => {
+            const lock = { release: vi.fn(), addEventListener: vi.fn() };
+            const request = vi.fn(async () => lock);
+            Object.defineProperty(navigator, 'wakeLock', { configurable: true, value: { request } });
+            return { lock, request };
+        };
+
+        afterEach(() => {
+            delete navigator.wakeLock;
+        });
+
+        it('keeps the screen on while listening and releases it when listening stops', async () => {
+            window.webkitSpeechRecognition = FakeRecognition;
+            const { lock, request } = installWakeLock();
+            VoiceService.startListening({ onResult: () => {}, onError: () => {} });
+            await Promise.resolve();
+            await Promise.resolve();
+            expect(request).toHaveBeenCalledWith('screen');
+            VoiceService.stopListening();
+            expect(lock.release).toHaveBeenCalledTimes(1);
+        });
+
+        it('releases a lock granted after listening was already stopped', async () => {
+            window.webkitSpeechRecognition = FakeRecognition;
+            const { lock } = installWakeLock();
+            VoiceService.startListening({ onResult: () => {}, onError: () => {} });
+            VoiceService.stopListening();
+            await Promise.resolve();
+            await Promise.resolve();
+            expect(lock.release).toHaveBeenCalled();
+        });
+
+        it('listens normally without the API or when the lock is refused', async () => {
+            window.webkitSpeechRecognition = FakeRecognition;
+            expect(VoiceService.startListening({ onResult: () => {}, onError: () => {} })).toBe(true);
+            VoiceService.stopListening();
+            Object.defineProperty(navigator, 'wakeLock', {
+                configurable: true,
+                value: { request: vi.fn(async () => Promise.reject(new Error('refusé'))) },
+            });
+            expect(VoiceService.startListening({ onResult: () => {}, onError: () => {} })).toBe(true);
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+    });
+
     describe('prefs (data-model VoicePrefs)', () => {
         it('defaults to everything off', () => {
-            expect(VoiceService.getPrefs()).toEqual({ autoRead: false, voiceConsent: false });
+            expect(VoiceService.getPrefs()).toEqual({ autoRead: false, voiceConsent: false, chain: false });
         });
 
         it('stores partial updates', () => {
             VoiceService.setPrefs({ autoRead: true });
             VoiceService.setPrefs({ voiceConsent: true });
-            expect(VoiceService.getPrefs()).toEqual({ autoRead: true, voiceConsent: true });
+            VoiceService.setPrefs({ chain: true });
+            expect(VoiceService.getPrefs()).toEqual({ autoRead: true, voiceConsent: true, chain: true });
             expect(JSON.parse(localStorage.getItem('parapente_voice_prefs'))).toEqual({
                 autoRead: true,
                 voiceConsent: true,
+                chain: true,
             });
         });
 
         it('falls back to defaults on a corrupt value', () => {
             localStorage.setItem('parapente_voice_prefs', 'oops');
-            expect(VoiceService.getPrefs()).toEqual({ autoRead: false, voiceConsent: false });
+            expect(VoiceService.getPrefs()).toEqual({ autoRead: false, voiceConsent: false, chain: false });
             localStorage.setItem('parapente_voice_prefs', JSON.stringify({ autoRead: 'yes', voiceConsent: 1 }));
-            expect(VoiceService.getPrefs()).toEqual({ autoRead: false, voiceConsent: false });
+            expect(VoiceService.getPrefs()).toEqual({ autoRead: false, voiceConsent: false, chain: false });
         });
     });
 });

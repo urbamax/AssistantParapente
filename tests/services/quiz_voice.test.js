@@ -6,6 +6,7 @@ import {
     buildAutoFeedbackSpeech,
     buildTrapSpeech,
     buildFaultExplanation,
+    buildFinishedSpeech,
     describeSelection,
     parseVoiceCommand,
     looksLikeEcho,
@@ -270,5 +271,11 @@ describe('spoken explanation: only what concerns the fault', () => {
             original,
         );
         expect(speech).toBe('Mauvaise réponse. Pourquoi la bonne. Pourquoi le piège est faux.');
+    });
+});
+
+describe('end of series, spoken when chaining', () => {
+    it('says the score and the total', () => {
+        expect(buildFinishedSpeech(8, 10)).toBe('Série terminée : 8 sur 10.');
     });
 });

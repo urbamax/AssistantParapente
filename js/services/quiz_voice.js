@@ -99,6 +99,15 @@ export function buildTrapSpeech(feedback) {
 }
 
 /**
+ * Phrase de fin de série, lue en mode enchaîné (mains libres) : le pilote n'a pas l'écran sous les yeux.
+ * @param {number} score bonnes réponses
+ * @param {number} total questions de la série
+ */
+export function buildFinishedSpeech(score, total) {
+    return t('quiz.voice.speech.finished', { score, total });
+}
+
+/**
  * Verdict, pièges éventuels, puis les passages de l'explication qui concernent la faute.
  * Verdict « incomplète » : des points gagnés, aucune réponse fausse cochée, mais pas toutes les bonnes.
  * @param {{ isCorrect: boolean, question: { explication?: string }, userPoints?: number, selected?: { pts: number }[], trapFeedback?: any }} result
