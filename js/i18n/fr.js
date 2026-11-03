@@ -1264,6 +1264,7 @@ export const FR = Object.freeze({
             explanation: 'Explication',
             seeCourse: 'VOIR DANS LE COURS',
             seeCourseAt: 'VOIR : {title} (p. {page})',
+            seeCourseShort: 'COURS · p. {page}',
         }),
         traps: Object.freeze({
             resultsTitleOne: '1 piège rencontré dans cette série',

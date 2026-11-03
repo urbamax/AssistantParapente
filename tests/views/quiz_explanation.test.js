@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { explanationHtml, highlightedExplanationHtml } from '../../js/views/quiz_explanation.js';
+import {
+    explanationHtml,
+    optionExplanationHtml,
+    optionExplanations,
+    optionOutcome,
+} from '../../js/views/quiz_explanation.js';
 import QuizService from '../../js/services/quiz_service.js';
 import { buildFeedbackSpeech } from '../../js/services/quiz_voice.js';
 
@@ -32,16 +37,51 @@ const question = {
     explication: 'Bonne <b>réponse</b>.\nPourquoi A est faux.\nPourquoi B est faux.',
 };
 
-describe('highlightedExplanationHtml', () => {
-    it('highlights the paragraph of each wrong choice picked, and escapes the text', () => {
-        const html = highlightedExplanationHtml(question, new Set([1]));
-        expect(html).toBe(
-            'Bonne &lt;b&gt;réponse&lt;/b&gt;.<br><mark class="explanation-picked">Pourquoi A est faux.</mark><br>Pourquoi B est faux.',
-        );
+describe('optionExplanations', () => {
+    it('gives one paragraph per choice, in the original order', () => {
+        expect(optionExplanations(question)).toEqual([
+            'Bonne <b>réponse</b>.',
+            'Pourquoi A est faux.',
+            'Pourquoi B est faux.',
+        ]);
     });
 
-    it('returns null when nothing is picked or the split is unreliable, so the full text is shown', () => {
-        expect(highlightedExplanationHtml(question, new Set())).toBeNull();
-        expect(highlightedExplanationHtml({ ...question, explication: 'un seul bloc' }, new Set([1]))).toBeNull();
+    it('returns null when the split is unreliable, so the whole explanation is shown', () => {
+        expect(optionExplanations({ ...question, explication: 'un seul bloc' })).toBeNull();
+    });
+});
+
+describe('optionOutcome', () => {
+    it('tells a fault from what was done right', () => {
+        expect(optionOutcome({ pts: -6 }, true)).toBe('incorrect');
+        expect(optionOutcome({ pts: 6 }, false)).toBe('missed');
+        expect(optionOutcome({ pts: 6 }, true)).toBe('ok');
+        expect(optionOutcome({ pts: -6 }, false)).toBe('ok');
+        expect(optionOutcome({ pts: 0 }, true)).toBe('ok');
+    });
+});
+
+describe('optionExplanationHtml', () => {
+    it('is always a fold: open under a fault, shut under what was done right', () => {
+        const fault = optionExplanationHtml('A <b>faux</b>', 'incorrect', 'Explication');
+        expect(fault).toBe(
+            '<details class="qcm-option-explanation" data-kind="incorrect" open><summary aria-label="Explication" title="Explication"></summary><div>A &lt;b&gt;faux&lt;/b&gt;</div></details>',
+        );
+        expect(optionExplanationHtml('Oubliée', 'missed', 'Explication')).toContain('data-kind="missed" open');
+        const ok = optionExplanationHtml('Juste', 'ok', 'Explication');
+        expect(ok).toContain('data-kind="ok"><summary');
+        expect(ok).not.toContain(' open');
+    });
+
+    it('shows only an arrow: the label is for screen readers and the tooltip, never written in the fold', () => {
+        const html = optionExplanationHtml('Texte', 'ok', 'Explication');
+        expect(html).toContain('<summary aria-label="Explication" title="Explication"></summary>');
+        expect(html.replace(/<[^>]+>/g, '')).toBe('Texte');
+    });
+
+    it('puts the ready-made extra html (course buttons) inside the fold, under the text', () => {
+        const html = optionExplanationHtml('Juste', 'ok', 'Explication', '<div class="course-links">x</div>');
+        expect(html.indexOf('Juste')).toBeLessThan(html.indexOf('course-links'));
+        expect(html.endsWith('</div></details>')).toBe(true);
     });
 });

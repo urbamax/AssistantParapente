@@ -13,8 +13,8 @@ import { pickAntiTrapQuestions, summarizeSessionTraps } from '../services/error_
 import GdprEngine from '../gdpr_engine.js';
 import { buildResultsTrapsHtml } from './quiz_traps_html.js';
 import { tq, tql } from './quiz_strings.js';
-import { courseLinksHtml } from './quiz_course_links.js';
-import { explanationHtml, highlightedExplanationHtml } from './quiz_explanation.js';
+import { choiceCourseLinksHtml, courseLinksHtml } from './quiz_course_links.js';
+import { explanationHtml, optionExplanationHtml, optionExplanations, optionOutcome } from './quiz_explanation.js';
 import { buildTrapFeedback } from '../services/error_diagnostic.js';
 import { choiceIndex } from '../services/answer_log.js';
 
@@ -1020,22 +1020,59 @@ class QuizViewClass extends QuizVoiceBase {
 
         const courseLinks = this.getCourseLinks(result.question.code);
 
-        // Surbrillance du passage qui explique la réponse fausse cochée (index lus sur la question d'origine).
+        // Chaque choix porte son explication juste en dessous, toujours repliable : ouverte sous une faute
+        // (fausse réponse cochée, bonne réponse oubliée), repliée sous ce qui est bien traité. Les index se lisent sur la
+        // question d'origine (les choix de la séance sont mélangés). Sans découpage fiable, on garde
+        // l'explication entière sous les choix.
         const original = QuizService.getQuestionByCode(result.question.code) || result.question;
-        const pickedWrong = new Set(result.selected.filter((c) => c.pts < 0).map((c) => choiceIndex(original, c)));
-        pickedWrong.delete(-1);
-        const explanation =
-            highlightedExplanationHtml(original, pickedWrong) ?? explanationHtml(result.question.explication);
+        const perOption = optionExplanations(original);
+        document.querySelectorAll('#qcm-choices .qcm-option-explanation').forEach((el) => el.remove());
+        if (perOption) {
+            btns.forEach((btn) => {
+                const opt = this._currentChoices[parseInt(btn.getAttribute('data-idx'))];
+                const text = perOption[choiceIndex(original, opt)];
+                if (!text) return;
+                // Le choix et son pli vont dans un même groupe : la flèche se pose sur la ligne du choix.
+                let group = /** @type {HTMLElement | null} */ (btn.closest('.qcm-option-group'));
+                if (!group) {
+                    const created = document.createElement('div');
+                    created.className = 'qcm-option-group';
+                    btn.replaceWith(created);
+                    created.appendChild(btn);
+                    // La flèche se centre sur la hauteur de la ligne du choix, qui varie avec le texte et la largeur.
+                    const syncRowHeight = () => created.style.setProperty('--row-h', `${btn.offsetHeight}px`);
+                    syncRowHeight();
+                    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(syncRowHeight).observe(btn);
+                    group = created;
+                }
+                // Les boutons du cours sont rattachés aux bonnes réponses, où se trouve ce que dit le cours.
+                const links = opt.pts > 0 ? choiceCourseLinksHtml(courseLinks) : '';
+                group.insertAdjacentHTML(
+                    'beforeend',
+                    optionExplanationHtml(
+                        text,
+                        optionOutcome(opt, result.selected.includes(opt)),
+                        tq('question.explanation'),
+                        links,
+                    ),
+                );
+            });
+        }
 
+        const alertsHtml = this.trapAlertsHtml(result.trapFeedback);
         const feedbackDiv = document.getElementById('qcm-feedback');
-        feedbackDiv.style.display = 'block';
-        feedbackDiv.innerHTML = `
-            ${this.trapAlertsHtml(result.trapFeedback)}<details class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}"${result.isCorrect ? '' : ' open'}>
+        // Sans découpage par choix : l'explication entière, comme avant (gabarit inchangé, spec 024).
+        const feedbackHtml = perOption
+            ? alertsHtml
+            : `
+            ${alertsHtml}<details class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}"${result.isCorrect ? '' : ' open'}>
                 <summary>${tq('question.explanation')}</summary>
-                <div>${explanation}</div>
+                <div>${explanationHtml(result.question.explication)}</div>
                 ${courseLinksHtml(courseLinks)}
             </details>
         `;
+        feedbackDiv.innerHTML = feedbackHtml;
+        feedbackDiv.style.display = feedbackHtml.trim() === '' ? 'none' : 'block';
 
         this._voiceFeedback = result;
         this.renderVoiceBar();

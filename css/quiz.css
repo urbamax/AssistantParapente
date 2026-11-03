@@ -738,6 +738,25 @@ body.light-mode .bank-item-explication {
         gap: 8px !important;
     }
 
+    /* Choix et pli d'explication, version compacte : le choix touche sa case, la flèche est centrée sur sa ligne. */
+    .qcm-option-group {
+        margin-bottom: 8px;
+    }
+
+    .qcm-option-group > .qcm-option {
+        margin-bottom: 0 !important;
+        padding-right: 44px !important;
+    }
+
+    .qcm-option-explanation > summary {
+        right: 2px;
+    }
+
+    .qcm-option-explanation[open] {
+        padding: 10px 14px 12px;
+        border-radius: 0 0 10px 10px;
+    }
+
     /* Quiz Question Text Compact Sizing */
     .quiz-question-text {
         font-size: 1.05rem !important;
@@ -1154,9 +1173,77 @@ body.light-mode .bank-choice.correct {
     color: var(--text-main);
 }
 
-.explanation-picked {
-    background: rgba(245, 158, 11, 0.25);
-    color: inherit;
-    padding: 1px 3px;
-    border-radius: 4px;
+/* Explication de chaque choix : un petit pli au bout de la ligne du choix. Fermé, il ne prend aucune place
+   (juste la flèche, dans le choix) ; ouvert, une case s'ouvre sous le choix. */
+.qcm-option-group {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.qcm-option-group > .qcm-option {
+    margin-bottom: 0;
+    /* Laisse la place de la flèche, et la réponse cochée (agrandie par ailleurs) reste alignée sur sa case. */
+    padding-right: 56px;
+    transform: none;
+}
+
+.qcm-option-group:has(> details[open]) > .qcm-option {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.qcm-option-explanation {
+    padding: 0;
+    color: var(--text-main);
+    font-size: 0.93rem;
+    line-height: 1.5;
+}
+
+.qcm-option-explanation[open] {
+    padding: 12px 20px 14px;
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    background: var(--bg-card);
+}
+
+.qcm-option-explanation[open][data-kind='incorrect'] {
+    border-color: var(--accent-red);
+    background: rgba(248, 113, 113, 0.08);
+}
+
+.qcm-option-explanation[open][data-kind='missed'] {
+    border-color: #f97316;
+    background: rgba(249, 115, 22, 0.08);
+}
+
+/* La flèche reste toujours au même endroit : au bout de la ligne du choix, centrée sur sa hauteur
+   (--row-h, mesurée par le script, car le texte du choix peut passer sur plusieurs lignes). */
+.qcm-option-explanation > summary {
+    position: absolute;
+    top: 0;
+    right: 8px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: var(--row-h, 44px);
+    cursor: pointer;
+    color: var(--text-secondary);
+    list-style: none;
+}
+
+.qcm-option-explanation > summary::-webkit-details-marker {
+    display: none;
+}
+
+.qcm-option-explanation > summary::before {
+    content: '▸';
+    font-size: 1.1rem;
+    transition: transform 0.2s;
+}
+
+.qcm-option-explanation[open] > summary::before {
+    transform: rotate(90deg);
 }

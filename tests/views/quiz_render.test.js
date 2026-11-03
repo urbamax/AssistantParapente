@@ -228,6 +228,52 @@ describe('quiz renders (spec 024: identical before and after moving the texts)',
         expect({ actions: html('qcm-actions-container'), feedback: html('qcm-feedback') }).toMatchSnapshot();
     });
 
+    it('puts each choice explanation under the choice, always foldable: open for a fault, shut otherwise', () => {
+        const q = Q(
+            'B7V',
+            'Météo',
+            'Question à trois choix',
+            'Pourquoi la bonne.\nPourquoi la fausse est fausse.\nPourquoi la neutre.',
+            { courseId: 'general/20240409-ffvl-formation-espacesaeriens', coursePage: 3 },
+        );
+        QuizService.getQuestionByCode.mockImplementation((c) =>
+            c === q.code ? q : QUESTIONS.find((x) => x.code === c),
+        );
+        QuizView.renderQuestion(q);
+        const folds = () => [...document.querySelectorAll('#qcm-choices details.qcm-option-explanation')];
+        const state = () => folds().map((e) => `${e.dataset.kind}:${e.hasAttribute('open') ? 'open' : 'shut'}`);
+
+        // Fausse cochée, bonne oubliée : deux fautes ouvertes, la neutre repliée, tout repliable.
+        QuizView.showAnswerFeedback({ selected: [q.choices[1]], isCorrect: false, question: q }, true);
+        expect(state()).toEqual(['missed:open', 'incorrect:open', 'ok:shut']);
+        expect(folds()[1].textContent).toContain('Pourquoi la fausse est fausse.');
+        expect(document.querySelector('#qcm-feedback details.instructor-feedback')).toBeNull();
+
+        // Le bouton du cours est sous la bonne réponse, pas sous les autres, pas dans le bloc du bas.
+        expect(folds()[0].querySelector('[data-action="openUrl"]')).not.toBeNull();
+        expect(folds()[1].querySelector('[data-action="openUrl"]')).toBeNull();
+        expect(folds()[2].querySelector('[data-action="openUrl"]')).toBeNull();
+        expect(document.querySelector('#qcm-feedback [data-action="openUrl"]')).toBeNull();
+
+        // Chaque pli est dans le même groupe que son choix (la flèche se pose sur la ligne du choix).
+        expect(folds().every((f) => f.parentElement.classList.contains('qcm-option-group'))).toBe(true);
+        expect(folds().every((f) => f.previousElementSibling.classList.contains('qcm-option'))).toBe(true);
+
+        // On peut replier ce qui est ouvert.
+        folds()[1].removeAttribute('open');
+        expect(state()[1]).toBe('incorrect:shut');
+
+        // Appelé de nouveau (retour sur la question) : pas de doublon.
+        QuizView.showAnswerFeedback({ selected: [q.choices[1]], isCorrect: false, question: q }, true);
+        expect(folds()).toHaveLength(3);
+
+        // Bonne réponse complète : tout est replié, la zone du bas est masquée.
+        QuizView.renderQuestion(q);
+        QuizView.showAnswerFeedback({ selected: [q.choices[0]], isCorrect: true, question: q }, true);
+        expect(state()).toEqual(['ok:shut', 'ok:shut', 'ok:shut']);
+        expect(document.getElementById('qcm-feedback').style.display).toBe('none');
+    });
+
     it('explanation fold: shut after a complete correct answer, open after a miss or a wrong answer', () => {
         QuizView.renderQuestion(QUESTIONS[0]);
         const show = (isCorrect) => {
