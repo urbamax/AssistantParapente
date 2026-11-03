@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import QuizService from '../../js/services/quiz_service.js';
 import StorageService from '../../js/services/storage.js';
+import { readAnswerLog } from '../../js/services/answer_log.js';
 
 describe('QuizService - Mode REVISION', () => {
     // Faux jeu de données "Météo" de niveau "BI" (Suffixe V)
@@ -313,7 +314,7 @@ describe('QuizService - Choix cochés (choicePicks)', () => {
         answer('EXAM', q, [1]);
         answer('EXAM', q, [0]);
         expect(stored().choicePicks).toEqual([1, 0, 0]);
-        expect(stored().answers.map((e) => e[1])).toEqual([0b001]);
+        expect(readAnswerLog(stored().answers).map((e) => e[1])).toEqual([0b001]);
     });
 
     it('journalise chaque réponse avec son masque, en entraînement comme en examen', () => {
@@ -321,8 +322,8 @@ describe('QuizService - Choix cochés (choicePicks)', () => {
         answer('TRAINING', q, [0, 1]);
         QuizService.state.examResults = [];
         answer('EXAM', q, [2]);
-        expect(stored().answers.map((e) => e[1])).toEqual([0b011, 0b100]);
-        expect(stored().answers[0][0]).toBe(Math.floor(Date.now() / 86_400_000));
+        expect(readAnswerLog(stored().answers).map((e) => e[1])).toEqual([0b011, 0b100]);
+        expect(readAnswerLog(stored().answers)[0][0]).toBe(Math.floor(Date.now() / 86_400_000));
     });
 
     it("enregistre l'index canonique du choix même quand les choix sont mélangés pour la séance", () => {
@@ -334,7 +335,7 @@ describe('QuizService - Choix cochés (choicePicks)', () => {
         const another = { ...q, choices: [q.choices[1], q.choices[0], q.choices[2]] };
         answer('TRAINING', another, [0]);
         expect(stored().choicePicks).toEqual([0, 2, 0]);
-        expect(stored().answers.map((e) => e[1])).toEqual([0b010, 0b010]);
+        expect(readAnswerLog(stored().answers).map((e) => e[1])).toEqual([0b010, 0b010]);
         QuizService.setQuestions([]);
     });
 });
