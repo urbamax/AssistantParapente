@@ -8,12 +8,18 @@ import AppEvents from '../core/events.js';
 import VoiceService from '../services/voice_service.js';
 
 import { optionLetter } from '../services/quiz_voice.js';
-import { pickWorkshopQuestions } from '../services/revision_axes.js';
+import { pickWorkshopQuestions, resolveAxisIdForQuestion } from '../services/revision_axes.js';
+import { pickAntiTrapQuestions } from '../services/error_diagnostic.js';
 import { tq, tql } from './quiz_strings.js';
 import { courseLinksHtml } from './quiz_course_links.js';
 import { explanationHtml, highlightedExplanationHtml } from './quiz_explanation.js';
 import { buildTrapFeedback } from '../services/error_diagnostic.js';
 import { choiceIndex } from '../services/answer_log.js';
+
+// Identifiant réservé de l'atelier anti-pièges (aucun axe du catalogue ne porte ce nom).
+const TRAPS_WORKSHOP_ID = 'TRAPS';
+// Sous ce nombre de questions, l'atelier anti-pièges est complété avec des questions des mêmes chapitres.
+const TRAPS_WORKSHOP_MIN = 5;
 import { buildOfficialTheoryBannerHtml } from './quiz_stats_html.js';
 import { QuizVoiceBase } from './quiz_voice_ui.js';
 
@@ -304,6 +310,9 @@ class QuizViewClass extends QuizVoiceBase {
                 break;
             case 'QuizstartAxisWorkshop':
                 this.startAxisWorkshop(args[0]);
+                break;
+            case 'QuizstartTrapsWorkshop':
+                this.startTrapsWorkshop();
                 break;
             case 'QuizsetThemeSort':
                 this.setThemeSort(args[0]);
@@ -722,9 +731,14 @@ class QuizViewClass extends QuizVoiceBase {
         });
         if (!picked.length) return;
 
+        this.launchWorkshop(picked, axisId);
+    }
+
+    launchWorkshop(picked, workshopId) {
         const sessionQuestions = QuizService.shuffle(picked).map((q) => QuizService.shuffleQuestionChoices(q));
-        this._activeWorkshopAxisId = axisId;
+        this._activeWorkshopAxisId = workshopId;
         QuizService._masteryPool = null;
+        QuizService._trapRetried = new Set();
         QuizService.state.qcmConfig.mode = 'TRAINING';
         QuizService.state.qcmIndex = 0;
         QuizService.state.qcmSessionData = sessionQuestions;
@@ -737,6 +751,38 @@ class QuizViewClass extends QuizVoiceBase {
         if (qcmScreen) qcmScreen.classList.add('active');
 
         this.renderQuestion(sessionQuestions[0]);
+    }
+
+    // Atelier anti-pièges : les questions où un piège est actif (puis en consolidation), tous chapitres
+    // confondus. Il se comporte comme un atelier d'axe, d'où l'identifiant réservé.
+    startTrapsWorkshop() {
+        const level = (typeof GlobalState !== 'undefined' && GlobalState.get('level')) || 'BI';
+        const stats = QuizService.getPersistentStats();
+        const picked = pickAntiTrapQuestions(QuizService.getLevelQuestions(level), stats, { maxQuestions: 8 });
+        if (!picked.length) return;
+
+        // Quelques questions seulement : on complète avec celles des mêmes chapitres, pour qu'une
+        // série courte ne se résolve pas par élimination (les pièges restent en tête).
+        const seen = new Set(picked.map((q) => q.code));
+        const questions = QuizService.getQuestions();
+        for (const axisId of new Set(picked.map((q) => resolveAxisIdForQuestion(q)))) {
+            if (picked.length >= TRAPS_WORKSHOP_MIN) break;
+            for (const q of pickWorkshopQuestions(questions, stats, { axisId, level, targetCount: 6 })) {
+                if (picked.length >= TRAPS_WORKSHOP_MIN) break;
+                if (!seen.has(q.code)) {
+                    seen.add(q.code);
+                    picked.push(q);
+                }
+            }
+        }
+        this.launchWorkshop(picked, TRAPS_WORKSHOP_ID);
+    }
+
+    // Titre de l'atelier en cours (axe ou anti-pièges) pour l'en-tête et le résumé de fin.
+    workshopTitle(id) {
+        return id === TRAPS_WORKSHOP_ID
+            ? tql('modes.labels.TRAPS_WORKSHOP')
+            : tql('modes.labels.AXIS_WORKSHOP', { title: tql(`axes.catalog.${id}.title`) });
     }
 
     renderQuestion(q) {
@@ -771,9 +817,7 @@ class QuizViewClass extends QuizVoiceBase {
         const modeLabelEl = document.getElementById('qcm-mode-label');
         if (modeLabelEl) {
             if (this._activeWorkshopAxisId) {
-                modeLabelEl.innerText = tql('modes.labels.AXIS_WORKSHOP', {
-                    title: tql(`axes.catalog.${this._activeWorkshopAxisId}.title`),
-                });
+                modeLabelEl.innerText = this.workshopTitle(this._activeWorkshopAxisId);
             } else {
                 const mode = QuizService.state.qcmConfig.mode;
                 modeLabelEl.innerText = tql(
@@ -1012,9 +1056,7 @@ class QuizViewClass extends QuizVoiceBase {
         const isExam = QuizService.state.qcmConfig.mode === 'EXAM';
         const sessionMode = QuizService.state.qcmConfig.mode;
         const modeTitle = this._activeWorkshopAxisId
-            ? tql('modes.labels.AXIS_WORKSHOP', {
-                  title: tql(`axes.catalog.${this._activeWorkshopAxisId}.title`),
-              })
+            ? this.workshopTitle(this._activeWorkshopAxisId)
             : tql(`modes.labels.${['EXAM', 'REVISION', 'MASTERY'].includes(sessionMode) ? sessionMode : 'TRAINING'}`);
 
         if (isExam) {
