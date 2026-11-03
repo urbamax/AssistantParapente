@@ -1267,12 +1267,6 @@ export const FR = Object.freeze({
             seeCourseAt: 'VOIR : {title} (p. {page})',
         }),
         traps: Object.freeze({
-            nudgeTitleOne: '1 piège actif à corriger',
-            nudgeTitleMany: '{count} pièges actifs à corriger',
-            nudgeTextOne: 'Dans 1 chapitre. Un court atelier reprend les questions où vous êtes tombé dans un piège.',
-            nudgeTextMany:
-                'Dans {axes} chapitres. Un court atelier reprend les questions où vous êtes tombé dans un piège.',
-            nudgeAxesBtn: 'Voir mes axes',
             resultsTitleOne: '1 piège rencontré dans cette série',
             resultsTitleMany: '{count} pièges rencontrés dans cette série',
             resultsAllNew: 'Première fois pour chacun.',
@@ -1285,7 +1279,6 @@ export const FR = Object.freeze({
             relapse: 'Ce piège était surmonté et il est revenu : « {text} ». Relisez le passage en surbrillance.',
             avoided: 'Cette fois, vous avez évité le piège « {text} ».',
             overcome: 'Piège surmonté : vous ne tombez plus dans « {text} ». Bravo !',
-            retryBadge: 'Question revue',
         }),
         results: Object.freeze({
             invalidated: 'INVALIDÉ',

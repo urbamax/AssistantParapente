@@ -9,7 +9,6 @@ import {
     isFullyCorrectMask,
     pickAntiTrapQuestions,
     summarizeSessionTraps,
-    summarizeTraps,
     splitOptionExplanations,
 } from '../../js/services/error_diagnostic.js';
 import { buildRevisionAxes, pickWorkshopQuestions } from '../../js/services/revision_axes.js';
@@ -356,7 +355,7 @@ describe('buildTrapFeedback', () => {
     });
 });
 
-describe('summarizeTraps and summarizeSessionTraps', () => {
+describe('summarizeSessionTraps', () => {
     const stats = {
         questions: {
             U1V: stat(
@@ -380,13 +379,6 @@ describe('summarizeTraps and summarizeSessionTraps', () => {
         },
     };
     const questions = ['U1V', 'U2V', 'U3V', 'U4V'].map((c) => q(c));
-
-    it('counts traps by status and the chapters with an active trap', () => {
-        const axisOf = (x) => (x.code === 'U2V' ? 'axe-b' : 'axe-a');
-        expect(summarizeTraps(questions, stats, axisOf)).toEqual({ active: 2, consolidating: 0, overcome: 1, axes: 2 });
-        expect(summarizeTraps(questions, stats).axes).toBe(2);
-        expect(summarizeTraps([], stats)).toEqual({ active: 0, consolidating: 0, overcome: 0, axes: 0 });
-    });
 
     it('lists the traps ticked in a session with their counts, one entry per question', () => {
         const originalOf = (code) => questions.find((x) => x.code === code);

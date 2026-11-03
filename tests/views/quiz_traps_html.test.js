@@ -1,22 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildResultsTrapsHtml, buildTrapsNudgeHtml } from '../../js/views/quiz_traps_html.js';
-
-describe('buildTrapsNudgeHtml', () => {
-    it('stays empty without an active trap', () => {
-        expect(buildTrapsNudgeHtml({ active: 0, axes: 0 })).toBe('');
-    });
-
-    it('offers the anti-trap workshop and the axes, with singular and plural wording', () => {
-        const one = buildTrapsNudgeHtml({ active: 1, axes: 1 });
-        expect(one).toContain('1 piège actif à corriger');
-        expect(one).toContain('Dans 1 chapitre');
-        expect(one).toContain('data-action="QuizstartTrapsWorkshop"');
-        expect(one).toContain('data-action="QuizshowRevisionAxes"');
-        const many = buildTrapsNudgeHtml({ active: 4, axes: 3 });
-        expect(many).toContain('4 pièges actifs à corriger');
-        expect(many).toContain('Dans 3 chapitres');
-    });
-});
+import { buildResultsTrapsHtml } from '../../js/views/quiz_traps_html.js';
 
 describe('buildResultsTrapsHtml', () => {
     const trap = (count) => ({ code: 'U1V', count, status: 'active', relapse: false });
