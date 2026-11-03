@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { explanationHtml } from '../../js/views/quiz_explanation.js';
+import { explanationHtml, highlightedExplanationHtml } from '../../js/views/quiz_explanation.js';
 import QuizService from '../../js/services/quiz_service.js';
 import { buildFeedbackSpeech } from '../../js/services/quiz_voice.js';
 
@@ -24,5 +24,24 @@ describe('explanation paragraphs', () => {
         });
         expect(speech).not.toContain('\n');
         expect(speech).toContain('Première réponse. Seconde réponse.');
+    });
+});
+
+const question = {
+    choices: [{ pts: 6 }, { pts: -6 }, { pts: -3 }],
+    explication: 'Bonne <b>réponse</b>.\nPourquoi A est faux.\nPourquoi B est faux.',
+};
+
+describe('highlightedExplanationHtml', () => {
+    it('highlights the paragraph of each wrong choice picked, and escapes the text', () => {
+        const html = highlightedExplanationHtml(question, new Set([1]));
+        expect(html).toBe(
+            'Bonne &lt;b&gt;réponse&lt;/b&gt;.<br><mark class="explanation-picked">Pourquoi A est faux.</mark><br>Pourquoi B est faux.',
+        );
+    });
+
+    it('returns null when nothing is picked or the split is unreliable, so the full text is shown', () => {
+        expect(highlightedExplanationHtml(question, new Set())).toBeNull();
+        expect(highlightedExplanationHtml({ ...question, explication: 'un seul bloc' }, new Set([1]))).toBeNull();
     });
 });

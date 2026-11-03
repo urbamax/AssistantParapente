@@ -1119,3 +1119,35 @@ body.light-mode .bank-choice.correct {
     font-weight: 600;
     color: var(--accent-orange);
 }
+
+/* Pièges récurrents et pièges évités, au-dessus de l'explication d'une réponse. */
+.trap-alert {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.trap-alert--warn {
+    background: rgba(245, 158, 11, 0.14);
+    border: 1px solid rgba(245, 158, 11, 0.45);
+    color: var(--text-main);
+}
+
+.trap-alert--good {
+    background: rgba(34, 197, 94, 0.14);
+    border: 1px solid rgba(34, 197, 94, 0.45);
+    color: var(--text-main);
+}
+
+.explanation-picked {
+    background: rgba(245, 158, 11, 0.25);
+    color: inherit;
+    padding: 1px 3px;
+    border-radius: 4px;
+}

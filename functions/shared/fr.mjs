@@ -1241,6 +1241,13 @@ export const FR = Object.freeze({
             seeCourse: 'VOIR DANS LE COURS',
             seeCourseAt: 'VOIR : {title} (p. {page})',
         }),
+        diagnostic: Object.freeze({
+            recurrent: "C'est la {count}ᵉ fois que vous choisissez la réponse « {text} ».",
+            relapse: 'Ce piège était surmonté et il est revenu : « {text} ». Relisez le passage en surbrillance.',
+            avoided: 'Cette fois, vous avez évité le piège « {text} ».',
+            overcome: 'Piège surmonté : vous ne tombez plus dans « {text} ». Bravo !',
+            retryBadge: 'Question revue',
+        }),
         results: Object.freeze({
             invalidated: 'INVALIDÉ',
             passed: 'RÉUSSI',
