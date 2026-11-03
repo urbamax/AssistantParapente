@@ -54,31 +54,41 @@ describe('mode d’emploi sans le rôle « beta »', () => {
         expect(isHidden('#manual-section-scoring')).toBe(true);
     });
 
-    it('garde les autres onglets et les parties sur les sites, avec des numéros qui se suivent', () => {
-        for (const tab of ['sites', 'logbook', 'equipment', 'safety', 'qcm', 'library', 'stats'])
+    it('garde les autres onglets, mais cache entièrement la partie sur les sites', () => {
+        for (const tab of ['logbook', 'equipment', 'safety', 'qcm', 'library', 'stats'])
             expect(isHidden(`#manual-tab-${tab}`)).toBe(false);
+        expect(isHidden('#manual-tab-sites')).toBe(true);
+        expect(isHidden('#manual-section-sites')).toBe(true);
         const text = visibleText();
-        expect(text).toContain('1. Point de Référence et Rayon de Recherche');
-        expect(text).toContain('2. Fiche Site et Favoris');
-        expect(text).toContain('3. Cartographie & Cartes Externes');
-        expect(text).not.toContain('5. Fiche Site, Favoris et Comparateur');
+        expect(text).not.toContain('Point de Référence et Rayon de Recherche');
+        expect(text).not.toContain('Ce module présente les sites de vol libre');
+        expect(text).not.toContain('Elle réunit les sites de vol');
     });
 
     it('garde les phrases de remplacement, sans trou', () => {
-        const text = visibleText();
-        expect(text).toContain('Ce module présente les sites de vol libre');
-        expect(text).toContain(
+        expect(visibleText()).toContain(
             "les QCM, le carnet de vol et l'écran Sécurité fonctionnent hors ligne. Les cours déjà ouverts",
         );
     });
 });
 
-describe('mode d’emploi avec le rôle « beta » ou « owner »', () => {
-    it.each(['beta', 'owner'])('montre tout le détail de la météo calculée (%s)', (role) => {
-        AccessService.setRoles('pilote-A', [role]);
+describe('mode d’emploi avec le rôle « beta » seul', () => {
+    it('montre la météo calculée mais cache la partie sur les sites (réservée au propriétaire)', () => {
+        AccessService.setRoles('pilote-A', ['beta']);
+        applyRoleVisibility(root);
+        expect(isHidden('#manual-tab-scoring')).toBe(false);
+        expect(isHidden('#manual-tab-sites')).toBe(true);
+        expect(isHidden('#manual-section-sites')).toBe(true);
+    });
+});
+
+describe('mode d’emploi avec le rôle « owner »', () => {
+    it('montre tout le détail de la météo calculée et la partie sur les sites', () => {
+        AccessService.setRoles('pilote-A', ['owner']);
         applyRoleVisibility(root);
         expect(isHidden('#manual-tab-scoring')).toBe(false);
         expect(isHidden('#manual-section-scoring')).toBe(false);
+        expect(isHidden('#manual-tab-sites')).toBe(false);
         const text = visibleText();
         expect(text).toContain('Paramètres de Calcul Météo');
         expect(text).toContain('5. Fiche Site, Favoris et Comparateur');

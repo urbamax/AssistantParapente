@@ -396,7 +396,7 @@
                 <section class="welcome-step" aria-labelledby="welcome-start-title">
                     <h3 data-i18n="welcomeScreen.parOuCommencer" id="welcome-start-title">Par où commencer ?</h3>
                     <div class="welcome-cards">
-                        <button type="button" class="welcome-card" data-action="navigate" data-args="SITES">
+                        <button type="button" class="welcome-card" data-requires-role="owner" hidden data-action="navigate" data-args="SITES">
                             <i class="ri-map-pin-line" aria-hidden="true"></i>
                             <span data-i18n="welcomeScreen.sitesDeVol" class="welcome-card-title">Sites de vol</span>
                             <span data-i18n="welcomeScreen.meteoEtVolabiliteDes" data-requires-role="beta" hidden class="welcome-card-text">Météo et volabilité des sites de vol autour de vous.</span>
@@ -2901,7 +2901,7 @@
                         >
                             Général
                         </button>
-                        <button data-i18n="manualModal.sitesDeVol"
+                        <button data-requires-role="owner" hidden data-i18n="manualModal.sitesDeVol"
                             class="manual-tab-btn"
                             data-action="showManualSection"
                             data-args="'sites'"
@@ -3097,14 +3097,13 @@
                                     interactif avec correction et explications pédagogiques, accessible à tout moment,
                                     même hors ligne.
                                 </li>
-                                <li data-requires-role="beta" hidden data-i18n-html="manualModal.elleCroiseEnTemps" style="margin-bottom: 6px">
+                                <li data-requires-role="owner" hidden data-i18n-html="manualModal.elleCroiseEnTemps" style="margin-bottom: 6px">
                                     Elle croise en temps réel les
                                     <strong>données géographiques des sites de vol</strong> (orientation des décollages,
                                     altitude, type) avec les <strong>prévisions météo multi-modèles</strong> (AROME,
                                     ICON, GFS…) pour indiquer quels sites sont potentiellement volables et à quelle
                                     heure.
                                 </li>
-                                <li data-hidden-with-role="beta" data-i18n-html="manualModal.elleReunitLesSites" style="margin-bottom: 6px">Elle réunit les <strong>sites de vol</strong> (orientation des décollages, altitude, type) sur une carte et dans une liste, avec recherche et filtres, autour de vous ou de l'endroit de votre choix.</li>
                                 <li data-i18n-html="manualModal.elleRegroupeLesDu" style="margin-bottom: 6px">
                                     Elle regroupe les <strong>cours, manuels et fiches synthèse</strong> du brevet de
                                     pilote dans une bibliothèque consultable et téléchargeable.
@@ -3375,7 +3374,7 @@
                             </ul>
                         </div>
 
-                        <div id="manual-section-sites" class="manual-section" style="display: none">
+                        <div data-requires-role="owner" hidden id="manual-section-sites" class="manual-section" style="display: none">
                             <h4 data-requires-role="beta" hidden data-i18n="manualModal.preparationDesVolsSites" style="margin-top: 0; color: var(--accent-orange)">
                                 Préparation des Vols (Sites &amp; Météo)
                             </h4>
@@ -4363,7 +4362,7 @@
                     </button>
                 </div>
             </div>
-            <button class="nav-menu-btn" data-target="SITES" data-action="navigate" data-args="SITES">
+            <button class="nav-menu-btn" data-target="SITES" data-requires-role="owner" hidden data-action="navigate" data-args="SITES">
                 <i class="ri-map-pin-line"></i> <span data-i18n="common.sites" class="nav-text">Sites</span>
             </button>
             <div class="nav-dropdown">

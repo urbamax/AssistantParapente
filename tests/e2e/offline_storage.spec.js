@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { grantBetaRole } from '../helpers/e2e_beta_role.js';
 import { statSync } from 'node:fs';
 
 // Spec 008 : cours déjà ouverts et zones de carte déjà affichées disponibles hors ligne, grâce au
@@ -94,6 +95,7 @@ test.describe('Spec 008 - stockage hors ligne', () => {
             .catch(() => false);
         test.skip(!esriReachable, 'Serveur de fonds de carte Esri injoignable');
 
+        await grantBetaRole(page);
         await loadWithServiceWorker(page);
         await page.goto('/?mode=SITES');
         await expect(page.locator('#sites-map-canvas')).toBeVisible();

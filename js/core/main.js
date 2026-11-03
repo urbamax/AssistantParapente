@@ -4,7 +4,7 @@
  */
 
 import GlobalState from './app_state.js';
-import AppRouter, { lazyViewModule, viewProxy } from './router.js';
+import AppRouter, { canOpenRoute, lazyViewModule, viewProxy } from './router.js';
 import AppEvents from './events.js';
 import UIManager from './ui_manager.js';
 import StorageService from '../services/storage.js';
@@ -373,7 +373,12 @@ async function bootApplication() {
 
     // Éléments réservés à un rôle (météo calculée) : cachés d'emblée, montrés si le compte a le rôle.
     applyRoleVisibility();
-    AccessService.on(ACCESS_EVENTS.CHANGED, () => applyRoleVisibility());
+    AccessService.on(ACCESS_EVENTS.CHANGED, () => {
+        applyRoleVisibility();
+        // Le compte perd un rôle (déconnexion, rôle retiré) alors qu'il est sur un écran qui l'exige.
+        const mode = GlobalState.get('mode');
+        if (!canOpenRoute(mode)) AppRouter.navigate('WELCOME');
+    });
 
     AppRouter.navigate(startMode);
 

@@ -1,10 +1,12 @@
 import { test, expect } from '@playwright/test';
+import { grantBetaRole } from '../helpers/e2e_beta_role.js';
 
 // Spec 036 : la politique de sécurité (sans script inline) ne bloque rien d'utile.
 // Le navigateur applique réellement la balise <meta> : on relève les violations qu'il signale.
 test.use({ serviceWorkers: 'block' });
 
 test.beforeEach(async ({ page }) => {
+    await grantBetaRole(page);
     await page.addInitScript(() => {
         window.__cspViolations = [];
         document.addEventListener('securitypolicyviolation', (e) => {

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { grantBetaRole } from '../helpers/e2e_beta_role.js';
 
 // Spec 009 : à l'ouverture, aucune requête vers les serveurs tiers qui recevaient l'adresse IP du
 // visiteur avant tout consentement (polices, icônes, bibliothèque de carte, logos).
@@ -8,6 +9,7 @@ const THIRD_PARTY =
 test.use({ serviceWorkers: 'block' });
 
 test('Spec 009 : l’accueil et la page des sites ne contactent aucun serveur tiers au démarrage', async ({ page }) => {
+    await grantBetaRole(page);
     const contacted = [];
     page.on('request', (request) => {
         if (THIRD_PARTY.test(request.url())) contacted.push(request.url());
@@ -62,6 +64,7 @@ test.describe('Spec 013 - page et service worker, sans consentement', () => {
             );
         });
 
+        await grantBetaRole(page);
         await page.goto('/');
         // Prédicat synchrone : waitForFunction n'attend pas une promesse (une fonction async rendait
         // la main aussitôt, avant que le service worker contrôle la page).
