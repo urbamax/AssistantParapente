@@ -27,7 +27,7 @@ const q = (code, extra = {}) => ({
     parapente: true,
     ...extra,
 });
-const stat = (answers, pickedChoices) => ({ total: answers.length, correct: 0, answers, pickedChoices });
+const stat = (answers, choicePicks) => ({ total: answers.length, correct: 0, answers, choicePicks });
 
 describe('splitOptionExplanations', () => {
     it('returns one paragraph per choice, in order', () => {
@@ -240,7 +240,7 @@ describe('revision axes integration', () => {
         const axisOf = (r) => r.axes.find((a) => a.id === 'pilotage-plan-vol-vent');
         expect(axisOf(buildRevisionAxes(questions, stats, [], { level: 'BI' })).status).not.toBe('BLOCKER');
 
-        stats.U1V = { ...good, answers: [[Math.floor(Date.now() / 86_400_000), TRAP_A]], pickedChoices: [0, 1, 0, 0] };
+        stats.U1V = { ...good, answers: [[Math.floor(Date.now() / 86_400_000), TRAP_A]], choicePicks: [0, 1, 0, 0] };
         const axis = axisOf(buildRevisionAxes(questions, stats, [], { level: 'BI' }));
         expect(axis.status).toBe('BLOCKER');
         expect(axis.traps).toMatchObject({ active: 1, consolidating: 0, overcome: 0 });
@@ -250,7 +250,7 @@ describe('revision axes integration', () => {
     it('puts questions with an active trap first in the axis workshop', () => {
         const good = { total: 10, correct: 10, streak: 10, lastSeen: Date.now(), recent: [1, 1, 1, 1, 1] };
         const stats = Object.fromEntries(questions.map((x) => [x.code, { ...good }]));
-        stats.U7V = { ...good, answers: [[Math.floor(Date.now() / 86_400_000), TRAP_A]], pickedChoices: [0, 1, 0, 0] };
+        stats.U7V = { ...good, answers: [[Math.floor(Date.now() / 86_400_000), TRAP_A]], choicePicks: [0, 1, 0, 0] };
         const picked = pickWorkshopQuestions(questions, stats, {
             axisId: 'pilotage-plan-vol-vent',
             level: 'BI',

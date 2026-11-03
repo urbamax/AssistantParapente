@@ -4,7 +4,7 @@
  * Module pur (aucun accès au stockage ni au DOM).
  *
  * Un « piège » est un choix à points négatifs que le pilote a coché au moins une fois. À partir des
- * compteurs `pickedChoices` et du journal daté `answers` (voir answer_log.js), on donne à chaque
+ * compteurs `choicePicks` et du journal daté `answers` (voir answer_log.js), on donne à chaque
  * piège un statut. Rien n'est jamais effacé : un piège surmonté garde son historique et redevient
  * actif s'il est recoché (rechute).
  *
@@ -145,13 +145,13 @@ function compareTraps(a, b) {
  * Pièges d'une question : choix à points négatifs déjà cochés, du plus urgent au moins urgent.
  *
  * @param {{ code?: string, choices?: any[], explication?: string }} question
- * @param {{ pickedChoices?: number[], answers?: unknown } | undefined} qStat
+ * @param {{ choicePicks?: number[], answers?: unknown } | undefined} qStat
  * @returns {{ code: string, traps: Trap[], hasActive: boolean }}
  */
 export function diagnoseQuestionErrors(question, qStat) {
     const choices = question?.choices || [];
     const log = readAnswerLog(qStat?.answers);
-    const counts = Array.isArray(qStat?.pickedChoices) ? qStat.pickedChoices : [];
+    const counts = Array.isArray(qStat?.choicePicks) ? qStat.choicePicks : [];
     const explanations = splitOptionExplanations(question);
 
     /** @type {Trap[]} */
