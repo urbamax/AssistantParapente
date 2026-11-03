@@ -1034,6 +1034,10 @@ class QuizViewClass extends QuizVoiceBase {
                     group.className = 'qcm-option-group';
                     btn.replaceWith(group);
                     group.appendChild(btn);
+                    // La flèche se centre sur la hauteur de la ligne du choix, qui varie avec le texte et la largeur.
+                    const syncRowHeight = () => group.style.setProperty('--row-h', `${btn.offsetHeight}px`);
+                    syncRowHeight();
+                    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(syncRowHeight).observe(btn);
                 }
                 // Les boutons du cours sont rattachés aux bonnes réponses, où se trouve ce que dit le cours.
                 const links = opt.pts > 0 ? choiceCourseLinksHtml(courseLinks) : '';

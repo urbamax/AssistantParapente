@@ -749,8 +749,7 @@ body.light-mode .bank-item-explication {
     }
 
     .qcm-option-explanation > summary {
-        top: 2px;
-        right: 6px;
+        right: 2px;
     }
 
     .qcm-option-explanation[open] {
@@ -1218,17 +1217,18 @@ body.light-mode .bank-choice.correct {
     background: rgba(249, 115, 22, 0.08);
 }
 
-/* La flèche reste toujours au même endroit, en haut à droite de la ligne du choix. */
+/* La flèche reste toujours au même endroit : au bout de la ligne du choix, centrée sur sa hauteur
+   (--row-h, mesurée par le script, car le texte du choix peut passer sur plusieurs lignes). */
 .qcm-option-explanation > summary {
     position: absolute;
-    top: 14px;
-    right: 12px;
+    top: 0;
+    right: 8px;
     z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: var(--row-h, 44px);
     cursor: pointer;
     color: var(--text-secondary);
     list-style: none;
