@@ -8,6 +8,8 @@ import {
     buildTrapFeedback,
     isFullyCorrectMask,
     pickAntiTrapQuestions,
+    summarizeSessionTraps,
+    summarizeTraps,
     splitOptionExplanations,
 } from '../../js/services/error_diagnostic.js';
 import { buildRevisionAxes, pickWorkshopQuestions } from '../../js/services/revision_axes.js';
@@ -351,5 +353,60 @@ describe('buildTrapFeedback', () => {
                 [],
             ).avoided,
         ).toEqual([]);
+    });
+});
+
+describe('summarizeTraps and summarizeSessionTraps', () => {
+    const stats = {
+        questions: {
+            U1V: stat(
+                [
+                    [100, TRAP_A],
+                    [101, TRAP_A],
+                ],
+                [0, 2, 0, 0],
+            ),
+            U2V: stat([[100, TRAP_A]], [0, 1, 0, 0]),
+            U3V: stat(
+                [
+                    [100, TRAP_A],
+                    [101, GOOD],
+                    [104, GOOD],
+                    [110, GOOD],
+                ],
+                [0, 1, 0, 0],
+            ),
+            U4V: stat([[100, GOOD]], [1, 0, 0, 0]),
+        },
+    };
+    const questions = ['U1V', 'U2V', 'U3V', 'U4V'].map((c) => q(c));
+
+    it('counts traps by status and the chapters with an active trap', () => {
+        const axisOf = (x) => (x.code === 'U2V' ? 'axe-b' : 'axe-a');
+        expect(summarizeTraps(questions, stats, axisOf)).toEqual({ active: 2, consolidating: 0, overcome: 1, axes: 2 });
+        expect(summarizeTraps(questions, stats).axes).toBe(2);
+        expect(summarizeTraps([], stats)).toEqual({ active: 0, consolidating: 0, overcome: 0, axes: 0 });
+    });
+
+    it('lists the traps ticked in a session with their counts, one entry per question', () => {
+        const originalOf = (code) => questions.find((x) => x.code === code);
+        const shuffled = (code) => ({ ...originalOf(code), choices: [...choices].reverse() });
+        const results = [
+            { question: shuffled('U1V'), selected: [choices[1]] },
+            { question: shuffled('U2V'), selected: [choices[1]] },
+            { question: shuffled('U2V'), selected: [choices[1]] },
+            { question: shuffled('U4V'), selected: [choices[0]] },
+        ];
+        const summary = summarizeSessionTraps(results, originalOf, stats);
+        expect(summary.trapped.map((t) => [t.code, t.count])).toEqual([
+            ['U1V', 2],
+            ['U2V', 1],
+        ]);
+        expect(summary.recurrent).toBe(1);
+    });
+
+    it('ignores answers without a trap and unknown questions', () => {
+        const results = [{ question: { code: 'ZZZ' }, selected: [choices[1]] }];
+        expect(summarizeSessionTraps(results, () => null, stats)).toEqual({ trapped: [], recurrent: 0 });
     });
 });

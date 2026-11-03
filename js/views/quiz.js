@@ -9,7 +9,9 @@ import VoiceService from '../services/voice_service.js';
 
 import { optionLetter } from '../services/quiz_voice.js';
 import { pickWorkshopQuestions, resolveAxisIdForQuestion } from '../services/revision_axes.js';
-import { pickAntiTrapQuestions } from '../services/error_diagnostic.js';
+import { pickAntiTrapQuestions, summarizeSessionTraps, summarizeTraps } from '../services/error_diagnostic.js';
+import GdprEngine from '../gdpr_engine.js';
+import { buildResultsTrapsHtml, buildTrapsNudgeHtml } from './quiz_traps_html.js';
 import { tq, tql } from './quiz_strings.js';
 import { courseLinksHtml } from './quiz_course_links.js';
 import { explanationHtml, highlightedExplanationHtml } from './quiz_explanation.js';
@@ -108,6 +110,7 @@ class QuizViewClass extends QuizVoiceBase {
                     // Le résumé du mode Révision reste caché tant que les questions ne sont pas chargées :
                     // si le mode a été choisi entre-temps, il faut l'afficher maintenant.
                     this.updateRevisionSummary();
+                    this.updateTrapsNudge();
                     this.refreshMasterySlider();
 
                     // Re-render the correct screen based on routing mode if needed
@@ -161,6 +164,7 @@ class QuizViewClass extends QuizVoiceBase {
                 this.syncOfficialTheoryForLevel();
                 this.updateThemeUI();
                 this.updateRevisionSummary();
+                this.updateTrapsNudge();
                 this.refreshMasterySlider();
 
                 const bankScreen = document.getElementById('qcm-bank-screen');
@@ -183,6 +187,7 @@ class QuizViewClass extends QuizVoiceBase {
                 this.syncOfficialTheoryForLevel();
                 this.updateThemeUI();
                 this.updateRevisionSummary();
+                this.updateTrapsNudge();
                 this.refreshMasterySlider();
                 const statsScreen = document.getElementById('stats-screen');
                 if (statsScreen && statsScreen.classList.contains('active')) {
@@ -402,6 +407,7 @@ class QuizViewClass extends QuizVoiceBase {
             QuizService.setTheme(e.target.value);
             this.updateThemeUI(e.target.value);
             this.updateRevisionSummary();
+            this.updateTrapsNudge();
             this.refreshMasterySlider();
         } else if (e.target.id === 'bank-theme-filter' || e.target.id === 'bank-search') {
             const select = /** @type {HTMLSelectElement} */ (document.getElementById('bank-theme-filter'));
@@ -530,6 +536,7 @@ class QuizViewClass extends QuizVoiceBase {
         }
 
         this.updateRevisionSummary();
+        this.updateTrapsNudge();
 
         const trainingOptions = document.getElementById('training-options');
         if (trainingOptions) {
@@ -554,6 +561,23 @@ class QuizViewClass extends QuizVoiceBase {
         if (masteryOptions) masteryOptions.style.display = mode === 'MASTERY' ? '' : 'none';
         this.updateThemeUI();
         this.refreshMasterySlider();
+    }
+
+    // Bandeau de l'accueil : pièges actifs à corriger, avec accès direct à l'atelier. Caché sans statistiques
+    // (consentement refusé), tant que les questions ne sont pas chargées, ou s'il n'y a aucun piège actif.
+    updateTrapsNudge() {
+        const el = document.getElementById('traps-nudge');
+        if (!el) return;
+        const ready = QuizService.state.isLoaded && GdprEngine.isConsentGranted('stats');
+        const level = (typeof GlobalState !== 'undefined' && GlobalState.get('level')) || 'BI';
+        const totals = ready
+            ? summarizeTraps(QuizService.getLevelQuestions(level), QuizService.getPersistentStats(), (q) =>
+                  resolveAxisIdForQuestion(q),
+              )
+            : { active: 0, axes: 0 };
+        const html = buildTrapsNudgeHtml(totals);
+        el.innerHTML = html;
+        el.hidden = html === '';
     }
 
     // Mode Révision : combien de questions sont à réviser, et pourquoi la session peut proposer des
@@ -670,6 +694,7 @@ class QuizViewClass extends QuizVoiceBase {
         this.syncOfficialTheoryForLevel();
         this.updateThemeUI();
         this.updateRevisionSummary();
+        this.updateTrapsNudge();
         this.refreshMasterySlider();
     }
 
@@ -1091,6 +1116,18 @@ class QuizViewClass extends QuizVoiceBase {
               ? `<span style="background:rgba(74,222,128,0.1); color:#16a34a; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #4ade80;">${tq('results.passed')}</span>`
               : `<span style="background:rgba(248,113,113,0.1); color:#dc2626; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #f87171;">${tq('results.failed')}</span>`;
 
+        // Pièges cochés pendant la série (statistiques déjà à jour). Sans suivi des statistiques, rien à dire.
+        const trapsHtml = GdprEngine.isConsentGranted('stats')
+            ? buildResultsTrapsHtml(
+                  summarizeSessionTraps(
+                      results,
+                      (code) => QuizService.getQuestionByCode(code),
+                      QuizService.getPersistentStats(),
+                  ),
+                  { canStartWorkshop: true },
+              )
+            : '';
+
         container.innerHTML = `
             <div class="stats-circle-container" style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom: 32px;">
                 <h2 style="margin:0;">${tq('results.title')}</h2>
@@ -1103,7 +1140,7 @@ class QuizViewClass extends QuizVoiceBase {
                 </div>
             </div>
             
-            <div style="margin-top: 32px; font-weight: 600; font-size: 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px; color:var(--text-main);">
+            ${trapsHtml}<div style="margin-top: 32px; font-weight: 600; font-size: 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px; color:var(--text-main);">
                 ${tq('results.summary')}
             </div>
             
