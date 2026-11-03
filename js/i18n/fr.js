@@ -1262,9 +1262,9 @@ export const FR = Object.freeze({
             validate: 'VALIDER',
             next: 'QUESTION SUIVANTE',
             explanation: 'Explication',
-            optionExplanation: 'Voir l’explication',
             seeCourse: 'VOIR DANS LE COURS',
             seeCourseAt: 'VOIR : {title} (p. {page})',
+            seeCourseShort: 'COURS · p. {page}',
         }),
         traps: Object.freeze({
             resultsTitleOne: '1 piège rencontré dans cette série',

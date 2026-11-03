@@ -13,7 +13,7 @@ import { pickAntiTrapQuestions, summarizeSessionTraps } from '../services/error_
 import GdprEngine from '../gdpr_engine.js';
 import { buildResultsTrapsHtml } from './quiz_traps_html.js';
 import { tq, tql } from './quiz_strings.js';
-import { courseLinksHtml } from './quiz_course_links.js';
+import { choiceCourseLinksHtml, courseLinksHtml } from './quiz_course_links.js';
 import { explanationHtml, optionExplanationHtml, optionExplanations, optionOutcome } from './quiz_explanation.js';
 import { buildTrapFeedback } from '../services/error_diagnostic.js';
 import { choiceIndex } from '../services/answer_log.js';
@@ -1015,8 +1015,8 @@ class QuizViewClass extends QuizVoiceBase {
 
         const courseLinks = this.getCourseLinks(result.question.code);
 
-        // Chaque choix porte son explication juste en dessous : ouverte sous une faute (fausse réponse
-        // cochée, bonne réponse oubliée), repliée sous ce qui est bien traité. Les index se lisent sur la
+        // Chaque choix porte son explication juste en dessous, toujours repliable : ouverte sous une faute
+        // (fausse réponse cochée, bonne réponse oubliée), repliée sous ce qui est bien traité. Les index se lisent sur la
         // question d'origine (les choix de la séance sont mélangés). Sans découpage fiable, on garde
         // l'explication entière sous les choix.
         const original = QuizService.getQuestionByCode(result.question.code) || result.question;
@@ -1029,12 +1029,15 @@ class QuizViewClass extends QuizVoiceBase {
                 const text = perOption[choiceIndex(original, opt)];
                 if (!text) return;
                 btn.classList.add('has-explanation');
+                // Les boutons du cours sont rattachés aux bonnes réponses, où se trouve ce que dit le cours.
+                const links = opt.pts > 0 ? choiceCourseLinksHtml(courseLinks) : '';
                 btn.insertAdjacentHTML(
                     'afterend',
                     optionExplanationHtml(
                         text,
                         optionOutcome(opt, result.selected.includes(opt)),
-                        tq('question.optionExplanation'),
+                        tq('question.explanation'),
+                        links,
                     ),
                 );
             });
@@ -1044,7 +1047,7 @@ class QuizViewClass extends QuizVoiceBase {
         const feedbackDiv = document.getElementById('qcm-feedback');
         // Sans découpage par choix : l'explication entière, comme avant (gabarit inchangé, spec 024).
         const feedbackHtml = perOption
-            ? `${alertsHtml}${courseLinksHtml(courseLinks)}`
+            ? alertsHtml
             : `
             ${alertsHtml}<details class="instructor-feedback ${result.isCorrect ? 'feedback-success' : 'feedback-fail'}"${result.isCorrect ? '' : ' open'}>
                 <summary>${tq('question.explanation')}</summary>

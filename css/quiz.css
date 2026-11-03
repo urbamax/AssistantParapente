@@ -1190,6 +1190,22 @@ body.light-mode .bank-choice.correct {
     color: var(--text-secondary);
     font-size: 0.85rem;
     font-weight: 700;
+    list-style: none;
+}
+
+.qcm-option-explanation > summary::-webkit-details-marker {
+    display: none;
+}
+
+.qcm-option-explanation > summary::before {
+    content: '▸';
+    display: inline-block;
+    width: 1.1em;
+    transition: transform 0.2s;
+}
+
+.qcm-option-explanation[open] > summary::before {
+    transform: rotate(90deg);
 }
 
 .qcm-option-explanation[open] > summary {

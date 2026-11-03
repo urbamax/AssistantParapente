@@ -38,18 +38,16 @@ export function optionOutcome(choice, selected) {
 }
 
 /**
- * Explication affichée sous un choix après la correction : ouverte d'office sous une faute (fausse
- * réponse cochée, bonne réponse oubliée), repliée sous ce qui est bien traité.
+ * Explication affichée sous un choix après la correction. Toujours repliable : ouverte d'office sous
+ * une faute (fausse réponse cochée, bonne réponse oubliée), repliée sous ce qui est bien traité.
  *
  * @param {string} text
  * @param {'incorrect' | 'missed' | 'ok'} outcome
  * @param {string} summary libellé du pli
+ * @param {string} [extraHtml] HTML déjà prêt ajouté sous le texte (boutons du cours)
  * @returns {string}
  */
-export function optionExplanationHtml(text, outcome, summary) {
-    const body = escapeHTML(String(text || ''));
-    if (outcome === 'ok') {
-        return `<details class="qcm-option-explanation" data-kind="ok"><summary>${escapeHTML(summary)}</summary><div>${body}</div></details>`;
-    }
-    return `<div class="qcm-option-explanation" data-kind="${outcome}">${body}</div>`;
+export function optionExplanationHtml(text, outcome, summary, extraHtml = '') {
+    const open = outcome === 'ok' ? '' : ' open';
+    return `<details class="qcm-option-explanation" data-kind="${outcome}"${open}><summary>${escapeHTML(summary)}</summary><div>${escapeHTML(String(text || ''))}</div>${extraHtml}</details>`;
 }

@@ -22,3 +22,22 @@ export function courseLinksHtml(links) {
         .join('');
     return `<div class="course-links" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:6px;">${buttons}</div>`;
 }
+
+/**
+ * Boutons du cours sous une bonne réponse. Le rapprochement entre la question et les pages du cours
+ * est établi pour la question entière, pas choix par choix : chaque bonne réponse reprend donc les
+ * pages vérifiées de la question. Courts (« Cours · p. 45 ») quand tous viennent du même cours.
+ */
+export function choiceCourseLinksHtml(links) {
+    if (!links || !links.length) return '';
+    const sameCourse = new Set(links.map((l) => l.title)).size === 1;
+    const buttons = links
+        .map((l) => {
+            const label = sameCourse
+                ? tq('question.seeCourseShort', { page: l.page })
+                : tq('question.seeCourseAt', { title: l.title, page: l.page });
+            return `<button data-action="openUrl" data-url="${escapeHTML(l.url)}" style="${COURSE_BUTTON_STYLE} text-align:left;"><i class="ri-book-open-line"></i> ${label}</button>`;
+        })
+        .join('');
+    return `<div class="course-links" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:6px;">${buttons}</div>`;
+}

@@ -62,17 +62,20 @@ describe('optionOutcome', () => {
 });
 
 describe('optionExplanationHtml', () => {
-    it('shows the explanation of a fault right away, escaped', () => {
-        expect(optionExplanationHtml('A <b>faux</b>', 'incorrect', 'Voir')).toBe(
-            '<div class="qcm-option-explanation" data-kind="incorrect">A &lt;b&gt;faux&lt;/b&gt;</div>',
+    it('is always a fold: open under a fault, shut under what was done right', () => {
+        const fault = optionExplanationHtml('A <b>faux</b>', 'incorrect', 'Explication');
+        expect(fault).toBe(
+            '<details class="qcm-option-explanation" data-kind="incorrect" open><summary>Explication</summary><div>A &lt;b&gt;faux&lt;/b&gt;</div></details>',
         );
-        expect(optionExplanationHtml('Oubliée', 'missed', 'Voir')).toContain('data-kind="missed"');
+        expect(optionExplanationHtml('Oubliée', 'missed', 'Explication')).toContain('data-kind="missed" open');
+        const ok = optionExplanationHtml('Juste', 'ok', 'Explication');
+        expect(ok).toContain('data-kind="ok"><summary>');
+        expect(ok).not.toContain(' open');
     });
 
-    it('folds the explanation of what was done right', () => {
-        const html = optionExplanationHtml('Juste', 'ok', 'Voir l’explication');
-        expect(html).toContain('<details class="qcm-option-explanation" data-kind="ok">');
-        expect(html).toContain('<summary>Voir l’explication</summary>');
-        expect(html).not.toContain(' open');
+    it('puts the ready-made extra html (course buttons) inside the fold, under the text', () => {
+        const html = optionExplanationHtml('Juste', 'ok', 'Explication', '<div class="course-links">x</div>');
+        expect(html.indexOf('Juste')).toBeLessThan(html.indexOf('course-links'));
+        expect(html.endsWith('</div></details>')).toBe(true);
     });
 });
