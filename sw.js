@@ -121,6 +121,7 @@ const CRITICAL_ASSETS = [
     './js/services/igc_batch_import.js',
     './js/services/pilot_habits.js',
     './js/services/answer_log.js',
+    './js/services/error_diagnostic.js',
     './js/services/mastery.js',
     './js/services/review_scheduler.js',
     './js/services/revision_axes.js',
