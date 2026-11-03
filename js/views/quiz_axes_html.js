@@ -72,6 +72,36 @@ export function buildStatsAxesShortcutHtml() {
 function buildAxisBreakdownPillsHtml(axis) {
     /** @type {string[]} */
     const pills = [];
+    const traps = axis.traps || { active: 0, consolidating: 0, overcome: 0 };
+    const trapPill = (count, one, many, color, rgb) =>
+        `<span style="background:rgba(${rgb},0.14); color:${color}; border:1px solid rgba(${rgb},0.35); padding:3px 9px; border-radius:999px; font-size:0.76rem; font-weight:700;"><i class="ri-alert-line"></i> ${count === 1 ? tq(one) : tq(many, { count })}</span>`;
+    if (traps.active > 0) {
+        pills.push(
+            trapPill(traps.active, 'axes.pillTrapsActiveOne', 'axes.pillTrapsActiveMany', '#ef4444', '248,113,113'),
+        );
+    }
+    if (traps.consolidating > 0) {
+        pills.push(
+            trapPill(
+                traps.consolidating,
+                'axes.pillTrapsConsolidatingOne',
+                'axes.pillTrapsConsolidatingMany',
+                '#f59e0b',
+                '251,191,36',
+            ),
+        );
+    }
+    if (traps.overcome > 0) {
+        pills.push(
+            trapPill(
+                traps.overcome,
+                'axes.pillTrapsOvercomeOne',
+                'axes.pillTrapsOvercomeMany',
+                '#22c55e',
+                '74,222,128',
+            ),
+        );
+    }
     if (axis.strugglingCount > 0) {
         const label =
             axis.strugglingCount === 1
@@ -115,6 +145,77 @@ function buildAxisBreakdownPillsHtml(axis) {
         );
     }
     return pills.join('');
+}
+
+/** Nombre de pièges visibles sans déplier le bloc. */
+const TRAPS_VISIBLE = 3;
+
+/** @type {Record<string, { key: string, color: string, bg: string }>} */
+const TRAP_STATUS_META = {
+    active: { key: 'axes.trapStatusActive', color: '#ef4444', bg: 'rgba(248,113,113,0.14)' },
+    consolidating: { key: 'axes.trapStatusConsolidating', color: '#f59e0b', bg: 'rgba(251,191,36,0.14)' },
+    overcome: { key: 'axes.trapStatusOvercome', color: '#22c55e', bg: 'rgba(74,222,128,0.14)' },
+};
+
+/**
+ * Construit le bloc « Mes pièges sur ce chapitre » : les fausses croyances déjà cochées, avec le
+ * passage qui les corrige. Comme les points clés, il n'affiche jamais l'énoncé ni les choix QCM.
+ *
+ * @param {any} axis
+ * @param {Set<string>} expandedIds
+ * @returns {string}
+ */
+function buildTrapsBlockHtml(axis, expandedIds) {
+    const items = Array.isArray(axis.traps?.items) ? axis.traps.items : [];
+    if (items.length === 0) return '';
+
+    const expanded = expandedIds instanceof Set && expandedIds.has(`traps:${axis.id}`);
+    const urgent = items.filter((i) => i.status !== 'overcome');
+    const shown = expanded ? items : urgent.slice(0, TRAPS_VISIBLE);
+    const hasMore = items.length > urgent.slice(0, TRAPS_VISIBLE).length;
+
+    const itemsHtml = shown
+        .map((item) => {
+            const meta = TRAP_STATUS_META[item.status] || TRAP_STATUS_META.active;
+            const relapse = item.relapse
+                ? `<span style="background:rgba(248,113,113,0.14); color:#ef4444; padding:2px 8px; border-radius:999px; font-size:0.72rem; font-weight:700;">${tq('axes.trapRelapse')}</span>`
+                : '';
+            const picked = item.count === 1 ? tq('axes.trapPickedOne') : tq('axes.trapPicked', { count: item.count });
+            const courseLink =
+                item.courseUrl && item.courseTitle && item.coursePage
+                    ? `<a href="${escapeHTML(item.courseUrl)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:4px; font-size:0.76rem; font-weight:700; color:var(--accent-orange); text-decoration:none;"><i class="ri-file-pdf-line"></i> ${tq('axes.takeawayCourseLink', { title: item.courseTitle, page: item.coursePage })}</a>`
+                    : '';
+            return `
+                <div class="revision-axis-trap-item" data-trap-status="${escapeHTML(item.status)}" style="padding:12px 14px; border-radius:10px; background:var(--bg-card); border:1px solid var(--border-color); border-left:3px solid ${meta.color};">
+                    <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px;">
+                        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:6px;">
+                            <span style="background:${meta.bg}; color:${meta.color}; padding:2px 8px; border-radius:999px; font-size:0.74rem; font-weight:700;">${tq(meta.key)}</span>
+                            ${relapse}
+                            <span style="font-size:0.76rem; color:var(--text-secondary); font-weight:600;">${picked} · ${tq('axes.trapQuestionRef', { num: item.questionNum })}</span>
+                        </div>
+                        ${courseLink}
+                    </div>
+                    <div style="font-size:0.88rem; color:var(--text-main); line-height:1.5;">${explanationHtml(item.explanation)}</div>
+                </div>
+            `;
+        })
+        .join('');
+
+    const toggle = hasMore
+        ? `<button type="button" data-action="QuiztoggleAxisTakeaways" data-args="traps:${escapeHTML(axis.id)}" aria-expanded="${expanded ? 'true' : 'false'}" style="align-self:flex-start; background:rgba(248,113,113,0.1); color:#ef4444; border:1px solid rgba(248,113,113,0.35); padding:6px 12px; border-radius:10px; font-size:0.8rem; font-weight:700; cursor:pointer;">${expanded ? tq('axes.trapsHideAll') : tq('axes.trapsShowAll', { count: items.length })}</button>`
+        : '';
+
+    return `
+        <div class="revision-axis-step revision-axis-traps" style="padding:14px 16px; border-radius:12px; background:rgba(248,113,113,0.05); border:1px solid rgba(248,113,113,0.3); display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; align-items:center; gap:8px; font-weight:700; font-size:0.88rem; color:var(--text-main);">
+                <i class="ri-alert-line" style="color:#ef4444;"></i>
+                <span>${tq('axes.trapsHeading')}</span>
+            </div>
+            <div style="font-size:0.8rem; color:var(--text-secondary); line-height:1.45;">${tq('axes.trapsHint')}</div>
+            ${itemsHtml}
+            ${toggle}
+        </div>
+    `;
 }
 
 /**
@@ -284,7 +385,7 @@ function buildStep3WorkshopHtml(axis) {
                     <span>${tq('axes.step3Heading')}</span>
                 </div>
                 <div style="font-size:0.8rem; color:var(--text-secondary); line-height:1.4;">
-                    ${tq('axes.step3Hint')}
+                    ${tq('axes.step3Hint')}${axis.traps?.active > 0 ? ` ${tq('axes.workshopTrapsHint')}` : ''}
                 </div>
             </div>
             <button type="button" data-action="QuizstartAxisWorkshop" data-args="${escapeHTML(axis.id)}" style="background:var(--accent-orange); color:#fff; border:none; padding:10px 18px; border-radius:10px; font-weight:700; font-size:0.86rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; white-space:nowrap;">
@@ -353,6 +454,7 @@ export function buildRevisionAxisCardHtml(axis, expandedIds) {
                 </div>
             </header>
 
+            ${buildTrapsBlockHtml(axis, expandedIds)}
             ${buildStep1CoursesHtml(axis)}
             ${buildStep2TakeawaysHtml(axis, isExpanded)}
             ${buildStep3WorkshopHtml(axis)}
@@ -363,7 +465,7 @@ export function buildRevisionAxisCardHtml(axis, expandedIds) {
 /**
  * Construit le tableau de bord complet de l'écran « Axes de révision ».
  *
- * @param {{ level: string, axes: any[], counts: Record<string, number> }} report
+ * @param {{ level: string, axes: any[], counts: Record<string, number>, trapTotals?: { active: number, consolidating: number, overcome: number, axes: number } }} report
  * @param {{ statusFilter?: string, expandedIds?: Set<string> }} [uiState]
  * @returns {string}
  */
@@ -378,6 +480,10 @@ export function buildRevisionAxesDashboardHtml(report, uiState = {}) {
         { key: 'EXPLORE', label: tq('axes.filterExplore', { count: report.counts.EXPLORE || 0 }) },
         { key: 'MASTERED', label: tq('axes.filterMastered', { count: report.counts.MASTERED || 0 }) },
     ];
+    const trapAxes = report.trapTotals?.axes || 0;
+    if (trapAxes > 0 || activeFilter === 'TRAPS') {
+        filterDefs.splice(1, 0, { key: 'TRAPS', label: tq('axes.filterTraps', { count: trapAxes }) });
+    }
 
     const filtersHtml = filterDefs
         .map((f) => {
@@ -394,7 +500,23 @@ export function buildRevisionAxesDashboardHtml(report, uiState = {}) {
         .join('');
 
     const visibleAxes =
-        activeFilter === 'ALL' ? report.axes : report.axes.filter((axis) => axis.status === activeFilter);
+        activeFilter === 'ALL'
+            ? report.axes
+            : activeFilter === 'TRAPS'
+              ? report.axes.filter((axis) => axis.traps?.active > 0)
+              : report.axes.filter((axis) => axis.status === activeFilter);
+
+    const activeTraps = report.trapTotals?.active || 0;
+    const trapsCtaHtml =
+        activeTraps > 0
+            ? `<div class="revision-axes-traps-cta" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; padding:16px 20px; border-radius:var(--radius-md); background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.35);">
+                    <div style="flex:1 1 260px;">
+                        <div style="font-weight:800; font-size:0.95rem; color:var(--text-main); margin-bottom:2px; display:flex; align-items:center; gap:8px;"><i class="ri-alert-line" style="color:#ef4444;"></i> ${tq('axes.trapsWorkshopTitle', { count: activeTraps })}</div>
+                        <div style="font-size:0.82rem; color:var(--text-secondary); line-height:1.4;">${tq('axes.trapsWorkshopText')}</div>
+                    </div>
+                    <button type="button" data-action="QuizstartTrapsWorkshop" style="background:#ef4444; color:#fff; border:none; padding:10px 18px; border-radius:10px; font-weight:700; font-size:0.86rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; white-space:nowrap;"><i class="ri-focus-2-line"></i> ${tq('axes.trapsWorkshopBtn')} <i class="ri-arrow-right-line"></i></button>
+                </div>`
+            : '';
 
     const cardsHtml =
         visibleAxes.length > 0
@@ -433,6 +555,8 @@ export function buildRevisionAxesDashboardHtml(report, uiState = {}) {
                     </div>
                 </div>
             </div>
+
+            ${trapsCtaHtml}
 
             <div class="revision-axes-filters" style="display:flex; flex-wrap:wrap; gap:8px;">
                 ${filtersHtml}

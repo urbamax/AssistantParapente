@@ -335,6 +335,22 @@ function aggregateCourseReadings(classifiedQuestions, coursesById) {
 }
 
 /**
+ * Lien vers la page vérifiée du cours pour une question (Principe III : jamais de page non vérifiée).
+ *
+ * @param {any} q
+ * @param {Map<string, { id: string, title: string, category: string, file: string }>} coursesById
+ */
+function courseLinkFor(q, coursesById) {
+    const hasVerifiedCourse = Boolean(q.courseId) && Number.isInteger(q.coursePage) && q.coursePage > 0;
+    const course = hasVerifiedCourse ? coursesById.get(q.courseId) : undefined;
+    return {
+        courseTitle: course ? course.title : null,
+        coursePage: course ? q.coursePage : null,
+        courseUrl: course ? `${course.file}#page=${q.coursePage}` : null,
+    };
+}
+
+/**
  * Extrait les points clés à retenir (`takeaways`) pour un axe, sans exposer l'énoncé QCM ni les
  * propositions A/B/C/D.
  *
@@ -366,21 +382,13 @@ function buildAxisTakeaways(classifiedQuestions, coursesById, maxItems = 6) {
         return a.key.localeCompare(b.key, 'fr', { numeric: true });
     });
 
-    return withExplanations.slice(0, maxItems).map((item) => {
-        const hasVerifiedCourse =
-            Boolean(item.q.courseId) && Number.isInteger(item.q.coursePage) && item.q.coursePage > 0;
-        const course = hasVerifiedCourse ? coursesById.get(item.q.courseId) : undefined;
-
-        return {
-            questionId: item.key,
-            questionNum: item.q.num || item.key,
-            bucket: item.bucket,
-            explanation: item.cleanedExplanation,
-            courseTitle: course ? course.title : null,
-            coursePage: course ? item.q.coursePage : null,
-            courseUrl: course ? `${course.file}#page=${item.q.coursePage}` : null,
-        };
-    });
+    return withExplanations.slice(0, maxItems).map((item) => ({
+        questionId: item.key,
+        questionNum: item.q.num || item.key,
+        bucket: item.bucket,
+        explanation: item.cleanedExplanation,
+        ...courseLinkFor(item.q, coursesById),
+    }));
 }
 
 /**
@@ -464,6 +472,8 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
         EXPLORE: 0,
         MASTERED: 0,
     };
+    // Pièges de tout le niveau : `axes` = nombre d'axes où au moins un piège est actif.
+    const trapTotals = { active: 0, consolidating: 0, overcome: 0, axes: 0 };
 
     for (let idx = 0; idx < REVISION_AXES_CATALOG.length; idx++) {
         const def = REVISION_AXES_CATALOG[idx];
@@ -503,7 +513,19 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
 
             for (const trap of diagnoseQuestionErrors(q, stat).traps) {
                 traps[trap.status] += 1;
-                traps.items.push({ ...trap, questionId: key });
+                // Pas de texte de choix ni d'énoncé : cet écran n'expose jamais les réponses QCM.
+                traps.items.push({
+                    questionId: key,
+                    questionNum: q.num || key,
+                    choiceIndex: trap.choiceIndex,
+                    count: trap.count,
+                    status: trap.status,
+                    relapse: trap.relapse,
+                    lastPickedDay: trap.lastPickedDay,
+                    explanation: trap.explanation ?? cleanAxisExplanation(q.explication),
+                    isOptionExplanation: trap.explanation !== null,
+                    ...courseLinkFor(q, coursesById),
+                });
             }
         }
         traps.items.sort(
@@ -531,6 +553,10 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
 
         counts.ALL += 1;
         counts[status] += 1;
+        if (traps.active > 0) trapTotals.axes += 1;
+        trapTotals.active += traps.active;
+        trapTotals.consolidating += traps.consolidating;
+        trapTotals.overcome += traps.overcome;
 
         const copy = catalogCopy[def.id] || { title: def.id, subtitle: '' };
         const courseReadings = aggregateCourseReadings(classified, coursesById);
@@ -597,6 +623,7 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
         level,
         axes,
         counts,
+        trapTotals,
     };
 }
 
