@@ -5,6 +5,7 @@ import {
     buildFeedbackSpeech,
     buildAutoFeedbackSpeech,
     buildTrapSpeech,
+    buildFaultExplanation,
     describeSelection,
     parseVoiceCommand,
     looksLikeEcho,
@@ -220,5 +221,54 @@ describe('spoken trap messages', () => {
 
     it('keeps the verdict alone for a correct answer without trap feedback', () => {
         expect(buildAutoFeedbackSpeech({ isCorrect: true, question: { explication: 'x' } })).toBe('Bonne réponse.');
+    });
+});
+
+describe('spoken explanation: only what concerns the fault', () => {
+    const original = {
+        choices: [
+            { text: 'bonne', pts: 6 },
+            { text: 'piège', pts: -6 },
+            { text: 'autre', pts: -6 },
+        ],
+        explication:
+            'Pourquoi la bonne.\nPourquoi le piège est faux.\nPourquoi l’autre est faux.\nAucune source trouvée pour le moment.',
+    };
+    // La copie de séance a ses choix mélangés : seul l'objet compte, pas la position.
+    const shuffled = { ...original, choices: [original.choices[2], original.choices[0], original.choices[1]] };
+    const result = (selected) => ({ question: shuffled, selected });
+
+    it('reads the paragraph of the wrong answer ticked and of the right answer missed, in the original order', () => {
+        const text = buildFaultExplanation(result([original.choices[1]]), original);
+        expect(text).toBe('Pourquoi la bonne. Pourquoi le piège est faux.');
+    });
+
+    it('reads only the missed right answer for an incomplete answer', () => {
+        const partial = { question: { ...shuffled, choices: [original.choices[0]] }, selected: [] };
+        expect(buildFaultExplanation(partial, original)).toBe('Pourquoi la bonne.');
+    });
+
+    it('never reads the "Aucune source trouvée" note, with or without a split', () => {
+        expect(buildFaultExplanation(result([original.choices[2]]), original)).not.toMatch(/source/i);
+        const unsplit = { question: { explication: 'Un bloc.\nAucune source trouvée dans les documents fournis.' } };
+        expect(buildFaultExplanation(unsplit, null)).toBe('Un bloc.');
+        expect(buildFaultExplanation(unsplit, { choices: [{ pts: 1 }, { pts: -1 }], explication: 'Un bloc.' })).toBe(
+            'Un bloc.',
+        );
+    });
+
+    it('falls back to the whole explanation when nothing relates to a fault', () => {
+        const fine = result([original.choices[0]]);
+        expect(buildFaultExplanation(fine, original)).toBe(
+            'Pourquoi la bonne. Pourquoi le piège est faux. Pourquoi l’autre est faux.',
+        );
+    });
+
+    it('is what the feedback speech reads after the verdict', () => {
+        const speech = buildFeedbackSpeech(
+            { isCorrect: false, userPoints: -6, selected: [original.choices[1]], question: shuffled },
+            original,
+        );
+        expect(speech).toBe('Mauvaise réponse. Pourquoi la bonne. Pourquoi le piège est faux.');
     });
 });

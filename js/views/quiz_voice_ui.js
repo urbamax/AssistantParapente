@@ -51,7 +51,11 @@ export class QuizVoiceBase extends QuizStatsBase {
      */
     currentSpeech({ auto = false } = {}) {
         if (this._voiceFeedback) {
-            return auto ? buildAutoFeedbackSpeech(this._voiceFeedback) : buildFeedbackSpeech(this._voiceFeedback);
+            // Les choix de la séance sont mélangés : les passages de l'explication se retrouvent sur la question d'origine.
+            const original = QuizService.getQuestionByCode(this._voiceFeedback.question?.code);
+            return auto
+                ? buildAutoFeedbackSpeech(this._voiceFeedback, original)
+                : buildFeedbackSpeech(this._voiceFeedback, original);
         }
         return this._voiceQuestion ? buildQuestionSpeech(this._voiceQuestion) : '';
     }

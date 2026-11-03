@@ -32,6 +32,23 @@ const VoiceService = {
     _recognizerActive: false,
     _wantListen: false,
 
+    /**
+     * Sur iPhone, le commutateur « vibreur » coupe la synthèse vocale d'une page web : la voix ne sort que
+     * si la page déclare une session audio de lecture (API Audio Session de Safari). On la déclare juste
+     * avant de parler, en lecture + enregistrement quand l'écoute est active pour ne pas couper le micro,
+     * puis on rend la main au navigateur. Sans cette API (Chrome, Firefox), rien ne change.
+     * @param {'auto' | 'playback' | 'play-and-record'} type
+     */
+    _setAudioSession(type) {
+        const session = typeof navigator !== 'undefined' ? /** @type {any} */ (navigator).audioSession : null;
+        if (!session) return;
+        try {
+            session.type = type;
+        } catch {
+            // type refusé par le navigateur : on parle quand même
+        }
+    },
+
     canSpeak() {
         return typeof window !== 'undefined' && !!window.speechSynthesis && !!window.SpeechSynthesisUtterance;
     },
@@ -66,6 +83,7 @@ const VoiceService = {
         const id = ++this._speechId;
         this._speaking = true;
         window.speechSynthesis.cancel();
+        this._setAudioSession(this._wantListen ? 'play-and-record' : 'playback');
 
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'fr-FR';
@@ -74,6 +92,7 @@ const VoiceService = {
             if (id !== this._speechId) return; // lecture remplacée ou arrêtée
             this._speaking = false;
             this._lastSpeechEnd = Date.now();
+            if (!this._wantListen) this._setAudioSession('auto');
             if (onEnd) onEnd();
         };
         utterance.onend = finish;

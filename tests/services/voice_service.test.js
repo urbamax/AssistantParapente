@@ -139,6 +139,61 @@ describe('VoiceService (spec 016)', () => {
             expect(synth.current.text).toBe('Deux');
         });
 
+        describe('audio session (iPhone silent switch)', () => {
+            afterEach(() => {
+                delete navigator.audioSession;
+            });
+
+            it('declares a playback session before speaking and gives it back at the end', () => {
+                const synth = installSynthesis();
+                const seen = [];
+                Object.defineProperty(navigator, 'audioSession', {
+                    configurable: true,
+                    value: {
+                        set type(v) {
+                            seen.push(v);
+                        },
+                    },
+                });
+                VoiceService.speak('Bonjour');
+                expect(seen).toEqual(['playback']);
+                synth.finish();
+                expect(seen).toEqual(['playback', 'auto']);
+            });
+
+            it('keeps the microphone usable when listening is active', () => {
+                installSynthesis();
+                window.webkitSpeechRecognition = FakeRecognition;
+                const seen = [];
+                Object.defineProperty(navigator, 'audioSession', {
+                    configurable: true,
+                    value: {
+                        set type(v) {
+                            seen.push(v);
+                        },
+                    },
+                });
+                VoiceService.startListening({ onResult: () => {}, onError: () => {} });
+                VoiceService.speak('Bonjour');
+                expect(seen).toEqual(['play-and-record']);
+            });
+
+            it('speaks normally when the browser has no audio session or refuses the type', () => {
+                const synth = installSynthesis();
+                expect(() => VoiceService.speak('Sans API')).not.toThrow();
+                Object.defineProperty(navigator, 'audioSession', {
+                    configurable: true,
+                    value: {
+                        set type(_v) {
+                            throw new Error('refusé');
+                        },
+                    },
+                });
+                expect(() => VoiceService.speak('Refusé')).not.toThrow();
+                expect(synth.spoken).toHaveLength(2);
+            });
+        });
+
         it('does nothing without synthesis', () => {
             expect(() => VoiceService.speak('Bonjour')).not.toThrow();
             expect(VoiceService.isSpeaking()).toBe(false);
