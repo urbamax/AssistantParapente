@@ -2655,19 +2655,25 @@
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
     "title": "Vol libre et milieux naturels - Référentiel de connaissances",
     "verifiedPage": 3,
-    "verifiedAt": "2026-10-12"
+    "verifiedAt": "2026-11-04"
   },
   "P4BM": {
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
     "title": "Référentiel - Brevet de Pilote",
-    "verifiedPage": 3,
-    "verifiedAt": "2026-11-03"
+    "verifiedPage": 4,
+    "verifiedAt": "2026-11-04",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
+        "verifiedPage": 3
+      }
+    ]
   },
   "P5V": {
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
     "title": "Vol libre et milieux naturels - Référentiel de connaissances",
     "verifiedPage": 4,
-    "verifiedAt": "2026-11-03"
+    "verifiedAt": "2026-11-04"
   },
   "P6BM": {
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
@@ -2773,7 +2779,7 @@
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
     "title": "Référentiel - Brevet de Pilote",
     "verifiedPage": 6,
-    "verifiedAt": "2026-11-03"
+    "verifiedAt": "2026-11-04"
   },
   "P21V": {
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
@@ -2791,7 +2797,7 @@
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
     "title": "Vol libre et milieux naturels - Référentiel de connaissances",
     "verifiedPage": 8,
-    "verifiedAt": "2026-10-12"
+    "verifiedAt": "2026-11-04"
   },
   "P24BM": {
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
@@ -2815,11 +2821,11 @@
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
     "title": "Référentiel - Brevet de Pilote",
     "verifiedPage": 11,
-    "verifiedAt": "2026-10-12",
+    "verifiedAt": "2026-11-04",
     "others": [
       {
-        "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
-        "verifiedPage": 6
+        "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/18-milieux-naturels2022/18-milieux-naturels2022",
+        "verifiedPage": 1
       }
     ]
   },
@@ -2833,7 +2839,7 @@
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
     "title": "Vol libre et milieux naturels - Référentiel de connaissances",
     "verifiedPage": 4,
-    "verifiedAt": "2026-11-03"
+    "verifiedAt": "2026-11-04"
   },
   "P30V": {
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
@@ -2994,13 +3000,7 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 30,
-    "verifiedAt": "2026-10-12",
-    "others": [
-      {
-        "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-        "verifiedPage": 23
-      }
-    ]
+    "verifiedAt": "2026-11-04"
   },
   "S3B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -3098,7 +3098,7 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 29,
-    "verifiedAt": "2026-10-12",
+    "verifiedAt": "2026-11-04",
     "others": [
       {
         "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3140,20 +3140,26 @@
     "title": "milieux naturels2022"
   },
   "S18T": {
-    "course_id": "treuil/ffvl-dossiertracte-2023",
-    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
-    "verifiedPage": 15,
-    "verifiedAt": "2026-10-21",
+    "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/17-facteurs-humains2023/17-facteurs-humains2023",
+    "title": "Facteurs Humains",
+    "verifiedPage": 1,
+    "verifiedAt": "2026-11-04",
     "others": [
       {
         "course_id": "treuil/ffvl-dossiertracte-2023",
-        "verifiedPage": 16
+        "verifiedPage": 15
+      },
+      {
+        "course_id": "treuil/ffvl-dossiertracte-2023",
+        "verifiedPage": 17
       }
     ]
   },
   "S19V": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote"
+    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
+    "verifiedPage": 28,
+    "verifiedAt": "2026-11-04"
   },
   "S20M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -3163,8 +3169,8 @@
   "S20T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
-    "verifiedPage": 46,
-    "verifiedAt": "2026-10-11",
+    "verifiedPage": 20,
+    "verifiedAt": "2026-11-04",
     "others": [
       {
         "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3231,7 +3237,7 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 21,
-    "verifiedAt": "2026-10-12",
+    "verifiedAt": "2026-11-04",
     "others": [
       {
         "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3243,7 +3249,7 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 20,
-    "verifiedAt": "2026-10-12"
+    "verifiedAt": "2026-11-04"
   },
   "S29B": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3253,7 +3259,7 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 20,
-    "verifiedAt": "2026-10-12"
+    "verifiedAt": "2026-11-04"
   },
   "S30T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3283,7 +3289,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 3,
-    "verifiedAt": "2026-10-11"
+    "verifiedAt": "2026-11-04"
   },
   "S33T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3342,7 +3348,7 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 22,
-    "verifiedAt": "2026-10-12"
+    "verifiedAt": "2026-11-04"
   },
   "S39T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3395,13 +3401,19 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 26,
-    "verifiedAt": "2026-10-22"
+    "verifiedAt": "2026-11-04"
   },
   "S44M": {
     "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/07-parachute-de-secours2019/07-parachute-de-secours2019",
     "title": "Le Parachute de secours",
     "verifiedPage": 1,
-    "verifiedAt": "2026-10-11"
+    "verifiedAt": "2026-11-04",
+    "others": [
+      {
+        "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques",
+        "verifiedPage": 31
+      }
+    ]
   },
   "S44T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3437,7 +3449,7 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 23,
-    "verifiedAt": "2026-10-11"
+    "verifiedAt": "2026-11-04"
   },
   "S47B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -3449,11 +3461,11 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 27,
-    "verifiedAt": "2026-10-11",
+    "verifiedAt": "2026-11-04",
     "others": [
       {
         "course_id": "treuil/ffvl-dossiertracte-2023",
-        "verifiedPage": 21
+        "verifiedPage": 22
       }
     ]
   },
@@ -3461,7 +3473,7 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 25,
-    "verifiedAt": "2026-10-22"
+    "verifiedAt": "2026-11-04"
   },
   "S48T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3581,7 +3593,7 @@
     "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025",
     "title": "Réglementation - La division de l’espace aérien",
     "verifiedPage": 1,
-    "verifiedAt": "2026-10-22",
+    "verifiedAt": "2026-11-04",
     "others": [
       {
         "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -4025,8 +4037,8 @@
   "S125B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 131,
-    "verifiedAt": "2026-10-11"
+    "verifiedPage": 83,
+    "verifiedAt": "2026-11-04"
   },
   "S126B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -4037,20 +4049,14 @@
   "S127B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 134,
-    "verifiedAt": "2026-10-11",
-    "others": [
-      {
-        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
-        "verifiedPage": 81
-      }
-    ]
+    "verifiedPage": 81,
+    "verifiedAt": "2026-11-04"
   },
   "S128B": {
     "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025",
     "title": "Réglementation - La division de l’espace aérien",
     "verifiedPage": 1,
-    "verifiedAt": "2026-10-12"
+    "verifiedAt": "2026-11-04"
   },
   "S129B": {
     "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025",
@@ -4080,7 +4086,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 131,
-    "verifiedAt": "2026-10-21"
+    "verifiedAt": "2026-11-04"
   },
   "S136B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
