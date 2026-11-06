@@ -79,12 +79,12 @@ async function startTraining(page) {
     await expect(page.locator('#qcm-choices .qcm-option').first()).toBeVisible();
 }
 
-test('Spec 016 : « Lire » lit la question et ses réponses avec leur lettre', async ({ page }) => {
+test('Spec 016 : « Lecture auto » lit la question et ses réponses avec leur lettre', async ({ page }) => {
     await startTraining(page);
     const letters = page.locator('#qcm-choices .qcm-option-letter');
     await expect(letters.first()).toHaveText('A');
 
-    await page.locator('[data-action="quiz-voice-read"]').click();
+    await page.locator('[data-action="quiz-voice-auto"]').click();
     const question = (await page.locator('.quiz-question-text').textContent()).trim();
     const firstAnswer = (await page.locator('#qcm-choices .qcm-option').first().textContent())
         .trim()
