@@ -119,33 +119,31 @@ describe('US1 - read aloud (spec 016)', () => {
         expect(letters).toEqual(['A', 'B', 'C', 'D']);
     });
 
-    it('« Lire » reads the question and its lettered answers', () => {
+    it('« Lecture auto » reads the question and its lettered answers', () => {
         mockVoice();
         startSession();
-        expect(btn('quiz-voice-read').getAttribute('aria-pressed')).toBe('false');
-        click('quiz-voice-read');
+        expect(btn('quiz-voice-auto').getAttribute('aria-pressed')).toBe('false');
+        click('quiz-voice-auto');
         expect(speech.texts).toEqual([buildQuestionSpeech(QuizService.getCurrentQuestion())]);
-        expect(btn('quiz-voice-read').getAttribute('aria-pressed')).toBe('true');
-        finishSpeech();
-        expect(btn('quiz-voice-read').getAttribute('aria-pressed')).toBe('false');
+        expect(btn('quiz-voice-auto').getAttribute('aria-pressed')).toBe('true');
     });
 
-    it('a second tap stops the reading', () => {
+    it('a second tap stops the reading and turns off auto reading', () => {
         mockVoice();
         startSession();
-        click('quiz-voice-read');
-        click('quiz-voice-read');
+        click('quiz-voice-auto');
+        click('quiz-voice-auto');
         expect(VoiceService.stopSpeaking).toHaveBeenCalled();
         expect(speech.speaking).toBe(false);
-        expect(speech.texts.length).toBe(1);
+        expect(btn('quiz-voice-auto').getAttribute('aria-pressed')).toBe('false');
     });
 
-    it('after validation, « Lire » reads the verdict and the explanation', () => {
+    it('after validation with auto reading, reads the verdict and the explanation', () => {
         mockVoice();
         startSession();
+        VoiceService.setPrefs({ autoRead: true });
         QuizView.handleClick({ target: document.querySelector('.qcm-option[data-idx="0"]') });
         QuizView.validateQuestion();
-        click('quiz-voice-read');
         const result = QuizService.state.examResults[0];
         expect(speech.texts).toEqual([buildFeedbackSpeech(result)]);
     });
@@ -153,15 +151,15 @@ describe('US1 - read aloud (spec 016)', () => {
     it('in exam mode, never reads an explanation', () => {
         mockVoice();
         startSession('EXAM');
+        VoiceService.setPrefs({ autoRead: true });
         QuizView.validateQuestion();
-        click('quiz-voice-read');
         expect(speech.texts).toEqual([buildQuestionSpeech(QuizService.state.qcmSessionData[1])]);
     });
 
     it('changing question stops the reading', () => {
         mockVoice();
         startSession();
-        click('quiz-voice-read');
+        QuizView.readAloud();
         VoiceService.stopSpeaking.mockClear();
         QuizView.validateQuestion();
         QuizView.renderQuestion(QuizService.nextQuestion());
@@ -172,7 +170,7 @@ describe('US1 - read aloud (spec 016)', () => {
     it('leaving the quiz stops the reading and the listening', async () => {
         mockVoice();
         startSession();
-        click('quiz-voice-read');
+        click('quiz-voice-auto');
         await QuizView.unmount();
         expect(VoiceService.stopSpeaking).toHaveBeenCalled();
         expect(VoiceService.stopListening).toHaveBeenCalled();
@@ -181,7 +179,7 @@ describe('US1 - read aloud (spec 016)', () => {
     it('the controls are native buttons with accessible names and without icons', () => {
         mockVoice();
         startSession();
-        for (const action of ['quiz-voice-read', 'quiz-voice-auto', 'quiz-voice-chain', 'quiz-voice-mic']) {
+        for (const action of ['quiz-voice-auto', 'quiz-voice-chain', 'quiz-voice-mic']) {
             expect(btn(action).tagName).toBe('BUTTON');
             expect(btn(action).getAttribute('type')).toBe('button');
             expect(btn(action).getAttribute('aria-label') || btn(action).textContent.trim()).not.toBe('');
@@ -196,10 +194,10 @@ describe('US1 - read aloud (spec 016)', () => {
         startSession();
         const container = bar().querySelector('.qcm-voice-buttons');
         expect(container).not.toBeNull();
-        expect(container.contains(btn('quiz-voice-read'))).toBe(true);
         expect(container.contains(btn('quiz-voice-auto'))).toBe(true);
         expect(container.contains(btn('quiz-voice-chain'))).toBe(true);
         expect(container.contains(btn('quiz-voice-mic'))).toBe(true);
+        expect(btn('quiz-voice-read')).toBeNull();
 
         const revokeLink = bar().querySelector('.qcm-voice-link');
         expect(revokeLink).not.toBeNull();
@@ -209,9 +207,9 @@ describe('US1 - read aloud (spec 016)', () => {
     it('keeps the focus on the pressed control after an update', () => {
         mockVoice();
         startSession();
-        btn('quiz-voice-read').focus();
-        click('quiz-voice-read');
-        expect(document.activeElement).toBe(btn('quiz-voice-read'));
+        btn('quiz-voice-auto').focus();
+        click('quiz-voice-auto');
+        expect(document.activeElement).toBe(btn('quiz-voice-auto'));
     });
 });
 
@@ -281,7 +279,7 @@ describe('US2 - automatic reading (spec 016)', () => {
         startSession();
         const result = answer([0, 3]);
         finishSpeech();
-        click('quiz-voice-read');
+        QuizView.readAloud();
         expect(speech.texts.at(-1)).toBe(buildFeedbackSpeech(result));
         expect(speech.texts.at(-1)).toContain('Explication du cours.');
     });
@@ -426,7 +424,7 @@ describe('US3 - answer by voice (spec 016)', () => {
         mockVoice();
         startSession();
         agreeAndListen();
-        click('quiz-voice-read');
+        QuizView.readAloud();
         expect(speech.speaking).toBe(true);
         VoiceService.stopSpeaking.mockClear();
         hear('B et D');
@@ -440,7 +438,7 @@ describe('US3 - answer by voice (spec 016)', () => {
         startSession();
         agreeAndListen();
         hear('A');
-        click('quiz-voice-read');
+        QuizView.readAloud();
         hear('valider');
         expect(QuizService.state.examResults[0]).toBeTruthy();
     });
@@ -450,7 +448,7 @@ describe('US3 - answer by voice (spec 016)', () => {
         startSession();
         agreeAndListen();
         const before = status();
-        click('quiz-voice-read');
+        QuizView.readAloud();
         hear('Réponse A : Vent de face');
         hear('réponse A');
         hear('Que signifie un vent de travers');

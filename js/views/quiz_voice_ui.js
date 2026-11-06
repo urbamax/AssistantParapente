@@ -126,7 +126,14 @@ export class QuizVoiceBase extends QuizStatsBase {
     }
 
     toggleAutoRead() {
-        VoiceService.setPrefs({ autoRead: !VoiceService.getPrefs().autoRead });
+        const next = !VoiceService.getPrefs().autoRead;
+        VoiceService.setPrefs(next ? { autoRead: true } : { autoRead: false, chain: false });
+        if (!next) {
+            this.cancelChainAdvance();
+            if (VoiceService.isSpeaking()) VoiceService.stopSpeaking();
+        } else if (!VoiceService.isSpeaking()) {
+            this.readAloud({ auto: true });
+        }
         this.renderVoiceBar();
     }
 
@@ -293,9 +300,7 @@ export class QuizVoiceBase extends QuizStatsBase {
         const canSpeak = VoiceService.canSpeak();
         const canListen = VoiceService.canListen();
         const { autoRead, voiceConsent, chain } = VoiceService.getPrefs();
-        const speaking = VoiceService.isSpeaking();
         const listening = VoiceService.isListening();
-        const readLabel = speaking ? 'stopLabel' : this._voiceFeedback ? 'readFeedbackLabel' : 'readLabel';
 
         bar.hidden = false;
         // La zone d'état reste le même élément pour que les lecteurs d'écran annoncent ses changements.
@@ -311,8 +316,7 @@ export class QuizVoiceBase extends QuizStatsBase {
                 <div class="qcm-voice-buttons">
                     ${
                         canSpeak
-                            ? `<button type="button" class="qcm-voice-btn" data-action="quiz-voice-read" aria-pressed="${speaking}" aria-label="${tv(readLabel)}">${tv('read')}</button>
-                    <button type="button" class="qcm-voice-btn" data-action="quiz-voice-auto" aria-pressed="${autoRead}" aria-label="${tv('autoLabel')}">${tv('auto')}</button>
+                            ? `<button type="button" class="qcm-voice-btn" data-action="quiz-voice-auto" aria-pressed="${autoRead}" aria-label="${tv('autoLabel')}">${tv('auto')}</button>
                     <button type="button" class="qcm-voice-btn" data-action="quiz-voice-chain" aria-pressed="${chain}" aria-label="${tv('chainLabel')}">${tv('chain')}</button>`
                             : ''
                     }
