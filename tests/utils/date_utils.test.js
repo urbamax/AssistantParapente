@@ -5,6 +5,7 @@ import {
     formatDateTime,
     formatRelativeTime,
     getFileTimestamp,
+    parseDateToMs,
 } from '../../js/utils/date_utils.js';
 
 describe('Date Utils', () => {
@@ -61,5 +62,20 @@ describe('Date Utils', () => {
         const d = new Date('2026-08-21T14:30:00Z');
         const ts = getFileTimestamp(d);
         expect(ts).toMatch(/^2026-08-21_\d{2}-\d{2}$/);
+    });
+
+    it('parseDateToMs safely parses dates across timezones', () => {
+        expect(parseDateToMs(null)).toBe(0);
+        expect(parseDateToMs('')).toBe(0);
+        expect(parseDateToMs('invalid-date')).toBe(0);
+        expect(parseDateToMs(1790587800000)).toBe(1790587800000);
+        expect(parseDateToMs(new Date('2026-09-28T09:30:00Z'))).toBe(1790587800000);
+
+        // Date with Z
+        expect(parseDateToMs('2026-09-28T09:30:00Z')).toBe(1790587800000);
+
+        // Date without timezone suffix is parsed deterministically as UTC
+        expect(parseDateToMs('2026-09-28T09:30:00')).toBe(1790587800000);
+        expect(parseDateToMs('2026-09-28T09:30')).toBe(1790587800000);
     });
 });

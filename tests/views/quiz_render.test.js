@@ -164,13 +164,18 @@ describe('quiz renders (spec 024: identical before and after moving the texts)',
         const none = html('stats-content');
         QuizService.getPersistentStats.mockImplementation(() => structuredClone(STATS));
         QuizView.renderStats();
+        const sortButtonIds = ['sort-rate-btn', 'sort-attempts-btn', 'sort-streak-btn', 'sort-date-btn'];
         QuizView.sortQuestions('attempts');
-        const attempts = ['sort-rate-btn', 'sort-attempts-btn', 'sort-streak-btn'].map(html);
+        const attempts = sortButtonIds.map(html);
         QuizView.sortQuestions('streak');
+        const streak = sortButtonIds.map(html);
+        QuizView.sortQuestions('date');
+        const date = sortButtonIds.map(html);
         expect({
             none,
             attempts,
-            streak: ['sort-rate-btn', 'sort-attempts-btn', 'sort-streak-btn'].map(html),
+            streak,
+            date,
         }).toMatchSnapshot();
     });
 

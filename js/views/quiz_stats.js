@@ -364,7 +364,12 @@ export class QuizStatsBase extends BaseView {
                 totalLevelQuestions,
             });
             const { themesHtml, sortControlsHtml } = buildThemesHtml(this, levelThemes);
-            const allQuestionsHtml = buildQuestionsHtml(this, { levelQs, levelQuestionEntries, stats });
+            const allQuestionsHtml = buildQuestionsHtml(this, {
+                levelQs,
+                levelQuestionEntries,
+                stats,
+                examHistory: QuizService.getExamHistory(),
+            });
             const successGaugeHtml = buildGaugeHtml({ color, currentLevel, globalPct, stats });
             const officialTheoryBannerHtml = buildOfficialTheoryBannerHtml(
                 currentLevel,
@@ -675,7 +680,7 @@ export class QuizStatsBase extends BaseView {
 
         // Update button states & Icons
         // Update button states & Icons - Scope only to Stats buttons
-        const statsButtons = ['sort-rate-btn', 'sort-attempts-btn', 'sort-streak-btn'];
+        const statsButtons = ['sort-rate-btn', 'sort-attempts-btn', 'sort-streak-btn', 'sort-date-btn'];
         statsButtons.forEach((id) => {
             const btn = document.getElementById(id);
             if (!btn) return;
@@ -685,12 +690,17 @@ export class QuizStatsBase extends BaseView {
             let baseText = tq('stats.sortByRate');
             if (id === 'sort-attempts-btn') baseText = tq('stats.sortByAttempts');
             if (id === 'sort-streak-btn') baseText = tq('stats.sortByStreak');
+            if (id === 'sort-date-btn') baseText = tq('stats.sortByDate');
             btn.innerHTML = baseText;
         });
 
-        const activeBtn = document.getElementById(
-            sortBy === 'rate' ? 'sort-rate-btn' : sortBy === 'attempts' ? 'sort-attempts-btn' : 'sort-streak-btn',
-        );
+        const sortBtnMap = {
+            rate: 'sort-rate-btn',
+            attempts: 'sort-attempts-btn',
+            streak: 'sort-streak-btn',
+            date: 'sort-date-btn',
+        };
+        const activeBtn = document.getElementById(sortBtnMap[sortBy] || 'sort-rate-btn');
         if (activeBtn) {
             activeBtn.style.background = 'rgba(255,255,255,0.05)';
             const arrow = dir === 'asc' ? ' <i class="ri-arrow-up-line"></i>' : ' <i class="ri-arrow-down-line"></i>';
@@ -705,6 +715,16 @@ export class QuizStatsBase extends BaseView {
             } else if (sortBy === 'streak') {
                 valA = parseInt(a.dataset.streak || '0');
                 valB = parseInt(b.dataset.streak || '0');
+            } else if (sortBy === 'date') {
+                valA = Number(a.dataset.date) || 0;
+                valB = Number(b.dataset.date) || 0;
+
+                if (valA === 0 && valB === 0) return 0;
+                if (valA === 0) return 1;
+                if (valB === 0) return -1;
+
+                if (dir === 'asc') return valA - valB;
+                return valB - valA;
             } else {
                 valA = parseInt(a.dataset.total);
                 valB = parseInt(b.dataset.total);
@@ -809,8 +829,7 @@ export class QuizStatsBase extends BaseView {
                 results: QuizService.compactExamResults(results),
             };
 
-            history.exams.unshift(exam); // Add to beginning
-            history.exams = history.exams.slice(0, 20); // Keep only last 20
+            history.exams.unshift(exam); // Add to beginning (pas de limite)
 
             StorageService.set(StorageService.KEYS.EXAM_HISTORY, history);
             if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {

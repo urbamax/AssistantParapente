@@ -243,7 +243,7 @@ describe('Quiz Exam History Compaction & Migration', () => {
         expect(history[0].questionsTotal).toBe(2);
     });
 
-    it('FirebaseAuthEngine.mergeExamHistory compacts cloud and local exams and limits to 20', () => {
+    it('FirebaseAuthEngine.mergeExamHistory compacts cloud and local exams without 20 limit', () => {
         const cloudBloated = {
             exams: [
                 {

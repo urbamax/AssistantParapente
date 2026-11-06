@@ -772,6 +772,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
     "Par taux",
     "Par tentatives <i class="ri-arrow-down-line"></i>",
     "Par série",
+    "Par date",
+  ],
+  "date": [
+    "Par taux",
+    "Par tentatives",
+    "Par série",
+    "Par date <i class="ri-arrow-down-line"></i>",
   ],
   "none": "
             
@@ -1005,6 +1012,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
     "Par taux",
     "Par tentatives",
     "Par série <i class="ri-arrow-down-line"></i>",
+    "Par date",
   ],
 }
 `;
@@ -1340,11 +1348,14 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
                             Par série
                         </button>
+                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
+                            Par date
+                        </button>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="S3V" data-pct="0" data-total="1" data-streak="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['S3V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="S3V" data-pct="0" data-total="1" data-streak="0" data-date="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['S3V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -1381,7 +1392,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         </div>
                     </div>
                 
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="10" data-total="4" data-streak="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="10" data-total="4" data-streak="0" data-date="1790587800000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -1423,7 +1434,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         </div>
                     </div>
                 
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790587800000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -1809,6 +1820,9 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
                             Par série
                         </button>
+                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
+                            Par date
+                        </button>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
@@ -2157,11 +2171,14 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
                             Par série
                         </button>
+                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
+                            Par date
+                        </button>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="S3V" data-pct="0" data-total="1" data-streak="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['S3V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="S3V" data-pct="0" data-total="1" data-streak="0" data-date="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['S3V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -2542,6 +2559,9 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
                             Par série
                         </button>
+                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
+                            Par date
+                        </button>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
@@ -2890,11 +2910,14 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
                             Par série
                         </button>
+                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
+                            Par date
+                        </button>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="F4V" data-pct="0" data-total="0" data-streak="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['F4V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="F4V" data-pct="0" data-total="0" data-streak="0" data-date="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['F4V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -3280,6 +3303,9 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
                             Par série
                         </button>
+                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
+                            Par date
+                        </button>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
@@ -3628,11 +3654,14 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
                             Par série
                         </button>
+                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
+                            Par date
+                        </button>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="10" data-total="4" data-streak="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="10" data-total="4" data-streak="0" data-date="1790587800000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -3674,7 +3703,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         </div>
                     </div>
                 
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790587800000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -4060,6 +4089,9 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
                             Par série
                         </button>
+                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
+                            Par date
+                        </button>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
@@ -4408,11 +4440,14 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
                             Par série
                         </button>
+                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
+                            Par date
+                        </button>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790587800000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">

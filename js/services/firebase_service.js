@@ -1416,6 +1416,7 @@ export const FirebaseAuthEngine = {
             questionsCorrect,
             themesCorrect,
         );
+        merged.appliedExamIds = Array.from(new Set([...(local.appliedExamIds || []), ...(cloud.appliedExamIds || [])]));
 
         return merged;
     },
@@ -1447,7 +1448,7 @@ export const FirebaseAuthEngine = {
             examMap.set(key, exam);
         });
 
-        // Convert map back to list, sort descending by date (newest first), and limit to 20
+        // Convert map back to list, sort descending by date (newest first) sans limitation à 20
         const mergedExams = Array.from(examMap.values());
         mergedExams.sort((a, b) => {
             const dateA = new Date(a.date).getTime();
@@ -1455,7 +1456,7 @@ export const FirebaseAuthEngine = {
             return dateB - dateA;
         });
 
-        const compactedExams = mergedExams.slice(0, 20).map((exam) => compactExam(exam));
+        const compactedExams = mergedExams.map((exam) => compactExam(exam));
 
         return {
             exams: compactedExams,
