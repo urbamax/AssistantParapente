@@ -1215,6 +1215,7 @@ export const FR = Object.freeze({
             sortByRate: 'Par taux',
             sortByAttempts: 'Par tentatives',
             sortByStreak: 'Par série',
+            sortByDate: 'Par date',
             unknownQuestion: 'Question inconnue',
             course: 'COURS',
             questionLineOne: '{correct}/{total} corrects • {total} tentative • Série en cours : {streak}',

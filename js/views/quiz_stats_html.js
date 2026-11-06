@@ -6,6 +6,7 @@
 import { escapeHTML } from '../core/security.js';
 import { BREVET_CODES } from '../services/brevet_service.js';
 import { masteryRatio } from '../services/mastery.js';
+import { readAnswerLog } from '../services/answer_log.js';
 import { toSorted } from '../utils/array_utils.js';
 import { formatDateOnly } from '../utils/date_utils.js';
 import { truncate } from '../utils/text_utils.js';
@@ -262,11 +263,66 @@ export function buildThemesHtml(view, levelThemes) {
     return { themesHtml, sortControlsHtml };
 }
 
+/**
+ * Calcule l'horodatage (ms) du dernier passage d'une question, en combinant lastSeen,
+ * le journal des réponses récentes et l'historique des examens.
+ * @param {{ lastSeen?: number | string, answers?: any[] } | undefined} data
+ * @param {string} [code]
+ * @param {Map<string, number>} [examDateByCode]
+ * @returns {number} 0 si la question n'a jamais été tentée
+ */
+export function getQuestionLastSeen(data, code, examDateByCode) {
+    if (!data) return 0;
+    let lastSeen = 0;
+    if (typeof data.lastSeen === 'number') {
+        lastSeen = data.lastSeen;
+    } else if (data.lastSeen) {
+        const parsed = Date.parse(data.lastSeen);
+        if (Number.isFinite(parsed)) lastSeen = parsed;
+    }
+    if (Array.isArray(data.answers) && data.answers.length > 0) {
+        const log = readAnswerLog(data.answers);
+        if (log.length > 0) {
+            const lastEntry = log[log.length - 1];
+            if (lastEntry && Number.isInteger(lastEntry[0])) {
+                const answerMs = lastEntry[0] * 86400000;
+                if (answerMs > lastSeen) {
+                    lastSeen = answerMs;
+                }
+            }
+        }
+    }
+    if (code && examDateByCode && examDateByCode.has(code)) {
+        const examMs = examDateByCode.get(code);
+        if (examMs > lastSeen) {
+            lastSeen = examMs;
+        }
+    }
+    return lastSeen;
+}
+
 /** Liste des questions du niveau, filtrée par maîtrise et par thème. */
-export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats }) {
+export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats, examHistory = [] }) {
     // Build individual questions list (FILTERED BY LEVEL)
     let allQuestionsHtml = '';
     // Use levelQuestionEntries computed earlier to show only relevant questions
+
+    const examDateByCode = new Map();
+    if (Array.isArray(examHistory)) {
+        for (const exam of examHistory) {
+            const examTime = exam?.date ? Date.parse(exam.date) : 0;
+            if (!Number.isFinite(examTime) || examTime <= 0) continue;
+            if (Array.isArray(exam.results)) {
+                for (const r of exam.results) {
+                    const code =
+                        r?.code || r?.questionCode || (typeof r?.question === 'object' ? r.question.code : r?.question);
+                    if (code && (!examDateByCode.has(code) || examDateByCode.get(code) < examTime)) {
+                        examDateByCode.set(code, examTime);
+                    }
+                }
+            }
+        }
+    }
 
     if (levelQuestionEntries.length > 0) {
         // Sort by success rate (worst first) immutably using ES2023 toSorted
@@ -359,6 +415,9 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats 
                         <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
                             ${tq('stats.sortByStreak')}
                         </button>
+                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
+                            ${tq('stats.sortByDate')}
+                        </button>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
@@ -393,6 +452,7 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats 
             const pct = Math.round(masteryRatio(data) * 100);
             const qColor = pct >= 90 ? '#4ade80' : pct >= 75 ? '#38bdf8' : pct >= 50 ? '#facc15' : '#f87171';
             const streak = data.streak || 0;
+            const lastSeen = getQuestionLastSeen(data, code, examDateByCode);
 
             // Build answers HTML if available
             let answersHtml = '';
@@ -430,7 +490,7 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats 
             const hasAnswers = qObj && qObj.choices;
 
             allQuestionsHtml += `
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="${code}" data-pct="${pct}" data-total="${data.total}" data-streak="${streak}" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:${hasAnswers ? 'pointer' : 'default'};" ${hasAnswers ? `data-action="QuiztoggleQuestionDetails" data-args="['${code}']"` : ''}>
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="${code}" data-pct="${pct}" data-total="${data.total}" data-streak="${streak}" data-date="${lastSeen}" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:${hasAnswers ? 'pointer' : 'default'};" ${hasAnswers ? `data-action="QuiztoggleQuestionDetails" data-args="['${code}']"` : ''}>
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">

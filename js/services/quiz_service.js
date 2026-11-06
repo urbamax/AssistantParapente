@@ -3,7 +3,14 @@ import { toSorted } from '../utils/array_utils.js';
 import { t } from '../utils/i18n.js';
 import { dueScore, summarizeReviews } from './review_scheduler.js';
 import { masteryRatio, masteryRatioAfterCorrect, pushAttempt } from './mastery.js';
-import { appendAnswer, choiceIndex, flattenAnswerLogs, pickMask, removeLastAnswer } from './answer_log.js';
+import {
+    appendAnswer,
+    choiceIndex,
+    flattenAnswerLogs,
+    pickMask,
+    readAnswerLog,
+    removeLastAnswer,
+} from './answer_log.js';
 import { diagnoseQuestionErrors } from './error_diagnostic.js';
 
 // Tolérance sur la somme des maîtrises (flottants) pour décider que l'objectif est atteint.
@@ -329,6 +336,101 @@ export function recalculateGlobalCounters(stats) {
     stats.totalQuestions = realTotal;
     stats.totalCorrect = realCorrect;
     return stats;
+}
+
+/**
+ * Rétro-intègre les résultats d'un examen passé dans les statistiques du QCM (compteurs de questions,
+ * de thèmes, streaks, recent, lastSeen, choix cochés).
+ *
+ * @param {any} exam
+ * @param {any} stats
+ * @param {(code: string) => any} questionLookup
+ * @returns {boolean} true si les statistiques ont été modifiées
+ */
+export function replayExamToStats(exam, stats, questionLookup) {
+    if (!exam || !Array.isArray(exam.results) || typeof questionLookup !== 'function') return false;
+    const examDateMs = new Date(exam.date).getTime() || Date.now();
+    const examDay = Math.floor(examDateMs / (24 * 60 * 60 * 1000));
+
+    if (!stats.questions) stats.questions = {};
+    if (!stats.themes) stats.themes = {};
+
+    let modified = false;
+
+    for (const r of exam.results) {
+        if (!r) continue;
+        const code = (
+            (r.question && typeof r.question === 'object'
+                ? r.question.code || r.question.id
+                : r.code || r.questionCode || (typeof r.question === 'string' ? r.question : '')) || ''
+        ).trim();
+        if (!code) continue;
+        const question = questionLookup(code) || (r.question && typeof r.question === 'object' ? r.question : null);
+        if (!question) continue;
+
+        const isCorrect = Boolean(r.isCorrect);
+        const theme = question.theme || r.theme;
+
+        if (!stats.questions[code]) {
+            stats.questions[code] = { total: 0, correct: 0, streak: 0 };
+        }
+        const qStat = stats.questions[code];
+
+        const choices = question.choices || [];
+        let selectedOptions = [];
+        if (Array.isArray(r.selected)) {
+            selectedOptions = r.selected
+                .map((s) => {
+                    if (typeof s === 'number' && choices[s]) return choices[s];
+                    if (typeof s === 'object' && s !== null) return s;
+                    if (typeof s === 'string') return choices.find((c) => c.text === s) || { text: s, pts: 0 };
+                    return null;
+                })
+                .filter(Boolean);
+        }
+
+        const mask = pickMask(question, selectedOptions);
+        const existingLog = readAnswerLog(qStat.answers);
+        const alreadyLogged = existingLog.some(([day, m]) => day === examDay && m === mask);
+        if (!alreadyLogged) {
+            recordPicks(qStat, question, selectedOptions);
+        }
+
+        qStat.recent = pushAttempt(qStat, isCorrect);
+        qStat.total = (qStat.total || 0) + 1;
+        if (isCorrect) {
+            qStat.correct = (qStat.correct || 0) + 1;
+        }
+
+        let s = 0;
+        if (Array.isArray(qStat.recent)) {
+            for (let i = qStat.recent.length - 1; i >= 0; i--) {
+                if (qStat.recent[i] === 1) s++;
+                else break;
+            }
+        }
+        qStat.streak = s;
+        if (!qStat.lastSeen || examDateMs > qStat.lastSeen) {
+            qStat.lastSeen = examDateMs;
+        }
+
+        if (theme) {
+            if (!stats.themes[theme]) stats.themes[theme] = { total: 0, correct: 0 };
+            stats.themes[theme].total = (stats.themes[theme].total || 0) + 1;
+            if (isCorrect) {
+                stats.themes[theme].correct = (stats.themes[theme].correct || 0) + 1;
+            }
+        }
+
+        stats.totalQuestions = (stats.totalQuestions || 0) + 1;
+        if (isCorrect) {
+            stats.totalCorrect = (stats.totalCorrect || 0) + 1;
+        }
+
+        modified = true;
+    }
+
+    return modified;
 }
 
 class QuizService {
@@ -938,12 +1040,8 @@ class QuizService {
         const previous = this.state.examResults[this.state.qcmIndex];
         this.state.examResults[this.state.qcmIndex] = resultData;
 
-        if (this.state.qcmConfig.mode !== 'EXAM') {
-            this.updateStats(question, isCorrect, selectedOptions);
-            if (this.state.qcmConfig.mode === 'MASTERY') this.advanceMasteryProgress();
-        } else {
-            this.recordExamPicks(question, selectedOptions, previous);
-        }
+        this.updateStats(question, isCorrect, selectedOptions, previous);
+        if (this.state.qcmConfig.mode === 'MASTERY') this.advanceMasteryProgress();
 
         return resultData;
     }
@@ -1000,19 +1098,13 @@ class QuizService {
         return diagnoseQuestionErrors(original, this.getPersistentStats().questions?.[question.code]);
     }
 
-    // Les choix cochés en examen alimentent le diagnostic des erreurs, mais l'examen ne touche
-    // ni aux compteurs de réussite ni à la révision espacée : seuls `choicePicks` et `answers` sont écrits.
+    // Les choix cochés en examen reçoivent le même traitement qu'en entraînement.
     recordExamPicks(shownQuestion, selected, previous) {
-        // La copie de séance a ses choix mélangés : les index se comptent sur la question d'origine.
         const question = this.getQuestionByCode(shownQuestion.code) || shownQuestion;
-        const stats = this.getPersistentStats();
-        if (!stats.questions) stats.questions = {};
-        if (!stats.questions[question.code]) {
-            stats.questions[question.code] = { total: 0, correct: 0, streak: 0 };
-        }
-        const qStat = stats.questions[question.code];
-        recordPicks(qStat, question, selected, Array.isArray(previous?.selected) ? previous.selected : null);
-        this._persistStats(stats);
+        const pts = (selected || []).reduce((sum, opt) => sum + (Number(opt?.pts) || 0), 0);
+        const maxPts = (question.choices || []).reduce((sum, c) => sum + (c.pts > 0 ? c.pts : 0), 0);
+        const isCorrect = maxPts > 0 && pts === maxPts;
+        this.updateStats(question, isCorrect, selected, previous);
     }
 
     _persistStats(stats) {
@@ -1024,7 +1116,7 @@ class QuizService {
         }
     }
 
-    updateStats(shownQuestion, isCorrect, selected = []) {
+    updateStats(shownQuestion, isCorrect, selected = [], previous = null, timestamp = Date.now()) {
         const question = this.getQuestionByCode(shownQuestion.code) || shownQuestion;
         const stats = this.getPersistentStats();
         if (!stats.questions) stats.questions = {};
@@ -1035,24 +1127,54 @@ class QuizService {
             stats.questions[question.code] = { total: 0, correct: 0, streak: 0 };
         }
         const qStat = stats.questions[question.code];
-        recordPicks(qStat, question, selected);
-        qStat.recent = pushAttempt(qStat, isCorrect);
-        qStat.total++;
-        if (isCorrect) {
-            qStat.correct++;
-            qStat.streak = (qStat.streak || 0) + 1;
-        } else {
-            qStat.streak = 0;
+
+        if (previous) {
+            qStat.total = Math.max(0, (qStat.total || 0) - 1);
+            if (previous.isCorrect) {
+                qStat.correct = Math.max(0, (qStat.correct || 0) - 1);
+            }
+            if (Array.isArray(qStat.recent) && qStat.recent.length > 0) {
+                qStat.recent.pop();
+            }
+            if (question.theme && stats.themes[question.theme]) {
+                const tStatPrev = stats.themes[question.theme];
+                tStatPrev.total = Math.max(0, (tStatPrev.total || 0) - 1);
+                if (previous.isCorrect) {
+                    tStatPrev.correct = Math.max(0, (tStatPrev.correct || 0) - 1);
+                }
+            }
+            stats.totalQuestions = Math.max(0, (stats.totalQuestions || 0) - 1);
+            if (previous.isCorrect) {
+                stats.totalCorrect = Math.max(0, (stats.totalCorrect || 0) - 1);
+            }
         }
-        qStat.lastSeen = Date.now();
+
+        recordPicks(qStat, question, selected, Array.isArray(previous?.selected) ? previous.selected : null);
+        qStat.recent = pushAttempt(qStat, isCorrect);
+        qStat.total = (qStat.total || 0) + 1;
+        if (isCorrect) {
+            qStat.correct = (qStat.correct || 0) + 1;
+        }
+
+        let s = 0;
+        if (Array.isArray(qStat.recent)) {
+            for (let i = qStat.recent.length - 1; i >= 0; i--) {
+                if (qStat.recent[i] === 1) s++;
+                else break;
+            }
+        }
+        qStat.streak = s;
+        qStat.lastSeen = timestamp;
 
         // Theme specific stats
-        if (!stats.themes[question.theme]) {
-            stats.themes[question.theme] = { total: 0, correct: 0 };
+        if (question.theme) {
+            if (!stats.themes[question.theme]) {
+                stats.themes[question.theme] = { total: 0, correct: 0 };
+            }
+            const tStat = stats.themes[question.theme];
+            tStat.total = (tStat.total || 0) + 1;
+            if (isCorrect) tStat.correct = (tStat.correct || 0) + 1;
         }
-        const tStat = stats.themes[question.theme];
-        tStat.total++;
-        if (isCorrect) tStat.correct++;
 
         // Global counters
         stats.totalQuestions = (stats.totalQuestions || 0) + 1;
@@ -1112,8 +1234,9 @@ class QuizService {
                 ? this.state.qcmSessionData.length
                 : results.length;
 
+        const examId = 'exam_' + Date.now();
         history.unshift({
-            id: 'exam_' + Date.now(),
+            id: examId,
             date: new Date().toISOString(),
             level: level,
             score: earnedPoints,
@@ -1125,16 +1248,23 @@ class QuizService {
             questionsCorrect,
             questionsTotal,
             results: this.compactExamResults(results),
+            appliedToStats: true,
         });
 
-        // Garder que les 20 derniers
-        if (history.length > 20) history.pop();
+        // Conserve tous les examens sans limite (pas de limitation à 20)
 
         const raw = StorageService.get(StorageService.KEYS.EXAM_HISTORY, { exams: [] });
         const deletedExamIds =
             raw && typeof raw === 'object' && Array.isArray(raw.deletedExamIds) ? raw.deletedExamIds : [];
         StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: history, deletedExamIds });
         this.state.invalidated = false;
+
+        const stats = this.getPersistentStats();
+        if (!Array.isArray(stats.appliedExamIds)) stats.appliedExamIds = [];
+        if (!stats.appliedExamIds.includes(examId)) {
+            stats.appliedExamIds.push(examId);
+            this._persistStats(stats);
+        }
 
         // Synchronisation vers Firebase si disponible
         if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
@@ -1153,7 +1283,8 @@ class QuizService {
             exams = h.filter((e) => e && typeof e === 'object' && e.date);
         }
 
-        // Migration automatique des historiques d'examens volumineux et migration vers le barème en points FFVL
+        // Migration automatique des historiques d'examens volumineux, migration vers le barème en points FFVL,
+        // et rétroaction des examens passés dans les statistiques générales.
         let needsMigration = false;
         const hasQuestions = this.questions && this.questions.length > 0;
         const migrated = exams.map((exam) => {
@@ -1168,6 +1299,37 @@ class QuizService {
             }
             return updated;
         });
+
+        if (hasQuestions) {
+            const stats = this.getPersistentStats();
+            if (!Array.isArray(stats.appliedExamIds)) stats.appliedExamIds = [];
+            const appliedSet = new Set(stats.appliedExamIds);
+
+            const unapplied = migrated.filter((e) => {
+                const id = e.id || e.date;
+                return !e.appliedToStats && !appliedSet.has(id);
+            });
+
+            if (unapplied.length > 0) {
+                unapplied.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+                let statsChanged = false;
+                for (const exam of unapplied) {
+                    const ok = replayExamToStats(exam, stats, (code) => this.getQuestionByCode(code));
+                    if (ok) {
+                        statsChanged = true;
+                    }
+                    exam.appliedToStats = true;
+                    const id = exam.id || exam.date;
+                    appliedSet.add(id);
+                    stats.appliedExamIds.push(id);
+                    needsMigration = true;
+                }
+                if (statsChanged) {
+                    recalculateGlobalCounters(stats);
+                    this._persistStats(stats);
+                }
+            }
+        }
 
         if (needsMigration && hasQuestions) {
             const deletedExamIds =

@@ -302,19 +302,79 @@ describe('QuizService - Choix cochés (choicePicks)', () => {
         expect(stored().total).toBe(2);
     });
 
-    it('compte aussi les choix en examen, sans toucher aux compteurs de réussite', () => {
+    it('traite les réponses en examen exactement comme en entraînement (compteurs et choix)', () => {
         const q = makeQuestion();
         answer('EXAM', q, [1, 2]);
-        expect(stored()).toMatchObject({ choicePicks: [0, 1, 1], total: 0, correct: 0, streak: 0 });
-        expect(StorageService.get(StorageService.KEYS.QCM_STATS).totalQuestions || 0).toBe(0);
+        expect(stored()).toMatchObject({ choicePicks: [0, 1, 1], total: 1, correct: 0, streak: 0 });
+        expect(StorageService.get(StorageService.KEYS.QCM_STATS).totalQuestions).toBe(1);
     });
 
     it('remplace la réponse précédente quand on corrige en examen', () => {
         const q = makeQuestion();
         answer('EXAM', q, [1]);
-        answer('EXAM', q, [0]);
-        expect(stored().choicePicks).toEqual([1, 0, 0]);
-        expect(readAnswerLog(stored().answers).map((e) => e[1])).toEqual([0b001]);
+        answer('EXAM', q, [0, 2]);
+        expect(stored().choicePicks).toEqual([1, 0, 1]);
+        expect(stored().total).toBe(1);
+        expect(stored().correct).toBe(1);
+        expect(readAnswerLog(stored().answers).map((e) => e[1])).toEqual([0b101]);
+    });
+
+    it('rétro-intègre les examens passés dans les statistiques générales sans doubler', () => {
+        const q = makeQuestion();
+        QuizService.setQuestions([q]);
+        StorageService.set(StorageService.KEYS.QCM_STATS, { themes: {}, questions: {} });
+        StorageService.set(StorageService.KEYS.EXAM_HISTORY, {
+            exams: [
+                {
+                    id: 'past_exam_1',
+                    date: '2026-10-01T12:00:00.000Z',
+                    level: 'BI',
+                    score: 6,
+                    total: 6,
+                    results: [{ code: 'P1V', isCorrect: true, selected: [0] }],
+                },
+            ],
+        });
+
+        const history = QuizService.getExamHistory();
+        expect(history[0].appliedToStats).toBe(true);
+
+        const stats = StorageService.get(StorageService.KEYS.QCM_STATS);
+        expect(stats.questions.P1V.total).toBe(1);
+        expect(stats.questions.P1V.correct).toBe(1);
+        expect(stats.totalQuestions).toBe(1);
+        expect(stats.totalCorrect).toBe(1);
+
+        // Deuxième appel : ne doit pas doubler les compteurs
+        QuizService.getExamHistory();
+        const statsAgain = StorageService.get(StorageService.KEYS.QCM_STATS);
+        expect(statsAgain.questions.P1V.total).toBe(1);
+        expect(statsAgain.questions.P1V.correct).toBe(1);
+        expect(statsAgain.totalQuestions).toBe(1);
+        QuizService.setQuestions([]);
+    });
+
+    it("ne limite plus l'historique des examens à 20", () => {
+        const q = makeQuestion();
+        QuizService.setQuestions([q]);
+        const manyExams = Array.from({ length: 25 }, (_, i) => ({
+            id: `exam_${i}`,
+            date: new Date(Date.now() - (i + 1) * 1000).toISOString(),
+            level: 'BI',
+            score: 6,
+            total: 6,
+            results: [{ code: 'P1V', isCorrect: true, selected: [0] }],
+            appliedToStats: true,
+        }));
+        StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: manyExams });
+
+        QuizService.state.examResults = [{ question: q, selected: [q.choices[0]], isCorrect: true }];
+        QuizService.state.examSaved = false;
+        QuizService.saveExamHistory('BI');
+
+        const saved = StorageService.get(StorageService.KEYS.EXAM_HISTORY);
+        expect(saved.exams.length).toBe(26);
+        QuizService.setQuestions([]);
     });
 
     it('journalise chaque réponse avec son masque, en entraînement comme en examen', () => {
