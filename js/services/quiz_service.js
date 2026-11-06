@@ -4,7 +4,6 @@ import { parseDateToMs } from '../utils/date_utils.js';
 import { t } from '../utils/i18n.js';
 import { dueScore, summarizeReviews } from './review_scheduler.js';
 import { masteryRatio, masteryRatioAfterCorrect, pushAttempt } from './mastery.js';
-import { healQcmStats } from './stats_corrections.js';
 import {
     appendAnswer,
     choiceIndex,
@@ -1083,10 +1082,15 @@ class QuizService {
             return { totalQuestions: 0, totalCorrect: 0, themes: {}, questions: {} };
         const prevTotal = s.totalQuestions;
         const prevCorrect = s.totalCorrect;
-        const healed = healQcmStats(s);
         recalculateGlobalCounters(s);
         const flattened = flattenAnswerLogs(s);
-        if (healed || flattened || s.totalQuestions !== prevTotal || s.totalCorrect !== prevCorrect) {
+        let cleanedLegacyKeys = false;
+        if ('appliedCorrections' in s || 'corrections' in s) {
+            delete s.appliedCorrections;
+            delete s.corrections;
+            cleanedLegacyKeys = true;
+        }
+        if (flattened || cleanedLegacyKeys || s.totalQuestions !== prevTotal || s.totalCorrect !== prevCorrect) {
             StorageService.set(StorageService.KEYS.QCM_STATS, s);
             if (typeof window !== 'undefined' && window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
                 window.FirebaseAuthEngine.saveStatsToCloud();
