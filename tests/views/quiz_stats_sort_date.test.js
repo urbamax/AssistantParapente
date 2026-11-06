@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import QuizView from '../../js/views/quiz.js';
+import StorageService from '../../js/services/storage.js';
 import { getQuestionLastSeen, buildQuestionsHtml } from '../../js/views/quiz_stats_html.js';
 import { encodeAnswerLog } from '../../js/services/answer_log.js';
 
@@ -160,6 +161,36 @@ describe('Quiz Stats - Chronological question sorting (Par date)', () => {
             QuizView.sortQuestions('date');
             expect(attemptsBtn.innerHTML).not.toContain('ri-arrow');
             expect(document.getElementById('sort-date-btn').innerHTML).toContain('ri-arrow-down-line');
+        });
+
+        it('persists selected sort to StorageService so it does not reset', () => {
+            QuizView.sortQuestions('date');
+            expect(StorageService.get('parapente_quiz_question_sort')).toBe('date');
+            expect(StorageService.get('parapente_quiz_question_sort_dir')).toBe('desc');
+            expect(StorageService.get('parapente_quiz_question_sort_explicit')).toBe(true);
+        });
+
+        it('buildQuestionsHtml respects view.state.questionSort and renders arrow on re-render', () => {
+            QuizView.state.questionSort = 'date';
+            QuizView.state.questionSortDir = 'desc';
+            QuizView.state.questionSortExplicit = true;
+
+            const html = buildQuestionsHtml(QuizView, {
+                levelQs: [{ code: 'Q1' }, { code: 'Q2' }],
+                levelQuestionEntries: [
+                    ['Q1', { total: 1, correct: 1, lastSeen: '2026-09-01T10:00:00Z' }],
+                    ['Q2', { total: 1, correct: 1, lastSeen: '2026-09-10T10:00:00Z' }],
+                ],
+                stats: { questions: {} },
+            });
+
+            // Date button has arrow and active background
+            expect(html).toContain('id="sort-date-btn"');
+            expect(html).toContain('ri-arrow-down-line');
+            // Q2 (newer) comes before Q1 (older)
+            const posQ1 = html.indexOf('data-code="Q1"');
+            const posQ2 = html.indexOf('data-code="Q2"');
+            expect(posQ2).toBeLessThan(posQ1);
         });
     });
 });

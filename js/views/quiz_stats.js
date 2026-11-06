@@ -674,6 +674,12 @@ export class QuizStatsBase extends BaseView {
             // Default directions: Rate -> ASC (worst first), Attempts -> DESC (most first)
             this.state.questionSortDir = sortBy === 'rate' ? 'asc' : 'desc';
         }
+        this.state.questionSortExplicit = true;
+        try {
+            StorageService.set('parapente_quiz_question_sort', this.state.questionSort);
+            StorageService.set('parapente_quiz_question_sort_dir', this.state.questionSortDir);
+            StorageService.set('parapente_quiz_question_sort_explicit', true);
+        } catch {}
 
         const dir = this.state.questionSortDir;
         const items = Array.from(/** @type {NodeListOf<HTMLElement>} */ (list.querySelectorAll('.question-stat-item')));
@@ -785,6 +791,10 @@ export class QuizStatsBase extends BaseView {
             this.state.themeSortDir = 'desc'; // Default to desc for new sort
             if (sortType === 'alpha') this.state.themeSortDir = 'asc'; // Default asc for alpha
         }
+        try {
+            StorageService.set('parapente_quiz_theme_sort', this.state.themeSort);
+            StorageService.set('parapente_quiz_theme_sort_dir', this.state.themeSortDir);
+        } catch {}
         this.renderStats();
     }
 

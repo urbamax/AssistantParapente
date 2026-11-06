@@ -855,33 +855,26 @@ export const FirebaseAuthEngine = {
 
             await setDoc(prefsDocRef, finalPrefs);
 
-            // Refresh UI if quiz stats are currently visible.
-            // NB : ces trois blocs référençaient auparavant les anciens globals
-            // QuizEngine/SitesEngine/LogbookEngine, qui n'existent plus depuis le passage à
-            // l'architecture services/vues (js/core/main.js) — ce rafraîchissement post-sync
-            // ne faisait donc plus jamais rien. Corrigé en important directement les modules
-            // (SitesService/LogbookService/QuizView).
-            // Les statistiques ne se rafraîchissent que si l'écran a déjà été chargé (sinon rien n'est affiché).
-            AppRouter.getView('STATS')?.renderStats?.();
-
-            // Refresh sites list so that limits, favorites and locations are re-applied
+            // Maintien des données en mémoire des services (sans effet sur le DOM)
             SitesService.loadUserPreferences();
-            SitesService.renderList();
-
-            // Refresh logbook (flights + equipment) and re-render whichever tab is open.
-            // On ne touche pas à l'onglet "add" : c'est un formulaire (vol ou gonflage), pas
-            // une vue de données, et le re-render effacerait une saisie/modification en cours.
-            // On attend whenReady() avant de rendre : sinon le rendu peut avoir lieu avant la
-            // réhydratation de rawIgc depuis IndexedDB, cachant à tort le bouton "Voir la trace"
-            // d'un vol dont la trace n'est stockée que là (cf. LogbookService.getFlightTrace()).
-            // Rien de changé (cas le plus courant de la synchro toutes les 30 s) : pas de nouveau
-            // rendu, qui refermait les traces et les encarts ouverts par le pilote.
-            const shownBefore = LogbookService.dataSignature();
             LogbookService.loadData();
             await LogbookService.whenReady();
-            const logbookView = AppRouter.getView('LOGBOOK');
-            if (logbookView && logbookView.currentTab !== 'add' && LogbookService.dataSignature() !== shownBefore) {
-                logbookView.switchTab(logbookView.currentTab);
+
+            // AUCUN rafraîchissement automatique de vue en tâche de fond (silent = true) :
+            // l'utilisateur ne doit jamais voir son écran ou ses listes se réinitialiser
+            // sans action explicite de sa part. Les vues se mettent à jour lors des navigations.
+            if (!silent) {
+                const activeMode = GlobalState ? GlobalState.get('mode') : null;
+                if (activeMode === 'STATS') {
+                    AppRouter.getView('STATS')?.renderStats?.();
+                } else if (activeMode === 'SITES') {
+                    SitesService.renderList();
+                } else if (activeMode === 'LOGBOOK') {
+                    const logbookView = AppRouter.getView('LOGBOOK');
+                    if (logbookView && logbookView.currentTab !== 'add') {
+                        logbookView.switchTab(logbookView.currentTab);
+                    }
+                }
             }
 
             console.log('Sync complete!');

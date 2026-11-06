@@ -2,6 +2,7 @@ import GlobalState from '../core/app_state.js';
 import AppRouter from '../core/router.js';
 import QuizService from '../services/quiz_service.js';
 import BrevetService from '../services/brevet_service.js';
+import StorageService from '../services/storage.js';
 import { escapeHTML } from '../core/security.js';
 import { formatDateOnly } from '../utils/date_utils.js';
 import AppEvents from '../core/events.js';
@@ -40,10 +41,11 @@ class QuizViewClass extends QuizVoiceBase {
         this.state = {
             masteryFilter: 'ALL',
             themeFilter: null,
-            themeSort: 'alpha',
-            themeSortDir: 'asc',
-            questionSort: 'rate',
-            questionSortDir: 'asc',
+            themeSort: StorageService.get('parapente_quiz_theme_sort', 'alpha'),
+            themeSortDir: StorageService.get('parapente_quiz_theme_sort_dir', 'asc'),
+            questionSort: StorageService.get('parapente_quiz_question_sort', 'rate'),
+            questionSortDir: StorageService.get('parapente_quiz_question_sort_dir', 'asc'),
+            questionSortExplicit: StorageService.get('parapente_quiz_question_sort_explicit', false),
         };
 
         Object.assign(this, {

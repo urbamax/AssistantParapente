@@ -319,18 +319,11 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
     }
 
     if (levelQuestionEntries.length > 0) {
-        // Sort by success rate (worst first) immutably using ES2023 toSorted
-        const sortedQuestions = toSorted(levelQuestionEntries, (a, b) => {
-            const pctA = masteryRatio(a[1]);
-            const pctB = masteryRatio(b[1]);
-            return pctA - pctB;
-        });
-
         // --- FILTERING LOGIC ---
         let visibleQuestions = [];
 
         if (view.state.masteryFilter === 'ALL') {
-            visibleQuestions = sortedQuestions;
+            visibleQuestions = levelQuestionEntries;
         } else if (view.state.masteryFilter === 'NOT_ATTEMPTED') {
             // Determine unattempted questions
             // levelQs contains ALL valid questions for this level (excluding Delta)
@@ -342,7 +335,7 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
                 }
             });
         } else {
-            visibleQuestions = sortedQuestions.filter(([, data]) => {
+            visibleQuestions = levelQuestionEntries.filter(([, data]) => {
                 const pct = Math.round(masteryRatio(data) * 100);
                 if (view.state.masteryFilter === 'PERFECT') return pct === 100;
                 if (view.state.masteryFilter === 'EXCELLENT') return pct >= 90 && pct < 100;
@@ -392,6 +385,41 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
             });
         }
 
+        const sortKey = view.state.questionSort || 'rate';
+        const sortDir = view.state.questionSortDir || (sortKey === 'rate' ? 'asc' : 'desc');
+
+        visibleQuestions = toSorted(visibleQuestions, (a, b) => {
+            let valA, valB;
+            if (sortKey === 'rate') {
+                valA = Math.round(masteryRatio(a[1]) * 100);
+                valB = Math.round(masteryRatio(b[1]) * 100);
+            } else if (sortKey === 'streak') {
+                valA = a[1].streak || 0;
+                valB = b[1].streak || 0;
+            } else if (sortKey === 'date') {
+                valA = getQuestionLastSeen(a[1], a[0], examDateByCode);
+                valB = getQuestionLastSeen(b[1], b[0], examDateByCode);
+
+                if (valA === 0 && valB === 0) return 0;
+                if (valA === 0) return 1;
+                if (valB === 0) return -1;
+
+                return sortDir === 'asc' ? valA - valB : valB - valA;
+            } else {
+                valA = a[1].total || 0;
+                valB = b[1].total || 0;
+            }
+
+            if (sortDir === 'asc') return valA - valB;
+            return valB - valA;
+        });
+
+        const getSortArrow = (type) => {
+            if (!view.state.questionSortExplicit || sortKey !== type) return '';
+            return sortDir === 'asc' ? ' <i class="ri-arrow-up-line"></i>' : ' <i class="ri-arrow-down-line"></i>';
+        };
+        const getSortBtnBg = (type) => (sortKey === type ? 'rgba(255,255,255,0.05)' : 'transparent');
+
         allQuestionsHtml = `
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
@@ -400,17 +428,17 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
                         ${view.state.masteryFilter !== 'ALL' || view.state.themeFilter ? `<a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">${tq('stats.clearFilters')}</a>` : ''}
                     </div>
                     <div style="display:flex; gap:8px;">
-                        <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
-                            ${tq('stats.sortByRate')}
+                        <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:${getSortBtnBg('rate')}; cursor:pointer; font-size:0.8rem;">
+                            ${tq('stats.sortByRate')}${getSortArrow('rate')}
                         </button>
-                        <button data-action="QuizsortQuestions" data-args="['attempts']" id="sort-attempts-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            ${tq('stats.sortByAttempts')}
+                        <button data-action="QuizsortQuestions" data-args="['attempts']" id="sort-attempts-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:${getSortBtnBg('attempts')}; cursor:pointer; font-size:0.8rem;">
+                            ${tq('stats.sortByAttempts')}${getSortArrow('attempts')}
                         </button>
-                        <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            ${tq('stats.sortByStreak')}
+                        <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:${getSortBtnBg('streak')}; cursor:pointer; font-size:0.8rem;">
+                            ${tq('stats.sortByStreak')}${getSortArrow('streak')}
                         </button>
-                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            ${tq('stats.sortByDate')}
+                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:${getSortBtnBg('date')}; cursor:pointer; font-size:0.8rem;">
+                            ${tq('stats.sortByDate')}${getSortArrow('date')}
                         </button>
                     </div>
                 </div>
