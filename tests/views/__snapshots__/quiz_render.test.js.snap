@@ -40,7 +40,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2</span>
+                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -61,7 +62,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2</span>
+                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -82,7 +84,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2</span>
+                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -352,7 +355,12 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             <div class="stats-circle-container" style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom: 32px;">
                 <h2 style="margin:0;">RÉSULTATS</h2>
                 <div style="display:flex; align-items:center; justify-content:center; gap:32px; background:var(--bg-card); padding:24px 32px; border-radius:16px; border:1px solid var(--border-color); box-shadow:0 4px 6px rgba(0,0,0,0.05);">
-                    <div class="stats-circle" style="margin:0;">1/2</div>
+                    
+                <div class="stats-circle" style="margin:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <div style="font-size:1.4rem; font-weight:800; color:var(--text-main); line-height:1.2;">2/4 <span style="font-size:0.95rem; font-weight:600; color:var(--text-secondary);">pts</span></div>
+                    <div style="font-size:0.8rem; color:var(--text-secondary); margin-top:4px;">1/2 questions</div>
+                </div>
+            
                     <div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
                         <div style="font-size:2rem; font-weight:800; color:var(--text-main);">50%</div>
                         <span style="background:rgba(248,113,113,0.1); color:#dc2626; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #f87171;">ÉCHOUÉ</span>
@@ -405,9 +413,14 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             <div class="stats-circle-container" style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom: 32px;">
                 <h2 style="margin:0;">RÉSULTATS</h2>
                 <div style="display:flex; align-items:center; justify-content:center; gap:32px; background:var(--bg-card); padding:24px 32px; border-radius:16px; border:1px solid var(--border-color); box-shadow:0 4px 6px rgba(0,0,0,0.05);">
-                    <div class="stats-circle" style="margin:0;">2/2</div>
+                    
+                <div class="stats-circle" style="margin:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <div style="font-size:1.4rem; font-weight:800; color:var(--text-main); line-height:1.2;">0/4 <span style="font-size:0.95rem; font-weight:600; color:var(--text-secondary);">pts</span></div>
+                    <div style="font-size:0.8rem; color:var(--text-secondary); margin-top:4px;">2/2 questions</div>
+                </div>
+            
                     <div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
-                        <div style="font-size:2rem; font-weight:800; color:var(--text-main);">100%</div>
+                        <div style="font-size:2rem; font-weight:800; color:var(--text-main);">0%</div>
                         <span style="background:rgba(248,113,113,0.1); color:#f87171; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #f87171;">INVALIDÉ</span>
                     </div>
                 </div>
@@ -434,7 +447,12 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             <div class="stats-circle-container" style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom: 32px;">
                 <h2 style="margin:0;">RÉSULTATS</h2>
                 <div style="display:flex; align-items:center; justify-content:center; gap:32px; background:var(--bg-card); padding:24px 32px; border-radius:16px; border:1px solid var(--border-color); box-shadow:0 4px 6px rgba(0,0,0,0.05);">
-                    <div class="stats-circle" style="margin:0;">2/2</div>
+                    
+                <div class="stats-circle" style="margin:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <div style="font-size:1.4rem; font-weight:800; color:var(--text-main); line-height:1.2;">4/4 <span style="font-size:0.95rem; font-weight:600; color:var(--text-secondary);">pts</span></div>
+                    <div style="font-size:0.8rem; color:var(--text-secondary); margin-top:4px;">2/2 questions</div>
+                </div>
+            
                     <div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
                         <div style="font-size:2rem; font-weight:800; color:var(--text-main);">100%</div>
                         <span style="background:rgba(74,222,128,0.1); color:#16a34a; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #4ade80;">RÉUSSI</span>
@@ -1215,7 +1233,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2</span>
+                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -1287,7 +1306,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2</span>
+                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -1682,7 +1702,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2</span>
+                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -1754,7 +1775,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2</span>
+                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -2028,7 +2050,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2</span>
+                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -2100,7 +2123,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2</span>
+                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -2411,7 +2435,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2</span>
+                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -2483,7 +2508,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2</span>
+                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -2757,7 +2783,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2</span>
+                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -2829,7 +2856,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2</span>
+                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -3145,7 +3173,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2</span>
+                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -3217,7 +3246,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2</span>
+                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -3491,7 +3521,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2</span>
+                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -3563,7 +3594,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2</span>
+                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -3921,7 +3953,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2</span>
+                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -3993,7 +4026,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2</span>
+                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -4267,7 +4301,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2</span>
+                    <span style="color:#facc15; font-weight:700; font-size:1.1rem;">1/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">
@@ -4339,7 +4374,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2</span>
+                    <span style="color:#f87171; font-weight:700; font-size:1.1rem;">2/2 pts</span>
+                    
                 </div>
             </div>
             <div style="text-align:right;">

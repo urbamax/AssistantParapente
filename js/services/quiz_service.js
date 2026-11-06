@@ -9,6 +9,74 @@ import { diagnoseQuestionErrors } from './error_diagnostic.js';
 // Tolérance sur la somme des maîtrises (flottants) pour décider que l'objectif est atteint.
 const MASTERY_EPSILON = 1e-9;
 
+// Distribution officielle FFVL des thèmes par bloc de 10 questions (source : qcm.ffvl.fr / jruffet/qcmffvl) :
+// - 10% Matériel (1/10)
+// - 20% Mécavol (2/10)
+// - 20% Pilotage (2/10)
+// - 10% Réglementation (1/10)
+// - 20% Météo (2/10)
+// - 10% Facteurs humains (1/10)
+// - 10% Milieu naturel (1/10)
+export const FFVL_THEME_DISTRIBUTION = Object.freeze([
+    'Matériel',
+    'Mécavol',
+    'Mécavol',
+    'Pilotage',
+    'Pilotage',
+    'Réglementation',
+    'Météo',
+    'Météo',
+    'Facteurs humains',
+    'Milieu naturel',
+]);
+
+// Quotas officiels des examens théoriques fédéraux FFVL :
+// - Brevet Initial (BI) : 30 questions (3 blocs de 10)
+// - Brevet de Pilote (BP) : 60 questions (6 blocs de 10)
+// - Brevet de Pilote Confirmé (BPC) : 30 questions QCM (3 blocs de 10)
+export const FFVL_EXAM_QUOTAS = Object.freeze({
+    BI: Object.freeze({
+        total: 30,
+        themes: Object.freeze({
+            Matériel: 3,
+            Mécavol: 6,
+            Pilotage: 6,
+            Réglementation: 3,
+            Météo: 6,
+            'Facteurs humains': 3,
+            'Milieu naturel': 3,
+        }),
+    }),
+    BP: Object.freeze({
+        total: 60,
+        themes: Object.freeze({
+            Matériel: 6,
+            Mécavol: 12,
+            Pilotage: 12,
+            Réglementation: 6,
+            Météo: 12,
+            'Facteurs humains': 6,
+            'Milieu naturel': 6,
+        }),
+    }),
+    BPC: Object.freeze({
+        total: 30,
+        themes: Object.freeze({
+            Matériel: 3,
+            Mécavol: 6,
+            Pilotage: 6,
+            Réglementation: 3,
+            Météo: 6,
+            'Facteurs humains': 3,
+            'Milieu naturel': 3,
+        }),
+    }),
+});
+
+export function getExamQuotas(level = 'BI') {
+    return FFVL_EXAM_QUOTAS[level] || FFVL_EXAM_QUOTAS.BI;
+}
+
 // Compte, pour une question, combien de fois chaque choix a été coché (index = position dans les
 // choix d'origine du CSV, voir `choiceIndex`). `sign` à -1 retire une réponse déjà comptée (examen :
 // réponse modifiée). Tableau plat d'entiers : sérialisable par Firestore et simple à fusionner.
@@ -83,7 +151,7 @@ export function compactExamResult(r, questionLookup) {
 export function compactExam(exam, questionLookup) {
     if (!exam || typeof exam !== 'object') return exam;
     const results = Array.isArray(exam.results) ? exam.results.map((r) => compactExamResult(r, questionLookup)) : [];
-    return {
+    const base = {
         id: exam.id,
         date: exam.date,
         level: exam.level,
@@ -93,6 +161,143 @@ export function compactExam(exam, questionLookup) {
         passed: exam.passed !== undefined ? exam.passed : false,
         invalidated: Boolean(exam.invalidated),
         results,
+    };
+    if (exam.scoreMode) base.scoreMode = exam.scoreMode;
+    if (exam.questionsCorrect !== undefined) base.questionsCorrect = exam.questionsCorrect;
+    if (exam.questionsTotal !== undefined) base.questionsTotal = exam.questionsTotal;
+    return base;
+}
+
+/**
+ * Calcule les points et le pourcentage officiel FFVL pour un examen.
+ * Barème FFVL :
+ * - Chaque question rapporte jusqu'à son maxScore (généralement 6 pts).
+ * - Les mauvaises réponses entraînent un malus (points négatifs, ex: -6, -3).
+ * - Plancher à 0 par question (la note d'une question ne descend jamais en dessous de 0).
+ * - Seuil officiel de réussite : 75% des points totaux.
+ *
+ * @param {Array} results Tableau des résultats de la session (examResults)
+ * @param {Array} sessionQuestions Questions de la session (qcmSessionData) si disponibles
+ * @param {Function} questionLookup Fonction optionnelle pour retrouver une question par code
+ * @returns {{ earnedPoints: number, totalPoints: number, percentage: number, passed: boolean }}
+ */
+export function calculateExamPoints(results = [], sessionQuestions = [], questionLookup = null) {
+    let earnedPoints = 0;
+    let totalPoints = 0;
+
+    const count = Math.max(
+        Array.isArray(results) ? results.length : 0,
+        Array.isArray(sessionQuestions) ? sessionQuestions.length : 0,
+    );
+
+    for (let i = 0; i < count; i++) {
+        const r = Array.isArray(results) ? results[i] : null;
+        const qFromSession = Array.isArray(sessionQuestions) ? sessionQuestions[i] : null;
+        const code =
+            r?.code ||
+            r?.questionCode ||
+            (r?.question && (r.question.code || r.question.id)) ||
+            qFromSession?.code ||
+            '';
+        const q =
+            (r?.question && typeof r.question === 'object' ? r.question : null) ||
+            qFromSession ||
+            (typeof questionLookup === 'function' && code ? questionLookup(code) : null);
+
+        let maxPts = 6;
+        let userScore = 0;
+
+        if (q && Array.isArray(q.choices)) {
+            const pos = q.choices.filter((c) => c && c.pts > 0).reduce((sum, c) => sum + c.pts, 0);
+            if (pos > 0) maxPts = pos;
+
+            if (r) {
+                if (typeof r.userPoints === 'number') {
+                    userScore = r.userPoints;
+                } else if (Array.isArray(r.selected)) {
+                    let ptsSum = 0;
+                    q.choices.forEach((choice, choiceIdx) => {
+                        const wasSelected = r.selected.some((s) => {
+                            if (typeof s === 'number') return s === choiceIdx;
+                            if (typeof s === 'string') return s === choice.text;
+                            return Boolean(s && s.text === choice.text);
+                        });
+                        if (wasSelected && typeof choice.pts === 'number') {
+                            ptsSum += choice.pts;
+                        }
+                    });
+                    userScore = ptsSum;
+                } else if (r.isCorrect) {
+                    userScore = maxPts;
+                }
+            }
+        } else {
+            maxPts = typeof r?.maxPoints === 'number' ? r.maxPoints : 6;
+            if (r) {
+                if (typeof r.userPoints === 'number') {
+                    userScore = r.userPoints;
+                } else if (r.isCorrect) {
+                    userScore = maxPts;
+                }
+            }
+        }
+
+        totalPoints += maxPts;
+        earnedPoints += Math.max(0, userScore);
+    }
+
+    const percentage = totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
+    const passed = percentage >= 75;
+
+    return {
+        earnedPoints,
+        totalPoints,
+        percentage,
+        passed,
+    };
+}
+
+/**
+ * Détermine si un ancien examen sauvegardé a besoin d'être migré au format par points.
+ * @param {Object} exam
+ * @returns {boolean}
+ */
+export function needsPointsMigration(exam) {
+    if (!exam || typeof exam !== 'object') return false;
+    if (exam.scoreMode === 'points') return false;
+    return Array.isArray(exam.results) && exam.results.length > 0;
+}
+
+/**
+ * Migre un examen historique au barème officiel de points FFVL.
+ * @param {Object} exam
+ * @param {Function} questionLookup
+ * @returns {Object}
+ */
+export function migrateExamToPoints(exam, questionLookup) {
+    if (!exam || typeof exam !== 'object') return exam;
+    const results = Array.isArray(exam.results) ? exam.results : [];
+    if (results.length === 0) {
+        return {
+            ...exam,
+            scoreMode: 'points',
+        };
+    }
+
+    const pointsData = calculateExamPoints(results, [], questionLookup);
+    const isInvalidated = Boolean(exam.invalidated);
+    const questionsCorrect = results.filter((r) => r && r.isCorrect).length;
+    const questionsTotal = exam.questionsTotal || results.length;
+
+    return {
+        ...exam,
+        score: isInvalidated ? 0 : pointsData.earnedPoints,
+        total: pointsData.totalPoints,
+        percentage: isInvalidated ? 0 : pointsData.percentage,
+        passed: isInvalidated ? false : pointsData.passed,
+        scoreMode: 'points',
+        questionsCorrect,
+        questionsTotal,
     };
 }
 
@@ -190,6 +395,7 @@ class QuizService {
             const questions = this.parseQuestionsCSV(questionsCSV, explications, courseMapping);
 
             this.setQuestions(questions);
+            this.getExamHistory();
             this.state.isLoaded = true;
             return { success: true, data: questions, error: null };
         } catch (err) {
@@ -408,7 +614,7 @@ class QuizService {
 
     setMode(mode) {
         this.state.qcmConfig.mode = mode;
-        // L'examen blanc doit toujours porter sur les 60 questions aléatoires de tous les thèmes :
+        // L'examen blanc doit toujours porter sur tous les thèmes selon la répartition FFVL officielle :
         // on force ce reset ici pour qu'un filtre thématique laissé actif en entraînement ne fuite jamais dans l'examen.
         if (mode === 'EXAM') this.state.qcmConfig.theme = 'ALL';
     }
@@ -557,6 +763,70 @@ class QuizService {
         return summarizeReviews(questions, this.getPersistentStats().questions || {});
     }
 
+    // Sélection d'examen conforme à 100 % aux règles officielles de la FFVL :
+    // - 30 questions pour le BI (Brevet Initial) et le BPC (Brevet de Pilote Confirmé)
+    // - 60 questions pour le BP (Brevet de Pilote)
+    // Répartition officielle FFVL par blocs de 10 questions (catDistrib qcm.ffvl.fr) :
+    // 10% Matériel (1/10), 20% Mécavol (2/10), 20% Pilotage (2/10), 10% Réglementation (1/10),
+    // 20% Météo (2/10), 10% Facteurs humains (1/10), 10% Milieu naturel (1/10).
+    // Chaque bloc de 10 questions est mélangé pour garantir une variété homogène tout au long de l'épreuve.
+    buildExamSelection(level = 'BI', sourceData = null) {
+        const pool = [...(sourceData || this.getLevelQuestions(level))];
+        if (pool.length === 0) return [];
+
+        const targetCount = Math.min(level === 'BP' ? 60 : 30, pool.length);
+        const shuffledPool = this.shuffle(pool);
+        const used = new Set();
+        const distributed = [];
+
+        while (distributed.length < targetCount && used.size < shuffledPool.length) {
+            const currentChunkSize = Math.min(10, targetCount - distributed.length);
+            const currentChunk = [];
+            let chunkRequirementIndex = 0;
+
+            for (let i = 0; i < currentChunkSize; i++) {
+                let found = false;
+
+                // Tente d'attribuer la catégorie selon la grille officielle FFVL, avec bascule circulaire si épuisée
+                for (let attempt = 0; attempt < FFVL_THEME_DISTRIBUTION.length; attempt++) {
+                    const targetIdx = (chunkRequirementIndex + attempt) % FFVL_THEME_DISTRIBUTION.length;
+                    const targetCat = FFVL_THEME_DISTRIBUTION[targetIdx];
+
+                    for (let j = 0; j < shuffledPool.length; j++) {
+                        if (!used.has(j) && shuffledPool[j].theme === targetCat) {
+                            currentChunk.push(shuffledPool[j]);
+                            used.add(j);
+                            chunkRequirementIndex = (targetIdx + 1) % FFVL_THEME_DISTRIBUTION.length;
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) break;
+                }
+
+                // Fallback de sécurité si aucun thème de la distribution n'est disponible (ex: jeu de données réduit)
+                if (!found) {
+                    for (let j = 0; j < shuffledPool.length; j++) {
+                        if (!used.has(j)) {
+                            currentChunk.push(shuffledPool[j]);
+                            used.add(j);
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!found) break;
+            }
+
+            if (currentChunk.length === 0) break;
+            distributed.push(...this.shuffle(currentChunk));
+        }
+
+        return distributed;
+    }
+
     startSession(level = 'BI') {
         if (!this.state.isLoaded) throw new Error('Données QCM non chargées');
 
@@ -595,11 +865,11 @@ class QuizService {
             const stats = this.getPersistentStats();
             const target = this.state.qcmConfig.masteryTarget || 75;
             questions = this.buildMasterySelection(sourceData, stats, target);
+        } else if (this.state.qcmConfig.mode === 'EXAM') {
+            questions = this.buildExamSelection(level, sourceData);
+            this.state.qcmConfig.count = questions.length;
         } else {
             if (selectedTheme !== 'ALL') sourceData = sourceData.filter((q) => q.theme === selectedTheme);
-            if (this.state.qcmConfig.mode === 'EXAM') {
-                count = level === 'BP' ? 60 : 30;
-            }
             questions = this.shuffle(sourceData).slice(0, count);
         }
 
@@ -779,6 +1049,18 @@ class QuizService {
         this._persistStats(stats);
     }
 
+    calculateExamPoints(results, sessionQuestions) {
+        return calculateExamPoints(results, sessionQuestions, (code) => this.getQuestionByCode(code));
+    }
+
+    needsPointsMigration(exam) {
+        return needsPointsMigration(exam);
+    }
+
+    migrateExamToPoints(exam) {
+        return migrateExamToPoints(exam, (code) => this.getQuestionByCode(code));
+    }
+
     compactExamResult(r) {
         return compactExamResult(r, (code) => this.getQuestionByCode(code));
     }
@@ -802,24 +1084,32 @@ class QuizService {
         if (this.state.examSaved) return;
         this.state.examSaved = true;
         const results = this.state.examResults;
-        const total =
+        const history = this.getExamHistory();
+        const isInvalidated = this.state.invalidated === true;
+
+        const pointsData = this.calculateExamPoints(results, this.state.qcmSessionData);
+        const earnedPoints = isInvalidated ? 0 : pointsData.earnedPoints;
+        const totalPoints = pointsData.totalPoints;
+        const percentage = isInvalidated ? 0 : pointsData.percentage;
+        const passed = isInvalidated ? false : pointsData.passed;
+        const questionsCorrect = results.filter((r) => r && r.isCorrect).length;
+        const questionsTotal =
             this.state.qcmSessionData && this.state.qcmSessionData.length > 0
                 ? this.state.qcmSessionData.length
                 : results.length;
-        const score = results.filter((r) => r.isCorrect).length;
-        const history = this.getExamHistory();
-
-        const isInvalidated = this.state.invalidated === true;
 
         history.unshift({
             id: 'exam_' + Date.now(),
             date: new Date().toISOString(),
             level: level,
-            score: isInvalidated ? 0 : score,
-            total: total,
-            percentage: isInvalidated ? 0 : Math.round((score / total) * 100),
-            passed: isInvalidated ? false : score >= total * 0.75, // 75% pour réussir
+            score: earnedPoints,
+            total: totalPoints,
+            percentage: percentage,
+            passed: passed,
             invalidated: isInvalidated,
+            scoreMode: 'points',
+            questionsCorrect,
+            questionsTotal,
             results: this.compactExamResults(results),
         });
 
@@ -849,26 +1139,32 @@ class QuizService {
             exams = h.filter((e) => e && typeof e === 'object' && e.date);
         }
 
-        // Migration automatique des historiques d'examens volumineux
+        // Migration automatique des historiques d'examens volumineux et migration vers le barème en points FFVL
         let needsMigration = false;
-        const compacted = exams.map((exam) => {
-            if (this.isExamBloated(exam)) {
+        const hasQuestions = this.questions && this.questions.length > 0;
+        const migrated = exams.map((exam) => {
+            let updated = exam;
+            if (this.isExamBloated(updated)) {
                 needsMigration = true;
-                return this.compactExam(exam);
+                updated = this.compactExam(updated);
             }
-            return exam;
+            if (hasQuestions && this.needsPointsMigration(updated)) {
+                needsMigration = true;
+                updated = this.migrateExamToPoints(updated);
+            }
+            return updated;
         });
 
-        if (needsMigration && this.questions && this.questions.length > 0) {
+        if (needsMigration && hasQuestions) {
             const deletedExamIds =
                 h && typeof h === 'object' && Array.isArray(h.deletedExamIds) ? h.deletedExamIds : [];
-            StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: compacted, deletedExamIds });
+            StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: migrated, deletedExamIds });
             if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
                 window.FirebaseAuthEngine.saveHistoryToCloud();
             }
         }
 
-        return compacted;
+        return migrated;
     }
 
     deleteExam(examId) {

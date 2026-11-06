@@ -1247,6 +1247,8 @@ export const FR = Object.freeze({
                 TREUIL: 'Treuil',
             }),
             questionNumber: 'Question {n}',
+            pointsScore: '{score}/{total} pts',
+            questionsCount: '({correct}/{total} questions)',
         }),
         review: Object.freeze({
             title: "Revue de l'examen du {date}",
@@ -1291,6 +1293,9 @@ export const FR = Object.freeze({
             wrong: 'FAUX',
             yourAnswer: 'Votre réponse',
             finish: 'TERMINER',
+            pointsScore: '{points}/{total}',
+            pointsUnit: 'pts',
+            questionsCount: '{correct}/{total} questions',
         }),
         dialogs: Object.freeze({
             examInvalidated:

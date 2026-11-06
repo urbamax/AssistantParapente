@@ -1116,14 +1116,37 @@ class QuizViewClass extends QuizVoiceBase {
         if (modeLabel) modeLabel.innerText = modeTitle;
 
         const results = QuizService.state.examResults;
-        const total =
+        const totalQuestions =
             QuizService.state.qcmSessionData && QuizService.state.qcmSessionData.length > 0
                 ? QuizService.state.qcmSessionData.length
                 : results.length;
-        const score = results.filter((r) => r.isCorrect).length;
-        const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
-        const passed = percentage >= 75;
+        const correctCount = results.filter((r) => r.isCorrect).length;
         const isInvalidated = QuizService.state.invalidated === true;
+
+        let displayScoreHtml;
+        let percentage;
+        let passed;
+
+        if (isExam) {
+            const pointsData = QuizService.calculateExamPoints(results, QuizService.state.qcmSessionData);
+            const earnedPoints = isInvalidated ? 0 : pointsData.earnedPoints;
+            const totalPoints = pointsData.totalPoints;
+            percentage = isInvalidated ? 0 : pointsData.percentage;
+            passed = isInvalidated ? false : pointsData.passed;
+
+            displayScoreHtml = `
+                <div class="stats-circle" style="margin:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <div style="font-size:1.4rem; font-weight:800; color:var(--text-main); line-height:1.2;">${tq('results.pointsScore', { points: earnedPoints, total: totalPoints })} <span style="font-size:0.95rem; font-weight:600; color:var(--text-secondary);">${tq('results.pointsUnit')}</span></div>
+                    <div style="font-size:0.8rem; color:var(--text-secondary); margin-top:4px;">${tq('results.questionsCount', { correct: correctCount, total: totalQuestions })}</div>
+                </div>
+            `;
+        } else {
+            const score = correctCount;
+            const total = totalQuestions;
+            percentage = total > 0 ? Math.round((score / total) * 100) : 0;
+            passed = percentage >= 75;
+            displayScoreHtml = `<div class="stats-circle" style="margin:0;">${score}/${total}</div>`;
+        }
 
         const badgeHtml = isInvalidated
             ? `<span style="background:rgba(248,113,113,0.1); color:#f87171; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #f87171;">${tq('results.invalidated')}</span>`
@@ -1151,7 +1174,7 @@ class QuizViewClass extends QuizVoiceBase {
             <div class="stats-circle-container" style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom: 32px;">
                 <h2 style="margin:0;">${tq('results.title')}</h2>
                 <div style="display:flex; align-items:center; justify-content:center; gap:32px; background:var(--bg-card); padding:24px 32px; border-radius:16px; border:1px solid var(--border-color); box-shadow:0 4px 6px rgba(0,0,0,0.05);">
-                    <div class="stats-circle" style="margin:0;">${score}/${total}</div>
+                    ${displayScoreHtml}
                     <div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
                         <div style="font-size:2rem; font-weight:800; color:var(--text-main);">${percentage}%</div>
                         ${isExam ? badgeHtml : ''}

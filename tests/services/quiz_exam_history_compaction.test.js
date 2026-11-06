@@ -165,8 +165,12 @@ describe('Quiz Exam History Compaction & Migration', () => {
         const saved = StorageService.get(StorageService.KEYS.EXAM_HISTORY);
         expect(saved.exams).toHaveLength(1);
         const exam = saved.exams[0];
-        expect(exam.score).toBe(1);
-        expect(exam.total).toBe(2);
+        expect(exam.score).toBe(6);
+        expect(exam.total).toBe(12);
+        expect(exam.percentage).toBe(50);
+        expect(exam.scoreMode).toBe('points');
+        expect(exam.questionsCorrect).toBe(1);
+        expect(exam.questionsTotal).toBe(2);
         expect(exam.results).toEqual([
             { code: 'E52V', isCorrect: true, selected: [0] },
             { code: 'P10B', isCorrect: false, selected: [1] },
@@ -198,11 +202,45 @@ describe('Quiz Exam History Compaction & Migration', () => {
             isCorrect: true,
             selected: [0],
         });
+        expect(history[0].score).toBe(6);
+        expect(history[0].total).toBe(6);
+        expect(history[0].percentage).toBe(100);
+        expect(history[0].scoreMode).toBe('points');
+        expect(history[0].questionsCorrect).toBe(1);
+        expect(history[0].questionsTotal).toBe(1);
 
         // Verify StorageService was updated in place
         const updatedStorage = StorageService.get(StorageService.KEYS.EXAM_HISTORY);
         expect(updatedStorage.exams[0].results[0].question).toBeUndefined();
         expect(updatedStorage.exams[0].results[0].theme).toBeUndefined();
+        expect(updatedStorage.exams[0].score).toBe(6);
+        expect(updatedStorage.exams[0].total).toBe(6);
+        expect(updatedStorage.exams[0].percentage).toBe(100);
+    });
+
+    it('QuizService.getExamHistory migrates legacy exams with question counts to points and points-based percentage', () => {
+        const legacyCompactExam = {
+            id: 'exam_legacy_compact',
+            date: '2026-10-16T10:00:00.000Z',
+            level: 'BI',
+            score: 1,
+            total: 2,
+            percentage: 50,
+            passed: false,
+            results: [
+                { code: 'E52V', isCorrect: true, selected: [0] },
+                { code: 'P10B', isCorrect: false, selected: [1] },
+            ],
+        };
+        StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: [legacyCompactExam] });
+
+        const history = QuizService.getExamHistory();
+        expect(history[0].score).toBe(6);
+        expect(history[0].total).toBe(12);
+        expect(history[0].percentage).toBe(50);
+        expect(history[0].scoreMode).toBe('points');
+        expect(history[0].questionsCorrect).toBe(1);
+        expect(history[0].questionsTotal).toBe(2);
     });
 
     it('FirebaseAuthEngine.mergeExamHistory compacts cloud and local exams and limits to 20', () => {
