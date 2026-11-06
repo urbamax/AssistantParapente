@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import QuizService, { compactExam } from '../../js/services/quiz_service.js';
 import StorageService from '../../js/services/storage.js';
 import { FirebaseAuthEngine } from '../../js/services/firebase_service.js';
+import { STATS_HOTFIXES, healQcmStats } from '../../js/services/stats_corrections.js';
 
 // Un examen ne doit être rejoué qu'une seule fois dans les statistiques, quels que soient les
 // allers-retours de l'historique (compaction, synchro cloud, import, identifiants numériques).
@@ -94,5 +95,68 @@ describe('Rétroactivité des examens : jamais de double comptage', () => {
             { questions: {}, themes: {}, appliedExamIds: ['1779271797639'] },
         );
         expect(stats.appliedExamIds).toEqual(['1779271797639']);
+    });
+
+    it("auto-guérit le doublon de l'examen exam_1794000732892 localement et empêche le cloud ou un autre appareil de le réintroduire", () => {
+        const hotfixQuestions = STATS_HOTFIXES[0].questions;
+        const makePollutedStats = () => {
+            const questions = {};
+            const themes = {};
+            let totalQuestions = 0;
+            let totalCorrect = 0;
+            for (const [code, d] of Object.entries(hotfixQuestions)) {
+                questions[code] = {
+                    total: d.minTotal,
+                    correct: d.correct ? d.minTotal - 1 : 1,
+                    streak: d.correct ? 2 : 0,
+                    recent: Array.from({ length: Math.min(d.minTotal, 10) }, () => (d.correct ? 1 : 0)),
+                    lastSeen: 1794000732892,
+                };
+                if (!themes[d.theme]) themes[d.theme] = { total: 0, correct: 0 };
+                themes[d.theme].total += d.minTotal;
+                themes[d.theme].correct += d.correct ? d.minTotal - 1 : 1;
+                totalQuestions += d.minTotal;
+                totalCorrect += d.correct ? d.minTotal - 1 : 1;
+            }
+            return {
+                totalQuestions,
+                totalCorrect,
+                themes,
+                questions,
+                appliedExamIds: ['exam_1794000732892'],
+            };
+        };
+
+        const pollutedLocal = makePollutedStats();
+        const initialTotal = pollutedLocal.totalQuestions;
+        const initialCorrect = pollutedLocal.totalCorrect;
+
+        // 1. Guérison directe : retire exactement les 60 tentatives et 49 bonnes réponses en trop
+        expect(healQcmStats(pollutedLocal)).toBe(true);
+        expect(pollutedLocal.totalQuestions).toBe(initialTotal - 60);
+        expect(pollutedLocal.totalCorrect).toBe(initialCorrect - 49);
+        expect(pollutedLocal.questions.E13B.total).toBe(3);
+        expect(pollutedLocal.questions.S100B.total).toBe(2);
+
+        // 2. Idempotence : un second passage sur une copie déjà saine ne retire plus rien
+        expect(healQcmStats(pollutedLocal)).toBe(false);
+        expect(pollutedLocal.totalQuestions).toBe(initialTotal - 60);
+
+        // 3. Si le cloud (ou un second appareil) possède encore la version polluée sans appliedCorrections,
+        // mergeQcmStats guérit le cloud AVANT Math.max : le doublon ne revient jamais.
+        const stillPollutedCloud = makePollutedStats();
+        const merged = FirebaseAuthEngine.mergeQcmStats(pollutedLocal, stillPollutedCloud);
+        expect(merged.totalQuestions).toBe(initialTotal - 60);
+        expect(merged.totalCorrect).toBe(initialCorrect - 49);
+        expect(merged.questions.E13B.total).toBe(3);
+        expect(merged.questions.S100B.total).toBe(2);
+        expect(merged.appliedCorrections).toContain('exam-double-replay:exam_1794000732892');
+
+        // 4. getPersistentStats() auto-guérit directement le localStorage au premier accès
+        StorageService.set(StorageService.KEYS.QCM_STATS, makePollutedStats());
+        const fromStorage = QuizService.getPersistentStats();
+        expect(fromStorage.totalQuestions).toBe(initialTotal - 60);
+        expect(fromStorage.totalCorrect).toBe(initialCorrect - 49);
+        expect(StorageService.get(StorageService.KEYS.QCM_STATS).totalQuestions).toBe(initialTotal - 60);
     });
 });
