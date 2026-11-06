@@ -1,5 +1,6 @@
 import StorageService from './storage.js';
 import { toSorted } from '../utils/array_utils.js';
+import { parseDateToMs } from '../utils/date_utils.js';
 import { t } from '../utils/i18n.js';
 import { dueScore, summarizeReviews } from './review_scheduler.js';
 import { masteryRatio, masteryRatioAfterCorrect, pushAttempt } from './mastery.js';
@@ -349,7 +350,7 @@ export function recalculateGlobalCounters(stats) {
  */
 export function replayExamToStats(exam, stats, questionLookup) {
     if (!exam || !Array.isArray(exam.results) || typeof questionLookup !== 'function') return false;
-    const examDateMs = new Date(exam.date).getTime() || Date.now();
+    const examDateMs = parseDateToMs(exam.date) || Date.now();
     const examDay = Math.floor(examDateMs / (24 * 60 * 60 * 1000));
 
     if (!stats.questions) stats.questions = {};
@@ -1311,7 +1312,7 @@ class QuizService {
             });
 
             if (unapplied.length > 0) {
-                unapplied.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+                unapplied.sort((a, b) => parseDateToMs(a.date) - parseDateToMs(b.date));
                 let statsChanged = false;
                 for (const exam of unapplied) {
                     const ok = replayExamToStats(exam, stats, (code) => this.getQuestionByCode(code));

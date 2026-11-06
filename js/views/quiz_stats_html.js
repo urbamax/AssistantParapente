@@ -8,7 +8,7 @@ import { BREVET_CODES } from '../services/brevet_service.js';
 import { masteryRatio } from '../services/mastery.js';
 import { readAnswerLog } from '../services/answer_log.js';
 import { toSorted } from '../utils/array_utils.js';
-import { formatDateOnly } from '../utils/date_utils.js';
+import { formatDateOnly, parseDateToMs } from '../utils/date_utils.js';
 import { truncate } from '../utils/text_utils.js';
 import { tq, tqh, tql } from './quiz_strings.js';
 import { explanationHtml } from './quiz_explanation.js';
@@ -273,13 +273,7 @@ export function buildThemesHtml(view, levelThemes) {
  */
 export function getQuestionLastSeen(data, code, examDateByCode) {
     if (!data) return 0;
-    let lastSeen = 0;
-    if (typeof data.lastSeen === 'number') {
-        lastSeen = data.lastSeen;
-    } else if (data.lastSeen) {
-        const parsed = Date.parse(data.lastSeen);
-        if (Number.isFinite(parsed)) lastSeen = parsed;
-    }
+    let lastSeen = parseDateToMs(data.lastSeen);
     if (Array.isArray(data.answers) && data.answers.length > 0) {
         const log = readAnswerLog(data.answers);
         if (log.length > 0) {
@@ -310,8 +304,8 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
     const examDateByCode = new Map();
     if (Array.isArray(examHistory)) {
         for (const exam of examHistory) {
-            const examTime = exam?.date ? Date.parse(exam.date) : 0;
-            if (!Number.isFinite(examTime) || examTime <= 0) continue;
+            const examTime = parseDateToMs(exam?.date);
+            if (examTime <= 0) continue;
             if (Array.isArray(exam.results)) {
                 for (const r of exam.results) {
                     const code =

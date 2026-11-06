@@ -1392,7 +1392,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         </div>
                     </div>
                 
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="10" data-total="4" data-streak="0" data-date="1790580600000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="10" data-total="4" data-streak="0" data-date="1790587800000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -1434,7 +1434,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         </div>
                     </div>
                 
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790580600000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790587800000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -3661,7 +3661,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="10" data-total="4" data-streak="0" data-date="1790580600000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="10" data-total="4" data-streak="0" data-date="1790587800000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -3703,7 +3703,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         </div>
                     </div>
                 
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790580600000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790587800000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
@@ -4447,7 +4447,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790580600000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790587800000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">

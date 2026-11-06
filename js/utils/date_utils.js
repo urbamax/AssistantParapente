@@ -17,6 +17,30 @@ export function formatDuration(minutes) {
     return `${h}h ${m.toString().padStart(2, '0')}min`;
 }
 
+/**
+ * Parse an ISO-8601 date string, Date or timestamp into milliseconds since epoch in a timezone-resilient way.
+ * When a date string has an ISO datetime format without a timezone offset or 'Z' (e.g. "2026-09-28T09:30:00"),
+ * it is treated as UTC ("Z") to ensure deterministic timestamps across environments (CI, local machines in different timezones).
+ * @param {string|number|Date|null|undefined} dateVal
+ * @returns {number} Timestamp in ms, or 0 if invalid
+ */
+export function parseDateToMs(dateVal) {
+    if (!dateVal) return 0;
+    if (typeof dateVal === 'number') return Number.isFinite(dateVal) ? dateVal : 0;
+    if (dateVal instanceof Date) {
+        const ms = dateVal.getTime();
+        return Number.isFinite(ms) ? ms : 0;
+    }
+    if (typeof dateVal !== 'string') return 0;
+    let s = dateVal.trim();
+    if (!s) return 0;
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/.test(s)) {
+        s += 'Z';
+    }
+    const ms = Date.parse(s);
+    return Number.isFinite(ms) ? ms : 0;
+}
+
 // Memoized Intl formatters for performance and lower memory allocation
 const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
     day: '2-digit',
