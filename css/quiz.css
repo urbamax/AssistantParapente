@@ -741,7 +741,8 @@ body.light-mode .bank-item-explication {
         margin-bottom: 8px;
     }
 
-    .qcm-option-group > .qcm-option {
+    .qcm-option-group > .qcm-option,
+    .qcm-option-group > .bank-choice {
         margin-bottom: 0 !important;
         padding-right: 44px !important;
     }
@@ -1178,16 +1179,22 @@ body.light-mode .bank-choice.correct {
     margin-bottom: 16px;
 }
 
-.qcm-option-group > .qcm-option {
+.bank-item-choices .qcm-option-group {
+    margin-bottom: 0;
+}
+
+.qcm-option-group > .qcm-option,
+.qcm-option-group > .bank-choice {
     margin-bottom: 0;
     /* Laisse la place de la flèche, et la réponse cochée (agrandie par ailleurs) reste alignée sur sa case. */
-    padding-right: 56px;
+    padding-right: 56px !important;
     transform: none;
 }
 
-.qcm-option-group:has(> details[open]) > .qcm-option {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+.qcm-option-group:has(> details[open]) > .qcm-option,
+.qcm-option-group:has(> details[open]) > .bank-choice {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
 }
 
 .qcm-option-explanation {
@@ -1203,6 +1210,15 @@ body.light-mode .bank-choice.correct {
     border-top: none;
     border-radius: 0 0 16px 16px;
     background: var(--bg-card);
+}
+
+.qcm-option-group:has(> .bank-choice) > .qcm-option-explanation[open] {
+    border-radius: 0 0 8px 8px;
+}
+
+.qcm-option-group:has(> .bank-choice) > .qcm-option-explanation[open][data-kind='incorrect'],
+.qcm-option-group:has(> .bank-choice) > .qcm-option-explanation[open][data-kind='missed'] {
+    border-width: 2px;
 }
 
 .qcm-option-explanation[open][data-kind='incorrect'] {

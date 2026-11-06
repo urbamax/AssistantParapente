@@ -1209,8 +1209,12 @@ class QuizViewClass extends QuizVoiceBase {
                     </div>`
                         : results
                               .filter((r) => !r.isCorrect)
-                              .map(
-                                  (r) => `
+                              .map((r) => {
+                                  const original = QuizService.getQuestionByCode(r.question.code) || r.question;
+                                  const perOption = optionExplanations(original);
+                                  const courseLinks = this.getCourseLinks(r.question.code);
+
+                                  return `
                     <div class="bank-item" style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; background: var(--bg-card); box-shadow:0 2px 4px rgba(0,0,0,0.02);">
                         <div class="bank-item-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items:center;">
                             <span class="bank-item-code" style="font-family:monospace; font-size:0.85rem; color:var(--text-secondary); background:rgba(0,0,0,0.05); padding:4px 8px; border-radius:4px;">#${escapeHTML(r.question.code)}</span>
@@ -1249,19 +1253,37 @@ class QuizViewClass extends QuizVoiceBase {
                                             '<i class="ri-error-warning-fill" style="color:#ea580c; font-size:1.2rem; margin-right: 8px;"></i>';
                                     }
 
-                                    return `
+                                    const optIdx = choiceIndex(original, c);
+                                    const text = perOption ? perOption[optIdx] : null;
+                                    const outcome = optionOutcome(c, isUserSelected);
+                                    const links = isCorrectChoice ? choiceCourseLinksHtml(courseLinks) : '';
+                                    const explHtml = text
+                                        ? optionExplanationHtml(text, outcome, tq('question.explanation'), links)
+                                        : '';
+
+                                    const choiceHtml = `
                                 <div class="bank-choice" style="${bgStyle} border: ${borderStyle}; padding: 12px 16px; border-radius: 8px; font-size: 0.95rem; display: flex; justify-content: space-between; align-items:center;">
                                     <span style="display:flex; align-items:center; flex:1;">${icon} <span style="flex:1;">${escapeHTML(c.text)}</span></span>
                                     <span style="font-weight:bold; margin-left:12px; color:var(--text-secondary);">${isUserSelected ? `<i class="ri-user-line" style="margin-right: 4px;" title="${tq('results.yourAnswer')}"></i>` : ''}${c.pts > 0 ? '+' + c.pts : c.pts < 0 ? c.pts : ''}</span>
                                 </div>
                                 `;
+
+                                    return explHtml
+                                        ? `<div class="qcm-option-group">${choiceHtml}${explHtml}</div>`
+                                        : choiceHtml;
                                 })
                                 .join('')}
                         </div>
-                        ${r.question.explication ? `<div class="bank-item-explication" style="margin-top: 20px; font-size: 0.95rem; color: var(--text-main); background: rgba(251, 146, 60, 0.1); border-left:4px solid #fb923c; padding: 16px; border-radius: 0 8px 8px 0;"><div style="font-weight:bold; color:#ea580c; margin-bottom:4px; font-size:0.8rem; text-transform:uppercase;"><i class="ri-information-fill" style="margin-right: 4px;"></i>${tq('explanation')}</div>${explanationHtml(r.question.explication)}</div>` : ''}
+                        ${
+                            perOption
+                                ? ''
+                                : r.question.explication
+                                  ? `<div class="bank-item-explication" style="margin-top: 20px; font-size: 0.95rem; color: var(--text-main); background: rgba(251, 146, 60, 0.1); border-left:4px solid #fb923c; padding: 16px; border-radius: 0 8px 8px 0;"><div style="font-weight:bold; color:#ea580c; margin-bottom:4px; font-size:0.8rem; text-transform:uppercase;"><i class="ri-information-fill" style="margin-right: 4px;"></i>${tq('explanation')}</div>${explanationHtml(r.question.explication)}</div>`
+                                  : ''
+                        }
                     </div>
-                `,
-                              )
+                `;
+                              })
                               .join('')
                 }
             </div>
@@ -1271,6 +1293,17 @@ class QuizViewClass extends QuizVoiceBase {
         // Le bouton de sortie est dans le contenu, avant le récapitulatif : sinon il faut faire défiler
         // toute la liste d'erreurs pour le trouver.
         actionsDiv.innerHTML = '';
+
+        container.querySelectorAll('.bank-item-choices .qcm-option-group').forEach((el) => {
+            const group = /** @type {HTMLElement} */ (el);
+            const row = /** @type {HTMLElement | null} */ (group.firstElementChild);
+            if (!row) return;
+            const syncRowHeight = () => {
+                if (row.offsetHeight) group.style.setProperty('--row-h', `${row.offsetHeight}px`);
+            };
+            syncRowHeight();
+            if (typeof ResizeObserver !== 'undefined') new ResizeObserver(syncRowHeight).observe(row);
+        });
     }
 
     // --- STATISTICS MANAGEMENT ---
