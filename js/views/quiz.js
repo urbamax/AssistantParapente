@@ -370,6 +370,7 @@ class QuizViewClass extends QuizVoiceBase {
                 this.renderQuestion(QuizService.prevQuestion());
                 break;
             case 'finish-session':
+                this._activeWorkshopAxisId = null;
                 AppRouter.navigate('QCM');
                 break;
             case 'quiz-voice-read':
@@ -673,6 +674,7 @@ class QuizViewClass extends QuizVoiceBase {
         document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
         document.getElementById('qcm-setup-screen').classList.add('active');
         this.syncOfficialTheoryForLevel();
+        this.updateModeUI(QuizService.state.qcmConfig.mode);
         this.updateThemeUI();
         this.updateRevisionSummary();
         this.refreshMasterySlider();
