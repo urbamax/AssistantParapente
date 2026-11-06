@@ -560,7 +560,12 @@ export class QuizStatsBase extends BaseView {
                     <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
-                    <span style="color:${color}; font-weight:700; font-size:1.1rem;">${exam.score}/${exam.total}</span>
+                    <span style="color:${color}; font-weight:700; font-size:1.1rem;">${tq('history.pointsScore', { score: exam.score, total: exam.total })}</span>
+                    ${
+                        exam.questionsCorrect !== undefined && exam.questionsTotal !== undefined
+                            ? `<span style="font-size:0.8rem; color:var(--text-secondary); margin-left:8px;">${tq('history.questionsCount', { correct: exam.questionsCorrect, total: exam.questionsTotal })}</span>`
+                            : ''
+                    }
                 </div>
             </div>
             ${rightBlockHtml}
