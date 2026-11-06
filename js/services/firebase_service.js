@@ -22,6 +22,7 @@ import AccessService from './access_service.js';
 import { flattenAnswerLogs, mergeAnswerLogs } from './answer_log.js';
 import { mergeBrevets } from './brevet_service.js';
 import { compactExam } from './quiz_service.js';
+import { applyPendingCorrections, healQcmStats, unionCorrections } from './stats_corrections.js';
 
 // We inject the original code but export the Engine
 // --- FIREBASE AUTHENTICATION & SYNC ENGINE ---
@@ -1355,6 +1356,16 @@ export const FirebaseAuthEngine = {
     },
 
     mergeQcmStats: function (local, cloud) {
+        const allCorrections = unionCorrections(local?.corrections, cloud?.corrections);
+        if (local && typeof local === 'object') {
+            applyPendingCorrections(local, allCorrections);
+            healQcmStats(local);
+        }
+        if (cloud && typeof cloud === 'object') {
+            applyPendingCorrections(cloud, allCorrections);
+            healQcmStats(cloud);
+        }
+
         const merged = {
             totalQuestions: 0,
             totalCorrect: 0,
@@ -1409,7 +1420,18 @@ export const FirebaseAuthEngine = {
             questionsCorrect,
             themesCorrect,
         );
-        merged.appliedExamIds = Array.from(new Set([...(local.appliedExamIds || []), ...(cloud.appliedExamIds || [])]));
+        merged.appliedExamIds = Array.from(
+            new Set([...(local.appliedExamIds || []), ...(cloud.appliedExamIds || [])].map(String)),
+        );
+        const mergedAppliedCorrections = Array.from(
+            new Set([...(local.appliedCorrections || []), ...(cloud.appliedCorrections || [])].map(String)),
+        );
+        if (mergedAppliedCorrections.length > 0) {
+            merged.appliedCorrections = mergedAppliedCorrections;
+        }
+        if (allCorrections.length > 0) {
+            merged.corrections = allCorrections;
+        }
 
         return merged;
     },
@@ -1436,9 +1458,15 @@ export const FirebaseAuthEngine = {
             if (!exam) return;
             const key = exam.id || exam.date;
             if (deletedIds.has(String(exam.id)) || deletedIds.has(String(exam.date)) || exam.deleted === true) return;
-            // In case of conflict, we keep the one already present or cloud.
-            // Since exam logs are read-only historic records, duplicates are identical.
-            examMap.set(key, exam);
+            const existing = examMap.get(key);
+            if (existing) {
+                if (exam.appliedToStats || existing.appliedToStats) {
+                    existing.appliedToStats = true;
+                }
+                examMap.set(key, existing);
+            } else {
+                examMap.set(key, exam);
+            }
         });
 
         // Convert map back to list, sort descending by date (newest first) sans limitation à 20
@@ -1498,8 +1526,10 @@ export const FirebaseAuthEngine = {
     getLocalQcmStats: function () {
         const saved = StorageService.get(StorageService.KEYS.QCM_STATS);
         if (saved && typeof saved === 'object') {
+            const healed = healQcmStats(saved);
             // Firestore refuse les tableaux imbriqués : on remet à plat l'ancien format du journal avant toute écriture.
-            if (flattenAnswerLogs(saved)) StorageService.set(StorageService.KEYS.QCM_STATS, saved);
+            const flattened = flattenAnswerLogs(saved);
+            if (healed || flattened) StorageService.set(StorageService.KEYS.QCM_STATS, saved);
             return saved;
         }
         return { totalQuestions: 0, totalCorrect: 0, themes: {}, questions: {} };

@@ -4,6 +4,7 @@ import { parseDateToMs } from '../utils/date_utils.js';
 import { t } from '../utils/i18n.js';
 import { dueScore, summarizeReviews } from './review_scheduler.js';
 import { masteryRatio, masteryRatioAfterCorrect, pushAttempt } from './mastery.js';
+import { healQcmStats } from './stats_corrections.js';
 import {
     appendAnswer,
     choiceIndex,
@@ -173,6 +174,7 @@ export function compactExam(exam, questionLookup) {
     if (exam.scoreMode) base.scoreMode = exam.scoreMode;
     if (exam.questionsCorrect !== undefined) base.questionsCorrect = exam.questionsCorrect;
     if (exam.questionsTotal !== undefined) base.questionsTotal = exam.questionsTotal;
+    if (exam.appliedToStats !== undefined) base.appliedToStats = exam.appliedToStats;
     return base;
 }
 
@@ -1081,9 +1083,10 @@ class QuizService {
             return { totalQuestions: 0, totalCorrect: 0, themes: {}, questions: {} };
         const prevTotal = s.totalQuestions;
         const prevCorrect = s.totalCorrect;
+        const healed = healQcmStats(s);
         recalculateGlobalCounters(s);
         const flattened = flattenAnswerLogs(s);
-        if (flattened || s.totalQuestions !== prevTotal || s.totalCorrect !== prevCorrect) {
+        if (healed || flattened || s.totalQuestions !== prevTotal || s.totalCorrect !== prevCorrect) {
             StorageService.set(StorageService.KEYS.QCM_STATS, s);
             if (typeof window !== 'undefined' && window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
                 window.FirebaseAuthEngine.saveStatsToCloud();
@@ -1236,9 +1239,10 @@ class QuizService {
                 : results.length;
 
         const examId = 'exam_' + Date.now();
+        const examDate = new Date().toISOString();
         history.unshift({
             id: examId,
-            date: new Date().toISOString(),
+            date: examDate,
             level: level,
             score: earnedPoints,
             total: totalPoints,
@@ -1262,8 +1266,16 @@ class QuizService {
 
         const stats = this.getPersistentStats();
         if (!Array.isArray(stats.appliedExamIds)) stats.appliedExamIds = [];
+        let statsUpdated = false;
         if (!stats.appliedExamIds.includes(examId)) {
             stats.appliedExamIds.push(examId);
+            statsUpdated = true;
+        }
+        if (!stats.appliedExamIds.includes(examDate)) {
+            stats.appliedExamIds.push(examDate);
+            statsUpdated = true;
+        }
+        if (statsUpdated) {
             this._persistStats(stats);
         }
 
@@ -1304,11 +1316,11 @@ class QuizService {
         if (hasQuestions) {
             const stats = this.getPersistentStats();
             if (!Array.isArray(stats.appliedExamIds)) stats.appliedExamIds = [];
-            const appliedSet = new Set(stats.appliedExamIds);
+            const appliedSet = new Set(stats.appliedExamIds.map(String));
 
             const unapplied = migrated.filter((e) => {
                 const id = e.id || e.date;
-                return !e.appliedToStats && !appliedSet.has(id);
+                return !e.appliedToStats && !appliedSet.has(String(id)) && (!e.date || !appliedSet.has(String(e.date)));
             });
 
             if (unapplied.length > 0) {
@@ -1321,8 +1333,14 @@ class QuizService {
                     }
                     exam.appliedToStats = true;
                     const id = exam.id || exam.date;
-                    appliedSet.add(id);
-                    stats.appliedExamIds.push(id);
+                    appliedSet.add(String(id));
+                    if (exam.date) appliedSet.add(String(exam.date));
+                    if (!stats.appliedExamIds.includes(String(id))) {
+                        stats.appliedExamIds.push(String(id));
+                    }
+                    if (exam.date && !stats.appliedExamIds.includes(String(exam.date))) {
+                        stats.appliedExamIds.push(String(exam.date));
+                    }
                     needsMigration = true;
                 }
                 if (statsChanged) {
