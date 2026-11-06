@@ -338,4 +338,92 @@ describe('QuizService - Choix cochés (choicePicks)', () => {
         expect(readAnswerLog(stored().answers).map((e) => e[1])).toEqual([0b010, 0b010]);
         QuizService.setQuestions([]);
     });
+
+    it('restaure la sélection de la question précédente lors du retour arrière en examen', () => {
+        const q1 = {
+            code: 'Q1',
+            theme: 'T',
+            question: 'Q1?',
+            choices: [
+                { text: 'A', pts: 1 },
+                { text: 'B', pts: 0 },
+            ],
+        };
+        const q2 = {
+            code: 'Q2',
+            theme: 'T',
+            question: 'Q2?',
+            choices: [
+                { text: 'C', pts: 1 },
+                { text: 'D', pts: 0 },
+            ],
+        };
+        QuizService.state.qcmConfig.mode = 'EXAM';
+        QuizService.state.qcmSessionData = [q1, q2];
+        QuizService.state.qcmIndex = 0;
+        QuizService.state.examResults = [];
+
+        // Répond à Q1 avec le choix A
+        QuizService.toggleSelection(q1.choices[0]);
+        QuizService.validate();
+        QuizService.nextQuestion();
+
+        expect(QuizService.state.qcmIndex).toBe(1);
+        expect(QuizService.state.currentQcmSelection.size).toBe(0);
+
+        // Retour arrière sur Q1
+        QuizService.prevQuestion();
+        expect(QuizService.state.qcmIndex).toBe(0);
+        expect(QuizService.state.currentQcmSelection.has(q1.choices[0])).toBe(true);
+
+        // Avance vers Q2 (non encore répondue)
+        QuizService.nextQuestion();
+        expect(QuizService.state.qcmIndex).toBe(1);
+        expect(QuizService.state.currentQcmSelection.size).toBe(0);
+    });
+
+    it('restaure également la sélection vers lavant si la question suivante avait déjà été répondue', () => {
+        const q1 = {
+            code: 'Q1',
+            theme: 'T',
+            question: 'Q1?',
+            choices: [
+                { text: 'A', pts: 1 },
+                { text: 'B', pts: 0 },
+            ],
+        };
+        const q2 = {
+            code: 'Q2',
+            theme: 'T',
+            question: 'Q2?',
+            choices: [
+                { text: 'C', pts: 1 },
+                { text: 'D', pts: 0 },
+            ],
+        };
+        QuizService.state.qcmConfig.mode = 'EXAM';
+        QuizService.state.qcmSessionData = [q1, q2];
+        QuizService.state.qcmIndex = 0;
+        QuizService.state.examResults = [];
+
+        // Répond à Q1
+        QuizService.toggleSelection(q1.choices[0]);
+        QuizService.validate();
+        QuizService.nextQuestion();
+
+        // Répond à Q2
+        QuizService.toggleSelection(q2.choices[1]);
+        QuizService.validate();
+
+        // Revient sur Q1
+        QuizService.prevQuestion();
+        expect(QuizService.state.qcmIndex).toBe(0);
+        expect(QuizService.state.currentQcmSelection.has(q1.choices[0])).toBe(true);
+
+        // Re-valide Q1 et avance sur Q2
+        QuizService.validate();
+        QuizService.nextQuestion();
+        expect(QuizService.state.qcmIndex).toBe(1);
+        expect(QuizService.state.currentQcmSelection.has(q2.choices[1])).toBe(true);
+    });
 });

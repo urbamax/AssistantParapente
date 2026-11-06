@@ -887,14 +887,24 @@ class QuizViewClass extends QuizVoiceBase {
 
         // Render choices (spec 016 : lettres affichées dès que le mode vocal est disponible)
         const withLetters = this.isVoiceAvailable();
+        const currentSelection = QuizService.state.currentQcmSelection;
+        if (currentSelection && currentSelection.size > 0) {
+            const normalized = new Set();
+            for (const s of currentSelection) {
+                const match = q.choices.find((c) => c === s || (c && s && c.text === s.text && c.pts === s.pts));
+                normalized.add(match || s);
+            }
+            QuizService.state.currentQcmSelection = normalized;
+        }
         choicesDiv.innerHTML = q.choices
-            .map(
-                (opt, idx) => `
-            <button class="qcm-option" data-action="toggle-option" data-idx="${idx}">
+            .map((opt, idx) => {
+                const isSelected = QuizService.state.currentQcmSelection?.has(opt);
+                return `
+            <button class="qcm-option${isSelected ? ' selected' : ''}" data-action="toggle-option" data-idx="${idx}">
                 ${withLetters ? `<span class="qcm-option-letter">${optionLetter(idx)}</span>` : ''}${escapeHTML(opt.text)}
             </button>
-        `,
-            )
+        `;
+            })
             .join('');
 
         // Cache choices for reference during selection

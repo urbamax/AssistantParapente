@@ -678,16 +678,30 @@ class QuizService {
         return resultData;
     }
 
+    _restoreSelection() {
+        const selected = this.state.examResults[this.state.qcmIndex]?.selected || [];
+        const question = this.getCurrentQuestion();
+        if (!question || !Array.isArray(question.choices)) {
+            this.state.currentQcmSelection = new Set(selected);
+            return;
+        }
+        const choices = question.choices;
+        const matched = selected.map(
+            (s) => choices.find((c) => c === s || (c && s && c.text === s.text && c.pts === s.pts)) || s,
+        );
+        this.state.currentQcmSelection = new Set(matched);
+    }
+
     nextQuestion() {
         this.state.qcmIndex++;
-        this.state.currentQcmSelection = new Set();
+        this._restoreSelection();
         return this.getCurrentQuestion();
     }
 
     prevQuestion() {
         if (this.state.qcmIndex > 0) {
             this.state.qcmIndex--;
-            this.state.currentQcmSelection = new Set(this.state.examResults[this.state.qcmIndex]?.selected || []);
+            this._restoreSelection();
         }
         return this.getCurrentQuestion();
     }
