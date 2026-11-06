@@ -1409,7 +1409,9 @@ export const FirebaseAuthEngine = {
             questionsCorrect,
             themesCorrect,
         );
-        merged.appliedExamIds = Array.from(new Set([...(local.appliedExamIds || []), ...(cloud.appliedExamIds || [])]));
+        merged.appliedExamIds = Array.from(
+            new Set([...(local.appliedExamIds || []), ...(cloud.appliedExamIds || [])].map(String)),
+        );
 
         return merged;
     },
@@ -1436,9 +1438,15 @@ export const FirebaseAuthEngine = {
             if (!exam) return;
             const key = exam.id || exam.date;
             if (deletedIds.has(String(exam.id)) || deletedIds.has(String(exam.date)) || exam.deleted === true) return;
-            // In case of conflict, we keep the one already present or cloud.
-            // Since exam logs are read-only historic records, duplicates are identical.
-            examMap.set(key, exam);
+            const existing = examMap.get(key);
+            if (existing) {
+                if (exam.appliedToStats || existing.appliedToStats) {
+                    existing.appliedToStats = true;
+                }
+                examMap.set(key, existing);
+            } else {
+                examMap.set(key, exam);
+            }
         });
 
         // Convert map back to list, sort descending by date (newest first) sans limitation à 20
