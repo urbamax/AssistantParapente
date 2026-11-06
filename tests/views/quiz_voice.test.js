@@ -178,18 +178,19 @@ describe('US1 - read aloud (spec 016)', () => {
         expect(VoiceService.stopListening).toHaveBeenCalled();
     });
 
-    it('the controls are native buttons with accessible names', () => {
+    it('the controls are native buttons with accessible names and without icons', () => {
         mockVoice();
         startSession();
-        for (const action of ['quiz-voice-read', 'quiz-voice-auto', 'quiz-voice-mic']) {
+        for (const action of ['quiz-voice-read', 'quiz-voice-auto', 'quiz-voice-chain', 'quiz-voice-mic']) {
             expect(btn(action).tagName).toBe('BUTTON');
             expect(btn(action).getAttribute('type')).toBe('button');
             expect(btn(action).getAttribute('aria-label') || btn(action).textContent.trim()).not.toBe('');
+            expect(btn(action).querySelector('i')).toBeNull();
         }
         expect(document.getElementById('qcm-voice-status').getAttribute('aria-live')).toBe('polite');
     });
 
-    it('spec 047: groups the three voice action buttons in .qcm-voice-buttons with revoke link placed below', () => {
+    it('spec 047: groups the voice action buttons in .qcm-voice-buttons with revoke link placed below', () => {
         mockVoice();
         VoiceService.setPrefs({ voiceConsent: true });
         startSession();
@@ -197,6 +198,7 @@ describe('US1 - read aloud (spec 016)', () => {
         expect(container).not.toBeNull();
         expect(container.contains(btn('quiz-voice-read'))).toBe(true);
         expect(container.contains(btn('quiz-voice-auto'))).toBe(true);
+        expect(container.contains(btn('quiz-voice-chain'))).toBe(true);
         expect(container.contains(btn('quiz-voice-mic'))).toBe(true);
 
         const revokeLink = bar().querySelector('.qcm-voice-link');

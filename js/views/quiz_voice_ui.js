@@ -311,22 +311,14 @@ export class QuizVoiceBase extends QuizStatsBase {
                 <div class="qcm-voice-buttons">
                     ${
                         canSpeak
-                            ? `<button type="button" class="qcm-voice-btn" data-action="quiz-voice-read" aria-pressed="${speaking}" aria-label="${tv(readLabel)}">
-                        <i class="${speaking ? 'ri-stop-circle-line' : 'ri-volume-up-line'}" aria-hidden="true"></i> ${tv('read')}
-                    </button>
-                    <button type="button" class="qcm-voice-btn" data-action="quiz-voice-auto" aria-pressed="${autoRead}" aria-label="${tv('autoLabel')}">
-                        <i class="ri-play-list-line" aria-hidden="true"></i> ${tv('auto')}
-                    </button>
-                    <button type="button" class="qcm-voice-btn" data-action="quiz-voice-chain" aria-pressed="${chain}" aria-label="${tv('chainLabel')}">
-                        <i class="ri-repeat-line" aria-hidden="true"></i> ${tv('chain')}
-                    </button>`
+                            ? `<button type="button" class="qcm-voice-btn" data-action="quiz-voice-read" aria-pressed="${speaking}" aria-label="${tv(readLabel)}">${tv('read')}</button>
+                    <button type="button" class="qcm-voice-btn" data-action="quiz-voice-auto" aria-pressed="${autoRead}" aria-label="${tv('autoLabel')}">${tv('auto')}</button>
+                    <button type="button" class="qcm-voice-btn" data-action="quiz-voice-chain" aria-pressed="${chain}" aria-label="${tv('chainLabel')}">${tv('chain')}</button>`
                             : ''
                     }
                     ${
                         canListen
-                            ? `<button type="button" class="qcm-voice-btn" data-action="quiz-voice-mic" aria-pressed="${listening}"${listening ? ` aria-label="${tv('micStopLabel')}"` : ''}>
-                        <i class="${listening ? 'ri-mic-fill' : 'ri-mic-line'}" aria-hidden="true"></i> ${tv('mic')}
-                    </button>`
+                            ? `<button type="button" class="qcm-voice-btn" data-action="quiz-voice-mic" aria-pressed="${listening}"${listening ? ` aria-label="${tv('micStopLabel')}"` : ''}>${tv('mic')}</button>`
                             : ''
                     }
                 </div>
