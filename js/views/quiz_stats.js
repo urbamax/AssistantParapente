@@ -16,6 +16,7 @@ import BaseView from '../core/base_view.js';
 import { tq, tql } from './quiz_strings.js';
 import { explanationHtml } from './quiz_explanation.js';
 import { buildRevisionAxes } from '../services/revision_axes.js';
+import { floorPercent1, formatPercent } from '../utils/text_utils.js';
 import { buildRevisionAxesDashboardHtml } from './quiz_axes_html.js';
 import {
     buildDistributionHtml,
@@ -457,7 +458,7 @@ export class QuizStatsBase extends BaseView {
                 exam.percentage !== undefined
                     ? exam.percentage
                     : exam.total > 0
-                      ? Math.round((exam.score / exam.total) * 100)
+                      ? floorPercent1(exam.score, exam.total)
                       : 0;
             const color = exam.invalidated ? '#f87171' : pct >= 75 ? '#4ade80' : pct >= 50 ? '#facc15' : '#f87171';
             const levelLabel = tql(
@@ -547,13 +548,13 @@ export class QuizStatsBase extends BaseView {
 
             const rightBlockHtml = isOwner
                 ? `<div style="display:flex; align-items:center; gap:12px;">
-                <div style="font-size:1.5rem; font-weight:700; color:${color};">${pct}%</div>
+                <div style="font-size:1.5rem; font-weight:700; color:${color};">${formatPercent(pct)}%</div>
                 <button type="button" class="action-btn-text exam-delete-btn" data-action="QuizdeleteExam" data-args="['${exam.id}']" data-prevent-default title="${tq('history.delete')}" style="color:#f87171; background:rgba(248, 113, 113, 0.1); border:1px solid rgba(248, 113, 113, 0.25); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:1rem; display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s;" aria-label="${tq('history.delete')}">
                     <i class="ri-delete-bin-line"></i>
                 </button>
             </div>`
                 : `<div style="text-align:right;">
-                <div style="font-size:1.5rem; font-weight:700; color:${color};">${pct}%</div>
+                <div style="font-size:1.5rem; font-weight:700; color:${color};">${formatPercent(pct)}%</div>
             </div>`;
 
             html += `
