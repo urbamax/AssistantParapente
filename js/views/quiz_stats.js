@@ -517,11 +517,13 @@ export class QuizStatsBase extends BaseView {
                     let statusClass;
                     let icon = '';
 
-                    if (pts > 0) {
+                    if (pts > 0 && wasSelected) {
                         statusClass = 'background:rgba(74, 222, 128, 0.1); border-left:3px solid #4ade80;';
-                        icon = wasSelected
-                            ? '<i class="ri-check-double-line" style="color:#4ade80;"></i>'
-                            : '<i class="ri-checkbox-circle-line" style="color:#4ade80;"></i>';
+                        icon = '<i class="ri-check-double-line" style="color:#4ade80;"></i>';
+                    } else if (pts > 0) {
+                        // Bonne réponse oubliée : orange, comme son explication (et l'écran de résultats)
+                        statusClass = 'background:rgba(249, 115, 22, 0.1); border-left:3px solid #f97316;';
+                        icon = '<i class="ri-error-warning-line" style="color:#f97316;"></i>';
                     } else if (pts < 0 && wasSelected) {
                         statusClass = 'background:rgba(248, 113, 113, 0.1); border-left:3px solid #f87171;';
                         icon = '<i class="ri-close-circle-line" style="color:#f87171;"></i>';
@@ -555,10 +557,12 @@ export class QuizStatsBase extends BaseView {
                 const expl = q.explanation || q.explication || original.explication || original.explanation;
 
                 questionsHtml += `
-    <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; ${!r.isCorrect ? 'border:1px solid #f87171;' : ''}" >
-                        <div style="font-size:0.75rem; opacity:0.6; margin-bottom:6px;">${tq('history.questionNumber', { n: idx + 1 })}${qCode ? ` • <span style="font-family:monospace;">#${escapeHTML(qCode)}</span>` : ''}</div>
-                        <div style="font-weight:600; margin-bottom:12px;">${escapeHTML(q.question)}</div>
-                        <div class="bank-item-choices" style="display:flex; flex-direction:column; gap:6px;">
+    <details class="exam-history-question" style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; ${!r.isCorrect ? 'border:1px solid #f87171;' : 'border:1px solid var(--border-color);'}"${r.isCorrect ? '' : ' open'}>
+                        <summary>
+                            <div style="font-size:0.75rem; opacity:0.6; margin-bottom:6px;">${tq('history.questionNumber', { n: idx + 1 })}${qCode ? ` • <span style="font-family:monospace;">#${escapeHTML(qCode)}</span>` : ''}</div>
+                            <div style="font-weight:600;">${escapeHTML(q.question)}</div>
+                        </summary>
+                        <div class="bank-item-choices" style="display:flex; flex-direction:column; gap:6px; margin-top:12px;">
                             ${optionsHtml}
                         </div>
                         ${
@@ -568,7 +572,7 @@ export class QuizStatsBase extends BaseView {
                                     ${courseLinksHtml(courseLinks)}</div>`
                                 : ''
                         }
-                    </div >
+                    </details>
     `;
             });
 

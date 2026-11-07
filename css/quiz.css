@@ -1652,6 +1652,49 @@ body.light-mode .bank-choice.correct {
     transform: rotate(90deg);
 }
 
+/* Historique d'un examen : questions réussies repliées, questions ratées dépliées. */
+.exam-history-question > summary {
+    position: relative;
+    padding-right: 40px;
+    cursor: pointer;
+    list-style: none;
+}
+
+.exam-history-question > summary::-webkit-details-marker {
+    display: none;
+}
+
+.exam-history-question > summary::after {
+    content: '❯';
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    margin-top: -13px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--text-main);
+    font-size: 0.85rem;
+    font-weight: 800;
+    line-height: 1;
+    transition: transform 0.2s;
+
+    body.light-mode & {
+        background: rgba(15, 23, 42, 0.09);
+        border-color: rgba(15, 23, 42, 0.22);
+        color: #0f172a;
+    }
+}
+
+.exam-history-question[open] > summary::after {
+    transform: rotate(90deg);
+}
+
 #all-questions-list [id^='arrow-'],
 #bank-questions-list [id^='bank-arrow-'] {
     opacity: 0.85 !important;
