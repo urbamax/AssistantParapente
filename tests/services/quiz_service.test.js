@@ -281,8 +281,12 @@ describe('QuizService - Choix cochés (choicePicks)', () => {
 
     beforeEach(() => {
         StorageService.set(StorageService.KEYS.QCM_STATS, { themes: {}, questions: {} });
+        StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: [] });
+        QuizService.state.qcmSessionData = [];
         QuizService.state.examResults = [];
         QuizService.state.qcmIndex = 0;
+        QuizService.state.examSaved = false;
+        QuizService.state.invalidated = false;
         QuizService.state.currentQcmSelection = new Set();
     });
 
@@ -302,9 +306,11 @@ describe('QuizService - Choix cochés (choicePicks)', () => {
         expect(stored().total).toBe(2);
     });
 
-    it('traite les réponses en examen exactement comme en entraînement (compteurs et choix)', () => {
+    it('traite les réponses en examen exactement comme en entraînement une fois lexamen terminé (compteurs et choix)', () => {
         const q = makeQuestion();
         answer('EXAM', q, [1, 2]);
+        expect(stored()).toBeUndefined();
+        QuizService.saveExamHistory('BI');
         expect(stored()).toMatchObject({ choicePicks: [0, 1, 1], total: 1, correct: 0, streak: 0 });
         expect(StorageService.get(StorageService.KEYS.QCM_STATS).totalQuestions).toBe(1);
     });
@@ -313,10 +319,38 @@ describe('QuizService - Choix cochés (choicePicks)', () => {
         const q = makeQuestion();
         answer('EXAM', q, [1]);
         answer('EXAM', q, [0, 2]);
+        expect(stored()).toBeUndefined();
+        QuizService.saveExamHistory('BI');
         expect(stored().choicePicks).toEqual([1, 0, 1]);
         expect(stored().total).toBe(1);
         expect(stored().correct).toBe(1);
         expect(readAnswerLog(stored().answers).map((e) => e[1])).toEqual([0b101]);
+    });
+
+    it("n'enregistre rien (ni questions ni historique) si un examen est coupé en plein milieu ou invalidé", () => {
+        const q1 = makeQuestion();
+        const q2 = { ...makeQuestion(), code: 'P2V' };
+        QuizService.state.qcmConfig.mode = 'EXAM';
+        QuizService.state.qcmSessionData = [q1, q2];
+        QuizService.state.qcmIndex = 0;
+        QuizService.state.currentQcmSelection = new Set([q1.choices[0]]);
+        QuizService.validate();
+
+        // Examen coupé à la question 1/2 : rien dans QCM_STATS ni dans EXAM_HISTORY
+        QuizService.saveExamHistory('BI');
+        expect(StorageService.get(StorageService.KEYS.QCM_STATS).questions.P1V).toBeUndefined();
+        expect(StorageService.get(StorageService.KEYS.QCM_STATS).totalQuestions || 0).toBe(0);
+        expect(StorageService.get(StorageService.KEYS.EXAM_HISTORY).exams).toHaveLength(0);
+
+        // Examen invalidé : rien non plus même si toutes les questions étaient répondues
+        QuizService.state.qcmIndex = 1;
+        QuizService.state.currentQcmSelection = new Set([q2.choices[0]]);
+        QuizService.validate();
+        QuizService.state.invalidated = true;
+        QuizService.saveExamHistory('BI');
+        expect(StorageService.get(StorageService.KEYS.QCM_STATS).questions.P1V).toBeUndefined();
+        expect(StorageService.get(StorageService.KEYS.QCM_STATS).questions.P2V).toBeUndefined();
+        expect(StorageService.get(StorageService.KEYS.EXAM_HISTORY).exams).toHaveLength(0);
     });
 
     it('rétro-intègre les examens passés dans les statistiques générales sans doubler', () => {
@@ -381,7 +415,9 @@ describe('QuizService - Choix cochés (choicePicks)', () => {
         const q = makeQuestion();
         answer('TRAINING', q, [0, 1]);
         QuizService.state.examResults = [];
+        QuizService.state.examSaved = false;
         answer('EXAM', q, [2]);
+        QuizService.saveExamHistory('BI');
         expect(readAnswerLog(stored().answers).map((e) => e[1])).toEqual([0b011, 0b100]);
         expect(readAnswerLog(stored().answers)[0][0]).toBe(Math.floor(Date.now() / 86_400_000));
     });

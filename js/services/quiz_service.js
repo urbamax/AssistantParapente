@@ -352,7 +352,8 @@ export function recalculateGlobalCounters(stats) {
  * @returns {boolean} true si les statistiques ont été modifiées
  */
 export function replayExamToStats(exam, stats, questionLookup) {
-    if (!exam || !Array.isArray(exam.results) || typeof questionLookup !== 'function') return false;
+    if (!exam || exam.invalidated || !Array.isArray(exam.results) || typeof questionLookup !== 'function') return false;
+    if (exam.questionsTotal > 0 && exam.results.filter(Boolean).length < exam.questionsTotal) return false;
     const examDateMs = parseDateToMs(exam.date) || Date.now();
     const examDay = Math.floor(examDateMs / (24 * 60 * 60 * 1000));
 
@@ -1039,15 +1040,30 @@ class QuizService {
             maxPoints: maxScore,
         };
 
-        // En examen on peut revenir en arrière et corriger : la réponse précédente est retirée
-        // du décompte avant d'ajouter la nouvelle, pour ne pas compter deux fois la question.
+        // En examen, les réponses ne sont enregistrées dans les statistiques qu'à la fin d'un
+        // examen complet : un examen interrompu en plein milieu ne laisse aucune trace dans les stats.
         const previous = this.state.examResults[this.state.qcmIndex];
         this.state.examResults[this.state.qcmIndex] = resultData;
 
-        this.updateStats(question, isCorrect, selectedOptions, previous);
+        if (this.state.qcmConfig.mode !== 'EXAM') {
+            this.updateStats(question, isCorrect, selectedOptions, previous);
+        }
         if (this.state.qcmConfig.mode === 'MASTERY') this.advanceMasteryProgress();
 
         return resultData;
+    }
+
+    abortExamIfIncomplete() {
+        if (this.state.qcmConfig.mode !== 'EXAM' || this.state.examSaved) return;
+        const sessionLen = Array.isArray(this.state.qcmSessionData) ? this.state.qcmSessionData.length : 0;
+        const answeredCount = Array.isArray(this.state.examResults) ? this.state.examResults.filter(Boolean).length : 0;
+        if (this.state.invalidated || (sessionLen > 0 && answeredCount < sessionLen)) {
+            this.state.examResults = [];
+            this.state.qcmSessionData = [];
+            this.state.currentQcmSelection = new Set();
+            this.state.qcmIndex = 0;
+            this.state.invalidated = false;
+        }
     }
 
     _restoreSelection() {
@@ -1224,25 +1240,32 @@ class QuizService {
         return isExamBloated(exam);
     }
 
-    // Une session d'examen ne produit qu'une entrée d'historique, même si l'écran de résultats
-    // est rendu plusieurs fois (invalidation puis fin de série, nouveau rendu...).
+    // Une session d'examen ne produit qu'une entrée d'historique, et uniquement si l'examen est
+    // allé jusqu'au bout sans être invalidé ni coupé en plein milieu.
     saveExamHistory(level) {
         if (this.state.examSaved) return;
+        const results = Array.isArray(this.state.examResults) ? this.state.examResults : [];
+        const answeredResults = results.filter(Boolean);
+        const sessionLen = Array.isArray(this.state.qcmSessionData) ? this.state.qcmSessionData.length : 0;
+        if (this.state.invalidated === true || (sessionLen > 0 && answeredResults.length < sessionLen)) {
+            return;
+        }
         this.state.examSaved = true;
-        const results = this.state.examResults;
         const history = this.getExamHistory();
-        const isInvalidated = this.state.invalidated === true;
+
+        for (const r of answeredResults) {
+            if (r && r.question) {
+                this.updateStats(r.question, Boolean(r.isCorrect), Array.isArray(r.selected) ? r.selected : []);
+            }
+        }
 
         const pointsData = this.calculateExamPoints(results, this.state.qcmSessionData);
-        const earnedPoints = isInvalidated ? 0 : pointsData.earnedPoints;
+        const earnedPoints = pointsData.earnedPoints;
         const totalPoints = pointsData.totalPoints;
-        const percentage = isInvalidated ? 0 : pointsData.percentage;
-        const passed = isInvalidated ? false : pointsData.passed;
-        const questionsCorrect = results.filter((r) => r && r.isCorrect).length;
-        const questionsTotal =
-            this.state.qcmSessionData && this.state.qcmSessionData.length > 0
-                ? this.state.qcmSessionData.length
-                : results.length;
+        const percentage = pointsData.percentage;
+        const passed = pointsData.passed;
+        const questionsCorrect = answeredResults.filter((r) => r && r.isCorrect).length;
+        const questionsTotal = sessionLen > 0 ? sessionLen : results.length;
 
         const examId = 'exam_' + Date.now();
         const examDate = new Date().toISOString();
@@ -1254,7 +1277,7 @@ class QuizService {
             total: totalPoints,
             percentage: percentage,
             passed: passed,
-            invalidated: isInvalidated,
+            invalidated: false,
             scoreMode: 'points',
             questionsCorrect,
             questionsTotal,
