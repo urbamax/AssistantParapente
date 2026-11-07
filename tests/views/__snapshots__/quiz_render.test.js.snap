@@ -656,8 +656,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </div>
                 
                 <div style="text-align:center; margin-top:24px;">
-                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : TREUIL</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">Treuil</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">0 réponses</div>
                 </div>
             </div>
         
@@ -807,7 +807,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </div>
                 
                 <div style="text-align:center; margin-top:24px;">
-                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : TOUS LES NIVEAUX</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">Tous les niveaux</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">0 réponses</div>
                 </div>
             </div>
@@ -1008,8 +1008,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </div>
                 
                 <div style="text-align:center; margin-top:24px;">
-                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">Brevet Initial</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">7 réponses</div>
                 </div>
             </div>
         
@@ -1439,8 +1439,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </div>
                 
                 <div style="text-align:center; margin-top:24px;">
-                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">Brevet Initial</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">7 réponses</div>
                 </div>
             </div>
         
@@ -1763,8 +1763,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </div>
                 
                 <div style="text-align:center; margin-top:24px;">
-                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">Brevet Initial</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">7 réponses</div>
                 </div>
             </div>
         
@@ -2116,8 +2116,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </div>
                 
                 <div style="text-align:center; margin-top:24px;">
-                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">Brevet Initial</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">7 réponses</div>
                 </div>
             </div>
         
@@ -2440,8 +2440,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </div>
                 
                 <div style="text-align:center; margin-top:24px;">
-                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">Brevet Initial</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">7 réponses</div>
                 </div>
             </div>
         
@@ -2798,8 +2798,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </div>
                 
                 <div style="text-align:center; margin-top:24px;">
-                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">Brevet Initial</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">7 réponses</div>
                 </div>
             </div>
         
@@ -3122,8 +3122,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </div>
                 
                 <div style="text-align:center; margin-top:24px;">
-                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">Brevet Initial</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">7 réponses</div>
                 </div>
             </div>
         
@@ -3519,8 +3519,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </div>
                 
                 <div style="text-align:center; margin-top:24px;">
-                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">Brevet Initial</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">7 réponses</div>
                 </div>
             </div>
         
@@ -3843,8 +3843,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </div>
                 
                 <div style="text-align:center; margin-top:24px;">
-                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">Brevet Initial</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">7 réponses</div>
                 </div>
             </div>
         

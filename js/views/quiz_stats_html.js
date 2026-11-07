@@ -4,7 +4,7 @@
  * getCourseUrl…) et les chiffres déjà calculés, et rend un fragment HTML. Aucun accès au DOM.
  */
 import { escapeHTML } from '../core/security.js';
-import { BREVET_CODES } from '../services/brevet_service.js';
+import { BREVET_CODES, OFFICIAL_THEORY_TOTAL_POINTS } from '../services/brevet_service.js';
 import { masteryRatio } from '../services/mastery.js';
 import { readAnswerLog } from '../services/answer_log.js';
 import { toSorted } from '../utils/array_utils.js';
@@ -30,11 +30,25 @@ export function buildOfficialTheoryBannerHtml(level, entry, attrName = 'data-qui
         const title = rawDate
             ? tq('officialTheory.validatedWithDate', { level, date: formatDateOnly(rawDate) })
             : tq('officialTheory.validatedBadge', { level });
+        let score = th.score;
+        let total = th.total;
+        const pct =
+            th.percentage ?? (score !== null && total !== null && total > 0 ? Math.round((score / total) * 100) : null);
+
+        if (
+            (score === null || total === null || typeof score === 'undefined' || typeof total === 'undefined') &&
+            pct !== null &&
+            OFFICIAL_THEORY_TOTAL_POINTS[level]
+        ) {
+            total = OFFICIAL_THEORY_TOTAL_POINTS[level];
+            score = Math.round((pct / 100) * total);
+        }
+
         const scorePart =
-            th.score !== null && th.total !== null
-                ? tq('officialTheory.scoreBadge', { score: th.score, total: th.total, pct: th.percentage ?? 0 })
-                : th.percentage !== null
-                  ? tq('officialTheory.pctBadge', { pct: th.percentage })
+            score !== null && total !== null && typeof score !== 'undefined' && typeof total !== 'undefined'
+                ? tq('officialTheory.scoreBadge', { score, total, pct: pct ?? 0 })
+                : pct !== null
+                  ? tq('officialTheory.pctBadge', { pct })
                   : '';
         const hintHtml =
             attrName === 'data-quiz-brevet-banner'
@@ -636,10 +650,13 @@ export function buildQuestionsHtml(
 }
 
 /** Jauge circulaire du taux de réussite global. */
-export function buildGaugeHtml({ color, currentLevel, globalPct, stats }) {
+export function buildGaugeHtml({ color, currentLevel, globalPct, stats, levelTotalResponses }) {
     // Premium Circular Gauge Calculation
     const strokeDash = 2 * Math.PI * 55; // r=55
     const offset = strokeDash - (globalPct / 100) * strokeDash;
+    const levelName =
+        currentLevel === 'ALL' ? tql('stats.allLevels') : tql(`history.levels.${currentLevel}`) || currentLevel;
+    const responseCount = typeof levelTotalResponses === 'number' ? levelTotalResponses : stats?.totalQuestions || 0;
 
     const successGaugeHtml = `
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
@@ -668,8 +685,8 @@ export function buildGaugeHtml({ color, currentLevel, globalPct, stats }) {
                 </div>
                 
                 <div style="text-align:center; margin-top:24px;">
-                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">${tq('stats.level', { level: currentLevel === 'ALL' ? tql('stats.allLevels') : currentLevel })}</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">${tq('stats.activity', { count: stats.totalQuestions || 0 })}</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">${tq('stats.level', { level: levelName })}</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">${tq('stats.activity', { count: responseCount })}</div>
                 </div>
             </div>
         `;
