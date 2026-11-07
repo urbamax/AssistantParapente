@@ -22,10 +22,12 @@ describe('Quiz Stats Screen Mobile Layout & Overflow Rules (css/quiz.css)', () =
         );
     });
 
-    it('ensures sort buttons toolbar wraps and adapts cleanly on mobile', () => {
+    it('ensures sort buttons toolbar wraps and adapts cleanly on mobile without overlapping', () => {
         const mobileSection = css.slice(css.indexOf('@media (max-width: 768px)'));
         expect(mobileSection).toMatch(/#stats-content\s+div:has\([^)]*\.sort-btn\)/);
-        expect(mobileSection).toMatch(/#stats-content\s+\.sort-btn\s*\{[^}]*flex:\s*1\s+1\s+0/);
+        expect(mobileSection).toMatch(/grid-template-columns:\s*repeat\(2,\s*1fr\)/);
+        expect(mobileSection).toMatch(/#stats-content\s+\.sort-btn\s*\{[^}]*overflow:\s*hidden/);
+        expect(mobileSection).toMatch(/#stats-content\s+\.sort-btn\s*\{[^}]*text-overflow:\s*ellipsis/);
     });
 
     it('reduces bulky padding on mobile stats cards and containers to fit narrow screens', () => {
