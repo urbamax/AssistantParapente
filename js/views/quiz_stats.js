@@ -701,7 +701,13 @@ export class QuizStatsBase extends BaseView {
 
         // Update button states & Icons
         // Update button states & Icons - Scope only to Stats buttons
-        const statsButtons = ['sort-rate-btn', 'sort-attempts-btn', 'sort-streak-btn', 'sort-date-btn'];
+        const statsButtons = [
+            'sort-rate-btn',
+            'sort-attempts-btn',
+            'sort-streak-btn',
+            'sort-date-btn',
+            'sort-exams-btn',
+        ];
         statsButtons.forEach((id) => {
             const btn = document.getElementById(id);
             if (!btn) return;
@@ -712,6 +718,7 @@ export class QuizStatsBase extends BaseView {
             if (id === 'sort-attempts-btn') baseText = tq('stats.sortByAttempts');
             if (id === 'sort-streak-btn') baseText = tq('stats.sortByStreak');
             if (id === 'sort-date-btn') baseText = tq('stats.sortByDate');
+            if (id === 'sort-exams-btn') baseText = tq('stats.sortByExams');
             btn.innerHTML = baseText;
         });
 
@@ -720,6 +727,7 @@ export class QuizStatsBase extends BaseView {
             attempts: 'sort-attempts-btn',
             streak: 'sort-streak-btn',
             date: 'sort-date-btn',
+            exams: 'sort-exams-btn',
         };
         const activeBtn = document.getElementById(sortBtnMap[currentSort] || 'sort-rate-btn');
         if (activeBtn) {
@@ -746,6 +754,9 @@ export class QuizStatsBase extends BaseView {
 
                 if (dir === 'asc') return valA - valB;
                 return valB - valA;
+            } else if (currentSort === 'exams') {
+                valA = parseInt(a.dataset.exams || '0');
+                valB = parseInt(b.dataset.exams || '0');
             } else {
                 valA = parseInt(a.dataset.total);
                 valB = parseInt(b.dataset.total);

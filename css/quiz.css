@@ -498,8 +498,52 @@ body.light-mode .bank-item-explication {
 
 #stats-screen .course-container {
     overflow-x: hidden !important;
-    max-width: 100% !important;
+    max-width: 1440px !important;
     box-sizing: border-box !important;
+    padding-top: 8px !important;
+}
+
+#stats-screen .page-title {
+    margin: 0 auto 10px auto !important;
+    font-size: 1.75rem !important;
+}
+
+#stats-axes-banner .stats-axes-shortcut {
+    padding: 10px 14px !important;
+    margin-top: 6px !important;
+    gap: 12px !important;
+}
+
+#stats-axes-banner .stats-axes-shortcut > div:first-child {
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+#stats-axes-banner .stats-axes-shortcut > div:first-child > div:first-child {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 10px !important;
+}
+
+#stats-axes-banner .stats-axes-shortcut > div:first-child > div:last-child > div:first-child {
+    font-size: 0.92rem !important;
+    margin-bottom: 2px !important;
+}
+
+#stats-axes-banner .stats-axes-shortcut > div:first-child > div:last-child > div:last-child {
+    font-size: 0.78rem !important;
+    line-height: 1.3 !important;
+}
+
+#stats-axes-banner .stats-axes-shortcut button[data-action="QuizshowRevisionAxes"] {
+    padding: 8px 14px !important;
+    font-size: 0.82rem !important;
+    border-radius: 10px !important;
+}
+
+#stats-content [data-stats-brevet-banner] {
+    padding: 10px 14px !important;
+    margin-bottom: 12px !important;
 }
 
 #stats-content {
@@ -508,9 +552,212 @@ body.light-mode .bank-item-explication {
     min-width: 0 !important;
     box-sizing: border-box !important;
     overflow-x: hidden !important;
+    margin-top: 10px !important;
 }
 
-#stats-content div:has(> div > .sort-btn) {
+#stats-content > div {
+    margin-top: 22px !important;
+}
+
+#stats-content .library-section-header {
+    margin-top: 0 !important;
+    margin-bottom: 10px !important;
+    padding-bottom: 0 !important;
+    font-size: 1.05rem !important;
+}
+
+/* Align "STATISTIQUES PAR THÈME" header and sort toggle on the same row */
+#stats-content > .premium-gauge-container + div + div,
+#stats-content > div:has([data-action="QuizsetThemeSort"]) {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    align-items: center !important;
+    gap: 10px 16px !important;
+}
+
+#stats-content > .premium-gauge-container + div + div > .library-section-header,
+#stats-content > div:has([data-action="QuizsetThemeSort"]) > .library-section-header {
+    grid-column: 1 / 2 !important;
+    margin: 0 !important;
+}
+
+#stats-content > .premium-gauge-container + div + div > div:first-of-type,
+#stats-content > div:has([data-action="QuizsetThemeSort"]) > div:has([data-action="QuizsetThemeSort"]) {
+    grid-column: 2 / 3 !important;
+    margin-bottom: 0 !important;
+}
+
+#stats-content > .premium-gauge-container + div + div > div:last-child,
+#stats-content > div:has([data-action="QuizsetThemeSort"]) > div:last-child {
+    grid-column: 1 / -1 !important;
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)) !important;
+    gap: 10px !important;
+}
+
+#stats-content .theme-card {
+    padding: 12px 14px !important;
+    border-radius: 14px !important;
+}
+
+/* Compact outer containers for Exam History & Detailed Questions */
+#stats-content > .premium-gauge-container + div + div + div > div,
+#stats-content > .premium-gauge-container + div + div + div + div > div,
+#stats-content div:has(> #all-questions-list),
+#stats-content div:has(> div > [data-exam-id]) {
+    padding: 14px 16px !important;
+    border-radius: 18px !important;
+}
+
+#stats-content > div:last-child {
+    margin-top: 24px !important;
+    padding-bottom: 20px !important;
+}
+
+/* Multi-column Exam History grid on tablet & desktop */
+@media (min-width: 769px) {
+    #stats-content > .premium-gauge-container + div + div + div > div > div:has(> [data-exam-id]),
+    #stats-content div:has(> [data-exam-id]) {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)) !important;
+        gap: 10px !important;
+        align-items: start !important;
+    }
+
+    #stats-content div[data-exam-id] {
+        padding: 12px 14px !important;
+        border-radius: 12px !important;
+    }
+
+    #stats-content div[data-exam-id]:has(> .exam-details[style*="display: block"]),
+    #stats-content div[data-exam-id]:has(> .exam-details[style*="display:block"]) {
+        grid-column: 1 / -1 !important;
+    }
+}
+
+/* Desktop side-by-side layout: Top banners paired + Gauge paired with Mastery Distribution */
+@media (min-width: 960px) {
+    #stats-screen .course-container:has(#stats-content > .premium-gauge-container) {
+        display: grid !important;
+        grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+        gap: 14px 16px !important;
+        align-items: stretch !important;
+    }
+
+    #stats-screen .course-container:has(#stats-content > .premium-gauge-container) > * {
+        grid-column: 1 / -1 !important;
+    }
+
+    #stats-screen .course-container:has(#stats-content > .premium-gauge-container) > #stats-axes-banner:not(:empty),
+    #stats-screen .course-container:has(#stats-content > .premium-gauge-container) > #stats-content {
+        display: contents !important;
+    }
+
+    #stats-screen .course-container:has(#stats-content > .premium-gauge-container) #stats-content > * {
+        grid-column: 1 / -1 !important;
+        margin-top: 0 !important;
+    }
+
+    /* Pair the two top banners side-by-side when both exist */
+    #stats-screen .course-container:has([data-stats-brevet-banner]) .stats-axes-shortcut {
+        grid-column: 1 / 8 !important;
+        margin-top: 0 !important;
+        height: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    #stats-screen .course-container:has(.stats-axes-shortcut) #stats-content > [data-stats-brevet-banner] {
+        grid-column: 8 / -1 !important;
+        margin-bottom: 0 !important;
+        height: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    #stats-screen .course-container:not(:has([data-stats-brevet-banner])) .stats-axes-shortcut {
+        grid-column: 1 / -1 !important;
+        margin-top: 0 !important;
+    }
+
+    /* Pair Global Gauge (left) and Mastery Distribution (right) on the same row */
+    #stats-screen .course-container #stats-content > .premium-gauge-container {
+        grid-column: 1 / 4 !important;
+        margin: 0 !important;
+        padding: 16px 14px !important;
+        border-radius: 20px !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+    }
+
+    #stats-screen .course-container #stats-content > .premium-gauge-container .gauge-wrapper {
+        width: 150px !important;
+        height: 150px !important;
+    }
+
+    #stats-screen .course-container #stats-content > .premium-gauge-container .gauge-wrapper svg {
+        width: 150px !important;
+        height: 150px !important;
+    }
+
+    #stats-screen .course-container #stats-content > .premium-gauge-container .gauge-wrapper svg + div > div:first-child {
+        font-size: 2.6rem !important;
+    }
+
+    #stats-screen .course-container #stats-content > .premium-gauge-container .gauge-wrapper svg + div > div:first-child span {
+        font-size: 1.2rem !important;
+    }
+
+    #stats-screen .course-container #stats-content > .premium-gauge-container .gauge-wrapper svg + div > div:last-child {
+        font-size: 0.65rem !important;
+        margin-top: 4px !important;
+    }
+
+    #stats-screen .course-container #stats-content > .premium-gauge-container > div:last-child {
+        margin-top: 10px !important;
+    }
+
+    #stats-screen .course-container #stats-content > .premium-gauge-container > div:last-child > div:first-child {
+        font-size: 0.95rem !important;
+    }
+
+    #stats-screen .course-container #stats-content > .premium-gauge-container + div,
+    #stats-screen .course-container #stats-content > div:has([data-action="QuizsetMasteryFilter"]) {
+        grid-column: 4 / -1 !important;
+        margin-top: 0 !important;
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 20px !important;
+        padding: 16px 20px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+    }
+
+    #stats-screen .course-container #stats-content > .premium-gauge-container + div > .library-section-header,
+    #stats-screen .course-container #stats-content > div:has([data-action="QuizsetMasteryFilter"]) > .library-section-header {
+        margin-bottom: 12px !important;
+    }
+
+    #stats-screen .course-container #stats-content > .premium-gauge-container + div > div,
+    #stats-screen .course-container #stats-content div:has(> div[data-action="QuizsetMasteryFilter"]) {
+        display: grid !important;
+        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    #stats-screen .course-container #stats-content div[data-action="QuizsetMasteryFilter"] {
+        max-width: none !important;
+        min-width: 0 !important;
+        padding: 14px 6px !important;
+        border-radius: 14px !important;
+    }
+
+    #stats-screen .course-container #stats-content div[data-action="QuizsetMasteryFilter"] > div:first-child {
+        font-size: 1.65rem !important;
+    }
+}
+
+#stats-content div:has(> div > .sort-btn),
+#stats-content div:has(> .stats-sort-container) {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
@@ -522,7 +769,8 @@ body.light-mode .bank-item-explication {
     box-sizing: border-box !important;
 }
 
-#stats-content div:has(> div > .sort-btn) > div:first-child {
+#stats-content div:has(> div > .sort-btn) > div:first-child,
+#stats-content div:has(> .stats-sort-container) > div:first-child {
     min-width: 0 !important;
     flex: 1 1 200px !important;
     word-break: break-word !important;

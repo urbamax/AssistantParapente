@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import QuizView from '../../js/views/quiz.js';
 import StorageService from '../../js/services/storage.js';
-import { getQuestionLastSeen, buildQuestionsHtml } from '../../js/views/quiz_stats_html.js';
+import { getQuestionLastSeen, getQuestionExamCounts, buildQuestionsHtml } from '../../js/views/quiz_stats_html.js';
 import { encodeAnswerLog } from '../../js/services/answer_log.js';
 
 describe('Quiz Stats - Chronological question sorting (Par date)', () => {
@@ -62,7 +62,7 @@ describe('Quiz Stats - Chronological question sorting (Par date)', () => {
     });
 
     describe('buildQuestionsHtml & data-date attribute', () => {
-        it('renders sort-date-btn and sets data-date on question cards', () => {
+        it('renders sort dropdown with date options and sets data-date on question cards', () => {
             const levelQs = [
                 { code: 'A1V', theme: 'Météo', question: 'Question A', choices: [{ text: 'x', pts: 1 }] },
                 { code: 'B2V', theme: 'Météo', question: 'Question B', choices: [{ text: 'y', pts: 1 }] },
@@ -83,8 +83,9 @@ describe('Quiz Stats - Chronological question sorting (Par date)', () => {
 
             const html = buildQuestionsHtml(mockView, { levelQs, levelQuestionEntries, stats });
 
-            expect(html).toContain('id="sort-date-btn"');
-            expect(html).toContain('Par date');
+            expect(html).toContain('id="sort-questions-select"');
+            expect(html).toContain('value="date-desc"');
+            expect(html).toContain('value="date-asc"');
             expect(html).toContain('data-code="A1V"');
             expect(html).toContain('data-date="1730100000000"');
             expect(html).toContain('data-code="B2V"');
@@ -184,9 +185,7 @@ describe('Quiz Stats - Chronological question sorting (Par date)', () => {
                 stats: { questions: {} },
             });
 
-            // Date button has arrow and active background
-            expect(html).toContain('id="sort-date-btn"');
-            expect(html).toContain('ri-arrow-down-line');
+            // Date option is selected in dropdown
             expect(html).toContain('id="sort-questions-select"');
             expect(html).toContain('value="date-desc" selected');
             // Q2 (newer) comes before Q1 (older)
@@ -213,6 +212,117 @@ describe('Quiz Stats - Chronological question sorting (Par date)', () => {
             const items = Array.from(document.querySelectorAll('.question-stat-item'));
             const totals = items.map((el) => Number(el.dataset.total));
             expect(totals).toEqual([0, 1, 2, 3]);
+        });
+    });
+
+    describe('Exam badge & sorting by exam count (Par examens)', () => {
+        it('getQuestionExamCounts counts question appearances across exams', () => {
+            const examHistory = [
+                {
+                    id: 'e1',
+                    results: [{ code: 'A1V' }, { question: { code: 'B2V' } }, { questionCode: 'C3V' }],
+                },
+                {
+                    id: 'e2',
+                    results: [{ code: 'A1V' }, { question: 'C3V' }],
+                },
+            ];
+            const counts = getQuestionExamCounts(examHistory);
+            expect(counts.get('A1V')).toBe(2);
+            expect(counts.get('B2V')).toBe(1);
+            expect(counts.get('C3V')).toBe(2);
+            expect(counts.get('D4V')).toBeUndefined();
+        });
+
+        it('renders exam badge ("Examen" / "Examen ×N") and data-exams attribute', () => {
+            const levelQs = [
+                { code: 'A1V', theme: 'Météo', question: 'Q1', choices: [{ text: 'x', pts: 1 }] },
+                { code: 'B2V', theme: 'Météo', question: 'Q2', choices: [{ text: 'y', pts: 1 }] },
+                { code: 'C3V', theme: 'Météo', question: 'Q3', choices: [{ text: 'z', pts: 1 }] },
+            ];
+            const stats = {
+                questions: {
+                    A1V: { total: 3, correct: 2, streak: 1 },
+                    B2V: { total: 2, correct: 1, streak: 0 },
+                    C3V: { total: 1, correct: 1, streak: 1 },
+                },
+            };
+            const examHistory = [
+                { id: 'e1', date: '2026-10-01T10:00:00Z', results: [{ code: 'A1V' }, { code: 'B2V' }] },
+                { id: 'e2', date: '2026-10-05T10:00:00Z', results: [{ code: 'A1V' }] },
+            ];
+            const mockView = {
+                state: {
+                    masteryFilter: 'ALL',
+                    themeFilter: null,
+                    questionSort: 'exams',
+                    questionSortDir: 'desc',
+                    questionSortExplicit: true,
+                },
+                getQuestionByCode: (code) => levelQs.find((q) => q.code === code),
+                getCourseUrl: () => null,
+            };
+
+            const html = buildQuestionsHtml(mockView, {
+                levelQs,
+                levelQuestionEntries: Object.entries(stats.questions),
+                stats,
+                examHistory,
+            });
+
+            expect(html).toContain('data-code="A1V"');
+            expect(html).toContain('data-exams="2"');
+            expect(html).toContain('🎓 Examen ×2');
+            expect(html).toContain('Posée 2 fois en examen');
+
+            expect(html).toContain('data-code="B2V"');
+            expect(html).toContain('data-exams="1"');
+            expect(html).toContain('🎓 Examen</span>');
+            expect(html).toContain('Posée 1 fois en examen');
+
+            expect(html).toContain('data-code="C3V"');
+            expect(html).toContain('data-exams="0"');
+
+            // Sorted descending by exam count: A1V (2), B2V (1), C3V (0)
+            const posA = html.indexOf('data-code="A1V"');
+            const posB = html.indexOf('data-code="B2V"');
+            const posC = html.indexOf('data-code="C3V"');
+            expect(posA).toBeLessThan(posB);
+            expect(posB).toBeLessThan(posC);
+        });
+
+        it('QuizView.sortQuestions sorts by exams desc and asc', () => {
+            document.body.innerHTML = `
+                <div id="stats-content">
+                    <select id="sort-questions-select">
+                        <option value="exams-desc">Plus posées</option>
+                        <option value="exams-asc">Moins posées</option>
+                    </select>
+                    <button id="sort-exams-btn" class="sort-btn">Par examens</button>
+                    <div id="all-questions-list">
+                        <div class="question-stat-item" data-code="Q_ONE" data-pct="50" data-total="2" data-streak="0" data-date="1000" data-exams="1">Q1</div>
+                        <div class="question-stat-item" data-code="Q_THREE" data-pct="80" data-total="3" data-streak="2" data-date="5000" data-exams="3">Q3</div>
+                        <div class="question-stat-item" data-code="Q_ZERO" data-pct="30" data-total="1" data-streak="0" data-date="3000" data-exams="0">Q0</div>
+                    </div>
+                </div>
+            `;
+
+            QuizView.sortQuestions('exams');
+            expect(QuizView.state.questionSort).toBe('exams');
+            expect(QuizView.state.questionSortDir).toBe('desc');
+            expect(Array.from(document.querySelectorAll('.question-stat-item')).map((el) => el.dataset.code)).toEqual([
+                'Q_THREE',
+                'Q_ONE',
+                'Q_ZERO',
+            ]);
+
+            QuizView.sortQuestions('exams-asc');
+            expect(QuizView.state.questionSortDir).toBe('asc');
+            expect(Array.from(document.querySelectorAll('.question-stat-item')).map((el) => el.dataset.code)).toEqual([
+                'Q_ZERO',
+                'Q_ONE',
+                'Q_THREE',
+            ]);
         });
     });
 });
