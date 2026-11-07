@@ -342,15 +342,13 @@ describe('statistics filter label (spec 025)', () => {
         QuizView.renderStats();
         const content = document.getElementById('stats-content');
         expect(content.querySelector('img')).toBeNull();
-        expect(content.textContent).toContain(
-            '(Toutes les questions tentées • Thème : <img src=x onerror="window.__spec025=1">)',
-        );
+        expect(content.textContent).toContain('(Thème : <img src=x onerror="window.__spec025=1">)');
     });
 
     it('puts a space before the colon in « Thème : » and « Détail : »', () => {
         QuizView.state.themeFilter = 'Météo';
         QuizView.renderStats();
-        expect(text('stats-content')).toContain('(Toutes les questions tentées • Thème : Météo)');
+        expect(text('stats-content')).toContain('(Thème : Météo)');
         QuizService.state.loadingError = 'CORS';
         QuizView.renderStats();
         expect(text('stats-content')).toContain('Détail : CORS');

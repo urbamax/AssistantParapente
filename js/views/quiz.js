@@ -283,6 +283,33 @@ class QuizViewClass extends QuizVoiceBase {
 
     // --- EVENT DELEGATION ---
     handleClick(e) {
+        const optionRow = e.target.closest('.qcm-option-group > .bank-choice');
+        if (optionRow && !e.target.closest('[data-action="openUrl"]')) {
+            const group = optionRow.parentElement;
+            const details = group
+                ? /** @type {HTMLDetailsElement | null} */ (group.querySelector('details.qcm-option-explanation'))
+                : null;
+            if (details) {
+                if (group && optionRow.offsetHeight) {
+                    group.style.setProperty('--row-h', `${optionRow.offsetHeight}px`);
+                }
+                details.open = !details.open;
+                AppEvents.markHandled(e);
+                return;
+            }
+        }
+
+        const summary = e.target.closest('.qcm-option-group > details > summary');
+        if (summary) {
+            const group = summary.closest('.qcm-option-group');
+            const row = group
+                ? /** @type {HTMLElement | null} */ (group.querySelector('.bank-choice, .qcm-option'))
+                : null;
+            if (group && row && row.offsetHeight) {
+                group.style.setProperty('--row-h', `${row.offsetHeight}px`);
+            }
+        }
+
         // Find closest element with data-action
         const target = e.target.closest('[data-action]');
         if (!target) return;
@@ -340,7 +367,13 @@ class QuizViewClass extends QuizVoiceBase {
                 this.setThemeFilter(args[0]);
                 break;
             case 'QuiztoggleQuestionDetails':
+                if (e.target.closest('.question-answers, details, summary')) {
+                    break;
+                }
                 this.toggleQuestionDetails(args[0]);
+                break;
+            case 'QuizcloseExamModal':
+                this.closeExamModal();
                 break;
             case 'QuizsortQuestions':
                 this.sortQuestions(args[0]);
@@ -507,6 +540,9 @@ class QuizViewClass extends QuizVoiceBase {
                 colorStyle = `background: linear-gradient(90deg, ${stops.join(', ')}); border: 1px solid rgba(255,255,255,0.1); color: var(--text-main); text-shadow: 0 1px 2px rgba(0,0,0,0.5);`;
             }
 
+            const perOption = optionExplanations(q);
+            const courseLinks = this.getCourseLinks(q.code);
+
             html += `
                 <div class="bank-item">
                     <div class="bank-item-header">
@@ -516,21 +552,35 @@ class QuizViewClass extends QuizVoiceBase {
                     <div class="bank-item-question">${escapeHTML(q.question)}</div>
                     <div class="bank-item-choices">
                         ${q.choices
-                            .map(
-                                (c) => `
+                            .map((c, idx) => {
+                                const isCorrectChoice = c.pts > 0;
+                                const text = perOption ? perOption[idx] : null;
+                                const links = isCorrectChoice ? choiceCourseLinksHtml(courseLinks) : '';
+                                const explHtml = text
+                                    ? optionExplanationHtml(text, 'ok', tq('question.explanation'), links)
+                                    : '';
+                                const choiceHtml = `
                             <div class="bank-choice ${c.pts > 0 ? 'correct' : c.pts < 0 ? 'incorrect' : ''}">
                                 ${escapeHTML(c.text)} ${c.pts > 0 ? '(+' + c.pts + ')' : c.pts < 0 ? '(' + c.pts + ')' : ''}
                             </div>
-                        `,
-                            )
+                        `;
+                                return explHtml
+                                    ? `<div class="qcm-option-group">${choiceHtml}${explHtml}</div>`
+                                    : choiceHtml;
+                            })
                             .join('')}
                     </div>
-                    ${q.explication ? `<div class="bank-item-explication">${explanationHtml(q.explication)}</div>` : ''}
+                    ${
+                        !perOption && (q.explication || courseLinks.length > 0)
+                            ? `<div class="bank-item-explication">${q.explication ? `<div>${explanationHtml(q.explication)}</div>` : ''}${courseLinksHtml(courseLinks)}</div>`
+                            : ''
+                    }
                 </div>
             `;
         });
 
         container.innerHTML = html;
+        // Do not observe thousands of bank choices with individual ResizeObservers (causes severe reflow stalls).
     }
 
     updateModeUI(mode, targetBtn) {

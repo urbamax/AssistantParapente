@@ -1195,7 +1195,7 @@ export const FR = Object.freeze({
             outOf: '(sur {total})',
             sortAlpha: 'Alphabétique',
             sortRate: 'Taux',
-            themeCount: '{attempted} tentées / {total} questions',
+            themeCount: '{attempted} / {total} tentées',
             themeNotAttemptedOne: '({count} non tentée)',
             themeNotAttemptedMany: '({count} non tentées)',
             removeFilter: '✕ Retirer filtre',

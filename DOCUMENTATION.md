@@ -334,33 +334,54 @@ Tracks the pilot's official FFVL certifications (`BI`, `BP`, `BPC`, `TREUIL`) in
 
 
 
-## 📚 FFVL Theory & QCM Engine
+### 3d. Landing approach detection & landed-out flag (spec 040, `js/services/landing_approach.js`)
+- **Landing Approach Detection**: Analyzes the final descent phase of an IGC flight trace (from 100 m above landing down to 10 m). By counting same-direction heading turns of 70° or more, it automatically suggests standard flight patterns: `Directe` (0 turn), `En U` (1 turn), `En S` (2 turns), or `En huit` (3+ turns). It abstains on ambiguous tracks (tight spirals, hops, tracks ending mid-air).
+- **Custom Approaches & Landed Out**: Pilots can freely record their own landing pattern or check "Posé hors terrain (vache)". Badges appear on history cards and values are editable.
+
+### 3e. Importing FFVL Intranet Logbooks (spec 046, `js/services/xlsx_reader.js`)
+- Direct offline reading of `.xlsx` Excel spreadsheets exported from the FFVL intranet logbook (Passport > Logbook > Excel Export) without any third-party library.
+- Imported flights receive an import mark (`batch`, `date`, `fingerprint`), avoid duplication if re-imported, and can be cancelled as a whole batch from the logbook history.
 
 ### 4. Wing & Equipment Hours Tracking (`js/services/logbook_service.js`)
-Every logged flight automatically increments the total airtime (hours & minutes) of the associated wing and harness, triggering visual alerts when equipment passes maintenance thresholds (e.g., 100h inspection alert).
+Every logged flight automatically increments the total airtime (hours & minutes) of the associated wing and harness, triggering visual alerts when equipment passes maintenance thresholds (e.g., 100h inspection alert). For **emergency rescue parachutes**, wear is tracked by **openings** rather than airtime: an opened rescue immediately triggers a red maintenance alert until a repacking date on or after the deployment date is recorded.
 
 ### 5. Coordinates of a Manually Entered Place (spec 011)
 A place typed in the add form that is not in the site database can be placed on an inline Leaflet map (« Placer sur la carte »: Esri satellite and topo layers from the host already cached by the service worker, created only when opened and released on re-render and in `unmount()`), or by pasting coordinates (decimal, degrees-minutes-seconds or a Google Maps `@lat,lon` link, parsed by `parseCoordinates` in `js/utils/geo_utils.js`). They are stored as `lat`/`lon` on the session and used for its weather; an imported IGC track overrides them. `LogbookService.findLastCoordsForPlace(name)` proposes the coordinates of the latest earlier session at the same place.
 
----
-
 ### 6. Flight traces follow the account (spec 037)
 The flight document in `users/{uid}/logbook/{id}` never carries the IGC text: `stripTrace()` (`js/services/flight_trace_sync.js`) removes `rawIgc` before every write. The trace lives in `users/{uid}/igcTraces/{flightId}_{index}`: `js/utils/trace_codec.js` gzips the text (`CompressionStream`, fallback plain base64), cuts it in parts of at most 700,000 characters (12 parts max, under the 1 MiB document limit) and stores a SHA-256 digest. The flight keeps a small `traceCloud` descriptor (`at`, `parts`, `bytes`, `encoding`, `digest`); `traceUpdatedAt` is set when a new trace is attached, and a trace is uploaded when `traceUpdatedAt > traceCloud.at` (two per sync, so a large backlog is spread over several syncs). On another device the logbook shows the trace buttons from `traceCloud` alone; `LogbookService.getFlightTrace()` reads memory/IndexedDB first, otherwise downloads and verifies the parts, then caches them in IndexedDB. Deleting a flight (or its tombstone) deletes its parts. Flights that still carry a legacy `rawIgc` in the cloud are migrated automatically on the next sync. The `igcTraces` rules (`isTracePart` in `firestore.rules`) are tested in `tests/firestore_rules/`; **publish the rules before deploying the app version that uploads traces**.
+
+---
 
 ## 📚 FFVL Theory & QCM Engine
 
 ### 1. Modes of Operation (`js/services/quiz_service.js`)
-- **Training Mode**: Instant correction per question, selection by category/theme (Météo, Aérologie, Réglementation, Pilotage, Matériel).
-- **Exam Mode**: 60 random questions selected across all subjects according to official FFVL weighting. Includes a strict 60-minute countdown timer.
-- **Revision Mode**: Focuses specifically on questions previously answered incorrectly by the user.
+- **Training Mode (`TRAINING`)**: Instant correction per question, selection by category/theme (Météo, Mécavol, Matériel, Pilotage, Réglementation, etc.). Displays collapsible explanations for each choice individually, with direct links to verified official course PDF pages under correct answers. Recurring traps are automatically detected and highlighted with a dedicated badge and replayed later in the series.
+- **Exam Mode (`EXAM`)**: 30 questions (60 for BP) drawn proportionally across themes with a 60-minute countdown.
+  - **Points Scoring**: Evaluated strictly using official FFVL positive/negative points with pass threshold at exact 75.0% (`ratio >= 0.75`).
+  - **Review & Navigation**: Pilots can navigate backward and forward, changing answers before submission.
+  - **Incomplete / Invalidation Handling**: An exam is aborted without polluting statistics if abandoned mid-way or invalidated (switching tabs for more than a few seconds).
+  - **Idempotent Replay**: Completed exams are replayed idempotently into question-level statistics and spaced-repetition schedules across local storage and cloud sync.
+  - **Modal Exam Review**: Clicking an exam card in history opens a modal dialog displaying all exam questions and explanations in full width.
+- **Revision Mode (`REVISION`)**: Leitner-style spaced repetition schedule (intervals of 1, 3, 7, 14, 30 days) prioritizing unanswered questions and overdue reviews. Automatically selected when reviewing a certified level.
+- **Perfectionnement Mode (`MASTERY`)**: Dynamic target threshold (50%, 75%, 100%) targeting unmastered questions and continuously adjusting the required series length after every validated answer.
+- **Revision Axes (`REVISION_AXES`, spec 043)**: Splits the 777 official FFVL questions into 21 sub-chapters categorized by pilot mastery (Point bloquant, À rafraîchir, À découvrir, Maîtrisé). Offers a 3-step structured study path:
+  1. Open official course PDFs directly at exact verified pages.
+  2. Study concise key concepts synthesized from explanations (without spoiling question statements).
+  3. Launch targeted mini-workshops (5–8 questions) or an anti-trap workshop specifically focusing on repeated errors.
+- **Hands-Free Voice Mode (`QuizVoiceBase` & `VoiceService`)**: Spoken questions, choice selection by letter, automatic chaining (`Enchaîner`) advancing after correction, screen kept on via Screen Wake Lock API during listening, and spoken summary scores.
+- **Keyboard Shortcuts**: Complete desktop keyboard navigation (keys `A`–`D` or `1`–`4` to toggle choices, `Enter` to validate and advance, arrow keys to navigate).
 
-### 2. Service Encapsulation & Indexing (`QuizService`)
+### 2. In-App PDF Course Viewer (`js/views/course_viewer.js`)
+When running as an installed PWA on mobile or tablet, course PDF links (from the library, QCM explanations, or revision axes) open in a custom overlay viewer built on local `pdf.js` (`vendor/pdfjs-6.4.299/`). It provides a top header with a "Retour" button, page counter, pinch-to-zoom and zoom buttons, and closes smoothly on Escape or device back gestures without unloading the background screen. Desktop browser tabs continue to use the browser's native PDF reader.
+
+### 3. Service Encapsulation & Indexing (`QuizService`)
 - **Data Encapsulation**: Questions are encapsulated within `QuizService` and accessed via `getQuestions()`, `getThemes()`, and `getQuestionsByTheme()` (using `Object.groupBy` Baseline 2024).
 - **Fast Lookup**: `getQuestionByCode(code)` maintains an internal `Map` for $\mathcal{O}(1)$ resolution by code or id.
 - **Backwards Compatibility**: `window.QCM_OFFICIAL` is mirrored for external tools and debugging console access.
 
-### 3. Scoring & Progression Analytics
-Calculates overall success percentage, subject mastery radar, active day streak, and logs exam history locally and in Cloud Firestore.
+### 4. Scoring & Progression Analytics
+Calculates overall success percentage, subject mastery radar, active day streak, official theory validation status, and logs exam history locally and in Cloud Firestore. Question lists can be sorted by mastery rate, attempt counts, recent answer dates, or code.
 
 ---
 
