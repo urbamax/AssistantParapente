@@ -205,6 +205,11 @@ class QuizViewClass extends QuizVoiceBase {
     async unmount() {
         await super.unmount();
         this.stopVoice();
+        clearTimeout(this._examLeaveTimer);
+        this._examLeaveTimer = null;
+        if (typeof QuizService.abortExamIfIncomplete === 'function') {
+            QuizService.abortExamIfIncomplete();
+        }
         if (this._handleClick) document.body.removeEventListener('click', this._handleClick);
         if (this._handleKeydown) document.removeEventListener('keydown', this._handleKeydown);
 
@@ -429,6 +434,11 @@ class QuizViewClass extends QuizVoiceBase {
 
     // --- UI UPDATES ---
     showBankScreen() {
+        clearTimeout(this._examLeaveTimer);
+        this._examLeaveTimer = null;
+        if (typeof QuizService.abortExamIfIncomplete === 'function') {
+            QuizService.abortExamIfIncomplete();
+        }
         document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
         const bankScreen = document.getElementById('qcm-bank-screen');
         if (bankScreen) {
@@ -683,6 +693,11 @@ class QuizViewClass extends QuizVoiceBase {
     }
 
     showSetupScreen() {
+        clearTimeout(this._examLeaveTimer);
+        this._examLeaveTimer = null;
+        if (typeof QuizService.abortExamIfIncomplete === 'function') {
+            QuizService.abortExamIfIncomplete();
+        }
         document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
         document.getElementById('qcm-setup-screen').classList.add('active');
         this.syncOfficialTheoryForLevel();
@@ -1123,7 +1138,9 @@ class QuizViewClass extends QuizVoiceBase {
             ? this.workshopTitle(this._activeWorkshopAxisId)
             : tql(`modes.labels.${['EXAM', 'REVISION', 'MASTERY'].includes(sessionMode) ? sessionMode : 'TRAINING'}`);
 
-        if (isExam) {
+        const isInvalidated = QuizService.state.invalidated === true;
+
+        if (isExam && !isInvalidated) {
             const level = typeof GlobalState !== 'undefined' ? GlobalState.get('level') : 'BI';
             QuizService.saveExamHistory(level);
         }
@@ -1145,7 +1162,6 @@ class QuizViewClass extends QuizVoiceBase {
                 ? QuizService.state.qcmSessionData.length
                 : results.length;
         const correctCount = results.filter((r) => r.isCorrect).length;
-        const isInvalidated = QuizService.state.invalidated === true;
 
         let displayScoreHtml;
         let percentage;

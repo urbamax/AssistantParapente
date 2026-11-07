@@ -45,6 +45,11 @@ export class QuizStatsBase extends BaseView {
     }
 
     showStatsScreen() {
+        clearTimeout(this._examLeaveTimer);
+        this._examLeaveTimer = null;
+        if (typeof QuizService.abortExamIfIncomplete === 'function') {
+            QuizService.abortExamIfIncomplete();
+        }
         document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
         const statsScreen = document.getElementById('stats-screen');
         if (statsScreen) statsScreen.classList.add('active');
@@ -52,6 +57,11 @@ export class QuizStatsBase extends BaseView {
     }
 
     showRevisionAxesScreen() {
+        clearTimeout(this._examLeaveTimer);
+        this._examLeaveTimer = null;
+        if (typeof QuizService.abortExamIfIncomplete === 'function') {
+            QuizService.abortExamIfIncomplete();
+        }
         document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
         const axesScreen = document.getElementById('revision-axes-screen');
         if (axesScreen) axesScreen.classList.add('active');
