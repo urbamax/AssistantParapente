@@ -3,6 +3,7 @@ import QuizService, {
     FFVL_THEME_DISTRIBUTION,
     FFVL_EXAM_QUOTAS,
     getExamQuotas,
+    calculateExamPoints,
 } from '../../js/services/quiz_service.js';
 import { readFileSync } from 'node:fs';
 
@@ -211,5 +212,24 @@ describe('QuizService - Conformité officielle des examens FFVL (BI / BP / BPC)'
         expect(selection).toHaveLength(3);
         const codes = selection.map((q) => q.code).sort();
         expect(codes).toEqual(['A1V', 'E2V', 'S3V']);
+    });
+});
+
+describe('calculateExamPoints : seuil de réussite sur le ratio exact', () => {
+    const q = {
+        code: 'X1V',
+        choices: [
+            { text: 'a', pts: 6 },
+            { text: 'b', pts: -6 },
+        ],
+    };
+    const mk = (okCount, total) =>
+        Array.from({ length: total }, (_, i) => ({ code: 'X1V', question: q, userPoints: i < okCount ? 6 : 0 }));
+
+    it('74,6 % (arrondi à 75 %) ne réussit pas', () => {
+        expect(calculateExamPoints(mk(373, 500)).passed).toBe(false);
+    });
+    it('exactement 75 % réussit', () => {
+        expect(calculateExamPoints(mk(3, 4)).passed).toBe(true);
     });
 });
