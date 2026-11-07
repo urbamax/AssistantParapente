@@ -265,7 +265,7 @@ export function buildThemesHtml(view, levelThemes) {
                     </div>
 
                     <!-- Theme name — full width, wraps freely -->
-                    <div style="font-weight:700; font-size:0.88rem; line-height:1.3; letter-spacing:0.01em; margin-bottom:12px;">${name}</div>
+                    <div class="theme-card-name" style="font-weight:700; font-size:0.88rem; line-height:1.3; letter-spacing:0.01em; margin-bottom:12px;">${name}</div>
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
