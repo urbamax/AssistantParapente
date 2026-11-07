@@ -216,7 +216,13 @@ describe('QuizService - Conformité officielle des examens FFVL (BI / BP / BPC)'
 });
 
 describe('calculateExamPoints : seuil de réussite sur le ratio exact', () => {
-    const q = { code: 'X1V', choices: [{ text: 'a', pts: 6 }, { text: 'b', pts: -6 }] };
+    const q = {
+        code: 'X1V',
+        choices: [
+            { text: 'a', pts: 6 },
+            { text: 'b', pts: -6 },
+        ],
+    };
     const mk = (okCount, total) =>
         Array.from({ length: total }, (_, i) => ({ code: 'X1V', question: q, userPoints: i < okCount ? 6 : 0 }));
 
