@@ -14,7 +14,9 @@ import { COURSES_DATA } from '../data/courses_data.js';
 import GdprEngine from '../gdpr_engine.js';
 import BaseView from '../core/base_view.js';
 import { tq, tql } from './quiz_strings.js';
-import { explanationHtml } from './quiz_explanation.js';
+import { choiceCourseLinksHtml, courseLinksHtml } from './quiz_course_links.js';
+import { explanationHtml, optionExplanationHtml, optionExplanations, optionOutcome } from './quiz_explanation.js';
+import { choiceIndex } from '../services/answer_log.js';
 import { buildRevisionAxes } from '../services/revision_axes.js';
 import { floorPercent1, formatPercent } from '../utils/text_utils.js';
 import { buildRevisionAxesDashboardHtml } from './quiz_axes_html.js';
@@ -45,6 +47,11 @@ export class QuizStatsBase extends BaseView {
     }
 
     showStatsScreen() {
+        clearTimeout(this._examLeaveTimer);
+        this._examLeaveTimer = null;
+        if (typeof QuizService.abortExamIfIncomplete === 'function') {
+            QuizService.abortExamIfIncomplete();
+        }
         document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
         const statsScreen = document.getElementById('stats-screen');
         if (statsScreen) statsScreen.classList.add('active');
@@ -52,6 +59,11 @@ export class QuizStatsBase extends BaseView {
     }
 
     showRevisionAxesScreen() {
+        clearTimeout(this._examLeaveTimer);
+        this._examLeaveTimer = null;
+        if (typeof QuizService.abortExamIfIncomplete === 'function') {
+            QuizService.abortExamIfIncomplete();
+        }
         document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
         const axesScreen = document.getElementById('revision-axes-screen');
         if (axesScreen) axesScreen.classList.add('active');
@@ -365,11 +377,15 @@ export class QuizStatsBase extends BaseView {
                 totalLevelQuestions,
             });
             const { themesHtml, sortControlsHtml } = buildThemesHtml(this, levelThemes);
+            const allExams = QuizService.getExamHistory();
+            const levelExams =
+                currentLevel !== 'ALL' ? allExams.filter((e) => !e.level || e.level === currentLevel) : allExams;
             const allQuestionsHtml = buildQuestionsHtml(this, {
                 levelQs,
                 levelQuestionEntries,
                 stats,
-                examHistory: QuizService.getExamHistory(),
+                examHistory: levelExams,
+                currentLevel,
             });
             const officialTheoryBannerHtml = buildOfficialTheoryBannerHtml(
                 currentLevel,
@@ -481,6 +497,13 @@ export class QuizStatsBase extends BaseView {
 
                 if (!q) return; // Skip if question couldn't be resolved
 
+                const qCode =
+                    q.code || r.code || r.questionCode || (typeof r.question === 'string' ? r.question : null);
+                const original = (qCode && this.getQuestionByCode(qCode)) || q;
+                const perOption = optionExplanations(original);
+                const courseLinks =
+                    qCode && typeof this.getCourseLinks === 'function' ? this.getCourseLinks(qCode) : [];
+
                 const selectedOptions = r.selected || [];
                 let optionsHtml = '';
 
@@ -491,6 +514,7 @@ export class QuizStatsBase extends BaseView {
                         return Boolean(s && s.text === opt.text);
                     });
                     const pts = parseInt(opt.pts || 0);
+                    const isCorrectChoice = pts > 0;
                     let statusClass;
                     let icon = '';
 
@@ -510,36 +534,41 @@ export class QuizStatsBase extends BaseView {
                         statusClass = 'background:rgba(255,255,255,0.02);';
                     }
 
-                    optionsHtml += `
-            <div style="padding:8px 12px; border-radius:6px; ${statusClass} display:flex; align-items:center; gap:8px; font-size:0.85rem;" >
+                    const origIdx = choiceIndex(original, opt);
+                    const text = perOption ? perOption[origIdx >= 0 ? origIdx : optIdx] : null;
+                    const outcome = optionOutcome({ pts }, wasSelected);
+                    const links = isCorrectChoice ? choiceCourseLinksHtml(courseLinks) : '';
+                    const explHtml = text
+                        ? optionExplanationHtml(text, outcome, tq('question.explanation'), links)
+                        : '';
+
+                    const choiceHtml = `
+            <div class="bank-choice" style="padding:8px 12px; border-radius:6px; ${statusClass} display:flex; align-items:center; gap:8px; font-size:0.85rem;" >
                 ${icon}
         <span style="flex:1;">${escapeHTML(opt.text)}</span>
                         </div >
     `;
+                    optionsHtml += explHtml
+                        ? `<div class="qcm-option-group">${choiceHtml}${explHtml}</div>`
+                        : choiceHtml;
                 });
+
+                const expl = q.explanation || q.explication || original.explication || original.explanation;
 
                 questionsHtml += `
     <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; ${!r.isCorrect ? 'border:1px solid #f87171;' : ''}" >
-                        <div style="font-size:0.75rem; opacity:0.6; margin-bottom:6px;">${tq('history.questionNumber', { n: idx + 1 })}</div>
+                        <div style="font-size:0.75rem; opacity:0.6; margin-bottom:6px;">${tq('history.questionNumber', { n: idx + 1 })}${qCode ? ` • <span style="font-family:monospace;">#${escapeHTML(qCode)}</span>` : ''}</div>
                         <div style="font-weight:600; margin-bottom:12px;">${escapeHTML(q.question)}</div>
-                        <div style="display:flex; flex-direction:column; gap:6px;">
+                        <div class="bank-item-choices" style="display:flex; flex-direction:column; gap:6px;">
                             ${optionsHtml}
                         </div>
-                        ${function () {
-                            // Try to get explanation from saved question, or lookup in the current question bank
-                            let expl = q.explanation || q.explication;
-                            if (!expl) {
-                                const currentQ = this.getQuestionByCode(q.code);
-                                if (currentQ) expl = currentQ.explication || currentQ.explanation;
-                            }
-
-                            if (expl) {
-                                return `<div style="margin-top:12px; padding:8px; background:rgba(251, 146, 60, 0.15); border-left:3px solid #fb923c; font-size:0.85rem; color:var(--text-main); border-radius:8px;">
-                                    <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">${tq('explanation')}</div>
-                                    ${explanationHtml(expl)}</div>`;
-                            }
-                            return '';
-                        }.call(this)}
+                        ${
+                            !perOption && (expl || courseLinks.length > 0)
+                                ? `<div class="bank-item-explication" style="margin-top:12px;">
+                                    ${expl ? `<div>${explanationHtml(expl)}</div>` : ''}
+                                    ${courseLinksHtml(courseLinks)}</div>`
+                                : ''
+                        }
                     </div >
     `;
             });
@@ -558,14 +587,13 @@ export class QuizStatsBase extends BaseView {
             </div>`;
 
             html += `
-    <div role="button" tabindex="0" data-exam-id="${exam.id}" style="background:var(--bg-card); padding:16px; border-radius:12px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleExamDetails" data-args="['${exam.id}']" >
+    <div role="button" tabindex="0" data-exam-id="${exam.id}" data-exam-title="${escapeHTML(`${dateStr} — ${levelLabel} (${formatPercent(pct)}%)`)}" style="background:var(--bg-card); padding:16px; border-radius:12px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleExamDetails" data-args="['${exam.id}']" >
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div style="flex:1;">
                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                     <span style="font-size:0.75rem; opacity:0.6;">${dateStr}</span>
                     <span style="background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:4px; font-size:0.7rem;">${levelLabel}</span>
                     ${exam.invalidated ? `<span style="background:rgba(248, 113, 113, 0.1); color:#f87171; border:1px solid #f87171; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:bold;">${tq('results.invalidated')}</span>` : ''}
-                    <i class="ri-arrow-down-s-line exam-arrow" style="opacity:0.5; transition:transform 0.2s;"></i>
                 </div>
                 <div style="font-size:0.9rem;">
                     <span style="color:${color}; font-weight:700; font-size:1.1rem;">${tq('history.pointsScore', { score: exam.score, total: exam.total })}</span>
@@ -773,6 +801,20 @@ export class QuizStatsBase extends BaseView {
         items.forEach((item) => list.appendChild(item));
     }
 
+    syncOptionGroupHeights(root) {
+        if (!root) return;
+        root.querySelectorAll('.bank-item-choices .qcm-option-group').forEach((el) => {
+            const group = /** @type {HTMLElement} */ (el);
+            const row = /** @type {HTMLElement | null} */ (group.firstElementChild);
+            if (!row) return;
+            const syncRowHeight = () => {
+                if (row.offsetHeight) group.style.setProperty('--row-h', `${row.offsetHeight}px`);
+            };
+            syncRowHeight();
+            if (typeof ResizeObserver !== 'undefined') new ResizeObserver(syncRowHeight).observe(row);
+        });
+    }
+
     toggleQuestionDetails(code) {
         const card = document.querySelector(`[data-code="${code}"]`);
         if (!card) return;
@@ -790,6 +832,7 @@ export class QuizStatsBase extends BaseView {
         } else {
             answersDiv.style.display = 'block';
             if (arrow) arrow.style.transform = 'rotate(180deg)';
+            this.syncOptionGroupHeights(answersDiv);
         }
     }
 
@@ -941,19 +984,58 @@ export class QuizStatsBase extends BaseView {
         if (!card) return;
 
         const detailsDiv = /** @type {HTMLElement} */ (card.querySelector('.exam-details'));
-        const arrow = /** @type {HTMLElement} */ (card.querySelector('.exam-arrow'));
-
         if (!detailsDiv) return;
 
-        const isExpanded = detailsDiv.style.display !== 'none';
-
-        if (isExpanded) {
-            detailsDiv.style.display = 'none';
-            if (arrow) arrow.style.transform = 'rotate(0deg)';
-        } else {
-            detailsDiv.style.display = 'block';
-            if (arrow) arrow.style.transform = 'rotate(180deg)';
+        let modal = /** @type {HTMLDialogElement | null} */ (document.getElementById('exam-details-modal'));
+        if (!modal) {
+            modal = document.createElement('dialog');
+            modal.id = 'exam-details-modal';
+            modal.className = 'gdpr-modal-overlay';
+            modal.setAttribute('data-backdrop-action', 'QuizcloseExamModal');
+            modal.innerHTML = `
+                <div class="gdpr-modal gdpr-modal--large">
+                    <div class="gdpr-modal-header">
+                        <div class="gdpr-modal-title">
+                            <i class="ri-file-list-3-line"></i>
+                            <h2 id="exam-details-modal-title"></h2>
+                        </div>
+                        <button type="button" class="gdpr-modal-close-btn" data-action="QuizcloseExamModal" aria-label="${tq('review.back')}">
+                            <i class="ri-close-line"></i>
+                        </button>
+                    </div>
+                    <div class="gdpr-modal-body" id="exam-details-modal-body"></div>
+                </div>
+            `;
+            document.body.appendChild(modal);
         }
+
+        const titleEl = document.getElementById('exam-details-modal-title');
+        if (titleEl) {
+            titleEl.textContent = card.getAttribute('data-exam-title') || tq('stats.historyTitle');
+        }
+        const bodyEl = document.getElementById('exam-details-modal-body');
+        if (bodyEl) {
+            bodyEl.innerHTML = detailsDiv.innerHTML;
+            this.syncOptionGroupHeights(bodyEl);
+        }
+
+        if (typeof modal.showModal === 'function' && !modal.open) {
+            modal.showModal();
+        } else {
+            modal.setAttribute('open', '');
+            modal.classList.add('active');
+        }
+    }
+
+    closeExamModal() {
+        const modal = /** @type {HTMLDialogElement | null} */ (document.getElementById('exam-details-modal'));
+        if (!modal) return;
+        if (typeof modal.close === 'function' && modal.open) {
+            modal.close();
+        } else {
+            modal.removeAttribute('open');
+        }
+        modal.classList.remove('active');
     }
 
     exportData() {

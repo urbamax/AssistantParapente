@@ -234,6 +234,17 @@ describe('Quiz Stats - Chronological question sorting (Par date)', () => {
             expect(counts.get('D4V')).toBeUndefined();
         });
 
+        it('getQuestionExamCounts filters exams by currentLevel when specified', () => {
+            const examHistory = [
+                { id: 'e1', level: 'BI', results: [{ code: 'F25VBM' }] },
+                { id: 'e2', level: 'BP', results: [{ code: 'F25VBM' }] },
+                { id: 'e3', level: 'BP', results: [{ code: 'F25VBM' }] },
+            ];
+            expect(getQuestionExamCounts(examHistory, 'BI').get('F25VBM')).toBe(1);
+            expect(getQuestionExamCounts(examHistory, 'BP').get('F25VBM')).toBe(2);
+            expect(getQuestionExamCounts(examHistory, 'ALL').get('F25VBM')).toBe(3);
+        });
+
         it('renders exam badge ("Examen" / "Examen ×N") and data-exams attribute', () => {
             const levelQs = [
                 { code: 'A1V', theme: 'Météo', question: 'Q1', choices: [{ text: 'x', pts: 1 }] },

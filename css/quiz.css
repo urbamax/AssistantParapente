@@ -684,11 +684,6 @@ body.light-mode .bank-item-explication {
         font-size: 1.4rem !important;
     }
 
-    #stats-screen #stats-content > .premium-gauge-container .gauge-wrapper svg + div > div:last-child {
-        font-size: 0.68rem !important;
-        margin-top: 6px !important;
-    }
-
     #stats-screen #stats-content > .premium-gauge-container > div:last-child {
         margin-top: 14px !important;
     }
@@ -716,15 +711,16 @@ body.light-mode .bank-item-explication {
     }
 
     #stats-screen #stats-content div:has(> div[data-action="QuizsetMasteryFilter"]) {
-        display: grid !important;
-        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
-        gap: 8px !important;
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        gap: 10px !important;
     }
 
     #stats-screen #stats-content div[data-action="QuizsetMasteryFilter"] {
+        flex: 1 1 0 !important;
         max-width: none !important;
         min-width: 0 !important;
-        padding: 10px 4px !important;
+        padding: 12px 6px !important;
         border-radius: 14px !important;
         overflow: hidden !important;
     }
@@ -768,18 +764,18 @@ body.light-mode .bank-item-explication {
     }
 
     #stats-screen #stats-content .theme-card {
-        padding: 10px 8px !important;
+        padding: 12px 8px !important;
         border-radius: 14px !important;
         min-width: 0 !important;
     }
 
     #stats-screen #stats-content .theme-card-name {
-        font-size: 0.72rem !important;
-        line-height: 1.2 !important;
+        font-size: 0.82rem !important;
+        line-height: 1.25 !important;
         letter-spacing: normal !important;
         word-break: break-word !important;
         hyphens: auto !important;
-        margin-bottom: 8px !important;
+        margin-bottom: 6px !important;
     }
 
     /* Official theory button directly underneath the Global Gauge card (cols 1-3) */
@@ -1522,6 +1518,7 @@ body.light-mode .bank-choice.correct {
     /* Laisse la place de la flèche, et la réponse cochée (agrandie par ailleurs) reste alignée sur sa case. */
     padding-right: 56px !important;
     transform: none;
+    cursor: pointer;
 }
 
 .qcm-option-group:has(> details[open]) > .qcm-option,

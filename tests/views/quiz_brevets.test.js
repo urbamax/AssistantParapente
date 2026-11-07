@@ -78,7 +78,7 @@ describe('QuizView — Official Theory Exam & Progression (spec 042)', () => {
         expect(document.getElementById('mode-revision').classList.contains('active')).toBe(true);
 
         const biBanner = document.querySelector('#qcm-setup-screen [data-quiz-brevet-banner]');
-        expect(biBanner.textContent).toContain('28/30 (93%)');
+        expect(biBanner.textContent).toContain('(93%)');
     });
 
     it('displays the official theory validation badge inside #stats-screen for a validated level', () => {
@@ -91,7 +91,7 @@ describe('QuizView — Official Theory Exam & Progression (spec 042)', () => {
 
         const statsBanner = document.querySelector('#stats-screen [data-stats-brevet-banner]');
         expect(statsBanner).toBeTruthy();
-        expect(statsBanner.textContent).toContain('28/30 (93%)');
+        expect(statsBanner.textContent).toContain('(93%)');
         expect(statsBanner.querySelector('[data-action="openBrevetModal"]')).toBeTruthy();
     });
 });

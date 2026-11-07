@@ -205,6 +205,11 @@ class QuizViewClass extends QuizVoiceBase {
     async unmount() {
         await super.unmount();
         this.stopVoice();
+        clearTimeout(this._examLeaveTimer);
+        this._examLeaveTimer = null;
+        if (typeof QuizService.abortExamIfIncomplete === 'function') {
+            QuizService.abortExamIfIncomplete();
+        }
         if (this._handleClick) document.body.removeEventListener('click', this._handleClick);
         if (this._handleKeydown) document.removeEventListener('keydown', this._handleKeydown);
 
@@ -278,6 +283,19 @@ class QuizViewClass extends QuizVoiceBase {
 
     // --- EVENT DELEGATION ---
     handleClick(e) {
+        const optionRow = e.target.closest('.qcm-option-group > .bank-choice');
+        if (optionRow && !e.target.closest('[data-action="openUrl"]')) {
+            const group = optionRow.parentElement;
+            const details = group
+                ? /** @type {HTMLDetailsElement | null} */ (group.querySelector('details.qcm-option-explanation'))
+                : null;
+            if (details) {
+                details.open = !details.open;
+                AppEvents.markHandled(e);
+                return;
+            }
+        }
+
         // Find closest element with data-action
         const target = e.target.closest('[data-action]');
         if (!target) return;
@@ -335,7 +353,13 @@ class QuizViewClass extends QuizVoiceBase {
                 this.setThemeFilter(args[0]);
                 break;
             case 'QuiztoggleQuestionDetails':
+                if (e.target.closest('.question-answers, details, summary')) {
+                    break;
+                }
                 this.toggleQuestionDetails(args[0]);
+                break;
+            case 'QuizcloseExamModal':
+                this.closeExamModal();
                 break;
             case 'QuizsortQuestions':
                 this.sortQuestions(args[0]);
@@ -429,6 +453,11 @@ class QuizViewClass extends QuizVoiceBase {
 
     // --- UI UPDATES ---
     showBankScreen() {
+        clearTimeout(this._examLeaveTimer);
+        this._examLeaveTimer = null;
+        if (typeof QuizService.abortExamIfIncomplete === 'function') {
+            QuizService.abortExamIfIncomplete();
+        }
         document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
         const bankScreen = document.getElementById('qcm-bank-screen');
         if (bankScreen) {
@@ -497,6 +526,9 @@ class QuizViewClass extends QuizVoiceBase {
                 colorStyle = `background: linear-gradient(90deg, ${stops.join(', ')}); border: 1px solid rgba(255,255,255,0.1); color: var(--text-main); text-shadow: 0 1px 2px rgba(0,0,0,0.5);`;
             }
 
+            const perOption = optionExplanations(q);
+            const courseLinks = this.getCourseLinks(q.code);
+
             html += `
                 <div class="bank-item">
                     <div class="bank-item-header">
@@ -506,21 +538,35 @@ class QuizViewClass extends QuizVoiceBase {
                     <div class="bank-item-question">${escapeHTML(q.question)}</div>
                     <div class="bank-item-choices">
                         ${q.choices
-                            .map(
-                                (c) => `
+                            .map((c, idx) => {
+                                const isCorrectChoice = c.pts > 0;
+                                const text = perOption ? perOption[idx] : null;
+                                const links = isCorrectChoice ? choiceCourseLinksHtml(courseLinks) : '';
+                                const explHtml = text
+                                    ? optionExplanationHtml(text, 'ok', tq('question.explanation'), links)
+                                    : '';
+                                const choiceHtml = `
                             <div class="bank-choice ${c.pts > 0 ? 'correct' : c.pts < 0 ? 'incorrect' : ''}">
                                 ${escapeHTML(c.text)} ${c.pts > 0 ? '(+' + c.pts + ')' : c.pts < 0 ? '(' + c.pts + ')' : ''}
                             </div>
-                        `,
-                            )
+                        `;
+                                return explHtml
+                                    ? `<div class="qcm-option-group">${choiceHtml}${explHtml}</div>`
+                                    : choiceHtml;
+                            })
                             .join('')}
                     </div>
-                    ${q.explication ? `<div class="bank-item-explication">${explanationHtml(q.explication)}</div>` : ''}
+                    ${
+                        !perOption && (q.explication || courseLinks.length > 0)
+                            ? `<div class="bank-item-explication">${q.explication ? `<div>${explanationHtml(q.explication)}</div>` : ''}${courseLinksHtml(courseLinks)}</div>`
+                            : ''
+                    }
                 </div>
             `;
         });
 
         container.innerHTML = html;
+        this.syncOptionGroupHeights(container);
     }
 
     updateModeUI(mode, targetBtn) {
@@ -683,6 +729,11 @@ class QuizViewClass extends QuizVoiceBase {
     }
 
     showSetupScreen() {
+        clearTimeout(this._examLeaveTimer);
+        this._examLeaveTimer = null;
+        if (typeof QuizService.abortExamIfIncomplete === 'function') {
+            QuizService.abortExamIfIncomplete();
+        }
         document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
         document.getElementById('qcm-setup-screen').classList.add('active');
         this.syncOfficialTheoryForLevel();
@@ -1123,7 +1174,9 @@ class QuizViewClass extends QuizVoiceBase {
             ? this.workshopTitle(this._activeWorkshopAxisId)
             : tql(`modes.labels.${['EXAM', 'REVISION', 'MASTERY'].includes(sessionMode) ? sessionMode : 'TRAINING'}`);
 
-        if (isExam) {
+        const isInvalidated = QuizService.state.invalidated === true;
+
+        if (isExam && !isInvalidated) {
             const level = typeof GlobalState !== 'undefined' ? GlobalState.get('level') : 'BI';
             QuizService.saveExamHistory(level);
         }
@@ -1145,7 +1198,6 @@ class QuizViewClass extends QuizVoiceBase {
                 ? QuizService.state.qcmSessionData.length
                 : results.length;
         const correctCount = results.filter((r) => r.isCorrect).length;
-        const isInvalidated = QuizService.state.invalidated === true;
 
         let displayScoreHtml;
         let percentage;
