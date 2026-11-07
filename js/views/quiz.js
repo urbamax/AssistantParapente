@@ -302,7 +302,9 @@ class QuizViewClass extends QuizVoiceBase {
         const summary = e.target.closest('.qcm-option-group > details > summary');
         if (summary) {
             const group = summary.closest('.qcm-option-group');
-            const row = group ? /** @type {HTMLElement | null} */ (group.querySelector('.bank-choice, .qcm-option')) : null;
+            const row = group
+                ? /** @type {HTMLElement | null} */ (group.querySelector('.bank-choice, .qcm-option'))
+                : null;
             if (group && row && row.offsetHeight) {
                 group.style.setProperty('--row-h', `${row.offsetHeight}px`);
             }
