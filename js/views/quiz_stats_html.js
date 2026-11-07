@@ -351,7 +351,7 @@ export function getQuestionExamCounts(examHistory = [], currentLevel = null) {
     if (!Array.isArray(examHistory)) return counts;
     for (const exam of examHistory) {
         if (!exam || !Array.isArray(exam.results)) continue;
-        if (currentLevel && currentLevel !== 'ALL' && exam.level && exam.level !== currentLevel) continue;
+        if (currentLevel && currentLevel !== 'ALL' && exam.level !== currentLevel) continue;
         for (const r of exam.results) {
             const rawCode =
                 r?.code || r?.questionCode || (typeof r?.question === 'object' ? r.question.code : r?.question);
@@ -375,9 +375,10 @@ export function buildQuestionsHtml(
 
     const examDateByCode = new Map();
     const examCountByCode = getQuestionExamCounts(examHistory, currentLevel);
+    const allowGlobalExamCount = !currentLevel || currentLevel === 'ALL';
     if (Array.isArray(examHistory)) {
         for (const exam of examHistory) {
-            if (currentLevel && currentLevel !== 'ALL' && exam?.level && exam.level !== currentLevel) continue;
+            if (currentLevel && currentLevel !== 'ALL' && exam?.level !== currentLevel) continue;
             const examTime = parseDateToMs(exam?.date);
             if (examTime <= 0) continue;
             if (Array.isArray(exam.results)) {
@@ -482,8 +483,8 @@ export function buildQuestionsHtml(
 
                 return sortDir === 'asc' ? valA - valB : valB - valA;
             } else if (sortKey === 'exams') {
-                valA = examCountByCode.get(a[0]) || Number(a[1]?.examCount) || 0;
-                valB = examCountByCode.get(b[0]) || Number(b[1]?.examCount) || 0;
+                valA = examCountByCode.get(a[0]) ?? (allowGlobalExamCount ? Number(a[1]?.examCount) || 0 : 0);
+                valB = examCountByCode.get(b[0]) ?? (allowGlobalExamCount ? Number(b[1]?.examCount) || 0 : 0);
             } else {
                 valA = a[1].total || 0;
                 valB = b[1].total || 0;
@@ -549,7 +550,7 @@ export function buildQuestionsHtml(
             const qColor = pct >= 90 ? '#4ade80' : pct >= 75 ? '#38bdf8' : pct >= 50 ? '#facc15' : '#f87171';
             const streak = data.streak || 0;
             const lastSeen = getQuestionLastSeen(data, code, examDateByCode);
-            const examCount = examCountByCode.get(code) || Number(data?.examCount) || 0;
+            const examCount = examCountByCode.get(code) ?? (allowGlobalExamCount ? Number(data?.examCount) || 0 : 0);
             const examBadgeHtml =
                 examCount > 0
                     ? `<span class="question-exam-badge" title="${tq(examCount > 1 ? 'stats.examBadgeTitleMany' : 'stats.examBadgeTitleOne', { count: examCount })}" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35); padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🎓 ${examCount > 1 ? tq('stats.examBadgeMany', { count: examCount }) : tq('stats.examBadgeOne')}</span>`

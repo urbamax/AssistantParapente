@@ -108,10 +108,29 @@
 }
 
 .instructor-feedback > summary::before {
-    content: '▸';
-    display: inline-block;
-    width: 1.1em;
-    transition: transform 0.2s;
+    content: '❯';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    margin-right: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    color: var(--text-main);
+    font-size: 0.78rem;
+    font-weight: 800;
+    line-height: 1;
+    transition:
+        transform 0.2s,
+        background 0.2s;
+
+    body.light-mode & {
+        background: rgba(15, 23, 42, 0.08);
+        border-color: rgba(15, 23, 42, 0.2);
+        color: #0f172a;
+    }
 }
 
 .instructor-feedback[open] > summary::before {
@@ -1587,7 +1606,7 @@ body.light-mode .bank-choice.correct {
     width: 40px;
     height: var(--row-h, 44px);
     cursor: pointer;
-    color: var(--text-secondary);
+    color: var(--text-main);
     list-style: none;
 }
 
@@ -1596,11 +1615,45 @@ body.light-mode .bank-choice.correct {
 }
 
 .qcm-option-explanation > summary::before {
-    content: '▸';
-    font-size: 1.1rem;
-    transition: transform 0.2s;
+    content: '❯';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--text-main);
+    font-size: 0.85rem;
+    font-weight: 800;
+    line-height: 1;
+    transition:
+        transform 0.2s,
+        background 0.2s,
+        border-color 0.2s;
+
+    body.light-mode & {
+        background: rgba(15, 23, 42, 0.09);
+        border-color: rgba(15, 23, 42, 0.22);
+        color: #0f172a;
+    }
+}
+
+.qcm-option-explanation > summary:hover::before {
+    background: rgba(255, 255, 255, 0.25);
+
+    body.light-mode & {
+        background: rgba(15, 23, 42, 0.16);
+    }
 }
 
 .qcm-option-explanation[open] > summary::before {
     transform: rotate(90deg);
+}
+
+#all-questions-list [id^='arrow-'],
+#bank-questions-list [id^='bank-arrow-'] {
+    opacity: 0.85 !important;
+    font-size: 1.15rem;
 }

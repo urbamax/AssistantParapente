@@ -378,8 +378,7 @@ export class QuizStatsBase extends BaseView {
             });
             const { themesHtml, sortControlsHtml } = buildThemesHtml(this, levelThemes);
             const allExams = QuizService.getExamHistory();
-            const levelExams =
-                currentLevel !== 'ALL' ? allExams.filter((e) => !e.level || e.level === currentLevel) : allExams;
+            const levelExams = currentLevel !== 'ALL' ? allExams.filter((e) => e.level === currentLevel) : allExams;
             const allQuestionsHtml = buildQuestionsHtml(this, {
                 levelQs,
                 levelQuestionEntries,
@@ -986,24 +985,27 @@ export class QuizStatsBase extends BaseView {
         const detailsDiv = /** @type {HTMLElement} */ (card.querySelector('.exam-details'));
         if (!detailsDiv) return;
 
-        let modal = /** @type {HTMLDialogElement | null} */ (document.getElementById('exam-details-modal'));
+        let modal = /** @type {(HTMLDialogElement & { _cancelBound?: boolean }) | null} */ (
+            document.getElementById('exam-details-modal')
+        );
         if (!modal) {
             modal = document.createElement('dialog');
             modal.id = 'exam-details-modal';
             modal.className = 'gdpr-modal-overlay';
             modal.setAttribute('data-backdrop-action', 'QuizcloseExamModal');
+            modal.style.display = 'none';
             modal.innerHTML = `
-                <div class="gdpr-modal gdpr-modal--large">
+                <div class="gdpr-modal gdpr-modal--large" style="max-width: 1100px; max-height: 92vh; display: flex; flex-direction: column">
                     <div class="gdpr-modal-header">
                         <div class="gdpr-modal-title">
                             <i class="ri-file-list-3-line"></i>
-                            <h2 id="exam-details-modal-title"></h2>
+                            <span id="exam-details-modal-title"></span>
                         </div>
                         <button type="button" class="gdpr-modal-close-btn" data-action="QuizcloseExamModal" aria-label="${tq('review.back')}">
                             <i class="ri-close-line"></i>
                         </button>
                     </div>
-                    <div class="gdpr-modal-body" id="exam-details-modal-body"></div>
+                    <div class="gdpr-modal-body" id="exam-details-modal-body" style="padding-top: 16px; overflow-y: auto; flex: 1"></div>
                 </div>
             `;
             document.body.appendChild(modal);
@@ -1016,26 +1018,38 @@ export class QuizStatsBase extends BaseView {
         const bodyEl = document.getElementById('exam-details-modal-body');
         if (bodyEl) {
             bodyEl.innerHTML = detailsDiv.innerHTML;
-            this.syncOptionGroupHeights(bodyEl);
         }
 
         if (typeof modal.showModal === 'function' && !modal.open) {
             modal.showModal();
-        } else {
+            if (!modal._cancelBound) {
+                modal._cancelBound = true;
+                modal.addEventListener('cancel', (e) => {
+                    e.preventDefault();
+                    this.closeExamModal();
+                });
+            }
+        } else if (!modal.open) {
             modal.setAttribute('open', '');
-            modal.classList.add('active');
+        }
+        modal.style.display = 'flex';
+        void modal.offsetWidth;
+        modal.classList.add('active');
+        if (bodyEl) {
+            this.syncOptionGroupHeights(bodyEl);
         }
     }
 
     closeExamModal() {
         const modal = /** @type {HTMLDialogElement | null} */ (document.getElementById('exam-details-modal'));
         if (!modal) return;
+        modal.classList.remove('active');
         if (typeof modal.close === 'function' && modal.open) {
             modal.close();
         } else {
             modal.removeAttribute('open');
         }
-        modal.classList.remove('active');
+        modal.style.display = 'none';
     }
 
     exportData() {
