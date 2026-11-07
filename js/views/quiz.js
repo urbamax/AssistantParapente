@@ -18,6 +18,7 @@ import { choiceCourseLinksHtml, courseLinksHtml } from './quiz_course_links.js';
 import { explanationHtml, optionExplanationHtml, optionExplanations, optionOutcome } from './quiz_explanation.js';
 import { buildTrapFeedback } from '../services/error_diagnostic.js';
 import { choiceIndex } from '../services/answer_log.js';
+import { floorPercent1, formatPercent } from '../utils/text_utils.js';
 
 // Identifiant réservé de l'atelier anti-pièges (aucun axe du catalogue ne porte ce nom).
 const TRAPS_WORKSHOP_ID = 'TRAPS';
@@ -1157,7 +1158,7 @@ class QuizViewClass extends QuizVoiceBase {
         } else {
             const score = correctCount;
             const total = totalQuestions;
-            percentage = total > 0 ? Math.round((score / total) * 100) : 0;
+            percentage = floorPercent1(score, total);
             passed = total > 0 && score * 100 >= total * 75;
             displayScoreHtml = `<div class="stats-circle" style="margin:0;">${score}/${total}</div>`;
         }
@@ -1190,7 +1191,7 @@ class QuizViewClass extends QuizVoiceBase {
                 <div style="display:flex; align-items:center; justify-content:center; gap:32px; background:var(--bg-card); padding:24px 32px; border-radius:16px; border:1px solid var(--border-color); box-shadow:0 4px 6px rgba(0,0,0,0.05);">
                     ${displayScoreHtml}
                     <div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
-                        <div style="font-size:2rem; font-weight:800; color:var(--text-main);">${percentage}%</div>
+                        <div style="font-size:2rem; font-weight:800; color:var(--text-main);">${formatPercent(percentage)}%</div>
                         ${isExam ? badgeHtml : ''}
                     </div>
                 </div>

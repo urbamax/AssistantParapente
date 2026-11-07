@@ -35,3 +35,24 @@ export function removeAccents(str) {
     if (typeof str !== 'string' || !str) return '';
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
+
+/**
+ * Pourcentage à la française, une décimale au plus (74,6 ; 80 ; 100).
+ * @param {number} value
+ * @returns {string}
+ */
+export function formatPercent(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return '0';
+    return String(Math.round(n * 10) / 10).replace('.', ',');
+}
+
+/**
+ * Pourcentage arrondi vers le bas à une décimale : jamais affiché à 75 % si le seuil de 75 % n'est pas atteint.
+ * @param {number} part
+ * @param {number} total
+ * @returns {number}
+ */
+export function floorPercent1(part, total) {
+    return total > 0 ? Math.floor((part * 1000) / total) / 10 : 0;
+}

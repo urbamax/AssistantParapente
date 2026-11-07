@@ -2,6 +2,7 @@ import StorageService from './storage.js';
 import { toSorted } from '../utils/array_utils.js';
 import { parseDateToMs } from '../utils/date_utils.js';
 import { t } from '../utils/i18n.js';
+import { floorPercent1 } from '../utils/text_utils.js';
 import { dueScore, summarizeReviews } from './review_scheduler.js';
 import { masteryRatio, masteryRatioAfterCorrect, pushAttempt } from './mastery.js';
 import {
@@ -255,7 +256,7 @@ export function calculateExamPoints(results = [], sessionQuestions = [], questio
         earnedPoints += Math.max(0, userScore);
     }
 
-    const percentage = totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
+    const percentage = totalPoints > 0 ? floorPercent1(earnedPoints, totalPoints) : 0;
     // Seuil sur le ratio exact : 74,6 % arrondi à 75 % ne doit pas valider l'examen.
     const passed = totalPoints > 0 && earnedPoints * 100 >= totalPoints * 75;
 
