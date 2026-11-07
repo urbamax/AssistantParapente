@@ -1,5 +1,14 @@
 # 🪂 Assistant Parapente
 
+> [!CAUTION]
+> **Projet Privé & Propriétaire — Tous droits réservés / All Rights Reserved**
+> 
+> Ce dépôt et l'application **Assistant Parapente** sont un projet **privé et propriétaire** appartenant exclusivement à **Maxime Urbaniak**.
+> 
+> **Aucune licence libre ni droit d'utilisation n'est accordé** : vous n'êtes pas autorisé à copier, cloner pour réutilisation publique, modifier, redistribuer, héberger, sous-licencier ou exploiter tout ou partie du code source, de l'interface ou des éléments graphiques sans l'autorisation écrite préalable de l'auteur (voir [`LICENSE`](LICENSE)).
+> 
+> **Contributions extérieures fermées** : ce projet n'accepte aucune contribution externe, pull request ou issue de tiers.
+
 **Assistant Parapente** est une application web progressive (SPA) moderne dédiée aux pilotes de parapente. Elle centralise la recherche de sites de vol avec calcul d'exploitabilité météo en temps réel (AROME/GFS), un carnet de vol numérique avec analyseur de traces GPS `.igc` et suivi d'usure des voiles, la préparation aux brevets théoriques FFVL (BI, BP, BPC), ainsi qu'une bibliothèque de cours et de manuels.
 
 ---
@@ -56,11 +65,11 @@ Le déploiement reste manuel : `firebase deploy --only firestore:rules`, ou coll
 
 ---
 
-## ⚖️ Droits et contenus tiers
+## ⚖️ Droits, Propriété Privée & Contenus Tiers
 
-Le code source est © Maxime Urbaniak, **tous droits réservés** (voir `LICENSE`). Les cours, affiches, livrets et questions du QCM **appartiennent à la FFVL et à leurs auteurs** : ils ne nous appartiennent pas et ne sont présentés que pour faciliter la formation (voir `NOTICE`). Toute demande de retrait est traitée sans délai.
-
-**Contributions** : ce projet n'accepte pas de contributions extérieures. Les pull requests de tiers seront fermées. Voir `SECURITY.md` pour signaler une faille de sécurité (en privé, jamais dans une issue publique).
+- **Propriété exclusive & Droits d'auteur** : Le code source, l'architecture logicielle, le design de l'interface utilisateur, la marque et les textes originaux sont © Maxime Urbaniak — **tous droits réservés** (voir [`LICENSE`](LICENSE)). Il s'agit d'un développement **strictement privé et propriétaire**. Aucune autorisation de réutilisation, de reproduction ou de diffusion publique n'est concédée.
+- **Contributions fermées** : Ce dépôt est rendu visible à titre de vitrine et de consultation personnelle. Le projet n'accepte aucune contribution extérieure : toute pull request non sollicitée sera systématiquement fermée. Pour signaler une éventuelle faille de sécurité en toute confidentialité, consultez [`SECURITY.md`](SECURITY.md).
+- **Contenus tiers fédéraux** : Les cours, affiches, livrets de progression et questions officielles du QCM restent la **propriété intellectuelle exclusive de la FFVL et de leurs auteurs respectifs** (voir [`NOTICE`](NOTICE)). Ils sont référencés ou mis à disposition sans but lucratif uniquement pour faciliter la formation et la sécurité des pilotes. Toute demande de retrait ou de modification émanant d'un ayant droit est traitée sans délai.
 
 ## 🛠️ Stack Technique
 
