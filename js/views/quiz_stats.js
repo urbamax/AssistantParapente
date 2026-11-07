@@ -662,12 +662,19 @@ export class QuizStatsBase extends BaseView {
         statsContent.innerHTML = html;
     }
 
-    sortQuestions(sortBy) {
+    sortQuestions(sortBy, explicitDir = null) {
         const list = document.getElementById('all-questions-list');
         if (!list) return;
 
-        // Toggle direction if clicking same sort
-        if (this.state.questionSort === sortBy) {
+        // Support compound value from select, e.g. "rate-asc", "date-desc"
+        if (typeof sortBy === 'string' && sortBy.includes('-')) {
+            const [k, d] = sortBy.split('-');
+            this.state.questionSort = k;
+            this.state.questionSortDir = d;
+        } else if (explicitDir) {
+            this.state.questionSort = sortBy;
+            this.state.questionSortDir = explicitDir;
+        } else if (this.state.questionSort === sortBy) {
             this.state.questionSortDir = this.state.questionSortDir === 'asc' ? 'desc' : 'asc';
         } else {
             this.state.questionSort = sortBy;
@@ -682,6 +689,14 @@ export class QuizStatsBase extends BaseView {
         } catch {}
 
         const dir = this.state.questionSortDir;
+        const currentSort = this.state.questionSort;
+
+        // Keep dropdown select in sync if present
+        const select = /** @type {HTMLSelectElement | null} */ (document.getElementById('sort-questions-select'));
+        if (select) {
+            select.value = `${currentSort}-${dir}`;
+        }
+
         const items = Array.from(/** @type {NodeListOf<HTMLElement>} */ (list.querySelectorAll('.question-stat-item')));
 
         // Update button states & Icons
@@ -706,7 +721,7 @@ export class QuizStatsBase extends BaseView {
             streak: 'sort-streak-btn',
             date: 'sort-date-btn',
         };
-        const activeBtn = document.getElementById(sortBtnMap[sortBy] || 'sort-rate-btn');
+        const activeBtn = document.getElementById(sortBtnMap[currentSort] || 'sort-rate-btn');
         if (activeBtn) {
             activeBtn.style.background = 'rgba(255,255,255,0.05)';
             const arrow = dir === 'asc' ? ' <i class="ri-arrow-up-line"></i>' : ' <i class="ri-arrow-down-line"></i>';
@@ -715,13 +730,13 @@ export class QuizStatsBase extends BaseView {
 
         items.sort((a, b) => {
             let valA, valB;
-            if (sortBy === 'rate') {
+            if (currentSort === 'rate') {
                 valA = parseInt(a.dataset.pct);
                 valB = parseInt(b.dataset.pct);
-            } else if (sortBy === 'streak') {
+            } else if (currentSort === 'streak') {
                 valA = parseInt(a.dataset.streak || '0');
                 valB = parseInt(b.dataset.streak || '0');
-            } else if (sortBy === 'date') {
+            } else if (currentSort === 'date') {
                 valA = Number(a.dataset.date) || 0;
                 valB = Number(b.dataset.date) || 0;
 

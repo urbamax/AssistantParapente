@@ -528,6 +528,52 @@ body.light-mode .bank-item-explication {
     word-break: break-word !important;
 }
 
+.stats-sort-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stats-sort-select-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+}
+
+.sort-select-btn {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 8px 32px 8px 12px !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--border-color) !important;
+    background: var(--bg-card) !important;
+    color: var(--text-main) !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 10px center !important;
+    background-size: 14px 14px !important;
+    transition: all 0.2s ease;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.light-mode .sort-select-btn {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #1e293b !important;
+}
+
+.sort-select-btn:hover,
+.sort-select-btn:focus {
+    border-color: var(--accent-orange) !important;
+    outline: none;
+}
+
 #stats-content div:has(> .sort-btn) {
     display: flex !important;
     flex-wrap: wrap !important;
@@ -923,47 +969,34 @@ body.light-mode .bank-item-explication {
         min-width: 0 !important;
     }
 
-    #stats-content div:has(> div > .sort-btn) {
+    #stats-content div:has(> div > .sort-btn),
+    #stats-content div:has(> .stats-sort-container) {
         flex-direction: column !important;
         align-items: stretch !important;
         gap: 10px !important;
         margin-bottom: 12px !important;
     }
 
-    #stats-content div:has(> div > .sort-btn) > div:first-child {
+    #stats-content div:has(> div > .sort-btn) > div:first-child,
+    #stats-content div:has(> .stats-sort-container) > div:first-child {
         flex: none !important;
         width: 100% !important;
         font-size: 0.85rem !important;
     }
 
+    .stats-sort-container,
+    .stats-sort-select-wrapper {
+        width: 100% !important;
+    }
+
+    .sort-select-btn {
+        width: 100% !important;
+        padding: 10px 36px 10px 14px !important;
+        font-size: 0.84rem !important;
+    }
+
     #stats-content div:has(> .sort-btn) {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        gap: 6px !important;
-    }
-
-    @media (min-width: 541px) {
-        #stats-content div:has(> .sort-btn) {
-            grid-template-columns: repeat(4, 1fr) !important;
-        }
-    }
-
-    #stats-content .sort-btn {
-        width: 100% !important;
-        min-width: 0 !important;
-        padding: 8px 6px !important;
-        font-size: 0.76rem !important;
-        text-align: center !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 4px !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        box-sizing: border-box !important;
+        display: none !important;
     }
 
     #all-questions-list {

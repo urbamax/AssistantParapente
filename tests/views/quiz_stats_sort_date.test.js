@@ -187,10 +187,32 @@ describe('Quiz Stats - Chronological question sorting (Par date)', () => {
             // Date button has arrow and active background
             expect(html).toContain('id="sort-date-btn"');
             expect(html).toContain('ri-arrow-down-line');
+            expect(html).toContain('id="sort-questions-select"');
+            expect(html).toContain('value="date-desc" selected');
             // Q2 (newer) comes before Q1 (older)
             const posQ1 = html.indexOf('data-code="Q1"');
             const posQ2 = html.indexOf('data-code="Q2"');
             expect(posQ2).toBeLessThan(posQ1);
+        });
+
+        it('syncs sort-questions-select when sortQuestions is called', () => {
+            const select = document.createElement('select');
+            select.id = 'sort-questions-select';
+            select.innerHTML = '<option value="rate-asc">Taux</option><option value="date-desc">Date</option>';
+            document.body.appendChild(select);
+
+            QuizView.sortQuestions('date');
+            expect(select.value).toBe('date-desc');
+        });
+
+        it('sorts directly from dropdown change with compound value like date-desc or attempts-asc', () => {
+            QuizView.sortQuestions('attempts-asc');
+            expect(QuizView.state.questionSort).toBe('attempts');
+            expect(QuizView.state.questionSortDir).toBe('asc');
+
+            const items = Array.from(document.querySelectorAll('.question-stat-item'));
+            const totals = items.map((el) => Number(el.dataset.total));
+            expect(totals).toEqual([0, 1, 2, 3]);
         });
     });
 });

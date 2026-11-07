@@ -148,6 +148,7 @@ class QuizViewClass extends QuizVoiceBase {
             document.addEventListener('keydown', this._handleKeydown);
 
             this._handleChange = this.handleChange.bind(this);
+            document.body.addEventListener('change', this._handleChange);
             const themeSelect = document.getElementById('qcm-theme-select');
             if (themeSelect) {
                 themeSelect.addEventListener('change', this._handleChange);
@@ -215,6 +216,10 @@ class QuizViewClass extends QuizVoiceBase {
             this._onBrevetsUpdated = null;
         }
 
+        if (this._handleChange) {
+            document.body.removeEventListener('change', this._handleChange);
+        }
+
         const themeSelect = document.getElementById('qcm-theme-select');
         if (themeSelect && this._handleChange) {
             themeSelect.removeEventListener('change', this._handleChange);
@@ -275,6 +280,7 @@ class QuizViewClass extends QuizVoiceBase {
         // Find closest element with data-action
         const target = e.target.closest('[data-action]');
         if (!target) return;
+        if (target.tagName === 'SELECT') return;
 
         const action = target.getAttribute('data-action');
         const rawValue = target.getAttribute('data-args') || target.getAttribute('data-value');
@@ -406,7 +412,10 @@ class QuizViewClass extends QuizVoiceBase {
     }
 
     handleChange(e) {
-        if (e.target.id === 'qcm-theme-select') {
+        if (e.target.id === 'sort-questions-select' || e.target.getAttribute('data-action') === 'QuizsortQuestions') {
+            this.sortQuestions(e.target.value);
+            AppEvents.markHandled(e);
+        } else if (e.target.id === 'qcm-theme-select') {
             QuizService.setTheme(e.target.value);
             this.updateThemeUI(e.target.value);
             this.updateRevisionSummary();

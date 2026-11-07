@@ -427,19 +427,33 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
                         <span style="opacity:0.6;">(${displayLabel})</span>
                         ${view.state.masteryFilter !== 'ALL' || view.state.themeFilter ? `<a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">${tq('stats.clearFilters')}</a>` : ''}
                     </div>
-                    <div style="display:flex; gap:8px;">
-                        <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:${getSortBtnBg('rate')}; cursor:pointer; font-size:0.8rem;">
-                            ${tq('stats.sortByRate')}${getSortArrow('rate')}
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['attempts']" id="sort-attempts-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:${getSortBtnBg('attempts')}; cursor:pointer; font-size:0.8rem;">
-                            ${tq('stats.sortByAttempts')}${getSortArrow('attempts')}
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:${getSortBtnBg('streak')}; cursor:pointer; font-size:0.8rem;">
-                            ${tq('stats.sortByStreak')}${getSortArrow('streak')}
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:${getSortBtnBg('date')}; cursor:pointer; font-size:0.8rem;">
-                            ${tq('stats.sortByDate')}${getSortArrow('date')}
-                        </button>
+                    <div class="stats-sort-container" style="display:flex; align-items:center; gap:8px;">
+                        <div class="stats-sort-select-wrapper">
+                            <select id="sort-questions-select" class="sort-btn sort-select-btn" data-action="QuizsortQuestions" aria-label="${tq('stats.sortQuestionsLabel')}">
+                                <option value="rate-asc"${sortKey === 'rate' && sortDir === 'asc' ? ' selected' : ''}>${tq('stats.sortRateAsc')}</option>
+                                <option value="rate-desc"${sortKey === 'rate' && sortDir === 'desc' ? ' selected' : ''}>${tq('stats.sortRateDesc')}</option>
+                                <option value="attempts-desc"${sortKey === 'attempts' && sortDir === 'desc' ? ' selected' : ''}>${tq('stats.sortAttemptsDesc')}</option>
+                                <option value="attempts-asc"${sortKey === 'attempts' && sortDir === 'asc' ? ' selected' : ''}>${tq('stats.sortAttemptsAsc')}</option>
+                                <option value="streak-desc"${sortKey === 'streak' && sortDir === 'desc' ? ' selected' : ''}>${tq('stats.sortStreakDesc')}</option>
+                                <option value="streak-asc"${sortKey === 'streak' && sortDir === 'asc' ? ' selected' : ''}>${tq('stats.sortStreakAsc')}</option>
+                                <option value="date-desc"${sortKey === 'date' && sortDir === 'desc' ? ' selected' : ''}>${tq('stats.sortDateDesc')}</option>
+                                <option value="date-asc"${sortKey === 'date' && sortDir === 'asc' ? ' selected' : ''}>${tq('stats.sortDateAsc')}</option>
+                            </select>
+                        </div>
+                        <div class="stats-sort-buttons-desktop" style="display:none;" aria-hidden="true">
+                            <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:${getSortBtnBg('rate')}; cursor:pointer; font-size:0.8rem;">
+                                ${tq('stats.sortByRate')}${getSortArrow('rate')}
+                            </button>
+                            <button data-action="QuizsortQuestions" data-args="['attempts']" id="sort-attempts-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:${getSortBtnBg('attempts')}; cursor:pointer; font-size:0.8rem;">
+                                ${tq('stats.sortByAttempts')}${getSortArrow('attempts')}
+                            </button>
+                            <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:${getSortBtnBg('streak')}; cursor:pointer; font-size:0.8rem;">
+                                ${tq('stats.sortByStreak')}${getSortArrow('streak')}
+                            </button>
+                            <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:${getSortBtnBg('date')}; cursor:pointer; font-size:0.8rem;">
+                                ${tq('stats.sortByDate')}${getSortArrow('date')}
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
