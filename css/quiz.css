@@ -720,29 +720,37 @@ body.light-mode .bank-item-explication {
         flex: 1 1 0 !important;
         max-width: none !important;
         min-width: 0 !important;
-        padding: 12px 6px !important;
+        height: 108px !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        padding: 12px 8px !important;
         border-radius: 14px !important;
         overflow: hidden !important;
     }
 
     #stats-screen #stats-content div[data-action="QuizsetMasteryFilter"] > div:first-child {
-        font-size: 1.5rem !important;
+        font-size: 1.55rem !important;
+        line-height: 1.1 !important;
     }
 
     #stats-screen #stats-content div[data-action="QuizsetMasteryFilter"] > div:nth-child(2) {
-        font-size: 0.62rem !important;
+        font-size: 0.68rem !important;
         letter-spacing: normal !important;
         word-break: break-word !important;
         overflow-wrap: break-word !important;
         hyphens: auto !important;
         text-align: center !important;
-        line-height: 1.15 !important;
-        margin-top: 4px !important;
+        line-height: 1.2 !important;
+        margin-top: 6px !important;
         opacity: 0.8 !important;
     }
 
     #stats-screen #stats-content div[data-action="QuizsetMasteryFilter"] > div:nth-child(3) {
-        font-size: 0.58rem !important;
+        font-size: 0.64rem !important;
+        margin-top: 2px !important;
         white-space: nowrap !important;
     }
 
@@ -764,6 +772,11 @@ body.light-mode .bank-item-explication {
     }
 
     #stats-screen #stats-content .theme-card {
+        height: 108px !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
         padding: 12px 8px !important;
         border-radius: 14px !important;
         min-width: 0 !important;
