@@ -42,12 +42,12 @@ export function buildOfficialTheoryBannerHtml(level, entry, attrName = 'data-qui
 
         if (attrName === 'data-stats-brevet-banner') {
             return `
-                <div ${attrName} style="margin-top: 12px; display: flex; flex-direction: column; align-items: center; gap: 6px;">
-                    <div style="font-weight: 700; color: #10b981; font-size: 0.78rem; display: flex; align-items: center; justify-content: center; gap: 5px; flex-wrap: wrap; text-align: center;">
+                <div ${attrName} style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 14px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                    <div style="font-weight: 700; color: #10b981; font-size: 0.78rem; display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
                         <i class="ri-medal-fill"></i> <span>${title}</span>
                         ${scorePart ? `<span style="color: var(--text-main); font-weight: 600;">— ${scorePart}</span>` : ''}
                     </div>
-                    <button type="button" data-action="openBrevetModal" data-args="${escapeHTML(level)}" style="background: transparent; border: 1px solid rgba(16, 185, 129, 0.5); color: #10b981; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600;">
+                    <button type="button" data-action="openBrevetModal" data-args="${escapeHTML(level)}" style="background: transparent; border: 1px solid rgba(16, 185, 129, 0.5); color: #10b981; padding: 4px 8px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600;">
                         <i class="ri-edit-line"></i> ${tq('officialTheory.editBtn')}
                     </button>
                 </div>`;
@@ -70,8 +70,8 @@ export function buildOfficialTheoryBannerHtml(level, entry, attrName = 'data-qui
 
     if (attrName === 'data-stats-brevet-banner') {
         return `
-            <div ${attrName} style="margin-top: 12px;">
-                <button type="button" data-action="openBrevetModal" data-args="${escapeHTML(level)}" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+            <div ${attrName} style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="${escapeHTML(level)}" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
                     <i class="ri-checkbox-circle-line"></i> ${tq('officialTheory.recordBtn')}
                 </button>
             </div>`;
@@ -594,7 +594,7 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
 }
 
 /** Jauge circulaire du taux de réussite global. */
-export function buildGaugeHtml({ color, currentLevel, globalPct, stats, officialTheoryBannerHtml = '' }) {
+export function buildGaugeHtml({ color, currentLevel, globalPct, stats }) {
     // Premium Circular Gauge Calculation
     const strokeDash = 2 * Math.PI * 55; // r=55
     const offset = strokeDash - (globalPct / 100) * strokeDash;
@@ -631,7 +631,6 @@ export function buildGaugeHtml({ color, currentLevel, globalPct, stats, official
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">${tq('stats.level', { level: currentLevel === 'ALL' ? tql('stats.allLevels') : currentLevel })}</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">${tq('stats.activity', { count: stats.totalQuestions || 0 })}</div>
-                    ${officialTheoryBannerHtml}
                 </div>
             </div>
         `;

@@ -381,10 +381,10 @@ export class QuizStatsBase extends BaseView {
                 currentLevel,
                 globalPct,
                 stats,
-                officialTheoryBannerHtml,
             });
             container.innerHTML = `
             ${successGaugeHtml}
+            ${officialTheoryBannerHtml}
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">${tq('stats.distributionTitle')}</h3>

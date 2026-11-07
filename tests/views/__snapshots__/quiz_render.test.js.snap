@@ -664,15 +664,15 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : TREUIL</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
-                    
-            <div data-stats-brevet-banner="" style="margin-top: 12px;">
-                <button type="button" data-action="openBrevetModal" data-args="TREUIL" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
-                </button>
-            </div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="TREUIL" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -817,10 +817,10 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : TOUS LES NIVEAUX</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">0 réponses</div>
-                    
                 </div>
             </div>
         
+            
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -1062,15 +1062,15 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
-                    
-            <div data-stats-brevet-banner="" style="margin-top: 12px;">
-                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
-                </button>
-            </div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -1538,15 +1538,15 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
-                    
-            <div data-stats-brevet-banner="" style="margin-top: 12px;">
-                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
-                </button>
-            </div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -1890,15 +1890,15 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
-                    
-            <div data-stats-brevet-banner="" style="margin-top: 12px;">
-                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
-                </button>
-            </div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -2280,15 +2280,15 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
-                    
-            <div data-stats-brevet-banner="" style="margin-top: 12px;">
-                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
-                </button>
-            </div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -2632,15 +2632,15 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
-                    
-            <div data-stats-brevet-banner="" style="margin-top: 12px;">
-                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
-                </button>
-            </div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -3027,15 +3027,15 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
-                    
-            <div data-stats-brevet-banner="" style="margin-top: 12px;">
-                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
-                </button>
-            </div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -3379,15 +3379,15 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
-                    
-            <div data-stats-brevet-banner="" style="margin-top: 12px;">
-                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
-                </button>
-            </div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -3817,15 +3817,15 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
-                    
-            <div data-stats-brevet-banner="" style="margin-top: 12px;">
-                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
-                </button>
-            </div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -4169,15 +4169,15 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
                     <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
-                    
-            <div data-stats-brevet-banner="" style="margin-top: 12px;">
-                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
-                </button>
-            </div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>

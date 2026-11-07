@@ -527,7 +527,6 @@ body.light-mode .bank-item-explication {
 }
 
 /* Align "STATISTIQUES PAR THÈME" header and sort toggle on the same row */
-#stats-content > .premium-gauge-container + div + div,
 #stats-content > div:has([data-action="QuizsetThemeSort"]) {
     display: grid !important;
     grid-template-columns: 1fr auto !important;
@@ -535,19 +534,16 @@ body.light-mode .bank-item-explication {
     gap: 10px 16px !important;
 }
 
-#stats-content > .premium-gauge-container + div + div > .library-section-header,
 #stats-content > div:has([data-action="QuizsetThemeSort"]) > .library-section-header {
     grid-column: 1 / 2 !important;
     margin: 0 !important;
 }
 
-#stats-content > .premium-gauge-container + div + div > div:first-of-type,
 #stats-content > div:has([data-action="QuizsetThemeSort"]) > div:has([data-action="QuizsetThemeSort"]) {
     grid-column: 2 / 3 !important;
     margin-bottom: 0 !important;
 }
 
-#stats-content > .premium-gauge-container + div + div > div:last-child,
 #stats-content > div:has([data-action="QuizsetThemeSort"]) > div:last-child {
     grid-column: 1 / -1 !important;
     grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)) !important;
@@ -560,8 +556,6 @@ body.light-mode .bank-item-explication {
 }
 
 /* Compact outer containers for Exam History & Detailed Questions */
-#stats-content > .premium-gauge-container + div + div + div > div,
-#stats-content > .premium-gauge-container + div + div + div + div > div,
 #stats-content div:has(> #all-questions-list),
 #stats-content div:has(> div > [data-exam-id]) {
     padding: 14px 16px !important;
@@ -575,7 +569,6 @@ body.light-mode .bank-item-explication {
 
 /* Multi-column Exam History grid on tablet & desktop with clean single-line text */
 @media (min-width: 769px) {
-    #stats-content > .premium-gauge-container + div + div + div > div > div:has(> [data-exam-id]),
     #stats-content div:has(> [data-exam-id]) {
         display: grid !important;
         grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)) !important;
@@ -703,7 +696,6 @@ body.light-mode .bank-item-explication {
     }
 
     /* Top-right block (cols 4-12, row 1 of pair): Mastery Distribution */
-    #stats-screen #stats-content > .premium-gauge-container + div,
     #stats-screen #stats-content > div:has([data-action="QuizsetMasteryFilter"]) {
         grid-column: 4 / -1 !important;
         order: 3 !important;
@@ -717,12 +709,10 @@ body.light-mode .bank-item-explication {
         box-sizing: border-box !important;
     }
 
-    #stats-screen #stats-content > .premium-gauge-container + div > .library-section-header,
     #stats-screen #stats-content > div:has([data-action="QuizsetMasteryFilter"]) > .library-section-header {
         margin-bottom: 10px !important;
     }
 
-    #stats-screen #stats-content > .premium-gauge-container + div > div,
     #stats-screen #stats-content div:has(> div[data-action="QuizsetMasteryFilter"]) {
         display: grid !important;
         grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
@@ -741,14 +731,17 @@ body.light-mode .bank-item-explication {
     }
 
     /* Bottom-right block (cols 4-12, row 2 of pair): Statistiques par thème */
-    #stats-screen #stats-content > .premium-gauge-container + div + div,
     #stats-screen #stats-content > div:has([data-action="QuizsetThemeSort"]) {
         grid-column: 4 / -1 !important;
         order: 4 !important;
         gap: 8px 16px !important;
     }
 
-    #stats-screen #stats-content > .premium-gauge-container + div + div > div:last-child,
+    #stats-screen #stats-content:where(:has(> [data-stats-brevet-banner])) > div:has([data-action="QuizsetThemeSort"]) {
+        grid-row: span 2 !important;
+        align-self: end !important;
+    }
+
     #stats-screen #stats-content > div:has([data-action="QuizsetThemeSort"]) > div:last-child {
         grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
         gap: 10px !important;
@@ -758,6 +751,14 @@ body.light-mode .bank-item-explication {
         padding: 10px 12px !important;
         border-radius: 14px !important;
         min-width: 0 !important;
+    }
+
+    /* Official theory button directly underneath the Global Gauge card (cols 1-3) */
+    #stats-screen #stats-content > [data-stats-brevet-banner] {
+        grid-column: 1 / 4 !important;
+        order: 5 !important;
+        margin-top: -8px !important;
+        margin-bottom: 0 !important;
     }
 }
 

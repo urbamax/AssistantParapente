@@ -37,6 +37,11 @@ const LibraryView = viewProxy(libraryModule);
 const SafetyView = viewProxy(safetyModule);
 
 async function bootApplication() {
+    try {
+        sessionStorage.removeItem('ap_stale_module_reloaded');
+    } catch {
+        // ignore
+    }
     console.time('BOOT_TOTAL');
     console.log('🚀 Booting Application...');
 
