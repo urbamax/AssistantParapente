@@ -9,7 +9,6 @@ import { masteryRatio } from '../services/mastery.js';
 import { readAnswerLog } from '../services/answer_log.js';
 import { toSorted } from '../utils/array_utils.js';
 import { formatDateOnly, parseDateToMs } from '../utils/date_utils.js';
-import { truncate } from '../utils/text_utils.js';
 import { tq, tqh, tql } from './quiz_strings.js';
 import { explanationHtml } from './quiz_explanation.js';
 
@@ -41,6 +40,19 @@ export function buildOfficialTheoryBannerHtml(level, entry, attrName = 'data-qui
                 ? `<div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">${tq('officialTheory.revisionHint')}</div>`
                 : '';
 
+        if (attrName === 'data-stats-brevet-banner') {
+            return `
+                <div ${attrName} style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 14px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                    <div style="font-weight: 700; color: #10b981; font-size: 0.78rem; display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
+                        <i class="ri-medal-fill"></i> <span>${title}</span>
+                        ${scorePart ? `<span style="color: var(--text-main); font-weight: 600;">— ${scorePart}</span>` : ''}
+                    </div>
+                    <button type="button" data-action="openBrevetModal" data-args="${escapeHTML(level)}" style="background: transparent; border: 1px solid rgba(16, 185, 129, 0.5); color: #10b981; padding: 4px 8px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600;">
+                        <i class="ri-edit-line"></i> ${tq('officialTheory.editBtn')}
+                    </button>
+                </div>`;
+        }
+
         return `
             <div ${attrName} style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 14px; padding: 12px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
                 <div>
@@ -52,6 +64,15 @@ export function buildOfficialTheoryBannerHtml(level, entry, attrName = 'data-qui
                 </div>
                 <button type="button" data-action="openBrevetModal" data-args="${escapeHTML(level)}" style="background: transparent; border: 1px solid rgba(16, 185, 129, 0.5); color: #10b981; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
                     <i class="ri-edit-line"></i> ${tq('officialTheory.editBtn')}
+                </button>
+            </div>`;
+    }
+
+    if (attrName === 'data-stats-brevet-banner') {
+        return `
+            <div ${attrName} style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="${escapeHTML(level)}" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> ${tq('officialTheory.recordBtn')}
                 </button>
             </div>`;
     }
@@ -295,6 +316,28 @@ export function getQuestionLastSeen(data, code, examDateByCode) {
     return lastSeen;
 }
 
+/**
+ * Compte combien de fois chaque question (par code) a été posée dans l'historique des examens.
+ * @param {any[]} [examHistory]
+ * @returns {Map<string, number>}
+ */
+export function getQuestionExamCounts(examHistory = []) {
+    const counts = new Map();
+    if (!Array.isArray(examHistory)) return counts;
+    for (const exam of examHistory) {
+        if (!exam || !Array.isArray(exam.results)) continue;
+        for (const r of exam.results) {
+            const rawCode =
+                r?.code || r?.questionCode || (typeof r?.question === 'object' ? r.question.code : r?.question);
+            const code = typeof rawCode === 'string' ? rawCode.trim() : '';
+            if (code) {
+                counts.set(code, (counts.get(code) || 0) + 1);
+            }
+        }
+    }
+    return counts;
+}
+
 /** Liste des questions du niveau, filtrée par maîtrise et par thème. */
 export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats, examHistory = [] }) {
     // Build individual questions list (FILTERED BY LEVEL)
@@ -302,6 +345,7 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
     // Use levelQuestionEntries computed earlier to show only relevant questions
 
     const examDateByCode = new Map();
+    const examCountByCode = getQuestionExamCounts(examHistory);
     if (Array.isArray(examHistory)) {
         for (const exam of examHistory) {
             const examTime = parseDateToMs(exam?.date);
@@ -405,6 +449,9 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
                 if (valB === 0) return -1;
 
                 return sortDir === 'asc' ? valA - valB : valB - valA;
+            } else if (sortKey === 'exams') {
+                valA = examCountByCode.get(a[0]) || Number(a[1]?.examCount) || 0;
+                valB = examCountByCode.get(b[0]) || Number(b[1]?.examCount) || 0;
             } else {
                 valA = a[1].total || 0;
                 valB = b[1].total || 0;
@@ -414,12 +461,6 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
             return valB - valA;
         });
 
-        const getSortArrow = (type) => {
-            if (!view.state.questionSortExplicit || sortKey !== type) return '';
-            return sortDir === 'asc' ? ' <i class="ri-arrow-up-line"></i>' : ' <i class="ri-arrow-down-line"></i>';
-        };
-        const getSortBtnBg = (type) => (sortKey === type ? 'rgba(255,255,255,0.05)' : 'transparent');
-
         allQuestionsHtml = `
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
@@ -427,19 +468,21 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
                         <span style="opacity:0.6;">(${displayLabel})</span>
                         ${view.state.masteryFilter !== 'ALL' || view.state.themeFilter ? `<a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">${tq('stats.clearFilters')}</a>` : ''}
                     </div>
-                    <div style="display:flex; gap:8px;">
-                        <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:${getSortBtnBg('rate')}; cursor:pointer; font-size:0.8rem;">
-                            ${tq('stats.sortByRate')}${getSortArrow('rate')}
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['attempts']" id="sort-attempts-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:${getSortBtnBg('attempts')}; cursor:pointer; font-size:0.8rem;">
-                            ${tq('stats.sortByAttempts')}${getSortArrow('attempts')}
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:${getSortBtnBg('streak')}; cursor:pointer; font-size:0.8rem;">
-                            ${tq('stats.sortByStreak')}${getSortArrow('streak')}
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:${getSortBtnBg('date')}; cursor:pointer; font-size:0.8rem;">
-                            ${tq('stats.sortByDate')}${getSortArrow('date')}
-                        </button>
+                    <div class="stats-sort-container">
+                        <div class="stats-sort-select-wrapper">
+                            <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="${tq('stats.sortQuestionsLabel')}">
+                                <option value="rate-asc"${sortKey === 'rate' && sortDir === 'asc' ? ' selected' : ''}>${tq('stats.sortRateAsc')}</option>
+                                <option value="rate-desc"${sortKey === 'rate' && sortDir === 'desc' ? ' selected' : ''}>${tq('stats.sortRateDesc')}</option>
+                                <option value="attempts-desc"${sortKey === 'attempts' && sortDir === 'desc' ? ' selected' : ''}>${tq('stats.sortAttemptsDesc')}</option>
+                                <option value="attempts-asc"${sortKey === 'attempts' && sortDir === 'asc' ? ' selected' : ''}>${tq('stats.sortAttemptsAsc')}</option>
+                                <option value="streak-desc"${sortKey === 'streak' && sortDir === 'desc' ? ' selected' : ''}>${tq('stats.sortStreakDesc')}</option>
+                                <option value="streak-asc"${sortKey === 'streak' && sortDir === 'asc' ? ' selected' : ''}>${tq('stats.sortStreakAsc')}</option>
+                                <option value="date-desc"${sortKey === 'date' && sortDir === 'desc' ? ' selected' : ''}>${tq('stats.sortDateDesc')}</option>
+                                <option value="date-asc"${sortKey === 'date' && sortDir === 'asc' ? ' selected' : ''}>${tq('stats.sortDateAsc')}</option>
+                                <option value="exams-desc"${sortKey === 'exams' && sortDir === 'desc' ? ' selected' : ''}>${tq('stats.sortExamsDesc')}</option>
+                                <option value="exams-asc"${sortKey === 'exams' && sortDir === 'asc' ? ' selected' : ''}>${tq('stats.sortExamsAsc')}</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
@@ -475,6 +518,11 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
             const qColor = pct >= 90 ? '#4ade80' : pct >= 75 ? '#38bdf8' : pct >= 50 ? '#facc15' : '#f87171';
             const streak = data.streak || 0;
             const lastSeen = getQuestionLastSeen(data, code, examDateByCode);
+            const examCount = examCountByCode.get(code) || Number(data?.examCount) || 0;
+            const examBadgeHtml =
+                examCount > 0
+                    ? `<span class="question-exam-badge" title="${tq(examCount > 1 ? 'stats.examBadgeTitleMany' : 'stats.examBadgeTitleOne', { count: examCount })}" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35); padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🎓 ${examCount > 1 ? tq('stats.examBadgeMany', { count: examCount }) : tq('stats.examBadgeOne')}</span>`
+                    : '';
 
             // Build answers HTML if available
             let answersHtml = '';
@@ -508,17 +556,18 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
             }
 
             const qText = qObj ? qObj.question : tql('stats.unknownQuestion');
-            const displayText = truncate(qText, 80);
+            const displayText = qText;
             const hasAnswers = qObj && qObj.choices;
 
             allQuestionsHtml += `
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="${code}" data-pct="${pct}" data-total="${data.total}" data-streak="${streak}" data-date="${lastSeen}" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:${hasAnswers ? 'pointer' : 'default'};" ${hasAnswers ? `data-action="QuiztoggleQuestionDetails" data-args="['${code}']"` : ''}>
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="${code}" data-pct="${pct}" data-total="${data.total}" data-streak="${streak}" data-date="${lastSeen}" data-exams="${examCount}" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:${hasAnswers ? 'pointer' : 'default'};" ${hasAnswers ? `data-action="QuiztoggleQuestionDetails" data-args="['${code}']"` : ''}>
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#${code}</span>
                                     ${view.getCourseUrl(code) ? `<button data-action="openUrl" data-url="${escapeHTML(view.getCourseUrl(code))}" style="background:var(--accent-orange); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> ${tq('stats.course')}</button>` : ''}
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">${theme}</span>
+                                    ${examBadgeHtml}
                                     ${streak >= 3 ? `<span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 ${streak}</span>` : ''}
                                     ${hasAnswers ? '<i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-' + code + '"></i>' : ''}
                                 </div>

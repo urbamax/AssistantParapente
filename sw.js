@@ -9,7 +9,7 @@
 //   2. CACHE_NAME est versionné (synchronisé par bump.py avec le ?v= du reste du site) et
 //      activate() supprime systématiquement tout cache dont le nom ne correspond pas à la
 //      version courante.
-const CACHE_NAME = 'parapente-app-v2026.10.27_v1';
+const CACHE_NAME = 'parapente-app-v2026.11.07_v7';
 
 // La météo ne doit jamais être servie depuis le cache : une donnée de vent vieille de
 // plusieurs heures mais présentée comme "en direct" est un vrai risque sécurité pour un
@@ -337,7 +337,7 @@ self.addEventListener('fetch', (event) => {
     const key = dataKey(request, url);
     if (isDev) {
         event.respondWith(
-            fetch(request, { cache: 'no-cache' })
+            fetch(request, { cache: 'reload' })
                 .then((response) => {
                     if (response.ok) {
                         const copy = response.clone();

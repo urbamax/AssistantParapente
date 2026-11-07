@@ -502,15 +502,268 @@ body.light-mode .bank-item-explication {
     box-sizing: border-box !important;
 }
 
+#stats-axes-banner {
+    display: none !important;
+}
+
 #stats-content {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
     overflow-x: hidden !important;
+    margin-top: 12px !important;
 }
 
-#stats-content div:has(> div > .sort-btn) {
+#stats-content > div {
+    margin-top: 24px !important;
+}
+
+#stats-content .library-section-header {
+    margin-top: 0 !important;
+    margin-bottom: 12px !important;
+    padding-bottom: 0 !important;
+    font-size: 1.05rem !important;
+}
+
+/* Align "STATISTIQUES PAR THÈME" header and sort toggle on the same row */
+#stats-content > div:has([data-action="QuizsetThemeSort"]) {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    align-items: center !important;
+    gap: 10px 16px !important;
+}
+
+#stats-content > div:has([data-action="QuizsetThemeSort"]) > .library-section-header {
+    grid-column: 1 / 2 !important;
+    margin: 0 !important;
+}
+
+#stats-content > div:has([data-action="QuizsetThemeSort"]) > div:has([data-action="QuizsetThemeSort"]) {
+    grid-column: 2 / 3 !important;
+    margin-bottom: 0 !important;
+}
+
+#stats-content > div:has([data-action="QuizsetThemeSort"]) > div:last-child {
+    grid-column: 1 / -1 !important;
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)) !important;
+    gap: 10px !important;
+}
+
+#stats-content .theme-card {
+    padding: 12px 14px !important;
+    border-radius: 14px !important;
+}
+
+/* Compact outer containers for Exam History & Detailed Questions */
+#stats-content div:has(> #all-questions-list),
+#stats-content div:has(> div > [data-exam-id]) {
+    padding: 14px 16px !important;
+    border-radius: 18px !important;
+}
+
+#stats-content > div:last-child {
+    margin-top: 24px !important;
+    padding-bottom: 20px !important;
+}
+
+/* Multi-column Exam History grid on tablet & desktop with clean single-line text */
+@media (min-width: 769px) {
+    #stats-content div:has(> [data-exam-id]) {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)) !important;
+        gap: 12px !important;
+        align-items: start !important;
+    }
+
+    #stats-content div[data-exam-id] {
+        padding: 14px 18px !important;
+        border-radius: 12px !important;
+    }
+
+    #stats-content div[data-exam-id] > div:first-child {
+        gap: 16px !important;
+    }
+
+    #stats-content div[data-exam-id] > div:first-child > div:first-child > div:first-child {
+        flex-wrap: nowrap !important;
+        white-space: nowrap !important;
+    }
+
+    #stats-content div[data-exam-id] > div:first-child > div:first-child > div:nth-child(2) {
+        display: flex !important;
+        align-items: baseline !important;
+        gap: 8px !important;
+        white-space: nowrap !important;
+    }
+
+    #stats-content div[data-exam-id] > div:first-child > div:first-child > div:nth-child(2) > span {
+        margin-left: 0 !important;
+        white-space: nowrap !important;
+    }
+
+    #stats-content div[data-exam-id] > div:first-child > div:last-child {
+        flex-shrink: 0 !important;
+    }
+
+    #stats-content div[data-exam-id]:has(> .exam-details[style*="display: block"]),
+    #stats-content div[data-exam-id]:has(> .exam-details[style*="display:block"]) {
+        grid-column: 1 / -1 !important;
+    }
+}
+
+/* Desktop 12-column grid:
+   Row 1: Page Title (STATISTIQUES)
+   Row 2: Guest warning (if any)
+   Row 3: Global Gauge (cols 1-3) + Mastery Distribution (cols 4-12, frameless)
+   Row 4: Statistiques par thème (cols 1-12)
+   Row 5: Slim shortcut banner (cols 1-6) + Official theory banner (cols 7-12)
+   Row 6+: Exam History, Detailed Questions, Actions */
+@media (min-width: 960px) {
+    #stats-screen .course-container:where(:has(#stats-content > .premium-gauge-container)) {
+        display: grid !important;
+        grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+        gap: 20px 24px !important;
+        align-items: center !important;
+    }
+
+    #stats-screen .course-container:where(:has(#stats-content > .premium-gauge-container)) > #stats-content {
+        display: contents !important;
+    }
+
+    #stats-screen :where(.course-container:has(#stats-content > .premium-gauge-container)) > :where(*),
+    #stats-screen :where(.course-container:has(#stats-content > .premium-gauge-container) #stats-content) > :where(*) {
+        grid-column: 1 / -1 !important;
+        order: 10 !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+    #stats-screen .page-title {
+        grid-column: 1 / -1 !important;
+        order: 1 !important;
+        margin-bottom: 18px !important;
+    }
+
+    #stats-screen #stats-guest-warning {
+        grid-column: 1 / -1 !important;
+        order: 2 !important;
+    }
+
+    /* Left block (cols 1-3, spanning 2 rows): Global Gauge */
+    #stats-screen #stats-content > .premium-gauge-container {
+        grid-column: 1 / 4 !important;
+        grid-row: span 2 !important;
+        order: 3 !important;
+        align-self: stretch !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 20px 16px !important;
+        border-radius: 24px !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+    }
+
+    #stats-screen #stats-content > .premium-gauge-container .gauge-wrapper {
+        width: 185px !important;
+        height: 185px !important;
+    }
+
+    #stats-screen #stats-content > .premium-gauge-container .gauge-wrapper svg {
+        width: 185px !important;
+        height: 185px !important;
+    }
+
+    #stats-screen #stats-content > .premium-gauge-container .gauge-wrapper svg + div > div:first-child {
+        font-size: 3.1rem !important;
+    }
+
+    #stats-screen #stats-content > .premium-gauge-container .gauge-wrapper svg + div > div:first-child span {
+        font-size: 1.4rem !important;
+    }
+
+    #stats-screen #stats-content > .premium-gauge-container .gauge-wrapper svg + div > div:last-child {
+        font-size: 0.68rem !important;
+        margin-top: 6px !important;
+    }
+
+    #stats-screen #stats-content > .premium-gauge-container > div:last-child {
+        margin-top: 14px !important;
+    }
+
+    #stats-screen #stats-content > .premium-gauge-container > div:last-child > div:first-child {
+        font-size: 1rem !important;
+    }
+
+    /* Top-right block (cols 4-12, row 1 of pair): Mastery Distribution */
+    #stats-screen #stats-content > div:has([data-action="QuizsetMasteryFilter"]) {
+        grid-column: 4 / -1 !important;
+        order: 3 !important;
+        margin-top: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+    }
+
+    #stats-screen #stats-content > div:has([data-action="QuizsetMasteryFilter"]) > .library-section-header {
+        margin-bottom: 10px !important;
+    }
+
+    #stats-screen #stats-content div:has(> div[data-action="QuizsetMasteryFilter"]) {
+        display: grid !important;
+        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    #stats-screen #stats-content div[data-action="QuizsetMasteryFilter"] {
+        max-width: none !important;
+        min-width: 0 !important;
+        padding: 14px 6px !important;
+        border-radius: 16px !important;
+    }
+
+    #stats-screen #stats-content div[data-action="QuizsetMasteryFilter"] > div:first-child {
+        font-size: 1.65rem !important;
+    }
+
+    /* Bottom-right block (cols 4-12, row 2 of pair): Statistiques par thème */
+    #stats-screen #stats-content > div:has([data-action="QuizsetThemeSort"]) {
+        grid-column: 4 / -1 !important;
+        order: 4 !important;
+        gap: 8px 16px !important;
+    }
+
+    #stats-screen #stats-content:where(:has(> [data-stats-brevet-banner])) > div:has([data-action="QuizsetThemeSort"]) {
+        grid-row: span 2 !important;
+        align-self: end !important;
+    }
+
+    #stats-screen #stats-content > div:has([data-action="QuizsetThemeSort"]) > div:last-child {
+        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    #stats-screen #stats-content .theme-card {
+        padding: 10px 12px !important;
+        border-radius: 14px !important;
+        min-width: 0 !important;
+    }
+
+    /* Official theory button directly underneath the Global Gauge card (cols 1-3) */
+    #stats-screen #stats-content > [data-stats-brevet-banner] {
+        grid-column: 1 / 4 !important;
+        order: 5 !important;
+        margin-top: -8px !important;
+        margin-bottom: 0 !important;
+    }
+}
+
+#stats-content div:has(> div > .sort-btn),
+#stats-content div:has(> .stats-sort-container) {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
@@ -522,10 +775,57 @@ body.light-mode .bank-item-explication {
     box-sizing: border-box !important;
 }
 
-#stats-content div:has(> div > .sort-btn) > div:first-child {
+#stats-content div:has(> div > .sort-btn) > div:first-child,
+#stats-content div:has(> .stats-sort-container) > div:first-child {
     min-width: 0 !important;
     flex: 1 1 200px !important;
     word-break: break-word !important;
+}
+
+.stats-sort-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stats-sort-select-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+}
+
+.sort-select-btn {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 8px 32px 8px 12px !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--border-color) !important;
+    background: var(--bg-card) !important;
+    color: var(--text-main) !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 10px center !important;
+    background-size: 14px 14px !important;
+    transition: all 0.2s ease;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.light-mode .sort-select-btn {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #1e293b !important;
+}
+
+.sort-select-btn:hover,
+.sort-select-btn:focus {
+    border-color: var(--accent-orange) !important;
+    outline: none;
 }
 
 #stats-content div:has(> .sort-btn) {
@@ -537,8 +837,11 @@ body.light-mode .bank-item-explication {
 
 #stats-content .sort-btn {
     white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
     font-size: 0.78rem !important;
     padding: 6px 10px !important;
+    box-sizing: border-box !important;
 }
 
 #all-questions-list {
@@ -920,34 +1223,34 @@ body.light-mode .bank-item-explication {
         min-width: 0 !important;
     }
 
-    #stats-content div:has(> div > .sort-btn) {
+    #stats-content div:has(> div > .sort-btn),
+    #stats-content div:has(> .stats-sort-container) {
         flex-direction: column !important;
         align-items: stretch !important;
         gap: 10px !important;
         margin-bottom: 12px !important;
     }
 
-    #stats-content div:has(> div > .sort-btn) > div:first-child {
+    #stats-content div:has(> div > .sort-btn) > div:first-child,
+    #stats-content div:has(> .stats-sort-container) > div:first-child {
         flex: none !important;
         width: 100% !important;
         font-size: 0.85rem !important;
     }
 
-    #stats-content div:has(> .sort-btn) {
-        display: flex !important;
+    .stats-sort-container,
+    .stats-sort-select-wrapper {
         width: 100% !important;
-        max-width: 100% !important;
-        gap: 6px !important;
     }
 
-    #stats-content .sort-btn {
-        flex: 1 1 0 !important;
-        min-width: 0 !important;
-        padding: 7px 4px !important;
-        font-size: 0.72rem !important;
-        text-align: center !important;
-        justify-content: center !important;
-        white-space: nowrap !important;
+    .sort-select-btn {
+        width: 100% !important;
+        padding: 10px 36px 10px 14px !important;
+        font-size: 0.84rem !important;
+    }
+
+    #stats-content div:has(> .sort-btn) {
+        display: none !important;
     }
 
     #all-questions-list {

@@ -640,13 +640,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 exports[`quiz renders (spec 024: identical before and after moving the texts) > statistics for a level without questions 1`] = `
 "
             
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel TREUIL en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="TREUIL" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
-            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -670,10 +663,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : TREUIL</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="TREUIL" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -768,20 +767,31 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 
 exports[`quiz renders (spec 024: identical before and after moving the texts) > statistics for all levels, without attempts, and question sort buttons 1`] = `
 {
-  "attempts": [
-    "Par taux",
-    "Par tentatives <i class="ri-arrow-down-line"></i>",
-    "Par série",
-    "Par date",
-  ],
-  "date": [
-    "Par taux",
-    "Par tentatives",
-    "Par série",
-    "Par date <i class="ri-arrow-down-line"></i>",
-  ],
+  "attempts": "
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
+                            ",
+  "date": "
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
+                            ",
   "none": "
-            
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -806,10 +816,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : TOUS LES NIVEAUX</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 0 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">0 réponses</div>
                 </div>
             </div>
         
+            
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -1008,25 +1019,24 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </button>
             </div>
         ",
-  "streak": [
-    "Par taux",
-    "Par tentatives",
-    "Par série <i class="ri-arrow-down-line"></i>",
-    "Par date",
-  ],
+  "streak": "
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
+                            ",
 }
 `;
 
 exports[`quiz renders (spec 024: identical before and after moving the texts) > statistics with every filter label 1`] = `
 {
   "ALL": "
-            
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -1051,10 +1061,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -1338,30 +1354,33 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <span style="opacity:0.6;">(Toutes les questions tentées)</span>
                         
                     </div>
-                    <div style="display:flex; gap:8px;">
-                        <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
-                            Par taux
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['attempts']" id="sort-attempts-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par tentatives
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par série
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par date
-                        </button>
+                    <div class="stats-sort-container">
+                        <div class="stats-sort-select-wrapper">
+                            <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="S3V" data-pct="0" data-total="1" data-streak="0" data-date="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['S3V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="S3V" data-pct="0" data-total="1" data-streak="0" data-date="0" data-exams="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['S3V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#S3V</span>
                                     
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Réglementation</span>
+                                    
                                     
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-S3V"></i>
                                 </div>
@@ -1392,13 +1411,14 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         </div>
                     </div>
                 
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="10" data-total="4" data-streak="0" data-date="1790587800000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="10" data-total="4" data-streak="0" data-date="1790587800000" data-exams="1" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#E2VB</span>
                                     
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Mécavol</span>
+                                    <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35); padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🎓 Examen</span>
                                     
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-E2VB"></i>
                                 </div>
@@ -1434,13 +1454,14 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         </div>
                     </div>
                 
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790587800000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790587800000" data-exams="1" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#A1V</span>
                                     <button data-action="openUrl" data-url="courses/5b7d1610914c.pdf#page=3" style="background:var(--accent-orange); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Météo</span>
+                                    <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35); padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🎓 Examen</span>
                                     <span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 3</span>
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-A1V"></i>
                                 </div>
@@ -1493,13 +1514,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "EXCELLENT": "
             
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
-            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -1523,10 +1537,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -1810,19 +1830,21 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <span style="opacity:0.6;">(Questions Excellentes (90-99%))</span>
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
-                    <div style="display:flex; gap:8px;">
-                        <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
-                            Par taux
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['attempts']" id="sort-attempts-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par tentatives
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par série
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par date
-                        </button>
+                    <div class="stats-sort-container">
+                        <div class="stats-sort-select-wrapper">
+                            <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
@@ -1843,13 +1865,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             </div>
         ",
   "FAILED": "
-            
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -1874,10 +1889,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -2161,30 +2182,33 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <span style="opacity:0.6;">(Questions Échouées (0%))</span>
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
-                    <div style="display:flex; gap:8px;">
-                        <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
-                            Par taux
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['attempts']" id="sort-attempts-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par tentatives
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par série
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par date
-                        </button>
+                    <div class="stats-sort-container">
+                        <div class="stats-sort-select-wrapper">
+                            <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="S3V" data-pct="0" data-total="1" data-streak="0" data-date="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['S3V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="S3V" data-pct="0" data-total="1" data-streak="0" data-date="0" data-exams="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['S3V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#S3V</span>
                                     
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Réglementation</span>
+                                    
                                     
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-S3V"></i>
                                 </div>
@@ -2232,13 +2256,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "GOOD": "
             
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
-            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -2262,10 +2279,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -2549,19 +2572,21 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <span style="opacity:0.6;">(Questions Satisfaisantes (50-74%))</span>
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
-                    <div style="display:flex; gap:8px;">
-                        <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
-                            Par taux
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['attempts']" id="sort-attempts-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par tentatives
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par série
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par date
-                        </button>
+                    <div class="stats-sort-container">
+                        <div class="stats-sort-select-wrapper">
+                            <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
@@ -2582,13 +2607,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             </div>
         ",
   "NOT_ATTEMPTED": "
-            
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -2613,10 +2631,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -2900,30 +2924,33 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <span style="opacity:0.6;">(Questions Non Tentées)</span>
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
-                    <div style="display:flex; gap:8px;">
-                        <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
-                            Par taux
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['attempts']" id="sort-attempts-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par tentatives
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par série
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par date
-                        </button>
+                    <div class="stats-sort-container">
+                        <div class="stats-sort-select-wrapper">
+                            <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="F4V" data-pct="0" data-total="0" data-streak="0" data-date="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['F4V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="F4V" data-pct="0" data-total="0" data-streak="0" data-date="0" data-exams="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['F4V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#F4V</span>
                                     
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Facteurs humains</span>
+                                    
                                     
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-F4V"></i>
                                 </div>
@@ -2976,13 +3003,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "PERFECT": "
             
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
-            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -3006,10 +3026,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -3293,19 +3319,21 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <span style="opacity:0.6;">(Questions Maîtrisées (100%))</span>
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
-                    <div style="display:flex; gap:8px;">
-                        <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
-                            Par taux
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['attempts']" id="sort-attempts-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par tentatives
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par série
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par date
-                        </button>
+                    <div class="stats-sort-container">
+                        <div class="stats-sort-select-wrapper">
+                            <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
@@ -3326,13 +3354,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             </div>
         ",
   "POOR": "
-            
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -3357,10 +3378,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -3644,30 +3671,33 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <span style="opacity:0.6;">(Questions À travailler (1-49%))</span>
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
-                    <div style="display:flex; gap:8px;">
-                        <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
-                            Par taux
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['attempts']" id="sort-attempts-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par tentatives
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par série
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par date
-                        </button>
+                    <div class="stats-sort-container">
+                        <div class="stats-sort-select-wrapper">
+                            <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="10" data-total="4" data-streak="0" data-date="1790587800000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="10" data-total="4" data-streak="0" data-date="1790587800000" data-exams="1" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#E2VB</span>
                                     
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Mécavol</span>
+                                    <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35); padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🎓 Examen</span>
                                     
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-E2VB"></i>
                                 </div>
@@ -3703,13 +3733,14 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         </div>
                     </div>
                 
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790587800000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790587800000" data-exams="1" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#A1V</span>
                                     <button data-action="openUrl" data-url="courses/5b7d1610914c.pdf#page=3" style="background:var(--accent-orange); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Météo</span>
+                                    <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35); padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🎓 Examen</span>
                                     <span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 3</span>
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-A1V"></i>
                                 </div>
@@ -3762,13 +3793,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "VERY_GOOD": "
             
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
-            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -3792,10 +3816,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -4079,19 +4109,21 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <span style="opacity:0.6;">(Questions Très Bonnes (75-89%))</span>
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
-                    <div style="display:flex; gap:8px;">
-                        <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
-                            Par taux
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['attempts']" id="sort-attempts-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par tentatives
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par série
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par date
-                        </button>
+                    <div class="stats-sort-container">
+                        <div class="stats-sort-select-wrapper">
+                            <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
@@ -4112,13 +4144,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             </div>
         ",
   "theme": "
-            
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -4143,10 +4168,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
                 </div>
             </div>
         
+            
+            <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -4430,30 +4461,33 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <span style="opacity:0.6;">(Toutes les questions tentées • Thème : Météo)</span>
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
-                    <div style="display:flex; gap:8px;">
-                        <button data-action="QuizsortQuestions" data-args="['rate']" id="sort-rate-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:rgba(255,255,255,0.05); cursor:pointer; font-size:0.8rem;">
-                            Par taux
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['attempts']" id="sort-attempts-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par tentatives
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['streak']" id="sort-streak-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par série
-                        </button>
-                        <button data-action="QuizsortQuestions" data-args="['date']" id="sort-date-btn" class="sort-btn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-color); background:transparent; cursor:pointer; font-size:0.8rem;">
-                            Par date
-                        </button>
+                    <div class="stats-sort-container">
+                        <div class="stats-sort-select-wrapper">
+                            <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div id="all-questions-list" style="display:flex; flex-direction:column; gap:8px; max-height:500px; overflow-y:auto; padding-right:8px;">
             
-                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790587800000" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
+                    <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790587800000" data-exams="1" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#A1V</span>
                                     <button data-action="openUrl" data-url="courses/5b7d1610914c.pdf#page=3" style="background:var(--accent-orange); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> COURS</button>
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Météo</span>
+                                    <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35); padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🎓 Examen</span>
                                     <span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 3</span>
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-A1V"></i>
                                 </div>

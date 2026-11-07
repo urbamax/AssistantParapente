@@ -22,15 +22,31 @@ describe('Quiz Stats Screen Mobile Layout & Overflow Rules (css/quiz.css)', () =
         );
     });
 
-    it('ensures sort buttons toolbar wraps and adapts cleanly on mobile', () => {
+    it('ensures dropdown sort select is used on mobile rather than multiple button rows', () => {
         const mobileSection = css.slice(css.indexOf('@media (max-width: 768px)'));
-        expect(mobileSection).toMatch(/#stats-content\s+div:has\([^)]*\.sort-btn\)/);
-        expect(mobileSection).toMatch(/#stats-content\s+\.sort-btn\s*\{[^}]*flex:\s*1\s+1\s+0/);
+        expect(mobileSection).toMatch(/\.sort-select-btn\s*\{[^}]*width:\s*100%/);
+        expect(mobileSection).toMatch(/\.stats-sort-container/);
     });
 
     it('reduces bulky padding on mobile stats cards and containers to fit narrow screens', () => {
         const mobileSection = css.slice(css.indexOf('@media (max-width: 768px)'));
         expect(mobileSection).toMatch(/#stats-screen\s+\.course-container\s*\{[^}]*padding:\s*8px\s+6px/);
         expect(mobileSection).toMatch(/#stats-content\s+div:has\(>\s*#all-questions-list\)[^}]*padding:\s*14px\s+10px/);
+    });
+
+    it('packs desktop stats layout: pairs top banners, pairs gauge with mastery distribution, aligns theme sort header, and uses multi-column exam history grid', () => {
+        expect(css).toMatch(
+            /#stats-content\s*>\s*div:has\(\[data-action="QuizsetThemeSort"\]\)\s*\{[^}]*grid-template-columns:\s*1fr\s+auto/,
+        );
+        expect(css).toMatch(
+            /#stats-content\s+div:has\(>\s*\[data-exam-id\]\)\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(440px,\s*1fr\)\)/,
+        );
+        const desktopSection = css.slice(css.indexOf('@media (min-width: 960px)'));
+        expect(desktopSection).toMatch(
+            /#stats-screen\s+#stats-content\s*>\s*\.premium-gauge-container\s*\{[^}]*grid-column:\s*1\s*\/\s*4/,
+        );
+        expect(desktopSection).toMatch(
+            /#stats-screen\s+#stats-content\s*>\s*div:has\(\[data-action="QuizsetMasteryFilter"\]\)\s*\{[^}]*grid-column:\s*4\s*\/\s*-1/,
+        );
     });
 });

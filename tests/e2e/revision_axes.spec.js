@@ -38,10 +38,7 @@ test('Spec 043 : parcours complet Axes de révision (cours PDF #page=N, points c
         if (msg.text().startsWith('Unregistered action triggered')) warnings.push(msg.text());
     });
 
-    await page.goto('/?mode=STATS');
-    const shortcutBtn = page.locator('[data-action="QuizshowRevisionAxes"]');
-    await expect(shortcutBtn).toBeVisible();
-    await shortcutBtn.click();
+    await page.goto('/?mode=REVISION_AXES');
 
     const axesScreen = page.locator('#revision-axes-screen');
     await expect(axesScreen).toHaveClass(/active/);
