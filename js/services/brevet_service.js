@@ -21,6 +21,20 @@ export const BREVET_CODES = ['BI', 'BP', 'BPC', 'TREUIL'];
 export const PROGRESSION_CHAIN = ['BI', 'BP', 'BPC'];
 
 /**
+ * Barème officiel des points pour l'examen théorique de chaque brevet FFVL (QCM).
+ * - BI : 30 questions x max 6 pts = 180 pts (seuil min. 135/180)
+ * - BP : 60 questions x max 6 pts = 360 pts (seuil min. 270/360)
+ * - BPC : 30 questions QCM x max 6 pts = 180 pts (+ 2 questions ouvertes)
+ * - TREUIL : 30 questions x max 6 pts = 180 pts
+ */
+export const OFFICIAL_THEORY_TOTAL_POINTS = Object.freeze({
+    BI: 180,
+    BP: 360,
+    BPC: 180,
+    TREUIL: 180,
+});
+
+/**
  * @param {unknown} code
  * @returns {boolean}
  */

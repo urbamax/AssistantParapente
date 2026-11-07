@@ -348,16 +348,21 @@ export class QuizStatsBase extends BaseView {
                 }
             }
 
+            let levelTotalResponses = 0;
             // Iterate over ALL unique questions for this level (attempted or not)
             levelQs.forEach((q) => {
                 const stat = stats.questions[q.code];
                 if (stat && stat.total > 0) {
                     accumulatedMastery += masteryRatio(stat);
+                    levelTotalResponses += stat.total;
                 } else {
                     // Unattempted or 0 total attempts = 0% mastery
                     accumulatedMastery += 0;
                 }
             });
+            if (currentLevel === 'ALL') {
+                levelTotalResponses = stats.totalQuestions || 0;
+            }
 
             // If totalLevelQuestions is 0 (should not happen if data loaded), avoid division by zero
             const globalPct =
@@ -391,6 +396,7 @@ export class QuizStatsBase extends BaseView {
                 currentLevel,
                 globalPct,
                 stats,
+                levelTotalResponses,
             });
             container.innerHTML = `
             ${successGaugeHtml}
