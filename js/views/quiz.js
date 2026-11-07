@@ -290,9 +290,21 @@ class QuizViewClass extends QuizVoiceBase {
                 ? /** @type {HTMLDetailsElement | null} */ (group.querySelector('details.qcm-option-explanation'))
                 : null;
             if (details) {
+                if (group && optionRow.offsetHeight) {
+                    group.style.setProperty('--row-h', `${optionRow.offsetHeight}px`);
+                }
                 details.open = !details.open;
                 AppEvents.markHandled(e);
                 return;
+            }
+        }
+
+        const summary = e.target.closest('.qcm-option-group > details > summary');
+        if (summary) {
+            const group = summary.closest('.qcm-option-group');
+            const row = group ? /** @type {HTMLElement | null} */ (group.querySelector('.bank-choice, .qcm-option')) : null;
+            if (group && row && row.offsetHeight) {
+                group.style.setProperty('--row-h', `${row.offsetHeight}px`);
             }
         }
 
@@ -566,7 +578,7 @@ class QuizViewClass extends QuizVoiceBase {
         });
 
         container.innerHTML = html;
-        this.syncOptionGroupHeights(container);
+        // Do not observe thousands of bank choices with individual ResizeObservers (causes severe reflow stalls).
     }
 
     updateModeUI(mode, targetBtn) {
