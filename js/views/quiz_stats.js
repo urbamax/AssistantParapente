@@ -16,7 +16,7 @@ import BaseView from '../core/base_view.js';
 import { tq, tql } from './quiz_strings.js';
 import { explanationHtml } from './quiz_explanation.js';
 import { buildRevisionAxes } from '../services/revision_axes.js';
-import { buildRevisionAxesDashboardHtml, buildStatsAxesShortcutHtml } from './quiz_axes_html.js';
+import { buildRevisionAxesDashboardHtml } from './quiz_axes_html.js';
 import {
     buildDistributionHtml,
     buildThemesHtml,
@@ -370,17 +370,19 @@ export class QuizStatsBase extends BaseView {
                 stats,
                 examHistory: QuizService.getExamHistory(),
             });
-            const successGaugeHtml = buildGaugeHtml({ color, currentLevel, globalPct, stats });
             const officialTheoryBannerHtml = buildOfficialTheoryBannerHtml(
                 currentLevel,
                 BrevetService.getBrevet(currentLevel),
                 'data-stats-brevet-banner',
             );
-            if (axesBannerSlot) {
-                axesBannerSlot.innerHTML = buildStatsAxesShortcutHtml();
-            }
+            const successGaugeHtml = buildGaugeHtml({
+                color,
+                currentLevel,
+                globalPct,
+                stats,
+                officialTheoryBannerHtml,
+            });
             container.innerHTML = `
-            ${officialTheoryBannerHtml}
             ${successGaugeHtml}
 
             <div style="margin-top:48px;">

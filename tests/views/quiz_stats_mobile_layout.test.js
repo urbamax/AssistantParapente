@@ -39,14 +39,14 @@ describe('Quiz Stats Screen Mobile Layout & Overflow Rules (css/quiz.css)', () =
             /#stats-content\s*>\s*div:has\(\[data-action="QuizsetThemeSort"\]\)\s*\{[^}]*grid-template-columns:\s*1fr\s+auto/,
         );
         expect(css).toMatch(
-            /#stats-content\s+div:has\(>\s*\[data-exam-id\]\)\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fill,\s*minmax\(340px,\s*1fr\)\)/,
+            /#stats-content\s+div:has\(>\s*\[data-exam-id\]\)\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(440px,\s*1fr\)\)/,
         );
         const desktopSection = css.slice(css.indexOf('@media (min-width: 960px)'));
         expect(desktopSection).toMatch(
-            /#stats-screen\s+\.course-container\s+#stats-content\s*>\s*\.premium-gauge-container\s*\{[^}]*grid-column:\s*1\s*\/\s*4/,
+            /#stats-screen\s+#stats-content\s*>\s*\.premium-gauge-container\s*\{[^}]*grid-column:\s*1\s*\/\s*4/,
         );
         expect(desktopSection).toMatch(
-            /#stats-screen\s+\.course-container\s+#stats-content\s*>\s*div:has\(\[data-action="QuizsetMasteryFilter"\]\)\s*\{[^}]*grid-column:\s*4\s*\/\s*-1/,
+            /#stats-screen\s+#stats-content\s*>\s*div:has\(\[data-action="QuizsetMasteryFilter"\]\)\s*\{[^}]*grid-column:\s*4\s*\/\s*-1/,
         );
     });
 });

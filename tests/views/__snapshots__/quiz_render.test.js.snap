@@ -640,13 +640,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 exports[`quiz renders (spec 024: identical before and after moving the texts) > statistics for a level without questions 1`] = `
 "
             
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel TREUIL en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="TREUIL" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
-            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -670,7 +663,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : TREUIL</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    
+            <div data-stats-brevet-banner="" style="margin-top: 12px;">
+                <button type="button" data-action="openBrevetModal" data-args="TREUIL" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
                 </div>
             </div>
         
@@ -769,31 +768,30 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 exports[`quiz renders (spec 024: identical before and after moving the texts) > statistics for all levels, without attempts, and question sort buttons 1`] = `
 {
   "attempts": "
-                                <option value="rate-asc" selected="">Trier par : Taux croissant</option>
-                                <option value="rate-desc">Trier par : Taux décroissant</option>
-                                <option value="attempts-desc">Trier par : Plus tentées</option>
-                                <option value="attempts-asc">Trier par : Moins tentées</option>
-                                <option value="streak-desc">Trier par : Meilleure série</option>
-                                <option value="streak-asc">Trier par : Plus faible série</option>
-                                <option value="date-desc">Trier par : Plus récentes</option>
-                                <option value="date-asc">Trier par : Plus anciennes</option>
-                                <option value="exams-desc">Trier par : Plus posées en examen</option>
-                                <option value="exams-asc">Trier par : Moins posées en examen</option>
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
                             ",
   "date": "
-                                <option value="rate-asc" selected="">Trier par : Taux croissant</option>
-                                <option value="rate-desc">Trier par : Taux décroissant</option>
-                                <option value="attempts-desc">Trier par : Plus tentées</option>
-                                <option value="attempts-asc">Trier par : Moins tentées</option>
-                                <option value="streak-desc">Trier par : Meilleure série</option>
-                                <option value="streak-asc">Trier par : Plus faible série</option>
-                                <option value="date-desc">Trier par : Plus récentes</option>
-                                <option value="date-asc">Trier par : Plus anciennes</option>
-                                <option value="exams-desc">Trier par : Plus posées en examen</option>
-                                <option value="exams-asc">Trier par : Moins posées en examen</option>
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
                             ",
   "none": "
-            
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -818,7 +816,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : TOUS LES NIVEAUX</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 0 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">0 réponses</div>
+                    
                 </div>
             </div>
         
@@ -1021,16 +1020,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             </div>
         ",
   "streak": "
-                                <option value="rate-asc" selected="">Trier par : Taux croissant</option>
-                                <option value="rate-desc">Trier par : Taux décroissant</option>
-                                <option value="attempts-desc">Trier par : Plus tentées</option>
-                                <option value="attempts-asc">Trier par : Moins tentées</option>
-                                <option value="streak-desc">Trier par : Meilleure série</option>
-                                <option value="streak-asc">Trier par : Plus faible série</option>
-                                <option value="date-desc">Trier par : Plus récentes</option>
-                                <option value="date-asc">Trier par : Plus anciennes</option>
-                                <option value="exams-desc">Trier par : Plus posées en examen</option>
-                                <option value="exams-asc">Trier par : Moins posées en examen</option>
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
                             ",
 }
 `;
@@ -1038,13 +1037,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 exports[`quiz renders (spec 024: identical before and after moving the texts) > statistics with every filter label 1`] = `
 {
   "ALL": "
-            
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -1069,7 +1061,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    
+            <div data-stats-brevet-banner="" style="margin-top: 12px;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
                 </div>
             </div>
         
@@ -1359,16 +1357,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div class="stats-sort-container">
                         <div class="stats-sort-select-wrapper">
                             <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
-                                <option value="rate-asc" selected="">Trier par : Taux croissant</option>
-                                <option value="rate-desc">Trier par : Taux décroissant</option>
-                                <option value="attempts-desc">Trier par : Plus tentées</option>
-                                <option value="attempts-asc">Trier par : Moins tentées</option>
-                                <option value="streak-desc">Trier par : Meilleure série</option>
-                                <option value="streak-asc">Trier par : Plus faible série</option>
-                                <option value="date-desc">Trier par : Plus récentes</option>
-                                <option value="date-asc">Trier par : Plus anciennes</option>
-                                <option value="exams-desc">Trier par : Plus posées en examen</option>
-                                <option value="exams-asc">Trier par : Moins posées en examen</option>
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
                             </select>
                         </div>
                     </div>
@@ -1516,13 +1514,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "EXCELLENT": "
             
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
-            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -1546,7 +1537,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    
+            <div data-stats-brevet-banner="" style="margin-top: 12px;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
                 </div>
             </div>
         
@@ -1836,16 +1833,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div class="stats-sort-container">
                         <div class="stats-sort-select-wrapper">
                             <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
-                                <option value="rate-asc" selected="">Trier par : Taux croissant</option>
-                                <option value="rate-desc">Trier par : Taux décroissant</option>
-                                <option value="attempts-desc">Trier par : Plus tentées</option>
-                                <option value="attempts-asc">Trier par : Moins tentées</option>
-                                <option value="streak-desc">Trier par : Meilleure série</option>
-                                <option value="streak-asc">Trier par : Plus faible série</option>
-                                <option value="date-desc">Trier par : Plus récentes</option>
-                                <option value="date-asc">Trier par : Plus anciennes</option>
-                                <option value="exams-desc">Trier par : Plus posées en examen</option>
-                                <option value="exams-asc">Trier par : Moins posées en examen</option>
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
                             </select>
                         </div>
                     </div>
@@ -1868,13 +1865,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             </div>
         ",
   "FAILED": "
-            
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -1899,7 +1889,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    
+            <div data-stats-brevet-banner="" style="margin-top: 12px;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
                 </div>
             </div>
         
@@ -2189,16 +2185,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div class="stats-sort-container">
                         <div class="stats-sort-select-wrapper">
                             <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
-                                <option value="rate-asc" selected="">Trier par : Taux croissant</option>
-                                <option value="rate-desc">Trier par : Taux décroissant</option>
-                                <option value="attempts-desc">Trier par : Plus tentées</option>
-                                <option value="attempts-asc">Trier par : Moins tentées</option>
-                                <option value="streak-desc">Trier par : Meilleure série</option>
-                                <option value="streak-asc">Trier par : Plus faible série</option>
-                                <option value="date-desc">Trier par : Plus récentes</option>
-                                <option value="date-asc">Trier par : Plus anciennes</option>
-                                <option value="exams-desc">Trier par : Plus posées en examen</option>
-                                <option value="exams-asc">Trier par : Moins posées en examen</option>
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
                             </select>
                         </div>
                     </div>
@@ -2260,13 +2256,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "GOOD": "
             
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
-            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -2290,7 +2279,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    
+            <div data-stats-brevet-banner="" style="margin-top: 12px;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
                 </div>
             </div>
         
@@ -2580,16 +2575,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div class="stats-sort-container">
                         <div class="stats-sort-select-wrapper">
                             <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
-                                <option value="rate-asc" selected="">Trier par : Taux croissant</option>
-                                <option value="rate-desc">Trier par : Taux décroissant</option>
-                                <option value="attempts-desc">Trier par : Plus tentées</option>
-                                <option value="attempts-asc">Trier par : Moins tentées</option>
-                                <option value="streak-desc">Trier par : Meilleure série</option>
-                                <option value="streak-asc">Trier par : Plus faible série</option>
-                                <option value="date-desc">Trier par : Plus récentes</option>
-                                <option value="date-asc">Trier par : Plus anciennes</option>
-                                <option value="exams-desc">Trier par : Plus posées en examen</option>
-                                <option value="exams-asc">Trier par : Moins posées en examen</option>
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
                             </select>
                         </div>
                     </div>
@@ -2612,13 +2607,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             </div>
         ",
   "NOT_ATTEMPTED": "
-            
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -2643,7 +2631,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    
+            <div data-stats-brevet-banner="" style="margin-top: 12px;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
                 </div>
             </div>
         
@@ -2933,16 +2927,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div class="stats-sort-container">
                         <div class="stats-sort-select-wrapper">
                             <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
-                                <option value="rate-asc" selected="">Trier par : Taux croissant</option>
-                                <option value="rate-desc">Trier par : Taux décroissant</option>
-                                <option value="attempts-desc">Trier par : Plus tentées</option>
-                                <option value="attempts-asc">Trier par : Moins tentées</option>
-                                <option value="streak-desc">Trier par : Meilleure série</option>
-                                <option value="streak-asc">Trier par : Plus faible série</option>
-                                <option value="date-desc">Trier par : Plus récentes</option>
-                                <option value="date-asc">Trier par : Plus anciennes</option>
-                                <option value="exams-desc">Trier par : Plus posées en examen</option>
-                                <option value="exams-asc">Trier par : Moins posées en examen</option>
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
                             </select>
                         </div>
                     </div>
@@ -3009,13 +3003,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "PERFECT": "
             
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
-            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -3039,7 +3026,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    
+            <div data-stats-brevet-banner="" style="margin-top: 12px;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
                 </div>
             </div>
         
@@ -3329,16 +3322,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div class="stats-sort-container">
                         <div class="stats-sort-select-wrapper">
                             <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
-                                <option value="rate-asc" selected="">Trier par : Taux croissant</option>
-                                <option value="rate-desc">Trier par : Taux décroissant</option>
-                                <option value="attempts-desc">Trier par : Plus tentées</option>
-                                <option value="attempts-asc">Trier par : Moins tentées</option>
-                                <option value="streak-desc">Trier par : Meilleure série</option>
-                                <option value="streak-asc">Trier par : Plus faible série</option>
-                                <option value="date-desc">Trier par : Plus récentes</option>
-                                <option value="date-asc">Trier par : Plus anciennes</option>
-                                <option value="exams-desc">Trier par : Plus posées en examen</option>
-                                <option value="exams-asc">Trier par : Moins posées en examen</option>
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
                             </select>
                         </div>
                     </div>
@@ -3361,13 +3354,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             </div>
         ",
   "POOR": "
-            
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -3392,7 +3378,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    
+            <div data-stats-brevet-banner="" style="margin-top: 12px;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
                 </div>
             </div>
         
@@ -3682,16 +3674,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div class="stats-sort-container">
                         <div class="stats-sort-select-wrapper">
                             <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
-                                <option value="rate-asc" selected="">Trier par : Taux croissant</option>
-                                <option value="rate-desc">Trier par : Taux décroissant</option>
-                                <option value="attempts-desc">Trier par : Plus tentées</option>
-                                <option value="attempts-asc">Trier par : Moins tentées</option>
-                                <option value="streak-desc">Trier par : Meilleure série</option>
-                                <option value="streak-asc">Trier par : Plus faible série</option>
-                                <option value="date-desc">Trier par : Plus récentes</option>
-                                <option value="date-asc">Trier par : Plus anciennes</option>
-                                <option value="exams-desc">Trier par : Plus posées en examen</option>
-                                <option value="exams-asc">Trier par : Moins posées en examen</option>
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
                             </select>
                         </div>
                     </div>
@@ -3801,13 +3793,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
         ",
   "VERY_GOOD": "
             
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
-            
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
                     <!-- SVG Progress Circle -->
@@ -3831,7 +3816,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    
+            <div data-stats-brevet-banner="" style="margin-top: 12px;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
                 </div>
             </div>
         
@@ -4121,16 +4112,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div class="stats-sort-container">
                         <div class="stats-sort-select-wrapper">
                             <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
-                                <option value="rate-asc" selected="">Trier par : Taux croissant</option>
-                                <option value="rate-desc">Trier par : Taux décroissant</option>
-                                <option value="attempts-desc">Trier par : Plus tentées</option>
-                                <option value="attempts-asc">Trier par : Moins tentées</option>
-                                <option value="streak-desc">Trier par : Meilleure série</option>
-                                <option value="streak-asc">Trier par : Plus faible série</option>
-                                <option value="date-desc">Trier par : Plus récentes</option>
-                                <option value="date-asc">Trier par : Plus anciennes</option>
-                                <option value="exams-desc">Trier par : Plus posées en examen</option>
-                                <option value="exams-asc">Trier par : Moins posées en examen</option>
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
                             </select>
                         </div>
                     </div>
@@ -4153,13 +4144,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             </div>
         ",
   "theme": "
-            
-        <div data-stats-brevet-banner="" style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> Vous avez validé l'examen théorique officiel BI en école ?</span>
-            <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> Valider ma théorie officielle
-            </button>
-        </div>
             
             <div class="premium-gauge-container" style="display:flex; flex-direction:column; align-items:center; margin: 10px 0 40px 0; position:relative; padding:30px; background:var(--bg-card); border-radius:32px; border: 1px solid var(--border-color); backdrop-filter:blur(10px);">
                 <div class="gauge-wrapper" style="position:relative; width:250px; height:250px; display:flex; align-items:center; justify-content:center;">
@@ -4184,7 +4168,13 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                 <div style="text-align:center; margin-top:24px;">
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); letter-spacing:0.02em;">NIVEAU : BI</div>
-                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">Activité : 9 réponses enregistrées</div>
+                    <div style="font-size:0.8rem; opacity:0.4; margin-top:4px; font-family:monospace;">9 réponses</div>
+                    
+            <div data-stats-brevet-banner="" style="margin-top: 12px;">
+                <button type="button" data-action="openBrevetModal" data-args="BI" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
                 </div>
             </div>
         
@@ -4474,16 +4464,16 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div class="stats-sort-container">
                         <div class="stats-sort-select-wrapper">
                             <select id="sort-questions-select" class="sort-select-btn" data-action="QuizsortQuestions" aria-label="Trier les questions">
-                                <option value="rate-asc" selected="">Trier par : Taux croissant</option>
-                                <option value="rate-desc">Trier par : Taux décroissant</option>
-                                <option value="attempts-desc">Trier par : Plus tentées</option>
-                                <option value="attempts-asc">Trier par : Moins tentées</option>
-                                <option value="streak-desc">Trier par : Meilleure série</option>
-                                <option value="streak-asc">Trier par : Plus faible série</option>
-                                <option value="date-desc">Trier par : Plus récentes</option>
-                                <option value="date-asc">Trier par : Plus anciennes</option>
-                                <option value="exams-desc">Trier par : Plus posées en examen</option>
-                                <option value="exams-asc">Trier par : Moins posées en examen</option>
+                                <option value="rate-asc" selected="">Taux croissant</option>
+                                <option value="rate-desc">Taux décroissant</option>
+                                <option value="attempts-desc">Plus tentées</option>
+                                <option value="attempts-asc">Moins tentées</option>
+                                <option value="streak-desc">Meilleure série</option>
+                                <option value="streak-asc">Plus faible série</option>
+                                <option value="date-desc">Plus récentes</option>
+                                <option value="date-asc">Plus anciennes</option>
+                                <option value="exams-desc">Plus posées en examen</option>
+                                <option value="exams-asc">Moins posées en examen</option>
                             </select>
                         </div>
                     </div>
