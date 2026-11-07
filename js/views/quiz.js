@@ -1158,7 +1158,7 @@ class QuizViewClass extends QuizVoiceBase {
             const score = correctCount;
             const total = totalQuestions;
             percentage = total > 0 ? Math.round((score / total) * 100) : 0;
-            passed = percentage >= 75;
+            passed = total > 0 && score * 100 >= total * 75;
             displayScoreHtml = `<div class="stats-circle" style="margin:0;">${score}/${total}</div>`;
         }
 

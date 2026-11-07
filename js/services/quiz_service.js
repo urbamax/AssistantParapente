@@ -256,7 +256,8 @@ export function calculateExamPoints(results = [], sessionQuestions = [], questio
     }
 
     const percentage = totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
-    const passed = percentage >= 75;
+    // Seuil sur le ratio exact : 74,6 % arrondi à 75 % ne doit pas valider l'examen.
+    const passed = totalPoints > 0 && earnedPoints * 100 >= totalPoints * 75;
 
     return {
         earnedPoints,
