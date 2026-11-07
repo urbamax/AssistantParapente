@@ -108,10 +108,29 @@
 }
 
 .instructor-feedback > summary::before {
-    content: '▸';
-    display: inline-block;
-    width: 1.1em;
-    transition: transform 0.2s;
+    content: '❯';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    margin-right: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    color: var(--text-main);
+    font-size: 0.78rem;
+    font-weight: 800;
+    line-height: 1;
+    transition:
+        transform 0.2s,
+        background 0.2s;
+
+    body.light-mode & {
+        background: rgba(15, 23, 42, 0.08);
+        border-color: rgba(15, 23, 42, 0.2);
+        color: #0f172a;
+    }
 }
 
 .instructor-feedback[open] > summary::before {
@@ -684,11 +703,6 @@ body.light-mode .bank-item-explication {
         font-size: 1.4rem !important;
     }
 
-    #stats-screen #stats-content > .premium-gauge-container .gauge-wrapper svg + div > div:last-child {
-        font-size: 0.68rem !important;
-        margin-top: 6px !important;
-    }
-
     #stats-screen #stats-content > .premium-gauge-container > div:last-child {
         margin-top: 14px !important;
     }
@@ -716,37 +730,46 @@ body.light-mode .bank-item-explication {
     }
 
     #stats-screen #stats-content div:has(> div[data-action="QuizsetMasteryFilter"]) {
-        display: grid !important;
-        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
-        gap: 8px !important;
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        gap: 10px !important;
     }
 
     #stats-screen #stats-content div[data-action="QuizsetMasteryFilter"] {
+        flex: 1 1 0 !important;
         max-width: none !important;
         min-width: 0 !important;
-        padding: 10px 4px !important;
+        height: 108px !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        padding: 12px 8px !important;
         border-radius: 14px !important;
         overflow: hidden !important;
     }
 
     #stats-screen #stats-content div[data-action="QuizsetMasteryFilter"] > div:first-child {
-        font-size: 1.5rem !important;
+        font-size: 1.55rem !important;
+        line-height: 1.1 !important;
     }
 
     #stats-screen #stats-content div[data-action="QuizsetMasteryFilter"] > div:nth-child(2) {
-        font-size: 0.62rem !important;
+        font-size: 0.68rem !important;
         letter-spacing: normal !important;
         word-break: break-word !important;
         overflow-wrap: break-word !important;
         hyphens: auto !important;
         text-align: center !important;
-        line-height: 1.15 !important;
-        margin-top: 4px !important;
+        line-height: 1.2 !important;
+        margin-top: 6px !important;
         opacity: 0.8 !important;
     }
 
     #stats-screen #stats-content div[data-action="QuizsetMasteryFilter"] > div:nth-child(3) {
-        font-size: 0.58rem !important;
+        font-size: 0.64rem !important;
+        margin-top: 2px !important;
         white-space: nowrap !important;
     }
 
@@ -768,18 +791,23 @@ body.light-mode .bank-item-explication {
     }
 
     #stats-screen #stats-content .theme-card {
-        padding: 10px 8px !important;
+        height: 108px !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        padding: 12px 8px !important;
         border-radius: 14px !important;
         min-width: 0 !important;
     }
 
     #stats-screen #stats-content .theme-card-name {
-        font-size: 0.72rem !important;
-        line-height: 1.2 !important;
+        font-size: 0.82rem !important;
+        line-height: 1.25 !important;
         letter-spacing: normal !important;
         word-break: break-word !important;
         hyphens: auto !important;
-        margin-bottom: 8px !important;
+        margin-bottom: 6px !important;
     }
 
     /* Official theory button directly underneath the Global Gauge card (cols 1-3) */
@@ -1522,6 +1550,7 @@ body.light-mode .bank-choice.correct {
     /* Laisse la place de la flèche, et la réponse cochée (agrandie par ailleurs) reste alignée sur sa case. */
     padding-right: 56px !important;
     transform: none;
+    cursor: pointer;
 }
 
 .qcm-option-group:has(> details[open]) > .qcm-option,
@@ -1577,7 +1606,7 @@ body.light-mode .bank-choice.correct {
     width: 40px;
     height: var(--row-h, 44px);
     cursor: pointer;
-    color: var(--text-secondary);
+    color: var(--text-main);
     list-style: none;
 }
 
@@ -1586,11 +1615,88 @@ body.light-mode .bank-choice.correct {
 }
 
 .qcm-option-explanation > summary::before {
-    content: '▸';
-    font-size: 1.1rem;
-    transition: transform 0.2s;
+    content: '❯';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--text-main);
+    font-size: 0.85rem;
+    font-weight: 800;
+    line-height: 1;
+    transition:
+        transform 0.2s,
+        background 0.2s,
+        border-color 0.2s;
+
+    body.light-mode & {
+        background: rgba(15, 23, 42, 0.09);
+        border-color: rgba(15, 23, 42, 0.22);
+        color: #0f172a;
+    }
+}
+
+.qcm-option-explanation > summary:hover::before {
+    background: rgba(255, 255, 255, 0.25);
+
+    body.light-mode & {
+        background: rgba(15, 23, 42, 0.16);
+    }
 }
 
 .qcm-option-explanation[open] > summary::before {
     transform: rotate(90deg);
+}
+
+/* Historique d'un examen : questions réussies repliées, questions ratées dépliées. */
+.exam-history-question > summary {
+    position: relative;
+    padding-right: 40px;
+    cursor: pointer;
+    list-style: none;
+}
+
+.exam-history-question > summary::-webkit-details-marker {
+    display: none;
+}
+
+.exam-history-question > summary::after {
+    content: '❯';
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    margin-top: -13px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--text-main);
+    font-size: 0.85rem;
+    font-weight: 800;
+    line-height: 1;
+    transition: transform 0.2s;
+
+    body.light-mode & {
+        background: rgba(15, 23, 42, 0.09);
+        border-color: rgba(15, 23, 42, 0.22);
+        color: #0f172a;
+    }
+}
+
+.exam-history-question[open] > summary::after {
+    transform: rotate(90deg);
+}
+
+#all-questions-list [id^='arrow-'],
+#bank-questions-list [id^='bank-arrow-'] {
+    opacity: 0.85 !important;
+    font-size: 1.15rem;
 }

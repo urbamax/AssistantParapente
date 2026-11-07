@@ -10,7 +10,8 @@ import { readAnswerLog } from '../services/answer_log.js';
 import { toSorted } from '../utils/array_utils.js';
 import { formatDateOnly, parseDateToMs } from '../utils/date_utils.js';
 import { tq, tqh, tql } from './quiz_strings.js';
-import { explanationHtml } from './quiz_explanation.js';
+import { choiceCourseLinksHtml, courseLinksHtml } from './quiz_course_links.js';
+import { explanationHtml, optionExplanationHtml, optionExplanations } from './quiz_explanation.js';
 
 /**
  * Encart du statut officiel de l'examen théorique FFVL (affiché dans #qcm-setup-screen et #stats-screen).
@@ -45,7 +46,7 @@ export function buildOfficialTheoryBannerHtml(level, entry, attrName = 'data-qui
                 <div ${attrName} style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 14px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
                     <div style="font-weight: 700; color: #10b981; font-size: 0.78rem; display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
                         <i class="ri-medal-fill"></i> <span>${title}</span>
-                        ${scorePart ? `<span style="color: var(--text-main); font-weight: 600;">— ${scorePart}</span>` : ''}
+                        ${scorePart ? `<span style="color: var(--text-main); font-weight: 600;">${scorePart}</span>` : ''}
                     </div>
                     <button type="button" data-action="openBrevetModal" data-args="${escapeHTML(level)}" style="background: transparent; border: 1px solid rgba(16, 185, 129, 0.5); color: #10b981; padding: 4px 8px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600;">
                         <i class="ri-edit-line"></i> ${tq('officialTheory.editBtn')}
@@ -58,7 +59,7 @@ export function buildOfficialTheoryBannerHtml(level, entry, attrName = 'data-qui
                 <div>
                     <div style="font-weight: 700; color: #10b981; font-size: 0.92rem; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                         <i class="ri-medal-fill"></i> <span>${title}</span>
-                        ${scorePart ? `<span style="color: var(--text-main); font-weight: 600;">— ${scorePart}</span>` : ''}
+                        ${scorePart ? `<span style="color: var(--text-main); font-weight: 600;">${scorePart}</span>` : ''}
                     </div>
                     ${hintHtml}
                 </div>
@@ -98,7 +99,7 @@ export function buildDistributionHtml(
         const borderOpacity = isActive ? 0.6 : 0.1;
         // Remove scale, use shadow/border for "pop"
         const shadow = isActive ? `box-shadow: 0 0 20px rgba(${baseColor}, 0.2);` : '';
-        return `background:rgba(${baseColor}, ${bgOpacity}); border:1px solid rgba(${baseColor}, ${borderOpacity}); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 150px; max-width:220px; ${shadow}`;
+        return `background:rgba(${baseColor}, ${bgOpacity}); border:1px solid rgba(${baseColor}, ${borderOpacity}); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ${shadow}`;
     };
 
     // Colors in RGB for helper
@@ -108,43 +109,81 @@ export function buildDistributionHtml(
     const cRed = '248, 113, 113';
     const cGray = document.body.classList.contains('light-mode') ? '100, 116, 139' : '255, 255, 255';
 
+    const cards = [
+        {
+            filter: 'PERFECT',
+            count: perfect,
+            rgb: cGreen,
+            color: '#4ade80',
+            label: tq('stats.mastery.perfect'),
+            sub: '(100%)',
+        },
+        {
+            filter: 'EXCELLENT',
+            count: excellent,
+            rgb: '134, 239, 172',
+            color: '#86efac',
+            label: tq('stats.mastery.excellent'),
+            sub: '(90-99%)',
+        },
+        {
+            filter: 'VERY_GOOD',
+            count: veryGood,
+            rgb: '56, 189, 248',
+            color: '#38bdf8',
+            label: tq('stats.mastery.veryGood'),
+            sub: '(75-89%)',
+        },
+        {
+            filter: 'GOOD',
+            count: good,
+            rgb: cYellow,
+            color: '#facc15',
+            label: tq('stats.mastery.good'),
+            sub: '(50-74%)',
+        },
+        {
+            filter: 'POOR',
+            count: poor,
+            rgb: cOrange,
+            color: '#fb923c',
+            label: tq('stats.mastery.poor'),
+            sub: '(1-49%)',
+        },
+        {
+            filter: 'FAILED',
+            count: failed,
+            rgb: cRed,
+            color: '#f87171',
+            label: tq('stats.mastery.failed'),
+            sub: '(0%)',
+        },
+        {
+            filter: 'NOT_ATTEMPTED',
+            count: notAttempted,
+            rgb: cGray,
+            color: 'var(--text-muted)',
+            label: tq('stats.mastery.notAttempted'),
+            sub: tq('stats.outOf', { total: totalLevelQuestions }),
+        },
+    ];
+
+    const visibleCards = cards.some((c) => c.count > 0)
+        ? cards.filter((c) => c.count > 0 || currentFilter === c.filter)
+        : cards;
+
     const distributionHtml = `
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="${getCardStyle(cGreen, 'PERFECT')}">
-                    <div style="font-size:2rem; font-weight:900; color:#4ade80;">${perfect}</div>
-                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">${tq('stats.mastery.perfect')}</div>
-                    <div style="font-size:0.65rem; opacity:0.4;">(100%)</div>
-                </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['EXCELLENT']" style="${getCardStyle('134, 239, 172', 'EXCELLENT')}">
-                    <div style="font-size:2rem; font-weight:900; color:#86efac;">${excellent}</div>
-                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">${tq('stats.mastery.excellent')}</div>
-                    <div style="font-size:0.65rem; opacity:0.4;">(90-99%)</div>
-                </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['VERY_GOOD']" style="${getCardStyle('56, 189, 248', 'VERY_GOOD')}">
-                    <div style="font-size:2rem; font-weight:900; color:#38bdf8;">${veryGood}</div>
-                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">${tq('stats.mastery.veryGood')}</div>
-                    <div style="font-size:0.65rem; opacity:0.4;">(75-89%)</div>
-                </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['GOOD']" style="${getCardStyle(cYellow, 'GOOD')}">
-                    <div style="font-size:2rem; font-weight:900; color:#facc15;">${good}</div>
-                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">${tq('stats.mastery.good')}</div>
-                    <div style="font-size:0.65rem; opacity:0.4;">(50-74%)</div>
-                </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="${getCardStyle(cOrange, 'POOR')}">
-                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">${poor}</div>
-                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">${tq('stats.mastery.poor')}</div>
-                    <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
-                </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="${getCardStyle(cRed, 'FAILED')}">
-                    <div style="font-size:2rem; font-weight:900; color:#f87171;">${failed}</div>
-                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">${tq('stats.mastery.failed')}</div>
-                    <div style="font-size:0.65rem; opacity:0.4;">(0%)</div>
-                </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="${getCardStyle(cGray, 'NOT_ATTEMPTED')}">
-                    <div style="font-size:2rem; font-weight:900; color:var(--text-muted);">${notAttempted}</div>
-                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">${tq('stats.mastery.notAttempted')}</div>
-                    <div style="font-size:0.65rem; opacity:0.4;">${tq('stats.outOf', { total: totalLevelQuestions })}</div>
-                </div>
+                ${visibleCards
+                    .map(
+                        (c) => `
+                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['${c.filter}']" style="${getCardStyle(c.rgb, c.filter)}">
+                    <div style="font-size:2rem; font-weight:900; color:${c.color};">${c.count}</div>
+                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">${c.label}</div>
+                    <div style="font-size:0.65rem; opacity:0.4;">${c.sub}</div>
+                </div>`,
+                    )
+                    .join('')}
             </div>
         `;
 
@@ -229,18 +268,6 @@ export function buildThemesHtml(view, levelThemes) {
                       ? '150,150,150'
                       : '248,113,113';
 
-        // Theme emoji icon
-        const themeIcons = {
-            Météo: '🌦️',
-            Mécavol: '⚙️',
-            Matériel: '🪂',
-            Pilotage: '🧭',
-            Réglementation: '📋',
-            'Facteurs humains': '🧠',
-            'Milieu naturel': '🏔️',
-        };
-        const icon = themeIcons[name] || '📚';
-
         // Active state
         const isActive = view.state.themeFilter === name;
         const cardBorder = isActive
@@ -252,20 +279,17 @@ export function buildThemesHtml(view, levelThemes) {
         const barWidth = totalQ > 0 ? pct : 0;
 
         themesHtml += `
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['${name}']" style="cursor:pointer; padding:16px 18px; border-radius:16px; ${cardBorder} ${cardBg} color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['${name}']" style="cursor:pointer; padding:14px 14px; border-radius:16px; ${cardBorder} ${cardBg} color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
                     <!-- Subtle background glow for active -->
                     ${isActive ? `<div style="position:absolute;inset:0;background:radial-gradient(ellipse at top left, rgba(${tColorRgb},0.08) 0%, transparent 70%);pointer-events:none;"></div>` : ''}
 
-                    <!-- Top row: emoji (left) + badge % (right) — never overlaps -->
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                        <span style="font-size:1.4rem; line-height:1;">${icon}</span>
-                        <div style="background:rgba(${tColorRgb},0.15); color:${tColor}; font-weight:900; font-size:1rem; padding:3px 10px; border-radius:10px; letter-spacing:-0.5px; white-space:nowrap;">
-                            ${totalQ === 0 ? '—' : pct + '%'}
-                        </div>
-                    </div>
-
                     <!-- Theme name — full width, wraps freely -->
-                    <div class="theme-card-name" style="font-weight:700; font-size:0.88rem; line-height:1.3; letter-spacing:0.01em; margin-bottom:12px;">${name}</div>
+                    <div class="theme-card-name" style="font-weight:700; font-size:0.86rem; line-height:1.25; letter-spacing:0.01em; margin-bottom:6px;">${name}</div>
+
+                    <!-- Percentage below theme name -->
+                    <div style="color:${tColor}; font-weight:900; font-size:1.45rem; line-height:1.1; letter-spacing:-0.5px; margin-bottom:8px;">
+                        ${totalQ === 0 ? '—' : pct + '%'}
+                    </div>
 
                     <!-- Progress bar -->
                     <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; margin-bottom:8px;">
@@ -273,9 +297,9 @@ export function buildThemesHtml(view, levelThemes) {
                     </div>
 
                     <!-- Footer: question count -->
-                    <div style="font-size:0.72rem; opacity:0.5; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>${tq('stats.themeCount', { attempted: attemptedUnique, total: totalQ })}${notAttemptedQ > 0 ? ` <span style="opacity:0.7;">${tq(notAttemptedQ > 1 ? 'stats.themeNotAttemptedMany' : 'stats.themeNotAttemptedOne', { count: notAttemptedQ })}</span>` : ''}</span>
-                        ${isActive ? `<span style="font-size:0.68rem; font-weight:700; opacity:0.8;">${tq('stats.removeFilter')}</span>` : ''}
+                        ${isActive ? `<span style="font-size:0.65rem; font-weight:700; opacity:0.8;">${tq('stats.removeFilter')}</span>` : ''}
                     </div>
                 </div>
             `;
@@ -319,13 +343,15 @@ export function getQuestionLastSeen(data, code, examDateByCode) {
 /**
  * Compte combien de fois chaque question (par code) a été posée dans l'historique des examens.
  * @param {any[]} [examHistory]
+ * @param {string | null} [currentLevel]
  * @returns {Map<string, number>}
  */
-export function getQuestionExamCounts(examHistory = []) {
+export function getQuestionExamCounts(examHistory = [], currentLevel = null) {
     const counts = new Map();
     if (!Array.isArray(examHistory)) return counts;
     for (const exam of examHistory) {
         if (!exam || !Array.isArray(exam.results)) continue;
+        if (currentLevel && currentLevel !== 'ALL' && exam.level !== currentLevel) continue;
         for (const r of exam.results) {
             const rawCode =
                 r?.code || r?.questionCode || (typeof r?.question === 'object' ? r.question.code : r?.question);
@@ -339,15 +365,20 @@ export function getQuestionExamCounts(examHistory = []) {
 }
 
 /** Liste des questions du niveau, filtrée par maîtrise et par thème. */
-export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats, examHistory = [] }) {
+export function buildQuestionsHtml(
+    view,
+    { levelQs, levelQuestionEntries, stats, examHistory = [], currentLevel = null },
+) {
     // Build individual questions list (FILTERED BY LEVEL)
     let allQuestionsHtml = '';
     // Use levelQuestionEntries computed earlier to show only relevant questions
 
     const examDateByCode = new Map();
-    const examCountByCode = getQuestionExamCounts(examHistory);
+    const examCountByCode = getQuestionExamCounts(examHistory, currentLevel);
+    const allowGlobalExamCount = !currentLevel || currentLevel === 'ALL';
     if (Array.isArray(examHistory)) {
         for (const exam of examHistory) {
+            if (currentLevel && currentLevel !== 'ALL' && exam?.level !== currentLevel) continue;
             const examTime = parseDateToMs(exam?.date);
             if (examTime <= 0) continue;
             if (Array.isArray(exam.results)) {
@@ -392,11 +423,13 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
         }
 
         const filterLabel = tq(`stats.filters.${view.state.masteryFilter}`);
+        const hasActiveFilter = view.state.masteryFilter !== 'ALL' || Boolean(view.state.themeFilter);
 
         // Append theme filter label if active
-        let displayLabel = filterLabel;
+        let displayLabel = view.state.masteryFilter !== 'ALL' ? filterLabel : '';
         if (view.state.themeFilter) {
-            displayLabel += tq('stats.themeSuffix', { theme: view.state.themeFilter }); // inserted as HTML: escaped (spec 025)
+            const themeSuffix = tq('stats.themeSuffix', { theme: view.state.themeFilter }); // inserted as HTML: escaped (spec 025)
+            displayLabel = displayLabel ? displayLabel + themeSuffix : themeSuffix.replace(/^\s*•\s*/, '');
             // Filter sortedQuestions again by theme
             visibleQuestions = visibleQuestions.filter(([code]) => {
                 const qObj = view.getQuestionByCode(code);
@@ -450,8 +483,8 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
 
                 return sortDir === 'asc' ? valA - valB : valB - valA;
             } else if (sortKey === 'exams') {
-                valA = examCountByCode.get(a[0]) || Number(a[1]?.examCount) || 0;
-                valB = examCountByCode.get(b[0]) || Number(b[1]?.examCount) || 0;
+                valA = examCountByCode.get(a[0]) ?? (allowGlobalExamCount ? Number(a[1]?.examCount) || 0 : 0);
+                valB = examCountByCode.get(b[0]) ?? (allowGlobalExamCount ? Number(b[1]?.examCount) || 0 : 0);
             } else {
                 valA = a[1].total || 0;
                 valB = b[1].total || 0;
@@ -464,9 +497,8 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
         allQuestionsHtml = `
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
-                        ${tqh('stats.questionCount', { count: `<span style="font-weight:700; color:var(--text-main);">${visibleQuestions.length}</span>` })} 
-                        <span style="opacity:0.6;">(${displayLabel})</span>
-                        ${view.state.masteryFilter !== 'ALL' || view.state.themeFilter ? `<a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">${tq('stats.clearFilters')}</a>` : ''}
+                        ${tqh('stats.questionCount', { count: `<span style="font-weight:700; color:var(--text-main);">${visibleQuestions.length}</span>` })}${hasActiveFilter ? ` <span style="opacity:0.6;">(${displayLabel})</span>` : ''}
+                        ${hasActiveFilter ? `<a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">${tq('stats.clearFilters')}</a>` : ''}
                     </div>
                     <div class="stats-sort-container">
                         <div class="stats-sort-select-wrapper">
@@ -518,7 +550,7 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
             const qColor = pct >= 90 ? '#4ade80' : pct >= 75 ? '#38bdf8' : pct >= 50 ? '#facc15' : '#f87171';
             const streak = data.streak || 0;
             const lastSeen = getQuestionLastSeen(data, code, examDateByCode);
-            const examCount = examCountByCode.get(code) || Number(data?.examCount) || 0;
+            const examCount = examCountByCode.get(code) ?? (allowGlobalExamCount ? Number(data?.examCount) || 0 : 0);
             const examBadgeHtml =
                 examCount > 0
                     ? `<span class="question-exam-badge" title="${tq(examCount > 1 ? 'stats.examBadgeTitleMany' : 'stats.examBadgeTitleOne', { count: examCount })}" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35); padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🎓 ${examCount > 1 ? tq('stats.examBadgeMany', { count: examCount }) : tq('stats.examBadgeOne')}</span>`
@@ -527,28 +559,39 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
             // Build answers HTML if available
             let answersHtml = '';
             if (qObj && qObj.choices) {
+                const perOption = optionExplanations(qObj);
+                const courseLinks =
+                    typeof view.getCourseLinks === 'function'
+                        ? view.getCourseLinks(code)
+                        : view.getCourseUrl && view.getCourseUrl(code)
+                          ? [{ url: view.getCourseUrl(code), title: '', page: '' }]
+                          : [];
+
                 answersHtml =
                     '<div class="question-answers" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">';
-                qObj.choices.forEach((ans) => {
-                    const isCorrect = parseInt(ans.pts) > 0;
-                    const answerStyle = isCorrect
-                        ? 'background:rgba(74, 222, 128, 0.1); border-left:3px solid #4ade80;'
-                        : 'background:rgba(255,255,255,0.02);';
-                    const icon = isCorrect ? '<i class="ri-checkbox-circle-fill" style="color:#4ade80;"></i>' : '';
-
-                    answersHtml += `
-                            <div style="padding:8px 12px; margin-bottom:6px; border-radius:6px; ${answerStyle} display:flex; align-items:center; gap:8px; font-size:0.85rem;">
-                                ${icon}
-                                <span style="flex:1;">${ans.text}</span>
+                answersHtml += '<div class="bank-item-choices" style="display:flex; flex-direction:column; gap:8px;">';
+                qObj.choices.forEach((ans, idx) => {
+                    const pts = parseInt(ans.pts || 0);
+                    const isCorrect = pts > 0;
+                    const text = perOption ? perOption[idx] : null;
+                    const links = isCorrect ? choiceCourseLinksHtml(courseLinks) : '';
+                    const explHtml = text ? optionExplanationHtml(text, 'ok', tq('question.explanation'), links) : '';
+                    const choiceHtml = `
+                            <div class="bank-choice ${pts > 0 ? 'correct' : pts < 0 ? 'incorrect' : ''}">
+                                ${escapeHTML(ans.text)} ${pts > 0 ? '(+' + pts + ')' : pts < 0 ? '(' + pts + ')' : ''}
                             </div>
                         `;
+                    answersHtml += explHtml
+                        ? `<div class="qcm-option-group">${choiceHtml}${explHtml}</div>`
+                        : choiceHtml;
                 });
-                // Add Explanation in Stats View
-                if (qObj.explication) {
+                answersHtml += '</div>';
+
+                if (!perOption && (qObj.explication || courseLinks.length > 0)) {
                     answersHtml += `
-                                <div style="margin-top:12px; padding:12px; background:rgba(251, 146, 60, 0.15); border-left:3px solid #fb923c; font-size:0.9rem; color:var(--text-main); border-radius:8px;">
-                                    <div style="font-weight:700; font-size:0.75rem; color:#fb923c; margin-bottom:4px; text-transform:uppercase;">${tq('explanation')}</div>
-                                    ${explanationHtml(qObj.explication)}
+                                <div class="bank-item-explication" style="margin-top:12px;">
+                                    ${qObj.explication ? `<div>${explanationHtml(qObj.explication)}</div>` : ''}
+                                    ${courseLinksHtml(courseLinks)}
                                 </div>
                             `;
                 }
@@ -565,7 +608,6 @@ export function buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats,
                             <div style="flex:1;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#${code}</span>
-                                    ${view.getCourseUrl(code) ? `<button data-action="openUrl" data-url="${escapeHTML(view.getCourseUrl(code))}" style="background:var(--accent-orange); color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.65rem; font-weight:700; display:flex; align-items:center; gap:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"><i class="ri-book-open-line"></i> ${tq('stats.course')}</button>` : ''}
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">${theme}</span>
                                     ${examBadgeHtml}
                                     ${streak >= 3 ? `<span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 ${streak}</span>` : ''}
@@ -621,9 +663,6 @@ export function buildGaugeHtml({ color, currentLevel, globalPct, stats }) {
                     <div style="position:absolute; text-align:center; transform: rotate(0deg); display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%;">
                         <div style="font-size:4.5rem; font-weight:900; color:${color}; line-height:1; letter-spacing:-2px; font-family:'Inter', sans-serif;">
                             ${globalPct}<span style="font-size:1.8rem; opacity:0.8; margin-left:2px;">%</span>
-                        </div>
-                        <div style="font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; margin-top:8px; line-height:1.2;">
-                            ${tq('stats.globalLine1')}<br>${tq('stats.globalLine2')}
                         </div>
                     </div>
                 </div>
