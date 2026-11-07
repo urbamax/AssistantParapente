@@ -33,7 +33,7 @@
 - **Synchronisation Hybride** : Persistance locale immédiate (LocalStorage & IndexedDB) et synchronisation cloud temps réel avec Firebase Cloud Firestore.
 
 ### 🎓 Théorie & Brevets FFVL (QCM Officiel)
-- **100% Conforme au Moteur Officiel FFVL** : Aligné rigoureusement sur le barème et la sélection de l'application fédérale (`jruffet/qcmffvl`).
+- **100% Conforme aux Examens Officiels FFVL** : Aligné rigoureusement sur le barème et la sélection des examens officiels de la FFVL (qcm.ffvl.fr).
   - **Brevet Initial (BI)** : 30 questions $\times$ 6 pts = **180 points** (seuil de réussite : 135 pts / 75%).
   - **Brevet de Pilote (BP)** : 60 questions $\times$ 6 pts = **360 points** (seuil de réussite : 270 pts / 75%).
   - **Brevet de Pilote Confirmé (BPC)** : 30 questions QCM $\times$ 6 pts = **180 points** (+ questions ouvertes).

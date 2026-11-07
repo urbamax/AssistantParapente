@@ -18,7 +18,7 @@ import { diagnoseQuestionErrors } from './error_diagnostic.js';
 // Tolérance sur la somme des maîtrises (flottants) pour décider que l'objectif est atteint.
 const MASTERY_EPSILON = 1e-9;
 
-// Distribution officielle FFVL des thèmes par bloc de 10 questions (source : qcm.ffvl.fr / jruffet/qcmffvl) :
+// Distribution officielle FFVL des thèmes par bloc de 10 questions (source : qcm.ffvl.fr) :
 // - 10% Matériel (1/10)
 // - 20% Mécavol (2/10)
 // - 20% Pilotage (2/10)

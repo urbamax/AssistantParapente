@@ -47,6 +47,7 @@ const GdprEngine = {
     },
 
     showBanner: function () {
+        if (typeof document === 'undefined') return;
         const banner = document.getElementById('gdpr-banner');
         if (banner) {
             banner.classList.add('active');
@@ -54,6 +55,7 @@ const GdprEngine = {
     },
 
     hideBanner: function () {
+        if (typeof document === 'undefined') return;
         const banner = document.getElementById('gdpr-banner');
         if (banner) {
             banner.classList.remove('active');
