@@ -119,7 +119,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 41,
-    "verifiedAt": "2026-10-26"
+    "verifiedAt": "2026-11-07"
   },
   "A27B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -430,7 +430,13 @@
     "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/05-les-pieges-aerologiques2019/05-les-pieges-aerologiques2019",
     "title": "Les pièges aérologiques",
     "verifiedPage": 1,
-    "verifiedAt": "2026-10-27"
+    "verifiedAt": "2026-11-07",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 155
+      }
+    ]
   },
   "A81T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -508,11 +514,11 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 51,
-    "verifiedAt": "2026-10-12",
+    "verifiedAt": "2026-11-07",
     "others": [
       {
-        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
-        "verifiedPage": 50
+        "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/15-les-brises2021/15-les-brises2021",
+        "verifiedPage": 1
       }
     ]
   },
@@ -607,8 +613,14 @@
   "A105B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 50,
-    "verifiedAt": "2026-10-26"
+    "verifiedPage": 49,
+    "verifiedAt": "2026-11-07",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 151
+      }
+    ]
   },
   "A107B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -725,7 +737,7 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 18,
-    "verifiedAt": "2026-10-27"
+    "verifiedAt": "2026-11-07"
   },
   "E14B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -841,7 +853,7 @@
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 26,
-    "verifiedAt": "2026-10-10"
+    "verifiedAt": "2026-11-07"
   },
   "E33V": {
     "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/06-mecanique-du-vol2021/06-mecanique-du-vol2021",
@@ -1031,11 +1043,11 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 18,
-    "verifiedAt": "2026-10-27",
+    "verifiedAt": "2026-11-07",
     "others": [
       {
-        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
-        "verifiedPage": 92
+        "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
+        "verifiedPage": 20
       },
       {
         "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -1167,7 +1179,7 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 19,
-    "verifiedAt": "2026-10-27"
+    "verifiedAt": "2026-11-07"
   },
   "E78T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -1435,7 +1447,7 @@
     "course_id": "general/2014-livret-ffvl-9bd",
     "title": "Le guide des bonnes pratiques chez les libéristes",
     "verifiedPage": 40,
-    "verifiedAt": "2026-10-28"
+    "verifiedAt": "2026-11-07"
   },
   "F25VBM": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -1569,7 +1581,7 @@
     "course_id": "general/facteurs-humains/4-fh-fiche-synthase-intro-vl/4-fh-fiche-synthase-intro-vl",
     "title": "Facteurs Humains 01 - Introduction",
     "verifiedPage": 1,
-    "verifiedAt": "2026-11-02",
+    "verifiedAt": "2026-11-07",
     "others": [
       {
         "course_id": "general/2014-livret-ffvl-9bd",
@@ -1685,7 +1697,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 105,
-    "verifiedAt": "2026-11-02"
+    "verifiedAt": "2026-11-07"
   },
   "G16B": {
     "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques",
@@ -1757,7 +1769,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 152,
-    "verifiedAt": "2026-11-04"
+    "verifiedAt": "2026-11-07"
   },
   "G24B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -2132,7 +2144,7 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 36,
-    "verifiedAt": "2026-11-02"
+    "verifiedAt": "2026-11-07"
   },
   "L69T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -2155,13 +2167,7 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 34,
-    "verifiedAt": "2026-11-04",
-    "others": [
-      {
-        "course_id": "treuil/ffvl-dossiertracte-2023",
-        "verifiedPage": 35
-      }
-    ]
+    "verifiedAt": "2026-11-07"
   },
   "N3V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -2221,7 +2227,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 65,
-    "verifiedAt": "2026-11-04"
+    "verifiedAt": "2026-11-07"
   },
   "N12M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -2232,8 +2238,8 @@
   "N13B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 25,
-    "verifiedAt": "2026-10-10"
+    "verifiedPage": 29,
+    "verifiedAt": "2026-11-07"
   },
   "N14V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -2245,7 +2251,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 155,
-    "verifiedAt": "2026-10-12",
+    "verifiedAt": "2026-11-07",
     "others": [
       {
         "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -2275,7 +2281,7 @@
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 26,
-    "verifiedAt": "2026-11-03"
+    "verifiedAt": "2026-11-07"
   },
   "N20M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -2389,14 +2395,24 @@
   "N36B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 75,
-    "verifiedAt": "2026-11-04"
+    "verifiedPage": 57,
+    "verifiedAt": "2026-11-07",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/fiche-eval-2025/2025-fiche-cval-bpc-4-modules/2025-fiche-cval-bpc-4-modules",
+        "verifiedPage": 2
+      },
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 34
+      }
+    ]
   },
   "N37B": {
     "course_id": "brevet-de-pilote-confirme---marron/fiche-eval-2025/2025-fiche-cval-bpc-4-modules/2025-fiche-cval-bpc-4-modules",
-    "title": "brevet-de-pilote-confirme---marron/fiche-eval-2025/2025-fiche-cval-bpc-4-modules/2025-fiche-cval-bpc-4-modules",
+    "title": "Fiche d'évaluation - Brevet de Pilote Confirmé",
     "verifiedPage": 2,
-    "verifiedAt": "2026-10-10"
+    "verifiedAt": "2026-11-07"
   },
   "N38V": {
     "course_id": "general/passeport-telechargement-web/2012-passeportspeed12-hd/2012-passeportspeed12-hd",
@@ -2437,7 +2453,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 62,
-    "verifiedAt": "2026-11-03"
+    "verifiedAt": "2026-11-07"
   },
   "N45B": {
     "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/07-parachute-de-secours2019/07-parachute-de-secours2019",
@@ -3035,7 +3051,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 3,
-    "verifiedAt": "2026-11-04",
+    "verifiedAt": "2026-11-07",
     "others": [
       {
         "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -3174,7 +3190,7 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 20,
-    "verifiedAt": "2026-11-04",
+    "verifiedAt": "2026-11-07",
     "others": [
       {
         "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3220,7 +3236,7 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 19,
-    "verifiedAt": "2026-10-11"
+    "verifiedAt": "2026-11-07"
   },
   "S25V": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -3277,13 +3293,13 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 30,
-    "verifiedAt": "2026-10-11"
+    "verifiedAt": "2026-11-07"
   },
   "S31M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 41,
-    "verifiedAt": "2026-10-11"
+    "verifiedAt": "2026-11-07"
   },
   "S32T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3334,9 +3350,7 @@
   },
   "S37B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "title": "Livret Pédagogique - Initiation",
-    "verifiedPage": 22,
-    "verifiedAt": "2026-10-11"
+    "title": "Livret Pédagogique - Initiation"
   },
   "S37T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3347,8 +3361,8 @@
   "S38B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
-    "verifiedPage": 23,
-    "verifiedAt": "2026-10-22"
+    "verifiedPage": 22,
+    "verifiedAt": "2026-11-07"
   },
   "S38T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3384,7 +3398,7 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 23,
-    "verifiedAt": "2026-11-04",
+    "verifiedAt": "2026-11-07",
     "others": [
       {
         "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -3396,7 +3410,7 @@
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 40,
-    "verifiedAt": "2026-10-11"
+    "verifiedAt": "2026-11-07"
   },
   "S43M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -3431,7 +3445,7 @@
     "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025",
     "title": "Réglementation - La division de l’espace aérien",
     "verifiedPage": 1,
-    "verifiedAt": "2026-10-11",
+    "verifiedAt": "2026-11-07",
     "others": [
       {
         "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
@@ -4063,7 +4077,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 81,
-    "verifiedAt": "2026-11-04"
+    "verifiedAt": "2026-11-07"
   },
   "S128B": {
     "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025",
@@ -4355,7 +4369,7 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 20,
-    "verifiedAt": "2026-10-23",
+    "verifiedAt": "2026-11-07",
     "others": [
       {
         "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -4459,7 +4473,7 @@
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 23,
-    "verifiedAt": "2026-10-13"
+    "verifiedAt": "2026-11-07"
   },
   "U55B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -4474,7 +4488,9 @@
   },
   "U57B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
-    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit"
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 24,
+    "verifiedAt": "2026-11-07"
   },
   "U58B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -4483,9 +4499,10 @@
     "verifiedAt": "2026-10-23"
   },
   "U59B": {
-    "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/03-la-dynamique-du-vol2019/03-la-dynamique-du-vol2019",
-    "score": 0.0687,
-    "title": "03 la dynamique du vol2019"
+    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
+    "verifiedPage": 42,
+    "verifiedAt": "2026-11-07"
   },
   "U60M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -4509,11 +4526,11 @@
     "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/05-les-pieges-aerologiques2019/05-les-pieges-aerologiques2019",
     "title": "Les pièges aérologiques",
     "verifiedPage": 1,
-    "verifiedAt": "2026-10-11",
+    "verifiedAt": "2026-11-07",
     "others": [
       {
-        "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
-        "verifiedPage": 29
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 53
       }
     ]
   },
@@ -4586,8 +4603,16 @@
     "verifiedAt": "2026-10-23"
   },
   "U75B": {
-    "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques",
-    "title": "Maitrise de l’aile en vol - Exercices spécifiques"
+    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
+    "title": "Livret Pédagogique - Initiation",
+    "verifiedPage": 17,
+    "verifiedAt": "2026-11-07",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 63
+      }
+    ]
   },
   "U76M": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
@@ -4599,13 +4624,13 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 65,
-    "verifiedAt": "2026-10-13"
+    "verifiedAt": "2026-11-07"
   },
   "U78B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 32,
-    "verifiedAt": "2026-10-20",
+    "verifiedAt": "2026-11-07",
     "others": [
       {
         "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
@@ -4663,7 +4688,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 155,
-    "verifiedAt": "2026-10-11"
+    "verifiedAt": "2026-11-07"
   },
   "U86V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -4713,7 +4738,7 @@
     "course_id": "general/2014-livret-ffvl-9bd",
     "title": "Le guide des bonnes pratiques chez les libéristes",
     "verifiedPage": 11,
-    "verifiedAt": "2026-10-20",
+    "verifiedAt": "2026-11-07",
     "others": [
       {
         "course_id": "general/2014-livret-ffvl-9bd",
@@ -4731,15 +4756,15 @@
     "course_id": "general/facteurs-humains/1-fh-check-list/1-fh-check-list",
     "title": "Facteurs Humains 04 - Votre check-list",
     "verifiedPage": 1,
-    "verifiedAt": "2026-10-20",
+    "verifiedAt": "2026-11-07",
     "others": [
       {
-        "course_id": "brevet-de-pilote-confirme---marron/fiche-eval-2025/2025-fiche-cval-bpc-4-modules/2025-fiche-cval-bpc-4-modules",
-        "verifiedPage": 1
+        "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+        "verifiedPage": 29
       },
       {
-        "course_id": "general/2014-livret-ffvl-9bd",
-        "verifiedPage": 26
+        "course_id": "general/facteurs-humains/2-fh-le-vol-de-didier/2-fh-le-vol-de-didier",
+        "verifiedPage": 7
       }
     ]
   },
@@ -4747,7 +4772,7 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 31,
-    "verifiedAt": "2026-10-11"
+    "verifiedAt": "2026-11-07"
   },
   "W2V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
@@ -4758,8 +4783,8 @@
   "W3V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
-    "verifiedPage": 30,
-    "verifiedAt": "2026-10-11"
+    "verifiedPage": 4,
+    "verifiedAt": "2026-11-07"
   },
   "W4B": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -4839,7 +4864,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 69,
-    "verifiedAt": "2026-10-20"
+    "verifiedAt": "2026-11-07"
   },
   "W16V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -4923,7 +4948,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 58,
-    "verifiedAt": "2026-11-04"
+    "verifiedAt": "2026-11-07"
   },
   "W27B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -5139,7 +5164,9 @@
   },
   "W55V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
-    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial"
+    "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
+    "verifiedPage": 23,
+    "verifiedAt": "2026-11-07"
   },
   "W56B": {
     "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques",
@@ -5276,8 +5303,14 @@
   "W71V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
-    "verifiedPage": 68,
-    "verifiedAt": "2026-10-20"
+    "verifiedPage": 70,
+    "verifiedAt": "2026-11-07",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 68
+      }
+    ]
   },
   "W72V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -5319,11 +5352,11 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 12,
-    "verifiedAt": "2026-10-26",
+    "verifiedAt": "2026-11-07",
     "others": [
       {
-        "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
-        "verifiedPage": 20
+        "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/14-tangage2025/14-tangage2025",
+        "verifiedPage": 1
       },
       {
         "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
@@ -5424,7 +5457,7 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 75,
-    "verifiedAt": "2026-10-26"
+    "verifiedAt": "2026-11-07"
   },
   "W90M": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -5763,13 +5796,13 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 119,
-    "verifiedAt": "2026-11-04"
+    "verifiedAt": "2026-11-07"
   },
   "A39M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 31,
-    "verifiedAt": "2026-10-27"
+    "verifiedAt": "2026-11-07"
   },
   "A48M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -5815,7 +5848,7 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 32,
-    "verifiedAt": "2026-11-02"
+    "verifiedAt": "2026-11-07"
   },
   "S11T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -5963,7 +5996,7 @@
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 28,
-    "verifiedAt": "2026-10-25"
+    "verifiedAt": "2026-11-07"
   },
   "U63B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
