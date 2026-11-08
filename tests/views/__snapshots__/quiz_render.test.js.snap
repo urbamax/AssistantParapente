@@ -113,7 +113,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
 {
   "EXAM": {
     "description": "Mode Examen : Simulation dans les conditions réelles d'examen (volume et thèmes imposés).",
-    "theme": "THÈME SPÉCIFIQUE (OPTIONNEL)",
+    "theme": "THÈME SPÉCIFIQUE",
   },
   "MASTERY": {
     "description": "Mode Perfectionnement : Choisissez un niveau ou un thème et un palier cible. La série pioche vos questions non maîtrisées et se rallonge automatiquement si besoin, jusqu'à atteindre l'objectif.",
@@ -121,11 +121,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
   },
   "REVISION": {
     "description": "Mode Révision (répétition espacée) : les questions jamais tentées passent en premier, puis celles qui sont à réviser. Une question réussie revient à intervalles de plus en plus longs (1, 3, 7, 14 puis 30 jours) ; après une erreur, elle revient bien plus tôt.",
-    "theme": "THÈME SPÉCIFIQUE (OPTIONNEL)",
+    "theme": "THÈME SPÉCIFIQUE",
   },
   "TRAINING": {
     "description": "Mode Entraînement : Choisissez votre thème et volume. Correction immédiate après chaque question.",
-    "theme": "THÈME SPÉCIFIQUE (OPTIONNEL)",
+    "theme": "THÈME SPÉCIFIQUE",
   },
 }
 `;

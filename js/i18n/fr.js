@@ -988,7 +988,9 @@ export const FR = Object.freeze({
                 "Mode Perfectionnement : Choisissez un niveau ou un thème et un palier cible. La série pioche vos questions non maîtrisées et se rallonge automatiquement si besoin, jusqu'à atteindre l'objectif.",
             trainingDescription:
                 'Mode Entraînement : Choisissez votre thème et volume. Correction immédiate après chaque question.',
-            themeLabel: 'THÈME SPÉCIFIQUE (OPTIONNEL)',
+            themeLabel: 'THÈME SPÉCIFIQUE',
+            countValue: '{n} questions',
+            countAll: 'Toutes les questions',
             themeLabelMastery: 'NIVEAU (TOUT) OU THÈME CIBLÉ',
             masteryCurrent: 'Maîtrise actuelle : {current}%.',
             masteryAtMax: "Vous avez déjà atteint 100% sur ce périmètre : il n'y a plus rien à perfectionner.",

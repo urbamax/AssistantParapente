@@ -674,3 +674,179 @@ body.light-mode .library-list-item {
     font-weight: 700;
     text-decoration: underline;
 }
+
+/* --- Écran Théorie : mise en page compacte et typographie alignée sur le reste de l'app ---
+   Les boutons et la liste déroulante héritaient de la taille de police par défaut du navigateur
+   (13 px) alors que le reste de l'app est en 0.95–1 rem ; les marges verticales s'additionnaient
+   (gap de la grille + marge de chaque groupe), d'où l'espace perdu. Un seul rythme de 16 px. */
+#qcm-setup-screen .setup-grid {
+    width: 100%; /* le conteneur est en colonne flex : sans cela la grille se réduit à son contenu */
+    max-width: 1100px;
+    gap: 16px;
+    column-gap: 20px;
+}
+
+#qcm-setup-screen .mode-toggle-container,
+#qcm-setup-screen .count-selector {
+    gap: 6px;
+    padding: 5px;
+    margin-bottom: 0;
+}
+
+#qcm-setup-screen .mode-toggle-btn,
+#qcm-setup-screen .count-btn {
+    padding: 11px 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+#qcm-setup-screen .mode-toggle-btn i {
+    margin-right: 4px;
+    vertical-align: -1px;
+}
+
+#qcm-setup-screen .mode-description {
+    margin: 0;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    text-align: center;
+}
+
+#qcm-setup-screen .setup-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+#qcm-setup-screen .setup-group-margin {
+    margin-top: 0;
+}
+
+#qcm-setup-screen #qcm-theme-select {
+    padding: 12px 14px;
+    margin-bottom: 0;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+/* Nombre de questions et thème côte à côte sur grand écran */
+#qcm-setup-screen #training-options {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 16px 20px;
+    align-items: stretch;
+}
+
+#qcm-setup-screen #training-options .setup-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 12px 14px 14px;
+    border: var(--border-glass);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+#qcm-setup-screen #training-options .count-selector {
+    background: transparent;
+    padding: 0;
+}
+
+#qcm-setup-screen #training-options #qcm-theme-select {
+    flex: 1;
+    min-height: 46px;
+}
+
+/* Bandeau « examen théorique validé » : même largeur que le formulaire, pas toute la page */
+#qcm-brevet-banner-slot {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto 12px;
+}
+
+#qcm-brevet-banner-slot > [data-quiz-brevet-banner] {
+    margin-bottom: 0 !important;
+    padding: 8px 14px !important;
+}
+
+#qcm-setup-screen .mastery-target-hint {
+    margin: 8px 0 0;
+}
+
+#qcm-setup-screen .next-btn-large {
+    margin: 8px 0 0;
+    padding: 16px;
+    font-size: 1.05rem;
+}
+
+#qcm-setup-screen .bank-btn {
+    margin: 0;
+    padding: 12px;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    #qcm-setup-screen #training-options {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #qcm-setup-screen .mode-toggle-btn,
+    #qcm-setup-screen .count-btn {
+        padding: 10px 6px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Curseur du nombre de questions : même gabarit que celui du palier du mode Perfectionnement */
+#qcm-setup-screen .count-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    min-height: 46px;
+}
+
+#qcm-setup-screen .count-slider-row .mastery-target-slider {
+    flex: 1;
+    min-width: 0;
+}
+
+#qcm-setup-screen .count-slider-value {
+    min-width: 8.5em;
+    text-align: right;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+/* Perfectionnement : le nombre de questions est masqué, le thème prend toute la ligne ; le palier
+   objectif a la même présentation en carte que les autres réglages. */
+#qcm-setup-screen #qcm-count-group[style*='none'] ~ #qcm-theme-group {
+    grid-column: 1 / -1;
+}
+
+#qcm-setup-screen #mastery-options {
+    padding: 12px 14px 14px;
+    border: var(--border-glass);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+#qcm-setup-screen #mastery-options .mastery-target-row {
+    margin-bottom: 4px;
+}
+
+#qcm-setup-screen #mastery-options .setup-label {
+    margin-bottom: 0;
+}
+
+#qcm-setup-screen #mastery-options .mastery-target-value {
+    text-decoration: none;
+    font-size: 0.95rem;
+}

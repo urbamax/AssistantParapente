@@ -112,7 +112,7 @@ async function bootApplication() {
         if (QuizView.updateModeUI) QuizView.updateModeUI(mode, target);
     });
     AppEvents.register('setQcmCount', (count, e, target) => {
-        QuizService.setCount(count === 'ALL' ? 'ALL' : parseInt(count));
+        QuizService.setCount(QuizView.parseCountChoice(count));
         if (QuizView.updateCountUI) QuizView.updateCountUI(count, target);
     });
     AppEvents.register('setMasteryTarget', (target, e, btn) => {
