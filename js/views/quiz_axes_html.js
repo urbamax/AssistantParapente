@@ -40,30 +40,6 @@ const STATUS_THEME = {
 };
 
 /**
- * Construit le bandeau de raccourci affiché en haut de l'écran Statistiques (`#stats-axes-banner`).
- *
- * @returns {string}
- */
-export function buildStatsAxesShortcutHtml() {
-    return `
-        <div class="stats-axes-shortcut" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; padding:16px 20px; margin-top:16px; border-radius:var(--radius-md); background:var(--bg-card); border:1px solid var(--border-color); box-shadow:0 4px 12px rgba(0,0,0,0.06);">
-            <div style="display:flex; align-items:flex-start; gap:14px; flex:1 1 280px;">
-                <div style="width:42px; height:42px; border-radius:12px; background:rgba(14,165,233,0.14); color:var(--accent-orange); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                    <i class="ri-compass-3-line" style="font-size:1.35rem;"></i>
-                </div>
-                <div>
-                    <div style="font-weight:800; font-size:1rem; color:var(--text-main); margin-bottom:4px;">${tq('axes.shortcutFromStatsTitle')}</div>
-                    <div style="font-size:0.86rem; color:var(--text-secondary); line-height:1.45;">${tq('axes.shortcutFromStatsText')}</div>
-                </div>
-            </div>
-            <button type="button" data-action="QuizshowRevisionAxes" style="background:var(--accent-orange); color:#fff; border:none; padding:10px 18px; border-radius:12px; font-weight:700; font-size:0.88rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; white-space:nowrap;">
-                <i class="ri-compass-3-line"></i> ${tq('axes.shortcutFromStatsBtn')} <i class="ri-arrow-right-line"></i>
-            </button>
-        </div>
-    `;
-}
-
-/**
  * Construit les pastilles de répartition des questions d'un axe.
  *
  * @param {any} axis

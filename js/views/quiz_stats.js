@@ -156,8 +156,6 @@ export class QuizStatsBase extends BaseView {
         console.log('QuizEngine.renderStats v4.4 - Starting');
         const container = document.getElementById('stats-content');
         if (!container) return;
-        const axesBannerSlot = document.getElementById('stats-axes-banner');
-        if (axesBannerSlot) axesBannerSlot.innerHTML = '';
 
         if (!GdprEngine.isConsentGranted('stats')) {
             container.innerHTML = `
@@ -893,41 +891,6 @@ export class QuizStatsBase extends BaseView {
             }
             alert(tql('dialogs.resetDone'));
             this.renderStats();
-        }
-    }
-
-    saveExamHistory(level, score, total, results) {
-        if (!GdprEngine.isConsentGranted('stats')) {
-            console.log('Stats consent missing, skipping exam history save.');
-            return;
-        }
-        try {
-            let history = StorageService.get(StorageService.KEYS.EXAM_HISTORY) || { exams: [] };
-            if (typeof history !== 'object' || !history.exams) {
-                history = { exams: [] };
-            }
-
-            const exam = {
-                id:
-                    typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-                        ? crypto.randomUUID()
-                        : Date.now().toString(),
-                date: new Date().toISOString(),
-                level: level,
-                score: score,
-                total: total,
-                percentage: Math.round((score / total) * 100),
-                results: QuizService.compactExamResults(results),
-            };
-
-            history.exams.unshift(exam); // Add to beginning (pas de limite)
-
-            StorageService.set(StorageService.KEYS.EXAM_HISTORY, history);
-            if (window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
-                window.FirebaseAuthEngine.saveHistoryToCloud();
-            }
-        } catch (e) {
-            console.error('Failed to save exam history', e);
         }
     }
 

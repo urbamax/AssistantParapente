@@ -1013,10 +1013,6 @@ export const FR = Object.freeze({
             methodStep3Title: '3. Vérifier en atelier',
             methodStep3Text:
                 'Testez-vous sur 5 à 8 questions mêlant vos points d’hésitation et des acquis du chapitre.',
-            shortcutFromStatsTitle: 'Réviser intelligemment (sans bachotage)',
-            shortcutFromStatsText:
-                'Découvrez vos chapitres prioritaires avec les pages exactes des cours PDF officiels, les points clés à retenir et des ateliers ciblés.',
-            shortcutFromStatsBtn: 'Explorer mes axes de révision',
             backToAxesBtn: 'Retour aux axes de révision',
             filterAll: 'Tous les chapitres ({count})',
             filterBlocker: 'Priorité 1 · Blocages & hésitations ({count})',
