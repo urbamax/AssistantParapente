@@ -1,3 +1,4 @@
+import { setConsent } from '../helpers/stats_consent.js';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import QuizService, { compactExam, compactExamResult, isExamBloated } from '../../js/services/quiz_service.js';
 import StorageService from '../../js/services/storage.js';
@@ -40,6 +41,7 @@ describe('Quiz Exam History Compaction & Migration', () => {
 
     beforeEach(() => {
         localStorage.clear();
+        setConsent();
         QuizService.setQuestions(mockQuestions);
         QuizService.state.examResults = [];
         QuizService.state.examSaved = false;
