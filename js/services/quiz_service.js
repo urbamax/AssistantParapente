@@ -1330,7 +1330,7 @@ class QuizService {
         const hasQuestions = this.questions && this.questions.length > 0;
         const migrated = exams.map((exam) => {
             let updated = exam;
-            if (this.isExamBloated(updated)) {
+            if (this.isExamBloated(updated) || updated.percentage !== undefined) {
                 needsMigration = true;
                 updated = this.compactExam(updated);
             }

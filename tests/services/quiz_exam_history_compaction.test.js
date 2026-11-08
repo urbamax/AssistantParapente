@@ -243,6 +243,40 @@ describe('Quiz Exam History Compaction & Migration', () => {
         expect(history[0].questionsTotal).toBe(2);
     });
 
+    it('QuizService.getExamHistory rewrites already-migrated exams without the stored percentage', () => {
+        const pointsExam = {
+            id: 'exam_points',
+            date: '2026-11-01T10:00:00.000Z',
+            level: 'BI',
+            score: 318,
+            total: 360,
+            percentage: 88,
+            passed: true,
+            scoreMode: 'points',
+            appliedToStats: true,
+            results: [{ code: 'E52V', isCorrect: true, selected: [0] }],
+        };
+        StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: [pointsExam] });
+
+        const history = QuizService.getExamHistory();
+        expect(history[0].percentage).toBeUndefined();
+        expect(history[0].score).toBe(318);
+        expect(history[0].total).toBe(360);
+
+        const stored = StorageService.get(StorageService.KEYS.EXAM_HISTORY);
+        expect(stored.exams[0].percentage).toBeUndefined();
+        expect(stored.exams[0].score).toBe(318);
+    });
+
+    it('FirebaseAuthEngine.mergeExamHistory drops the stored percentage from cloud exams', () => {
+        const cloud = {
+            exams: [{ id: 'c1', date: '2026-11-01T10:00:00.000Z', score: 6, total: 6, percentage: 100, results: [] }],
+        };
+        const merged = FirebaseAuthEngine.mergeExamHistory({ exams: [] }, cloud);
+        expect(merged.exams[0].percentage).toBeUndefined();
+        expect(merged.exams[0].score).toBe(6);
+    });
+
     it('FirebaseAuthEngine.mergeExamHistory compacts cloud and local exams without 20 limit', () => {
         const cloudBloated = {
             exams: [
