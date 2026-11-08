@@ -475,12 +475,16 @@ export class QuizStatsBase extends BaseView {
 
         exams.forEach((exam) => {
             const dateStr = formatDateTime(exam.date);
+            // Les anciens examens ont un pourcentage entier enregistré : on recalcule depuis le score
+            // pour afficher la même précision (1 décimale) partout. Un examen invalidé garde son pourcentage.
             const pct =
-                exam.percentage !== undefined
-                    ? exam.percentage
-                    : exam.total > 0
-                      ? floorPercent1(exam.score, exam.total)
-                      : 0;
+                !exam.invalidated && exam.total > 0
+                    ? floorPercent1(exam.score, exam.total)
+                    : exam.percentage !== undefined
+                      ? exam.percentage
+                      : exam.total > 0
+                        ? floorPercent1(exam.score, exam.total)
+                        : 0;
             const color = exam.invalidated ? '#f87171' : pct >= 75 ? '#4ade80' : pct >= 50 ? '#facc15' : '#f87171';
             const levelLabel = tql(
                 `history.levels.${['BI', 'BP', 'BPC'].includes(exam.level) ? exam.level : 'TREUIL'}`,
@@ -920,7 +924,6 @@ export class QuizStatsBase extends BaseView {
                 level: level,
                 score: score,
                 total: total,
-                percentage: Math.round((score / total) * 100),
                 results: QuizService.compactExamResults(results),
             };
 
