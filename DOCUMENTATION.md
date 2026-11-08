@@ -365,7 +365,7 @@ The flight document in `users/{uid}/logbook/{id}` never carries the IGC text: `s
   - **Modal Exam Review**: Clicking an exam card in history opens a modal dialog displaying all exam questions and explanations in full width.
 - **Revision Mode (`REVISION`)**: Leitner-style spaced repetition schedule (intervals of 1, 3, 7, 14, 30 days) prioritizing unanswered questions and overdue reviews. Automatically selected when reviewing a certified level.
 - **Perfectionnement Mode (`MASTERY`)**: Dynamic target threshold (50%, 75%, 100%) targeting unmastered questions and continuously adjusting the required series length after every validated answer.
-- **Revision Axes (`REVISION_AXES`, spec 043)**: Splits the 777 official FFVL questions into 21 sub-chapters categorized by pilot mastery (Point bloquant, À rafraîchir, À découvrir, Maîtrisé). Offers a 3-step structured study path:
+- **Revision Axes (`REVISION_AXES`, spec 043)**: Splits the 775 official FFVL paragliding questions into 21 sub-chapters categorized by pilot mastery (Point bloquant, À rafraîchir, À découvrir, Maîtrisé). Offers a 3-step structured study path:
   1. Open official course PDFs directly at exact verified pages.
   2. Study concise key concepts synthesized from explanations (without spoiling question statements).
   3. Launch targeted mini-workshops (5–8 questions) or an anti-trap workshop specifically focusing on repeated errors.

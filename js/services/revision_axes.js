@@ -2,7 +2,7 @@
 /**
  * Service de diagnostic et de parcours « Axes de révision » anti-bachotage (Spec 043).
  *
- * Découpe les 777 questions Parapente en 21 sous-chapitres pédagogiques, évalue l'état de maîtrise
+ * Découpe les 775 questions Parapente en 21 sous-chapitres pédagogiques, évalue l'état de maîtrise
  * et de répétition espacée de chaque chapitre pour le niveau actif, agrège les références de cours
  * PDF vérifiées (Principe III de la Constitution : uniquement les pages vérifiées > 0), extrait les
  * points clés à retenir sans exposer les choix QCM, et construit des ateliers ciblés équilibrés.
