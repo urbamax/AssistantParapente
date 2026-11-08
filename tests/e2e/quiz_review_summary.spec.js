@@ -8,7 +8,8 @@ test.beforeEach(async ({ page }) => {
         localStorage.setItem(
             'parapente_gdpr_consent',
             JSON.stringify({
-                stats: false,
+                // Les statistiques ne sont lues et écrites qu'avec ce consentement (RGPD).
+                stats: true,
                 firebase: false,
                 gps: false,
                 version: 2026,
