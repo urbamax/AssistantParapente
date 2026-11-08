@@ -107,6 +107,7 @@ const CRITICAL_ASSETS = [
     './js/core/security.js',
     './js/core/start_mode.js',
     './js/core/ui_manager.js',
+    './js/services/consent_store.js',
     './js/services/firebase_service.js',
     './js/services/flight_trace_sync.js',
     './js/services/igc_parser.js',

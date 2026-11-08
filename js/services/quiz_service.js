@@ -3,6 +3,7 @@ import { toSorted } from '../utils/array_utils.js';
 import { parseDateToMs } from '../utils/date_utils.js';
 import { t } from '../utils/i18n.js';
 import { floorPercent1 } from '../utils/text_utils.js';
+import { isStatsConsentGranted } from './consent_store.js';
 import { dueScore, summarizeReviews } from './review_scheduler.js';
 import { masteryRatio, masteryRatioAfterCorrect, pushAttempt } from './mastery.js';
 import {
@@ -1095,7 +1096,18 @@ class QuizService {
         return this.getCurrentQuestion();
     }
 
+    // Sans consentement « statistiques » (RGPD), rien n'est écrit dans le stockage : les réponses ne
+    // vivent qu'en mémoire, le temps de la visite, pour que Perfectionnement et Révision continuent de
+    // fonctionner. Un rechargement les efface.
+    _volatileStats = null;
+
     getPersistentStats() {
+        if (!isStatsConsentGranted()) {
+            if (!this._volatileStats) {
+                this._volatileStats = { totalQuestions: 0, totalCorrect: 0, themes: {}, questions: {} };
+            }
+            return this._volatileStats;
+        }
         const s = StorageService.get(StorageService.KEYS.QCM_STATS, { themes: {}, questions: {} });
         if (!s || typeof s !== 'object' || !s.themes)
             return { totalQuestions: 0, totalCorrect: 0, themes: {}, questions: {} };
@@ -1135,6 +1147,10 @@ class QuizService {
     }
 
     _persistStats(stats) {
+        if (!isStatsConsentGranted()) {
+            this._volatileStats = stats;
+            return;
+        }
         StorageService.set(StorageService.KEYS.QCM_STATS, stats);
 
         // Synchronisation immédiate vers Firebase si disponible
@@ -1252,6 +1268,8 @@ class QuizService {
             return;
         }
         this.state.examSaved = true;
+        // Sans consentement « statistiques », l'examen n'entre ni dans l'historique ni dans les statistiques.
+        if (!isStatsConsentGranted()) return;
         const history = this.getExamHistory();
 
         for (const r of answeredResults) {
@@ -1341,7 +1359,7 @@ class QuizService {
             return updated;
         });
 
-        if (hasQuestions) {
+        if (hasQuestions && isStatsConsentGranted()) {
             const stats = this.getPersistentStats();
             if (!Array.isArray(stats.appliedExamIds)) stats.appliedExamIds = [];
             const appliedSet = new Set(stats.appliedExamIds.map(String));
@@ -1378,7 +1396,7 @@ class QuizService {
             }
         }
 
-        if (needsMigration && hasQuestions) {
+        if (needsMigration && hasQuestions && isStatsConsentGranted()) {
             const deletedExamIds =
                 h && typeof h === 'object' && Array.isArray(h.deletedExamIds) ? h.deletedExamIds : [];
             StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: migrated, deletedExamIds });

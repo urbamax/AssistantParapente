@@ -4,6 +4,7 @@
  */
 import StorageService from './storage.js';
 import GdprEngine from '../gdpr_engine.js';
+import { isStatsConsentGranted } from './consent_store.js';
 import AppRouter from '../core/router.js';
 import GlobalState from '../core/app_state.js';
 import SitesService, { migrateSitePrefs } from './sites_service.js';
@@ -795,34 +796,37 @@ export const FirebaseAuthEngine = {
                 }
             }
 
-            // --- Sync QCM Stats ---
-            const localQcmStats = this.getLocalQcmStats();
-            const qcmDocRef = doc(db, 'users', uid, 'stats', 'qcm_stats');
-            const qcmDocSnap = await getDoc(qcmDocRef);
+            // Statistiques et historique d'examens : seulement avec le consentement « statistiques ».
+            if (isStatsConsentGranted()) {
+                // --- Sync QCM Stats ---
+                const localQcmStats = this.getLocalQcmStats();
+                const qcmDocRef = doc(db, 'users', uid, 'stats', 'qcm_stats');
+                const qcmDocSnap = await getDoc(qcmDocRef);
 
-            let finalQcmStats = localQcmStats;
-            if (qcmDocSnap.exists()) {
-                const cloudQcmStats = qcmDocSnap.data();
-                finalQcmStats = this.mergeQcmStats(localQcmStats, cloudQcmStats);
+                let finalQcmStats = localQcmStats;
+                if (qcmDocSnap.exists()) {
+                    const cloudQcmStats = qcmDocSnap.data();
+                    finalQcmStats = this.mergeQcmStats(localQcmStats, cloudQcmStats);
+                }
+
+                // Save back merged stats to both LocalStorage and Cloud
+                StorageService.set(StorageService.KEYS.QCM_STATS, finalQcmStats);
+                await setDoc(qcmDocRef, finalQcmStats);
+
+                // --- Sync Exam History ---
+                const localExamHistory = this.getLocalExamHistory();
+                const examDocRef = doc(db, 'users', uid, 'stats', 'exam_history');
+                const examDocSnap = await getDoc(examDocRef);
+
+                let finalExamHistory = localExamHistory;
+                if (examDocSnap.exists()) {
+                    const cloudExamHistory = examDocSnap.data();
+                    finalExamHistory = this.mergeExamHistory(localExamHistory, cloudExamHistory);
+                }
+
+                StorageService.set(StorageService.KEYS.EXAM_HISTORY, finalExamHistory);
+                await setDoc(examDocRef, finalExamHistory);
             }
-
-            // Save back merged stats to both LocalStorage and Cloud
-            StorageService.set(StorageService.KEYS.QCM_STATS, finalQcmStats);
-            await setDoc(qcmDocRef, finalQcmStats);
-
-            // --- Sync Exam History ---
-            const localExamHistory = this.getLocalExamHistory();
-            const examDocRef = doc(db, 'users', uid, 'stats', 'exam_history');
-            const examDocSnap = await getDoc(examDocRef);
-
-            let finalExamHistory = localExamHistory;
-            if (examDocSnap.exists()) {
-                const cloudExamHistory = examDocSnap.data();
-                finalExamHistory = this.mergeExamHistory(localExamHistory, cloudExamHistory);
-            }
-
-            StorageService.set(StorageService.KEYS.EXAM_HISTORY, finalExamHistory);
-            await setDoc(examDocRef, finalExamHistory);
 
             // --- Sync Preferences ---
             const localPrefs = this.getLocalPreferences();
@@ -942,6 +946,8 @@ export const FirebaseAuthEngine = {
     saveStatsToCloud: async function () {
         if (!this.currentUser || !this.enabled)
             return { success: false, data: null, error: 'Not enabled or logged in' };
+        // Les statistiques et l'historique QCM relèvent du consentement « statistiques », en plus de la synchro.
+        if (!isStatsConsentGranted()) return { success: false, data: null, error: 'stats-consent-missing' };
         // Hors ligne, l'écriture Firestore ne répond qu'au retour du réseau : on le signale
         // tout de suite (voyant orange) et la synchro de rattrapage 'online' s'en chargera.
         if (typeof navigator !== 'undefined' && navigator.onLine === false) {
@@ -971,6 +977,8 @@ export const FirebaseAuthEngine = {
     saveHistoryToCloud: async function () {
         if (!this.currentUser || !this.enabled)
             return { success: false, data: null, error: 'Not enabled or logged in' };
+        // Les statistiques et l'historique QCM relèvent du consentement « statistiques », en plus de la synchro.
+        if (!isStatsConsentGranted()) return { success: false, data: null, error: 'stats-consent-missing' };
         // Hors ligne, l'écriture Firestore ne répond qu'au retour du réseau : on le signale
         // tout de suite (voyant orange) et la synchro de rattrapage 'online' s'en chargera.
         if (typeof navigator !== 'undefined' && navigator.onLine === false) {
