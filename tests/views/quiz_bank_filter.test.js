@@ -39,4 +39,20 @@ describe('quiz bank theme filter (spec 017)', () => {
         expect(render).toHaveBeenCalledWith('Météo');
         expect(warn.mock.calls.filter((args) => String(args[0]).startsWith('Unregistered action'))).toEqual([]);
     });
+
+    it('ne rend la banque qu’une fois quand le même change passe par l’écouteur du select et celui de <body>', () => {
+        document.body.innerHTML =
+            '<select id="bank-theme-filter"><option value="ALL">ALL</option><option value="Météo">M</option></select>';
+        const render = vi.spyOn(QuizView, 'renderBankContent').mockImplementation(() => {});
+        const select = /** @type {HTMLSelectElement} */ (document.getElementById('bank-theme-filter'));
+        const onChange = QuizView.handleChange.bind(QuizView);
+        select.addEventListener('change', onChange);
+        document.body.addEventListener('change', onChange);
+
+        select.value = 'Météo';
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        document.body.removeEventListener('change', onChange);
+
+        expect(render).toHaveBeenCalledTimes(1);
+    });
 });
