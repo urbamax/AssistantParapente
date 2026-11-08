@@ -8,10 +8,11 @@ import GlobalState from './core/app_state.js';
 import AppRouter from './core/router.js';
 import SitesService from './services/sites_service.js';
 import { t } from './utils/i18n.js';
+import { CONSENT_KEY, CONSENT_VERSION } from './services/consent_store.js';
 
 const GdprEngine = {
-    consentKey: 'parapente_gdpr_consent',
-    consentVersion: 2026,
+    consentKey: CONSENT_KEY,
+    consentVersion: CONSENT_VERSION,
 
     // Default consent settings
     consent: {
