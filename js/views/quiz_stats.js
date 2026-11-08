@@ -820,7 +820,11 @@ export class QuizStatsBase extends BaseView {
                 if (row.offsetHeight) group.style.setProperty('--row-h', `${row.offsetHeight}px`);
             };
             syncRowHeight();
-            if (typeof ResizeObserver !== 'undefined') new ResizeObserver(syncRowHeight).observe(row);
+            // Un seul observateur par ligne, même si la section est ouverte plusieurs fois.
+            if (typeof ResizeObserver !== 'undefined' && !row.dataset.rhObserved) {
+                row.dataset.rhObserved = '1';
+                new ResizeObserver(syncRowHeight).observe(row);
+            }
         });
     }
 
