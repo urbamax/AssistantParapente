@@ -167,7 +167,7 @@ describe('Quiz Exam History Compaction & Migration', () => {
         const exam = saved.exams[0];
         expect(exam.score).toBe(6);
         expect(exam.total).toBe(12);
-        expect(exam.percentage).toBe(50);
+        expect(exam.percentage).toBeUndefined();
         expect(exam.scoreMode).toBe('points');
         expect(exam.questionsCorrect).toBe(1);
         expect(exam.questionsTotal).toBe(2);
@@ -204,7 +204,7 @@ describe('Quiz Exam History Compaction & Migration', () => {
         });
         expect(history[0].score).toBe(6);
         expect(history[0].total).toBe(6);
-        expect(history[0].percentage).toBe(100);
+        expect(history[0].percentage).toBeUndefined();
         expect(history[0].scoreMode).toBe('points');
         expect(history[0].questionsCorrect).toBe(1);
         expect(history[0].questionsTotal).toBe(1);
@@ -215,7 +215,7 @@ describe('Quiz Exam History Compaction & Migration', () => {
         expect(updatedStorage.exams[0].results[0].theme).toBeUndefined();
         expect(updatedStorage.exams[0].score).toBe(6);
         expect(updatedStorage.exams[0].total).toBe(6);
-        expect(updatedStorage.exams[0].percentage).toBe(100);
+        expect(updatedStorage.exams[0].percentage).toBeUndefined();
     });
 
     it('QuizService.getExamHistory migrates legacy exams with question counts to points and points-based percentage', () => {
@@ -237,7 +237,7 @@ describe('Quiz Exam History Compaction & Migration', () => {
         const history = QuizService.getExamHistory();
         expect(history[0].score).toBe(6);
         expect(history[0].total).toBe(12);
-        expect(history[0].percentage).toBe(50);
+        expect(history[0].percentage).toBeUndefined();
         expect(history[0].scoreMode).toBe('points');
         expect(history[0].questionsCorrect).toBe(1);
         expect(history[0].questionsTotal).toBe(2);
