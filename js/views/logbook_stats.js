@@ -181,6 +181,7 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
             ? tt('records.totals', {
                   flights: analysed.length,
                   distance: Math.round(sum((f) => f.distanceKm) * 10) / 10,
+                  freeDistance: Math.round(sum((f) => f.igcStats.freeDistanceKm) * 10) / 10,
                   climb: Math.round(sum((f) => f.igcStats.cumulativeClimb)),
                   thermals: sum((f) => f.igcStats.thermalCount),
                   thermalTime: formatDuration(sum((f) => f.igcStats.thermalMinutes)),

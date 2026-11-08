@@ -80,7 +80,7 @@ describe('LogbookView.renderRecords', () => {
         expect(html).toContain('12.3 km');
         expect(html).toContain('+3.4 m/s');
         expect(html).toContain('PLAINE &lt;b&gt;');
-        expect(html).toContain('Sur 2 vols avec trace : 8.4 km parcourus');
+        expect(html).toContain('Sur 2 vols avec trace : 8.4 km de trace parcourue (14.9 km en distance libre, comme Syride)');
     });
 
     it('offers to compute the stats of flights imported before', () => {
