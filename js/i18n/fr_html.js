@@ -23,8 +23,7 @@ export const FR_HTML = Object.freeze({
         modeEntrainementChoisissez:
             'Mode Entraînement : choisissez votre thème et volume. Correction immédiate après chaque question.',
         nombreDeQuestions: 'NOMBRE DE QUESTIONS',
-        tout: 'TOUT',
-        themeSpecifiqueOptionnel: 'THÈME SPÉCIFIQUE (OPTIONNEL)',
+        themeSpecifiqueOptionnel: 'THÈME SPÉCIFIQUE',
         tousLesThemes: 'Tous les thèmes',
         palierObjectif: 'PALIER OBJECTIF',
         commencer: 'COMMENCER',

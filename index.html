@@ -157,20 +157,25 @@
                     <!-- TRAINING OPTIONS (Hidden in Exam Mode) -->
                     <div id="training-options">
                         <div class="setup-group" id="qcm-count-group">
-                            <label data-i18n="qcmSetupScreen.nombreDeQuestions" class="setup-label">NOMBRE DE QUESTIONS</label>
-                            <div class="count-selector">
-                                <button class="count-btn active" data-action="setQcmCount" data-args="10">10</button>
-                                <button class="count-btn" data-action="setQcmCount" data-args="20">20</button>
-                                <button class="count-btn" data-action="setQcmCount" data-args="30">30</button>
-                                <button class="count-btn" data-action="setQcmCount" data-args="40">40</button>
-                                <button data-i18n="qcmSetupScreen.tout" class="count-btn" data-action="setQcmCount" data-args="&#39;ALL&#39;">
-                                    TOUT
-                                </button>
+                            <label data-i18n="qcmSetupScreen.nombreDeQuestions" class="setup-label" id="qcm-count-label">NOMBRE DE QUESTIONS</label>
+                            <div class="count-slider-row">
+                                <input
+                                    type="range"
+                                    id="qcm-count-slider"
+                                    class="mastery-target-slider"
+                                    min="5"
+                                    max="55"
+                                    step="5"
+                                    value="10"
+                                    aria-labelledby="qcm-count-label"
+                                    data-input-action="setQcmCount"
+                                />
+                                <output id="qcm-count-value" for="qcm-count-slider" class="mastery-target-value count-slider-value">10</output>
                             </div>
                         </div>
 
                         <div class="setup-group setup-group-margin" id="qcm-theme-group">
-                            <label data-i18n="qcmSetupScreen.themeSpecifiqueOptionnel" class="setup-label" id="qcm-theme-label">THÈME SPÉCIFIQUE (OPTIONNEL)</label>
+                            <label data-i18n="qcmSetupScreen.themeSpecifiqueOptionnel" class="setup-label" id="qcm-theme-label">THÈME SPÉCIFIQUE</label>
                             <select id="qcm-theme-select" autocomplete="off">
                                 <option data-i18n="qcmSetupScreen.tousLesThemes" value="ALL">Tous les thèmes</option>
                                 <!-- Injected by JS -->

@@ -20,6 +20,9 @@ import { buildTrapFeedback } from '../services/error_diagnostic.js';
 import { choiceIndex } from '../services/answer_log.js';
 import { floorPercent1, formatPercent } from '../utils/text_utils.js';
 
+// Curseur du nombre de questions : 5 à 50 par pas de 5, puis « toutes » (voir parseCountChoice).
+const QCM_COUNT_MAX = 50;
+
 // Identifiant réservé de l'atelier anti-pièges (aucun axe du catalogue ne porte ce nom).
 const TRAPS_WORKSHOP_ID = 'TRAPS';
 // Sous ce nombre de questions, l'atelier anti-pièges est complété avec des questions des mêmes chapitres.
@@ -636,6 +639,7 @@ class QuizViewClass extends QuizVoiceBase {
         const masteryOptions = document.getElementById('mastery-options');
         if (masteryOptions) masteryOptions.style.display = mode === 'MASTERY' ? '' : 'none';
         this.updateThemeUI();
+        this.updateCountUI(QuizService.state.qcmConfig.count);
         this.refreshMasterySlider();
     }
 
@@ -706,16 +710,22 @@ class QuizViewClass extends QuizVoiceBase {
         if (startBtn) startBtn.disabled = complete && QuizService.state.qcmConfig.mode === 'MASTERY';
     }
 
-    updateCountUI(countVal, targetBtn) {
-        document.querySelectorAll('.count-btn').forEach((btn) => btn.classList.remove('active'));
-        if (targetBtn) {
-            targetBtn.classList.add('active');
-        } else {
-            // fallback
-            const btn =
-                document.querySelector(`[data-args="${countVal}"]`) ||
-                document.querySelector(`[data-value="${countVal}"]`);
-            if (btn) btn.classList.add('active');
+    // Le curseur du nombre de questions va de 5 à 50 par pas de 5 ; sa dernière position (55) veut
+    // dire « toutes les questions » (le service l'enregistre sous la forme 'ALL').
+    parseCountChoice(value) {
+        const n = parseInt(value);
+        return value === 'ALL' || !(n <= QCM_COUNT_MAX) ? 'ALL' : n;
+    }
+
+    updateCountUI(countVal) {
+        const count = this.parseCountChoice(countVal);
+        const label = count === 'ALL' ? tql('modes.countAll') : tql('modes.countValue', { n: count });
+        const output = document.getElementById('qcm-count-value');
+        if (output) output.textContent = label;
+        const slider = /** @type {HTMLInputElement | null} */ (document.getElementById('qcm-count-slider'));
+        if (slider) {
+            slider.value = String(count === 'ALL' ? QCM_COUNT_MAX + 5 : count);
+            slider.setAttribute('aria-valuetext', label);
         }
     }
 
