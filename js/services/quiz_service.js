@@ -280,7 +280,7 @@ export function needsPointsMigration(exam) {
 
 /**
  * Migre un examen historique au barème officiel de points FFVL.
- * @param {Object} exam
+ * @param {Object} rawExam
  * @param {Function} questionLookup
  * @returns {Object}
  */
