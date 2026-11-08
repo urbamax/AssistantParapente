@@ -523,10 +523,6 @@ body.light-mode .bank-item-explication {
     padding-bottom: 120px !important;
 }
 
-#stats-axes-banner {
-    display: none !important;
-}
-
 #stats-content {
     width: 100% !important;
     max-width: 100% !important;

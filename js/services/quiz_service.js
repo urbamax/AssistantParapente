@@ -882,7 +882,7 @@ class QuizService {
         const pool = [...(sourceData || this.getLevelQuestions(level))];
         if (pool.length === 0) return [];
 
-        const targetCount = Math.min(level === 'BP' ? 60 : 30, pool.length);
+        const targetCount = Math.min(getExamQuotas(level).total, pool.length);
         const shuffledPool = this.shuffle(pool);
         const used = new Set();
         const distributed = [];
@@ -1123,15 +1123,6 @@ class QuizService {
     getTrapDiagnosis(question) {
         const original = this.getQuestionByCode(question.code) || question;
         return diagnoseQuestionErrors(original, this.getPersistentStats().questions?.[question.code]);
-    }
-
-    // Les choix cochés en examen reçoivent le même traitement qu'en entraînement.
-    recordExamPicks(shownQuestion, selected, previous) {
-        const question = this.getQuestionByCode(shownQuestion.code) || shownQuestion;
-        const pts = (selected || []).reduce((sum, opt) => sum + (Number(opt?.pts) || 0), 0);
-        const maxPts = (question.choices || []).reduce((sum, c) => sum + (c.pts > 0 ? c.pts : 0), 0);
-        const isCorrect = maxPts > 0 && pts === maxPts;
-        this.updateStats(question, isCorrect, selected, previous);
     }
 
     _persistStats(stats) {
