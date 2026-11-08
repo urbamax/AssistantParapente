@@ -451,6 +451,11 @@ class QuizViewClass extends QuizVoiceBase {
     }
 
     handleChange(e) {
+        // Le même événement arrive deux fois pour les contrôles qui ont leur propre écouteur
+        // (il remonte aussi jusqu'à l'écouteur de <body>) : on ne le traite qu'une fois, sinon
+        // la banque de questions serait re-rendue en double à chaque changement de filtre.
+        if (this._lastChangeEvent === e) return;
+        this._lastChangeEvent = e;
         if (e.target.id === 'sort-questions-select' || e.target.getAttribute('data-action') === 'QuizsortQuestions') {
             this.sortQuestions(e.target.value);
             AppEvents.markHandled(e);

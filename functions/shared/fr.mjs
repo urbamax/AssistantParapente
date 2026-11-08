@@ -591,7 +591,7 @@ export const FR = Object.freeze({
             maxSpeed: 'Vitesse sol max',
             gMax: 'Facteur de charge max (capteur)',
             highestRelease: 'Plus haut largage au treuil',
-            totals: 'Sur {flights} vols avec trace : {distance} km parcourus, {climb} m de dénivelé positif, {thermals} thermiques enroulés ({thermalTime}).',
+            totals: 'Sur {flights} vols avec trace : {distance} km de trace parcourue ({freeDistance} km en distance libre, comme Syride), {climb} m de dénivelé positif, {thermals} thermiques enroulés ({thermalTime}).',
             recompute: 'Tout recalculer depuis les traces',
             recomputeConfirm:
                 'Recalculer tous les vols depuis leur trace IGC ? Date, durée, altitude max, gain, position du décollage et statistiques seront mis à jour. Le site, le type de vol, le matériel, l’école, les pilotes, le commentaire et ta correction d’altitude sont gardés.',

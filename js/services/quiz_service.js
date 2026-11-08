@@ -166,7 +166,6 @@ export function compactExam(exam, questionLookup) {
         level: exam.level,
         score: exam.score !== undefined ? exam.score : 0,
         total: exam.total !== undefined ? exam.total : results.length,
-        percentage: exam.percentage !== undefined ? exam.percentage : 0,
         passed: exam.passed !== undefined ? exam.passed : false,
         invalidated: Boolean(exam.invalidated),
         results,
@@ -281,12 +280,15 @@ export function needsPointsMigration(exam) {
 
 /**
  * Migre un examen historique au barème officiel de points FFVL.
- * @param {Object} exam
+ * @param {Object} rawExam
  * @param {Function} questionLookup
  * @returns {Object}
  */
-export function migrateExamToPoints(exam, questionLookup) {
-    if (!exam || typeof exam !== 'object') return exam;
+export function migrateExamToPoints(rawExam, questionLookup) {
+    if (!rawExam || typeof rawExam !== 'object') return rawExam;
+    // Le pourcentage se recalcule depuis score/total : on n'en garde pas de copie (sauvegardes plus légères).
+    // eslint-disable-next-line no-unused-vars
+    const { percentage: _legacyPercentage, ...exam } = rawExam;
     const results = Array.isArray(exam.results) ? exam.results : [];
     if (results.length === 0) {
         return {
@@ -304,7 +306,6 @@ export function migrateExamToPoints(exam, questionLookup) {
         ...exam,
         score: isInvalidated ? 0 : pointsData.earnedPoints,
         total: pointsData.totalPoints,
-        percentage: isInvalidated ? 0 : pointsData.percentage,
         passed: isInvalidated ? false : pointsData.passed,
         scoreMode: 'points',
         questionsCorrect,
@@ -1253,7 +1254,6 @@ class QuizService {
         const pointsData = this.calculateExamPoints(results, this.state.qcmSessionData);
         const earnedPoints = pointsData.earnedPoints;
         const totalPoints = pointsData.totalPoints;
-        const percentage = pointsData.percentage;
         const passed = pointsData.passed;
         const questionsCorrect = answeredResults.filter((r) => r && r.isCorrect).length;
         const questionsTotal = sessionLen > 0 ? sessionLen : results.length;
@@ -1266,7 +1266,6 @@ class QuizService {
             level: level,
             score: earnedPoints,
             total: totalPoints,
-            percentage: percentage,
             passed: passed,
             invalidated: false,
             scoreMode: 'points',
@@ -1322,7 +1321,7 @@ class QuizService {
         const hasQuestions = this.questions && this.questions.length > 0;
         const migrated = exams.map((exam) => {
             let updated = exam;
-            if (this.isExamBloated(updated)) {
+            if (this.isExamBloated(updated) || updated.percentage !== undefined) {
                 needsMigration = true;
                 updated = this.compactExam(updated);
             }

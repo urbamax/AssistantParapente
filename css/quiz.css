@@ -787,7 +787,9 @@ body.light-mode .bank-item-explication {
     }
 
     #stats-screen #stats-content .theme-card {
-        height: 108px !important;
+        /* min-height : à ~1000 px de large les 7 cartes font 95 px et le texte passe sur 3 lignes,
+           une hauteur fixe coupait le titre, le compteur et la barre de progression. */
+        min-height: 108px !important;
         box-sizing: border-box !important;
         display: flex !important;
         flex-direction: column !important;

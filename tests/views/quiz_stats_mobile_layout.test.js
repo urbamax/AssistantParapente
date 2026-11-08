@@ -49,4 +49,9 @@ describe('Quiz Stats Screen Mobile Layout & Overflow Rules (css/quiz.css)', () =
             /#stats-screen\s+#stats-content\s*>\s*div:has\(\[data-action="QuizsetMasteryFilter"\]\)\s*\{[^}]*grid-column:\s*4\s*\/\s*-1/,
         );
     });
+
+    it('ne fixe pas la hauteur des cartes de thème du bureau (texte coupé vers 1000 px de large)', () => {
+        expect(css).toMatch(/#stats-content\s+\.theme-card\s*\{[^}]*min-height:\s*108px/);
+        expect(css).not.toMatch(/\.theme-card\s*\{[^}]*[^-]height:\s*108px/);
+    });
 });
