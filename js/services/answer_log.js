@@ -14,6 +14,7 @@
  */
 
 import { DAY_MS } from './review_scheduler.js';
+import { LEGACY_CHOICE_TEXTS } from '../data/qcm_legacy_choice_texts.js';
 
 /** Nombre de réponses conservées par question. */
 export const ANSWER_LOG_SIZE = 6;
@@ -30,18 +31,33 @@ export function dayNumber(now = Date.now()) {
  * Position d'un choix dans les choix de la question telle qu'elle est dans le CSV. Les choix sont
  * mélangés à chaque séance : `question` doit être la question d'origine, jamais la copie mélangée,
  * sinon l'index changerait d'une séance à l'autre. Repli sur le texte si l'objet n'est pas le même.
- * @param {{ choices?: any[] }} question
+ * @param {{ code?: string, choices?: any[] }} question
  * @param {any} choice
  */
 export function choiceIndex(question, choice) {
     const choices = question.choices || [];
     const idx = choices.indexOf(choice);
     if (idx >= 0 || !choice || typeof choice.text !== 'string') return idx;
-    return choices.findIndex((c) => c && c.text === choice.text);
+    return textChoiceIndex(question.code, choices, choice.text);
 }
 
 /**
- * @param {{ choices?: any[] }} question question d'origine (ordre du CSV)
+ * Position d'un choix retrouvé par son texte : le texte actuel d'abord, puis un ancien libellé corrigé
+ * depuis (voir js/data/qcm_legacy_choice_texts.js). -1 si le choix est introuvable.
+ * @param {string | undefined} code code de la question
+ * @param {any[]} choices choix actuels de la question (ordre du CSV)
+ * @param {unknown} text texte enregistré
+ */
+export function textChoiceIndex(code, choices, text) {
+    if (typeof text !== 'string' || !Array.isArray(choices)) return -1;
+    const idx = choices.findIndex((c) => c && c.text === text);
+    if (idx >= 0) return idx;
+    const legacy = code ? LEGACY_CHOICE_TEXTS[code]?.[text.trim()] : undefined;
+    return Number.isInteger(legacy) && legacy < choices.length ? legacy : -1;
+}
+
+/**
+ * @param {{ code?: string, choices?: any[] }} question question d'origine (ordre du CSV)
  * @param {any[]} selected choix cochés
  * @returns {number}
  */

@@ -13,7 +13,9 @@ import {
     pickMask,
     readAnswerLog,
     removeLastAnswer,
+    textChoiceIndex,
 } from './answer_log.js';
+import { QCM_DATA_REVISION, QCM_POINT_CORRECTIONS } from '../data/qcm_point_corrections.js';
 import { diagnoseQuestionErrors } from './error_diagnostic.js';
 
 // Tolérance sur la somme des maîtrises (flottants) pour décider que l'objectif est atteint.
@@ -140,11 +142,11 @@ export function compactExamResult(r, questionLookup) {
               if (typeof s === 'number') return s;
               const text = typeof s === 'string' ? s : s?.text;
               if (canonicalQ && Array.isArray(canonicalQ.choices) && text !== undefined) {
-                  const idx = canonicalQ.choices.findIndex((c) => c && c.text === text);
+                  const idx = textChoiceIndex(code, canonicalQ.choices, text);
                   if (idx !== -1) return idx;
               }
               if (qObj && Array.isArray(qObj.choices) && text !== undefined) {
-                  const idx = qObj.choices.findIndex((c) => c && c.text === text);
+                  const idx = textChoiceIndex(code, qObj.choices, text);
                   if (idx !== -1) return idx;
               }
               return text !== undefined ? text : s;
@@ -175,6 +177,7 @@ export function compactExam(exam, questionLookup) {
     if (exam.questionsCorrect !== undefined) base.questionsCorrect = exam.questionsCorrect;
     if (exam.questionsTotal !== undefined) base.questionsTotal = exam.questionsTotal;
     if (exam.appliedToStats !== undefined) base.appliedToStats = exam.appliedToStats;
+    if (exam.qcmRevision !== undefined) base.qcmRevision = exam.qcmRevision;
     return base;
 }
 
@@ -225,14 +228,16 @@ export function calculateExamPoints(results = [], sessionQuestions = [], questio
                 if (typeof r.userPoints === 'number') {
                     userScore = r.userPoints;
                 } else if (Array.isArray(r.selected)) {
+                    const pickedIdx = new Set(
+                        r.selected.map((s) =>
+                            typeof s === 'number'
+                                ? s
+                                : textChoiceIndex(q.code || code, q.choices, typeof s === 'string' ? s : s?.text),
+                        ),
+                    );
                     let ptsSum = 0;
                     q.choices.forEach((choice, choiceIdx) => {
-                        const wasSelected = r.selected.some((s) => {
-                            if (typeof s === 'number') return s === choiceIdx;
-                            if (typeof s === 'string') return s === choice.text;
-                            return Boolean(s && s.text === choice.text);
-                        });
-                        if (wasSelected && typeof choice.pts === 'number') {
+                        if (pickedIdx.has(choiceIdx) && typeof choice.pts === 'number') {
                             ptsSum += choice.pts;
                         }
                     });
@@ -295,6 +300,7 @@ export function migrateExamToPoints(rawExam, questionLookup) {
         return {
             ...exam,
             scoreMode: 'points',
+            qcmRevision: QCM_DATA_REVISION,
         };
     }
 
@@ -309,9 +315,75 @@ export function migrateExamToPoints(rawExam, questionLookup) {
         total: pointsData.totalPoints,
         passed: isInvalidated ? false : pointsData.passed,
         scoreMode: 'points',
+        qcmRevision: QCM_DATA_REVISION,
         questionsCorrect,
         questionsTotal,
     };
+}
+
+/**
+ * Recalcule le score d'un examen enregistré avec d'anciens points de questions (voir
+ * js/data/qcm_point_corrections.js). Seules les questions corrigées changent : leur contribution
+ * (points gagnés et maximum) est remplacée, le reste du score est conservé tel quel, y compris pour les
+ * questions qui ne sont plus dans le QCM. L'examen est ensuite marqué de la révision courante : l'opération
+ * ne se répète pas. Un examen invalidé garde son score de 0.
+ * @param {any} exam
+ * @param {(code: string) => any} questionLookup
+ * @returns {any} le même objet s'il est déjà à jour, sinon une copie corrigée
+ */
+export function applyPointCorrections(exam, questionLookup) {
+    if (!exam || typeof exam !== 'object') return exam;
+    const from = Number(exam.qcmRevision) || 0;
+    if (from >= QCM_DATA_REVISION) return exam;
+
+    let score = exam.score;
+    let total = exam.total;
+    let changed = false;
+    const adjustable =
+        exam.scoreMode === 'points' &&
+        !exam.invalidated &&
+        Array.isArray(exam.results) &&
+        Number.isFinite(score) &&
+        Number.isFinite(total);
+
+    if (adjustable) {
+        const maxOf = (pts) => pts.reduce((sum, p) => sum + (p > 0 ? p : 0), 0);
+        for (const correction of QCM_POINT_CORRECTIONS) {
+            if (correction.revision <= from) continue;
+            const choices = typeof questionLookup === 'function' ? questionLookup(correction.code)?.choices : null;
+            if (!Array.isArray(choices) || choices.length !== correction.newPts.length) continue;
+            for (const r of exam.results) {
+                if (!r) continue;
+                const code = r.code || r.questionCode || (r.question && (r.question.code || r.question.id));
+                if (code !== correction.code) continue;
+                const earnedWith = (pts) => {
+                    if (!Array.isArray(r.selected)) return r.isCorrect ? maxOf(pts) : 0;
+                    const picked = new Set(
+                        r.selected.map((s) =>
+                            typeof s === 'number'
+                                ? s
+                                : textChoiceIndex(code, choices, typeof s === 'string' ? s : s?.text),
+                        ),
+                    );
+                    return Math.max(
+                        0,
+                        pts.reduce((sum, p, i) => sum + (picked.has(i) ? p : 0), 0),
+                    );
+                };
+                score += earnedWith(correction.newPts) - earnedWith(correction.oldPts);
+                total += maxOf(correction.newPts) - maxOf(correction.oldPts);
+                changed = true;
+            }
+        }
+    }
+
+    const next = { ...exam, qcmRevision: QCM_DATA_REVISION };
+    if (changed) {
+        next.score = score;
+        next.total = total;
+        next.passed = total > 0 && score * 100 >= total * 75;
+    }
+    return next;
 }
 
 export function recalculateGlobalCounters(stats) {
@@ -390,7 +462,10 @@ export function replayExamToStats(exam, stats, questionLookup) {
                 .map((s) => {
                     if (typeof s === 'number' && choices[s]) return choices[s];
                     if (typeof s === 'object' && s !== null) return s;
-                    if (typeof s === 'string') return choices.find((c) => c.text === s) || { text: s, pts: 0 };
+                    if (typeof s === 'string') {
+                        const idx = textChoiceIndex(code, choices, s);
+                        return idx >= 0 ? choices[idx] : { text: s, pts: 0 };
+                    }
                     return null;
                 })
                 .filter(Boolean);
@@ -1231,6 +1306,10 @@ class QuizService {
         return migrateExamToPoints(exam, (code) => this.getQuestionByCode(code));
     }
 
+    applyPointCorrections(exam) {
+        return applyPointCorrections(exam, (code) => this.getQuestionByCode(code));
+    }
+
     compactExamResult(r) {
         return compactExamResult(r, (code) => this.getQuestionByCode(code));
     }
@@ -1287,6 +1366,7 @@ class QuizService {
             passed: passed,
             invalidated: false,
             scoreMode: 'points',
+            qcmRevision: QCM_DATA_REVISION,
             questionsCorrect,
             questionsTotal,
             results: this.compactExamResults(results),
@@ -1346,6 +1426,11 @@ class QuizService {
             if (hasQuestions && this.needsPointsMigration(updated)) {
                 needsMigration = true;
                 updated = this.migrateExamToPoints(updated);
+            }
+            // Points de questions corrigés depuis l'enregistrement de l'examen (voir qcm_point_corrections.js).
+            if (hasQuestions && (Number(updated.qcmRevision) || 0) < QCM_DATA_REVISION) {
+                needsMigration = true;
+                updated = this.applyPointCorrections(updated);
             }
             return updated;
         });
