@@ -183,6 +183,8 @@ const CRITICAL_ASSETS = [
     './js/components/map_3d.js',
     './js/data/sites_data.json',
     './js/data/courses_data.js',
+    './js/data/qcm_legacy_choice_texts.js',
+    './js/data/qcm_point_corrections.js',
     './js/data/equipment_config.js',
     './js/data/spotair_widgets.js',
     './js/data/weather_config.js',

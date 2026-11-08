@@ -1448,10 +1448,13 @@ export const FirebaseAuthEngine = {
             if (deletedIds.has(String(exam.id)) || deletedIds.has(String(exam.date)) || exam.deleted === true) return;
             const existing = examMap.get(key);
             if (existing) {
+                // Même examen des deux côtés : on garde la copie dont les points sont à jour du QCM
+                // (révision la plus récente), sans perdre le marquage « déjà compté dans les statistiques ».
+                const winner = (Number(exam.qcmRevision) || 0) > (Number(existing.qcmRevision) || 0) ? exam : existing;
                 if (exam.appliedToStats || existing.appliedToStats) {
-                    existing.appliedToStats = true;
+                    winner.appliedToStats = true;
                 }
-                examMap.set(key, existing);
+                examMap.set(key, winner);
             } else {
                 examMap.set(key, exam);
             }
