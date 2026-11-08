@@ -2638,12 +2638,6 @@
       }
     ]
   },
-  "N66T": {
-    "course_id": "treuil/ffvl-dossiertracte-2023",
-    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
-    "verifiedPage": 36,
-    "verifiedAt": "2026-11-04"
-  },
   "N67B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
@@ -2655,12 +2649,6 @@
         "verifiedPage": 26
       }
     ]
-  },
-  "N68T": {
-    "course_id": "treuil/ffvl-dossiertracte-2023",
-    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
-    "verifiedPage": 6,
-    "verifiedAt": "2026-11-08"
   },
   "P1V": {
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
@@ -3002,12 +2990,6 @@
     "course_id": "general/passeport-telechargement-web/2012-passeportspeed12-hd/2012-passeportspeed12-hd",
     "score": 0.0613,
     "title": "2012 passeportspeed12 hd"
-  },
-  "R72T": {
-    "course_id": "treuil/ffvl-dossiertracte-2023",
-    "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
-    "verifiedPage": 39,
-    "verifiedAt": "2026-10-02"
   },
   "S1B": {
     "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025",
