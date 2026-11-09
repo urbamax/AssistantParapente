@@ -64,7 +64,8 @@ describe('SafetyView', () => {
         SafetyView.saveIceProfile();
 
         expect(document.getElementById('ice-sticker-wrapper').textContent).toContain('Jean Valjean');
-        expect(document.getElementById('ice-sticker-wrapper').textContent).toContain('0611223344');
+        // Le numéro est écrit en toutes lettres, par paires de chiffres (06 11 22 33 44).
+        expect(document.getElementById('ice-sticker-wrapper').textContent).toContain('06 11 22 33 44');
     });
 
     it('ticks prévol items, shows completion, and resets', () => {

@@ -12,7 +12,7 @@ import StorageService from '../../js/services/storage.js';
 import { FirebaseAuthEngine } from '../../js/services/firebase_service.js';
 import GdprEngine from '../../js/gdpr_engine.js';
 import { isIceLocation } from '../../js/core/start_mode.js';
-import { renderIceSticker, renderIceTabHtml } from '../../js/views/safety_ice.js';
+import { printIceSticker, renderIceSticker, renderIceTabHtml } from '../../js/views/safety_ice.js';
 import IceView from '../../js/views/ice_viewer.js';
 
 const typical = {
@@ -188,5 +188,104 @@ describe('page ICE : rien ne masque les informations vitales', () => {
         IceView.importToProfile();
         expect(confirmSpy).not.toHaveBeenCalled();
         expect(IceService.getProfile().nom).toBe('Dupont');
+    });
+});
+
+describe('étiquette casque : informations vitales en toutes lettres', () => {
+    afterEach(() => {
+        vi.unstubAllGlobals();
+    });
+
+    it('écrit le sang, les allergies et les deux contacts, sans emoji, avec la date de mise à jour', () => {
+        const html = renderIceSticker(typical);
+        const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+        expect(text).toContain('Thomas Dupont');
+        expect(text).toContain('SANG O+');
+        expect(text).toContain('ALLERGIES : Pénicilline');
+        expect(text).toContain('Sophie : 06 12 34 56 78');
+        expect(text).toContain('Pierre : 06 98 76 54 32');
+        expect(text).toMatch(/Mis à jour \d{2}\/\d{4}/);
+        expect(html).not.toMatch(/[\u{1F300}-\u{1FAFF}\u2795]/u);
+        expect(html).toContain('<svg');
+    });
+
+    it('sans contact, renvoie vers le 112 plutôt que de laisser un vide', () => {
+        const text = renderIceSticker({ prenom: 'Thomas', nom: 'Dupont' }).replace(/<[^>]+>/g, ' ');
+        expect(text).toContain('112');
+    });
+
+    it('échappe les textes saisis', () => {
+        const html = renderIceSticker({ ...typical, allergies: '<img src=x onerror=alert(1)>' });
+        expect(html).not.toContain('<img src=x');
+        expect(html).toContain('&lt;img');
+    });
+
+    it("imprime deux étiquettes (casque et sellette), puis retire la copie après l'impression", () => {
+        document.body.innerHTML = '<div id="ice-sticker-wrapper"></div>';
+        IceService.saveProfile(typical);
+        document.getElementById('ice-sticker-wrapper').innerHTML = renderIceSticker(typical);
+        const printSpy = vi.fn(() => {
+            expect(document.getElementById('ice-helmet-sticker-copy')).not.toBeNull();
+        });
+        vi.stubGlobal('print', printSpy);
+        window.print = printSpy;
+        printIceSticker();
+        expect(printSpy).toHaveBeenCalledTimes(1);
+        window.dispatchEvent(new Event('afterprint'));
+        expect(document.getElementById('ice-helmet-sticker-copy')).toBeNull();
+        expect(document.getElementById('ice-helmet-sticker')).not.toBeNull();
+    });
+});
+
+describe('anticoagulants et rappel antitétanique', () => {
+    const withMedical = { ...typical, anticoag: '1', tetanos: '2022' };
+
+    it('normalise la case à cocher', () => {
+        expect(clampProfile({ anticoag: true }).anticoag).toBe('1');
+        expect(clampProfile({ anticoag: 'on' }).anticoag).toBe('1');
+        expect(clampProfile({ anticoag: '1' }).anticoag).toBe('1');
+        expect(clampProfile({ anticoag: '' }).anticoag).toBe('');
+        expect(clampProfile({ anticoag: false }).anticoag).toBe('');
+        expect(clampProfile({ tetanos: '202222222' }).tetanos).toBe('2022');
+    });
+
+    it('survit au lien du lecteur web (encodage puis décodage)', () => {
+        const decoded = IceService.decodePayload(IceService.encodePayload(withMedical));
+        expect(decoded.anticoag).toBe('1');
+        expect(decoded.tetanos).toBe('2022');
+        expect(IceService.decodePayload(IceService.encodePayload(typical)).anticoag).toBe('');
+    });
+
+    it('est écrit dans le texte du QR', () => {
+        const text = buildIceText(withMedical);
+        expect(text).toContain('ANTICOAGULANTS');
+        expect(text).toContain('Tétanos 2022');
+        expect(buildIceText(typical)).not.toContain('ANTICOAGULANTS');
+    });
+
+    it("l'étiquette affiche une pastille ANTICOAGULANT à côté du groupe sanguin", () => {
+        const html = renderIceSticker(withMedical);
+        expect(html).toContain('ANTICOAGULANT');
+        expect(html).toContain('SANG O+');
+        expect(renderIceSticker(typical)).not.toContain('ANTICOAGULANT');
+    });
+
+    it('la fiche de secours affiche une alerte anticoagulants et le rappel antitétanique', async () => {
+        document.body.innerHTML = '<div id="ice-root"></div>';
+        window.history.replaceState({}, '', `/?mode=ICE#${IceService.encodePayload(withMedical)}`);
+        await IceView.mount({});
+        const text = document.getElementById('ice-root').textContent;
+        expect(text).toContain('anticoagulant');
+        expect(text).toContain('Dernier rappel antitétanique');
+        expect(text).toContain('2022');
+        window.history.replaceState({}, '', '/');
+    });
+
+    it('le formulaire propose la case et le champ, préremplis', () => {
+        IceService.saveProfile(withMedical);
+        const html = renderIceTabHtml();
+        expect(html).toContain('id="ice-anticoag" checked');
+        expect(html).toContain('id="ice-tetanos"');
+        expect(html).toContain('value="2022"');
     });
 });

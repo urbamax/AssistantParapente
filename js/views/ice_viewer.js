@@ -177,11 +177,18 @@ export class IceViewClass extends BaseView {
     /** @param {Partial<import('../services/ice_service.js').IceProfile>} p */
     renderMedical(p) {
         const rem = p.remarques || p.medical;
-        if (!p.allergies && !rem) return '';
+        if (!p.allergies && !rem && !p.anticoag && !p.tetanos) return '';
 
         return `
             <section class="ice-card ice-card-medical">
                 <h3><i class="ri-heart-pulse-fill" aria-hidden="true"></i> Santé & Alertes Médicales</h3>
+                ${
+                    p.anticoag
+                        ? `<div class="ice-medical-alert">
+                            <strong><i class="ri-drop-fill" aria-hidden="true"></i> Sous traitement anticoagulant : risque de saignement important.</strong>
+                        </div>`
+                        : ''
+                }
                 ${
                     p.allergies
                         ? `<div class="ice-medical-alert">
@@ -195,6 +202,14 @@ export class IceViewClass extends BaseView {
                         ? `<div class="ice-medical-info">
                             <strong>Antécédents / Traitements en cours :</strong>
                             <p>${esc(rem)}</p>
+                        </div>`
+                        : ''
+                }
+                ${
+                    p.tetanos
+                        ? `<div class="ice-medical-info">
+                            <strong>Dernier rappel antitétanique :</strong>
+                            <p>${esc(p.tetanos)}</p>
                         </div>`
                         : ''
                 }

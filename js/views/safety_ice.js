@@ -3,7 +3,7 @@
  * Sous-module de SafetyView pour la gestion de la fiche ICE et de l'étiquette casque.
  */
 
-import IceService, { BLOOD_GROUPS, ICE_LIMITS } from '../services/ice_service.js';
+import IceService, { BLOOD_GROUPS, ICE_LIMITS, formatPhoneDisplay } from '../services/ice_service.js';
 import { escapeHTML } from '../core/security.js';
 import AppRouter from '../core/router.js';
 
@@ -12,9 +12,6 @@ const esc = (text) => escapeHTML(text || '');
 export function renderIceSticker(profile) {
     const p = profile || IceService.getProfile();
     const fullName = `${p.prenom || ''} ${p.nom || ''}`.trim() || 'Pilote';
-    const phone = p.contact1Phone ? esc(p.contact1Phone) : '112 / Secours';
-    const contactLabel = p.contact1Name ? esc(p.contact1Name) : 'Contact';
-    const blood = p.bloodGroup && p.bloodGroup !== 'Inconnu' ? ` · 🩸 ${esc(p.bloodGroup)}` : '';
     // Une fiche trop longue ne tient pas dans un QR lisible : on le dit au lieu de faire échouer tout l'onglet.
     let qrSvg;
     try {
@@ -24,21 +21,43 @@ export function renderIceSticker(profile) {
             '<p class="ice-qr-error" role="alert">Fiche trop longue pour un QR lisible : raccourcissez les allergies ou les remarques.</p>';
     }
 
+    // Les informations vitales sont écrites en toutes lettres, pas seulement dans le QR.
+    const bloodTag =
+        p.bloodGroup && p.bloodGroup !== 'Inconnu'
+            ? `<span class="ice-sticker-vital">SANG ${esc(p.bloodGroup)}</span>`
+            : '';
+    const anticoagTag = p.anticoag ? '<span class="ice-sticker-vital">ANTICOAGULANT</span>' : '';
+    const blood = bloodTag || anticoagTag ? `<div class="ice-sticker-tags">${bloodTag}${anticoagTag}</div>` : '';
+    const allergy = p.allergies ? `<div class="ice-sticker-allergy">ALLERGIES : ${esc(p.allergies)}</div>` : '';
+    const contact = (name, phone) => {
+        const digits = IceService.sanitizePhone(phone);
+        if (!digits) return '';
+        return `<div class="ice-sticker-contact">${name ? `${esc(name)} : ` : ''}<strong>${esc(formatPhoneDisplay(phone))}</strong></div>`;
+    };
+    const contacts =
+        contact(p.contact1Name, p.contact1Phone) + contact(p.contact2Name, p.contact2Phone) ||
+        '<div class="ice-sticker-contact"><strong>112</strong></div>';
+    const now = new Date();
+    const updated = `${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+
     return `
         <div class="ice-helmet-sticker" id="ice-helmet-sticker">
             <div class="ice-sticker-header">
-                <span class="ice-sticker-cross">➕</span>
-                <span class="ice-sticker-title">ICE · SECOURS</span>
+                <span class="ice-sticker-title">URGENCE · ICE</span>
                 <span class="ice-sticker-ffvl">143.9875 MHz</span>
             </div>
             <div class="ice-sticker-body">
                 <div class="ice-sticker-qr">${qrSvg}</div>
                 <div class="ice-sticker-meta">
-                    <div class="ice-sticker-pilot">${esc(fullName)}${blood}</div>
-                    <div class="ice-sticker-contact">ICE : ${contactLabel}</div>
-                    <div class="ice-sticker-phone">${phone}</div>
-                    <div class="ice-sticker-scan">SCAN EN CAS D'URGENCE</div>
+                    <div class="ice-sticker-pilot">${esc(fullName)}</div>
+                    ${blood}
+                    ${allergy}
+                    ${contacts}
                 </div>
+            </div>
+            <div class="ice-sticker-foot">
+                <span>SCANNER : fiche complète</span>
+                <span>Mis à jour ${updated}</span>
             </div>
         </div>
     `;
@@ -134,6 +153,15 @@ export function renderIceTabHtml() {
                             <input type="text" id="ice-remarques" maxlength="${ICE_LIMITS.remarques}" value="${esc(p.remarques || p.medical)}" placeholder="Ex: Diabète, anticoagulant..." />
                         </label>
                     </div>
+                    <div class="ice-form-row ice-form-row-2">
+                        <label class="ice-check-label">
+                            <input type="checkbox" id="ice-anticoag" ${p.anticoag ? 'checked' : ''} />
+                            Traitement anticoagulant (saignement à risque)
+                        </label>
+                        <label>Dernier rappel antitétanique (année)
+                            <input type="number" id="ice-tetanos" value="${esc(p.tetanos)}" placeholder="Ex: 2022" min="1950" max="${new Date().getFullYear()}" />
+                        </label>
+                    </div>
                 </fieldset>
 
                 <fieldset class="ice-fieldset">
@@ -204,6 +232,8 @@ export function getIceFormValues() {
         bloodGroup: val('ice-bloodGroup'),
         allergies: val('ice-allergies'),
         remarques: val('ice-remarques'),
+        anticoag: /** @type {HTMLInputElement | null} */ (document.getElementById('ice-anticoag'))?.checked ? '1' : '',
+        tetanos: val('ice-tetanos'),
         ffvl: val('ice-ffvl'),
         insurance: val('ice-insurance'),
     };
@@ -238,6 +268,18 @@ export function printIceSticker() {
     const values = getIceFormValues();
     IceService.saveProfile(values);
     updateIceStickerPreview(values);
+
+    // Deux étiquettes par feuille (casque et sellette) : une copie le temps de l'impression.
+    const sticker = document.getElementById('ice-helmet-sticker');
+    if (sticker) {
+        const copy = /** @type {HTMLElement} */ (sticker.cloneNode(true));
+        copy.id = 'ice-helmet-sticker-copy';
+        copy.setAttribute('aria-hidden', 'true');
+        copy.classList.add('ice-sticker-copy');
+        sticker.after(copy);
+        const removeCopy = () => copy.remove();
+        window.addEventListener('afterprint', removeCopy, { once: true });
+    }
     window.print();
 }
 

@@ -34,6 +34,8 @@ export const BLOOD_GROUPS = Object.freeze(['Inconnu', 'A+', 'A-', 'B+', 'B-', 'A
  * @property {string} contact2Rel
  * @property {string} bloodGroup
  * @property {string} allergies
+ * @property {string} anticoag '1' si le pilote prend un traitement anticoagulant, sinon ''
+ * @property {string} tetanos année du dernier rappel antitétanique
  * @property {string} remarques
  * @property {string} [medical]
  * @property {string} ffvl
@@ -53,6 +55,8 @@ export const DEFAULT_ICE_PROFILE = Object.freeze({
     contact2Rel: '',
     bloodGroup: '',
     allergies: '',
+    anticoag: '',
+    tetanos: '',
     remarques: '',
     ffvl: '',
     insurance: '',
@@ -73,6 +77,7 @@ export const ICE_LIMITS = Object.freeze({
     birthYear: 4,
     bloodGroup: 4,
     allergies: 150,
+    tetanos: 4,
     remarques: 250,
     ffvl: 20,
     insurance: 60,
@@ -95,6 +100,8 @@ const FIELD_LIMIT = Object.freeze({
     contact2Rel: ICE_LIMITS.relation,
     bloodGroup: ICE_LIMITS.bloodGroup,
     allergies: ICE_LIMITS.allergies,
+    anticoag: 1,
+    tetanos: ICE_LIMITS.tetanos,
     remarques: ICE_LIMITS.remarques,
     ffvl: ICE_LIMITS.ffvl,
     insurance: ICE_LIMITS.insurance,
@@ -113,6 +120,8 @@ export function clampProfile(profile = {}) {
         const raw = key === 'remarques' ? src.remarques || src.medical : src[key];
         out[key] = cleanStr(typeof raw === 'number' ? String(raw) : raw).slice(0, max);
     }
+    // Case à cocher : toute valeur « vraie » (true, '1', 'on') devient '1', le reste ''.
+    out.anticoag = [true, '1', 'on', 'true'].includes(/** @type {any} */ (src).anticoag) ? '1' : '';
     return /** @type {IceProfile} */ (out);
 }
 
@@ -222,6 +231,8 @@ export function encodePayload(profile = {}) {
     }
 
     if (profile.allergies) params.set('al', profile.allergies.trim());
+    if (profile.anticoag) params.set('ac', '1');
+    if (profile.tetanos) params.set('te', String(profile.tetanos).trim());
     const rem = profile.remarques || profile.medical;
     if (rem) params.set('rem', rem.trim());
     if (profile.ffvl) params.set('ff', profile.ffvl.trim());
@@ -268,6 +279,8 @@ export function decodePayload(rawString = '') {
 
         if (params.has('bg')) result.bloodGroup = params.get('bg') || '';
         if (params.has('al')) result.allergies = params.get('al') || '';
+        if (params.get('ac') === '1') result.anticoag = '1';
+        if (params.has('te')) result.tetanos = params.get('te') || '';
         if (params.has('rem')) result.remarques = params.get('rem') || '';
         else if (params.has('med')) result.remarques = params.get('med') || '';
         if (params.has('ff')) result.ffvl = params.get('ff') || '';
@@ -293,6 +306,8 @@ export function buildIceText(profile = {}) {
     if (p.bloodGroup && p.bloodGroup !== 'Inconnu') lines.push(`Sang ${p.bloodGroup}`);
     if (p.allergies) lines.push(`Allergies: ${p.allergies}`);
     if (p.remarques) lines.push(`Santé: ${p.remarques}`);
+    if (p.anticoag) lines.push('ANTICOAGULANTS');
+    if (p.tetanos) lines.push(`Tétanos ${p.tetanos}`);
     const contact = (n, name, phone, rel) => {
         const digits = sanitizePhone(phone);
         if (!digits) return;

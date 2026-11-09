@@ -597,8 +597,11 @@
     margin: 16px 0;
 }
 
+/* Étiquette : 80 x 48 mm environ une fois imprimée. L'écran la montre à la même proportion. Les informations
+   vitales (sang, allergies, contacts) sont écrites en toutes lettres : elles doivent rester lisibles si le QR
+   est abîmé ou si le secouriste n'a pas de téléphone. Pas d'emoji : il disparaît sur une imprimante sans police. */
 .ice-helmet-sticker {
-    width: 290px;
+    width: 320px;
     background: #ffffff !important;
     color: #111827 !important;
     border: 2px dashed #94a3b8;
@@ -618,30 +621,26 @@
     padding: 4px 8px;
     border-radius: 4px;
     font-weight: 800;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     letter-spacing: 0.5px;
     margin-bottom: 8px;
 }
 
-.ice-sticker-cross {
-    font-size: 0.9rem;
-}
-
 .ice-sticker-ffvl {
     font-size: 0.7rem;
-    opacity: 0.9;
+    opacity: 0.95;
 }
 
 .ice-sticker-body {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 10px;
 }
 
 .ice-sticker-qr {
-    flex-shrink: 0;
-    width: 105px;
-    height: 105px;
+    flex: 0 0 128px;
+    width: 128px;
+    height: 128px;
 
     svg {
         display: block;
@@ -650,46 +649,91 @@
     }
 }
 
+.ice-sticker-qr .ice-qr-error {
+    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #b91c1c !important;
+}
+
 .ice-sticker-meta {
     flex: 1;
     min-width: 0;
-    line-height: 1.25;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
 }
 
 .ice-sticker-pilot {
-    font-size: 0.9rem;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #0f172a !important;
+    margin-bottom: 4px;
+}
+
+.ice-sticker-vital {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 800;
+    border: 2px solid #dc2626;
+    color: #dc2626 !important;
+    border-radius: 4px;
+    padding: 0 6px;
+    margin-bottom: 4px;
+}
+
+.ice-sticker-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+.ice-sticker-tags .ice-sticker-vital {
+    margin-bottom: 0;
+}
+
+.ice-check-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    align-self: end;
+}
+
+.ice-sticker-allergy {
+    font-size: 0.75rem;
     font-weight: 700;
     color: #0f172a !important;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     margin-bottom: 4px;
 }
 
 .ice-sticker-contact {
-    font-size: 0.72rem;
-    color: #64748b !important;
+    font-size: 0.75rem;
+    color: #334155 !important;
+    margin-top: 2px;
+}
+
+.ice-sticker-contact strong {
+    font-size: 0.85rem;
+    color: #0f172a !important;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-.ice-sticker-phone {
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: #dc2626 !important;
-    margin-bottom: 4px;
+/* La copie n'existe que le temps d'une impression (voir printIceSticker). */
+.ice-sticker-copy {
+    display: none;
 }
 
-.ice-sticker-scan {
-    display: inline-block;
+.ice-sticker-foot {
+    margin-top: 6px;
+    padding-top: 4px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
     font-size: 0.65rem;
     font-weight: 700;
-    background: #f1f5f9 !important;
-    color: #334155 !important;
-    padding: 2px 6px;
-    border-radius: 3px;
-    letter-spacing: 0.3px;
+    color: #475569 !important;
+    letter-spacing: 0.2px;
 }
 
 .ice-sticker-actions {
@@ -956,25 +1000,45 @@
    ========================================================================== */
 
 @media print {
-    /* Masquer tous les éléments du site sauf l'étiquette casque */
+    /* Masquer tous les éléments du site sauf les étiquettes casque */
     body * {
         visibility: hidden !important;
     }
 
     #ice-helmet-sticker,
-    #ice-helmet-sticker * {
+    #ice-helmet-sticker *,
+    #ice-helmet-sticker-copy,
+    #ice-helmet-sticker-copy * {
         visibility: visible !important;
     }
 
-    #ice-helmet-sticker {
+    /* Deux étiquettes par feuille (casque et sellette), à 80 mm de large : le QR fait environ 34 mm, soit 0,6 mm
+       par module pour une fiche usuelle, assez gros pour être lu à travers un adhésif sur une surface courbe. */
+    #ice-helmet-sticker,
+    #ice-helmet-sticker-copy {
         position: fixed !important;
-        left: 20mm !important;
-        top: 20mm !important;
+        left: 15mm !important;
         margin: 0 !important;
-        width: 58mm !important;
+        width: 80mm !important;
         box-shadow: none !important;
         border: 1px dashed #64748b !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
+    }
+
+    #ice-helmet-sticker {
+        top: 15mm !important;
+    }
+
+    #ice-helmet-sticker-copy {
+        display: block !important;
+        top: 75mm !important;
+    }
+
+    #ice-helmet-sticker .ice-sticker-qr,
+    #ice-helmet-sticker-copy .ice-sticker-qr {
+        flex-basis: 34mm !important;
+        width: 34mm !important;
+        height: 34mm !important;
     }
 }
