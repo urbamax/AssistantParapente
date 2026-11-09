@@ -508,10 +508,40 @@ export function buildQuestionsHtml(
             return valB - valA;
         });
 
+        const relevantExams = Array.isArray(examHistory)
+            ? examHistory.filter((exam) => {
+                  if (!exam || typeof exam !== 'object') return false;
+                  if (currentLevel && currentLevel !== 'ALL' && exam.level && exam.level !== currentLevel) return false;
+                  return true;
+              })
+            : [];
+        const examsCount = relevantExams.length;
+
+        let examQuestionsCount = 0;
+        for (const [code, data] of visibleQuestions) {
+            const count = examCountByCode.get(code) ?? (allowGlobalExamCount ? Number(data?.examCount) || 0 : 0);
+            if (count > 0) {
+                examQuestionsCount++;
+            }
+        }
+
+        const examStatsKey =
+            examQuestionsCount > 1
+                ? examsCount > 1
+                    ? 'stats.examStatsManyMany'
+                    : 'stats.examStatsManyOne'
+                : examsCount > 1
+                  ? 'stats.examStatsOneMany'
+                  : 'stats.examStatsOneOne';
+        const examStatsHtml = tqh(examStatsKey, {
+            questions: `<span style="font-weight:700; color:var(--text-main);">${examQuestionsCount}</span>`,
+            exams: `<span style="font-weight:700; color:var(--text-main);">${examsCount}</span>`,
+        });
+
         allQuestionsHtml = `
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
-                        ${tqh('stats.questionCount', { count: `<span style="font-weight:700; color:var(--text-main);">${visibleQuestions.length}</span>` })}${hasActiveFilter ? ` <span style="opacity:0.6;">(${displayLabel})</span>` : ''}
+                        ${tqh('stats.questionCount', { count: `<span style="font-weight:700; color:var(--text-main);">${visibleQuestions.length}</span>` })}${hasActiveFilter ? ` <span style="opacity:0.6;">(${displayLabel})</span>` : ''}, ${examStatsHtml}
                         ${hasActiveFilter ? `<a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">${tq('stats.clearFilters')}</a>` : ''}
                     </div>
                     <div class="stats-sort-container">
