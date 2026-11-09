@@ -1,8 +1,15 @@
 import { describe, it, expect } from 'vitest';
 import {
     DAY_MS,
+    DEFAULT_EASE_FACTOR,
+    MIN_EASE_FACTOR,
     REVIEW_INTERVALS_DAYS,
     reviewIntervalDays,
+    calculateEaseFactor,
+    calculateSm2Interval,
+    evaluateQuality,
+    applySm2Review,
+    getQuestionIntervalDays,
     dueScore,
     isDue,
     nextDueAt,
@@ -12,7 +19,194 @@ import {
 const NOW = Date.UTC(2026, 9, 13, 12, 0, 0);
 const daysAgo = (n) => NOW - n * DAY_MS;
 // Questions réussies à chaque fois (ratio 1) : l'échéance est « intervalle + 1 jour ».
-const seen = (streak, lastSeen, { total = 4, correct = 4 } = {}) => ({ total, correct, streak, lastSeen });
+const seen = (streak, lastSeen, { total = 4, correct = 4, easeFactor, interval, repetitions } = {}) => ({
+    total,
+    correct,
+    streak,
+    lastSeen,
+    easeFactor,
+    interval,
+    repetitions,
+});
+
+describe('SuperMemo SM-2: calculateEaseFactor', () => {
+    it('uses DEFAULT_EASE_FACTOR = 2.5 and MIN_EASE_FACTOR = 1.3', () => {
+        expect(DEFAULT_EASE_FACTOR).toBe(2.5);
+        expect(MIN_EASE_FACTOR).toBe(1.3);
+    });
+
+    it('adjusts EF based on quality q in 0..5', () => {
+        // q=5: delta = 0.1 - 0 = +0.1 => 2.5 + 0.1 = 2.6
+        expect(calculateEaseFactor(2.5, 5)).toBe(2.6);
+        // q=4: delta = 0.1 - 1 * (0.08 + 0.02) = 0 => 2.5
+        expect(calculateEaseFactor(2.5, 4)).toBe(2.5);
+        // q=3: delta = 0.1 - 2 * (0.08 + 0.04) = 0.1 - 0.24 = -0.14 => 2.36
+        expect(calculateEaseFactor(2.5, 3)).toBe(2.36);
+        // q=2: delta = 0.1 - 3 * (0.08 + 0.06) = 0.1 - 0.42 = -0.32 => 2.18
+        expect(calculateEaseFactor(2.5, 2)).toBe(2.18);
+        // q=1: delta = 0.1 - 4 * (0.08 + 0.08) = 0.1 - 0.64 = -0.54 => 1.96
+        expect(calculateEaseFactor(2.5, 1)).toBe(1.96);
+        // q=0: delta = 0.1 - 5 * (0.08 + 0.10) = 0.1 - 0.90 = -0.80 => 1.70
+        expect(calculateEaseFactor(2.5, 0)).toBe(1.7);
+    });
+
+    it('never drops below MIN_EASE_FACTOR (1.3)', () => {
+        expect(calculateEaseFactor(1.35, 0)).toBe(1.3);
+        expect(calculateEaseFactor(1.3, 1)).toBe(1.3);
+    });
+
+    it('falls back to default EF if previous is undefined or invalid', () => {
+        expect(calculateEaseFactor(undefined, 5)).toBe(2.6);
+        expect(calculateEaseFactor(NaN, 4)).toBe(2.5);
+    });
+});
+
+describe('SuperMemo SM-2: calculateSm2Interval', () => {
+    it('returns 0 for repetition 0', () => {
+        expect(calculateSm2Interval(0, 2.5)).toBe(0);
+        expect(calculateSm2Interval(-1, 2.5)).toBe(0);
+    });
+
+    it('returns 1 for repetition 1 and 6 for repetition 2', () => {
+        expect(calculateSm2Interval(1, 2.5)).toBe(1);
+        expect(calculateSm2Interval(2, 2.5)).toBe(6);
+        expect(calculateSm2Interval(1, 1.3)).toBe(1);
+        expect(calculateSm2Interval(2, 1.3)).toBe(6);
+    });
+
+    it('calculates interval from previousInterval * EF for repetition > 2', () => {
+        // rep 3 from previous interval 6: round(6 * 2.5) = 15
+        expect(calculateSm2Interval(3, 2.5, 6)).toBe(15);
+        // rep 4 from previous interval 15: round(15 * 2.5) = 38
+        expect(calculateSm2Interval(4, 2.5, 15)).toBe(38);
+    });
+
+    it('spaces harder questions (low EF) much more closely', () => {
+        // hard question EF = 1.3
+        expect(calculateSm2Interval(3, 1.3, 6)).toBe(8); // round(6 * 1.3) = 8
+        expect(calculateSm2Interval(4, 1.3, 8)).toBe(10); // round(8 * 1.3) = 10
+    });
+
+    it('falls back cleanly if previousInterval is omitted', () => {
+        expect(calculateSm2Interval(3, 2.5)).toBe(15); // 6 * 2.5^1 = 15
+        expect(calculateSm2Interval(4, 2.5)).toBe(38); // 6 * 2.5^2 = 37.5 => 38
+    });
+});
+
+describe('SuperMemo SM-2: evaluateQuality', () => {
+    it('respects explicit quality rating if given', () => {
+        expect(evaluateQuality({ explicitQuality: 4 })).toBe(4);
+        expect(evaluateQuality({ explicitQuality: 10 })).toBe(5);
+        expect(evaluateQuality({ explicitQuality: -2 })).toBe(0);
+    });
+
+    it('evaluates incorrect answers (partial vs zero)', () => {
+        expect(evaluateQuality({ isCorrect: false })).toBe(1);
+        expect(evaluateQuality({ isCorrect: false, userScore: 1, maxScore: 2 })).toBe(2);
+    });
+
+    it('ne tient pas compte du temps passé : une bonne réponse vaut 5, lente ou non (lecture vocale, veille)', () => {
+        expect(evaluateQuality({ isCorrect: true })).toBe(5);
+        expect(evaluateQuality({ isCorrect: true, timeTakenMs: 8000 })).toBe(5);
+        expect(evaluateQuality({ isCorrect: true, timeTakenMs: 90000 })).toBe(5);
+    });
+
+    it('huit bonnes réponses lentes ne font pas chuter le facteur de facilité', () => {
+        let stat = {};
+        for (let i = 0; i < 8; i++) stat = applySm2Review(stat, { isCorrect: true, timeTakenMs: 60000, now: i });
+        expect(stat.easeFactor).toBeGreaterThanOrEqual(DEFAULT_EASE_FACTOR);
+    });
+});
+
+describe('SuperMemo SM-2: applySm2Review', () => {
+    it('handles first successful attempt', () => {
+        const stat = { total: 0, correct: 0 };
+        const result = applySm2Review(stat, { isCorrect: true, now: NOW });
+        expect(result.repetitions).toBe(1);
+        expect(result.interval).toBe(1);
+        expect(result.easeFactor).toBe(2.6); // 2.5 + 0.1
+        expect(result.lastSeen).toBe(NOW);
+    });
+
+    it('progresses through repetitions 1 -> 2 -> 3', () => {
+        const s1 = applySm2Review({}, { isCorrect: true, now: NOW });
+        expect(s1.repetitions).toBe(1);
+        expect(s1.interval).toBe(1);
+
+        const s2 = applySm2Review(s1, { isCorrect: true, now: NOW });
+        expect(s2.repetitions).toBe(2);
+        expect(s2.interval).toBe(6);
+
+        const s3 = applySm2Review(s2, { isCorrect: true, now: NOW });
+        expect(s3.repetitions).toBe(3);
+        expect(s3.interval).toBe(Math.round(6 * s3.easeFactor));
+    });
+
+    it('resets repetitions and interval on failure, while reducing EF', () => {
+        const mastered = {
+            easeFactor: 2.6,
+            interval: 16,
+            repetitions: 3,
+            streak: 3,
+        };
+        const failed = applySm2Review(mastered, { isCorrect: false, now: NOW });
+        expect(failed.repetitions).toBe(0);
+        expect(failed.interval).toBe(0);
+        expect(failed.easeFactor).toBeLessThan(mastered.easeFactor);
+    });
+});
+
+describe('SuperMemo SM-2: reprise des questions suivies avant SM-2', () => {
+    const now = Date.UTC(2026, 10, 9);
+
+    it("part de l'intervalle de l'ancienne série au lieu de le recalculer depuis zéro", () => {
+        // Ancien calendrier : 1, 3, 7, 14, 30 jours. Avant correctif, une série de 5 passait à 274 jours.
+        const cases = [
+            { streak: 0, max: 1 },
+            { streak: 1, max: 6 },
+            { streak: 2, max: 20 },
+            { streak: 3, max: 25 },
+            { streak: 5, max: 90 },
+        ];
+        for (const { streak, max } of cases) {
+            const r = applySm2Review({ total: 10, correct: 8, streak }, { isCorrect: true, now });
+            expect(r.interval, `série ${streak}`).toBeLessThanOrEqual(max);
+        }
+    });
+
+    it("n'est jamais plus proche qu'avec l'ancien calendrier", () => {
+        for (let streak = 0; streak <= 6; streak++) {
+            const r = applySm2Review({ total: 10, correct: 8, streak }, { isCorrect: true, now });
+            expect(r.interval, `série ${streak}`).toBeGreaterThanOrEqual(reviewIntervalDays(streak + 1));
+        }
+    });
+
+    it('une série de 5 donne environ 78 jours, pas 274', () => {
+        expect(applySm2Review({ total: 10, correct: 8, streak: 5 }, { isCorrect: true, now }).interval).toBe(78);
+    });
+
+    it('une question déjà suivie par SM-2 reste sur ses propres intervalles', () => {
+        const r = applySm2Review({ easeFactor: 2.5, interval: 6, repetitions: 2, streak: 2 }, { isCorrect: true, now });
+        expect(r.interval).toBe(Math.round(6 * 2.6));
+    });
+});
+
+describe('getQuestionIntervalDays', () => {
+    it('returns stat.interval when present', () => {
+        expect(getQuestionIntervalDays({ interval: 15, streak: 1 })).toBe(15);
+        expect(getQuestionIntervalDays({ interval: 0, streak: 3 })).toBe(0);
+    });
+
+    it('computes SM-2 interval if easeFactor is present without interval', () => {
+        expect(getQuestionIntervalDays({ easeFactor: 2.5, streak: 2 })).toBe(6);
+        expect(getQuestionIntervalDays({ easeFactor: 2.5, repetitions: 3 })).toBe(15);
+    });
+
+    it('falls back to legacy reviewIntervalDays when neither is present', () => {
+        expect(getQuestionIntervalDays({ streak: 3 })).toBe(7);
+        expect(getQuestionIntervalDays(undefined)).toBe(0);
+    });
+});
 
 describe('reviewIntervalDays: the interval grows with the streak', () => {
     it('follows 0, 1, 3, 7, 14, 30 days', () => {
@@ -48,6 +242,14 @@ describe('dueScore and isDue', () => {
         expect(isDue(seen(3, daysAgo(30)), NOW)).toBe(true);
     });
 
+    it('supports SM-2 interval in dueScore and isDue', () => {
+        // interval 15 days, ratio 1 => due after 16 days
+        const sm2Stat = seen(3, daysAgo(15.5), { interval: 15, easeFactor: 2.5 });
+        expect(isDue(sm2Stat, NOW)).toBe(false);
+        const sm2Due = seen(3, daysAgo(16.5), { interval: 15, easeFactor: 2.5 });
+        expect(isDue(sm2Due, NOW)).toBe(true);
+    });
+
     it('a mistake resets the streak, so the question comes back much sooner', () => {
         const afterMistake = seen(0, daysAgo(1), { total: 4, correct: 2 }); // interval 0, ratio 0.5
         const afterStreak = seen(3, daysAgo(1)); // interval 7
@@ -67,6 +269,14 @@ describe('nextDueAt', () => {
         const stat = seen(3, daysAgo(2));
         const due = nextDueAt(stat);
         expect(due).toBe(stat.lastSeen + 8 * DAY_MS);
+        expect(isDue(stat, due - 1)).toBe(false);
+        expect(isDue(stat, due)).toBe(true);
+    });
+
+    it('calculates nextDueAt with SM-2 interval', () => {
+        const stat = seen(3, daysAgo(2), { interval: 15 });
+        const due = nextDueAt(stat);
+        expect(due).toBe(stat.lastSeen + 16 * DAY_MS); // 15 + 1
         expect(isDue(stat, due - 1)).toBe(false);
         expect(isDue(stat, due)).toBe(true);
     });

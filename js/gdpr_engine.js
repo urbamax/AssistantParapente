@@ -9,6 +9,7 @@ import AppRouter from './core/router.js';
 import SitesService from './services/sites_service.js';
 import { t } from './utils/i18n.js';
 import { CONSENT_KEY, CONSENT_VERSION } from './services/consent_store.js';
+import { isIceLocation } from './core/start_mode.js';
 
 const GdprEngine = {
     consentKey: CONSENT_KEY,
@@ -49,6 +50,8 @@ const GdprEngine = {
 
     showBanner: function () {
         if (typeof document === 'undefined') return;
+        // Fiche d'urgence ouverte depuis le QR d'un casque : rien ne doit masquer les informations vitales.
+        if (isIceLocation(window.location.search, window.location.hash)) return;
         const banner = document.getElementById('gdpr-banner');
         if (banner) {
             banner.classList.add('active');

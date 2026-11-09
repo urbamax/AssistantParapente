@@ -438,6 +438,12 @@
             <div class="app-footer-placeholder"></div>
         </div>
 
+        <!-- ICE SCREEN (Fiche d'urgence lue par QR Code : rendu par js/views/ice_viewer.js) -->
+        <div id="ice-screen" class="mode-screen">
+            <div id="ice-root" class="library-container"></div>
+            <div class="app-footer-placeholder"></div>
+        </div>
+
         <!-- LIBRARY SCREEN -->
         <div id="library-screen" class="mode-screen">
             <div class="library-container">
@@ -4387,6 +4393,14 @@
                         data-safety-tab="sigr"
                     >
                         <i class="ri-shield-check-line"></i> <span data-i18n="common.maSigr" class="nav-text">Ma SIGR</span>
+                    </button>
+                    <button
+                        class="nav-menu-btn"
+                        data-action="openSafetySection"
+                        data-args="ice"
+                        data-safety-tab="ice"
+                    >
+                        <i class="ri-qr-code-line"></i> <span data-i18n="common.ice" class="nav-text">Fiche ICE</span>
                     </button>
                 </div>
             </div>

@@ -14,6 +14,8 @@ describe('resolveStartMode', () => {
     it('lets a deep link win over the stored page', () => {
         expect(resolveStartMode('LIBRARY', 'SITES')).toBe('LIBRARY');
         expect(resolveStartMode('QCM', null)).toBe('QCM');
+        expect(resolveStartMode(null, 'SITES', '#ice')).toBe('ICE');
+        expect(resolveStartMode(null, null, '#v=1&n=Test')).toBe('ICE');
     });
 
     it('keeps the welcome screen until the visitor actually leaves it', () => {

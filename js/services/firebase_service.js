@@ -1319,27 +1319,36 @@ export const FirebaseAuthEngine = {
 
     // Merge algorithms
 
-    // État de révision espacée (streak + lastSeen) d'une question : on garde celui de l'appareil
+    // État de révision espacée (streak + lastSeen + SM-2) d'une question : on garde celui de l'appareil
     // qui a vu la question le plus récemment. Prendre le max des streaks effacerait une erreur
     // récente (streak remis à 0 sur le téléphone, 4 dans le cloud), et ne pas recopier lastSeen
     // faisait retomber le mode Révision sur l'ancien critère de ratio après chaque synchro.
-    // Les dernières réponses (`recent`, qui fondent la maîtrise) suivent la même règle : elles
-    // viennent de l'appareil le plus récent, et on n'écrit jamais de champ indéfini (Firestore le refuse).
+    // Les dernières réponses (`recent`), le facteur de facilité (`easeFactor`), l'intervalle (`interval`)
+    // et les répétitions (`repetitions`) suivent la même règle : ils viennent de l'appareil le plus récent,
+    // et on n'écrit jamais de champ indéfini (Firestore le refuse).
     _latestReviewState: function (a, b) {
         const aSeen = a.lastSeen || 0;
         const bSeen = b.lastSeen || 0;
-        const withRecent = (state, source) =>
-            Array.isArray(source.recent) ? { ...state, recent: source.recent } : state;
+        // `recent` vient de la source retenue ; le facteur de facilité, l'intervalle et les répétitions aussi,
+        // et à défaut de la première copie qui en a un. Jamais de champ indéfini (Firestore le refuse).
+        const withExtra = (state, source) => {
+            const res = Array.isArray(source.recent) ? { ...state, recent: source.recent } : { ...state };
+            for (const field of ['easeFactor', 'interval', 'repetitions']) {
+                const value = [source, a, b].map((x) => x[field]).find((v) => typeof v === 'number' && !isNaN(v));
+                if (value !== undefined) res[field] = value;
+            }
+            return res;
+        };
         if (!aSeen && !bSeen) {
             const longest = (a.recent?.length || 0) >= (b.recent?.length || 0) ? a : b;
-            return withRecent({ streak: Math.max(a.streak || 0, b.streak || 0) }, longest);
+            return withExtra({ streak: Math.max(a.streak || 0, b.streak || 0) }, longest);
         }
         if (aSeen === bSeen) {
             const longest = (a.recent?.length || 0) >= (b.recent?.length || 0) ? a : b;
-            return withRecent({ streak: Math.max(a.streak || 0, b.streak || 0), lastSeen: aSeen }, longest);
+            return withExtra({ streak: Math.max(a.streak || 0, b.streak || 0), lastSeen: aSeen }, longest);
         }
         const latest = aSeen > bSeen ? a : b;
-        return withRecent({ streak: latest.streak || 0, lastSeen: latest.lastSeen }, latest);
+        return withExtra({ streak: latest.streak || 0, lastSeen: latest.lastSeen }, latest);
     },
 
     // Nombre de fois où chaque choix a été coché. Comme `total` et `correct`, on prend le max par
@@ -1509,6 +1518,9 @@ export const FirebaseAuthEngine = {
             merged.brevets = mergeBrevets(local.brevets, cloud.brevets);
         }
 
+        // Jamais de fiche d'urgence (données de santé) venue du cloud ni renvoyée vers lui.
+        delete merged.iceProfile;
+
         // Réglages retirés ou renommés (spec 002) : rayon « Illimité », modèle « meteoblue ».
         return migrateSitePrefs(merged);
     },
@@ -1578,6 +1590,9 @@ export const FirebaseAuthEngine = {
         if (themeMode) {
             prefs.themeMode = themeMode;
         }
+
+        // La fiche d'urgence (ICE) contient des données de santé : elle ne quitte jamais l'appareil.
+        delete (/** @type {any} */ (prefs).iceProfile);
 
         // Réglages retirés ou renommés (spec 002) : rayon « Illimité », modèle « meteoblue ».
         return migrateSitePrefs(prefs);

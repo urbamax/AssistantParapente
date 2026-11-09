@@ -507,3 +507,617 @@
         align-items: stretch;
     }
 }
+
+/* ==========================================================================
+   MODULE ICE : FICHE D'URGENCE & ÉTIQUETTE CASQUE
+   ========================================================================== */
+
+.ice-grid-layout {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 20px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .ice-grid-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ice-fieldset {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+
+    legend {
+        padding: 0 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-color);
+    }
+}
+
+.ice-form-row {
+    margin-bottom: 12px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    label {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    input,
+    select {
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--input-bg, var(--surface-card, #ffffff));
+        color: var(--text-color);
+        font-size: 0.95rem;
+        transition: border-color 0.2s ease;
+
+        &:focus {
+            outline: none;
+            border-color: var(--accent-primary, #0ea5e9);
+        }
+    }
+}
+
+.ice-form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.ice-form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+/* Aperçu & Étiquette Casque */
+.ice-preview-card {
+    position: sticky;
+    top: 80px;
+}
+
+.ice-sticker-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 16px;
+    margin: 16px 0;
+}
+
+/* Étiquette : 96 x 58 mm environ une fois imprimée. L'écran la montre à la même proportion. Les informations
+   vitales (sang, allergies, contacts) sont écrites en toutes lettres : elles doivent rester lisibles si le QR
+   est abîmé ou si le secouriste n'a pas de téléphone. Pas d'emoji : il disparaît sur une imprimante sans police. */
+.ice-helmet-sticker {
+    width: 380px;
+    background: #ffffff !important;
+    color: #111827 !important;
+    border: 2px dashed #94a3b8;
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    user-select: none;
+}
+
+.ice-sticker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #dc2626 !important;
+    color: #ffffff !important;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.ice-sticker-sos {
+    font-size: 0.9rem;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+}
+
+.ice-sticker-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.ice-sticker-qr {
+    flex: 0 0 160px;
+    width: 160px;
+    height: 160px;
+
+    svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.ice-sticker-qr .ice-qr-error {
+    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #b91c1c !important;
+}
+
+.ice-sticker-meta {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.ice-sticker-pilot {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #0f172a !important;
+    margin-bottom: 4px;
+}
+
+.ice-sticker-flag,
+.ice-flag {
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
+
+.ice-pilot-origin {
+    margin: 2px 0 0;
+    font-size: 0.85rem;
+    opacity: 0.75;
+}
+
+.ice-sticker-vital {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 800;
+    border: 2px solid #dc2626;
+    color: #dc2626 !important;
+    border-radius: 4px;
+    padding: 0 6px;
+    margin-bottom: 4px;
+}
+
+.ice-sticker-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+.ice-sticker-tags .ice-sticker-vital {
+    margin-bottom: 0;
+}
+
+.ice-check-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    align-self: end;
+}
+
+.ice-sticker-allergy {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #0f172a !important;
+    margin-bottom: 4px;
+}
+
+.ice-sticker-contact {
+    font-size: 0.75rem;
+    color: #334155 !important;
+    margin-top: 2px;
+}
+
+.ice-sticker-contact strong {
+    font-size: 0.85rem;
+    color: #0f172a !important;
+    white-space: nowrap;
+}
+
+/* Étiquette compacte : « URGENCE », le QR et l'identité (drapeau, nom, date de naissance), 56 mm de large imprimée. */
+.ice-sticker-compact {
+    width: 200px;
+}
+
+.ice-sticker-header-compact {
+    justify-content: center;
+    font-size: 1rem;
+    margin-bottom: 6px;
+}
+
+.ice-sticker-compact .ice-sticker-qr {
+    flex: none;
+    width: 180px;
+    height: 180px;
+    margin: 0 auto;
+}
+
+.ice-sticker-id {
+    margin-top: 6px;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.ice-sticker-id .ice-sticker-pilot {
+    margin-bottom: 2px;
+}
+
+.ice-sticker-birth {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #334155 !important;
+    margin-bottom: 4px;
+}
+
+.ice-sticker-id .ice-sticker-birth {
+    margin-bottom: 0;
+}
+
+/* La copie n'existe que le temps d'une impression (voir printIceSticker). */
+.ice-sticker-copy {
+    display: none;
+}
+
+.ice-sticker-licence {
+    font-size: 0.8rem;
+    color: #0f172a !important;
+    letter-spacing: 0.3px;
+}
+
+.ice-sticker-foot {
+    margin-top: 6px;
+    padding-top: 4px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #475569 !important;
+    letter-spacing: 0.2px;
+}
+
+.ice-sticker-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+.ice-print-tips {
+    margin-top: 18px;
+    padding: 12px;
+    background: color-mix(in srgb, var(--accent-primary, #0ea5e9) 8%, transparent);
+    border-radius: 10px;
+    font-size: 0.85rem;
+
+    h4 {
+        margin: 0 0 6px;
+        font-size: 0.85rem;
+    }
+
+    ul {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+    li + li {
+        margin-top: 4px;
+    }
+}
+
+/* ==========================================================================
+   VUE SECOURS / ICE VIEWER (LECTURE SEULE LORS DU SCAN)
+   ========================================================================== */
+
+.ice-viewer-container {
+    max-width: 650px;
+    margin: 0 auto;
+    padding: 10px 0 30px;
+}
+
+.ice-header-banner {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    color: #ffffff;
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.25);
+}
+
+.ice-banner-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 6px;
+
+    i {
+        font-size: 1.8rem;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+    }
+}
+
+.ice-banner-subtitle {
+    margin: 0;
+    font-size: 0.88rem;
+    opacity: 0.92;
+}
+
+.ice-card {
+    background: var(--surface-card, #ffffff);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+    h3 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 14px;
+        font-size: 1.05rem;
+    }
+}
+
+.ice-identity-layout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.ice-badge-pilot {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    background: color-mix(in srgb, var(--accent-primary, #0ea5e9) 15%, transparent);
+    color: var(--accent-primary, #0ea5e9);
+    border-radius: 6px;
+    margin-bottom: 6px;
+}
+
+.ice-pilot-name {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+.ice-pilot-age {
+    margin: 4px 0 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.ice-blood-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #fef2f2;
+    border: 2px solid #ef4444;
+    border-radius: 16px;
+    padding: 8px 16px;
+    color: #b91c1c;
+
+    .ice-blood-drop {
+        font-size: 1.3rem;
+    }
+
+    .ice-blood-val {
+        font-size: 1.3rem;
+        font-weight: 800;
+        line-height: 1;
+    }
+}
+
+.ice-contact-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--surface-hover, rgba(0, 0, 0, 0.02));
+    border: 1px solid var(--border-color);
+    margin-bottom: 10px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.ice-contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ice-contact-num {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.ice-contact-rel {
+    font-weight: normal;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.ice-call-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #16a34a !important;
+    color: #ffffff !important;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
+    transition: transform 0.15s ease;
+
+    &:hover,
+    &:active {
+        transform: scale(1.03);
+    }
+}
+
+.ice-medical-alert {
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
+    padding: 12px 14px;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 10px;
+    color: #92400e;
+
+    p {
+        margin: 4px 0 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #78350f;
+    }
+}
+
+.ice-medical-info {
+    background: var(--surface-hover, rgba(0, 0, 0, 0.02));
+    padding: 12px 14px;
+    border-radius: 10px;
+
+    p {
+        margin: 4px 0 0;
+        font-size: 0.92rem;
+    }
+}
+
+.ice-dl-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 16px;
+    margin: 0;
+    font-size: 0.92rem;
+
+    dt {
+        color: var(--text-secondary);
+    }
+
+    dd {
+        margin: 0;
+    }
+}
+
+.ice-actions-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 24px;
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+    }
+}
+
+/* ==========================================================================
+   IMPRESSION DE L'ÉTIQUETTE CASQUE (@media print)
+   ========================================================================== */
+
+@media print {
+    /* Masquer tous les éléments du site sauf les étiquettes */
+    body * {
+        visibility: hidden !important;
+    }
+
+    #ice-helmet-sticker,
+    #ice-helmet-sticker *,
+    #ice-helmet-sticker-compact,
+    #ice-helmet-sticker-compact *,
+    #ice-helmet-sticker-compact-copy,
+    #ice-helmet-sticker-compact-copy * {
+        visibility: visible !important;
+    }
+
+    #ice-helmet-sticker,
+    #ice-helmet-sticker-compact,
+    #ice-helmet-sticker-compact-copy {
+        position: fixed !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: 1px dashed #64748b !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Une feuille : l'étiquette complète (sellette), 96 mm de large, QR de 46 mm soit environ 0,55 mm par module
+       pour une fiche complète (83 modules), assez gros pour être lu à travers un adhésif sur une surface courbe ;
+       et deux étiquettes compactes de 56 mm (les deux côtés du casque), QR de 46 mm. */
+    #ice-helmet-sticker {
+        left: 15mm !important;
+        top: 15mm !important;
+        width: 96mm !important;
+    }
+
+    #ice-helmet-sticker .ice-sticker-qr {
+        flex-basis: 46mm !important;
+        width: 46mm !important;
+        height: 46mm !important;
+    }
+
+    #ice-helmet-sticker-compact,
+    #ice-helmet-sticker-compact-copy {
+        left: 122mm !important;
+        width: 56mm !important;
+    }
+
+    #ice-helmet-sticker-compact {
+        top: 15mm !important;
+    }
+
+    #ice-helmet-sticker-compact-copy {
+        display: block !important;
+        top: 85mm !important;
+    }
+
+    #ice-helmet-sticker-compact .ice-sticker-qr,
+    #ice-helmet-sticker-compact-copy .ice-sticker-qr {
+        width: 46mm !important;
+        height: 46mm !important;
+    }
+}

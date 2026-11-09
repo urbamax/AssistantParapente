@@ -257,6 +257,7 @@ export const FR_HTML = Object.freeze({
         urgence: 'Urgence',
         checkLists: 'Check-lists',
         maSigr: 'Ma SIGR',
+        ice: 'Fiche ICE',
         manuel: 'Manuel',
     }),
     authSetupRequiredView: Object.freeze({

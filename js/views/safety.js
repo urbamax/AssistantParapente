@@ -21,6 +21,7 @@ import { escapeHTML } from '../core/security.js';
 import { t } from '../utils/i18n.js';
 import { FR } from '../i18n/fr.js';
 import GlobalState from '../core/app_state.js';
+import { renderIceTabHtml, saveIceProfile, clearIceProfile, printIceSticker, testIceView } from './safety_ice.js';
 
 // Textes de l'écran (spec 019), tous dans js/i18n/fr.js (section safety). esc() : texte pour du
 // HTML ; rich() : idem, en gardant le gras <strong> de l'affiche ou du livret (seule balise permise).
@@ -112,7 +113,7 @@ export const SIGR_PLATES = [
 export const SIGR_STORAGE_KEY = 'parapente_sigr_assessment';
 const SIGR_RATINGS = ['solid', 'weak'];
 
-const TABS = ['urgence', 'prevol', 'sigr'];
+const TABS = ['urgence', 'prevol', 'sigr', 'ice'];
 
 const GEO_ERRORS = S.geo.errors;
 
@@ -415,7 +416,22 @@ class SafetyViewClass extends BaseView {
     switchTab(tab) {
         if (!TABS.includes(tab)) return;
         this.activeTab = tab;
+        if (tab === 'ice') {
+            this.renderIcePanel();
+        }
         this.applyTab();
+    }
+
+    renderIcePanel() {
+        let panel = document.getElementById('safety-panel-ice');
+        if (!panel) {
+            panel = document.createElement('section');
+            panel.id = 'safety-panel-ice';
+            panel.className = 'safety-panel';
+            panel.setAttribute('aria-label', esc(S.tabs.ice));
+            document.getElementById('safety-root')?.appendChild(panel);
+        }
+        panel.innerHTML = renderIceTabHtml();
     }
 
     applyTab() {
@@ -652,6 +668,24 @@ class SafetyViewClass extends BaseView {
         if (rated === 0) summary.textContent = '';
         else if (weak.length === 0) summary.textContent = tl('sigr.summaryNone', { rated, total: SIGR_PLATES.length });
         else summary.textContent = tl('sigr.summaryWeak', { plates: weak.join(', ') });
+    }
+
+    // ------------------------------------------------------------------ Fiche ICE & Étiquette Casque
+
+    saveIceProfile() {
+        saveIceProfile();
+    }
+
+    clearIceProfile() {
+        clearIceProfile();
+    }
+
+    printIceSticker() {
+        printIceSticker();
+    }
+
+    testIceView() {
+        testIceView();
     }
 }
 

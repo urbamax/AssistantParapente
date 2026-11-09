@@ -49,6 +49,33 @@ describe('FirebaseAuthEngine.mergeQcmStats (révision espacée)', () => {
         expect(merge(local, cloud).recent).toEqual([1, 1, 1, 1, 0]);
     });
 
+    it('keeps SM-2 spaced repetition state (easeFactor, interval, repetitions) from the most recent device', () => {
+        const local = stats({
+            total: 6,
+            correct: 5,
+            streak: 3,
+            repetitions: 3,
+            easeFactor: 2.6,
+            interval: 16,
+            lastSeen: 4000,
+        });
+        const cloud = stats({
+            total: 5,
+            correct: 4,
+            streak: 2,
+            repetitions: 2,
+            easeFactor: 2.5,
+            interval: 6,
+            lastSeen: 2000,
+        });
+        expect(merge(local, cloud)).toMatchObject({
+            easeFactor: 2.6,
+            interval: 16,
+            repetitions: 3,
+            lastSeen: 4000,
+        });
+    });
+
     it('never writes an undefined `recent` (Firestore refuses undefined fields)', () => {
         const merged = merge(stats({ total: 2, correct: 2, streak: 2, lastSeen: 5 }), stats({ total: 1, correct: 1 }));
         expect('recent' in merged).toBe(false);

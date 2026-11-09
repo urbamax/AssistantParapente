@@ -1382,7 +1382,7 @@ export const FR = Object.freeze({
     // dans ces textes : <strong> (gras de l'affiche ou du livret), tout le reste est échappé.
     safety: Object.freeze({
         title: 'SÉCURITÉ',
-        tabs: Object.freeze({ urgence: 'Urgence', prevol: 'Check-lists', sigr: 'Ma SIGR' }),
+        tabs: Object.freeze({ urgence: 'Urgence', prevol: 'Check-lists', sigr: 'Ma SIGR', ice: 'Fiche ICE / Casque' }),
         source: 'Source : {label}',
         sources: Object.freeze({
             secours: 'affiche FFVL « Secours vol libre » (2022)',

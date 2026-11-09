@@ -27,6 +27,7 @@ const sitesModule = lazyViewModule(() => import('../views/sites.js'));
 const libraryModule = lazyViewModule(() => import('../views/manual.js'));
 const welcomeModule = lazyViewModule(() => import('../views/welcome.js'));
 const safetyModule = lazyViewModule(() => import('../views/safety.js'));
+const iceModule = lazyViewModule(() => import('../views/ice_viewer.js'));
 
 // Mêmes noms qu'avant pour les gestionnaires de clics ci-dessous : chaque méthode appelée charge l'écran
 // si besoin puis l'exécute (immédiat si l'écran est déjà chargé, asynchrone sinon ; méthode absente = null).
@@ -35,6 +36,7 @@ const LogbookView = viewProxy(logbookModule);
 const SitesView = viewProxy(sitesModule);
 const LibraryView = viewProxy(libraryModule);
 const SafetyView = viewProxy(safetyModule);
+const IceView = viewProxy(iceModule);
 
 async function bootApplication() {
     try {
@@ -240,8 +242,17 @@ async function bootApplication() {
         'answerReady',
         'resetReady',
         'ratePlate',
+        'saveIceProfile',
+        'clearIceProfile',
+        'printIceSticker',
+        'testIceView',
     ].forEach((action) => {
         AppEvents.register('Safety' + action, (args, e, t) => SafetyView[action](args, e, t));
+    });
+
+    // Wire IceView actions
+    ['importToProfile', 'goToApp'].forEach((action) => {
+        AppEvents.register('Ice' + action, (args, e, t) => IceView[action](args, e, t));
     });
 
     // Generic UI helpers
@@ -367,6 +378,7 @@ async function bootApplication() {
     AppRouter.register('LIBRARY', libraryModule);
     AppRouter.register('WELCOME', welcomeModule);
     AppRouter.register('SAFETY', safetyModule);
+    AppRouter.register('ICE', iceModule);
 
     // 4. Initialize History API
     AppRouter.initHistory();
@@ -374,7 +386,11 @@ async function bootApplication() {
     // 5. Restore State or Default
     const params = new URLSearchParams(window.location.search);
     // Lien direct > dernière page ouverte > écran d'accueil (toute première visite uniquement)
-    const startMode = resolveStartMode(params.get('mode'), StorageService.get('LAST_ACTIVE_ROUTE'));
+    const startMode = resolveStartMode(
+        params.get('mode'),
+        StorageService.get('LAST_ACTIVE_ROUTE'),
+        window.location.hash,
+    );
 
     // Éléments réservés à un rôle (météo calculée) : cachés d'emblée, montrés si le compte a le rôle.
     applyRoleVisibility();

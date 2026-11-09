@@ -4,7 +4,7 @@ import { parseDateToMs } from '../utils/date_utils.js';
 import { t } from '../utils/i18n.js';
 import { floorPercent1 } from '../utils/text_utils.js';
 import { isStatsConsentGranted } from './consent_store.js';
-import { dueScore, summarizeReviews } from './review_scheduler.js';
+import { applySm2Review, dueScore, summarizeReviews } from './review_scheduler.js';
 import { masteryRatio, masteryRatioAfterCorrect, pushAttempt } from './mastery.js';
 import {
     appendAnswer,
@@ -472,6 +472,7 @@ export function replayExamToStats(exam, stats, questionLookup) {
         }
 
         const mask = pickMask(question, selectedOptions);
+        const prevReps = typeof qStat.repetitions === 'number' ? qStat.repetitions : qStat.streak || 0;
         const existingLog = readAnswerLog(qStat.answers);
         const alreadyLogged = existingLog.some(([day, m]) => day === examDay && m === mask);
         if (!alreadyLogged) {
@@ -492,6 +493,18 @@ export function replayExamToStats(exam, stats, questionLookup) {
             }
         }
         qStat.streak = s;
+        const sm2 = applySm2Review(
+            { ...qStat, repetitions: prevReps },
+            {
+                isCorrect,
+                userScore: r.userPoints,
+                maxScore: r.maxPoints,
+                now: examDateMs,
+            },
+        );
+        qStat.easeFactor = sm2.easeFactor;
+        qStat.interval = sm2.interval;
+        qStat.repetitions = sm2.repetitions;
         if (!qStat.lastSeen || examDateMs > qStat.lastSeen) {
             qStat.lastSeen = examDateMs;
         }
@@ -1124,7 +1137,10 @@ class QuizService {
         this.state.examResults[this.state.qcmIndex] = resultData;
 
         if (this.state.qcmConfig.mode !== 'EXAM') {
-            this.updateStats(question, isCorrect, selectedOptions, previous);
+            this.updateStats(question, isCorrect, selectedOptions, previous, Date.now(), {
+                userScore,
+                maxScore,
+            });
         }
         if (this.state.qcmConfig.mode === 'MASTERY') this.advanceMasteryProgress();
 
@@ -1226,7 +1242,7 @@ class QuizService {
         }
     }
 
-    updateStats(shownQuestion, isCorrect, selected = [], previous = null, timestamp = Date.now()) {
+    updateStats(shownQuestion, isCorrect, selected = [], previous = null, timestamp = Date.now(), options = {}) {
         const question = this.getQuestionByCode(shownQuestion.code) || shownQuestion;
         const stats = this.getPersistentStats();
         if (!stats.questions) stats.questions = {};
@@ -1259,6 +1275,8 @@ class QuizService {
             }
         }
 
+        const prevReps = typeof qStat.repetitions === 'number' ? qStat.repetitions : qStat.streak || 0;
+
         recordPicks(qStat, question, selected, Array.isArray(previous?.selected) ? previous.selected : null);
         qStat.recent = pushAttempt(qStat, isCorrect);
         qStat.total = (qStat.total || 0) + 1;
@@ -1275,6 +1293,20 @@ class QuizService {
         }
         qStat.streak = s;
         qStat.lastSeen = timestamp;
+
+        const sm2 = applySm2Review(
+            { ...qStat, repetitions: prevReps },
+            {
+                isCorrect,
+                userScore: options.userScore,
+                maxScore: options.maxScore,
+                explicitQuality: options.explicitQuality,
+                now: timestamp,
+            },
+        );
+        qStat.easeFactor = sm2.easeFactor;
+        qStat.interval = sm2.interval;
+        qStat.repetitions = sm2.repetitions;
 
         // Theme specific stats
         if (question.theme) {
