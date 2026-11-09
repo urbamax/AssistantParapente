@@ -42,8 +42,29 @@ describe('SafetyView', () => {
         SafetyView.switchTab('prevol');
         expect(document.getElementById('safety-panel-prevol').hidden).toBe(false);
         expect(document.getElementById('safety-panel-urgence').hidden).toBe(true);
+        SafetyView.switchTab('ice');
+        expect(document.getElementById('safety-panel-ice').hidden).toBe(false);
+        expect(document.getElementById('safety-panel-prevol').hidden).toBe(true);
         SafetyView.switchTab('nope');
-        expect(document.getElementById('safety-panel-prevol').hidden).toBe(false);
+        expect(document.getElementById('safety-panel-ice').hidden).toBe(false);
+    });
+
+    it('renders the ICE tab and updates sticker preview on save', () => {
+        SafetyView.switchTab('ice');
+        const prenomInput = document.getElementById('ice-prenom');
+        const nomInput = document.getElementById('ice-nom');
+        const c1Phone = document.getElementById('ice-c1-phone');
+        expect(prenomInput).not.toBeNull();
+
+        prenomInput.value = 'Jean';
+        nomInput.value = 'Valjean';
+        c1Phone.value = '0611223344';
+
+        window.alert = vi.fn();
+        SafetyView.saveIceProfile();
+
+        expect(document.getElementById('ice-sticker-wrapper').textContent).toContain('Jean Valjean');
+        expect(document.getElementById('ice-sticker-wrapper').textContent).toContain('0611223344');
     });
 
     it('ticks prévol items, shows completion, and resets', () => {

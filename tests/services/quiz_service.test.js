@@ -226,6 +226,7 @@ describe('QuizService - Révision espacée (échéances)', () => {
 describe('QuizService - Compteurs globaux et auto-guérison', () => {
     beforeEach(() => {
         StorageService.remove(StorageService.KEYS.QCM_STATS);
+        QuizService._volatileStats = null;
     });
 
     it('updateStats incrémente totalQuestions et totalCorrect', () => {
@@ -239,6 +240,29 @@ describe('QuizService - Compteurs globaux et auto-guérison', () => {
         s = QuizService.getPersistentStats();
         expect(s.totalQuestions).toBe(2);
         expect(s.totalCorrect).toBe(1);
+    });
+
+    it('updateStats met à jour les champs SM-2 (easeFactor, interval, repetitions)', () => {
+        const q1 = { code: 'A01V', theme: 'Météo' };
+        QuizService.updateStats(q1, true, [], null, Date.now(), { timeTakenMs: 5000 });
+        let qStat = QuizService.getPersistentStats().questions.A01V;
+        expect(qStat.repetitions).toBe(1);
+        expect(qStat.interval).toBe(1);
+        expect(qStat.easeFactor).toBe(2.6);
+
+        // Deuxième succès rapide
+        QuizService.updateStats(q1, true, [], null, Date.now(), { timeTakenMs: 6000 });
+        qStat = QuizService.getPersistentStats().questions.A01V;
+        expect(qStat.repetitions).toBe(2);
+        expect(qStat.interval).toBe(6);
+        expect(qStat.easeFactor).toBe(2.7);
+
+        // Erreur
+        QuizService.updateStats(q1, false, [], null, Date.now());
+        qStat = QuizService.getPersistentStats().questions.A01V;
+        expect(qStat.repetitions).toBe(0);
+        expect(qStat.interval).toBe(0);
+        expect(qStat.easeFactor).toBeLessThan(2.7);
     });
 
     it('getPersistentStats auto-guérit les compteurs figés si les questions détaillées ont des totaux supérieurs', () => {

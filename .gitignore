@@ -13,6 +13,7 @@ dist/
 # Notes personnelles (jamais dans le dépôt ni sur le site servi par le Raspberry Pi)
 BRIEF_*.md
 RAPPORT_*.md
+propositions_ameliorations.md
 
 # Version du site, écrite par le build ou par scripts/install_update_hook.sh
 version.json

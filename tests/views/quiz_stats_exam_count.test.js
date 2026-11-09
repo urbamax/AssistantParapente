@@ -224,4 +224,28 @@ describe('buildQuestionsHtml - Affichage des questions posées en examen', () =>
             'dont <span style="font-weight:700; color:var(--text-main);">1</span> posée en examen sur <span style="font-weight:700; color:var(--text-main);">1</span> examen réalisé',
         );
     });
+
+    it('affiche le badge EF (Facteur de Facilité SM-2) si la question a un easeFactor', () => {
+        const statsWithEf = {
+            questions: {
+                A1V: { total: 2, correct: 2, streak: 2, easeFactor: 2.6 },
+                B2V: { total: 1, correct: 1, streak: 1 },
+                C3V: { total: 0, correct: 0, streak: 0 },
+            },
+        };
+        const entriesWithEf = [
+            ['A1V', statsWithEf.questions.A1V],
+            ['B2V', statsWithEf.questions.B2V],
+            ['C3V', statsWithEf.questions.C3V],
+        ];
+        const html = buildQuestionsHtml(mockView, {
+            levelQs,
+            levelQuestionEntries: entriesWithEf,
+            stats: statsWithEf,
+            examHistory: [],
+            currentLevel: 'BI',
+        });
+        expect(html).toContain('EF 2.6');
+        expect(html).toContain('Facteur de facilité');
+    });
 });

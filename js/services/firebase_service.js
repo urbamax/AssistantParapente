@@ -1319,27 +1319,51 @@ export const FirebaseAuthEngine = {
 
     // Merge algorithms
 
-    // État de révision espacée (streak + lastSeen) d'une question : on garde celui de l'appareil
+    // État de révision espacée (streak + lastSeen + SM-2) d'une question : on garde celui de l'appareil
     // qui a vu la question le plus récemment. Prendre le max des streaks effacerait une erreur
     // récente (streak remis à 0 sur le téléphone, 4 dans le cloud), et ne pas recopier lastSeen
     // faisait retomber le mode Révision sur l'ancien critère de ratio après chaque synchro.
-    // Les dernières réponses (`recent`, qui fondent la maîtrise) suivent la même règle : elles
-    // viennent de l'appareil le plus récent, et on n'écrit jamais de champ indéfini (Firestore le refuse).
+    // Les dernières réponses (`recent`), le facteur de facilité (`easeFactor`), l'intervalle (`interval`)
+    // et les répétitions (`repetitions`) suivent la même règle : ils viennent de l'appareil le plus récent,
+    // et on n'écrit jamais de champ indéfini (Firestore le refuse).
     _latestReviewState: function (a, b) {
         const aSeen = a.lastSeen || 0;
         const bSeen = b.lastSeen || 0;
-        const withRecent = (state, source) =>
-            Array.isArray(source.recent) ? { ...state, recent: source.recent } : state;
+        const withExtra = (state, source) => {
+            const res = Array.isArray(source.recent) ? { ...state, recent: source.recent } : { ...state };
+            const ef =
+                typeof source.easeFactor === 'number'
+                    ? source.easeFactor
+                    : typeof a.easeFactor === 'number'
+                      ? a.easeFactor
+                      : b.easeFactor;
+            if (typeof ef === 'number' && !isNaN(ef)) res.easeFactor = ef;
+            const interval =
+                typeof source.interval === 'number'
+                    ? source.interval
+                    : typeof a.interval === 'number'
+                      ? a.interval
+                      : b.interval;
+            if (typeof interval === 'number' && !isNaN(interval)) res.interval = interval;
+            const reps =
+                typeof source.repetitions === 'number'
+                    ? source.repetitions
+                    : typeof a.repetitions === 'number'
+                      ? a.repetitions
+                      : b.repetitions;
+            if (typeof reps === 'number' && !isNaN(reps)) res.repetitions = reps;
+            return res;
+        };
         if (!aSeen && !bSeen) {
             const longest = (a.recent?.length || 0) >= (b.recent?.length || 0) ? a : b;
-            return withRecent({ streak: Math.max(a.streak || 0, b.streak || 0) }, longest);
+            return withExtra({ streak: Math.max(a.streak || 0, b.streak || 0) }, longest);
         }
         if (aSeen === bSeen) {
             const longest = (a.recent?.length || 0) >= (b.recent?.length || 0) ? a : b;
-            return withRecent({ streak: Math.max(a.streak || 0, b.streak || 0), lastSeen: aSeen }, longest);
+            return withExtra({ streak: Math.max(a.streak || 0, b.streak || 0), lastSeen: aSeen }, longest);
         }
         const latest = aSeen > bSeen ? a : b;
-        return withRecent({ streak: latest.streak || 0, lastSeen: latest.lastSeen }, latest);
+        return withExtra({ streak: latest.streak || 0, lastSeen: latest.lastSeen }, latest);
     },
 
     // Nombre de fois où chaque choix a été coché. Comme `total` et `correct`, on prend le max par
