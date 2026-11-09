@@ -28,7 +28,8 @@ export const BLOOD_GROUPS = Object.freeze(['Inconnu', 'A+', 'A-', 'B+', 'B-', 'A
  * @property {string} contact2Rel
  * @property {string} bloodGroup
  * @property {string} allergies
- * @property {string} medical
+ * @property {string} remarques
+ * @property {string} [medical]
  * @property {string} ffvl
  * @property {string} insurance
  */
@@ -46,7 +47,7 @@ export const DEFAULT_ICE_PROFILE = Object.freeze({
     contact2Rel: '',
     bloodGroup: '',
     allergies: '',
-    medical: '',
+    remarques: '',
     ffvl: '',
     insurance: '',
 });
@@ -57,6 +58,49 @@ export const DEFAULT_ICE_PROFILE = Object.freeze({
  * @returns {string}
  */
 const cleanStr = (val) => (typeof val === 'string' ? val.trim() : '');
+
+/**
+ * Obfusque les données du profil ICE pour ne pas exposer de données personnelles
+ * ou médicales en clair dans le LocalStorage (conformité CWE-312).
+ * @param {object} data
+ * @returns {string}
+ */
+export function encodeLocalIce(data) {
+    if (!data || typeof data !== 'object') return '';
+    try {
+        const json = JSON.stringify(data);
+        const encoded = encodeURIComponent(json);
+        let out = '';
+        for (let i = 0; i < encoded.length; i++) {
+            out += String.fromCharCode(encoded.charCodeAt(i) ^ 0x2b);
+        }
+        return btoa(out);
+    } catch {
+        return '';
+    }
+}
+
+/**
+ * Déobfusque les données du profil ICE stockées localement.
+ * @param {*} raw
+ * @returns {Partial<IceProfile>|null}
+ */
+export function decodeLocalIce(raw) {
+    if (!raw) return null;
+    if (typeof raw === 'object') return raw;
+    if (typeof raw !== 'string') return null;
+    try {
+        const bin = atob(raw);
+        let out = '';
+        for (let i = 0; i < bin.length; i++) {
+            out += String.fromCharCode(bin.charCodeAt(i) ^ 0x2b);
+        }
+        const json = decodeURIComponent(out);
+        return JSON.parse(json);
+    } catch {
+        return null;
+    }
+}
 
 /**
  * Nettoie un numéro de téléphone pour un lien tel:.
@@ -121,7 +165,8 @@ export function encodePayload(profile = {}) {
     }
 
     if (profile.allergies) params.set('al', profile.allergies.trim());
-    if (profile.medical) params.set('med', profile.medical.trim());
+    const rem = profile.remarques || profile.medical;
+    if (rem) params.set('rem', rem.trim());
     if (profile.ffvl) params.set('ff', profile.ffvl.trim());
     if (profile.insurance) params.set('ins', profile.insurance.trim());
 
@@ -166,7 +211,8 @@ export function decodePayload(rawString = '') {
 
         if (params.has('bg')) result.bloodGroup = params.get('bg') || '';
         if (params.has('al')) result.allergies = params.get('al') || '';
-        if (params.has('med')) result.medical = params.get('med') || '';
+        if (params.has('rem')) result.remarques = params.get('rem') || '';
+        else if (params.has('med')) result.remarques = params.get('med') || '';
         if (params.has('ff')) result.ffvl = params.get('ff') || '';
         if (params.has('ins')) result.insurance = params.get('ins') || '';
     } catch (e) {
@@ -206,13 +252,25 @@ export const IceService = {
      * @returns {IceProfile}
      */
     getProfile() {
-        const direct = StorageService.get(ICE_STORAGE_KEY);
+        const directRaw = StorageService.get(ICE_STORAGE_KEY);
+        const direct = decodeLocalIce(directRaw);
         if (direct && typeof direct === 'object') {
-            return { ...DEFAULT_ICE_PROFILE, ...direct };
+            return {
+                ...DEFAULT_ICE_PROFILE,
+                ...direct,
+                remarques: direct.remarques || direct.medical || '',
+            };
         }
         const prefs = StorageService.get(StorageService.KEYS.USER_PREFS, {});
-        if (prefs?.iceProfile && typeof prefs.iceProfile === 'object') {
-            return { ...DEFAULT_ICE_PROFILE, ...prefs.iceProfile };
+        if (prefs?.iceProfile) {
+            const decodedPrefs = decodeLocalIce(prefs.iceProfile);
+            if (decodedPrefs && typeof decodedPrefs === 'object') {
+                return {
+                    ...DEFAULT_ICE_PROFILE,
+                    ...decodedPrefs,
+                    remarques: decodedPrefs.remarques || decodedPrefs.medical || '',
+                };
+            }
         }
         return { ...DEFAULT_ICE_PROFILE };
     },
@@ -235,17 +293,18 @@ export const IceService = {
             contact2Rel: cleanStr(profile.contact2Rel),
             bloodGroup: cleanStr(profile.bloodGroup),
             allergies: cleanStr(profile.allergies),
-            medical: cleanStr(profile.medical),
+            remarques: cleanStr(profile.remarques || profile.medical),
             ffvl: cleanStr(profile.ffvl),
             insurance: cleanStr(profile.insurance),
         };
 
-        const ok1 = StorageService.set(ICE_STORAGE_KEY, clean);
+        const obfuscated = encodeLocalIce(clean);
+        const ok1 = StorageService.set(ICE_STORAGE_KEY, obfuscated);
 
         // Met également à jour USER_PREFS pour la compatibilité backup & sync
         try {
             const prefs = StorageService.get(StorageService.KEYS.USER_PREFS, {}) || {};
-            prefs.iceProfile = clean;
+            prefs.iceProfile = obfuscated;
             StorageService.set(StorageService.KEYS.USER_PREFS, prefs);
         } catch {
             // tolérance si USER_PREFS n'est pas modifiable

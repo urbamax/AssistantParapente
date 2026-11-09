@@ -654,7 +654,7 @@ export function buildQuestionsHtml(
                                     <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#${code}</span>
                                     <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">${theme}</span>
                                     ${examBadgeHtml}
-                                    ${streak >= 3 ? `<span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 ${streak}</span>` : ''}${typeof data.easeFactor === 'number' ? ` <span style="background:rgba(96,165,250,0.15); color:var(--accent-blue, #60a5fa); border:1px solid rgba(96,165,250,0.3); padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:600;" title="${escapeHTML(tql('stats.easeFactorTitle'))}">${tq('stats.easeFactorBadge', { ef: data.easeFactor.toFixed(1) })}</span>` : ''}
+                                    ${streak >= 3 ? `<span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 ${streak}</span>` : ''}
                                     ${hasAnswers ? '<i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-' + code + '"></i>' : ''}
                                 </div>
                                 <div style="font-size:0.9rem; line-height:1.4;">${escapeHTML(displayText)}</div>

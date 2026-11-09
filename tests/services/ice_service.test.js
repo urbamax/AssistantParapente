@@ -30,7 +30,7 @@ describe('IceService (js/services/ice_service.js)', () => {
                 contact1Rel: 'Conjointe',
                 bloodGroup: 'O+',
                 allergies: 'Pénicilline',
-                medical: 'Asthme léger',
+                remarques: 'Asthme léger',
                 ffvl: '1234567',
                 insurance: 'Europ Assistance FFVL',
             };
@@ -43,10 +43,12 @@ describe('IceService (js/services/ice_service.js)', () => {
             expect(retrieved.prenom).toBe('Maxime');
             expect(retrieved.bloodGroup).toBe('O+');
             expect(retrieved.contact1Name).toBe('Sophie');
+            expect(retrieved.remarques).toBe('Asthme léger');
 
-            // Vérifie la double persistance (ICE_STORAGE_KEY et USER_PREFS)
-            const prefs = StorageService.get(StorageService.KEYS.USER_PREFS);
-            expect(prefs?.iceProfile?.nom).toBe('Urbaniak');
+            // Vérifie que le stockage est obfusqué (non clair)
+            const rawStored = StorageService.get(IceService.ICE_STORAGE_KEY || 'parapente_ice_profile');
+            expect(typeof rawStored).toBe('string');
+            expect(rawStored).not.toContain('Asthme léger');
         });
 
         it('clears the profile', () => {
@@ -72,7 +74,7 @@ describe('IceService (js/services/ice_service.js)', () => {
                 contact2Rel: 'Frère',
                 bloodGroup: 'AB-',
                 allergies: 'Arachides, Iode',
-                medical: 'Diabète type 1',
+                remarques: 'Diabète type 1',
                 ffvl: '9876543A',
                 insurance: 'Rapatriement Mondial Assistance',
             };
@@ -94,9 +96,14 @@ describe('IceService (js/services/ice_service.js)', () => {
             expect(decoded.contact2Rel).toBe(original.contact2Rel);
             expect(decoded.bloodGroup).toBe(original.bloodGroup);
             expect(decoded.allergies).toBe(original.allergies);
-            expect(decoded.medical).toBe(original.medical);
+            expect(decoded.remarques).toBe(original.remarques);
             expect(decoded.ffvl).toBe(original.ffvl);
             expect(decoded.insurance).toBe(original.insurance);
+        });
+
+        it('supports legacy med param for backwards compatibility', () => {
+            const decoded = decodePayload('n=Test&med=Diabete');
+            expect(decoded.remarques).toBe('Diabete');
         });
 
         it('handles hash prefix and URL formats cleanly', () => {

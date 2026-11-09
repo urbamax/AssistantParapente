@@ -1237,9 +1237,6 @@ export const FR = Object.freeze({
             examBadgeTitleMany: 'Posée {count} fois en examen',
             unknownQuestion: 'Question inconnue',
             course: 'COURS',
-            easeFactorBadge: 'EF {ef}',
-            easeFactorTitle:
-                'Facteur de facilité (SuperMemo SM-2) : plus ce nombre est élevé, plus la question est facile pour vous',
             questionLineOne: '{correct}/{total} corrects • {total} tentative • Série en cours : {streak}',
             questionLineMany: '{correct}/{total} corrects • {total} tentatives • Série en cours : {streak}',
             noAttempt: 'Aucune question tentée pour le moment.',

@@ -27,7 +27,7 @@ describe('IceView (js/views/ice_viewer.js)', () => {
             contact1Rel: 'Conjointe',
             bloodGroup: 'O+',
             allergies: 'Pénicilline',
-            medical: 'Aucun',
+            remarques: 'Aucun',
             ffvl: '1234567',
             insurance: 'Europ Assistance',
         });

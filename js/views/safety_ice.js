@@ -124,7 +124,7 @@ export function renderIceTabHtml() {
                     </div>
                     <div class="ice-form-row">
                         <label>Antécédents / Traitements réguliers
-                            <input type="text" id="ice-medical" value="${esc(p.medical)}" placeholder="Ex: Diabète, anticoagulant..." />
+                            <input type="text" id="ice-remarques" value="${esc(p.remarques || p.medical)}" placeholder="Ex: Diabète, anticoagulant..." />
                         </label>
                     </div>
                 </fieldset>
@@ -196,7 +196,7 @@ export function getIceFormValues() {
         contact2Phone: val('ice-c2-phone'),
         bloodGroup: val('ice-bloodGroup'),
         allergies: val('ice-allergies'),
-        medical: val('ice-medical'),
+        remarques: val('ice-remarques'),
         ffvl: val('ice-ffvl'),
         insurance: val('ice-insurance'),
     };

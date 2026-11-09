@@ -176,7 +176,8 @@ export class IceViewClass extends BaseView {
 
     /** @param {Partial<import('../services/ice_service.js').IceProfile>} p */
     renderMedical(p) {
-        if (!p.allergies && !p.medical) return '';
+        const rem = p.remarques || p.medical;
+        if (!p.allergies && !rem) return '';
 
         return `
             <section class="ice-card ice-card-medical">
@@ -190,10 +191,10 @@ export class IceViewClass extends BaseView {
                         : ''
                 }
                 ${
-                    p.medical
+                    rem
                         ? `<div class="ice-medical-info">
                             <strong>Antécédents / Traitements en cours :</strong>
-                            <p>${esc(p.medical)}</p>
+                            <p>${esc(rem)}</p>
                         </div>`
                         : ''
                 }
