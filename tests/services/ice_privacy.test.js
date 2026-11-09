@@ -3,7 +3,7 @@ import IceService, {
     ICE_LIMITS,
     ICE_QR_MAX_BYTES,
     ICE_STORAGE_KEY,
-    buildIceText,
+    buildIceVCard,
     clampProfile,
     encodeLocalIce,
 } from '../../js/services/ice_service.js';
@@ -49,20 +49,54 @@ describe('fiche ICE : longueurs et QR', () => {
         expect(IceService.getProfile().remarques).toHaveLength(ICE_LIMITS.remarques);
     });
 
-    it('le texte du QR contient les informations vitales et des numéros nets', () => {
-        const text = buildIceText(typical);
-        expect(text).toContain('Thomas Dupont 1988');
-        expect(text).toContain('Sang O+');
-        expect(text).toContain('Allergies: Pénicilline');
-        expect(text).toContain('1: Sophie (Conjointe) 0612345678');
-        expect(text).toContain('2: Pierre (Frère) 0698765432');
-        expect(text).toContain('SOS 112');
+    it("le QR est une fiche contact (vCard) : nom, contacts étiquetés aux numéros nets, notes médicales d'abord", () => {
+        const vcard = buildIceVCard(typical);
+        const lines = vcard.split('\n');
+        expect(lines[0]).toBe('BEGIN:VCARD');
+        expect(lines.at(-1)).toBe('END:VCARD');
+        expect(vcard).toContain('VERSION:3.0');
+        expect(vcard).toContain('N:Dupont;Thomas;;;');
+        expect(vcard).toContain('FN:Thomas Dupont');
+        expect(vcard).toContain('ORG:URGENCE ICE PARAPENTE');
+        expect(vcard).toContain('item1.TEL:0612345678');
+        expect(vcard).toContain('item1.X-ABLabel:Sophie (Conjointe)');
+        expect(vcard).toContain('item2.TEL:0698765432');
+        expect(vcard).toContain('item2.X-ABLabel:Pierre (Frère)');
+        // Notes : une seule ligne vCard, les retours à la ligne sont écrits « \\n », le sang en premier.
+        const note = lines.find((l) => l.startsWith('NOTE:'));
+        expect(note.startsWith('NOTE:SANG O+\\n')).toBe(true);
+        expect(note).toContain('ALLERGIES: Pénicilline');
+        expect(note).toContain('Né 1988');
+        expect(note).toContain('ASSURANCE MAIF 123456');
     });
 
-    it('une fiche typique donne un QR petit, donc lisible sur un casque', () => {
+    it('échappe les caractères spéciaux de la vCard (virgule, point-virgule, antislash, retour à la ligne)', () => {
+        const vcard = buildIceVCard({ ...typical, nom: 'Du;pont', remarques: 'a,b;c\\d\ne' });
+        expect(vcard).toContain('N:Du\\;pont;Thomas;;;');
+        expect(vcard).toContain('SANTÉ: a\\,b\\;c\\\\d\\ne');
+        // Aucun retour à la ligne parasite dans une valeur : chaque ligne reste une propriété.
+        for (const line of vcard.split('\n')) expect(line).toMatch(/^(BEGIN|VERSION|N|FN|ORG|item\d\.|NOTE|END)/);
+    });
+
+    it('sans contact, propose le 112 pour garder un bouton d’appel', () => {
+        const vcard = buildIceVCard({ prenom: 'Thomas', nom: 'Dupont' });
+        expect(vcard).toContain('item1.TEL:112');
+        expect(vcard).toContain('item1.X-ABLabel:Secours');
+        expect(vcard).not.toContain('NOTE:');
+    });
+
+    it('un contact sans nom reçoit une étiquette par défaut', () => {
+        const vcard = buildIceVCard({ contact1Phone: '0612345678' });
+        expect(vcard).toContain('item1.X-ABLabel:Contact 1');
+        expect(vcard).toContain('FN:Pilote');
+    });
+
+    it("une fiche usuelle donne un QR d'au plus 73 modules (version 14), lisible sur un casque", () => {
         const svg = IceService.generateQrSvg(typical);
         expect(svg).toContain('<svg');
-        expect(generateQrMatrix(buildIceText(typical)).length).toBeLessThanOrEqual(57); // version 10 au plus
+        expect(
+            generateQrMatrix(buildIceVCard({ ...typical, anticoag: '1', tetanos: '2022' })).length,
+        ).toBeLessThanOrEqual(73);
     });
 
     it('la fiche la plus longue permise ne fait jamais échouer le générateur', () => {
@@ -70,7 +104,7 @@ describe('fiche ICE : longueurs et QR', () => {
             Object.entries(typical).map(([key, value]) => [key, value.padEnd(500, 'é')]),
         );
         const profile = clampProfile(longest);
-        expect(() => generateQrMatrix(buildIceText(profile))).not.toThrow();
+        expect(() => generateQrMatrix(buildIceVCard(profile))).not.toThrow();
     });
 
     it('refuse proprement une fiche trop longue pour un QR lisible (mesurée en octets, accents compris)', () => {
@@ -79,12 +113,12 @@ describe('fiche ICE : longueurs et QR', () => {
             allergies: 'a'.repeat(ICE_LIMITS.allergies),
             remarques: 'r'.repeat(ICE_LIMITS.remarques),
         };
-        expect(new TextEncoder().encode(buildIceText(huge)).length).toBeGreaterThan(ICE_QR_MAX_BYTES);
+        expect(new TextEncoder().encode(buildIceVCard(huge)).length).toBeGreaterThan(ICE_QR_MAX_BYTES);
         expect(IceService.qrFits(huge)).toBe(false);
         expect(() => IceService.generateQrSvg(huge)).toThrow('ice-qr-too-long');
 
-        // Les accents pèsent 2 octets : 200 « é » dépassent la limite alors que 200 « e » la respectent.
-        expect(IceService.qrFits({ ...typical, remarques: 'e'.repeat(120) })).toBe(true);
+        // Les accents pèsent 2 octets : 120 « é » (+100 pour les allergies) dépassent la limite alors que 80 « e » la respectent.
+        expect(IceService.qrFits({ ...typical, remarques: 'e'.repeat(80) })).toBe(true);
         expect(IceService.qrFits({ ...typical, remarques: 'é'.repeat(120), allergies: 'é'.repeat(100) })).toBe(false);
         expect(IceService.qrFits(typical)).toBe(true);
     });
@@ -256,11 +290,11 @@ describe('anticoagulants et rappel antitétanique', () => {
         expect(IceService.decodePayload(IceService.encodePayload(typical)).anticoag).toBe('');
     });
 
-    it('est écrit dans le texte du QR', () => {
-        const text = buildIceText(withMedical);
-        expect(text).toContain('ANTICOAGULANTS');
-        expect(text).toContain('Tétanos 2022');
-        expect(buildIceText(typical)).not.toContain('ANTICOAGULANTS');
+    it('est écrit dans les notes du QR', () => {
+        const vcard = buildIceVCard(withMedical);
+        expect(vcard).toContain('ANTICOAGULANTS');
+        expect(vcard).toContain('TÉTANOS 2022');
+        expect(buildIceVCard(typical)).not.toContain('ANTICOAGULANTS');
     });
 
     it("l'étiquette affiche une pastille ANTICOAGULANT à côté du groupe sanguin", () => {

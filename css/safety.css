@@ -597,11 +597,11 @@
     margin: 16px 0;
 }
 
-/* Étiquette : 80 x 48 mm environ une fois imprimée. L'écran la montre à la même proportion. Les informations
+/* Étiquette : 90 x 55 mm environ une fois imprimée. L'écran la montre à la même proportion. Les informations
    vitales (sang, allergies, contacts) sont écrites en toutes lettres : elles doivent rester lisibles si le QR
    est abîmé ou si le secouriste n'a pas de téléphone. Pas d'emoji : il disparaît sur une imprimante sans police. */
 .ice-helmet-sticker {
-    width: 320px;
+    width: 360px;
     background: #ffffff !important;
     color: #111827 !important;
     border: 2px dashed #94a3b8;
@@ -638,9 +638,9 @@
 }
 
 .ice-sticker-qr {
-    flex: 0 0 128px;
-    width: 128px;
-    height: 128px;
+    flex: 0 0 150px;
+    width: 150px;
+    height: 150px;
 
     svg {
         display: block;
@@ -1012,14 +1012,15 @@
         visibility: visible !important;
     }
 
-    /* Deux étiquettes par feuille (casque et sellette), à 80 mm de large : le QR fait environ 34 mm, soit 0,6 mm
-       par module pour une fiche usuelle, assez gros pour être lu à travers un adhésif sur une surface courbe. */
+    /* Deux étiquettes par feuille (casque et sellette), à 90 mm de large : le QR fait 40 mm, soit environ 0,53 mm
+       par module pour une fiche usuelle (73 modules), assez gros pour être lu à travers un adhésif sur une surface
+       courbe. */
     #ice-helmet-sticker,
     #ice-helmet-sticker-copy {
         position: fixed !important;
         left: 15mm !important;
         margin: 0 !important;
-        width: 80mm !important;
+        width: 90mm !important;
         box-shadow: none !important;
         border: 1px dashed #64748b !important;
         -webkit-print-color-adjust: exact !important;
@@ -1032,13 +1033,13 @@
 
     #ice-helmet-sticker-copy {
         display: block !important;
-        top: 75mm !important;
+        top: 85mm !important;
     }
 
     #ice-helmet-sticker .ice-sticker-qr,
     #ice-helmet-sticker-copy .ice-sticker-qr {
-        flex-basis: 34mm !important;
-        width: 34mm !important;
-        height: 34mm !important;
+        flex-basis: 40mm !important;
+        width: 40mm !important;
+        height: 40mm !important;
     }
 }

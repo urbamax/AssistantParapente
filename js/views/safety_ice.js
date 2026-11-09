@@ -76,7 +76,7 @@ export function renderIceTabHtml() {
             <p class="safety-hint">
                 Générez une étiquette étanche avec QR Code à coller sur votre casque ou votre sellette. En cas d'accident,
                 les témoins ou les secouristes peuvent la scanner avec n'importe quel smartphone pour joindre immédiatement
-                vos proches et connaître vos données médicales vitales. Le QR contient le texte de la fiche : l'appareil photo le lit sans réseau et sans ce site. Votre fiche reste sur cet appareil : elle n'est ni synchronisée ni exportée.
+                vos proches et connaître vos données médicales vitales. Le QR contient une fiche contact : l'appareil photo du téléphone l'ouvre sans réseau et sans ce site, avec vos contacts d'urgence et vos informations médicales dans les notes. Votre fiche reste sur cet appareil : elle n'est ni synchronisée ni exportée.
             </p>
         </div>
 

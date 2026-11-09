@@ -9,8 +9,8 @@
  * - Le stockage local est seulement masqué (XOR + base64) pour ne pas l'afficher en clair dans l'inspecteur
  *   du navigateur : ce n'est PAS du chiffrement et il ne protège pas contre un script de la page ou contre
  *   quelqu'un qui a l'appareil en main.
- * - Le QR code du casque contient le texte de la fiche : n'importe quel appareil photo le lit, sans réseau
- *   et sans dépendre de ce site. Le lecteur web (`?mode=ICE#...`) reste disponible pour un lien partagé ;
+ * - Le QR code du casque contient une fiche contact (vCard) : l'appareil photo d'un téléphone l'ouvre sans
+ *   réseau et sans dépendre de ce site (nom, contacts d'urgence, notes médicales). Le lecteur web (`?mode=ICE#...`) reste disponible pour un lien partagé ;
  *   son fragment d'URL (#...) n'est jamais envoyé au serveur HTTP.
  */
 
@@ -83,8 +83,8 @@ export const ICE_LIMITS = Object.freeze({
     insurance: 60,
 });
 
-/** Taille maximale (octets UTF-8) du texte du QR code : au-delà, les modules deviennent trop petits pour un casque (version 14, 73 modules). */
-export const ICE_QR_MAX_BYTES = 350;
+/** Taille maximale (octets UTF-8) du texte du QR code : au-delà, les modules deviennent trop petits pour un casque (version 15, 77 modules). */
+export const ICE_QR_MAX_BYTES = 400;
 
 const byteLength = (text) => new TextEncoder().encode(text).length;
 
@@ -292,33 +292,53 @@ export function decodePayload(rawString = '') {
     return clampProfile(result);
 }
 
+/** Échappement d'une valeur de fiche contact (vCard 3.0) : \\ ; , et retours à la ligne. */
+const vcardEscape = (value) =>
+    String(value).replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/;/g, '\\;').replace(/,/g, '\\,');
+
 /**
- * Texte lisible de la fiche, pour le QR code du casque : un appareil photo l'affiche tel quel (numéros
- * touchables) sans réseau ni application.
+ * Fiche contact (vCard 3.0) pour le QR code du casque. L'appareil photo d'un téléphone la reconnaît et ouvre
+ * l'écran « contact » SANS réseau : le nom, les contacts d'urgence avec leur étiquette (« Sophie (Conjointe) »,
+ * numéros touchables) et un champ Notes qui porte les informations médicales. Un QR de texte brut, lui, ne
+ * propose qu'une recherche web (testé sur iPhone).
  * @param {Partial<IceProfile>} profile
  * @returns {string}
  */
-export function buildIceText(profile = {}) {
+export function buildIceVCard(profile = {}) {
     const p = clampProfile(profile);
-    const lines = ['ICE PARAPENTE'];
-    const who = [p.prenom, p.nom, p.birthYear].filter(Boolean).join(' ');
-    if (who) lines.push(who);
-    if (p.bloodGroup && p.bloodGroup !== 'Inconnu') lines.push(`Sang ${p.bloodGroup}`);
-    if (p.allergies) lines.push(`Allergies: ${p.allergies}`);
-    if (p.remarques) lines.push(`Santé: ${p.remarques}`);
-    if (p.anticoag) lines.push('ANTICOAGULANTS');
-    if (p.tetanos) lines.push(`Tétanos ${p.tetanos}`);
-    const contact = (n, name, phone, rel) => {
+    const fullName = [p.prenom, p.nom].filter(Boolean).join(' ') || 'Pilote';
+    const lines = [
+        'BEGIN:VCARD',
+        'VERSION:3.0',
+        `N:${vcardEscape(p.nom)};${vcardEscape(p.prenom)};;;`,
+        `FN:${vcardEscape(fullName)}`,
+        'ORG:URGENCE ICE PARAPENTE',
+    ];
+    let item = 0;
+    const contact = (name, phone, rel, fallback) => {
         const digits = sanitizePhone(phone);
         if (!digits) return;
-        const label = [name, rel ? `(${rel})` : ''].filter(Boolean).join(' ');
-        lines.push(`${n}: ${label ? `${label} ` : ''}${digits}`);
+        item += 1;
+        const label = [name, rel ? `(${rel})` : ''].filter(Boolean).join(' ') || fallback;
+        lines.push(`item${item}.TEL:${digits}`, `item${item}.X-ABLabel:${vcardEscape(label)}`);
     };
-    contact(1, p.contact1Name, p.contact1Phone, p.contact1Rel);
-    contact(2, p.contact2Name, p.contact2Phone, p.contact2Rel);
-    if (p.ffvl) lines.push(`FFVL ${p.ffvl}`);
-    if (p.insurance) lines.push(`Assurance ${p.insurance}`);
-    lines.push('SOS 112');
+    contact(p.contact1Name, p.contact1Phone, p.contact1Rel, 'Contact 1');
+    contact(p.contact2Name, p.contact2Phone, p.contact2Rel, 'Contact 2');
+    if (item === 0) lines.push('item1.TEL:112', 'item1.X-ABLabel:Secours');
+
+    // Les informations vitales d'abord : c'est ce que lit un secouriste.
+    const note = [];
+    if (p.bloodGroup && p.bloodGroup !== 'Inconnu') note.push(`SANG ${p.bloodGroup}`);
+    if (p.anticoag) note.push('ANTICOAGULANTS');
+    if (p.allergies) note.push(`ALLERGIES: ${p.allergies}`);
+    if (p.remarques) note.push(`SANTÉ: ${p.remarques}`);
+    if (p.tetanos) note.push(`TÉTANOS ${p.tetanos}`);
+    if (p.birthYear) note.push(`Né ${p.birthYear}`);
+    if (p.ffvl) note.push(`FFVL ${p.ffvl}`);
+    if (p.insurance) note.push(`ASSURANCE ${p.insurance}`);
+    if (note.length) lines.push(`NOTE:${note.map(vcardEscape).join('\\n')}`);
+
+    lines.push('END:VCARD');
     return lines.join('\n');
 }
 
@@ -327,7 +347,7 @@ export function buildIceText(profile = {}) {
  * @param {Partial<IceProfile>} profile
  */
 export function qrFits(profile = {}) {
-    return byteLength(buildIceText(profile)) <= ICE_QR_MAX_BYTES;
+    return byteLength(buildIceVCard(profile)) <= ICE_QR_MAX_BYTES;
 }
 
 /**
@@ -410,11 +430,11 @@ export const IceService = {
     qrFits,
 
     /**
-     * Génère le QR Code SVG pour le casque : par défaut le texte de la fiche (lisible hors ligne), ou le lien
+     * Génère le QR Code SVG pour le casque : par défaut la fiche contact (lisible hors ligne), ou le lien
      * du lecteur web avec `mode: 'url'`.
      * @param {Partial<IceProfile>} profile
      * @param {object} [options]
-     * @param {"text"|"url"} [options.mode]
+     * @param {"vcard"|"url"} [options.mode]
      * @param {string} [options.baseUrl] (mode url)
      * @param {number} [options.size]
      * @param {number} [options.border]
@@ -427,7 +447,7 @@ export const IceService = {
         if (options.mode === 'url') {
             data = buildIceUrl(profile, options.baseUrl);
         } else {
-            data = buildIceText(profile);
+            data = buildIceVCard(profile);
             if (byteLength(data) > ICE_QR_MAX_BYTES) throw new Error('ice-qr-too-long');
         }
         return generateQrSvg(data, {
@@ -440,7 +460,7 @@ export const IceService = {
     encodePayload,
     decodePayload,
     buildIceUrl,
-    buildIceText,
+    buildIceVCard,
     clampProfile,
     sanitizePhone,
     formatPhoneDisplay,
