@@ -39,12 +39,13 @@ describe('IceView (js/views/ice_viewer.js)', () => {
         expect(root.textContent).toContain('Maxime Urbaniak');
         expect(root.textContent).toContain('O+');
         expect(root.textContent).toContain('Sophie');
-        expect(root.textContent).toContain('06 12 34 56 78');
+        // Numéro au format international : un secouriste étranger le compose tel quel.
+        expect(root.textContent).toContain('+33 6 12 34 56 78');
         expect(root.textContent).toContain('Pénicilline');
         expect(root.textContent).toContain('1234567');
 
         // Vérifie les liens d'appel direct
-        const callBtn = root.querySelector('a[href="tel:0612345678"]');
+        const callBtn = root.querySelector('a[href="tel:+33612345678"]');
         expect(callBtn).not.toBeNull();
         expect(root.querySelector('a[href="tel:112"]')).not.toBeNull();
     });

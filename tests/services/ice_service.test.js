@@ -141,7 +141,9 @@ describe('IceService (js/services/ice_service.js)', () => {
 
         it('formats 10-digit French phone numbers with spaces', () => {
             expect(formatPhoneDisplay('0612345678')).toBe('06 12 34 56 78');
-            expect(formatPhoneDisplay('+33612345678')).toBe('+33612345678');
+            expect(formatPhoneDisplay('+33612345678')).toBe('+33 6 12 34 56 78');
+            // Autre pays : laissé tel quel.
+            expect(formatPhoneDisplay('+41791234567')).toBe('+41791234567');
         });
     });
 

@@ -6,13 +6,19 @@ import IceService, {
     buildIceVCard,
     clampProfile,
     encodeLocalIce,
+    toInternationalPhone,
 } from '../../js/services/ice_service.js';
 import { generateQrMatrix } from '../../js/utils/qrcode.js';
 import StorageService from '../../js/services/storage.js';
 import { FirebaseAuthEngine } from '../../js/services/firebase_service.js';
 import GdprEngine from '../../js/gdpr_engine.js';
 import { isIceLocation } from '../../js/core/start_mode.js';
-import { printIceSticker, renderIceSticker, renderIceTabHtml } from '../../js/views/safety_ice.js';
+import {
+    printIceSticker,
+    renderIceSticker,
+    renderIceStickerCompact,
+    renderIceTabHtml,
+} from '../../js/views/safety_ice.js';
 import IceView from '../../js/views/ice_viewer.js';
 
 const typical = {
@@ -58,9 +64,9 @@ describe('fiche ICE : longueurs et QR', () => {
         expect(vcard).toContain('N:Dupont;Thomas;;;');
         expect(vcard).toContain('FN:Thomas Dupont');
         expect(vcard).toContain('ORG:URGENCE ICE PARAPENTE');
-        expect(vcard).toContain('item1.TEL:0612345678');
+        expect(vcard).toContain('item1.TEL:+33612345678');
         expect(vcard).toContain('item1.X-ABLabel:Sophie (Conjointe)');
-        expect(vcard).toContain('item2.TEL:0698765432');
+        expect(vcard).toContain('item2.TEL:+33698765432');
         expect(vcard).toContain('item2.X-ABLabel:Pierre (Frère)');
         // Notes : une seule ligne vCard, les retours à la ligne sont écrits « \\n », le sang en premier.
         const note = lines.find((l) => l.startsWith('NOTE:'));
@@ -236,11 +242,14 @@ describe('étiquette casque : informations vitales en toutes lettres', () => {
         expect(text).toContain('Thomas Dupont');
         expect(text).toContain('SANG O+');
         expect(text).toContain('ALLERGIES : Pénicilline');
-        expect(text).toContain('Sophie : 06 12 34 56 78');
-        expect(text).toContain('Pierre : 06 98 76 54 32');
+        expect(text).toContain('Sophie : +33 6 12 34 56 78');
+        expect(text).toContain('Pierre : +33 6 98 76 54 32');
         expect(text).toMatch(/Mis à jour \d{2}\/\d{4}/);
         expect(html).not.toMatch(/[\u{1F300}-\u{1FAFF}\u2795]/u);
         expect(html).toContain('<svg');
+        // En-tête : le numéro d'urgence que compose un témoin, pas une fréquence radio de pilote.
+        expect(text).toContain('SOS 112');
+        expect(html).not.toContain('143.9875');
     });
 
     it('sans contact, renvoie vers le 112 plutôt que de laisser un vide', () => {
@@ -254,20 +263,66 @@ describe('étiquette casque : informations vitales en toutes lettres', () => {
         expect(html).toContain('&lt;img');
     });
 
-    it("imprime deux étiquettes (casque et sellette), puis retire la copie après l'impression", () => {
+    it("imprime une étiquette complète et deux compactes, puis retire la copie après l'impression", () => {
         document.body.innerHTML = '<div id="ice-sticker-wrapper"></div>';
         IceService.saveProfile(typical);
-        document.getElementById('ice-sticker-wrapper').innerHTML = renderIceSticker(typical);
+        document.getElementById('ice-sticker-wrapper').innerHTML =
+            renderIceSticker(typical) + renderIceStickerCompact(typical);
         const printSpy = vi.fn(() => {
-            expect(document.getElementById('ice-helmet-sticker-copy')).not.toBeNull();
+            expect(document.getElementById('ice-helmet-sticker-compact-copy')).not.toBeNull();
         });
         vi.stubGlobal('print', printSpy);
         window.print = printSpy;
         printIceSticker();
         expect(printSpy).toHaveBeenCalledTimes(1);
         window.dispatchEvent(new Event('afterprint'));
-        expect(document.getElementById('ice-helmet-sticker-copy')).toBeNull();
+        expect(document.getElementById('ice-helmet-sticker-compact-copy')).toBeNull();
         expect(document.getElementById('ice-helmet-sticker')).not.toBeNull();
+        expect(document.getElementById('ice-helmet-sticker-compact')).not.toBeNull();
+    });
+});
+
+describe('étiquette compacte : URGENCE et le QR', () => {
+    it("ne porte que l'en-tête URGENCE et le QR, sans texte de fiche", () => {
+        const html = renderIceStickerCompact(typical);
+        const text = html
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+        expect(text).toBe('URGENCE');
+        expect(html).toContain('<svg');
+        expect(html).not.toContain('Dupont');
+        expect(text).not.toMatch(/\d/);
+    });
+
+    it("affiche un message plutôt qu'un QR illisible quand la fiche est trop longue", () => {
+        StorageService.set(ICE_STORAGE_KEY, encodeLocalIce({ ...typical, remarques: 'x'.repeat(5000) }));
+        expect(() => renderIceStickerCompact(IceService.getProfile())).not.toThrow();
+    });
+
+    it("l'aperçu de l'onglet montre les deux formats", () => {
+        const html = renderIceTabHtml();
+        expect(html).toContain('id="ice-helmet-sticker"');
+        expect(html).toContain('id="ice-helmet-sticker-compact"');
+    });
+});
+
+describe('numéros au format international', () => {
+    it('convertit les numéros nationaux français et garde les autres', () => {
+        expect(toInternationalPhone('06 12 34 56 78')).toBe('+33612345678');
+        expect(toInternationalPhone('06.12.34.56.78')).toBe('+33612345678');
+        expect(toInternationalPhone('+33 6 12 34 56 78')).toBe('+33612345678');
+        expect(toInternationalPhone('0033 6 12 34 56 78')).toBe('+33612345678');
+        expect(toInternationalPhone('+41 79 123 45 67')).toBe('+41791234567');
+        expect(toInternationalPhone('112')).toBe('112');
+        expect(toInternationalPhone('')).toBe('');
+        expect(toInternationalPhone('abc')).toBe('');
+        expect(toInternationalPhone('06 12', '33')).toBe('0612');
+    });
+
+    it('accepte un autre indicatif pays par défaut', () => {
+        expect(toInternationalPhone('079 123 45 67', '41')).toBe('+41791234567');
+        expect(toInternationalPhone('0791234567', '41')).toBe('+41791234567');
     });
 });
 

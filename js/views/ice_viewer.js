@@ -7,7 +7,7 @@
  */
 
 import BaseView from '../core/base_view.js';
-import { decodePayload, sanitizePhone, formatPhoneDisplay, IceService } from '../services/ice_service.js';
+import { decodePayload, toInternationalPhone, formatPhoneDisplay, IceService } from '../services/ice_service.js';
 import { escapeHTML } from '../core/security.js';
 import AppRouter from '../core/router.js';
 
@@ -131,8 +131,8 @@ export class IceViewClass extends BaseView {
 
     /** @param {Partial<import('../services/ice_service.js').IceProfile>} p */
     renderContacts(p) {
-        const c1Phone = sanitizePhone(p.contact1Phone);
-        const c2Phone = sanitizePhone(p.contact2Phone);
+        const c1Phone = toInternationalPhone(p.contact1Phone);
+        const c2Phone = toInternationalPhone(p.contact2Phone);
 
         if (!c1Phone && !c2Phone) {
             return `<p class="ice-empty-hint">Aucun contact d'urgence renseigné.</p>`;
@@ -146,7 +146,7 @@ export class IceViewClass extends BaseView {
                 <div class="ice-contact-item">
                     <div class="ice-contact-details">
                         <strong>${label}</strong> ${rel}
-                        <span class="ice-contact-num">${esc(formatPhoneDisplay(p.contact1Phone))}</span>
+                        <span class="ice-contact-num">${esc(formatPhoneDisplay(c1Phone))}</span>
                     </div>
                     <a class="ice-call-action-btn" href="tel:${c1Phone}" aria-label="Appeler ${label}">
                         <i class="ri-phone-fill" aria-hidden="true"></i> Appeler
@@ -162,7 +162,7 @@ export class IceViewClass extends BaseView {
                 <div class="ice-contact-item">
                     <div class="ice-contact-details">
                         <strong>${label}</strong> ${rel}
-                        <span class="ice-contact-num">${esc(formatPhoneDisplay(p.contact2Phone))}</span>
+                        <span class="ice-contact-num">${esc(formatPhoneDisplay(c2Phone))}</span>
                     </div>
                     <a class="ice-call-action-btn" href="tel:${c2Phone}" aria-label="Appeler ${label}">
                         <i class="ri-phone-fill" aria-hidden="true"></i> Appeler

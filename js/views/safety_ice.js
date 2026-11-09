@@ -3,7 +3,12 @@
  * Sous-module de SafetyView pour la gestion de la fiche ICE et de l'étiquette casque.
  */
 
-import IceService, { BLOOD_GROUPS, ICE_LIMITS, formatPhoneDisplay } from '../services/ice_service.js';
+import IceService, {
+    BLOOD_GROUPS,
+    ICE_LIMITS,
+    formatPhoneDisplay,
+    toInternationalPhone,
+} from '../services/ice_service.js';
 import { escapeHTML } from '../core/security.js';
 import AppRouter from '../core/router.js';
 
@@ -29,10 +34,11 @@ export function renderIceSticker(profile) {
     const anticoagTag = p.anticoag ? '<span class="ice-sticker-vital">ANTICOAGULANT</span>' : '';
     const blood = bloodTag || anticoagTag ? `<div class="ice-sticker-tags">${bloodTag}${anticoagTag}</div>` : '';
     const allergy = p.allergies ? `<div class="ice-sticker-allergy">ALLERGIES : ${esc(p.allergies)}</div>` : '';
+    // Numéros au format international (+33 …) : un secouriste étranger ou une carte SIM d'un autre pays les compose tels quels.
     const contact = (name, phone) => {
-        const digits = IceService.sanitizePhone(phone);
-        if (!digits) return '';
-        return `<div class="ice-sticker-contact">${name ? `${esc(name)} : ` : ''}<strong>${esc(formatPhoneDisplay(phone))}</strong></div>`;
+        const intl = toInternationalPhone(phone);
+        if (!intl) return '';
+        return `<div class="ice-sticker-contact">${name ? `${esc(name)} : ` : ''}<strong>${esc(formatPhoneDisplay(intl))}</strong></div>`;
     };
     const contacts =
         contact(p.contact1Name, p.contact1Phone) + contact(p.contact2Name, p.contact2Phone) ||
@@ -44,7 +50,7 @@ export function renderIceSticker(profile) {
         <div class="ice-helmet-sticker" id="ice-helmet-sticker">
             <div class="ice-sticker-header">
                 <span class="ice-sticker-title">URGENCE · ICE</span>
-                <span class="ice-sticker-ffvl">143.9875 MHz</span>
+                <span class="ice-sticker-sos">SOS 112</span>
             </div>
             <div class="ice-sticker-body">
                 <div class="ice-sticker-qr">${qrSvg}</div>
@@ -59,6 +65,30 @@ export function renderIceSticker(profile) {
                 <span>SCANNER : fiche complète</span>
                 <span>Mis à jour ${updated}</span>
             </div>
+        </div>
+    `;
+}
+
+/**
+ * Étiquette compacte : seulement « URGENCE » et le QR code (casque : peu de place, une surface courbe). Toutes
+ * les informations sont dans le QR ; l'étiquette complète les écrit en toutes lettres.
+ * @param {Partial<import('../services/ice_service.js').IceProfile>} [profile]
+ */
+export function renderIceStickerCompact(profile) {
+    const p = profile || IceService.getProfile();
+    let qrSvg;
+    try {
+        qrSvg = IceService.generateQrSvg(p, { size: 140, border: 1 });
+    } catch {
+        qrSvg =
+            '<p class="ice-qr-error" role="alert">Fiche trop longue pour un QR lisible : raccourcissez les allergies ou les remarques.</p>';
+    }
+    return `
+        <div class="ice-helmet-sticker ice-sticker-compact" id="ice-helmet-sticker-compact">
+            <div class="ice-sticker-header ice-sticker-header-compact">
+                <span class="ice-sticker-title">URGENCE</span>
+            </div>
+            <div class="ice-sticker-qr">${qrSvg}</div>
         </div>
     `;
 }
@@ -193,6 +223,7 @@ export function renderIceTabHtml() {
 
                 <div id="ice-sticker-wrapper" class="ice-sticker-wrapper">
                     ${renderIceSticker(p)}
+                    ${renderIceStickerCompact(p)}
                 </div>
 
                 <div class="ice-sticker-actions">
@@ -260,7 +291,7 @@ export function clearIceProfile() {
 export function updateIceStickerPreview(values) {
     const wrapper = document.getElementById('ice-sticker-wrapper');
     if (wrapper) {
-        wrapper.innerHTML = renderIceSticker(values);
+        wrapper.innerHTML = renderIceSticker(values) + renderIceStickerCompact(values);
     }
 }
 
@@ -269,16 +300,16 @@ export function printIceSticker() {
     IceService.saveProfile(values);
     updateIceStickerPreview(values);
 
-    // Deux étiquettes par feuille (casque et sellette) : une copie le temps de l'impression.
-    const sticker = document.getElementById('ice-helmet-sticker');
-    if (sticker) {
-        const copy = /** @type {HTMLElement} */ (sticker.cloneNode(true));
-        copy.id = 'ice-helmet-sticker-copy';
+    // Une feuille : l'étiquette complète (sellette) et deux compactes (les deux côtés du casque). La copie de
+    // l'étiquette compacte n'existe que le temps de l'impression.
+    const compact = document.getElementById('ice-helmet-sticker-compact');
+    if (compact) {
+        const copy = /** @type {HTMLElement} */ (compact.cloneNode(true));
+        copy.id = 'ice-helmet-sticker-compact-copy';
         copy.setAttribute('aria-hidden', 'true');
         copy.classList.add('ice-sticker-copy');
-        sticker.after(copy);
-        const removeCopy = () => copy.remove();
-        window.addEventListener('afterprint', removeCopy, { once: true });
+        compact.after(copy);
+        window.addEventListener('afterprint', () => copy.remove(), { once: true });
     }
     window.print();
 }

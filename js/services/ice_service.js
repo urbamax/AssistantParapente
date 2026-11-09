@@ -179,6 +179,23 @@ export function sanitizePhone(phone) {
 }
 
 /**
+ * Numéro au format international (E.164 : +33612345678), pour les liens d'appel et la fiche contact du QR.
+ * Un numéro national (06 12 34 56 78) est mal interprété par le téléphone d'un secouriste dont la carte SIM est
+ * d'un autre pays : « 00 » devient « + », et un numéro français à 10 chiffres reçoit « +33 ».
+ * @param {string} phone
+ * @param {string} [defaultCountry] indicatif pays des numéros nationaux (France par défaut)
+ * @returns {string} '' si le numéro est vide
+ */
+export function toInternationalPhone(phone, defaultCountry = '33') {
+    const clean = sanitizePhone(phone);
+    if (!clean) return '';
+    if (clean.startsWith('+')) return clean;
+    if (clean.startsWith('00')) return `+${clean.slice(2)}`;
+    if (clean.startsWith('0') && clean.length === 10) return `+${defaultCountry}${clean.slice(1)}`;
+    return clean;
+}
+
+/**
  * Formate un numéro de téléphone pour un affichage plus lisible.
  * @param {string} phone
  * @returns {string}
@@ -186,6 +203,11 @@ export function sanitizePhone(phone) {
 export function formatPhoneDisplay(phone) {
     if (!phone) return '';
     const clean = phone.trim();
+    // Numéro français au format international : +33 6 12 34 56 78
+    const intl = clean.replace(/[\s.-]/g, '');
+    if (/^\+33[1-9]\d{8}$/.test(intl)) {
+        return `+33 ${intl[3]} ${intl.slice(4, 6)} ${intl.slice(6, 8)} ${intl.slice(8, 10)} ${intl.slice(10, 12)}`;
+    }
     // Format français standard à 10 chiffres (06 12 34 56 78)
     if (/^0[1-9]\d{8}$/.test(clean.replace(/\s+/g, ''))) {
         const digits = clean.replace(/\s+/g, '');
@@ -316,7 +338,7 @@ export function buildIceVCard(profile = {}) {
     ];
     let item = 0;
     const contact = (name, phone, rel, fallback) => {
-        const digits = sanitizePhone(phone);
+        const digits = toInternationalPhone(phone);
         if (!digits) return;
         item += 1;
         const label = [name, rel ? `(${rel})` : ''].filter(Boolean).join(' ') || fallback;
@@ -463,6 +485,7 @@ export const IceService = {
     buildIceVCard,
     clampProfile,
     sanitizePhone,
+    toInternationalPhone,
     formatPhoneDisplay,
 };
 
