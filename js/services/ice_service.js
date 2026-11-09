@@ -36,6 +36,7 @@ export const BLOOD_GROUPS = Object.freeze(['Inconnu', 'A+', 'A-', 'B+', 'B-', 'A
  * @property {string} allergies
  * @property {string} anticoag '1' si le pilote prend un traitement anticoagulant, sinon ''
  * @property {string} tetanos année du dernier rappel antitétanique
+ * @property {string} pays code pays ISO 3166-1 alpha-2 (« FR ») : nationalité, affichée en drapeau
  * @property {string} remarques
  * @property {string} [medical]
  * @property {string} ffvl
@@ -57,6 +58,7 @@ export const DEFAULT_ICE_PROFILE = Object.freeze({
     allergies: '',
     anticoag: '',
     tetanos: '',
+    pays: '',
     remarques: '',
     ffvl: '',
     insurance: '',
@@ -78,6 +80,7 @@ export const ICE_LIMITS = Object.freeze({
     bloodGroup: 4,
     allergies: 150,
     tetanos: 4,
+    pays: 2,
     remarques: 250,
     ffvl: 20,
     insurance: 60,
@@ -102,10 +105,96 @@ const FIELD_LIMIT = Object.freeze({
     allergies: ICE_LIMITS.allergies,
     anticoag: 1,
     tetanos: ICE_LIMITS.tetanos,
+    pays: ICE_LIMITS.pays,
     remarques: ICE_LIMITS.remarques,
     ffvl: ICE_LIMITS.ffvl,
     insurance: ICE_LIMITS.insurance,
 });
+
+/**
+ * Pays proposés dans la fiche (code ISO 3166-1 alpha-2, nom en français) : ceux d'où viennent la plupart des
+ * pilotes de vol libre en Europe et en voyage. Un code valide absent de la liste reste accepté (lien partagé).
+ * @type {ReadonlyArray<readonly [string, string]>}
+ */
+export const ICE_COUNTRIES = Object.freeze([
+    ['FR', 'France'],
+    ['CH', 'Suisse'],
+    ['BE', 'Belgique'],
+    ['LU', 'Luxembourg'],
+    ['DE', 'Allemagne'],
+    ['AT', 'Autriche'],
+    ['IT', 'Italie'],
+    ['ES', 'Espagne'],
+    ['PT', 'Portugal'],
+    ['GB', 'Royaume-Uni'],
+    ['IE', 'Irlande'],
+    ['NL', 'Pays-Bas'],
+    ['DK', 'Danemark'],
+    ['NO', 'Norvège'],
+    ['SE', 'Suède'],
+    ['FI', 'Finlande'],
+    ['PL', 'Pologne'],
+    ['CZ', 'Tchéquie'],
+    ['SK', 'Slovaquie'],
+    ['HU', 'Hongrie'],
+    ['SI', 'Slovénie'],
+    ['HR', 'Croatie'],
+    ['RO', 'Roumanie'],
+    ['BG', 'Bulgarie'],
+    ['GR', 'Grèce'],
+    ['TR', 'Turquie'],
+    ['RU', 'Russie'],
+    ['UA', 'Ukraine'],
+    ['MA', 'Maroc'],
+    ['DZ', 'Algérie'],
+    ['TN', 'Tunisie'],
+    ['ZA', 'Afrique du Sud'],
+    ['US', 'États-Unis'],
+    ['CA', 'Canada'],
+    ['MX', 'Mexique'],
+    ['BR', 'Brésil'],
+    ['AR', 'Argentine'],
+    ['CL', 'Chili'],
+    ['CO', 'Colombie'],
+    ['IN', 'Inde'],
+    ['NP', 'Népal'],
+    ['JP', 'Japon'],
+    ['KR', 'Corée du Sud'],
+    ['AU', 'Australie'],
+    ['NZ', 'Nouvelle-Zélande'],
+]);
+
+/**
+ * Code pays valide (deux lettres), en majuscules, sinon ''.
+ * @param {unknown} code
+ * @returns {string}
+ */
+export function normalizeCountry(code) {
+    const c = typeof code === 'string' ? code.trim().toUpperCase() : '';
+    return /^[A-Z]{2}$/.test(c) ? c : '';
+}
+
+/**
+ * Drapeau (emoji) d'un code pays : « FR » donne le drapeau français. '' si le code n'est pas valide.
+ * Sur un système sans police de drapeaux (Windows), le navigateur affiche les deux lettres du code.
+ * @param {unknown} code
+ * @returns {string}
+ */
+export function flagEmoji(code) {
+    const c = normalizeCountry(code);
+    if (!c) return '';
+    return String.fromCodePoint(...[...c].map((ch) => 0x1f1e6 + ch.charCodeAt(0) - 65));
+}
+
+/**
+ * Nom français d'un pays de la liste (le code lui-même sinon, '' s'il est invalide).
+ * @param {unknown} code
+ * @returns {string}
+ */
+export function countryName(code) {
+    const c = normalizeCountry(code);
+    return ICE_COUNTRIES.find(([k]) => k === c)?.[1] || c;
+}
 
 /**
  * Profil nettoyé : textes rognés, tronqués à la longueur maximale de chaque champ, champs inconnus ignorés.
@@ -122,6 +211,7 @@ export function clampProfile(profile = {}) {
     }
     // Case à cocher : toute valeur « vraie » (true, '1', 'on') devient '1', le reste ''.
     out.anticoag = [true, '1', 'on', 'true'].includes(/** @type {any} */ (src).anticoag) ? '1' : '';
+    out.pays = normalizeCountry(src.pays);
     return /** @type {IceProfile} */ (out);
 }
 
@@ -255,6 +345,7 @@ export function encodePayload(profile = {}) {
     if (profile.allergies) params.set('al', profile.allergies.trim());
     if (profile.anticoag) params.set('ac', '1');
     if (profile.tetanos) params.set('te', String(profile.tetanos).trim());
+    if (normalizeCountry(profile.pays)) params.set('pa', normalizeCountry(profile.pays));
     const rem = profile.remarques || profile.medical;
     if (rem) params.set('rem', rem.trim());
     if (profile.ffvl) params.set('ff', profile.ffvl.trim());
@@ -303,6 +394,7 @@ export function decodePayload(rawString = '') {
         if (params.has('al')) result.allergies = params.get('al') || '';
         if (params.get('ac') === '1') result.anticoag = '1';
         if (params.has('te')) result.tetanos = params.get('te') || '';
+        if (params.has('pa')) result.pays = normalizeCountry(params.get('pa'));
         if (params.has('rem')) result.remarques = params.get('rem') || '';
         else if (params.has('med')) result.remarques = params.get('med') || '';
         if (params.has('ff')) result.ffvl = params.get('ff') || '';
@@ -334,7 +426,7 @@ export function buildIceVCard(profile = {}) {
         'VERSION:3.0',
         `N:${vcardEscape(p.nom)};${vcardEscape(p.prenom)};;;`,
         `FN:${vcardEscape(fullName)}`,
-        'ORG:URGENCE ICE PARAPENTE',
+        `ORG:URGENCE ICE PARAPENTE${flagEmoji(p.pays) ? ` ${flagEmoji(p.pays)}` : ''}`,
     ];
     let item = 0;
     const contact = (name, phone, rel, fallback) => {
@@ -355,6 +447,7 @@ export function buildIceVCard(profile = {}) {
     if (p.allergies) note.push(`ALLERGIES: ${p.allergies}`);
     if (p.remarques) note.push(`SANTÉ: ${p.remarques}`);
     if (p.tetanos) note.push(`TÉTANOS ${p.tetanos}`);
+    if (p.pays) note.push(`NATIONALITÉ: ${flagEmoji(p.pays)} ${countryName(p.pays)}`);
     if (p.birthYear) note.push(`Né ${p.birthYear}`);
     if (p.ffvl) note.push(`FFVL ${p.ffvl}`);
     if (p.insurance) note.push(`ASSURANCE ${p.insurance}`);
@@ -487,6 +580,9 @@ export const IceService = {
     sanitizePhone,
     toInternationalPhone,
     formatPhoneDisplay,
+    flagEmoji,
+    countryName,
+    normalizeCountry,
 };
 
 export default IceService;

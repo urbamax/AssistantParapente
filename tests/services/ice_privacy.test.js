@@ -7,6 +7,10 @@ import IceService, {
     clampProfile,
     encodeLocalIce,
     toInternationalPhone,
+    flagEmoji,
+    countryName,
+    normalizeCountry,
+    ICE_COUNTRIES,
 } from '../../js/services/ice_service.js';
 import { generateQrMatrix } from '../../js/utils/qrcode.js';
 import StorageService from '../../js/services/storage.js';
@@ -376,5 +380,92 @@ describe('anticoagulants et rappel antitétanique', () => {
         expect(html).toContain('id="ice-anticoag" checked');
         expect(html).toContain('id="ice-tetanos"');
         expect(html).toContain('value="2022"');
+    });
+});
+
+describe('drapeau de la nationalité', () => {
+    const withCountry = { ...typical, pays: 'FR' };
+
+    it('transforme un code pays en drapeau et en nom', () => {
+        expect(flagEmoji('FR')).toBe('🇫🇷');
+        expect(flagEmoji('ch')).toBe('🇨🇭');
+        expect(flagEmoji('XYZ')).toBe('');
+        expect(flagEmoji('1A')).toBe('');
+        expect(flagEmoji('')).toBe('');
+        expect(countryName('CH')).toBe('Suisse');
+        expect(countryName('nz')).toBe('Nouvelle-Zélande');
+        expect(countryName('ZZ')).toBe('ZZ');
+        expect(countryName('???')).toBe('');
+    });
+
+    it('la liste est cohérente : codes valides, uniques, noms renseignés', () => {
+        const codes = ICE_COUNTRIES.map(([code]) => code);
+        expect(new Set(codes).size).toBe(codes.length);
+        for (const [code, name] of ICE_COUNTRIES) {
+            expect(normalizeCountry(code), code).toBe(code);
+            expect(name.length, code).toBeGreaterThan(2);
+            expect(flagEmoji(code), code).not.toBe('');
+        }
+        expect(codes[0]).toBe('FR');
+    });
+
+    it('ne garde que les codes valides', () => {
+        expect(clampProfile({ pays: 'fr' }).pays).toBe('FR');
+        expect(clampProfile({ pays: ' de ' }).pays).toBe('DE');
+        expect(clampProfile({ pays: 'France' }).pays).toBe('');
+        expect(clampProfile({ pays: '<script>' }).pays).toBe('');
+        expect(clampProfile({}).pays).toBe('');
+    });
+
+    it('survit au lien du lecteur web', () => {
+        expect(IceService.decodePayload(IceService.encodePayload(withCountry)).pays).toBe('FR');
+        expect(IceService.decodePayload('#v=1&n=Dupont&pa=zz').pays).toBe('ZZ');
+        expect(IceService.decodePayload('#v=1&n=Dupont&pa=<img>').pays).toBe('');
+        expect(IceService.decodePayload(IceService.encodePayload(typical)).pays).toBe('');
+    });
+
+    it('apparaît dans la fiche contact : drapeau sous le nom, nationalité dans les notes', () => {
+        const vcard = buildIceVCard({ ...withCountry, pays: 'CH' });
+        expect(vcard).toContain('ORG:URGENCE ICE PARAPENTE 🇨🇭');
+        expect(vcard).toContain('NATIONALITÉ: 🇨🇭 Suisse');
+        expect(buildIceVCard(typical)).not.toContain('NATIONALITÉ');
+        expect(buildIceVCard(typical)).toContain('ORG:URGENCE ICE PARAPENTE\n');
+    });
+
+    it('une fiche usuelle avec nationalité tient toujours dans un QR lisible', () => {
+        const full = { ...withCountry, anticoag: '1', tetanos: '2022' };
+        expect(IceService.qrFits(full)).toBe(true);
+        expect(generateQrMatrix(buildIceVCard(full)).length).toBeLessThanOrEqual(77);
+    });
+
+    it("l'étiquette complète affiche le drapeau à côté du nom, l'étiquette compacte reste sans texte", () => {
+        const html = renderIceSticker(withCountry);
+        expect(html).toContain('<span class="ice-sticker-flag" role="img" aria-label="France">🇫🇷</span> Thomas Dupont');
+        expect(renderIceSticker(typical)).not.toContain('ice-sticker-flag');
+        expect(renderIceStickerCompact(withCountry)).not.toContain('🇫🇷');
+    });
+
+    it('la fiche de secours affiche le drapeau et la nationalité', async () => {
+        document.body.innerHTML = '<div id="ice-root"></div>';
+        window.history.replaceState({}, '', `/?mode=ICE#${IceService.encodePayload({ ...typical, pays: 'IT' })}`);
+        await IceView.mount({});
+        const root = document.getElementById('ice-root');
+        expect(root.querySelector('.ice-flag').textContent).toBe('🇮🇹');
+        expect(root.textContent).toContain('Nationalité : Italie');
+        window.history.replaceState({}, '', '/');
+    });
+
+    it('le formulaire propose la liste, France par défaut pour une nouvelle fiche, le choix enregistré sinon', () => {
+        expect(renderIceTabHtml()).toContain('<option value="FR" selected>🇫🇷 France</option>');
+        IceService.saveProfile({ ...typical, pays: 'DE' });
+        const html = renderIceTabHtml();
+        expect(html).toContain('<option value="DE" selected>🇩🇪 Allemagne</option>');
+        expect(html).not.toContain('<option value="FR" selected>');
+        // Fiche déjà remplie sans nationalité : on ne devine pas.
+        IceService.saveProfile(typical);
+        expect(renderIceTabHtml()).toContain('<option value="" selected>Non précisée</option>');
+        // Code valide hors liste : conservé.
+        IceService.saveProfile({ ...typical, pays: 'ZZ' });
+        expect(renderIceTabHtml()).toContain('<option value="ZZ" selected>');
     });
 });

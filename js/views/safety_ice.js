@@ -5,8 +5,12 @@
 
 import IceService, {
     BLOOD_GROUPS,
+    ICE_COUNTRIES,
     ICE_LIMITS,
+    countryName,
+    flagEmoji,
     formatPhoneDisplay,
+    normalizeCountry,
     toInternationalPhone,
 } from '../services/ice_service.js';
 import { escapeHTML } from '../core/security.js';
@@ -43,6 +47,11 @@ export function renderIceSticker(profile) {
     const contacts =
         contact(p.contact1Name, p.contact1Phone) + contact(p.contact2Name, p.contact2Phone) ||
         '<div class="ice-sticker-contact"><strong>112</strong></div>';
+    // Drapeau de la nationalité à côté du nom : les secours voient d'où vient le pilote.
+    const flagCode = normalizeCountry(p.pays);
+    const flag = flagCode
+        ? `<span class="ice-sticker-flag" role="img" aria-label="${esc(countryName(flagCode))}">${flagEmoji(flagCode)}</span> `
+        : '';
     const now = new Date();
     const updated = `${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
 
@@ -55,7 +64,7 @@ export function renderIceSticker(profile) {
             <div class="ice-sticker-body">
                 <div class="ice-sticker-qr">${qrSvg}</div>
                 <div class="ice-sticker-meta">
-                    <div class="ice-sticker-pilot">${esc(fullName)}</div>
+                    <div class="ice-sticker-pilot">${flag}${esc(fullName)}</div>
                     ${blood}
                     ${allergy}
                     ${contacts}
@@ -95,6 +104,21 @@ export function renderIceStickerCompact(profile) {
 
 export function renderIceTabHtml() {
     const p = IceService.getProfile();
+    // Nouvelle fiche : France par défaut (la plupart des pilotes de l'application) ; sinon le choix enregistré.
+    const currentCountry = normalizeCountry(p.pays) || (p.nom || p.prenom ? '' : 'FR');
+    const countries = ICE_COUNTRIES.some(([code]) => code === currentCountry)
+        ? ICE_COUNTRIES
+        : currentCountry
+          ? [...ICE_COUNTRIES, [currentCountry, currentCountry]]
+          : ICE_COUNTRIES;
+    const countryOptions =
+        `<option value=""${currentCountry ? '' : ' selected'}>Non précisée</option>` +
+        countries
+            .map(
+                ([code, name]) =>
+                    `<option value="${esc(code)}"${code === currentCountry ? ' selected' : ''}>${flagEmoji(code)} ${esc(name)}</option>`,
+            )
+            .join('');
     const bloodOptions = BLOOD_GROUPS.map((bg) => {
         const selected = (p.bloodGroup || 'Inconnu') === bg ? 'selected' : '';
         return `<option value="${esc(bg)}" ${selected}>${esc(bg)}</option>`;
@@ -123,6 +147,11 @@ export function renderIceTabHtml() {
                         </label>
                         <label>Nom
                             <input type="text" id="ice-nom" maxlength="${ICE_LIMITS.name}" value="${esc(p.nom)}" placeholder="Ex: Dupont" />
+                        </label>
+                    </div>
+                    <div class="ice-form-row">
+                        <label>Nationalité (drapeau à côté du nom)
+                            <select id="ice-pays">${countryOptions}</select>
                         </label>
                     </div>
                     <div class="ice-form-row">
@@ -265,6 +294,7 @@ export function getIceFormValues() {
         remarques: val('ice-remarques'),
         anticoag: /** @type {HTMLInputElement | null} */ (document.getElementById('ice-anticoag'))?.checked ? '1' : '',
         tetanos: val('ice-tetanos'),
+        pays: val('ice-pays'),
         ffvl: val('ice-ffvl'),
         insurance: val('ice-insurance'),
     };

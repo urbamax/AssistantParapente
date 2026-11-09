@@ -674,6 +674,17 @@
     margin-bottom: 4px;
 }
 
+.ice-sticker-flag,
+.ice-flag {
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
+
+.ice-pilot-origin {
+    margin: 2px 0 0;
+    font-size: 0.85rem;
+    opacity: 0.75;
+}
+
 .ice-sticker-vital {
     display: inline-block;
     font-size: 0.85rem;

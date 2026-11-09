@@ -7,7 +7,15 @@
  */
 
 import BaseView from '../core/base_view.js';
-import { decodePayload, toInternationalPhone, formatPhoneDisplay, IceService } from '../services/ice_service.js';
+import {
+    decodePayload,
+    toInternationalPhone,
+    formatPhoneDisplay,
+    flagEmoji,
+    countryName,
+    normalizeCountry,
+    IceService,
+} from '../services/ice_service.js';
 import { escapeHTML } from '../core/security.js';
 import AppRouter from '../core/router.js';
 
@@ -59,6 +67,12 @@ export class IceViewClass extends BaseView {
             }
         }
 
+        const country = normalizeCountry(p.pays);
+        const flag = country
+            ? `<span class="ice-flag" role="img" aria-label="${esc(countryName(country))}">${flagEmoji(country)}</span> `
+            : '';
+        const origin = country ? `<p class="ice-pilot-origin">Nationalité : ${esc(countryName(country))}</p>` : '';
+
         const bloodBadge =
             p.bloodGroup && p.bloodGroup !== 'Inconnu'
                 ? `<div class="ice-blood-badge" aria-label="Groupe sanguin : ${esc(p.bloodGroup)}">
@@ -83,7 +97,8 @@ export class IceViewClass extends BaseView {
                     <div class="ice-identity-layout">
                         <div class="ice-identity-info">
                             <span class="ice-badge-pilot">Pilote</span>
-                            <h2 class="ice-pilot-name">${esc(fullName)}</h2>
+                            <h2 class="ice-pilot-name">${flag}${esc(fullName)}</h2>
+                            ${origin}
                             ${ageText ? `<p class="ice-pilot-age">${ageText}</p>` : ''}
                         </div>
                         ${bloodBadge}
