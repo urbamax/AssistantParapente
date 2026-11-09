@@ -25,7 +25,10 @@ export const BLOOD_GROUPS = Object.freeze(['Inconnu', 'A+', 'A-', 'B+', 'B-', 'A
  * @typedef {Object} IceProfile
  * @property {string} nom
  * @property {string} prenom
- * @property {string} birthYear
+ * @property {string} birthYear année de naissance (déduite de birthDate quand elle est connue)
+ * @property {string} birthDate date de naissance complète, AAAA-MM-JJ
+ * @property {string} tel numéro de téléphone du pilote lui-même
+ * @property {string} langues langues parlées (texte libre)
  * @property {string} contact1Name
  * @property {string} contact1Phone
  * @property {string} contact1Rel
@@ -48,6 +51,9 @@ export const DEFAULT_ICE_PROFILE = Object.freeze({
     nom: '',
     prenom: '',
     birthYear: '',
+    birthDate: '',
+    tel: '',
+    langues: '',
     contact1Name: '',
     contact1Phone: '',
     contact1Rel: '',
@@ -77,6 +83,8 @@ export const ICE_LIMITS = Object.freeze({
     relation: 30,
     phone: 20,
     birthYear: 4,
+    birthDate: 10,
+    langues: 40,
     bloodGroup: 4,
     allergies: 150,
     tetanos: 4,
@@ -86,8 +94,8 @@ export const ICE_LIMITS = Object.freeze({
     insurance: 60,
 });
 
-/** Taille maximale (octets UTF-8) du texte du QR code : au-delà, les modules deviennent trop petits pour un casque (version 15, 77 modules). */
-export const ICE_QR_MAX_BYTES = 400;
+/** Taille maximale (octets UTF-8) du texte du QR code : au-delà, les modules deviennent trop petits pour un casque (version 16, 81 modules). */
+export const ICE_QR_MAX_BYTES = 450;
 
 const byteLength = (text) => new TextEncoder().encode(text).length;
 
@@ -95,6 +103,9 @@ const FIELD_LIMIT = Object.freeze({
     nom: ICE_LIMITS.name,
     prenom: ICE_LIMITS.name,
     birthYear: ICE_LIMITS.birthYear,
+    birthDate: ICE_LIMITS.birthDate,
+    tel: ICE_LIMITS.phone,
+    langues: ICE_LIMITS.langues,
     contact1Name: ICE_LIMITS.name,
     contact1Phone: ICE_LIMITS.phone,
     contact1Rel: ICE_LIMITS.relation,
@@ -197,6 +208,52 @@ export function countryName(code) {
 }
 
 /**
+ * Date de naissance valide (AAAA-MM-JJ, jour réel, entre 1900 et aujourd'hui), sinon ''.
+ * @param {unknown} value
+ * @param {Date} [now]
+ * @returns {string}
+ */
+export function normalizeBirthDate(value, now = new Date()) {
+    const v = typeof value === 'string' ? value.trim() : '';
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
+    if (!m) return '';
+    const [year, month, day] = [Number(m[1]), Number(m[2]), Number(m[3])];
+    const d = new Date(Date.UTC(year, month - 1, day));
+    const real = d.getUTCFullYear() === year && d.getUTCMonth() === month - 1 && d.getUTCDate() === day;
+    return real && year >= 1900 && d.getTime() <= now.getTime() ? v : '';
+}
+
+/**
+ * Date de naissance au format français (12/03/1988).
+ * @param {string} birthDate AAAA-MM-JJ
+ */
+export function formatBirthDate(birthDate) {
+    const v = normalizeBirthDate(birthDate);
+    return v ? `${v.slice(8, 10)}/${v.slice(5, 7)}/${v.slice(0, 4)}` : '';
+}
+
+/**
+ * Âge en années révolues d'après la date de naissance complète, sinon d'après l'année seule. null si inconnu.
+ * @param {Partial<IceProfile>} profile
+ * @param {Date} [now]
+ * @returns {number | null}
+ */
+export function ageOf(profile, now = new Date()) {
+    const full = normalizeBirthDate(profile.birthDate, now);
+    if (full) {
+        const [y, m, d] = full.split('-').map(Number);
+        let age = now.getFullYear() - y;
+        if (now.getMonth() + 1 < m || (now.getMonth() + 1 === m && now.getDate() < d)) age -= 1;
+        return age;
+    }
+    if (/^\d{4}$/.test(profile.birthYear || '')) {
+        const age = now.getFullYear() - Number(profile.birthYear);
+        return age > 0 && age < 120 ? age : null;
+    }
+    return null;
+}
+
+/**
  * Profil nettoyé : textes rognés, tronqués à la longueur maximale de chaque champ, champs inconnus ignorés.
  * @param {Partial<IceProfile> & { medical?: string }} [profile]
  * @returns {IceProfile}
@@ -212,6 +269,9 @@ export function clampProfile(profile = {}) {
     // Case à cocher : toute valeur « vraie » (true, '1', 'on') devient '1', le reste ''.
     out.anticoag = [true, '1', 'on', 'true'].includes(/** @type {any} */ (src).anticoag) ? '1' : '';
     out.pays = normalizeCountry(src.pays);
+    // Date de naissance complète : l'année s'en déduit ; sans date complète, l'année seule (anciennes fiches).
+    out.birthDate = normalizeBirthDate(src.birthDate);
+    if (out.birthDate) out.birthYear = out.birthDate.slice(0, 4);
     return /** @type {IceProfile} */ (out);
 }
 
@@ -319,6 +379,9 @@ export function encodePayload(profile = {}) {
     if (profile.nom) params.set('n', profile.nom.trim());
     if (profile.prenom) params.set('p', profile.prenom.trim());
     if (profile.birthYear) params.set('y', String(profile.birthYear).trim());
+    if (normalizeBirthDate(profile.birthDate)) params.set('bd', normalizeBirthDate(profile.birthDate));
+    if (profile.tel) params.set('tp', String(profile.tel).trim());
+    if (profile.langues) params.set('lg', String(profile.langues).trim());
 
     if (profile.contact1Phone) {
         const c1 = [
@@ -375,6 +438,9 @@ export function decodePayload(rawString = '') {
         if (params.has('n')) result.nom = params.get('n') || '';
         if (params.has('p')) result.prenom = params.get('p') || '';
         if (params.has('y')) result.birthYear = params.get('y') || '';
+        if (params.has('bd')) result.birthDate = normalizeBirthDate(params.get('bd'));
+        if (params.has('tp')) result.tel = params.get('tp') || '';
+        if (params.has('lg')) result.langues = params.get('lg') || '';
 
         if (params.has('c1')) {
             const [name, phone, rel] = (params.get('c1') || '').split('|');
@@ -438,7 +504,13 @@ export function buildIceVCard(profile = {}) {
     };
     contact(p.contact1Name, p.contact1Phone, p.contact1Rel, 'Contact 1');
     contact(p.contact2Name, p.contact2Phone, p.contact2Rel, 'Contact 2');
-    if (item === 0) lines.push('item1.TEL:112', 'item1.X-ABLabel:Secours');
+    if (item === 0) {
+        lines.push('item1.TEL:112', 'item1.X-ABLabel:Secours');
+        item = 1;
+    }
+    // Le numéro du pilote lui-même, en dernier : les secours appellent d'abord les contacts d'urgence.
+    const pilotPhone = toInternationalPhone(p.tel);
+    if (pilotPhone) lines.push(`item${item + 1}.TEL:${pilotPhone}`, `item${item + 1}.X-ABLabel:Pilote`);
 
     // Les informations vitales d'abord : c'est ce que lit un secouriste.
     const note = [];
@@ -447,8 +519,9 @@ export function buildIceVCard(profile = {}) {
     if (p.allergies) note.push(`ALLERGIES: ${p.allergies}`);
     if (p.remarques) note.push(`SANTÉ: ${p.remarques}`);
     if (p.tetanos) note.push(`TÉTANOS ${p.tetanos}`);
-    if (p.pays) note.push(`NATIONALITÉ: ${flagEmoji(p.pays)} ${countryName(p.pays)}`);
-    if (p.birthYear) note.push(`Né ${p.birthYear}`);
+    if (p.langues) note.push(`LANGUES: ${p.langues}`);
+    if (p.birthDate) note.push(`Né ${formatBirthDate(p.birthDate)}`);
+    else if (p.birthYear) note.push(`Né ${p.birthYear}`);
     if (p.ffvl) note.push(`FFVL ${p.ffvl}`);
     if (p.insurance) note.push(`ASSURANCE ${p.insurance}`);
     if (note.length) lines.push(`NOTE:${note.map(vcardEscape).join('\\n')}`);
@@ -583,6 +656,9 @@ export const IceService = {
     flagEmoji,
     countryName,
     normalizeCountry,
+    normalizeBirthDate,
+    formatBirthDate,
+    ageOf,
 };
 
 export default IceService;

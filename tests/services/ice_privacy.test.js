@@ -7,6 +7,9 @@ import IceService, {
     clampProfile,
     encodeLocalIce,
     toInternationalPhone,
+    normalizeBirthDate,
+    formatBirthDate,
+    ageOf,
     flagEmoji,
     countryName,
     normalizeCountry,
@@ -424,18 +427,17 @@ describe('drapeau de la nationalité', () => {
         expect(IceService.decodePayload(IceService.encodePayload(typical)).pays).toBe('');
     });
 
-    it('apparaît dans la fiche contact : drapeau sous le nom, nationalité dans les notes', () => {
+    it('apparaît dans la fiche contact : le drapeau sous le nom (pas de ligne en plus, le QR est plein)', () => {
         const vcard = buildIceVCard({ ...withCountry, pays: 'CH' });
         expect(vcard).toContain('ORG:URGENCE ICE PARAPENTE 🇨🇭');
-        expect(vcard).toContain('NATIONALITÉ: 🇨🇭 Suisse');
-        expect(buildIceVCard(typical)).not.toContain('NATIONALITÉ');
+        expect(vcard).not.toContain('NATIONALITÉ');
         expect(buildIceVCard(typical)).toContain('ORG:URGENCE ICE PARAPENTE\n');
     });
 
     it('une fiche usuelle avec nationalité tient toujours dans un QR lisible', () => {
         const full = { ...withCountry, anticoag: '1', tetanos: '2022' };
         expect(IceService.qrFits(full)).toBe(true);
-        expect(generateQrMatrix(buildIceVCard(full)).length).toBeLessThanOrEqual(77);
+        expect(generateQrMatrix(buildIceVCard(full)).length).toBeLessThanOrEqual(81);
     });
 
     it("l'étiquette complète affiche le drapeau à côté du nom, l'étiquette compacte reste sans texte", () => {
@@ -467,5 +469,102 @@ describe('drapeau de la nationalité', () => {
         // Code valide hors liste : conservé.
         IceService.saveProfile({ ...typical, pays: 'ZZ' });
         expect(renderIceTabHtml()).toContain('<option value="ZZ" selected>');
+    });
+});
+
+describe('date de naissance complète, numéro du pilote, langues', () => {
+    const complete = {
+        ...typical,
+        pays: 'FR',
+        birthYear: '',
+        birthDate: '1988-03-12',
+        tel: '06 00 11 22 33',
+        langues: 'Français, Anglais',
+        anticoag: '1',
+        tetanos: '2022',
+    };
+
+    it('valide la date de naissance : jour réel, entre 1900 et aujourd’hui', () => {
+        const now = new Date(2026, 10, 9);
+        expect(normalizeBirthDate('1988-03-12', now)).toBe('1988-03-12');
+        expect(normalizeBirthDate('1988-02-30', now)).toBe('');
+        expect(normalizeBirthDate('1988-13-01', now)).toBe('');
+        expect(normalizeBirthDate('1899-12-31', now)).toBe('');
+        expect(normalizeBirthDate('2027-01-01', now)).toBe('');
+        expect(normalizeBirthDate('12/03/1988', now)).toBe('');
+        expect(normalizeBirthDate('<script>', now)).toBe('');
+        expect(normalizeBirthDate('2000-02-29', now)).toBe('2000-02-29');
+        expect(normalizeBirthDate('1900-02-29', now)).toBe('');
+        expect(formatBirthDate('1988-03-12')).toBe('12/03/1988');
+        expect(formatBirthDate('n’importe quoi')).toBe('');
+    });
+
+    it("calcule l'âge en années révolues (anniversaire pas encore passé inclus)", () => {
+        expect(ageOf({ birthDate: '1988-03-12' }, new Date(2026, 2, 11))).toBe(37);
+        expect(ageOf({ birthDate: '1988-03-12' }, new Date(2026, 2, 12))).toBe(38);
+        expect(ageOf({ birthDate: '1988-03-12' }, new Date(2026, 10, 9))).toBe(38);
+        // Sans date complète : l'année seule (ancienne fiche).
+        expect(ageOf({ birthYear: '1988' }, new Date(2026, 10, 9))).toBe(38);
+        expect(ageOf({}, new Date(2026, 10, 9))).toBeNull();
+        expect(ageOf({ birthYear: '1800' }, new Date(2026, 10, 9))).toBeNull();
+    });
+
+    it("déduit l'année de la date complète et garde l'année seule des anciennes fiches", () => {
+        expect(clampProfile({ birthDate: '1988-03-12' }).birthYear).toBe('1988');
+        expect(clampProfile({ birthYear: '1990' }).birthYear).toBe('1990');
+        expect(clampProfile({ birthDate: 'faux', birthYear: '1990' }).birthDate).toBe('');
+    });
+
+    it('survit au lien du lecteur web', () => {
+        const decoded = IceService.decodePayload(IceService.encodePayload(complete));
+        expect(decoded.birthDate).toBe('1988-03-12');
+        expect(decoded.tel).toBe('06 00 11 22 33');
+        expect(decoded.langues).toBe('Français, Anglais');
+        expect(IceService.decodePayload('#v=1&bd=pas-une-date').birthDate).toBe('');
+    });
+
+    it('est écrit dans la fiche contact : numéro du pilote en dernier, langues et date dans les notes', () => {
+        const vcard = buildIceVCard(complete);
+        expect(vcard).toContain('item3.TEL:+33600112233');
+        expect(vcard).toContain('item3.X-ABLabel:Pilote');
+        expect(vcard.indexOf('item1.TEL')).toBeLessThan(vcard.indexOf('item3.TEL'));
+        expect(vcard).toContain('LANGUES: Français\\, Anglais');
+        expect(vcard).toContain('Né 12/03/1988');
+        // Ancienne fiche : l'année seule.
+        expect(buildIceVCard({ ...typical, birthYear: '1988' })).toContain('Né 1988');
+    });
+
+    it('le numéro du pilote ne remplace pas le 112 quand il n’y a aucun contact', () => {
+        const vcard = buildIceVCard({ prenom: 'Thomas', tel: '0600112233' });
+        expect(vcard).toContain('item1.TEL:112');
+        expect(vcard).toContain('item2.TEL:+33600112233');
+    });
+
+    it('une fiche avec TOUS les champs remplis tient dans le QR (81 modules au plus)', () => {
+        expect(IceService.qrFits(complete)).toBe(true);
+        expect(generateQrMatrix(buildIceVCard(complete)).length).toBeLessThanOrEqual(81);
+    });
+
+    it('la fiche de secours affiche l’âge exact, le numéro du pilote et les langues', async () => {
+        document.body.innerHTML = '<div id="ice-root"></div>';
+        window.history.replaceState({}, '', `/?mode=ICE#${IceService.encodePayload(complete)}`);
+        await IceView.mount({});
+        const root = document.getElementById('ice-root');
+        expect(root.textContent).toMatch(/\d+ ans · né le 12\/03\/1988/);
+        expect(root.textContent).toContain('Téléphone du pilote');
+        expect(root.querySelector('a[href="tel:+33600112233"]')).not.toBeNull();
+        expect(root.textContent).toContain('Langues : Français, Anglais');
+        window.history.replaceState({}, '', '/');
+    });
+
+    it('le formulaire propose la date, le numéro et les langues, préremplis', () => {
+        IceService.saveProfile(complete);
+        const html = renderIceTabHtml();
+        expect(html).toContain('id="ice-birthDate" value="1988-03-12"');
+        expect(html).toContain('id="ice-tel"');
+        expect(html).toContain('value="06 00 11 22 33"');
+        expect(html).toContain('id="ice-langues"');
+        expect(html).toContain('value="Français, Anglais"');
+        expect(html).not.toContain('id="ice-birthYear"');
     });
 });

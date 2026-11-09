@@ -600,11 +600,11 @@
     margin: 16px 0;
 }
 
-/* Étiquette : 90 x 55 mm environ une fois imprimée. L'écran la montre à la même proportion. Les informations
+/* Étiquette : 96 x 58 mm environ une fois imprimée. L'écran la montre à la même proportion. Les informations
    vitales (sang, allergies, contacts) sont écrites en toutes lettres : elles doivent rester lisibles si le QR
    est abîmé ou si le secouriste n'a pas de téléphone. Pas d'emoji : il disparaît sur une imprimante sans police. */
 .ice-helmet-sticker {
-    width: 360px;
+    width: 380px;
     background: #ffffff !important;
     color: #111827 !important;
     border: 2px dashed #94a3b8;
@@ -642,9 +642,9 @@
 }
 
 .ice-sticker-qr {
-    flex: 0 0 150px;
-    width: 150px;
-    height: 150px;
+    flex: 0 0 160px;
+    width: 160px;
+    height: 160px;
 
     svg {
         display: block;
@@ -735,7 +735,7 @@
 
 /* Étiquette compacte : « URGENCE » et le QR, 50 x 55 mm imprimée. */
 .ice-sticker-compact {
-    width: 190px;
+    width: 200px;
 }
 
 .ice-sticker-header-compact {
@@ -746,8 +746,8 @@
 
 .ice-sticker-compact .ice-sticker-qr {
     flex: none;
-    width: 170px;
-    height: 170px;
+    width: 180px;
+    height: 180px;
     margin: 0 auto;
 }
 
@@ -1058,25 +1058,25 @@
         print-color-adjust: exact !important;
     }
 
-    /* Une feuille : l'étiquette complète (sellette), 90 mm de large, QR de 40 mm soit environ 0,53 mm par module
-       pour une fiche usuelle (73 modules), assez gros pour être lu à travers un adhésif sur une surface courbe ;
-       et deux étiquettes compactes de 50 mm (les deux côtés du casque), QR de 40 mm. */
+    /* Une feuille : l'étiquette complète (sellette), 96 mm de large, QR de 46 mm soit environ 0,55 mm par module
+       pour une fiche complète (83 modules), assez gros pour être lu à travers un adhésif sur une surface courbe ;
+       et deux étiquettes compactes de 56 mm (les deux côtés du casque), QR de 46 mm. */
     #ice-helmet-sticker {
         left: 15mm !important;
         top: 15mm !important;
-        width: 90mm !important;
+        width: 96mm !important;
     }
 
     #ice-helmet-sticker .ice-sticker-qr {
-        flex-basis: 40mm !important;
-        width: 40mm !important;
-        height: 40mm !important;
+        flex-basis: 46mm !important;
+        width: 46mm !important;
+        height: 46mm !important;
     }
 
     #ice-helmet-sticker-compact,
     #ice-helmet-sticker-compact-copy {
-        left: 115mm !important;
-        width: 50mm !important;
+        left: 122mm !important;
+        width: 56mm !important;
     }
 
     #ice-helmet-sticker-compact {
@@ -1085,12 +1085,12 @@
 
     #ice-helmet-sticker-compact-copy {
         display: block !important;
-        top: 80mm !important;
+        top: 85mm !important;
     }
 
     #ice-helmet-sticker-compact .ice-sticker-qr,
     #ice-helmet-sticker-compact-copy .ice-sticker-qr {
-        width: 40mm !important;
-        height: 40mm !important;
+        width: 46mm !important;
+        height: 46mm !important;
     }
 }

@@ -10,6 +10,7 @@ import IceService, {
     countryName,
     flagEmoji,
     formatPhoneDisplay,
+    normalizeBirthDate,
     normalizeCountry,
     toInternationalPhone,
 } from '../services/ice_service.js';
@@ -154,9 +155,17 @@ export function renderIceTabHtml() {
                             <select id="ice-pays">${countryOptions}</select>
                         </label>
                     </div>
+                    <div class="ice-form-row ice-form-row-2">
+                        <label>Date de naissance
+                            <input type="date" id="ice-birthDate" value="${esc(normalizeBirthDate(p.birthDate))}" min="1900-01-01" max="${new Date().toISOString().slice(0, 10)}" />
+                        </label>
+                        <label>Mon numéro de téléphone
+                            <input type="tel" id="ice-tel" maxlength="${ICE_LIMITS.phone}" value="${esc(p.tel)}" placeholder="Ex: 06 00 11 22 33" />
+                        </label>
+                    </div>
                     <div class="ice-form-row">
-                        <label>Année de naissance
-                            <input type="number" id="ice-birthYear" value="${esc(p.birthYear)}" placeholder="Ex: 1988" min="1920" max="${new Date().getFullYear()}" />
+                        <label>Langues parlées
+                            <input type="text" id="ice-langues" maxlength="${ICE_LIMITS.langues}" value="${esc(p.langues)}" placeholder="Ex: Français, Anglais" />
                         </label>
                     </div>
                 </fieldset>
@@ -282,7 +291,9 @@ export function getIceFormValues() {
     return {
         prenom: val('ice-prenom'),
         nom: val('ice-nom'),
-        birthYear: val('ice-birthYear'),
+        birthDate: val('ice-birthDate'),
+        tel: val('ice-tel'),
+        langues: val('ice-langues'),
         contact1Name: val('ice-c1-name'),
         contact1Rel: val('ice-c1-rel'),
         contact1Phone: val('ice-c1-phone'),

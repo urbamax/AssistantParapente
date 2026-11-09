@@ -11,8 +11,11 @@ import {
     decodePayload,
     toInternationalPhone,
     formatPhoneDisplay,
+    ageOf,
     flagEmoji,
     countryName,
+    formatBirthDate,
+    normalizeBirthDate,
     normalizeCountry,
     IceService,
 } from '../services/ice_service.js';
@@ -57,20 +60,27 @@ export class IceViewClass extends BaseView {
         const p = this.profile || {};
         const fullName = `${p.prenom || ''} ${p.nom || ''}`.trim() || 'Pilote non renseigné';
 
-        // Calcul indicatif de l'âge
+        // Âge en années révolues, avec la date de naissance complète quand elle est connue.
         let ageText = '';
-        if (p.birthYear && /^\d{4}$/.test(p.birthYear)) {
-            const currentYear = new Date().getFullYear();
-            const age = currentYear - parseInt(p.birthYear, 10);
-            if (age > 0 && age < 120) {
-                ageText = `(${age} ans · né en ${esc(p.birthYear)})`;
-            }
+        const age = ageOf(p);
+        if (age !== null && age > 0 && age < 120) {
+            const born = normalizeBirthDate(p.birthDate)
+                ? `né le ${esc(formatBirthDate(p.birthDate))}`
+                : `né en ${esc(p.birthYear)}`;
+            ageText = `(${age} ans · ${born})`;
         }
 
         const country = normalizeCountry(p.pays);
         const flag = country
             ? `<span class="ice-flag" role="img" aria-label="${esc(countryName(country))}">${flagEmoji(country)}</span> `
             : '';
+        const pilotPhone = toInternationalPhone(p.tel);
+        const pilotLines = [
+            pilotPhone
+                ? `<p class="ice-pilot-origin">Téléphone du pilote : <a href="tel:${esc(pilotPhone)}">${esc(formatPhoneDisplay(pilotPhone))}</a></p>`
+                : '',
+            p.langues ? `<p class="ice-pilot-origin">Langues : ${esc(p.langues)}</p>` : '',
+        ].join('');
         const origin = country ? `<p class="ice-pilot-origin">Nationalité : ${esc(countryName(country))}</p>` : '';
 
         const bloodBadge =
@@ -99,6 +109,7 @@ export class IceViewClass extends BaseView {
                             <span class="ice-badge-pilot">Pilote</span>
                             <h2 class="ice-pilot-name">${flag}${esc(fullName)}</h2>
                             ${origin}
+                            ${pilotLines}
                             ${ageText ? `<p class="ice-pilot-age">${ageText}</p>` : ''}
                         </div>
                         ${bloodBadge}
