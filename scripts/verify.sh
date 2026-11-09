@@ -34,10 +34,27 @@ if [[ ! -f "$IMAGE" ]]; then
     step "Création du volume sensible à la casse (une seule fois)"
     hdiutil create -size 6g -type SPARSE -fs "Case-sensitive APFS" -volname ap-verify "${IMAGE%.sparseimage}" >/dev/null
 fi
-mount | grep -q " on $MNT " || hdiutil attach "$IMAGE" -mountpoint "$MNT" -nobrowse -quiet
-trap 'cd /; hdiutil detach "$MNT" -quiet -force >/dev/null 2>&1 || true' EXIT
+mount | grep -q " on $MNT " || hdiutil attach "$IMAGE" -mountpoint "$MNT" -nobrowse -quiet \
+    || mount | grep -q " on $MNT " || die "Impossible de monter le volume de vérification."
 
-WORK="$MNT/work"
+# Plusieurs vérifications peuvent tourner en même temps (plusieurs sessions, plusieurs dossiers de travail) :
+# chacune a son propre dossier `work-<pid>` dans le volume, et le volume n'est démonté que quand plus aucune
+# autre vérification vivante ne l'utilise (sinon l'une écrase le clone de l'autre ou démonte le volume sous ses
+# pieds : « Bus error », « destination path already exists », « Cannot find package chai »).
+WORK="$MNT/work-$$"
+cleanup() {
+    rm -rf "$WORK" >/dev/null 2>&1 || true
+    cd /
+    local other
+    for other in "$MNT"/work-*; do
+        [[ -e "$other" ]] || continue
+        if kill -0 "${other##*work-}" 2>/dev/null; then return 0; fi
+        rm -rf "$other" >/dev/null 2>&1 || true   # reste d'une vérification interrompue
+    done
+    hdiutil detach "$MNT" -quiet -force >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+
 rm -rf "$WORK"
 step "Clone propre de $(git rev-parse --short HEAD) + fusion avec origin/main"
 git clone -q "$ROOT" "$WORK"

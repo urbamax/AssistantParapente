@@ -1063,8 +1063,9 @@ class QuizService {
             const target = this.state.qcmConfig.masteryTarget || 75;
             questions = this.buildMasterySelection(sourceData, stats, target);
         } else if (this.state.qcmConfig.mode === 'EXAM') {
+            // Le volume de l'examen est imposé (30 ou 60) : on ne l'écrit pas dans qcmConfig.count, qui reste
+            // le choix du pilote pour l'entraînement (sinon la séance suivante reprendrait 30 ou 60 questions).
             questions = this.buildExamSelection(level, sourceData);
-            this.state.qcmConfig.count = questions.length;
         } else {
             if (selectedTheme !== 'ALL') sourceData = sourceData.filter((q) => q.theme === selectedTheme);
             questions = this.shuffle(sourceData).slice(0, count);
