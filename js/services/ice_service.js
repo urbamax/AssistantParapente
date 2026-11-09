@@ -15,6 +15,7 @@
  */
 
 import StorageService from './storage.js';
+import { setIceCloudState } from './ice_cloud_state.js';
 import { generateQrSvg } from '../utils/qrcode.js';
 
 export const ICE_STORAGE_KEY = 'parapente_ice_profile';
@@ -621,11 +622,15 @@ export const IceService = {
     /**
      * Sauvegarde le profil ICE sur cet appareil (jamais dans les préférences synchronisées).
      * @param {Partial<IceProfile>} profile
+     * @param {{ updatedAt?: number }} [options] date de cette version (maintenant par défaut)
      * @returns {boolean}
      */
-    saveProfile(profile) {
+    saveProfile(profile, { updatedAt = Date.now() } = {}) {
         const ok = StorageService.set(ICE_STORAGE_KEY, encodeLocalIce(clampProfile(profile)));
         removeLegacyPrefsCopy();
+        // Date de cette version de la fiche : elle départage les appareils quand la sauvegarde en ligne est active
+        // (une fiche reprise du cloud garde la date du cloud).
+        if (ok) setIceCloudState({ updatedAt });
         return ok;
     },
 

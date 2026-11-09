@@ -246,6 +246,8 @@ async function bootApplication() {
         'clearIceProfile',
         'printIceSticker',
         'testIceView',
+        'enableIceCloud',
+        'disableIceCloud',
     ].forEach((action) => {
         AppEvents.register('Safety' + action, (args, e, t) => SafetyView[action](args, e, t));
     });

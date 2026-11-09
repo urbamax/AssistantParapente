@@ -190,6 +190,108 @@ describe('traces de vol (igcTraces) : les autres', () => {
     });
 });
 
+// Fiche d'urgence ICE (données de santé) : propriétaire seulement, forme et longueurs contrôlées.
+const ice = (overrides = {}) => ({
+    nom: 'Dupont',
+    prenom: 'Thomas',
+    birthDate: '1988-03-12',
+    contact1Name: 'Sophie',
+    contact1Phone: '0612345678',
+    bloodGroup: 'O+',
+    allergies: 'Pénicilline',
+    anticoag: '1',
+    pays: 'FR',
+    ffvl: '1234567',
+    federation: 'FFVL',
+    updatedAt: 1700000000000,
+    consentAt: '2026-11-09T21:00:00.000Z',
+    ...overrides,
+});
+const iceRef = (db, uid, id = 'profile') => doc(db, 'users', uid, 'ice', id);
+
+describe('fiche ICE (ice/profile) : le propriétaire', () => {
+    it('écrit, relit, met à jour et supprime sa fiche', async () => {
+        const ref = iceRef(asMe(), ME);
+        await assertSucceeds(setDoc(ref, ice()));
+        await assertSucceeds(getDoc(ref));
+        await assertSucceeds(setDoc(ref, ice({ allergies: 'Aspirine', updatedAt: 1700000000001 })));
+        await assertSucceeds(deleteDoc(ref));
+    });
+
+    it('enregistre une fiche réduite à l’essentiel (champs facultatifs absents)', async () => {
+        await assertSucceeds(setDoc(iceRef(asMe(), ME), { updatedAt: 1, consentAt: '2026-11-09T21:00:00.000Z' }));
+    });
+
+    it('enregistre une fiche aux longueurs maximales de l’application', async () => {
+        await assertSucceeds(
+            setDoc(
+                iceRef(asMe(), ME),
+                ice({ allergies: 'a'.repeat(150), remarques: 'r'.repeat(250), insurance: 'i'.repeat(60) }),
+            ),
+        );
+    });
+});
+
+describe('fiche ICE (ice/profile) : ce qui est refusé même au propriétaire', () => {
+    it.each([
+        ['un champ inconnu', ice({ numeroSecu: '1880375123456' })],
+        ['sans consentAt (accord non daté)', (({ consentAt: _c, ...rest }) => rest)(ice())],
+        ['sans updatedAt', (({ updatedAt: _u, ...rest }) => rest)(ice())],
+        ['un consentAt vide', ice({ consentAt: '' })],
+        ['un consentAt trop long', ice({ consentAt: 'x'.repeat(41) })],
+        ['un updatedAt qui n’est pas un nombre', ice({ updatedAt: 'hier' })],
+        ['un nom qui n’est pas du texte', ice({ nom: 42 })],
+        ['un nom de 81 caractères', ice({ nom: 'n'.repeat(81) })],
+        ['des allergies de 301 caractères', ice({ allergies: 'a'.repeat(301) })],
+        ['des remarques de 501 caractères', ice({ remarques: 'r'.repeat(501) })],
+        ['un pays de 3 lettres', ice({ pays: 'FRA' })],
+        ['un anticoagulant qui n’est pas une case', ice({ anticoag: 'oui' })],
+        ['un champ imbriqué', ice({ contact1Name: { prenom: 'Sophie' } })],
+    ])('%s', async (_name, body) => {
+        await assertFails(setDoc(iceRef(asMe(), ME), body));
+    });
+
+    it('un autre nom de document que « profile »', async () => {
+        await assertFails(setDoc(iceRef(asMe(), ME, 'autre'), ice()));
+        await assertFails(setDoc(iceRef(asMe(), ME, 'profile2'), ice()));
+    });
+
+    it('une modification qui rend la fiche invalide', async () => {
+        await assertSucceeds(setDoc(iceRef(asMe(), ME), ice()));
+        await assertFails(setDoc(iceRef(asMe(), ME), ice({ nom: 'n'.repeat(81) })));
+    });
+});
+
+describe('fiche ICE (ice/profile) : les autres', () => {
+    beforeEach(async () => {
+        await env.withSecurityRulesDisabled(async (context) => {
+            await setDoc(iceRef(context.firestore(), OTHER), ice());
+        });
+    });
+
+    it('un autre pilote ne lit, n’écrit ni ne supprime la fiche d’autrui', async () => {
+        await assertFails(getDoc(iceRef(asMe(), OTHER)));
+        await assertFails(setDoc(iceRef(asMe(), OTHER), ice({ nom: 'Vol' })));
+        await assertFails(deleteDoc(iceRef(asMe(), OTHER)));
+        await assertFails(getDocs(collection(asMe(), 'users', OTHER, 'ice')));
+    });
+
+    it('les fiches ne sont pas lisibles par collectionGroup', async () => {
+        await assertFails(getDocs(collectionGroup(asMe(), 'ice')));
+    });
+
+    it('un visiteur non connecté ne lit ni n’écrit aucune fiche', async () => {
+        await assertFails(getDoc(iceRef(anonymous(), OTHER)));
+        await assertFails(getDoc(iceRef(anonymous(), ME)));
+        await assertFails(setDoc(iceRef(anonymous(), ME), ice()));
+    });
+
+    it('une fiche ne peut pas être rangée ailleurs', async () => {
+        await assertFails(setDoc(doc(asMe(), 'users', ME, 'urgence', 'profile'), ice()));
+        await assertFails(setDoc(doc(asMe(), 'ice', 'profile'), ice()));
+    });
+});
+
 describe('un visiteur non connecté', () => {
     it.each(APP_DOCS)("ne lit ni n'écrit rien : %s/%s", async (sub, id) => {
         const ref = doc(anonymous(), 'users', ME, sub, id);

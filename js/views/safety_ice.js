@@ -17,6 +17,11 @@ import IceService, {
     normalizeCountry,
     toInternationalPhone,
 } from '../services/ice_service.js';
+import {
+    getIceCloudState,
+    setIceCloudState,
+    disableIceCloud as clearIceCloudState,
+} from '../services/ice_cloud_state.js';
 import { escapeHTML } from '../core/security.js';
 import AppRouter from '../core/router.js';
 
@@ -318,7 +323,138 @@ export function renderIceTabHtml() {
                 </div>
             </div>
         </div>
+        ${renderIceCloudCard()}
     `;
+}
+
+/** Date et heure en français (jj/mm/aaaa hh:mm) d'un horodatage en millisecondes. */
+function formatDateTime(ms) {
+    const d = new Date(ms);
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+/**
+ * Carte « Sauvegarde en ligne » : la fiche reste sur l'appareil, sauf demande expresse du pilote.
+ * @returns {string}
+ */
+export function renderIceCloudCard() {
+    const engine = typeof window !== 'undefined' ? window.FirebaseAuthEngine : null;
+    const state = getIceCloudState();
+    let body;
+    if (!engine?.enabled) {
+        body =
+            '<p class="safety-hint">La synchronisation en ligne est désactivée (réglages de confidentialité) : votre fiche reste uniquement sur cet appareil.</p>';
+    } else if (!engine.currentUser) {
+        body =
+            '<p class="safety-hint">Connectez-vous à votre compte pour pouvoir enregistrer votre fiche dans votre profil en ligne.</p>';
+    } else if (state.enabled) {
+        const when = state.lastSyncedAt ? ` le ${formatDateTime(state.lastSyncedAt)}` : '';
+        body = `
+            <p class="ice-cloud-status" role="status"><i class="ri-cloud-fill" aria-hidden="true"></i> Fiche enregistrée dans votre profil en ligne${when}. Elle suit vos modifications et se retrouve sur vos autres appareils.</p>
+            <button type="button" class="safety-btn" data-action="SafetydisableIceCloud">
+                <i class="ri-delete-bin-line" aria-hidden="true"></i> Supprimer ma fiche en ligne
+            </button>`;
+    } else {
+        body = `
+            <button type="button" class="safety-btn safety-btn-primary" data-action="SafetyenableIceCloud">
+                <i class="ri-cloud-line" aria-hidden="true"></i> Enregistrer ma fiche dans mon profil en ligne
+            </button>`;
+    }
+    return `
+        <div class="safety-card ice-cloud-card" id="ice-cloud-card">
+            <h3><i class="ri-cloud-line" aria-hidden="true"></i> Sauvegarde en ligne (facultative)</h3>
+            <p class="safety-hint">
+                Votre fiche contient des données de santé : par défaut elle reste <strong>uniquement sur cet appareil</strong>.
+                Vous pouvez l'enregistrer dans votre profil en ligne pour la retrouver sur vos autres appareils. Elle n'est
+                lisible que par vous, et vous pouvez la supprimer à tout moment.
+            </p>
+            ${body}
+        </div>
+    `;
+}
+
+function refreshIcePanel() {
+    const panel = document.getElementById('safety-panel-ice');
+    if (panel) panel.innerHTML = renderIceTabHtml();
+}
+
+/** Envoie la fiche en ligne si le pilote a demandé la sauvegarde (sans bloquer l'écran). */
+function pushIceIfEnabled() {
+    if (!getIceCloudState().enabled) return;
+    const engine = window.FirebaseAuthEngine;
+    if (engine?.saveIceToCloud) void engine.saveIceToCloud().then(refreshIcePanelStatus);
+}
+
+/** Met à jour la ligne d'état de la carte en ligne (date de dernière sauvegarde) sans toucher au formulaire. */
+function refreshIcePanelStatus() {
+    const card = document.getElementById('ice-cloud-card');
+    if (card) card.outerHTML = renderIceCloudCard();
+}
+
+/**
+ * Demande expresse du pilote : enregistrer sa fiche dans son profil en ligne. Une fiche déjà en ligne est
+ * reprise si cet appareil n'a pas la sienne, sinon le pilote choisit laquelle garder.
+ */
+export async function enableIceCloud() {
+    const engine = window.FirebaseAuthEngine;
+    if (!engine?.enabled || !engine.currentUser) {
+        alert('Connectez-vous à votre compte (avec la synchronisation en ligne activée) pour enregistrer votre fiche.');
+        return;
+    }
+    const agreed = confirm(
+        'Enregistrer votre fiche d’urgence dans votre profil en ligne ?\n\n' +
+            'Elle contient des données de santé (groupe sanguin, allergies, traitements…). Elle sera stockée dans votre compte, ' +
+            'lisible uniquement par vous, et vous pourrez la supprimer à tout moment.\n\n' +
+            'Vous donnez votre accord exprès à cette sauvegarde.',
+    );
+    if (!agreed) return;
+
+    const local = IceService.getProfile();
+    const hasLocal = Boolean(local.nom || local.prenom || local.contact1Phone || local.contact2Phone);
+    const remote = await engine.fetchIceFromCloud();
+    if (!remote.success) {
+        alert('Impossible de joindre votre profil en ligne pour le moment. Réessayez plus tard.');
+        return;
+    }
+
+    let useRemote = false;
+    if (remote.data && hasLocal) {
+        const date = remote.data.updatedAt ? ` (modifiée le ${formatDateTime(remote.data.updatedAt)})` : '';
+        useRemote = !confirm(
+            `Une fiche est déjà enregistrée en ligne${date}.\n\nOK : la remplacer par celle de cet appareil.\nAnnuler : reprendre celle du profil en ligne.`,
+        );
+    } else if (remote.data) {
+        useRemote = true;
+    }
+
+    setIceCloudState({ enabled: true, consentAt: new Date().toISOString() });
+    if (useRemote) {
+        IceService.saveProfile(remote.data, { updatedAt: remote.data.updatedAt || Date.now() });
+        setIceCloudState({ lastSyncedAt: Date.now() });
+    } else {
+        const sent = await engine.saveIceToCloud();
+        if (!sent.success) {
+            clearIceCloudState();
+            alert('L’enregistrement en ligne a échoué : votre fiche reste uniquement sur cet appareil.');
+            refreshIcePanel();
+            return;
+        }
+    }
+    refreshIcePanel();
+}
+
+/** Supprime la fiche du profil en ligne (elle reste sur cet appareil) et arrête la sauvegarde. */
+export async function disableIceCloud() {
+    if (!confirm('Supprimer votre fiche de votre profil en ligne ? Elle restera sur cet appareil.')) return;
+    const engine = window.FirebaseAuthEngine;
+    const deleted = engine?.deleteIceFromCloud ? await engine.deleteIceFromCloud() : { success: false };
+    if (!deleted.success) {
+        alert('Impossible de supprimer la fiche en ligne pour le moment (hors ligne ?). Réessayez plus tard.');
+        return;
+    }
+    clearIceCloudState();
+    refreshIcePanel();
 }
 
 export function getIceFormValues() {
@@ -351,6 +487,7 @@ export function saveIceProfile() {
     const values = getIceFormValues();
     IceService.saveProfile(values);
     updateIceStickerPreview(values);
+    pushIceIfEnabled();
     alert(
         IceService.qrFits(values)
             ? 'Fiche d’urgence enregistrée sur cet appareil. Votre étiquette casque a été mise à jour.'
@@ -358,11 +495,26 @@ export function saveIceProfile() {
     );
 }
 
-export function clearIceProfile() {
-    if (!confirm('Voulez-vous réinitialiser votre fiche d’urgence ?')) return;
+export async function clearIceProfile() {
+    const online = getIceCloudState().enabled;
+    if (
+        !confirm(
+            online
+                ? 'Voulez-vous réinitialiser votre fiche d’urgence ? Sa copie dans votre profil en ligne sera aussi supprimée.'
+                : 'Voulez-vous réinitialiser votre fiche d’urgence ?',
+        )
+    )
+        return;
+    if (online) {
+        const deleted = await window.FirebaseAuthEngine?.deleteIceFromCloud?.();
+        if (!deleted?.success) {
+            alert('Impossible de supprimer la copie en ligne pour le moment (hors ligne ?). Réessayez plus tard.');
+            return;
+        }
+        clearIceCloudState();
+    }
     IceService.clearProfile();
-    const panel = document.getElementById('safety-panel-ice');
-    if (panel) panel.innerHTML = renderIceTabHtml();
+    refreshIcePanel();
 }
 
 export function updateIceStickerPreview(values) {
@@ -376,6 +528,7 @@ export function printIceSticker() {
     const values = getIceFormValues();
     IceService.saveProfile(values);
     updateIceStickerPreview(values);
+    pushIceIfEnabled();
 
     // Une feuille : l'étiquette complète (sellette) et deux compactes (les deux côtés du casque). La copie de
     // l'étiquette compacte n'existe que le temps de l'impression.

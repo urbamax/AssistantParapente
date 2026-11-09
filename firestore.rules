@@ -27,6 +27,34 @@ service cloud.firestore {
         && partId == data.flightId + '_' + string(data.index);
     }
 
+    // Texte facultatif d'une fiche d'urgence : absent, ou une chaîne d'au plus `max` caractères.
+    function optText(data, key, max) {
+      return !(key in data) || (data[key] is string && data[key].size() <= max);
+    }
+
+    // Fiche d'urgence (ICE) du pilote : données de santé, enregistrées seulement à sa demande expresse
+    // (case « Enregistrer ma fiche dans mon profil en ligne »). Même champs que js/services/ice_service.js, avec
+    // une marge sur les longueurs ; `updatedAt` départage les appareils, `consentAt` date son accord.
+    function isIceProfile(docId, data) {
+      return docId == 'profile'
+        && data.keys().hasAll(['updatedAt', 'consentAt'])
+        && data.keys().hasOnly([
+          'nom', 'prenom', 'birthYear', 'birthDate', 'tel', 'langues', 'contact1Name', 'contact1Phone',
+          'contact1Rel', 'contact2Name', 'contact2Phone', 'contact2Rel', 'bloodGroup', 'allergies', 'anticoag',
+          'tetanos', 'pays', 'remarques', 'ffvl', 'federation', 'insurance', 'updatedAt', 'consentAt'
+        ])
+        && data.updatedAt is number
+        && data.consentAt is string && data.consentAt.size() > 0 && data.consentAt.size() <= 40
+        && optText(data, 'nom', 80) && optText(data, 'prenom', 80)
+        && optText(data, 'birthYear', 4) && optText(data, 'birthDate', 10)
+        && optText(data, 'tel', 40) && optText(data, 'langues', 80)
+        && optText(data, 'contact1Name', 80) && optText(data, 'contact1Phone', 40) && optText(data, 'contact1Rel', 60)
+        && optText(data, 'contact2Name', 80) && optText(data, 'contact2Phone', 40) && optText(data, 'contact2Rel', 60)
+        && optText(data, 'bloodGroup', 8) && optText(data, 'allergies', 300) && optText(data, 'anticoag', 1)
+        && optText(data, 'tetanos', 4) && optText(data, 'pays', 2) && optText(data, 'remarques', 500)
+        && optText(data, 'ffvl', 40) && optText(data, 'federation', 24) && optText(data, 'insurance', 120);
+    }
+
     match /users/{userId} {
       // Le document du compte (jeton de notification fcmToken).
       allow read, write: if isOwner(userId);
@@ -59,6 +87,13 @@ service cloud.firestore {
       match /igcTraces/{partId} {
         allow read, delete: if isOwner(userId);
         allow create, update: if isOwner(userId) && isTracePart(partId, request.resource.data);
+      }
+
+      // Fiche d'urgence (ICE), un seul document « profile » : lue, écrite et supprimée par son propriétaire
+      // seulement ; la forme et les longueurs sont contrôlées à l'écriture.
+      match /ice/{docId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isIceProfile(docId, request.resource.data);
       }
     }
   }

@@ -23,6 +23,7 @@ import AccessService from './access_service.js';
 import { flattenAnswerLogs, mergeAnswerLogs } from './answer_log.js';
 import { mergeBrevets } from './brevet_service.js';
 import { compactExam } from './quiz_service.js';
+import { getIceCloudState, setIceCloudState, disableIceCloud } from './ice_cloud_state.js';
 
 // We inject the original code but export the Engine
 // --- FIREBASE AUTHENTICATION & SYNC ENGINE ---
@@ -859,6 +860,14 @@ export const FirebaseAuthEngine = {
 
             await setDoc(prefsDocRef, finalPrefs);
 
+            // Fiche d'urgence : seulement si le pilote a demandé la sauvegarde en ligne. Une erreur ici (règles pas
+            // encore publiées, par exemple) ne doit pas faire échouer le reste de la synchro.
+            try {
+                await this._syncIceProfile(firestoreModule, uid);
+            } catch (iceError) {
+                console.warn('[ICE] Synchro de la fiche d’urgence impossible :', iceError);
+            }
+
             // Maintien des données en mémoire des services (sans effet sur le DOM)
             SitesService.loadUserPreferences();
             LogbookService.loadData();
@@ -940,6 +949,107 @@ export const FirebaseAuthEngine = {
             }
         }, 2000);
         this.markUnsyncedChange();
+    },
+
+    // -----------------------------------------------------------------------
+    // FICHE D'URGENCE (ICE) : données de santé, enregistrées en ligne seulement à la demande expresse du pilote
+    // (voir js/services/ice_cloud_state.js). Un seul document, users/{uid}/ice/profile, lisible par lui seul.
+    // -----------------------------------------------------------------------
+
+    /** La fiche enregistrée en ligne, ou null. @returns {Promise<{ success: boolean, data: any, error: string | null }>} */
+    fetchIceFromCloud: async function () {
+        if (!this.currentUser || !this.enabled)
+            return { success: false, data: null, error: 'Not enabled or logged in' };
+        try {
+            const { doc, getDoc } = await this._loadFirestore();
+            const snap = await getDoc(doc(db, 'users', this.currentUser.uid, 'ice', 'profile'));
+            return { success: true, data: snap.exists() ? snap.data() : null, error: null };
+        } catch (error) {
+            console.error('[ICE] Lecture de la fiche en ligne impossible :', error);
+            return { success: false, data: null, error: error.message };
+        }
+    },
+
+    /** Envoie la fiche de cet appareil, si le pilote a demandé la sauvegarde en ligne. */
+    saveIceToCloud: async function () {
+        if (!this.currentUser || !this.enabled)
+            return { success: false, data: null, error: 'Not enabled or logged in' };
+        const state = getIceCloudState();
+        if (!state.enabled || !state.consentAt) return { success: false, data: null, error: 'ice-cloud-disabled' };
+        if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+            this.markUnsyncedChange(); // la synchro de rattrapage l'enverra
+            return { success: false, data: null, error: 'Offline' };
+        }
+        try {
+            const { doc, setDoc } = await this._loadFirestore();
+            const { IceService } = await import('./ice_service.js');
+            const body = {
+                ...IceService.getProfile(),
+                updatedAt: state.updatedAt || Date.now(),
+                consentAt: state.consentAt,
+            };
+            await setDoc(doc(db, 'users', this.currentUser.uid, 'ice', 'profile'), body);
+            setIceCloudState({ lastSyncedAt: Date.now() });
+            return { success: true, data: null, error: null };
+        } catch (error) {
+            console.error('[ICE] Envoi de la fiche impossible :', error);
+            this.markUnsyncedChange();
+            return { success: false, data: null, error: error.message };
+        }
+    },
+
+    /** Supprime la fiche enregistrée en ligne (droit à l'effacement). */
+    deleteIceFromCloud: async function () {
+        if (!this.currentUser || !this.enabled)
+            return { success: false, data: null, error: 'Not enabled or logged in' };
+        if (typeof navigator !== 'undefined' && navigator.onLine === false)
+            return { success: false, data: null, error: 'Offline' };
+        try {
+            const { doc, deleteDoc } = await this._loadFirestore();
+            await deleteDoc(doc(db, 'users', this.currentUser.uid, 'ice', 'profile'));
+            return { success: true, data: null, error: null };
+        } catch (error) {
+            console.error('[ICE] Suppression de la fiche en ligne impossible :', error);
+            return { success: false, data: null, error: error.message };
+        }
+    },
+
+    /**
+     * Synchro de la fiche entre les appareils (dernière modification gagnante), si le pilote l'a demandée.
+     * Une fiche supprimée en ligne depuis un autre appareil n'est pas recréée : la sauvegarde est alors arrêtée ici.
+     */
+    _syncIceProfile: async function (firestoreModule, uid) {
+        const state = getIceCloudState();
+        if (!state.enabled || !state.consentAt) return;
+        const { doc, getDoc, setDoc } = firestoreModule;
+        const ref = doc(db, 'users', uid, 'ice', 'profile');
+        const snap = await getDoc(ref);
+        const cloud = snap.exists() ? snap.data() : null;
+        const { IceService } = await import('./ice_service.js');
+
+        if (!cloud) {
+            if (state.lastSyncedAt) {
+                // Elle était en ligne, elle n'y est plus : effacée depuis un autre appareil.
+                disableIceCloud();
+                return;
+            }
+        } else if ((cloud.updatedAt || 0) > state.updatedAt) {
+            IceService.saveProfile(cloud, { updatedAt: cloud.updatedAt });
+            setIceCloudState({ lastSyncedAt: Date.now() });
+            return;
+        } else if ((cloud.updatedAt || 0) === state.updatedAt) {
+            setIceCloudState({ lastSyncedAt: Date.now() });
+            return;
+        }
+
+        // Pas de fiche en ligne (première sauvegarde) ou fiche locale plus récente : on envoie.
+        const body = {
+            ...IceService.getProfile(),
+            updatedAt: state.updatedAt || Date.now(),
+            consentAt: state.consentAt,
+        };
+        await setDoc(ref, body);
+        setIceCloudState({ lastSyncedAt: Date.now() });
     },
 
     // Write-through updates to Cloud when user makes progress
