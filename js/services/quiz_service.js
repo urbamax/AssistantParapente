@@ -1085,7 +1085,6 @@ class QuizService {
         this.state.examSaved = false;
         this.state.invalidated = false;
         this.state.currentQcmSelection = new Set();
-        this.state.questionStartTime = Date.now();
         return this.getCurrentQuestion();
     }
 
@@ -1136,16 +1135,10 @@ class QuizService {
         const previous = this.state.examResults[this.state.qcmIndex];
         this.state.examResults[this.state.qcmIndex] = resultData;
 
-        const timeTakenMs =
-            typeof this.state.questionStartTime === 'number'
-                ? Math.max(0, Date.now() - this.state.questionStartTime)
-                : undefined;
-
         if (this.state.qcmConfig.mode !== 'EXAM') {
             this.updateStats(question, isCorrect, selectedOptions, previous, Date.now(), {
                 userScore,
                 maxScore,
-                timeTakenMs,
             });
         }
         if (this.state.qcmConfig.mode === 'MASTERY') this.advanceMasteryProgress();
@@ -1182,7 +1175,6 @@ class QuizService {
 
     nextQuestion() {
         this.state.qcmIndex++;
-        this.state.questionStartTime = Date.now();
         this._restoreSelection();
         return this.getCurrentQuestion();
     }
@@ -1190,7 +1182,6 @@ class QuizService {
     prevQuestion() {
         if (this.state.qcmIndex > 0) {
             this.state.qcmIndex--;
-            this.state.questionStartTime = Date.now();
             this._restoreSelection();
         }
         return this.getCurrentQuestion();
@@ -1308,7 +1299,6 @@ class QuizService {
                 isCorrect,
                 userScore: options.userScore,
                 maxScore: options.maxScore,
-                timeTakenMs: options.timeTakenMs,
                 explicitQuality: options.explicitQuality,
                 now: timestamp,
             },

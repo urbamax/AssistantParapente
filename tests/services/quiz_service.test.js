@@ -244,14 +244,14 @@ describe('QuizService - Compteurs globaux et auto-guérison', () => {
 
     it('updateStats met à jour les champs SM-2 (easeFactor, interval, repetitions)', () => {
         const q1 = { code: 'A01V', theme: 'Météo' };
-        QuizService.updateStats(q1, true, [], null, Date.now(), { timeTakenMs: 5000 });
+        QuizService.updateStats(q1, true, []);
         let qStat = QuizService.getPersistentStats().questions.A01V;
         expect(qStat.repetitions).toBe(1);
         expect(qStat.interval).toBe(1);
         expect(qStat.easeFactor).toBe(2.6);
 
         // Deuxième succès rapide
-        QuizService.updateStats(q1, true, [], null, Date.now(), { timeTakenMs: 6000 });
+        QuizService.updateStats(q1, true, []);
         qStat = QuizService.getPersistentStats().questions.A01V;
         expect(qStat.repetitions).toBe(2);
         expect(qStat.interval).toBe(6);

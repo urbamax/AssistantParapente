@@ -3,7 +3,7 @@
  * Sous-module de SafetyView pour la gestion de la fiche ICE et de l'étiquette casque.
  */
 
-import IceService, { BLOOD_GROUPS } from '../services/ice_service.js';
+import IceService, { BLOOD_GROUPS, ICE_LIMITS } from '../services/ice_service.js';
 import { escapeHTML } from '../core/security.js';
 import AppRouter from '../core/router.js';
 
@@ -15,7 +15,14 @@ export function renderIceSticker(profile) {
     const phone = p.contact1Phone ? esc(p.contact1Phone) : '112 / Secours';
     const contactLabel = p.contact1Name ? esc(p.contact1Name) : 'Contact';
     const blood = p.bloodGroup && p.bloodGroup !== 'Inconnu' ? ` · 🩸 ${esc(p.bloodGroup)}` : '';
-    const qrSvg = IceService.generateQrSvg(p, { size: 140, border: 1 });
+    // Une fiche trop longue ne tient pas dans un QR lisible : on le dit au lieu de faire échouer tout l'onglet.
+    let qrSvg;
+    try {
+        qrSvg = IceService.generateQrSvg(p, { size: 140, border: 1 });
+    } catch {
+        qrSvg =
+            '<p class="ice-qr-error" role="alert">Fiche trop longue pour un QR lisible : raccourcissez les allergies ou les remarques.</p>';
+    }
 
     return `
         <div class="ice-helmet-sticker" id="ice-helmet-sticker">
@@ -50,7 +57,7 @@ export function renderIceTabHtml() {
             <p class="safety-hint">
                 Générez une étiquette étanche avec QR Code à coller sur votre casque ou votre sellette. En cas d'accident,
                 les témoins ou les secouristes peuvent la scanner avec n'importe quel smartphone pour joindre immédiatement
-                vos proches et connaître vos données médicales vitales, sans application ni connexion requise.
+                vos proches et connaître vos données médicales vitales. Le QR contient le texte de la fiche : l'appareil photo le lit sans réseau et sans ce site. Votre fiche reste sur cet appareil : elle n'est ni synchronisée ni exportée.
             </p>
         </div>
 
@@ -63,15 +70,15 @@ export function renderIceTabHtml() {
                     <legend>Identité</legend>
                     <div class="ice-form-row ice-form-row-2">
                         <label>Prénom
-                            <input type="text" id="ice-prenom" value="${esc(p.prenom)}" placeholder="Ex: Thomas" />
+                            <input type="text" id="ice-prenom" maxlength="${ICE_LIMITS.name}" value="${esc(p.prenom)}" placeholder="Ex: Thomas" />
                         </label>
                         <label>Nom
-                            <input type="text" id="ice-nom" value="${esc(p.nom)}" placeholder="Ex: Dupont" />
+                            <input type="text" id="ice-nom" maxlength="${ICE_LIMITS.name}" value="${esc(p.nom)}" placeholder="Ex: Dupont" />
                         </label>
                     </div>
                     <div class="ice-form-row">
                         <label>Année de naissance
-                            <input type="number" id="ice-birthYear" value="${esc(p.birthYear)}" placeholder="Ex: 1988" min="1920" max="2025" />
+                            <input type="number" id="ice-birthYear" value="${esc(p.birthYear)}" placeholder="Ex: 1988" min="1920" max="${new Date().getFullYear()}" />
                         </label>
                     </div>
                 </fieldset>
@@ -80,15 +87,15 @@ export function renderIceTabHtml() {
                     <legend>Contact d'urgence 1 (Prioritaire)</legend>
                     <div class="ice-form-row ice-form-row-2">
                         <label>Nom du contact
-                            <input type="text" id="ice-c1-name" value="${esc(p.contact1Name)}" placeholder="Ex: Sophie" />
+                            <input type="text" id="ice-c1-name" maxlength="${ICE_LIMITS.name}" value="${esc(p.contact1Name)}" placeholder="Ex: Sophie" />
                         </label>
                         <label>Lien / Parenté
-                            <input type="text" id="ice-c1-rel" value="${esc(p.contact1Rel)}" placeholder="Ex: Conjointe" />
+                            <input type="text" id="ice-c1-rel" maxlength="${ICE_LIMITS.relation}" value="${esc(p.contact1Rel)}" placeholder="Ex: Conjointe" />
                         </label>
                     </div>
                     <div class="ice-form-row">
                         <label>Téléphone d'urgence *
-                            <input type="tel" id="ice-c1-phone" value="${esc(p.contact1Phone)}" placeholder="Ex: 06 12 34 56 78" />
+                            <input type="tel" id="ice-c1-phone" maxlength="${ICE_LIMITS.phone}" value="${esc(p.contact1Phone)}" placeholder="Ex: 06 12 34 56 78" />
                         </label>
                     </div>
                 </fieldset>
@@ -97,15 +104,15 @@ export function renderIceTabHtml() {
                     <legend>Contact d'urgence 2 (Optionnel)</legend>
                     <div class="ice-form-row ice-form-row-2">
                         <label>Nom du contact
-                            <input type="text" id="ice-c2-name" value="${esc(p.contact2Name)}" placeholder="Ex: Pierre" />
+                            <input type="text" id="ice-c2-name" maxlength="${ICE_LIMITS.name}" value="${esc(p.contact2Name)}" placeholder="Ex: Pierre" />
                         </label>
                         <label>Lien / Parenté
-                            <input type="text" id="ice-c2-rel" value="${esc(p.contact2Rel)}" placeholder="Ex: Frère / Ami" />
+                            <input type="text" id="ice-c2-rel" maxlength="${ICE_LIMITS.relation}" value="${esc(p.contact2Rel)}" placeholder="Ex: Frère / Ami" />
                         </label>
                     </div>
                     <div class="ice-form-row">
                         <label>Téléphone
-                            <input type="tel" id="ice-c2-phone" value="${esc(p.contact2Phone)}" placeholder="Ex: 06 98 76 54 32" />
+                            <input type="tel" id="ice-c2-phone" maxlength="${ICE_LIMITS.phone}" value="${esc(p.contact2Phone)}" placeholder="Ex: 06 98 76 54 32" />
                         </label>
                     </div>
                 </fieldset>
@@ -119,12 +126,12 @@ export function renderIceTabHtml() {
                     </div>
                     <div class="ice-form-row">
                         <label>Allergies majeures / Contre-indications
-                            <input type="text" id="ice-allergies" value="${esc(p.allergies)}" placeholder="Ex: Pénicilline, aspirine, asthme..." />
+                            <input type="text" id="ice-allergies" maxlength="${ICE_LIMITS.allergies}" value="${esc(p.allergies)}" placeholder="Ex: Pénicilline, aspirine, asthme..." />
                         </label>
                     </div>
                     <div class="ice-form-row">
                         <label>Antécédents / Traitements réguliers
-                            <input type="text" id="ice-remarques" value="${esc(p.remarques || p.medical)}" placeholder="Ex: Diabète, anticoagulant..." />
+                            <input type="text" id="ice-remarques" maxlength="${ICE_LIMITS.remarques}" value="${esc(p.remarques || p.medical)}" placeholder="Ex: Diabète, anticoagulant..." />
                         </label>
                     </div>
                 </fieldset>
@@ -133,10 +140,10 @@ export function renderIceTabHtml() {
                     <legend>Informations Fédérales &amp; Assurance</legend>
                     <div class="ice-form-row ice-form-row-2">
                         <label>N° Licence FFVL
-                            <input type="text" id="ice-ffvl" value="${esc(p.ffvl)}" placeholder="Ex: 1234567" />
+                            <input type="text" id="ice-ffvl" maxlength="${ICE_LIMITS.ffvl}" value="${esc(p.ffvl)}" placeholder="Ex: 1234567" />
                         </label>
                         <label>Assurance assistance / Rapatriement
-                            <input type="text" id="ice-insurance" value="${esc(p.insurance)}" placeholder="Ex: Europ Assistance FFVL" />
+                            <input type="text" id="ice-insurance" maxlength="${ICE_LIMITS.insurance}" value="${esc(p.insurance)}" placeholder="Ex: Europ Assistance FFVL" />
                         </label>
                     </div>
                 </fieldset>
@@ -206,7 +213,11 @@ export function saveIceProfile() {
     const values = getIceFormValues();
     IceService.saveProfile(values);
     updateIceStickerPreview(values);
-    alert('Fiche d’urgence enregistrée dans votre profil ! Votre étiquette casque a été mise à jour.');
+    alert(
+        IceService.qrFits(values)
+            ? 'Fiche d’urgence enregistrée sur cet appareil. Votre étiquette casque a été mise à jour.'
+            : 'Fiche enregistrée, mais trop longue pour tenir dans un QR lisible : raccourcissez les allergies ou les remarques avant d’imprimer.',
+    );
 }
 
 export function clearIceProfile() {
@@ -231,8 +242,8 @@ export function printIceSticker() {
 }
 
 export function testIceView() {
+    // Simple essai du lecteur web avec ce qui est dans le formulaire : rien n'est enregistré.
     const values = getIceFormValues();
-    IceService.saveProfile(values);
     const payload = IceService.encodePayload(values);
     window.location.hash = '#' + payload;
     AppRouter.navigate('ICE');

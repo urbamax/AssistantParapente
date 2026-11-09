@@ -221,6 +221,10 @@ export class IceViewClass extends BaseView {
 
     importToProfile() {
         if (!this.profile) return;
+        // Ne jamais remplacer sa propre fiche par celle d'un autre sans le demander.
+        const current = IceService.getProfile();
+        const hasCurrent = Boolean(current.nom || current.prenom || current.contact1Phone);
+        if (hasCurrent && !confirm('Remplacer votre fiche d’urgence actuelle par celle-ci ?')) return;
         IceService.saveProfile(this.profile);
         alert('Fiche d’urgence enregistrée avec succès dans votre profil sur cet appareil.');
     }

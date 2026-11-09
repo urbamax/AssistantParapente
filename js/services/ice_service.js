@@ -2,10 +2,16 @@
  * SERVICE - IceService (In Case of Emergency)
  * Gestion de la fiche d'urgence et du générateur d'étiquette pour casque/sellette.
  *
- * Confidentialité & Sécurité :
- * - Les données encodées dans le QR Code utilisent le fragment d'URL (#hash),
- *   qui n'est JAMAIS envoyé au serveur HTTP (spécification standard W3C).
- * - En mode lecture seule (secours), aucune donnée n'est envoyée ni modifiée sans action explicite.
+ * Confidentialité :
+ * - La fiche reste sur cet appareil (clé `parapente_ice_profile`). Elle n'est JAMAIS copiée dans les
+ *   préférences utilisateur : celles-ci sont synchronisées avec le cloud et exportées dans la sauvegarde,
+ *   et il s'agit de données de santé (RGPD, catégorie particulière).
+ * - Le stockage local est seulement masqué (XOR + base64) pour ne pas l'afficher en clair dans l'inspecteur
+ *   du navigateur : ce n'est PAS du chiffrement et il ne protège pas contre un script de la page ou contre
+ *   quelqu'un qui a l'appareil en main.
+ * - Le QR code du casque contient le texte de la fiche : n'importe quel appareil photo le lit, sans réseau
+ *   et sans dépendre de ce site. Le lecteur web (`?mode=ICE#...`) reste disponible pour un lien partagé ;
+ *   son fragment d'URL (#...) n'est jamais envoyé au serveur HTTP.
  */
 
 import StorageService from './storage.js';
@@ -59,9 +65,60 @@ export const DEFAULT_ICE_PROFILE = Object.freeze({
  */
 const cleanStr = (val) => (typeof val === 'string' ? val.trim() : '');
 
+/** Longueurs maximales des champs de la fiche (une fiche trop longue ne tient plus dans un QR lisible). */
+export const ICE_LIMITS = Object.freeze({
+    name: 40,
+    relation: 30,
+    phone: 20,
+    birthYear: 4,
+    bloodGroup: 4,
+    allergies: 150,
+    remarques: 250,
+    ffvl: 20,
+    insurance: 60,
+});
+
+/** Taille maximale (octets UTF-8) du texte du QR code : au-delà, les modules deviennent trop petits pour un casque (version 14, 73 modules). */
+export const ICE_QR_MAX_BYTES = 350;
+
+const byteLength = (text) => new TextEncoder().encode(text).length;
+
+const FIELD_LIMIT = Object.freeze({
+    nom: ICE_LIMITS.name,
+    prenom: ICE_LIMITS.name,
+    birthYear: ICE_LIMITS.birthYear,
+    contact1Name: ICE_LIMITS.name,
+    contact1Phone: ICE_LIMITS.phone,
+    contact1Rel: ICE_LIMITS.relation,
+    contact2Name: ICE_LIMITS.name,
+    contact2Phone: ICE_LIMITS.phone,
+    contact2Rel: ICE_LIMITS.relation,
+    bloodGroup: ICE_LIMITS.bloodGroup,
+    allergies: ICE_LIMITS.allergies,
+    remarques: ICE_LIMITS.remarques,
+    ffvl: ICE_LIMITS.ffvl,
+    insurance: ICE_LIMITS.insurance,
+});
+
 /**
- * Obfusque les données du profil ICE pour ne pas exposer de données personnelles
- * ou médicales en clair dans le LocalStorage (conformité CWE-312).
+ * Profil nettoyé : textes rognés, tronqués à la longueur maximale de chaque champ, champs inconnus ignorés.
+ * @param {Partial<IceProfile> & { medical?: string }} [profile]
+ * @returns {IceProfile}
+ */
+export function clampProfile(profile = {}) {
+    const src = profile && typeof profile === 'object' ? profile : {};
+    /** @type {Record<string, string>} */
+    const out = {};
+    for (const [key, max] of Object.entries(FIELD_LIMIT)) {
+        const raw = key === 'remarques' ? src.remarques || src.medical : src[key];
+        out[key] = cleanStr(typeof raw === 'number' ? String(raw) : raw).slice(0, max);
+    }
+    return /** @type {IceProfile} */ (out);
+}
+
+/**
+ * Masque les données du profil ICE (XOR + base64) pour ne pas les afficher en clair dans le stockage local.
+ * Ce n'est pas du chiffrement : la clé est dans le code.
  * @param {object} data
  * @returns {string}
  */
@@ -81,7 +138,7 @@ export function encodeLocalIce(data) {
 }
 
 /**
- * Déobfusque les données du profil ICE stockées localement.
+ * Lit le profil ICE stocké localement (masqué, ou objet brut d'une ancienne version).
  * @param {*} raw
  * @returns {Partial<IceProfile>|null}
  */
@@ -219,7 +276,43 @@ export function decodePayload(rawString = '') {
         console.warn('[IceService] Erreur lors du décodage du payload ICE:', e);
     }
 
-    return result;
+    return clampProfile(result);
+}
+
+/**
+ * Texte lisible de la fiche, pour le QR code du casque : un appareil photo l'affiche tel quel (numéros
+ * touchables) sans réseau ni application.
+ * @param {Partial<IceProfile>} profile
+ * @returns {string}
+ */
+export function buildIceText(profile = {}) {
+    const p = clampProfile(profile);
+    const lines = ['ICE PARAPENTE'];
+    const who = [p.prenom, p.nom, p.birthYear].filter(Boolean).join(' ');
+    if (who) lines.push(who);
+    if (p.bloodGroup && p.bloodGroup !== 'Inconnu') lines.push(`Sang ${p.bloodGroup}`);
+    if (p.allergies) lines.push(`Allergies: ${p.allergies}`);
+    if (p.remarques) lines.push(`Santé: ${p.remarques}`);
+    const contact = (n, name, phone, rel) => {
+        const digits = sanitizePhone(phone);
+        if (!digits) return;
+        const label = [name, rel ? `(${rel})` : ''].filter(Boolean).join(' ');
+        lines.push(`${n}: ${label ? `${label} ` : ''}${digits}`);
+    };
+    contact(1, p.contact1Name, p.contact1Phone, p.contact1Rel);
+    contact(2, p.contact2Name, p.contact2Phone, p.contact2Rel);
+    if (p.ffvl) lines.push(`FFVL ${p.ffvl}`);
+    if (p.insurance) lines.push(`Assurance ${p.insurance}`);
+    lines.push('SOS 112');
+    return lines.join('\n');
+}
+
+/**
+ * La fiche tient-elle dans un QR code lisible sur un casque ?
+ * @param {Partial<IceProfile>} profile
+ */
+export function qrFits(profile = {}) {
+    return byteLength(buildIceText(profile)) <= ICE_QR_MAX_BYTES;
 }
 
 /**
@@ -246,71 +339,49 @@ export function buildIceUrl(profile, baseUrl) {
     return `${base}${separator}mode=ICE#${payload}`;
 }
 
+/** Retire la copie du profil que la première version rangeait dans les préférences (synchronisées au cloud). */
+function removeLegacyPrefsCopy() {
+    try {
+        const prefs = StorageService.get(StorageService.KEYS.USER_PREFS, {});
+        if (prefs && typeof prefs === 'object' && 'iceProfile' in prefs) {
+            delete prefs.iceProfile;
+            StorageService.set(StorageService.KEYS.USER_PREFS, prefs);
+        }
+    } catch {
+        // préférences illisibles : rien à nettoyer
+    }
+}
+
 export const IceService = {
     /**
      * Récupère le profil ICE enregistré sur cet appareil.
      * @returns {IceProfile}
      */
     getProfile() {
-        const directRaw = StorageService.get(ICE_STORAGE_KEY);
-        const direct = decodeLocalIce(directRaw);
-        if (direct && typeof direct === 'object') {
-            return {
-                ...DEFAULT_ICE_PROFILE,
-                ...direct,
-                remarques: direct.remarques || direct.medical || '',
-            };
-        }
+        const direct = decodeLocalIce(StorageService.get(ICE_STORAGE_KEY));
+        if (direct && typeof direct === 'object') return clampProfile(direct);
+
+        // Profil rangé dans les préférences par la première version : on le déplace puis on le retire.
         const prefs = StorageService.get(StorageService.KEYS.USER_PREFS, {});
-        if (prefs?.iceProfile) {
-            const decodedPrefs = decodeLocalIce(prefs.iceProfile);
-            if (decodedPrefs && typeof decodedPrefs === 'object') {
-                return {
-                    ...DEFAULT_ICE_PROFILE,
-                    ...decodedPrefs,
-                    remarques: decodedPrefs.remarques || decodedPrefs.medical || '',
-                };
-            }
+        const legacy = prefs && typeof prefs === 'object' ? decodeLocalIce(prefs.iceProfile) : null;
+        if (legacy && typeof legacy === 'object') {
+            const profile = clampProfile(legacy);
+            StorageService.set(ICE_STORAGE_KEY, encodeLocalIce(profile));
+            removeLegacyPrefsCopy();
+            return profile;
         }
         return { ...DEFAULT_ICE_PROFILE };
     },
 
     /**
-     * Sauvegarde le profil ICE sur cet appareil.
+     * Sauvegarde le profil ICE sur cet appareil (jamais dans les préférences synchronisées).
      * @param {Partial<IceProfile>} profile
      * @returns {boolean}
      */
     saveProfile(profile) {
-        const clean = {
-            nom: cleanStr(profile.nom),
-            prenom: cleanStr(profile.prenom),
-            birthYear: cleanStr(profile.birthYear),
-            contact1Name: cleanStr(profile.contact1Name),
-            contact1Phone: cleanStr(profile.contact1Phone),
-            contact1Rel: cleanStr(profile.contact1Rel),
-            contact2Name: cleanStr(profile.contact2Name),
-            contact2Phone: cleanStr(profile.contact2Phone),
-            contact2Rel: cleanStr(profile.contact2Rel),
-            bloodGroup: cleanStr(profile.bloodGroup),
-            allergies: cleanStr(profile.allergies),
-            remarques: cleanStr(profile.remarques || profile.medical),
-            ffvl: cleanStr(profile.ffvl),
-            insurance: cleanStr(profile.insurance),
-        };
-
-        const obfuscated = encodeLocalIce(clean);
-        const ok1 = StorageService.set(ICE_STORAGE_KEY, obfuscated);
-
-        // Met également à jour USER_PREFS pour la compatibilité backup & sync
-        try {
-            const prefs = StorageService.get(StorageService.KEYS.USER_PREFS, {}) || {};
-            prefs.iceProfile = obfuscated;
-            StorageService.set(StorageService.KEYS.USER_PREFS, prefs);
-        } catch {
-            // tolérance si USER_PREFS n'est pas modifiable
-        }
-
-        return ok1;
+        const ok = StorageService.set(ICE_STORAGE_KEY, encodeLocalIce(clampProfile(profile)));
+        removeLegacyPrefsCopy();
+        return ok;
     },
 
     /**
@@ -318,26 +389,33 @@ export const IceService = {
      */
     clearProfile() {
         StorageService.set(ICE_STORAGE_KEY, null);
-        try {
-            const prefs = StorageService.get(StorageService.KEYS.USER_PREFS, {}) || {};
-            delete prefs.iceProfile;
-            StorageService.set(StorageService.KEYS.USER_PREFS, prefs);
-        } catch {}
+        removeLegacyPrefsCopy();
     },
 
+    qrFits,
+
     /**
-     * Génère le QR Code SVG pour le casque.
+     * Génère le QR Code SVG pour le casque : par défaut le texte de la fiche (lisible hors ligne), ou le lien
+     * du lecteur web avec `mode: 'url'`.
      * @param {Partial<IceProfile>} profile
      * @param {object} [options]
-     * @param {string} [options.baseUrl]
+     * @param {"text"|"url"} [options.mode]
+     * @param {string} [options.baseUrl] (mode url)
      * @param {number} [options.size]
      * @param {number} [options.border]
      * @param {"LOW"|"MEDIUM"|"QUARTILE"|"HIGH"} [options.ecc]
      * @returns {string} SVG string
+     * @throws {Error} si la fiche est trop longue pour un QR lisible
      */
     generateQrSvg(profile, options = {}) {
-        const url = buildIceUrl(profile, options.baseUrl);
-        return generateQrSvg(url, {
+        let data;
+        if (options.mode === 'url') {
+            data = buildIceUrl(profile, options.baseUrl);
+        } else {
+            data = buildIceText(profile);
+            if (byteLength(data) > ICE_QR_MAX_BYTES) throw new Error('ice-qr-too-long');
+        }
+        return generateQrSvg(data, {
             size: options.size || 220,
             border: options.border || 2,
             ecc: options.ecc || 'MEDIUM',
@@ -347,6 +425,8 @@ export const IceService = {
     encodePayload,
     decodePayload,
     buildIceUrl,
+    buildIceText,
+    clampProfile,
     sanitizePhone,
     formatPhoneDisplay,
 };

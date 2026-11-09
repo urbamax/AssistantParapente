@@ -1329,29 +1329,14 @@ export const FirebaseAuthEngine = {
     _latestReviewState: function (a, b) {
         const aSeen = a.lastSeen || 0;
         const bSeen = b.lastSeen || 0;
+        // `recent` vient de la source retenue ; le facteur de facilité, l'intervalle et les répétitions aussi,
+        // et à défaut de la première copie qui en a un. Jamais de champ indéfini (Firestore le refuse).
         const withExtra = (state, source) => {
             const res = Array.isArray(source.recent) ? { ...state, recent: source.recent } : { ...state };
-            const ef =
-                typeof source.easeFactor === 'number'
-                    ? source.easeFactor
-                    : typeof a.easeFactor === 'number'
-                      ? a.easeFactor
-                      : b.easeFactor;
-            if (typeof ef === 'number' && !isNaN(ef)) res.easeFactor = ef;
-            const interval =
-                typeof source.interval === 'number'
-                    ? source.interval
-                    : typeof a.interval === 'number'
-                      ? a.interval
-                      : b.interval;
-            if (typeof interval === 'number' && !isNaN(interval)) res.interval = interval;
-            const reps =
-                typeof source.repetitions === 'number'
-                    ? source.repetitions
-                    : typeof a.repetitions === 'number'
-                      ? a.repetitions
-                      : b.repetitions;
-            if (typeof reps === 'number' && !isNaN(reps)) res.repetitions = reps;
+            for (const field of ['easeFactor', 'interval', 'repetitions']) {
+                const value = [source, a, b].map((x) => x[field]).find((v) => typeof v === 'number' && !isNaN(v));
+                if (value !== undefined) res[field] = value;
+            }
             return res;
         };
         if (!aSeen && !bSeen) {
@@ -1533,6 +1518,9 @@ export const FirebaseAuthEngine = {
             merged.brevets = mergeBrevets(local.brevets, cloud.brevets);
         }
 
+        // Jamais de fiche d'urgence (données de santé) venue du cloud ni renvoyée vers lui.
+        delete merged.iceProfile;
+
         // Réglages retirés ou renommés (spec 002) : rayon « Illimité », modèle « meteoblue ».
         return migrateSitePrefs(merged);
     },
@@ -1602,6 +1590,9 @@ export const FirebaseAuthEngine = {
         if (themeMode) {
             prefs.themeMode = themeMode;
         }
+
+        // La fiche d'urgence (ICE) contient des données de santé : elle ne quitte jamais l'appareil.
+        delete (/** @type {any} */ (prefs).iceProfile);
 
         // Réglages retirés ou renommés (spec 002) : rayon « Illimité », modèle « meteoblue ».
         return migrateSitePrefs(prefs);

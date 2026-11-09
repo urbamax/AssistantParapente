@@ -92,31 +92,27 @@ export function calculateSm2Interval(repetition, easeFactor = DEFAULT_EASE_FACTO
 
 /**
  * Évalue la qualité d'une réponse (0 à 5) pour l'algorithme SM-2.
+ *
+ * Elle ne dépend que de la justesse de la réponse, jamais du temps passé : une question se lit parfois à voix
+ * haute (mode vocal, 20 à 40 s), ou l'écran se met en veille. Compter ce temps ferait chuter à tort le facteur
+ * de facilité (8 bonnes réponses « lentes » le ramenaient à 1,38 pour un plancher de 1,3).
  * @param {object} [params={}]
  * @param {boolean} [params.isCorrect]
  * @param {number} [params.userScore]
  * @param {number} [params.maxScore]
- * @param {number} [params.timeTakenMs] Temps passé sur la question (ms)
  * @param {number} [params.explicitQuality] Note explicite éventuelle (0-5)
  * @returns {number} Qualité de rappel entière entre 0 et 5
  */
-export function evaluateQuality({ isCorrect, userScore, maxScore, timeTakenMs, explicitQuality } = {}) {
+export function evaluateQuality({ isCorrect, userScore, maxScore, explicitQuality } = {}) {
     if (typeof explicitQuality === 'number' && !isNaN(explicitQuality)) {
         return Math.max(0, Math.min(5, Math.round(explicitQuality)));
     }
     if (!isCorrect) {
-        // En cas d'erreur :
-        // Si points partiels obtenus sans score négatif : "Presque" => q = 2
+        // Points partiels sans malus : « presque » => q = 2 ; erreur classique => q = 1.
         if (typeof userScore === 'number' && typeof maxScore === 'number' && maxScore > 0 && userScore > 0) {
             return 2;
         }
-        return 1; // Erreur classique
-    }
-    // Réponse correcte :
-    if (typeof timeTakenMs === 'number' && timeTakenMs > 0) {
-        if (timeTakenMs > 30000) return 3; // Correct mais laborieux (> 30s)
-        if (timeTakenMs > 15000) return 4; // Correct avec hésitation (> 15s)
-        return 5; // Réponse fluide et rapide (<= 15s)
+        return 1;
     }
     return 5;
 }
@@ -129,7 +125,6 @@ export function evaluateQuality({ isCorrect, userScore, maxScore, timeTakenMs, e
  * @param {boolean} [result.isCorrect]
  * @param {number} [result.userScore]
  * @param {number} [result.maxScore]
- * @param {number} [result.timeTakenMs]
  * @param {number} [result.explicitQuality]
  * @param {number} [result.now]
  * @returns {{easeFactor: number, interval: number, repetitions: number, quality: number, lastSeen: number}}
@@ -144,7 +139,14 @@ export function applySm2Review(stat = {}, result = {}) {
 
     const isSuccess = quality >= 3;
     const newReps = isSuccess ? oldReps + 1 : 0;
-    const newInterval = isSuccess ? calculateSm2Interval(newReps, newEf, stat.interval) : 0;
+
+    // Une question suivie avant SM-2 n'a pas d'intervalle enregistré : on part de celui de son ancienne série
+    // (1, 3, 7, 14, 30 jours) au lieu de le recalculer depuis zéro (une série de 5 passait ainsi de 30 à
+    // 274 jours), et sa prochaine révision n'est jamais plus proche qu'avec l'ancien calendrier.
+    const legacy = typeof stat.interval !== 'number';
+    const previousInterval = legacy ? reviewIntervalDays(oldReps) : stat.interval;
+    let newInterval = isSuccess ? calculateSm2Interval(newReps, newEf, previousInterval) : 0;
+    if (isSuccess && legacy) newInterval = Math.max(newInterval, reviewIntervalDays(newReps));
 
     const lastSeen = typeof result.now === 'number' ? result.now : Date.now();
 

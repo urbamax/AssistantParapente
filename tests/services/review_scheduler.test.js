@@ -105,11 +105,16 @@ describe('SuperMemo SM-2: evaluateQuality', () => {
         expect(evaluateQuality({ isCorrect: false, userScore: 1, maxScore: 2 })).toBe(2);
     });
 
-    it('evaluates correct answers with hesitation/timing', () => {
-        expect(evaluateQuality({ isCorrect: true, timeTakenMs: 8000 })).toBe(5);
-        expect(evaluateQuality({ isCorrect: true, timeTakenMs: 20000 })).toBe(4);
-        expect(evaluateQuality({ isCorrect: true, timeTakenMs: 40000 })).toBe(3);
+    it('ne tient pas compte du temps passé : une bonne réponse vaut 5, lente ou non (lecture vocale, veille)', () => {
         expect(evaluateQuality({ isCorrect: true })).toBe(5);
+        expect(evaluateQuality({ isCorrect: true, timeTakenMs: 8000 })).toBe(5);
+        expect(evaluateQuality({ isCorrect: true, timeTakenMs: 90000 })).toBe(5);
+    });
+
+    it('huit bonnes réponses lentes ne font pas chuter le facteur de facilité', () => {
+        let stat = {};
+        for (let i = 0; i < 8; i++) stat = applySm2Review(stat, { isCorrect: true, timeTakenMs: 60000, now: i });
+        expect(stat.easeFactor).toBeGreaterThanOrEqual(DEFAULT_EASE_FACTOR);
     });
 });
 
@@ -148,6 +153,41 @@ describe('SuperMemo SM-2: applySm2Review', () => {
         expect(failed.repetitions).toBe(0);
         expect(failed.interval).toBe(0);
         expect(failed.easeFactor).toBeLessThan(mastered.easeFactor);
+    });
+});
+
+describe('SuperMemo SM-2: reprise des questions suivies avant SM-2', () => {
+    const now = Date.UTC(2026, 10, 9);
+
+    it("part de l'intervalle de l'ancienne série au lieu de le recalculer depuis zéro", () => {
+        // Ancien calendrier : 1, 3, 7, 14, 30 jours. Avant correctif, une série de 5 passait à 274 jours.
+        const cases = [
+            { streak: 0, max: 1 },
+            { streak: 1, max: 6 },
+            { streak: 2, max: 20 },
+            { streak: 3, max: 25 },
+            { streak: 5, max: 90 },
+        ];
+        for (const { streak, max } of cases) {
+            const r = applySm2Review({ total: 10, correct: 8, streak }, { isCorrect: true, now });
+            expect(r.interval, `série ${streak}`).toBeLessThanOrEqual(max);
+        }
+    });
+
+    it("n'est jamais plus proche qu'avec l'ancien calendrier", () => {
+        for (let streak = 0; streak <= 6; streak++) {
+            const r = applySm2Review({ total: 10, correct: 8, streak }, { isCorrect: true, now });
+            expect(r.interval, `série ${streak}`).toBeGreaterThanOrEqual(reviewIntervalDays(streak + 1));
+        }
+    });
+
+    it('une série de 5 donne environ 78 jours, pas 274', () => {
+        expect(applySm2Review({ total: 10, correct: 8, streak: 5 }, { isCorrect: true, now }).interval).toBe(78);
+    });
+
+    it('une question déjà suivie par SM-2 reste sur ses propres intervalles', () => {
+        const r = applySm2Review({ easeFactor: 2.5, interval: 6, repetitions: 2, streak: 2 }, { isCorrect: true, now });
+        expect(r.interval).toBe(Math.round(6 * 2.6));
     });
 });
 
