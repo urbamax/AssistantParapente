@@ -777,12 +777,18 @@
     display: none;
 }
 
+.ice-sticker-licence {
+    font-size: 0.8rem;
+    color: #0f172a !important;
+    letter-spacing: 0.3px;
+}
+
 .ice-sticker-foot {
     margin-top: 6px;
     padding-top: 4px;
     border-top: 1px solid #e2e8f0;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 8px;
     font-size: 0.65rem;
     font-weight: 700;

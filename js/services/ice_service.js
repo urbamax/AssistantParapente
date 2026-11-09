@@ -42,7 +42,8 @@ export const BLOOD_GROUPS = Object.freeze(['Inconnu', 'A+', 'A-', 'B+', 'B-', 'A
  * @property {string} pays code pays ISO 3166-1 alpha-2 (« FR ») : nationalité, affichée en drapeau
  * @property {string} remarques
  * @property {string} [medical]
- * @property {string} ffvl
+ * @property {string} ffvl numéro de licence (clé historique : la licence FFVL)
+ * @property {string} federation fédération de la licence (« FFVL », « SHV », « DHV »…)
  * @property {string} insurance
  */
 
@@ -67,6 +68,7 @@ export const DEFAULT_ICE_PROFILE = Object.freeze({
     pays: '',
     remarques: '',
     ffvl: '',
+    federation: '',
     insurance: '',
 });
 
@@ -91,6 +93,7 @@ export const ICE_LIMITS = Object.freeze({
     pays: 2,
     remarques: 250,
     ffvl: 20,
+    federation: 12,
     insurance: 60,
 });
 
@@ -119,6 +122,7 @@ const FIELD_LIMIT = Object.freeze({
     pays: ICE_LIMITS.pays,
     remarques: ICE_LIMITS.remarques,
     ffvl: ICE_LIMITS.ffvl,
+    federation: ICE_LIMITS.federation,
     insurance: ICE_LIMITS.insurance,
 });
 
@@ -253,6 +257,20 @@ export function ageOf(profile, now = new Date()) {
     return null;
 }
 
+/** Fédérations proposées pour la licence (suggestions : n'importe quel sigle de 12 caractères au plus est accepté). */
+export const ICE_FEDERATIONS = Object.freeze(['FFVL', 'SHV', 'DHV', 'ÖAeC', 'FIVL', 'RFEDA', 'BHPA', 'USHPA']);
+
+/**
+ * Licence sur une ligne : « FFVL 1234567 » (ou « LICENCE 1234567 » sans fédération) ; '' sans numéro.
+ * @param {Partial<IceProfile>} profile
+ */
+export function licenceLine(profile) {
+    const number = (profile.ffvl || '').trim();
+    if (!number) return '';
+    const federation = (profile.federation || '').trim();
+    return `${federation || 'LICENCE'} ${number}`;
+}
+
 /**
  * Profil nettoyé : textes rognés, tronqués à la longueur maximale de chaque champ, champs inconnus ignorés.
  * @param {Partial<IceProfile> & { medical?: string }} [profile]
@@ -269,6 +287,8 @@ export function clampProfile(profile = {}) {
     // Case à cocher : toute valeur « vraie » (true, '1', 'on') devient '1', le reste ''.
     out.anticoag = [true, '1', 'on', 'true'].includes(/** @type {any} */ (src).anticoag) ? '1' : '';
     out.pays = normalizeCountry(src.pays);
+    // Une licence enregistrée avant le champ « fédération » était forcément une licence FFVL.
+    if (out.ffvl && !out.federation) out.federation = 'FFVL';
     // Date de naissance complète : l'année s'en déduit ; sans date complète, l'année seule (anciennes fiches).
     out.birthDate = normalizeBirthDate(src.birthDate);
     if (out.birthDate) out.birthYear = out.birthDate.slice(0, 4);
@@ -412,6 +432,7 @@ export function encodePayload(profile = {}) {
     const rem = profile.remarques || profile.medical;
     if (rem) params.set('rem', rem.trim());
     if (profile.ffvl) params.set('ff', profile.ffvl.trim());
+    if (profile.federation) params.set('fd', profile.federation.trim());
     if (profile.insurance) params.set('ins', profile.insurance.trim());
 
     return params.toString();
@@ -464,6 +485,7 @@ export function decodePayload(rawString = '') {
         if (params.has('rem')) result.remarques = params.get('rem') || '';
         else if (params.has('med')) result.remarques = params.get('med') || '';
         if (params.has('ff')) result.ffvl = params.get('ff') || '';
+        if (params.has('fd')) result.federation = params.get('fd') || '';
         if (params.has('ins')) result.insurance = params.get('ins') || '';
     } catch (e) {
         console.warn('[IceService] Erreur lors du décodage du payload ICE:', e);
@@ -522,7 +544,7 @@ export function buildIceVCard(profile = {}) {
     if (p.langues) note.push(`LANGUES: ${p.langues}`);
     if (p.birthDate) note.push(`Né ${formatBirthDate(p.birthDate)}`);
     else if (p.birthYear) note.push(`Né ${p.birthYear}`);
-    if (p.ffvl) note.push(`FFVL ${p.ffvl}`);
+    if (p.ffvl) note.push(licenceLine(p));
     if (p.insurance) note.push(`ASSURANCE ${p.insurance}`);
     if (note.length) lines.push(`NOTE:${note.map(vcardEscape).join('\\n')}`);
 
@@ -655,6 +677,7 @@ export const IceService = {
     formatPhoneDisplay,
     flagEmoji,
     countryName,
+    licenceLine,
     normalizeCountry,
     normalizeBirthDate,
     formatBirthDate,

@@ -6,11 +6,13 @@
 import IceService, {
     BLOOD_GROUPS,
     ICE_COUNTRIES,
+    ICE_FEDERATIONS,
     ICE_LIMITS,
     countryName,
     flagEmoji,
     formatBirthDate,
     formatPhoneDisplay,
+    licenceLine,
     normalizeBirthDate,
     normalizeCountry,
     toInternationalPhone,
@@ -90,6 +92,7 @@ export function renderIceSticker(profile) {
                 </div>
             </div>
             <div class="ice-sticker-foot">
+                <span class="ice-sticker-licence">${esc(licenceLine(p))}</span>
                 <span>Mis à jour ${updated}</span>
             </div>
         </div>
@@ -129,6 +132,8 @@ export function renderIceStickerCompact(profile) {
 
 export function renderIceTabHtml() {
     const p = IceService.getProfile();
+    // Nouvelle fiche : fédération FFVL par défaut (comme la France pour la nationalité).
+    const federation = p.federation || (p.nom || p.prenom ? '' : 'FFVL');
     // Nouvelle fiche : France par défaut (la plupart des pilotes de l'application) ; sinon le choix enregistré.
     const currentCountry = normalizeCountry(p.pays) || (p.nom || p.prenom ? '' : 'FR');
     const countries = ICE_COUNTRIES.some(([code]) => code === currentCountry)
@@ -259,9 +264,15 @@ export function renderIceTabHtml() {
                 <fieldset class="ice-fieldset">
                     <legend>Informations Fédérales &amp; Assurance</legend>
                     <div class="ice-form-row ice-form-row-2">
-                        <label>N° Licence FFVL
+                        <label>Fédération
+                            <input type="text" id="ice-federation" list="ice-federations" maxlength="${ICE_LIMITS.federation}" value="${esc(federation)}" placeholder="Ex: FFVL" autocomplete="off" />
+                            <datalist id="ice-federations">${ICE_FEDERATIONS.map((f) => `<option value="${esc(f)}"></option>`).join('')}</datalist>
+                        </label>
+                        <label>N° de licence
                             <input type="text" id="ice-ffvl" maxlength="${ICE_LIMITS.ffvl}" value="${esc(p.ffvl)}" placeholder="Ex: 1234567" />
                         </label>
+                    </div>
+                    <div class="ice-form-row">
                         <label>Assurance assistance / Rapatriement
                             <input type="text" id="ice-insurance" maxlength="${ICE_LIMITS.insurance}" value="${esc(p.insurance)}" placeholder="Ex: Europ Assistance FFVL" />
                         </label>
@@ -331,6 +342,7 @@ export function getIceFormValues() {
         tetanos: val('ice-tetanos'),
         pays: val('ice-pays'),
         ffvl: val('ice-ffvl'),
+        federation: val('ice-federation'),
         insurance: val('ice-insurance'),
     };
 }

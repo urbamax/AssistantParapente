@@ -251,7 +251,7 @@ export class IceViewClass extends BaseView {
             <section class="ice-card ice-card-federal">
                 <h3><i class="ri-shield-fill" aria-hidden="true"></i> Assurance & Licence</h3>
                 <dl class="ice-dl-grid">
-                    ${p.ffvl ? `<dt>Licence FFVL</dt><dd><strong>${esc(p.ffvl)}</strong></dd>` : ''}
+                    ${p.ffvl ? `<dt>Licence${p.federation ? ` ${esc(p.federation)}` : ''}</dt><dd><strong>${esc(p.ffvl)}</strong></dd>` : ''}
                     ${p.insurance ? `<dt>Assurance / Rapatriement</dt><dd>${esc(p.insurance)}</dd>` : ''}
                 </dl>
             </section>

@@ -10,6 +10,8 @@ import IceService, {
     normalizeBirthDate,
     formatBirthDate,
     ageOf,
+    licenceLine,
+    ICE_FEDERATIONS,
     flagEmoji,
     countryName,
     normalizeCountry,
@@ -603,5 +605,92 @@ describe('date de naissance complète, numéro du pilote, langues', () => {
         expect(html).toContain('id="ice-langues"');
         expect(html).toContain('value="Français, Anglais"');
         expect(html).not.toContain('id="ice-birthYear"');
+    });
+});
+
+describe('fédération et numéro de licence', () => {
+    const licensed = { ...typical, ffvl: '1234567', federation: 'SHV' };
+
+    it('écrit la licence sur une ligne : « fédération numéro »', () => {
+        expect(licenceLine({ ffvl: '1234567', federation: 'FFVL' })).toBe('FFVL 1234567');
+        expect(licenceLine({ ffvl: '1234567', federation: 'ÖAeC' })).toBe('ÖAeC 1234567');
+        expect(licenceLine({ ffvl: '1234567' })).toBe('LICENCE 1234567');
+        expect(licenceLine({ federation: 'FFVL' })).toBe('');
+        expect(licenceLine({})).toBe('');
+    });
+
+    it('une licence enregistrée avant le champ fédération est une licence FFVL', () => {
+        expect(clampProfile({ ffvl: '123456' }).federation).toBe('FFVL');
+        expect(clampProfile({ ffvl: '123456', federation: 'DHV' }).federation).toBe('DHV');
+        expect(clampProfile({ federation: 'DHV' }).federation).toBe('DHV');
+        expect(clampProfile({}).federation).toBe('');
+        expect(clampProfile({ federation: 'x'.repeat(50) }).federation).toHaveLength(12);
+    });
+
+    it('propose les principales fédérations, FFVL en tête', () => {
+        expect(ICE_FEDERATIONS[0]).toBe('FFVL');
+        expect(new Set(ICE_FEDERATIONS).size).toBe(ICE_FEDERATIONS.length);
+    });
+
+    it('survit au lien du lecteur web', () => {
+        const decoded = IceService.decodePayload(IceService.encodePayload(licensed));
+        expect(decoded.federation).toBe('SHV');
+        expect(decoded.ffvl).toBe('1234567');
+    });
+
+    it('est écrit dans les notes du QR avec la fédération', () => {
+        expect(buildIceVCard(licensed)).toContain('SHV 1234567');
+        expect(buildIceVCard({ ...typical, ffvl: '1234567' })).toContain('FFVL 1234567');
+        expect(buildIceVCard(typical)).not.toContain('LICENCE');
+    });
+
+    it("est écrit sur l'étiquette complète (pied, à gauche de la mise à jour), pas sur la compacte", () => {
+        const text = renderIceSticker(licensed)
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/\s+/g, ' ');
+        expect(text).toContain('SHV 1234567');
+        expect(text.indexOf('SHV 1234567')).toBeLessThan(text.indexOf('Mis à jour'));
+        expect(renderIceStickerCompact(licensed)).not.toContain('SHV');
+        // Sans numéro : rien d'écrit (pas de « LICENCE » orphelin).
+        expect(renderIceSticker({ ...typical, ffvl: '' }).replace(/<[^>]+>/g, ' ')).not.toContain('LICENCE');
+    });
+
+    it('la fiche de secours nomme la fédération', async () => {
+        document.body.innerHTML = '<div id="ice-root"></div>';
+        window.history.replaceState({}, '', `/?mode=ICE#${IceService.encodePayload(licensed)}`);
+        await IceView.mount({});
+        const root = document.getElementById('ice-root');
+        expect(root.textContent).toContain('Licence SHV');
+        expect(root.textContent).toContain('1234567');
+        window.history.replaceState({}, '', '/');
+    });
+
+    it('le formulaire propose la fédération (FFVL par défaut pour une nouvelle fiche) et le numéro', () => {
+        expect(renderIceTabHtml()).toContain('id="ice-federation" list="ice-federations" maxlength="12" value="FFVL"');
+        IceService.saveProfile(licensed);
+        const html = renderIceTabHtml();
+        expect(html).toContain('value="SHV"');
+        expect(html).toContain('id="ice-ffvl"');
+        expect(html).toContain('<datalist id="ice-federations">');
+        // Fiche déjà remplie sans licence : on ne devine pas.
+        IceService.saveProfile({ ...typical, ffvl: '', federation: '' });
+        expect(renderIceTabHtml()).toContain('id="ice-federation" list="ice-federations" maxlength="12" value=""');
+    });
+
+    it('une fiche complète avec fédération tient toujours dans le QR', () => {
+        const everything = {
+            ...typical,
+            pays: 'FR',
+            birthYear: '',
+            birthDate: '1988-03-12',
+            tel: '06 00 11 22 33',
+            langues: 'Français, Anglais',
+            anticoag: '1',
+            tetanos: '2022',
+            ffvl: '1234567',
+            federation: 'FFVL',
+        };
+        expect(IceService.qrFits(everything)).toBe(true);
+        expect(generateQrMatrix(buildIceVCard(everything)).length).toBeLessThanOrEqual(81);
     });
 });
