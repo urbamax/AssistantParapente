@@ -765,6 +765,11 @@
     font-size: 0.8rem;
     font-weight: 700;
     color: #334155 !important;
+    margin-bottom: 4px;
+}
+
+.ice-sticker-id .ice-sticker-birth {
+    margin-bottom: 0;
 }
 
 /* La copie n'existe que le temps d'une impression (voir printIceSticker). */
@@ -777,7 +782,7 @@
     padding-top: 4px;
     border-top: 1px solid #e2e8f0;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 8px;
     font-size: 0.65rem;
     font-weight: 700;

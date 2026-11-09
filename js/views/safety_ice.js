@@ -61,11 +61,15 @@ export function renderIceSticker(profile) {
         if (!intl) return '';
         return `<div class="ice-sticker-contact">${name ? `${esc(name)} : ` : ''}<strong>${esc(formatPhoneDisplay(intl))}</strong></div>`;
     };
+    // Seul le contact d'urgence principal est écrit sur l'étiquette (le second n'est que dans le QR) ; à défaut
+    // de premier contact, le second ; sans aucun contact, le 112.
     const contacts =
-        contact(p.contact1Name, p.contact1Phone) + contact(p.contact2Name, p.contact2Phone) ||
+        contact(p.contact1Name, p.contact1Phone) ||
+        contact(p.contact2Name, p.contact2Phone) ||
         '<div class="ice-sticker-contact"><strong>112</strong></div>';
     // Drapeau de la nationalité à côté du nom : les secours voient d'où vient le pilote.
     const flag = stickerFlag(p);
+    const birth = stickerBirth(p);
     const now = new Date();
     const updated = `${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
 
@@ -79,13 +83,13 @@ export function renderIceSticker(profile) {
                 <div class="ice-sticker-qr">${qrSvg}</div>
                 <div class="ice-sticker-meta">
                     <div class="ice-sticker-pilot">${flag}${esc(fullName)}</div>
+                    ${birth ? `<div class="ice-sticker-birth">${esc(birth)}</div>` : ''}
                     ${blood}
                     ${allergy}
                     ${contacts}
                 </div>
             </div>
             <div class="ice-sticker-foot">
-                <span>SCANNER : fiche complète</span>
                 <span>Mis à jour ${updated}</span>
             </div>
         </div>

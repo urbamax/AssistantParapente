@@ -243,20 +243,39 @@ describe('étiquette casque : informations vitales en toutes lettres', () => {
         vi.unstubAllGlobals();
     });
 
-    it('écrit le sang, les allergies et les deux contacts, sans emoji, avec la date de mise à jour', () => {
+    it('écrit le sang, les allergies et le contact principal, sans emoji, avec la date de mise à jour', () => {
         const html = renderIceSticker(typical);
         const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
         expect(text).toContain('Thomas Dupont');
         expect(text).toContain('SANG O+');
         expect(text).toContain('ALLERGIES : Pénicilline');
         expect(text).toContain('Sophie : +33 6 12 34 56 78');
-        expect(text).toContain('Pierre : +33 6 98 76 54 32');
+        // Contact principal seulement sur l'étiquette : le second est dans le QR.
+        expect(text).not.toContain('Pierre');
+        expect(text).not.toContain('+33 6 98 76 54 32');
         expect(text).toMatch(/Mis à jour \d{2}\/\d{4}/);
+        // La date de naissance complète est écrite sur l'étiquette complète ; plus de texte « SCANNER » en pied.
+        expect(text).toContain('Né en 1988');
+        expect(text).not.toContain('SCANNER');
+        expect(
+            renderIceSticker({ ...typical, birthYear: '', birthDate: '1988-03-12' }).replace(/<[^>]+>/g, ' '),
+        ).toContain('Né le 12/03/1988');
         expect(html).not.toMatch(/[\u{1F300}-\u{1FAFF}\u2795]/u);
         expect(html).toContain('<svg');
         // En-tête : le numéro d'urgence que compose un témoin, pas une fréquence radio de pilote.
         expect(text).toContain('SOS 112');
         expect(html).not.toContain('143.9875');
+    });
+
+    it("sans premier contact, l'étiquette écrit le second ; le QR garde toujours les deux", () => {
+        const onlySecond = { ...typical, contact1Phone: '', contact1Name: '' };
+        const text = renderIceSticker(onlySecond)
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/\s+/g, ' ');
+        expect(text).toContain('Pierre : +33 6 98 76 54 32');
+        expect(text).not.toContain('Sophie');
+        expect(buildIceVCard(typical)).toContain('Sophie (Conjointe)');
+        expect(buildIceVCard(typical)).toContain('Pierre (Frère)');
     });
 
     it('sans contact, renvoie vers le 112 plutôt que de laisser un vide', () => {
