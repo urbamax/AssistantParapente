@@ -26,6 +26,10 @@ const CROSS_REFERENCES = [
     /autres? (option|réponse|proposition)s?/i,
     /(option|réponse|proposition)s? (précédente|suivante)s?/i,
     /\bidem\b/i,
+    /(comme|ainsi que) (indiqué|vu|dit|précisé|noté|expliqué)e?s? plus haut/i,
+    /\bcette étude\b/i,
+    /\bégalement (juste|vrai|vraie|faux|fausse)\b/i,
+    /\ble même chapitre\b/i,
 ];
 
 describe('quiz explanations stand alone (answer choices are shuffled)', () => {
