@@ -525,23 +525,18 @@ export function buildQuestionsHtml(
             }
         }
 
-        const examStatsKey =
-            examQuestionsCount > 1
-                ? examsCount > 1
-                    ? 'stats.examStatsManyMany'
-                    : 'stats.examStatsManyOne'
-                : examsCount > 1
-                  ? 'stats.examStatsOneMany'
-                  : 'stats.examStatsOneOne';
-        const examStatsHtml = tqh(examStatsKey, {
-            questions: `<span style="font-weight:700; color:var(--text-main);">${examQuestionsCount}</span>`,
-            exams: `<span style="font-weight:700; color:var(--text-main);">${examsCount}</span>`,
-        });
+        // Rien à dire tant qu'aucun examen n'a été passé (sinon « dont 0 posée en examen » sur chaque liste).
+        const examStatsHtml =
+            examsCount > 0
+                ? `, ${tqh(examQuestionsCount > 1 ? 'stats.examStatsMany' : 'stats.examStatsOne', {
+                      questions: `<span style="font-weight:700; color:var(--text-main);">${examQuestionsCount}</span>`,
+                  })}`
+                : '';
 
         allQuestionsHtml = `
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
-                        ${tqh('stats.questionCount', { count: `<span style="font-weight:700; color:var(--text-main);">${visibleQuestions.length}</span>` })}${hasActiveFilter ? ` <span style="opacity:0.6;">(${displayLabel})</span>` : ''}, ${examStatsHtml}
+                        ${tqh('stats.questionCount', { count: `<span style="font-weight:700; color:var(--text-main);">${visibleQuestions.length}</span>` })}${hasActiveFilter ? ` <span style="opacity:0.6;">(${displayLabel})</span>` : ''}${examStatsHtml}
                         ${hasActiveFilter ? `<a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">${tq('stats.clearFilters')}</a>` : ''}
                     </div>
                     <div class="stats-sort-container">
