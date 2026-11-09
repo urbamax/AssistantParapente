@@ -366,8 +366,9 @@ export function renderIceCloudCard() {
             <h3><i class="ri-cloud-line" aria-hidden="true"></i> Sauvegarde en ligne (facultative)</h3>
             <p class="safety-hint">
                 Votre fiche contient des données de santé : par défaut elle reste <strong>uniquement sur cet appareil</strong>.
-                Vous pouvez l'enregistrer dans votre profil en ligne pour la retrouver sur vos autres appareils. Elle n'est
-                lisible que par vous, et vous pouvez la supprimer à tout moment.
+                Vous pouvez l'enregistrer dans votre profil en ligne pour la retrouver sur vos autres appareils. Dans
+                l'application, elle n'est lisible que par vous (l'éditeur, qui administre la base de données, y a techniquement
+                accès), et vous pouvez la supprimer à tout moment.
             </p>
             ${body}
         </div>
@@ -404,8 +405,9 @@ export async function enableIceCloud() {
     }
     const agreed = confirm(
         'Enregistrer votre fiche d’urgence dans votre profil en ligne ?\n\n' +
-            'Elle contient des données de santé (groupe sanguin, allergies, traitements…). Elle sera stockée dans votre compte, ' +
-            'lisible uniquement par vous, et vous pourrez la supprimer à tout moment.\n\n' +
+            'Elle contient des données de santé (groupe sanguin, allergies, traitements…). Elle sera stockée dans votre compte : ' +
+            'dans l’application, vous seul pouvez la lire ; l’éditeur de l’application, qui administre la base de données, y a ' +
+            'techniquement accès. Vous pourrez la supprimer à tout moment.\n\n' +
             'Vous donnez votre accord exprès à cette sauvegarde.',
     );
     if (!agreed) return;

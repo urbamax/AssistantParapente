@@ -316,6 +316,9 @@ describe('carte « Sauvegarde en ligne » et boutons', () => {
         await enableIceCloud();
         expect(confirmSpy.mock.calls[0][0]).toContain('données de santé');
         expect(confirmSpy.mock.calls[0][0]).toContain('accord exprès');
+        // Transparence : l'éditeur a techniquement accès à la base, on ne promet pas « lisible par vous seul ».
+        expect(confirmSpy.mock.calls[0][0]).toContain('l’éditeur de l’application');
+        expect(confirmSpy.mock.calls[0][0]).not.toContain('lisible uniquement par vous');
         const state = getIceCloudState();
         expect(state.enabled).toBe(true);
         expect(Date.parse(state.consentAt)).not.toBeNaN();
