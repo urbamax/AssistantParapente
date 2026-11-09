@@ -21,7 +21,15 @@ import { escapeHTML } from '../core/security.js';
 import { t } from '../utils/i18n.js';
 import { FR } from '../i18n/fr.js';
 import GlobalState from '../core/app_state.js';
-import { renderIceTabHtml, saveIceProfile, clearIceProfile, printIceSticker, testIceView } from './safety_ice.js';
+import {
+    renderIceTabHtml,
+    saveIceProfile,
+    clearIceProfile,
+    printIceSticker,
+    testIceView,
+    enableIceCloud,
+    disableIceCloud,
+} from './safety_ice.js';
 
 // Textes de l'écran (spec 019), tous dans js/i18n/fr.js (section safety). esc() : texte pour du
 // HTML ; rich() : idem, en gardant le gras <strong> de l'affiche ou du livret (seule balise permise).
@@ -686,6 +694,14 @@ class SafetyViewClass extends BaseView {
 
     testIceView() {
         testIceView();
+    }
+
+    enableIceCloud() {
+        return enableIceCloud();
+    }
+
+    disableIceCloud() {
+        return disableIceCloud();
     }
 }
 
