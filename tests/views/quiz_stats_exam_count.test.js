@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { buildQuestionsHtml } from '../../js/views/quiz_stats_html.js';
 
-describe('buildQuestionsHtml - Affichage des questions posées en examen', () => {
+describe('buildQuestionsHtml - Questions déjà posées en examen', () => {
     const levelQs = [
         { code: 'A1V', theme: 'Météo', question: 'Question A', choices: [{ text: 'x', pts: 1 }] },
         { code: 'B2V', theme: 'Météo', question: 'Question B', choices: [{ text: 'y', pts: 1 }] },
@@ -28,200 +28,50 @@ describe('buildQuestionsHtml - Affichage des questions posées en examen', () =>
         getCourseUrl: () => null,
     };
 
-    it('affiche "dont 0 posée en examen sur 0 examen réalisé" quand aucun examen n’a été passé', () => {
-        const html = buildQuestionsHtml(mockView, {
-            levelQs,
-            levelQuestionEntries,
-            stats,
-            examHistory: [],
-            currentLevel: 'BI',
-        });
-
-        expect(html).toContain('3</span> questions');
-        expect(html).toContain(
-            'dont <span style="font-weight:700; color:var(--text-main);">0</span> posée en examen sur <span style="font-weight:700; color:var(--text-main);">0</span> examen réalisé',
-        );
+    const exam = (level, codes, day = 1) => ({
+        date: `2026-10-0${day}T10:00:00Z`,
+        level,
+        results: codes.map((code) => ({ code, isCorrect: true })),
     });
 
-    it('affiche le singulier "dont 1 posée en examen sur 1 examen réalisé"', () => {
-        const examHistory = [
-            {
-                date: '2026-10-01T10:00:00Z',
-                level: 'BI',
-                results: [{ code: 'A1V', isCorrect: true }],
-            },
-        ];
+    const render = (view, examHistory, currentLevel = 'BI') =>
+        buildQuestionsHtml(view, { levelQs, levelQuestionEntries, stats, examHistory, currentLevel });
 
-        const html = buildQuestionsHtml(mockView, {
-            levelQs,
-            levelQuestionEntries,
-            stats,
-            examHistory,
-            currentLevel: 'BI',
-        });
+    const text = (html) =>
+        html
+            .replace(/<[^>]+>/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
 
-        expect(html).toContain(
-            'dont <span style="font-weight:700; color:var(--text-main);">1</span> posée en examen sur <span style="font-weight:700; color:var(--text-main);">1</span> examen réalisé',
-        );
+    it("n'affiche rien sur les examens tant qu'aucun n'a été passé", () => {
+        const html = render(mockView, []);
+        expect(text(html)).toContain('3 questions');
+        expect(text(html)).not.toContain('déjà posée');
     });
 
-    it('gère singulier questions et pluriel examens : "dont 1 posée en examen sur 2 examens réalisés"', () => {
-        const examHistory = [
-            {
-                date: '2026-10-01T10:00:00Z',
-                level: 'BI',
-                results: [{ code: 'A1V', isCorrect: true }],
-            },
-            {
-                date: '2026-10-02T10:00:00Z',
-                level: 'BI',
-                results: [{ code: 'A1V', isCorrect: true }],
-            },
-        ];
-
-        const html = buildQuestionsHtml(mockView, {
-            levelQs,
-            levelQuestionEntries,
-            stats,
-            examHistory,
-            currentLevel: 'BI',
-        });
-
-        expect(html).toContain(
-            'dont <span style="font-weight:700; color:var(--text-main);">1</span> posée en examen sur <span style="font-weight:700; color:var(--text-main);">2</span> examens réalisés',
-        );
+    it('singulier : « dont 1 déjà posée en examen »', () => {
+        expect(text(render(mockView, [exam('BI', ['A1V'])]))).toContain('3 questions, dont 1 déjà posée en examen');
     });
 
-    it('gère pluriel questions et singulier examens : "dont 2 posées en examen sur 1 examen réalisé"', () => {
-        const examHistory = [
-            {
-                date: '2026-10-01T10:00:00Z',
-                level: 'BI',
-                results: [
-                    { code: 'A1V', isCorrect: true },
-                    { code: 'B2V', isCorrect: true },
-                ],
-            },
-        ];
-
-        const html = buildQuestionsHtml(mockView, {
-            levelQs,
-            levelQuestionEntries,
-            stats,
-            examHistory,
-            currentLevel: 'BI',
-        });
-
-        expect(html).toContain(
-            'dont <span style="font-weight:700; color:var(--text-main);">2</span> posées en examen sur <span style="font-weight:700; color:var(--text-main);">1</span> examen réalisé',
-        );
+    it('pluriel : « dont 2 déjà posées en examen », une question reposée dans plusieurs examens ne compte qu’une fois', () => {
+        const html = render(mockView, [exam('BI', ['A1V', 'B2V'], 1), exam('BI', ['A1V'], 2)]);
+        expect(text(html)).toContain('dont 2 déjà posées en examen');
     });
 
-    it('gère pluriel questions et pluriel examens : "dont 2 posées en examen sur 3 examens réalisés"', () => {
-        const examHistory = [
-            {
-                date: '2026-10-01T10:00:00Z',
-                level: 'BI',
-                results: [{ code: 'A1V', isCorrect: true }],
-            },
-            {
-                date: '2026-10-02T10:00:00Z',
-                level: 'BI',
-                results: [{ code: 'B2V', isCorrect: true }],
-            },
-            {
-                date: '2026-10-03T10:00:00Z',
-                level: 'BI',
-                results: [{ code: 'A1V', isCorrect: true }],
-            },
-        ];
-
-        const html = buildQuestionsHtml(mockView, {
-            levelQs,
-            levelQuestionEntries,
-            stats,
-            examHistory,
-            currentLevel: 'BI',
-        });
-
-        expect(html).toContain(
-            'dont <span style="font-weight:700; color:var(--text-main);">2</span> posées en examen sur <span style="font-weight:700; color:var(--text-main);">3</span> examens réalisés',
-        );
+    it('filtre par niveau courant (les examens BP ne comptent pas pour BI)', () => {
+        const history = [exam('BI', ['A1V'], 1), exam('BP', ['B2V', 'C3V'], 2)];
+        expect(text(render(mockView, history, 'BI'))).toContain('dont 1 déjà posée en examen');
+        expect(text(render(mockView, history, 'BP'))).toContain('dont 2 déjà posées en examen');
     });
 
-    it('filtre bien par niveau courant (isole les examens BP de BI)', () => {
-        const examHistory = [
-            {
-                date: '2026-10-01T10:00:00Z',
-                level: 'BI',
-                results: [{ code: 'A1V', isCorrect: true }],
-            },
-            {
-                date: '2026-10-02T10:00:00Z',
-                level: 'BP',
-                results: [
-                    { code: 'B2V', isCorrect: true },
-                    { code: 'C3V', isCorrect: true },
-                ],
-            },
-        ];
-
-        const htmlBI = buildQuestionsHtml(mockView, {
-            levelQs,
-            levelQuestionEntries,
-            stats,
-            examHistory,
-            currentLevel: 'BI',
-        });
-
-        expect(htmlBI).toContain(
-            'dont <span style="font-weight:700; color:var(--text-main);">1</span> posée en examen sur <span style="font-weight:700; color:var(--text-main);">1</span> examen réalisé',
-        );
-
-        const htmlBP = buildQuestionsHtml(mockView, {
-            levelQs,
-            levelQuestionEntries,
-            stats,
-            examHistory,
-            currentLevel: 'BP',
-        });
-
-        expect(htmlBP).toContain(
-            'dont <span style="font-weight:700; color:var(--text-main);">2</span> posées en examen sur <span style="font-weight:700; color:var(--text-main);">1</span> examen réalisé',
-        );
+    it("n'affiche rien pour un niveau sans examen", () => {
+        expect(text(render(mockView, [exam('BP', ['A1V'])], 'BI'))).not.toContain('déjà posée');
     });
 
-    it('adapte le décompte des questions posées au filtre de thème actif', () => {
-        const examHistory = [
-            {
-                date: '2026-10-01T10:00:00Z',
-                level: 'BI',
-                results: [
-                    { code: 'A1V', isCorrect: true }, // Thème Météo
-                    { code: 'C3V', isCorrect: true }, // Thème Pilotage
-                ],
-            },
-        ];
-
-        const viewWithTheme = {
-            ...mockView,
-            state: { ...mockView.state, themeFilter: 'Météo' },
-        };
-
-        const html = buildQuestionsHtml(viewWithTheme, {
-            levelQs,
-            levelQuestionEntries,
-            stats,
-            examHistory,
-            currentLevel: 'BI',
-        });
-
-        // Visible questions en météo: A1V et B2V (2 questions)
-        // Seule A1V a été posée en examen
-        expect(html).toContain('2</span> questions');
-        expect(html).toContain('(Thème : Météo)');
-        expect(html).toContain(
-            'dont <span style="font-weight:700; color:var(--text-main);">1</span> posée en examen sur <span style="font-weight:700; color:var(--text-main);">1</span> examen réalisé',
-        );
+    it('adapte le décompte au filtre de thème actif', () => {
+        const viewWithTheme = { ...mockView, state: { ...mockView.state, themeFilter: 'Météo' } };
+        const html = render(viewWithTheme, [exam('BI', ['A1V', 'C3V'])]);
+        // Questions de météo visibles : A1V et B2V ; seule A1V a été posée en examen.
+        expect(text(html)).toContain('2 questions (Thème : Météo), dont 1 déjà posée en examen');
     });
 });
