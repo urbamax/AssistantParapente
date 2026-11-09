@@ -280,10 +280,10 @@ export function renderIceTabHtml() {
                 </fieldset>
 
                 <div class="ice-form-actions">
-                    <button type="button" class="btn btn-primary" data-action="SafetysaveIceProfile">
+                    <button type="button" class="safety-btn safety-btn-primary" data-action="SafetysaveIceProfile">
                         <i class="ri-save-3-line" aria-hidden="true"></i> Enregistrer dans mon profil
                     </button>
-                    <button type="button" class="btn btn-outline" data-action="SafetyclearIceProfile">
+                    <button type="button" class="safety-btn" data-action="SafetyclearIceProfile">
                         <i class="ri-delete-bin-line" aria-hidden="true"></i> Réinitialiser
                     </button>
                 </div>
@@ -300,10 +300,10 @@ export function renderIceTabHtml() {
                 </div>
 
                 <div class="ice-sticker-actions">
-                    <button type="button" class="btn btn-primary" data-action="SafetyprintIceSticker">
+                    <button type="button" class="safety-btn safety-btn-primary" data-action="SafetyprintIceSticker">
                         <i class="ri-printer-fill" aria-hidden="true"></i> Imprimer l'étiquette casque
                     </button>
-                    <button type="button" class="btn btn-secondary" data-action="SafetytestIceView">
+                    <button type="button" class="safety-btn" data-action="SafetytestIceView">
                         <i class="ri-eye-line" aria-hidden="true"></i> Tester la vue Secours
                     </button>
                 </div>
@@ -395,6 +395,12 @@ export function testIceView() {
     // Simple essai du lecteur web avec ce qui est dans le formulaire : rien n'est enregistré.
     const values = getIceFormValues();
     const payload = IceService.encodePayload(values);
-    window.location.hash = '#' + payload;
+    // replaceState et non `location.hash = ...` : changer le hash déclenche « popstate » avec un état vide, et le
+    // routeur renvoie alors vers l'accueil (la fiche s'affichait un instant puis disparaissait).
+    window.history.replaceState(
+        window.history.state,
+        '',
+        `${window.location.pathname}${window.location.search}#${payload}`,
+    );
     AppRouter.navigate('ICE');
 }

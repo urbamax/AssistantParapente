@@ -144,10 +144,10 @@ export class IceViewClass extends BaseView {
 
                 <!-- Actions de bas de page -->
                 <footer class="ice-actions-footer">
-                    <button type="button" class="btn btn-secondary ice-import-btn" data-action="IceimportToProfile">
+                    <button type="button" class="safety-btn ice-import-btn" data-action="IceimportToProfile">
                         <i class="ri-download-2-line" aria-hidden="true"></i> Enregistrer cette fiche dans mon profil
                     </button>
-                    <button type="button" class="btn btn-outline" data-action="IcegoToApp">
+                    <button type="button" class="safety-btn" data-action="IcegoToApp">
                         <i class="ri-home-4-line" aria-hidden="true"></i> Ouvrir l'application
                     </button>
                 </footer>
