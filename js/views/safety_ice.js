@@ -9,6 +9,7 @@ import IceService, {
     ICE_LIMITS,
     countryName,
     flagEmoji,
+    formatBirthDate,
     formatPhoneDisplay,
     normalizeBirthDate,
     normalizeCountry,
@@ -18,6 +19,21 @@ import { escapeHTML } from '../core/security.js';
 import AppRouter from '../core/router.js';
 
 const esc = (text) => escapeHTML(text || '');
+
+/** Drapeau de la nationalité (emoji) pour une étiquette : '' si aucune nationalité n'est renseignée. */
+function stickerFlag(p) {
+    const code = normalizeCountry(p.pays);
+    return code
+        ? `<span class="ice-sticker-flag" role="img" aria-label="${esc(countryName(code))}">${flagEmoji(code)}</span> `
+        : '';
+}
+
+/** « Né le 12/03/1988 » (date complète) ou « Né en 1988 » (anciennes fiches) ; '' sans date. */
+function stickerBirth(p) {
+    const date = formatBirthDate(p.birthDate);
+    if (date) return `Né le ${date}`;
+    return /^\d{4}$/.test(p.birthYear || '') ? `Né en ${p.birthYear}` : '';
+}
 
 export function renderIceSticker(profile) {
     const p = profile || IceService.getProfile();
@@ -49,10 +65,7 @@ export function renderIceSticker(profile) {
         contact(p.contact1Name, p.contact1Phone) + contact(p.contact2Name, p.contact2Phone) ||
         '<div class="ice-sticker-contact"><strong>112</strong></div>';
     // Drapeau de la nationalité à côté du nom : les secours voient d'où vient le pilote.
-    const flagCode = normalizeCountry(p.pays);
-    const flag = flagCode
-        ? `<span class="ice-sticker-flag" role="img" aria-label="${esc(countryName(flagCode))}">${flagEmoji(flagCode)}</span> `
-        : '';
+    const flag = stickerFlag(p);
     const now = new Date();
     const updated = `${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
 
@@ -80,12 +93,15 @@ export function renderIceSticker(profile) {
 }
 
 /**
- * Étiquette compacte : seulement « URGENCE » et le QR code (casque : peu de place, une surface courbe). Toutes
- * les informations sont dans le QR ; l'étiquette complète les écrit en toutes lettres.
+ * Étiquette compacte : « URGENCE », le QR code, et en dessous l'identité (drapeau, nom, date de naissance) pour
+ * savoir à qui est le casque sans rien scanner. Toutes les autres informations sont dans le QR ; l'étiquette
+ * complète les écrit en toutes lettres.
  * @param {Partial<import('../services/ice_service.js').IceProfile>} [profile]
  */
 export function renderIceStickerCompact(profile) {
     const p = profile || IceService.getProfile();
+    const fullName = `${p.prenom || ''} ${p.nom || ''}`.trim() || 'Pilote';
+    const birth = stickerBirth(p);
     let qrSvg;
     try {
         qrSvg = IceService.generateQrSvg(p, { size: 140, border: 1 });
@@ -99,6 +115,10 @@ export function renderIceStickerCompact(profile) {
                 <span class="ice-sticker-title">URGENCE</span>
             </div>
             <div class="ice-sticker-qr">${qrSvg}</div>
+            <div class="ice-sticker-id">
+                <div class="ice-sticker-pilot">${stickerFlag(p)}${esc(fullName)}</div>
+                ${birth ? `<div class="ice-sticker-birth">${esc(birth)}</div>` : ''}
+            </div>
         </div>
     `;
 }

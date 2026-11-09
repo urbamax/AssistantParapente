@@ -289,17 +289,35 @@ describe('étiquette casque : informations vitales en toutes lettres', () => {
     });
 });
 
-describe('étiquette compacte : URGENCE et le QR', () => {
-    it("ne porte que l'en-tête URGENCE et le QR, sans texte de fiche", () => {
-        const html = renderIceStickerCompact(typical);
-        const text = html
+describe("étiquette compacte : URGENCE, le QR et l'identité", () => {
+    const text = (html) =>
+        html
             .replace(/<[^>]+>/g, ' ')
             .replace(/\s+/g, ' ')
             .trim();
-        expect(text).toBe('URGENCE');
+
+    it('porte URGENCE, le QR, puis le drapeau, le nom et la date de naissance, et rien d’autre', () => {
+        const html = renderIceStickerCompact({ ...typical, pays: 'FR', birthYear: '', birthDate: '1988-03-12' });
+        expect(text(html)).toBe('URGENCE 🇫🇷 Thomas Dupont Né le 12/03/1988');
         expect(html).toContain('<svg');
-        expect(html).not.toContain('Dupont');
-        expect(text).not.toMatch(/\d/);
+        expect(html).toContain('aria-label="France"');
+        // Aucune information médicale ni aucun numéro de téléphone en clair : tout cela est dans le QR.
+        for (const secret of ['O+', 'Pénicilline', 'Sophie', '+33', 'MAIF', 'ANTICOAGULANT']) {
+            expect(html, secret).not.toContain(secret);
+        }
+    });
+
+    it("sans drapeau ni date : seulement le nom ; ancienne fiche : l'année seule", () => {
+        expect(text(renderIceStickerCompact({ prenom: 'Thomas', nom: 'Dupont' }))).toBe('URGENCE Thomas Dupont');
+        expect(text(renderIceStickerCompact({ ...typical, birthYear: '1988', birthDate: '' }))).toBe(
+            'URGENCE Thomas Dupont Né en 1988',
+        );
+    });
+
+    it('échappe le nom', () => {
+        const html = renderIceStickerCompact({ prenom: '<img src=x onerror=alert(1)>', nom: 'D' });
+        expect(html).not.toContain('<img src=x');
+        expect(html).toContain('&lt;img');
     });
 
     it("affiche un message plutôt qu'un QR illisible quand la fiche est trop longue", () => {
@@ -440,11 +458,11 @@ describe('drapeau de la nationalité', () => {
         expect(generateQrMatrix(buildIceVCard(full)).length).toBeLessThanOrEqual(81);
     });
 
-    it("l'étiquette complète affiche le drapeau à côté du nom, l'étiquette compacte reste sans texte", () => {
+    it("l'étiquette complète et l'étiquette compacte affichent le drapeau à côté du nom", () => {
         const html = renderIceSticker(withCountry);
         expect(html).toContain('<span class="ice-sticker-flag" role="img" aria-label="France">🇫🇷</span> Thomas Dupont');
         expect(renderIceSticker(typical)).not.toContain('ice-sticker-flag');
-        expect(renderIceStickerCompact(withCountry)).not.toContain('🇫🇷');
+        expect(renderIceStickerCompact(withCountry)).toContain('🇫🇷');
     });
 
     it('la fiche de secours affiche le drapeau et la nationalité', async () => {

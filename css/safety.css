@@ -733,7 +733,7 @@
     white-space: nowrap;
 }
 
-/* Étiquette compacte : « URGENCE » et le QR, 50 x 55 mm imprimée. */
+/* Étiquette compacte : « URGENCE », le QR et l'identité (drapeau, nom, date de naissance), 56 mm de large imprimée. */
 .ice-sticker-compact {
     width: 200px;
 }
@@ -749,6 +749,22 @@
     width: 180px;
     height: 180px;
     margin: 0 auto;
+}
+
+.ice-sticker-id {
+    margin-top: 6px;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.ice-sticker-id .ice-sticker-pilot {
+    margin-bottom: 2px;
+}
+
+.ice-sticker-birth {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #334155 !important;
 }
 
 /* La copie n'existe que le temps d'une impression (voir printIceSticker). */
