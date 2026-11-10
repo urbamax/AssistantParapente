@@ -38,6 +38,7 @@ Usage:
 """
 import argparse
 import json
+import math
 import re
 import sys
 import unicodedata
@@ -242,8 +243,9 @@ def build_types(rec):
 
 def build_acces(rec):
     parts = []
-    if clean(rec.get("acces")):
-        parts.append(clean(rec["acces"]))
+    acces = clean(rec.get("access_description")) or clean(rec.get("acces"))
+    if acces:
+        parts.append(acces)
     wt = rec.get("walking_time_from_parking_minutes")
     if wt is not None and str(wt).strip() not in ("0", "None", ""):
         parts.append(f"Trajet parking → déco : {wt} min")
@@ -271,11 +273,12 @@ def build_secours(rec):
 
 def build_dangers(rec):
     w = clean(rec.get("warnings") or rec.get("dangers"))
-    if not w:
-        return None
-    if w.strip().lower() in TRIVIAL_WARNINGS:
-        return None
-    return w
+    if w and w.strip().lower() in TRIVIAL_WARNINGS:
+        w = None
+    # Message d'alerte de la FFVL (rare mais important : interdictions, difficulté).
+    alert = clean(rec.get("alert_msg"))
+    parts = [p for p in (alert, w) if p]
+    return "\n\n".join(parts) or None
 
 
 def build_convention(rec):
@@ -343,16 +346,74 @@ def convert(rec):
         "structure_gestionnaire": clean(rec.get("structure_gestionnaire")),
         "dangers": build_dangers(rec),
         "secours_acces": build_secours(rec),
-        "aerologie_ideale": clean(rec.get("conditions_ideales")) or clean(rec.get("vent_favo")),
+        "aerologie_ideale": clean(rec.get("ideal_conditions_description"))
+        or clean(rec.get("conditions_ideales"))
+        or clean(rec.get("vent_favo")),
         "acces_topo": build_acces(rec),
         "observations": clean(rec.get("description") or rec.get("environmental_description")),
         "restrictions": clean(rec.get("restrictions")),
-        "reglementation": clean(rec.get("reg_aerienne")),
+        "reglementation": clean(rec.get("flying_rules_description")) or clean(rec.get("reg_aerienne")),
         "url": f"https://federation.ffvl.fr/terrain/{suid}" if suid else None,
         "atterissage": None,
         "date_modification": date_mod,
         "source": source,
     }
+
+
+# Types « de nature de terrain » produits par l'import. Tout autre type présent sur une entrée
+# existante (SOARING, THERMIQUE, DUNE, MARCHE ET VOL…) vient d'un enrichissement manuel : il est conservé.
+COARSE_TYPES = {"NATUREL", "ATTERRO", "GONFLAGE", "TREUIL", "KITE", "ROULAGE", "INTERDIT"}
+
+# Champs que le jeu de données officiel ne fournit pas (ou pas toujours) : si la nouvelle valeur
+# est vide, on garde celle déjà présente plutôt que de l'effacer.
+KEEP_IF_EMPTY = ("structure_gestionnaire", "conventionnement", "atterissage", "aerologie_ideale")
+
+# Une entrée absente du jeu officiel et située à moins de cette distance d'un terrain officiel
+# a été renumérotée par la FFVL : elle fait doublon.
+SUPERSEDED_RADIUS_M = 500
+
+
+def is_ffvl_import(site):
+    """Entrée issue d'un import FFVL (donc rafraîchissable), par opposition à une entrée saisie à la main."""
+    return str(site.get("source") or "").startswith("FFVL")
+
+
+def refresh_entry(old, new):
+    """Entrée officielle à jour (`new`), en gardant ce qui a été enrichi à la main sur `old`."""
+    merged = dict(new)
+    # L'id sert de clé aux données enregistrées par les utilisateurs (carnet, favoris, prévisions en
+    # cache) : il ne change jamais, même si la FFVL renomme le terrain (l'id contient le nom).
+    if old.get("id"):
+        merged["id"] = old["id"]
+    extra_types = [t for t in (old.get("type") or []) if t not in COARSE_TYPES]
+    merged["type"] = list(new.get("type") or []) + [t for t in extra_types if t not in (new.get("type") or [])]
+    for key in KEEP_IF_EMPTY:
+        if not merged.get(key) and old.get(key):
+            merged[key] = old[key]
+    return merged
+
+
+def distance_m(lat1, lon1, lat2, lon2):
+    dy = math.radians(lat2 - lat1)
+    dx = math.radians(lon2 - lon1) * math.cos(math.radians((lat1 + lat2) / 2))
+    return 6371000.0 * math.hypot(dx, dy)
+
+
+def hide_superseded(by_ref, official_refs, official_points):
+    """Masque (affiche=False) les entrées FFVL absentes du jeu officiel qui font doublon avec un
+    terrain officiel voisin. Elles restent dans la base pour que les ids enregistrés par les
+    utilisateurs (carnet, favoris) continuent de se résoudre. Retourne le nombre d'entrées masquées."""
+    hidden = 0
+    for ref, site in by_ref.items():
+        if ref in official_refs or not is_ffvl_import(site) or site.get("affiche") is False:
+            continue
+        lat, lon = site.get("latitude"), site.get("longitude")
+        if lat is None or lon is None:
+            continue
+        if any(distance_m(lat, lon, la, lo) <= SUPERSEDED_RADIUS_M for la, lo in official_points):
+            site["affiche"] = False
+            hidden += 1
+    return hidden
 
 
 def load_dump(args):
@@ -372,7 +433,9 @@ def main():
     ap.add_argument("--wayback", action="store_true", help="utiliser l'ancien snapshot Wayback 2022")
     ap.add_argument("--all-disciplines", action="store_true", help="inclure toutes les disciplines FFVL (kite, cerf-volant, boomerang...)")
     ap.add_argument("--out", default=str(OUT), help=f"fichier de sortie (défaut: {OUT})")
-    ap.add_argument("--overwrite", action="store_true", help="remplacer aussi les entrées déjà présentes")
+    ap.add_argument("--overwrite", action="store_true", help="remplacer aussi les entrées saisies à la main")
+    ap.add_argument("--keep-existing", action="store_true",
+                    help="ne pas rafraîchir les entrées FFVL déjà présentes (ancien comportement, additif)")
     ap.add_argument("--dry-run", action="store_true", help="ne rien écrire, afficher les stats")
     args = ap.parse_args()
 
@@ -417,14 +480,29 @@ def main():
             continue
         ref = conv["reference_terrain"]
         if ref in by_ref:
+            current = by_ref[ref]
             if args.overwrite:
-                by_ref[ref] = conv
+                by_ref[ref] = refresh_entry(current, conv)
                 updated += 1
+            elif is_ffvl_import(current) and not args.keep_existing:
+                if current != (merged_entry := refresh_entry(current, conv)):
+                    by_ref[ref] = merged_entry
+                    updated += 1
+                else:
+                    skipped += 1
             else:
                 skipped += 1
         else:
             by_ref[ref] = conv
             added += 1
+
+    official_refs = {str(r.get("suid") or r.get("id")) for r in dump}
+    official_points = [
+        (float(r["latitude"]), float(r["longitude"]))
+        for r in dump
+        if (not parapente_only or is_parapente(r)) and r.get("latitude") is not None and r.get("longitude") is not None
+    ]
+    superseded = 0 if args.keep_existing else hide_superseded(by_ref, official_refs, official_points)
 
     merged = sorted(by_ref.values(), key=lambda s: (s.get("nom") or "").lower())
 
@@ -435,6 +513,7 @@ def main():
     print(f"Coords invalides    : {bad}", file=sys.stderr)
     print(f"Ajoutés             : {added}", file=sys.stderr)
     print(f"Mis à jour          : {updated}", file=sys.stderr)
+    print(f"Masqués (doublons renumérotés par la FFVL) : {superseded}", file=sys.stderr)
     print(f"Conservés (existant): {skipped}", file=sys.stderr)
     print(f"Total final sites   : {len(merged)}", file=sys.stderr)
 
