@@ -289,7 +289,12 @@ test.describe('E2E - Sites Flow', () => {
             .locator('.forecast-context');
         await expect(again).toContainText('peut être dépassée');
         await again.locator('[data-action="SitesrefreshWeather"]').click();
-        await page.clock.runFor(20000); // nouvelles tentatives après refus (3 s puis 12 s)
+        // Nouvelles tentatives après refus (3 s puis 12 s) : chaque attente est programmée seulement une
+        // fois la réponse 429 reçue, donc on avance l'horloge par petits pas en laissant la page réagir.
+        for (let elapsed = 0; elapsed < 20000; elapsed += 1000) {
+            await page.clock.runFor(1000);
+            await page.waitForTimeout(50);
+        }
         const failed = page
             .locator('.site-card:not(.minimized)', { hasText: 'AUTEUIL' })
             .first()
