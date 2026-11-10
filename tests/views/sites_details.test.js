@@ -34,8 +34,10 @@ describe('site details in the card (spec 003, US1)', () => {
         expect(link.getAttribute('target')).toBe('_blank');
     });
 
-    it('COL DES LIMOUCHES keeps its bold warning', () => {
-        const bolds = [...cardText(byId('col-des-limouches-728')).querySelectorAll('b')].map((b) => b.textContent);
+    it('a bold warning in a site text stays bold', () => {
+        // Le jeu officiel actuel n'a plus de balise <b> : on injecte celle que COL DES LIMOUCHES portait en 2022.
+        const site = { ...byId('col-des-limouches-728'), reglementation: '<b> NO Toplanding in fields behind TO!</b>' };
+        const bolds = [...cardText(site).querySelectorAll('b')].map((b) => b.textContent);
         expect(bolds.some((text) => text.includes('NO Toplanding'))).toBe(true);
     });
 

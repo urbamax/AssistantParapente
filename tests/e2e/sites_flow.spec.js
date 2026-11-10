@@ -337,7 +337,10 @@ test.describe('E2E - Sites Flow', () => {
         await page.addInitScript(() => {
             localStorage.setItem(
                 'parapente_user_prefs',
-                JSON.stringify({ favoriteSites: ['mathay-13452', 'notre-dame-de-la-mer-1098'], radiusLimit: 10 }),
+                JSON.stringify({
+                    favoriteSites: ['mathay-belvedere-mandeure-793', 'notre-dame-de-la-mer-1098'],
+                    radiusLimit: 10,
+                }),
             );
         });
         await mockOpenMeteo(page, { complete: 2, empty: 0 });
@@ -361,7 +364,7 @@ test.describe('E2E - Sites Flow', () => {
         const mathay = await openDetails('MATHAY');
         await expect(mathay).toContainText('<<corniches calcaires du Doubs>>');
 
-        const ndm = await openDetails('Les Grandes Bruy');
+        const ndm = await openDetails('LES-GRANDES-BRUY');
         const charter = ndm.locator('a[href*="thermiquefrancilien.org"]').first();
         await expect(charter).toHaveAttribute('target', '_blank');
         await expect(charter).toHaveAttribute('rel', 'noopener noreferrer');

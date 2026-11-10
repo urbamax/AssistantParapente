@@ -318,10 +318,6 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
                         <div class="site-wind-tags site-wind-tags-row"><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="S" title="Filtrer par vent S">S</span><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="SO" title="Filtrer par vent SO">SO</span></div>
                         <span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="NATUREL" style="cursor: pointer;" title="Filtrer par type NATUREL">NATUREL</span>
                         
-        <button class="site-coords-badge site-spotair-badge" data-spotair-id="3374" data-site-id="arbas-665" data-action="SitesopenSpotairModal" title="Voir le vent en direct (SpotAiR)">
-            <i class="ri-windy-line"></i> Balise
-        </button>
-    
                         <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'50.7', '1.65'" title="Copier les coordonnées">
                             <i class="ri-map-pin-2-line"></i> <span class="coords-text">50.7, 1.65</span>
                         </button>
@@ -897,10 +893,6 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
                         <div class="site-wind-tags site-wind-tags-row"><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="S" title="Filtrer par vent S">S</span><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="SO" title="Filtrer par vent SO">SO</span></div>
                         <span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="NATUREL" style="cursor: pointer;" title="Filtrer par type NATUREL">NATUREL</span>
                         
-        <button class="site-coords-badge site-spotair-badge" data-spotair-id="3374" data-site-id="arbas-665" data-action="SitesopenSpotairModal" title="Voir le vent en direct (SpotAiR)">
-            <i class="ri-windy-line"></i> Balise
-        </button>
-    
                         <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'50.7', '1.65'" title="Copier les coordonnées">
                             <i class="ri-map-pin-2-line"></i> <span class="coords-text">50.7, 1.65</span>
                         </button>
@@ -1337,10 +1329,6 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
                         <div class="site-wind-tags site-wind-tags-row"><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="S" title="Filtrer par vent S">S</span><span role="button" tabindex="0" class="wind-tag" data-action="SitesfilterByTag" data-args="SO" title="Filtrer par vent SO">SO</span></div>
                         <span role="button" tabindex="0" class="site-coords-badge site-type-badge" data-action="SitesfilterByType" data-args="NATUREL" style="cursor: pointer;" title="Filtrer par type NATUREL">NATUREL</span>
                         
-        <button class="site-coords-badge site-spotair-badge" data-spotair-id="3374" data-site-id="arbas-665" data-action="SitesopenSpotairModal" title="Voir le vent en direct (SpotAiR)">
-            <i class="ri-windy-line"></i> Balise
-        </button>
-    
                         <button class="site-coords-badge copy-coords-btn" data-action="copyCoords" data-args="'50.7', '1.65'" title="Copier les coordonnées">
                             <i class="ri-map-pin-2-line"></i> <span class="coords-text">50.7, 1.65</span>
                         </button>
