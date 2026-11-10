@@ -366,6 +366,31 @@ def load_dump(args):
         return json.loads(r.read().decode("utf-8"))
 
 
+# Champs recalculés depuis le flux officiel pour les sites déjà présents (issus d'un import FFVL).
+# Les champs enrichis à la main (nom, type, structure_gestionnaire, textes d'accès…) ne sont jamais touchés.
+REFRESH_ALWAYS = ("affiche", "praticabilite", "date_modification", "source")
+REFRESH_IF_FILLED = (
+    "latitude", "longitude", "altitude", "conventionnement", "orientations_vent",
+    "secours_acces", "dangers",
+)
+
+
+def refresh_existing(old, conv):
+    """Met à jour une entrée existante avec les valeurs officielles. Retourne True si elle a changé."""
+    if not str(old.get("source") or "").startswith("FFVL"):
+        return False  # entrée saisie à la main ou venue d'une autre source : on n'y touche pas
+    changed = False
+    for key in REFRESH_ALWAYS:
+        if old.get(key) != conv[key]:
+            old[key] = conv[key]
+            changed = True
+    for key in REFRESH_IF_FILLED:
+        if conv[key] not in (None, [], "") and old.get(key) != conv[key]:
+            old[key] = conv[key]
+            changed = True
+    return changed
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--input", help="chemin d'un fichier JSON local (sinon: data.gouv.fr)")
@@ -420,11 +445,17 @@ def main():
             if args.overwrite:
                 by_ref[ref] = conv
                 updated += 1
+            elif refresh_existing(by_ref[ref], conv):
+                updated += 1
             else:
                 skipped += 1
         else:
             by_ref[ref] = conv
             added += 1
+
+    absent = sorted(r for r in by_ref if r not in dump_by_ref)
+    if absent:
+        print(f"Absents du flux officiel (conservés, à vérifier) : {len(absent)}", file=sys.stderr)
 
     merged = sorted(by_ref.values(), key=lambda s: (s.get("nom") or "").lower())
 
@@ -435,7 +466,7 @@ def main():
     print(f"Coords invalides    : {bad}", file=sys.stderr)
     print(f"Ajoutés             : {added}", file=sys.stderr)
     print(f"Mis à jour          : {updated}", file=sys.stderr)
-    print(f"Conservés (existant): {skipped}", file=sys.stderr)
+    print(f"Inchangés           : {skipped}", file=sys.stderr)
     print(f"Total final sites   : {len(merged)}", file=sys.stderr)
 
     if args.dry_run:
