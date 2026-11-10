@@ -1,89 +1,32 @@
+#!/usr/bin/env python3
 """
-Crawle le reseau public de balises meteo FFVL (balisemeteo.com) pour recuperer,
-pour chaque balise, son numero FFVL (l'ID utilise par les widgets SpotAiR :
-https://www.spotair.mobi/widget/wind/ffvl/<ID>) et ses coordonnees GPS.
+Récupère le réseau officiel de balises météo FFVL depuis data.gouv.fr (Licence Ouverte / Etalab 2.0).
 
-Chaque balise est ensuite rattachee au site de vol le plus proche dans
-sites_data.json, uniquement si la distance est inferieure a 1 km (les balises
-ne sont jamais des "sites" a part entiere : c'est juste un capteur de vent
-associe a un site existant).
+Source officielle :
+    https://www.data.gouv.fr/datasets/reseau-de-balises-meteo-de-la-ffvl-federation-francaise-de-vol-libre
+    Fichier : balises.json (mis à jour quotidiennement)
+
+Chaque balise météo est rattachée au site de vol le plus proche dans sites_data.json,
+uniquement si la distance est inférieure à 1 km (seuil configurable).
+Les balises en maintenance (en_maintenance == 1) sont ignorées pour éviter d'afficher
+un widget SpotAiR sans mesure.
 
 Sortie : js/data/spotair_widgets.js (mapping site.id -> id de balise FFVL),
-genere automatiquement -- ne pas editer a la main, relancer ce script a la
-place quand le reseau de balises evolue.
-
-Source : https://balisemeteo.com (FFVL, reseau federal de balises meteo).
+généré automatiquement -- ne pas éditer à la main, relancer ce script à la place.
 """
+import argparse
 import json
 import math
-import re
-import time
+import sys
 import urllib.request
-from datetime import datetime, timedelta
+from pathlib import Path
 
-# Une balise dont la dernière mesure remonte à plus de ce délai est considérée
-# hors service (en maintenance, débranchée, etc.) : son widget SpotAiR affiche
-# alors un rond blanc "-/-/-" illisible sur fond sombre au lieu du vent en
-# direct, donc on ne la propose pas du tout plutôt que d'afficher ça.
-MAX_STALENESS = timedelta(hours=3)
+REPO = Path(__file__).resolve().parent.parent
+SITES_PATH = REPO / "js" / "data" / "sites_data.json"
+OUT_PATH = REPO / "js" / "data" / "spotair_widgets.js"
 
-BASE = "https://balisemeteo.com/"
+DATA_GOUV_BALISES_URL = "https://www.data.gouv.fr/api/1/datasets/r/8d795154-9145-4ab2-99de-6768a36f31ea"
 HEADERS = {"User-Agent": "Mozilla/5.0 (AssistantParapente balise sync)"}
-
-
-def fetch(url):
-    req = urllib.request.Request(url, headers=HEADERS)
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        return resp.read().decode("utf-8", errors="replace")
-
-
-def get_region_ids():
-    html = fetch(BASE + "index.php")
-    return sorted(set(int(m) for m in re.findall(r"idRegion=(\d+)", html)))
-
-
-def get_dept_codes(region_id):
-    html = fetch(BASE + f"region.php?idRegion={region_id}")
-    return sorted(set(re.findall(r"depart\.php\?dept=([0-9A-Za-z]+)", html)))
-
-
-def parse_balises(dept_code):
-    html = fetch(BASE + f"depart.php?dept={dept_code}")
-    m = re.search(r"const points\s*=\s*(\[.*?\]);", html, re.S)
-    if not m:
-        return []
-    raw_points = m.group(1)
-    balises = []
-    # Each point is its own JSON-ish object; split on "},\n{" boundaries is fragile,
-    # so parse with a tolerant regex per point block instead of full JSON (the
-    # popup HTML contains unescaped quotes-free JS strings but stays JSON-valid here).
-    for point_str in re.findall(r"\{[^{}]*\"popup\"[^{}]*\}", raw_points, re.S):
-        lat_m = re.search(r'"lat":\s*([\-0-9.]+)', point_str)
-        lng_m = re.search(r'"lng":\s*([\-0-9.]+)', point_str)
-        id_m = re.search(r'idBalise=(\d+)', point_str)
-        title_m = re.search(r'<b>([^<]+)</b>(?:</[a-zA-Z]+>)*\s*-\s*\d+', point_str)
-        time_m = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', point_str)
-        if not (lat_m and lng_m and id_m):
-            continue
-
-        # Ignore les balises hors service (dernière mesure trop ancienne, ex:
-        # station "en maintenance") : leur widget SpotAiR n'affiche aucune
-        # valeur, juste un rond blanc illisible sur fond sombre.
-        if time_m:
-            try:
-                last_seen = datetime.strptime(time_m.group(1), "%Y-%m-%d %H:%M:%S")
-                if datetime.now() - last_seen > MAX_STALENESS:
-                    continue
-            except ValueError:
-                pass
-
-        balises.append({
-            "ffvl_id": id_m.group(1),
-            "lat": float(lat_m.group(1)),
-            "lng": float(lng_m.group(1)),
-            "titre": title_m.group(1).strip() if title_m else "",
-        })
-    return balises
 
 
 def haversine_m(lat1, lon1, lat2, lon2):
@@ -95,37 +38,57 @@ def haversine_m(lat1, lon1, lat2, lon2):
     return 2 * R * math.asin(math.sqrt(a))
 
 
+def load_balises(args):
+    if args.input:
+        return json.loads(Path(args.input).read_text(encoding="utf-8"))
+    print(f"→ Téléchargement des balises FFVL depuis data.gouv.fr...", file=sys.stderr)
+    req = urllib.request.Request(DATA_GOUV_BALISES_URL, headers=HEADERS)
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        return json.loads(resp.read().decode("utf-8"))
+
+
 def main():
-    print("Recuperation de la liste des regions...")
-    region_ids = get_region_ids()
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--input", help="chemin vers un balises.json local")
+    ap.add_argument("--max-dist", type=int, default=1000, help="distance maximale en mètres (défaut: 1000 m)")
+    ap.add_argument("--dry-run", action="store_true", help="ne rien écrire, afficher le résumé")
+    args = ap.parse_args()
 
-    dept_codes = set()
-    for rid in region_ids:
+    raw_balises = load_balises(args)
+    if not isinstance(raw_balises, list):
+        sys.exit("Format inattendu : balises.json n'est pas une liste JSON")
+
+    print(f"{len(raw_balises)} balises reçues de data.gouv.fr.", file=sys.stderr)
+
+    # Filtrage des balises actives et valides
+    active_balises = []
+    maintenance_count = 0
+    invalid_coords = 0
+
+    for b in raw_balises:
+        if b.get("en_maintenance") == 1:
+            maintenance_count += 1
+            continue
         try:
-            codes = get_dept_codes(rid)
-            dept_codes.update(codes)
-        except Exception as e:
-            print(f"  ! region {rid} : {e}")
-        time.sleep(0.15)
-    print(f"{len(dept_codes)} departements trouves.")
+            lat = float(b["latitude"])
+            lon = float(b["longitude"])
+        except (KeyError, TypeError, ValueError):
+            invalid_coords += 1
+            continue
+        active_balises.append({
+            "ffvl_id": str(b["idBalise"]),
+            "nom": (b.get("nom") or "").strip(),
+            "lat": lat,
+            "lng": lon,
+        })
 
-    all_balises = []
-    for i, code in enumerate(sorted(dept_codes, key=lambda c: (len(c), c))):
-        try:
-            balises = parse_balises(code)
-            all_balises.extend(balises)
-            print(f"  [{i+1}/{len(dept_codes)}] dept {code} : {len(balises)} balise(s)")
-        except Exception as e:
-            print(f"  ! dept {code} : {e}")
-        time.sleep(0.15)
+    print(f"Balises actives et localisées : {len(active_balises)} "
+          f"({maintenance_count} en maintenance, {invalid_coords} sans coordonnées)", file=sys.stderr)
 
-    # Deduplique par ffvl_id (une meme balise peut apparaitre sur plusieurs pages)
-    by_id = {b["ffvl_id"]: b for b in all_balises}
-    all_balises = list(by_id.values())
-    print(f"\n{len(all_balises)} balises uniques au total.")
+    if not SITES_PATH.exists():
+        sys.exit(f"Fichier de sites introuvable : {SITES_PATH}")
 
-    with open("js/data/sites_data.json", encoding="utf-8") as f:
-        sites = json.load(f)
+    sites = json.loads(SITES_PATH.read_text(encoding="utf-8"))
 
     mapping = {}
     matched_count = 0
@@ -140,45 +103,57 @@ def main():
 
         best = None
         best_dist = None
-        for b in all_balises:
+        for b in active_balises:
             d = haversine_m(lat, lon, b["lat"], b["lng"])
             if best_dist is None or d < best_dist:
                 best_dist = d
                 best = b
 
-        if best is not None and best_dist <= 1000:
-            mapping[site["id"]] = {"ffvl_id": best["ffvl_id"], "dist_m": round(best_dist), "titre": best["titre"]}
+        if best is not None and best_dist <= args.max_dist:
+            mapping[site["id"]] = {
+                "ffvl_id": best["ffvl_id"],
+                "dist_m": round(best_dist),
+                "titre": best["nom"],
+            }
             matched_count += 1
 
-    print(f"{matched_count} sites rattaches a une balise a moins de 1 km.")
+    print(f"{matched_count} sites rattachés à une balise à moins de {args.max_dist} m.", file=sys.stderr)
 
-    lines = []
-    lines.append("// js/data/spotair_widgets.js")
-    lines.append("//")
-    lines.append("// GENERE AUTOMATIQUEMENT par scripts/import_spotair_balises.py -- ne pas editer")
-    lines.append("// a la main, relancer le script a la place.")
-    lines.append("//")
-    lines.append("// Mapping site.id -> identifiant de balise meteo FFVL (utilise par le widget")
-    lines.append("// SpotAiR : https://www.spotair.mobi/widget/wind/ffvl/<ID>). Chaque balise est")
-    lines.append("// rattachee au site de vol le plus proche, uniquement si elle se trouve a")
-    lines.append("// moins d'1 km de ce site (source : https://balisemeteo.com, reseau FFVL).")
-    lines.append("")
-    lines.append("export const SPOTAIR_WIND_WIDGETS = {")
+    if args.dry_run:
+        print("(dry-run: rien écrit)", file=sys.stderr)
+        return
+
+    lines = [
+        "// js/data/spotair_widgets.js",
+        "//",
+        "// GENERE AUTOMATIQUEMENT par scripts/import_spotair_balises.py -- ne pas editer",
+        "// a la main, relancer le script a la place.",
+        "//",
+        "// Mapping site.id -> identifiant de balise meteo FFVL (utilise par le widget",
+        "// SpotAiR : https://www.spotair.mobi/widget/wind/ffvl/<ID>). Chaque balise est",
+        "// rattachee au site de vol le plus proche, uniquement si elle se trouve a",
+        f"// moins de {args.max_dist} m de ce site (source : https://data.gouv.fr / FFVL).",
+        "",
+        "export const SPOTAIR_WIND_WIDGETS = {",
+    ]
+
     for site_id in sorted(mapping.keys()):
         info = mapping[site_id]
-        lines.append(f"    {json.dumps(site_id)}: {json.dumps(info['ffvl_id'])}, // {info['titre']} (~{info['dist_m']} m)")
-    lines.append("};")
-    lines.append("")
-    lines.append("export function getSpotairWidgetId(site) {")
-    lines.append("    if (!site) return null;")
-    lines.append("    return SPOTAIR_WIND_WIDGETS[site.id] || null;")
-    lines.append("}")
-    lines.append("")
+        escaped_title = info["titre"].replace("'", "\\'")
+        lines.append(f"    '{site_id}': '{info['ffvl_id']}', // {escaped_title} (~{info['dist_m']} m)")
 
-    with open("js/data/spotair_widgets.js", "w", encoding="utf-8") as f:
-        f.write("\n".join(lines))
+    lines.extend([
+        "};",
+        "",
+        "export function getSpotairWidgetId(site) {",
+        "    if (!site) return null;",
+        "    return SPOTAIR_WIND_WIDGETS[site.id] || null;",
+        "}",
+        "",
+    ])
 
-    print("js/data/spotair_widgets.js regenere.")
+    OUT_PATH.write_text("\n".join(lines), encoding="utf-8")
+    print(f"✓ Écrit : {OUT_PATH}", file=sys.stderr)
 
 
 if __name__ == "__main__":

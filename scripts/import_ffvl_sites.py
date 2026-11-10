@@ -1,37 +1,39 @@
 #!/usr/bin/env python3
 """
-Import / refresh js/data/sites_data.json from the FFVL "sites de pratique" open-data dump.
+Import / refresh js/data/sites_data.json from the FFVL open-data dataset on data.gouv.fr.
 
-The FFVL OpenData API (data.ffvl.fr) is currently gated behind an API key whose
-issuance is paused. This script rebuilds the local sites database from the last
-public snapshot of `data.ffvl.fr/json/sites.json`, which was distributed under the
-Licence Ouverte / Etalab 2.0 (attribution: "Source : FFVL").
+Source officielle :
+    https://www.data.gouv.fr/datasets/terrains-de-pratique-de-la-ffvl-federation-francaise-de-vol-libre
+    Fichier : terrains.json (mis à jour quotidiennement sous Licence Ouverte / Etalab 2.0)
+
+Par défaut, ce script filtre strictement les terrains ouverts à la pratique du PARAPENTE
+(les spots exclusifs de kite, delta seul, speed-riding seul, cerf-volant et boomerang sont ignorés).
+Utilisez `--all-disciplines` pour importer l'intégralité du réseau fédéral.
 
 Field mapping (dump -> app schema):
-    suid                      -> reference_terrain   (== id in federation.ffvl.fr/terrain/<suid>)
-    nom / sous_nom            -> nom
-    lat / lon / alt           -> latitude / longitude / altitude
-    cp / ville                -> code_postal / ville (title-cased)
-    numero prefix / cp prefix -> departement {code, nom} + region  (static table)
-    orientation               -> orientations_vent[]  (16-pt -> 8-pt FR cardinals, TOUTES -> all 8)
-    site_sous_type + pratiques -> type[]  (coarse: dump has no THERMIQUE/SOARING/… detail)
-    acces + trajet_*          -> acces_topo
-    description               -> observations
-    conditions_ideales/vent_favo -> aerologie_ideale
-    restrictions              -> restrictions
-    reg_aerienne              -> reglementation
-    dangers                   -> dangers
-    numero_cross              -> secours_acces
-    date_modification         -> date_modification (added field)
-
-Existing hand-enriched entries in sites_data.json (scraped from the HTML site pages,
-with richer `type`, `conventionnement`, `structure_gestionnaire`, …) are KEPT as-is;
-only sites missing from the current file are added. Use --overwrite to replace them.
+    suid                              -> reference_terrain
+    toponym / nom                     -> nom
+    latitude / longitude / altitude   -> latitude / longitude / altitude
+    zip / cp                          -> code_postal
+    city / ville                      -> ville (title-cased)
+    zip / cp prefix                   -> departement {code, nom} + region (table statique)
+    wind_orientations_ok / orientation-> orientations_vent[] (16-pt -> 8-pt FR cardinals)
+    flying_functions_text / site_sous_type -> type[] (NATUREL, ATTERRO, GONFLAGE, TREUIL, KITE)
+    walking_time_from_parking_minutes / acces -> acces_topo
+    environmental_description / description -> observations
+    warnings / dangers                -> dangers
+    emergency_services_text / emergency_access_text / numero_cross -> secours_acces
+    status                            -> praticabilite + affiche
+    convention_type                   -> conventionnement
+    restrictions                      -> restrictions
+    last_modification_datetime        -> date_modification
 
 Usage:
-    python3 scripts/import_ffvl_sites.py                 # fetch Wayback snapshot, merge, write
+    python3 scripts/import_ffvl_sites.py                 # parapente strict (par défaut)
+    python3 scripts/import_ffvl_sites.py --all-disciplines # inclure kite, cerf-volant, etc.
     python3 scripts/import_ffvl_sites.py --input dump.json
-    python3 scripts/import_ffvl_sites.py --overwrite     # replace existing entries too
+    python3 scripts/import_ffvl_sites.py --wayback       # fallback: use 2022 Wayback archive
+    python3 scripts/import_ffvl_sites.py --overwrite     # remplacer les entrées existantes
     python3 scripts/import_ffvl_sites.py --dry-run
 """
 import argparse
@@ -41,17 +43,21 @@ import sys
 import unicodedata
 import urllib.request
 from pathlib import Path
+
+SCRIPTS_DIR = Path(__file__).resolve().parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
 from text_repair import repair_cp1252
 
-REPO = Path(__file__).resolve().parent.parent
+REPO = SCRIPTS_DIR.parent
 OUT = REPO / "js" / "data" / "sites_data.json"
 
-# Last fully-public snapshot of the FFVL open-data sites file (id_ = raw, no Wayback banner)
+# Flux officiel data.gouv.fr (mis à jour quotidiennement par la FFVL)
+DATA_GOUV_URL = "https://www.data.gouv.fr/api/1/datasets/r/4375c95d-cf26-4e71-b72d-2e09be5a0e36"
+
+# Ancien snapshot Wayback Machine (conservé comme secours historique)
 WAYBACK_URL = "https://web.archive.org/web/20221205210404id_/https://data.ffvl.fr/json/sites.json"
 
-# ---------------------------------------------------------------------------
-# département code -> (nom, région).  Metropole + Corse + DOM.
-# ---------------------------------------------------------------------------
 DEPTS = {
     "01": ("Ain", "Auvergne-Rhône-Alpes"), "02": ("Aisne", "Hauts-de-France"),
     "03": ("Allier", "Auvergne-Rhône-Alpes"), "04": ("Alpes-de-Haute-Provence", "Provence-Alpes-Côte d'Azur"),
@@ -109,7 +115,6 @@ DEPTS = {
     "988": ("Nouvelle-Calédonie", "Nouvelle-Calédonie"),
 }
 
-# 16-point -> 8-point French cardinals (secondary intercardinals map to both neighbours)
 ORIENT_MAP = {
     "N": ["N"], "NNE": ["N", "NE"], "NE": ["NE"], "ENE": ["NE", "E"],
     "E": ["E"], "ESE": ["E", "SE"], "SE": ["SE"], "SSE": ["SE", "S"],
@@ -133,6 +138,30 @@ SOUS_TYPE_MAP = {
     "Interdiction de pratique": ["INTERDIT"],
 }
 
+CONVENTION_MAP = {
+    "convention_ffvl": "Convention FFVL",
+    "convention_usage": "Convention d'usage",
+    "propriete_ffvl": "Propriété FFVL",
+    "convention_orale_ffvl": "Convention orale FFVL",
+    "convention_non_ffvl": "Convention non FFVL",
+    "convention_en_cours_de_negociation": "Convention en cours de négociation",
+    "pas_de_convention": "Pas de convention identifiée",
+    "etat_conventionnement_inconnu": None,
+}
+
+STATUS_PRATICABILITE = {
+    "actif": "terrain ouvert à la pratique",
+    "actif_autorisation_systematique_requise": "autorisation préalable requise",
+    "non_praticable_temporaire": "non praticable temporairement",
+    "interdit_sauf_autorisation": "pratique interdite sauf autorisation",
+    "interdit": "pratique interdite",
+}
+
+TRIVIAL_WARNINGS = {
+    ".", "-", "ras", "r.a.s", "r.a.s.", "aucun", "néant", "neant",
+    "non", "0", "rien à signaler", "pas de danger particulier",
+}
+
 
 def slug(s):
     s = unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode()
@@ -149,7 +178,6 @@ def title_fr(s):
 def clean(v):
     if v is None:
         return None
-    # Caractères Windows-1252 mal décodés à la source (’ • … €) : réparés à chaque import (spec 003).
     v = repair_cp1252(str(v)).replace("\r\n", "\n").replace("\r", "\n").strip()
     return v or None
 
@@ -171,7 +199,7 @@ def parse_orientations(raw):
 
 
 def dept_from(rec):
-    for src in (rec.get("numero", ""), rec.get("cp", "")):
+    for src in (rec.get("zip", ""), rec.get("cp", ""), rec.get("numero", "")):
         src = (src or "").strip().upper()
         m = re.match(r"^(2A|2B|97[0-8]|98[0-8])", src) or re.match(r"^(\d{2})", src)
         if m and m.group(1) in DEPTS:
@@ -180,15 +208,35 @@ def dept_from(rec):
     return None, None
 
 
+def is_parapente(rec):
+    usages = (rec.get("possible_usages_text") or rec.get("pratiques") or "").lower()
+    if usages:
+        return "parapente" in usages
+    types = rec.get("type") or []
+    if types and all(t in ("KITE", "ROULAGE") for t in types):
+        return False
+    return True
+
+
 def build_types(rec):
-    # Site-nature types only (the app's type filter is about the terrain, not the
-    # discipline). The dump's coarse `site_sous_type` is all we can infer here;
-    # richer types (THERMIQUE, SOARING, MARCHE ET VOL…) only exist on hand-scraped
-    # entries and are preserved by the merge, not regenerated.
-    types = list(SOUS_TYPE_MAP.get(rec.get("site_sous_type", ""), []))
-    prat = (rec.get("pratiques") or "").lower()
-    if "kite" in prat and "KITE" not in types:
+    types = []
+    fft = (rec.get("flying_functions_text") or "").lower()
+    if fft:
+        if "décollage" in fft or "decollage" in fft:
+            types.append("NATUREL")
+        if "atterrissage" in fft:
+            types.append("ATTERRO")
+        if "pente-école" in fft or "pente école" in fft or "gonflage" in fft:
+            types.append("GONFLAGE")
+        if "treuil" in fft:
+            types.append("TREUIL")
+    elif rec.get("site_sous_type"):
+        types.extend(SOUS_TYPE_MAP.get(rec.get("site_sous_type", ""), []))
+
+    usages = (rec.get("possible_usages_text") or rec.get("pratiques") or "").lower()
+    if "kite" in usages and "KITE" not in types:
         types.append("KITE")
+
     return types or ["NATUREL"]
 
 
@@ -196,6 +244,9 @@ def build_acces(rec):
     parts = []
     if clean(rec.get("acces")):
         parts.append(clean(rec["acces"]))
+    wt = rec.get("walking_time_from_parking_minutes")
+    if wt is not None and str(wt).strip() not in ("0", "None", ""):
+        parts.append(f"Trajet parking → déco : {wt} min")
     tp = clean(rec.get("trajet_parcking"))
     if tp and tp not in ("0",):
         parts.append(f"Trajet parking → déco : {tp} min")
@@ -205,70 +256,121 @@ def build_acces(rec):
     return "\n\n".join(parts) or None
 
 
+def build_secours(rec):
+    secours = []
+    if clean(rec.get("numero_cross")):
+        secours.append(f"N° secours / CROSS : {clean(rec['numero_cross'])}")
+    es = clean(rec.get("emergency_services_text"))
+    if es and es.lower() not in ("aucun", "neant", "néant", "0"):
+        secours.append(f"Services de secours : {es}")
+    ea = clean(rec.get("emergency_access_text"))
+    if ea and ea.lower() not in ("aucun", "neant", "néant", "0", "autre"):
+        secours.append(f"Accès secours : {ea}")
+    return "\n".join(secours) if secours else None
+
+
+def build_dangers(rec):
+    w = clean(rec.get("warnings") or rec.get("dangers"))
+    if not w:
+        return None
+    if w.strip().lower() in TRIVIAL_WARNINGS:
+        return None
+    return w
+
+
+def build_convention(rec):
+    if rec.get("convention_type"):
+        return CONVENTION_MAP.get(rec["convention_type"])
+    return clean(rec.get("conventionnement"))
+
+
+def build_praticabilite(rec):
+    st = rec.get("status")
+    if st in STATUS_PRATICABILITE:
+        return STATUS_PRATICABILITE[st]
+    sous_type = rec.get("site_sous_type", "")
+    if sous_type == "Interdiction de pratique":
+        return "pratique interdite"
+    return "terrain ouvert à la pratique"
+
+
 def convert(rec):
     suid = str(rec.get("suid") or rec.get("id") or "").strip()
-    nom = clean(rec.get("nom")) or "SANS NOM"
+    raw_nom = rec.get("toponym") or rec.get("nom")
+    nom = clean(raw_nom) or "SANS NOM"
     sous = clean(rec.get("sous_nom"))
     full_nom = f"{nom} — {sous}" if sous and sous.lower() not in nom.lower() else nom
     full_nom = re.sub(r"\s*[—\-]\s*$", "", full_nom).strip() or "SANS NOM"
     placeholder = bool(re.match(r"^\s*(a|à)\s+renseigner", nom, re.I)) or full_nom == "SANS NOM"
+
     dept, region = dept_from(rec)
-    sous_type = rec.get("site_sous_type", "")
+
     try:
-        lat = round(float(rec["lat"]), 5)
-        lon = round(float(rec["lon"]), 5)
+        lat = round(float(rec["latitude"] if "latitude" in rec else rec["lat"]), 5)
+        lon = round(float(rec["longitude"] if "longitude" in rec else rec["lon"]), 5)
     except (TypeError, ValueError, KeyError):
         lat = lon = None
     try:
-        alt = int(float(rec["alt"]))
+        alt = int(float(rec["altitude"] if "altitude" in rec else rec["alt"]))
     except (TypeError, ValueError, KeyError):
         alt = None
+
+    st = rec.get("status")
+    sous_type = rec.get("site_sous_type", "")
+    is_interdit = st == "interdit" or sous_type == "Interdiction de pratique"
+    affiche = not is_interdit and not placeholder
+
+    date_mod = clean(rec.get("last_modification_datetime") or rec.get("date_modification"))
+    source = f"FFVL (data.gouv.fr) — {date_mod[:10]}" if date_mod else "FFVL (data.gouv.fr)"
+
     return {
         "id": f"{slug(nom)}-{suid}",
         "reference_terrain": suid,
         "nom": full_nom,
         "latitude": lat,
         "longitude": lon,
-        "code_postal": clean(rec.get("cp")),
-        "ville": title_fr(clean(rec.get("ville"))),
+        "code_postal": clean(rec.get("zip") or rec.get("cp")),
+        "ville": title_fr(clean(rec.get("city") or rec.get("ville"))),
         "departement": dept,
         "region": region,
         "pays": "France",
-        "orientations_vent": parse_orientations(rec.get("orientation")),
+        "orientations_vent": parse_orientations(rec.get("wind_orientations_ok") or rec.get("orientation")),
         "type": build_types(rec),
         "altitude": alt,
-        "affiche": sous_type != "Interdiction de pratique" and not placeholder,
-        "conventionnement": None,
-        "praticabilite": "pratique interdite" if sous_type == "Interdiction de pratique"
-        else "terrain ouvert à la pratique",
-        "structure_gestionnaire": None,
-        "dangers": clean(rec.get("dangers")),
-        "secours_acces": (f"N° secours / CROSS : {clean(rec.get('numero_cross'))}"
-                          if clean(rec.get("numero_cross")) else None),
+        "affiche": affiche,
+        "conventionnement": build_convention(rec),
+        "praticabilite": build_praticabilite(rec),
+        "structure_gestionnaire": clean(rec.get("structure_gestionnaire")),
+        "dangers": build_dangers(rec),
+        "secours_acces": build_secours(rec),
         "aerologie_ideale": clean(rec.get("conditions_ideales")) or clean(rec.get("vent_favo")),
         "acces_topo": build_acces(rec),
-        "observations": clean(rec.get("description")),
+        "observations": clean(rec.get("description") or rec.get("environmental_description")),
         "restrictions": clean(rec.get("restrictions")),
         "reglementation": clean(rec.get("reg_aerienne")),
         "url": f"https://federation.ffvl.fr/terrain/{suid}" if suid else None,
         "atterissage": None,
-        "date_modification": clean(rec.get("date_modification")),
-        "source": "FFVL (Licence Ouverte/Etalab 2.0) — snapshot 2022-12-05",
+        "date_modification": date_mod,
+        "source": source,
     }
 
 
 def load_dump(args):
     if args.input:
         return json.loads(Path(args.input).read_text(encoding="utf-8"))
-    print(f"→ Téléchargement du snapshot FFVL : {WAYBACK_URL}", file=sys.stderr)
-    req = urllib.request.Request(WAYBACK_URL, headers={"User-Agent": "Mozilla/5.0"})
+    url = WAYBACK_URL if args.wayback else DATA_GOUV_URL
+    label = "snapshot Wayback (2022)" if args.wayback else "flux officiel data.gouv.fr"
+    print(f"→ Téléchargement du jeu de données FFVL ({label}) : {url}", file=sys.stderr)
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (AssistantParapente sync)"})
     with urllib.request.urlopen(req, timeout=60) as r:
         return json.loads(r.read().decode("utf-8"))
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--input", help="chemin d'un dump sites.json local (sinon: Wayback)")
+    ap.add_argument("--input", help="chemin d'un fichier JSON local (sinon: data.gouv.fr)")
+    ap.add_argument("--wayback", action="store_true", help="utiliser l'ancien snapshot Wayback 2022")
+    ap.add_argument("--all-disciplines", action="store_true", help="inclure toutes les disciplines FFVL (kite, cerf-volant, boomerang...)")
     ap.add_argument("--out", default=str(OUT), help=f"fichier de sortie (défaut: {OUT})")
     ap.add_argument("--overwrite", action="store_true", help="remplacer aussi les entrées déjà présentes")
     ap.add_argument("--dry-run", action="store_true", help="ne rien écrire, afficher les stats")
@@ -278,14 +380,37 @@ def main():
     if not isinstance(dump, list):
         sys.exit("Format inattendu: le dump n'est pas une liste JSON")
 
+    parapente_only = not args.all_disciplines
+    mode_label = "Toutes disciplines" if args.all_disciplines else "Parapente strict"
+    print(f"Mode sélectionné   : {mode_label}", file=sys.stderr)
+
+    dump_by_ref = {str(r.get("suid") or r.get("id") or ""): r for r in dump if r.get("suid") or r.get("id")}
+
     out_path = Path(args.out)
     existing = []
     if out_path.exists():
         existing = json.loads(out_path.read_text(encoding="utf-8"))
-    by_ref = {str(s.get("reference_terrain")): s for s in existing}
 
-    added = updated = skipped = bad = 0
+    # Nettoyage / filtrage des existants
+    by_ref = {}
+    purged_non_parapente = 0
+    for s in existing:
+        ref = str(s.get("reference_terrain"))
+        if parapente_only:
+            if ref in dump_by_ref and not is_parapente(dump_by_ref[ref]):
+                purged_non_parapente += 1
+                continue
+            if ref not in dump_by_ref and not is_parapente(s):
+                purged_non_parapente += 1
+                continue
+        by_ref[ref] = s
+
+    added = updated = skipped = bad = skipped_non_parapente = 0
     for rec in dump:
+        if parapente_only and not is_parapente(rec):
+            skipped_non_parapente += 1
+            continue
+
         conv = convert(rec)
         if conv["latitude"] is None or conv["longitude"] is None or not conv["reference_terrain"]:
             bad += 1
@@ -303,12 +428,15 @@ def main():
 
     merged = sorted(by_ref.values(), key=lambda s: (s.get("nom") or "").lower())
 
-    print(f"Dump FFVL          : {len(dump)} enregistrements", file=sys.stderr)
-    print(f"Coords invalides   : {bad}", file=sys.stderr)
-    print(f"Ajoutés            : {added}", file=sys.stderr)
-    print(f"Mis à jour         : {updated}", file=sys.stderr)
+    print(f"Dump FFVL           : {len(dump)} enregistrements", file=sys.stderr)
+    if parapente_only:
+        print(f"Ignorés (non-parapente dans dump) : {skipped_non_parapente}", file=sys.stderr)
+        print(f"Purgés (non-parapente existants)  : {purged_non_parapente}", file=sys.stderr)
+    print(f"Coords invalides    : {bad}", file=sys.stderr)
+    print(f"Ajoutés             : {added}", file=sys.stderr)
+    print(f"Mis à jour          : {updated}", file=sys.stderr)
     print(f"Conservés (existant): {skipped}", file=sys.stderr)
-    print(f"Total en sortie    : {len(merged)}", file=sys.stderr)
+    print(f"Total final sites   : {len(merged)}", file=sys.stderr)
 
     if args.dry_run:
         print("(dry-run: rien écrit)", file=sys.stderr)
