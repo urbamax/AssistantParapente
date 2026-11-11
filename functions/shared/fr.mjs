@@ -1313,6 +1313,8 @@ export const FR = Object.freeze({
             summary: 'Récapitulatif des questions',
             noError: "Félicitations, vous n'avez fait aucune erreur !",
             wrong: 'FAUX',
+            incomplete: 'INCOMPLET',
+            correct: 'VRAI',
             yourAnswer: 'Votre réponse',
             finish: 'TERMINER',
             pointsScore: '{points}/{total}',
