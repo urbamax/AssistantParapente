@@ -28,7 +28,7 @@
 - **Capteurs de Vol Avancés** : Prise en charge des fichiers Syride `.sdf` pour l'analyse des facteurs de charge (accéléromètre G-Max / G-Min).
 - **Import en Masse** : Glisser-déposer de lots de fichiers `.igc` ou d'archives `.zip`, et import direct de l'historique de vols fédéral FFVL.
 - **Gestion du Matériel & Usure** : Suivi des heures de vol cumulées par aile, sellette et parachute de secours, avec rappels d'entretien et de repliage.
-- **Validation École & Signatures** : Signature numérique in-app des séances école par le moniteur/DTE.
+- **Encadrement École & Validation** : Suivi des sessions en école (nom de l'école, stage, moniteurs, brevet préparé) et enregistrement des validations pratiques de brevets.
 - **Statistiques & Records** : Graphiques d'activité, records personnels et filtres multi-critères.
 - **Synchronisation Hybride** : Persistance locale immédiate (LocalStorage & IndexedDB) et synchronisation cloud temps réel avec Firebase Cloud Firestore.
 
@@ -40,7 +40,7 @@
   - **Qualification Treuil** : 30 questions $\times$ 6 pts = **180 points**.
 - **Distribution Fédérale par Blocs de 10** : Respect strict des quotas par thème (Météo 20%, Mécavol 20%, Pilotage 20%, Matériel 10%, Réglementation 10%, Facteurs humains 10%, Milieu naturel 10%) avec exclusion des questions réservées au Delta.
 - **Modes d'Entraînement Multiples** :
-  - **Mode Examen** : Conditions réelles chronométrées, sans correction immédiate, avec bilan officiel en points.
+  - **Mode Examen** : Conditions réelles d'examen (sans correction immédiate, détection anti-triche et bilan officiel en points).
   - **Mode Révision (Répétition Espacée)** : Algorithme de mémorisation basé sur SM-2 avec suivi des échéances de révision.
   - **Mode Perfectionnement** : Ciblage des questions à travailler jusqu'à atteindre un pourcentage de maîtrise visé (50%, 75%, 90%, 100%).
   - **Mode Entraînement** : Filtrage par thème et volume, validation pas-à-pas avec explications pédagogiques détaillées pour chaque choix.
