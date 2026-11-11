@@ -28,7 +28,7 @@
 - **Capteurs de Vol Avancés** : Prise en charge des fichiers Syride `.sdf` pour l'analyse des facteurs de charge (accéléromètre G-Max / G-Min).
 - **Import en Masse** : Glisser-déposer de lots de fichiers `.igc` ou d'archives `.zip`, et import direct de l'historique de vols fédéral FFVL.
 - **Gestion du Matériel & Usure** : Suivi des heures de vol cumulées par aile, sellette et parachute de secours, avec rappels d'entretien et de repliage.
-- **Validation École & Signatures** : Signature numérique in-app des séances école par le moniteur/DTE.
+- **Encadrement École & Validation** : Suivi des sessions en école (nom de l'école, stage, moniteurs, brevet préparé) et enregistrement des validations pratiques de brevets.
 - **Statistiques & Records** : Graphiques d'activité, records personnels et filtres multi-critères.
 - **Synchronisation Hybride** : Persistance locale immédiate (LocalStorage & IndexedDB) et synchronisation cloud temps réel avec Firebase Cloud Firestore.
 
