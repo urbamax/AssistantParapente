@@ -40,7 +40,7 @@
   - **Qualification Treuil** : 30 questions $\times$ 6 pts = **180 points**.
 - **Distribution Fédérale par Blocs de 10** : Respect strict des quotas par thème (Météo 20%, Mécavol 20%, Pilotage 20%, Matériel 10%, Réglementation 10%, Facteurs humains 10%, Milieu naturel 10%) avec exclusion des questions réservées au Delta.
 - **Modes d'Entraînement Multiples** :
-  - **Mode Examen** : Conditions réelles chronométrées, sans correction immédiate, avec bilan officiel en points.
+  - **Mode Examen** : Conditions réelles d'examen (sans correction immédiate, détection anti-triche et bilan officiel en points).
   - **Mode Révision (Répétition Espacée)** : Algorithme de mémorisation basé sur SM-2 avec suivi des échéances de révision.
   - **Mode Perfectionnement** : Ciblage des questions à travailler jusqu'à atteindre un pourcentage de maîtrise visé (50%, 75%, 90%, 100%).
   - **Mode Entraînement** : Filtrage par thème et volume, validation pas-à-pas avec explications pédagogiques détaillées pour chaque choix.
