@@ -1269,7 +1269,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
-                        <span style="font-weight:700; color:var(--text-main);">3</span> questions, dont <span style="font-weight:700; color:var(--text-main);">2</span> déjà posées en examen
+                        <span style="font-weight:700; color:var(--text-main);">3</span> questions, dont <span style="font-weight:700; color:var(--text-main);">2</span> déjà posées en examen sur <span style="font-weight:700; color:var(--text-main);">2</span> examens
                         
                     </div>
                     <div class="stats-sort-container">
@@ -1705,7 +1705,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
-                        <span style="font-weight:700; color:var(--text-main);">0</span> questions <span style="opacity:0.6;">(Questions Excellentes (90-99%))</span>, dont <span style="font-weight:700; color:var(--text-main);">0</span> déjà posée en examen
+                        <span style="font-weight:700; color:var(--text-main);">0</span> questions <span style="opacity:0.6;">(Questions Excellentes (90-99%))</span>, dont <span style="font-weight:700; color:var(--text-main);">0</span> déjà posée en examen sur <span style="font-weight:700; color:var(--text-main);">2</span> examens
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
                     <div class="stats-sort-container">
@@ -2024,7 +2024,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
-                        <span style="font-weight:700; color:var(--text-main);">1</span> questions <span style="opacity:0.6;">(Questions Échouées (0%))</span>, dont <span style="font-weight:700; color:var(--text-main);">0</span> déjà posée en examen
+                        <span style="font-weight:700; color:var(--text-main);">1</span> questions <span style="opacity:0.6;">(Questions Échouées (0%))</span>, dont <span style="font-weight:700; color:var(--text-main);">0</span> déjà posée en examen sur <span style="font-weight:700; color:var(--text-main);">2</span> examens
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
                     <div class="stats-sort-container">
@@ -2382,7 +2382,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
-                        <span style="font-weight:700; color:var(--text-main);">0</span> questions <span style="opacity:0.6;">(Questions Satisfaisantes (50-74%))</span>, dont <span style="font-weight:700; color:var(--text-main);">0</span> déjà posée en examen
+                        <span style="font-weight:700; color:var(--text-main);">0</span> questions <span style="opacity:0.6;">(Questions Satisfaisantes (50-74%))</span>, dont <span style="font-weight:700; color:var(--text-main);">0</span> déjà posée en examen sur <span style="font-weight:700; color:var(--text-main);">2</span> examens
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
                     <div class="stats-sort-container">
@@ -2701,7 +2701,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
-                        <span style="font-weight:700; color:var(--text-main);">1</span> questions <span style="opacity:0.6;">(Questions Non Tentées)</span>, dont <span style="font-weight:700; color:var(--text-main);">0</span> déjà posée en examen
+                        <span style="font-weight:700; color:var(--text-main);">1</span> questions <span style="opacity:0.6;">(Questions Non Tentées)</span>, dont <span style="font-weight:700; color:var(--text-main);">0</span> déjà posée en examen sur <span style="font-weight:700; color:var(--text-main);">2</span> examens
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
                     <div class="stats-sort-container">
@@ -3064,7 +3064,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
-                        <span style="font-weight:700; color:var(--text-main);">0</span> questions <span style="opacity:0.6;">(Questions Maîtrisées (100%))</span>, dont <span style="font-weight:700; color:var(--text-main);">0</span> déjà posée en examen
+                        <span style="font-weight:700; color:var(--text-main);">0</span> questions <span style="opacity:0.6;">(Questions Maîtrisées (100%))</span>, dont <span style="font-weight:700; color:var(--text-main);">0</span> déjà posée en examen sur <span style="font-weight:700; color:var(--text-main);">2</span> examens
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
                     <div class="stats-sort-container">
@@ -3383,7 +3383,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
-                        <span style="font-weight:700; color:var(--text-main);">2</span> questions <span style="opacity:0.6;">(Questions À travailler (1-49%))</span>, dont <span style="font-weight:700; color:var(--text-main);">2</span> déjà posées en examen
+                        <span style="font-weight:700; color:var(--text-main);">2</span> questions <span style="opacity:0.6;">(Questions À travailler (1-49%))</span>, dont <span style="font-weight:700; color:var(--text-main);">2</span> déjà posées en examen sur <span style="font-weight:700; color:var(--text-main);">2</span> examens
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
                     <div class="stats-sort-container">
@@ -3785,7 +3785,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
-                        <span style="font-weight:700; color:var(--text-main);">0</span> questions <span style="opacity:0.6;">(Questions Très Bonnes (75-89%))</span>, dont <span style="font-weight:700; color:var(--text-main);">0</span> déjà posée en examen
+                        <span style="font-weight:700; color:var(--text-main);">0</span> questions <span style="opacity:0.6;">(Questions Très Bonnes (75-89%))</span>, dont <span style="font-weight:700; color:var(--text-main);">0</span> déjà posée en examen sur <span style="font-weight:700; color:var(--text-main);">2</span> examens
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
                     <div class="stats-sort-container">
@@ -4104,7 +4104,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
-                        <span style="font-weight:700; color:var(--text-main);">1</span> questions <span style="opacity:0.6;">(Thème : Météo)</span>, dont <span style="font-weight:700; color:var(--text-main);">1</span> déjà posée en examen
+                        <span style="font-weight:700; color:var(--text-main);">1</span> questions <span style="opacity:0.6;">(Thème : Météo)</span>, dont <span style="font-weight:700; color:var(--text-main);">1</span> déjà posée en examen sur <span style="font-weight:700; color:var(--text-main);">2</span> examens
                         <a role="button" tabindex="0" data-action="QuizclearAllFilters" data-args="[]" style="margin-left:8px; cursor:pointer; text-decoration:underline; font-size:0.8rem; color:var(--accent-orange);">Tout effacer</a>
                     </div>
                     <div class="stats-sort-container">

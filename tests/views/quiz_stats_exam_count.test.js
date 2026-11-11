@@ -49,19 +49,21 @@ describe('buildQuestionsHtml - Questions déjà posées en examen', () => {
         expect(text(html)).not.toContain('déjà posée');
     });
 
-    it('singulier : « dont 1 déjà posée en examen »', () => {
-        expect(text(render(mockView, [exam('BI', ['A1V'])]))).toContain('3 questions, dont 1 déjà posée en examen');
+    it('singulier : « dont 1 déjà posée en examen sur 1 examen »', () => {
+        expect(text(render(mockView, [exam('BI', ['A1V'])]))).toContain(
+            '3 questions, dont 1 déjà posée en examen sur 1 examen',
+        );
     });
 
-    it('pluriel : « dont 2 déjà posées en examen », une question reposée dans plusieurs examens ne compte qu’une fois', () => {
+    it('pluriel : « dont 2 déjà posées en examen sur 2 examens », une question reposée dans plusieurs examens ne compte qu’une fois', () => {
         const html = render(mockView, [exam('BI', ['A1V', 'B2V'], 1), exam('BI', ['A1V'], 2)]);
-        expect(text(html)).toContain('dont 2 déjà posées en examen');
+        expect(text(html)).toContain('dont 2 déjà posées en examen sur 2 examens');
     });
 
     it('filtre par niveau courant (les examens BP ne comptent pas pour BI)', () => {
         const history = [exam('BI', ['A1V'], 1), exam('BP', ['B2V', 'C3V'], 2)];
-        expect(text(render(mockView, history, 'BI'))).toContain('dont 1 déjà posée en examen');
-        expect(text(render(mockView, history, 'BP'))).toContain('dont 2 déjà posées en examen');
+        expect(text(render(mockView, history, 'BI'))).toContain('dont 1 déjà posée en examen sur 1 examen');
+        expect(text(render(mockView, history, 'BP'))).toContain('dont 2 déjà posées en examen sur 1 examen');
     });
 
     it("n'affiche rien pour un niveau sans examen", () => {
@@ -72,6 +74,6 @@ describe('buildQuestionsHtml - Questions déjà posées en examen', () => {
         const viewWithTheme = { ...mockView, state: { ...mockView.state, themeFilter: 'Météo' } };
         const html = render(viewWithTheme, [exam('BI', ['A1V', 'C3V'])]);
         // Questions de météo visibles : A1V et B2V ; seule A1V a été posée en examen.
-        expect(text(html)).toContain('2 questions (Thème : Météo), dont 1 déjà posée en examen');
+        expect(text(html)).toContain('2 questions (Thème : Météo), dont 1 déjà posée en examen sur 1 examen');
     });
 });
