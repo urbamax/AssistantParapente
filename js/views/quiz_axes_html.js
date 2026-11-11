@@ -78,6 +78,42 @@ function buildAxisBreakdownPillsHtml(axis) {
             ),
         );
     }
+    const omissions = axis.omissions || { active: 0, consolidating: 0, overcome: 0 };
+    const omissionPill = (count, one, many, color, rgb) =>
+        `<span style="background:rgba(${rgb},0.14); color:${color}; border:1px solid rgba(${rgb},0.35); padding:3px 9px; border-radius:999px; font-size:0.76rem; font-weight:700;"><i class="ri-error-warning-line"></i> ${count === 1 ? tq(one) : tq(many, { count })}</span>`;
+    if (omissions.active > 0) {
+        pills.push(
+            omissionPill(
+                omissions.active,
+                'axes.pillOmissionsActiveOne',
+                'axes.pillOmissionsActiveMany',
+                '#f97316',
+                '249,115,22',
+            ),
+        );
+    }
+    if (omissions.consolidating > 0) {
+        pills.push(
+            omissionPill(
+                omissions.consolidating,
+                'axes.pillOmissionsConsolidatingOne',
+                'axes.pillOmissionsConsolidatingMany',
+                '#f59e0b',
+                '251,191,36',
+            ),
+        );
+    }
+    if (omissions.overcome > 0) {
+        pills.push(
+            omissionPill(
+                omissions.overcome,
+                'axes.pillOmissionsOvercomeOne',
+                'axes.pillOmissionsOvercomeMany',
+                '#22c55e',
+                '74,222,128',
+            ),
+        );
+    }
     if (axis.strugglingCount > 0) {
         const label =
             axis.strugglingCount === 1
@@ -188,6 +224,69 @@ function buildTrapsBlockHtml(axis, expandedIds) {
                 <span>${tq('axes.trapsHeading')}</span>
             </div>
             <div style="font-size:0.8rem; color:var(--text-secondary); line-height:1.45;">${tq('axes.trapsHint')}</div>
+            ${itemsHtml}
+            ${toggle}
+        </div>
+    `;
+}
+
+/**
+ * Construit le bloc « Mes oublis sur ce chapitre » : les bonnes réponses oubliées (non cochées), avec le
+ * passage qui les explique. Comme les points clés et les pièges, il n'affiche jamais l'énoncé ni les choix QCM.
+ *
+ * @param {any} axis
+ * @param {Set<string>} expandedIds
+ * @returns {string}
+ */
+function buildOmissionsBlockHtml(axis, expandedIds) {
+    const items = Array.isArray(axis.omissions?.items) ? axis.omissions.items : [];
+    if (items.length === 0) return '';
+
+    const expanded = expandedIds instanceof Set && expandedIds.has(`omissions:${axis.id}`);
+    const urgent = items.filter((i) => i.status !== 'overcome');
+    const shown = expanded ? items : urgent.slice(0, TRAPS_VISIBLE);
+    const hasMore = items.length > urgent.slice(0, TRAPS_VISIBLE).length;
+
+    const itemsHtml = shown
+        .map((item) => {
+            const meta = TRAP_STATUS_META[item.status] || TRAP_STATUS_META.active;
+            const relapse = item.relapse
+                ? `<span style="background:rgba(249,115,22,0.14); color:#ea580c; padding:2px 8px; border-radius:999px; font-size:0.72rem; font-weight:700;">${tq('axes.trapRelapse')}</span>`
+                : '';
+            const missed =
+                item.count === 1 ? tq('axes.omissionMissedOne') : tq('axes.omissionMissed', { count: item.count });
+            const courseLink =
+                item.courseUrl && item.courseTitle && item.coursePage
+                    ? `<a href="${escapeHTML(item.courseUrl)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:4px; font-size:0.76rem; font-weight:700; color:var(--accent-orange); text-decoration:none;"><i class="ri-file-pdf-line"></i> ${tq('axes.takeawayCourseLink', { title: item.courseTitle, page: item.coursePage })}</a>`
+                    : '';
+            return `
+                <div class="revision-axis-omission-item" data-omission-status="${escapeHTML(item.status)}" style="padding:12px 14px; border-radius:10px; background:var(--bg-card); border:1px solid var(--border-color); border-left:3px solid #f97316;">
+                    <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px;">
+                        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:6px;">
+                            <span style="background:${meta.bg}; color:${meta.color}; padding:2px 8px; border-radius:999px; font-size:0.74rem; font-weight:700;">${tq(meta.key)}</span>
+                            ${relapse}
+                            <span style="font-size:0.76rem; color:var(--accent-orange); font-weight:700;"><i class="ri-error-warning-fill" style="margin-right:2px;"></i>${missed}</span>
+                            <span style="font-size:0.76rem; color:var(--text-secondary); font-weight:600;">· ${tq('axes.trapQuestionRef', { num: item.questionNum })}</span>
+                        </div>
+                        ${courseLink}
+                    </div>
+                    <div style="font-size:0.88rem; color:var(--text-main); line-height:1.5;">${explanationHtml(item.explanation)}</div>
+                </div>
+            `;
+        })
+        .join('');
+
+    const toggle = hasMore
+        ? `<button type="button" data-action="QuiztoggleAxisTakeaways" data-args="omissions:${escapeHTML(axis.id)}" aria-expanded="${expanded ? 'true' : 'false'}" style="align-self:flex-start; background:rgba(251,146,60,0.1); color:#ea580c; border:1px solid rgba(251,146,60,0.35); padding:6px 12px; border-radius:10px; font-size:0.8rem; font-weight:700; cursor:pointer;">${expanded ? tq('axes.omissionsHideAll') : tq('axes.omissionsShowAll', { count: items.length })}</button>`
+        : '';
+
+    return `
+        <div class="revision-axis-step revision-axis-omissions" style="padding:14px 16px; border-radius:12px; background:rgba(251,146,60,0.05); border:1px solid rgba(251,146,60,0.3); display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; align-items:center; gap:8px; font-weight:700; font-size:0.88rem; color:var(--text-main);">
+                <i class="ri-error-warning-line" style="color:var(--accent-orange);"></i>
+                <span>${tq('axes.omissionsHeading')}</span>
+            </div>
+            <div style="font-size:0.8rem; color:var(--text-secondary); line-height:1.45;">${tq('axes.omissionsHint')}</div>
             ${itemsHtml}
             ${toggle}
         </div>
@@ -361,7 +460,7 @@ function buildStep3WorkshopHtml(axis) {
                     <span>${tq('axes.step3Heading')}</span>
                 </div>
                 <div style="font-size:0.8rem; color:var(--text-secondary); line-height:1.4;">
-                    ${tq('axes.step3Hint')}${axis.traps?.active > 0 ? ` ${tq('axes.workshopTrapsHint')}` : ''}
+                    ${tq('axes.step3Hint')}${axis.traps?.active > 0 || axis.omissions?.active > 0 ? ` ${tq('axes.workshopTrapsHint')}` : ''}
                 </div>
             </div>
             <button type="button" data-action="QuizstartAxisWorkshop" data-args="${escapeHTML(axis.id)}" style="background:var(--accent-orange); color:#fff; border:none; padding:10px 18px; border-radius:10px; font-weight:700; font-size:0.86rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; white-space:nowrap;">
@@ -431,6 +530,7 @@ export function buildRevisionAxisCardHtml(axis, expandedIds) {
             </header>
 
             ${buildTrapsBlockHtml(axis, expandedIds)}
+            ${buildOmissionsBlockHtml(axis, expandedIds)}
             ${buildStep1CoursesHtml(axis)}
             ${buildStep2TakeawaysHtml(axis, isExpanded)}
             ${buildStep3WorkshopHtml(axis)}

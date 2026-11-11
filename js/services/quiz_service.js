@@ -90,18 +90,30 @@ export function getExamQuotas(level = 'BI') {
 }
 
 // Compte, pour une question, combien de fois chaque choix a été coché (index = position dans les
-// choix d'origine du CSV, voir `choiceIndex`). `sign` à -1 retire une réponse déjà comptée (examen :
-// réponse modifiée). Tableau plat d'entiers : sérialisable par Firestore et simple à fusionner.
+// choix d'origine du CSV, voir `choiceIndex`), et combien de fois chaque bonne réponse a été oubliée (`choiceMisses`).
+// `sign` à -1 retire une réponse déjà comptée (examen : réponse modifiée). Tableau plat d'entiers :
+// sérialisable par Firestore et simple à fusionner.
 // Champ `choicePicks` : l'ancien `pickedChoices` indexait les choix mélangés de la séance, donc ses
 // valeurs ne sont pas exploitables et il est ignoré.
 export function addPickedChoices(qStat, question, selected, sign = 1) {
     const choices = question.choices || [];
     const counts = Array.from({ length: choices.length }, (_, i) => Number(qStat.choicePicks?.[i]) || 0);
+    const misses = Array.from({ length: choices.length }, (_, i) => Number(qStat.choiceMisses?.[i]) || 0);
+    const pickedIndices = new Set();
     (selected || []).forEach((choice) => {
         const idx = choiceIndex(question, choice);
-        if (idx >= 0) counts[idx] = Math.max(0, counts[idx] + sign);
+        if (idx >= 0) {
+            counts[idx] = Math.max(0, counts[idx] + sign);
+            pickedIndices.add(idx);
+        }
+    });
+    choices.forEach((choice, idx) => {
+        if (choice.pts > 0 && !pickedIndices.has(idx)) {
+            misses[idx] = Math.max(0, misses[idx] + sign);
+        }
     });
     qStat.choicePicks = counts;
+    qStat.choiceMisses = misses;
 }
 
 // Enregistre une réponse dans les deux suivis du diagnostic : compteurs par choix et journal daté.

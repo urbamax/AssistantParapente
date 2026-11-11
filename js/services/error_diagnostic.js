@@ -89,21 +89,25 @@ function isOvercome(s) {
 }
 
 /**
- * Statut du piège `index` d'après le journal des réponses.
+ * Statut d'un piège ou d'un oubli d'après le journal des réponses.
+ *  - 'trap'   : choix négatif coché ;
+ *  - 'missed' : bonne réponse oubliée (non cochée).
+ *
  * @param {Array<[number, number]>} log
  * @param {number} index
  * @param {Array<{ pts: number }>} choices
+ * @param {'trap' | 'missed'} [kind]
  * @returns {{ status: TrapStatus, relapse: boolean, lastPickedDay: number | null, cleanSince: number }}
  */
-export function computeTrapStatus(log, index, choices) {
-    const picked = (e) => Boolean((e[1] >> index) & 1);
+export function computeTrapStatus(log, index, choices, kind = 'trap') {
+    const isError = kind === 'missed' ? (e) => !((e[1] >> index) & 1) : (e) => Boolean((e[1] >> index) & 1);
     /** @type {number[]} */
-    const pickIdx = [];
+    const errIdx = [];
     log.forEach((e, k) => {
-        if (picked(e)) pickIdx.push(k);
+        if (isError(e)) errIdx.push(k);
     });
-    const last = pickIdx.length ? pickIdx[pickIdx.length - 1] : -1;
-    // Dernier piège sorti du journal : on prend le début du journal comme borne basse de sa date.
+    const last = errIdx.length ? errIdx[errIdx.length - 1] : -1;
+    // Dernier piège/oubli sorti du journal : on prend le début du journal comme borne basse de sa date.
     const lastPickedDay = last >= 0 ? log[last][0] : null;
     const pickDay = lastPickedDay ?? (log.length ? log[0][0] : null);
 
@@ -115,8 +119,8 @@ export function computeTrapStatus(log, index, choices) {
     else if (last === -1 && log.length > 0) status = 'consolidating';
 
     let relapse = false;
-    if (status === 'active' && pickIdx.length >= 2) {
-        const prev = pickIdx[pickIdx.length - 2];
+    if (status === 'active' && errIdx.length >= 2) {
+        const prev = errIdx[errIdx.length - 2];
         const between = summarizeClean(log.slice(prev + 1, last), choices, log[prev][0]);
         relapse = isOvercome(between);
     }
@@ -124,8 +128,20 @@ export function computeTrapStatus(log, index, choices) {
 }
 
 /**
+ * Raccourci pour calculer le statut d'une bonne réponse oubliée.
+ *
+ * @param {Array<[number, number]>} log
+ * @param {number} index
+ * @param {Array<{ pts: number }>} choices
+ */
+export function computeOmissionStatus(log, index, choices) {
+    return computeTrapStatus(log, index, choices, 'missed');
+}
+
+/**
  * @typedef {{
  *   choiceIndex: number, text: string, pts: number, count: number,
+ *   kind?: 'trap' | 'missed',
  *   status: TrapStatus, relapse: boolean, lastPickedDay: number | null, cleanSince: number,
  *   explanation: string | null,
  * }} Trap
@@ -142,36 +158,68 @@ function compareTraps(a, b) {
 }
 
 /**
- * Pièges d'une question : choix à points négatifs déjà cochés, du plus urgent au moins urgent.
+ * Erreurs d'une question : pièges (choix négatifs cochés) et oublis (bonnes réponses non cochées),
+ * ordonnés du plus urgent au moins urgent.
  *
  * @param {{ code?: string, choices?: any[], explication?: string }} question
- * @param {{ choicePicks?: number[], answers?: unknown } | undefined} qStat
- * @returns {{ code: string, traps: Trap[], hasActive: boolean }}
+ * @param {{ choicePicks?: number[], choiceMisses?: number[], answers?: unknown } | undefined} qStat
+ * @returns {{ code: string, traps: Trap[], omissions: Trap[], hasActive: boolean, hasActiveOmission: boolean, hasActiveError: boolean }}
  */
 export function diagnoseQuestionErrors(question, qStat) {
     const choices = question?.choices || [];
     const log = readAnswerLog(qStat?.answers);
     const counts = Array.isArray(qStat?.choicePicks) ? qStat.choicePicks : [];
+    const misses = Array.isArray(qStat?.choiceMisses) ? qStat.choiceMisses : [];
     const explanations = splitOptionExplanations(question);
 
     /** @type {Trap[]} */
     const traps = [];
+    /** @type {Trap[]} */
+    const omissions = [];
+
     choices.forEach((choice, index) => {
-        if (!(choice.pts < 0)) return;
-        const logged = log.filter((e) => (e[1] >> index) & 1).length;
-        const count = Math.max(Number(counts[index]) || 0, logged);
-        if (count === 0) return;
-        traps.push({
-            choiceIndex: index,
-            text: choice.text,
-            pts: choice.pts,
-            count,
-            ...computeTrapStatus(log, index, choices),
-            explanation: explanations[index] ?? null,
-        });
+        if (choice.pts < 0) {
+            const logged = log.filter((e) => (e[1] >> index) & 1).length;
+            const count = Math.max(Number(counts[index]) || 0, logged);
+            if (count === 0) return;
+            traps.push({
+                choiceIndex: index,
+                text: choice.text,
+                pts: choice.pts,
+                count,
+                kind: 'trap',
+                ...computeTrapStatus(log, index, choices, 'trap'),
+                explanation: explanations[index] ?? null,
+            });
+        } else if (choice.pts > 0) {
+            const logged = log.filter((e) => !((e[1] >> index) & 1)).length;
+            const count = Math.max(Number(misses[index]) || 0, logged);
+            if (count === 0) return;
+            omissions.push({
+                choiceIndex: index,
+                text: choice.text,
+                pts: choice.pts,
+                count,
+                kind: 'missed',
+                ...computeTrapStatus(log, index, choices, 'missed'),
+                explanation: explanations[index] ?? null,
+            });
+        }
     });
     traps.sort(compareTraps);
-    return { code: String(question?.code ?? ''), traps, hasActive: traps.some((t) => t.status === 'active') };
+    omissions.sort(compareTraps);
+
+    const hasActiveTrap = traps.some((t) => t.status === 'active');
+    const hasActiveOmission = omissions.some((o) => o.status === 'active');
+
+    return {
+        code: String(question?.code ?? ''),
+        traps,
+        omissions,
+        hasActive: hasActiveTrap,
+        hasActiveOmission,
+        hasActiveError: hasActiveTrap || hasActiveOmission,
+    };
 }
 
 /** @param {Record<string, any> | undefined} stats */

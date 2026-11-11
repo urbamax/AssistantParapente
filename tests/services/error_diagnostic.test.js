@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import QuizService from '../../js/services/quiz_service.js';
 import {
     computeTrapStatus,
+    computeOmissionStatus,
     diagnoseQuestionErrors,
     getTopTraps,
     buildTrapFeedback,
@@ -156,7 +157,64 @@ describe('computeTrapStatus', () => {
     });
 });
 
+describe('computeOmissionStatus', () => {
+    it('is active right after a good answer is omitted', () => {
+        // Option 0 (bonne) non cochée dans mask 0b0010 (TRAP_A seul)
+        expect(computeOmissionStatus([[100, TRAP_A]], 0, choices)).toMatchObject({
+            status: 'active',
+            lastPickedDay: 100,
+        });
+    });
+
+    it('is consolidating after two fully correct answers since the omission', () => {
+        const log = [
+            [100, TRAP_A], // omission de l'option 0
+            [100, GOOD], // bonne réponse complète
+            [100, GOOD], // bonne réponse complète
+        ];
+        expect(computeOmissionStatus(log, 0, choices).status).toBe('consolidating');
+    });
+
+    it('is overcome only with 3 correct answers over 2+ days and 7+ days after the omission', () => {
+        const log = [
+            [100, TRAP_A],
+            [101, GOOD],
+            [104, GOOD],
+            [108, GOOD],
+        ];
+        expect(computeOmissionStatus(log, 0, choices).status).toBe('overcome');
+    });
+});
+
 describe('diagnoseQuestionErrors', () => {
+    it('diagnoses omitted correct choices as omissions with count and status', () => {
+        const d = diagnoseQuestionErrors(q('U1V'), stat([[100, TRAP_A]], [0, 1, 0, 0]));
+        expect(d.omissions.map((o) => o.choiceIndex)).toEqual([0]);
+        expect(d.hasActiveOmission).toBe(true);
+        expect(d.hasActiveError).toBe(true);
+        expect(d.omissions[0]).toMatchObject({
+            text: 'bonne',
+            pts: 6,
+            count: 1,
+            kind: 'missed',
+            status: 'active',
+            explanation: 'Pourquoi bonne.',
+        });
+    });
+
+    it('tracks choiceMisses for recurrence when available', () => {
+        const qStat = {
+            total: 3,
+            choiceMisses: [3, 0, 0, 0],
+            answers: [[100, TRAP_A]],
+        };
+        const d = diagnoseQuestionErrors(q('U1V'), qStat);
+        expect(d.omissions[0]).toMatchObject({
+            count: 3,
+            status: 'active',
+            kind: 'missed',
+        });
+    });
     it('lists only ticked negative choices, never the neutral or correct ones', () => {
         const d = diagnoseQuestionErrors(q('U1V'), stat([[100, TRAP_A | 0b1000]], [0, 1, 0, 1]));
         expect(d.traps.map((t) => t.choiceIndex)).toEqual([1]);
