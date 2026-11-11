@@ -46,6 +46,13 @@ describe('quiz exam: leaving the page', () => {
         expect(invalidate).toHaveBeenCalledTimes(1);
     });
 
+    it('invalidates when the student comes back after the grace period even if background timer was suspended', () => {
+        setHidden(true);
+        vi.setSystemTime(Date.now() + 20000);
+        setHidden(false);
+        expect(invalidate).toHaveBeenCalledTimes(1);
+    });
+
     it('does not invalidate an exam already saved or finished', () => {
         QuizService.state.examSaved = true;
         setHidden(true);
