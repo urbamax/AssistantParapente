@@ -28,6 +28,9 @@ import {
     buildOfficialTheoryBannerHtml,
 } from './quiz_stats_html.js';
 
+// Passer à true en cas de souci technique pour réactiver la suppression d'examen
+const SHOW_EXAM_DELETE = false;
+
 export class QuizStatsBase extends BaseView {
     constructor() {
         super();
@@ -456,6 +459,7 @@ export class QuizStatsBase extends BaseView {
     renderExamHistory() {
         let exams = QuizService.getExamHistory();
         const isOwner = AccessService.has(ROLES.OWNER);
+        const canDeleteExam = isOwner && SHOW_EXAM_DELETE;
 
         // FILTER EXAMS BY CURRENT LEVEL
         let currentLevel = typeof GlobalState !== 'undefined' ? GlobalState.get('level') : 'BI';
@@ -586,7 +590,7 @@ export class QuizStatsBase extends BaseView {
 
             questionsHtml += '</div></div>';
 
-            const rightBlockHtml = isOwner
+            const rightBlockHtml = canDeleteExam
                 ? `<div style="display:flex; align-items:center; gap:12px;">
                 <div style="font-size:1.5rem; font-weight:700; color:${color};">${formatPercent(pct)}%</div>
                 <button type="button" class="action-btn-text exam-delete-btn" data-action="QuizdeleteExam" data-args="['${exam.id}']" data-prevent-default title="${tq('history.delete')}" style="color:#f87171; background:rgba(248, 113, 113, 0.1); border:1px solid rgba(248, 113, 113, 0.25); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:1rem; display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s;" aria-label="${tq('history.delete')}">
