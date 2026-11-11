@@ -250,7 +250,7 @@ class QuizViewClass extends QuizVoiceBase {
     }
 
     // --- KEYBOARD SHORTCUTS (question screen) ---
-    // A-D or 1-4 tick an answer, Enter validates (or moves on once corrected), arrows go back/forward.
+    // A-F or 1-6 tick an answer, Enter validates (or moves on once corrected), arrows go back/forward.
     // Each shortcut clicks the matching on-screen button so the click handler stays the only code path.
     handleKeydown(e) {
         if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -278,7 +278,7 @@ class QuizViewClass extends QuizVoiceBase {
             press('[data-action="prev-question"]');
         } else if (e.key === 'ArrowRight') {
             press('[data-action="next-question"]');
-        } else if (/^[a-dA-D1-4]$/.test(e.key)) {
+        } else if (/^[a-fA-F1-6]$/.test(e.key)) {
             const idx = /\d/.test(e.key) ? Number(e.key) - 1 : e.key.toLowerCase().charCodeAt(0) - 97;
             press(`.qcm-option[data-idx="${idx}"]`);
         }
