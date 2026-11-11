@@ -250,7 +250,7 @@ class QuizViewClass extends QuizVoiceBase {
     }
 
     // --- KEYBOARD SHORTCUTS (question screen) ---
-    // A-D or 1-4 tick an answer, Enter validates (or moves on once corrected), arrows go back/forward.
+    // A-F or 1-6 tick an answer, Enter validates (or moves on once corrected), arrows go back/forward.
     // Each shortcut clicks the matching on-screen button so the click handler stays the only code path.
     handleKeydown(e) {
         if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -278,7 +278,7 @@ class QuizViewClass extends QuizVoiceBase {
             press('[data-action="prev-question"]');
         } else if (e.key === 'ArrowRight') {
             press('[data-action="next-question"]');
-        } else if (/^[a-dA-D1-4]$/.test(e.key)) {
+        } else if (/^[a-fA-F1-6]$/.test(e.key)) {
             const idx = /\d/.test(e.key) ? Number(e.key) - 1 : e.key.toLowerCase().charCodeAt(0) - 97;
             press(`.qcm-option[data-idx="${idx}"]`);
         }
@@ -1260,36 +1260,25 @@ class QuizViewClass extends QuizVoiceBase {
               : `<span style="background:rgba(248,113,113,0.1); color:#dc2626; padding:4px 12px; border-radius:8px; font-size:1.1rem; font-weight:bold; border:1px solid #f87171;">${tq('results.failed')}</span>`;
 
         // Pièges cochés pendant la série (statistiques déjà à jour). Sans suivi des statistiques, rien à dire.
-        const trapsHtml = GdprEngine.isConsentGranted('stats')
-            ? buildResultsTrapsHtml(
-                  summarizeSessionTraps(
-                      results,
-                      (code) => QuizService.getQuestionByCode(code),
-                      QuizService.getPersistentStats(),
-                  ),
-                  { canStartWorkshop: true },
-              )
-            : '';
+        const trapsHtml =
+            !isInvalidated && GdprEngine.isConsentGranted('stats')
+                ? buildResultsTrapsHtml(
+                      summarizeSessionTraps(
+                          results,
+                          (code) => QuizService.getQuestionByCode(code),
+                          QuizService.getPersistentStats(),
+                      ),
+                      { canStartWorkshop: true },
+                  )
+                : '';
 
         const exitButtonHtml = this._activeWorkshopAxisId
             ? `<button class="next-btn" data-action="QuizshowRevisionAxes" style="width:100%;"><i class="ri-compass-3-line"></i> ${tq('axes.backToAxesBtn')}</button>`
             : `<button class="next-btn" data-action="finish-session" style="width:100%;">${tq('results.finish')}</button>`;
 
-        container.innerHTML = `
-            <div class="stats-circle-container" style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom: 32px;">
-                <h2 style="margin:0;">${tq('results.title')}</h2>
-                <div style="display:flex; align-items:center; justify-content:center; gap:32px; background:var(--bg-card); padding:24px 32px; border-radius:16px; border:1px solid var(--border-color); box-shadow:0 4px 6px rgba(0,0,0,0.05);">
-                    ${displayScoreHtml}
-                    <div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
-                        <div style="font-size:2rem; font-weight:800; color:var(--text-main);">${formatPercent(percentage)}%</div>
-                        ${isExam ? badgeHtml : ''}
-                    </div>
-                </div>
-            </div>
-
-            <div class="qcm-results-exit" style="margin-bottom: 8px;">${exitButtonHtml}</div>
-
-            ${trapsHtml}<div style="margin-top: 32px; font-weight: 600; font-size: 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px; color:var(--text-main);">
+        const summaryHtml = isInvalidated
+            ? ''
+            : `${trapsHtml}<div style="margin-top: 32px; font-weight: 600; font-size: 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px; color:var(--text-main);">
                 ${tq('results.summary')}
             </div>
             
@@ -1379,7 +1368,21 @@ class QuizViewClass extends QuizVoiceBase {
                               })
                               .join('')
                 }
+            </div>`;
+
+        container.innerHTML = `
+            <div class="stats-circle-container" style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom: 32px;">
+                <h2 style="margin:0;">${tq('results.title')}</h2>
+                <div style="display:flex; align-items:center; justify-content:center; gap:32px; background:var(--bg-card); padding:24px 32px; border-radius:16px; border:1px solid var(--border-color); box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                    ${displayScoreHtml}
+                    <div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
+                        <div style="font-size:2rem; font-weight:800; color:var(--text-main);">${formatPercent(percentage)}%</div>
+                        ${isExam ? badgeHtml : ''}
+                    </div>
+                </div>
             </div>
+
+            <div class="qcm-results-exit" style="margin-bottom: 8px;">${exitButtonHtml}</div>${summaryHtml ? `\n\n            ${summaryHtml}` : ''}
         `;
 
         choicesDiv.innerHTML = '';

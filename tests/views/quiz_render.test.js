@@ -313,6 +313,10 @@ describe('quiz renders (spec 024: identical before and after moving the texts)',
         out.examPassed = run('EXAM', [results[1], results[1]]);
         out.examInvalidated = run('EXAM', [results[1], results[1]], true);
         expect(out).toMatchSnapshot();
+        expect(out.examInvalidated.body).toContain('INVALIDÉ');
+        expect(out.examInvalidated.body).not.toContain('Récapitulatif des questions');
+        expect(out.examInvalidated.body).not.toContain("Félicitations, vous n'avez fait aucune erreur !");
+        expect(out.examInvalidated.body).not.toContain('bank-container');
     });
 
     it('dialogs', async () => {
