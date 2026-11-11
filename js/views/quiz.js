@@ -1295,12 +1295,13 @@ class QuizViewClass extends QuizVoiceBase {
                                   const original = QuizService.getQuestionByCode(r.question.code) || r.question;
                                   const perOption = optionExplanations(original);
                                   const courseLinks = this.getCourseLinks(r.question.code);
+                                  const badge = questionResultBadge(r);
 
                                   return `
                     <div class="bank-item" style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; background: var(--bg-card); box-shadow:0 2px 4px rgba(0,0,0,0.02);">
                         <div class="bank-item-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items:center;">
                             <span class="bank-item-code" style="font-family:monospace; font-size:0.85rem; color:var(--text-secondary); background:rgba(0,0,0,0.05); padding:4px 8px; border-radius:4px;">#${escapeHTML(r.question.code)}</span>
-                            <span class="badge" style="background:rgba(248,113,113,0.1); color:#dc2626; border:1px solid #f87171; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">${tq('results.wrong')}</span>
+                            <span class="badge" style="${badge.style} padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">${tq(badge.labelKey)}</span>
                         </div>
                         <div class="bank-item-question" style="font-weight: 600; font-size:1.1rem; margin-bottom: 16px; color:var(--text-main); line-height:1.4;">${escapeHTML(r.question.question)}</div>
                         <div class="bank-item-choices" style="display: flex; flex-direction: column; gap: 10px;">
@@ -1404,6 +1405,68 @@ class QuizViewClass extends QuizVoiceBase {
 
     // --- STATISTICS MANAGEMENT ---
 } // End Class
+
+/**
+ * Calcule l'état et le badge d'une question à partir des réponses sélectionnées :
+ * - Si présence d'au moins une réponse rouge (fausse cochée) -> FAUX
+ * - Sinon, si absence de rouge mais présence d'orange (bonne réponse oubliée) -> INCOMPLET
+ * - Si uniquement du vert (bonnes réponses cochées, aucune faute ni oubli) -> VRAI
+ *
+ * @param {{ question?: { choices?: Array<{ text: string, pts: number }>, ans?: Array<{ text: string, pts: number }> }, selected?: Array<any> }} r
+ * @returns {{ status: 'wrong' | 'incomplete' | 'correct', labelKey: string, style: string }}
+ */
+export function questionResultBadge(r) {
+    const choices = (r && r.question && (r.question.choices || r.question.ans)) || [];
+    const selected = Array.isArray(r && r.selected) ? r.selected : [];
+
+    let hasRed = false;
+    let hasGreen = false;
+    let hasOrange = false;
+
+    choices.forEach((c, idx) => {
+        const isUserSelected = selected.some((sel) => {
+            if (typeof sel === 'number') return sel === idx;
+            if (typeof sel === 'string') return sel === c.text;
+            return Boolean(sel && sel.text === c.text);
+        });
+        const isCorrectChoice = Number(c.pts || 0) > 0;
+
+        if (isUserSelected && !isCorrectChoice) {
+            hasRed = true;
+        } else if (isUserSelected && isCorrectChoice) {
+            hasGreen = true;
+        } else if (!isUserSelected && isCorrectChoice) {
+            hasOrange = true;
+        }
+    });
+
+    if (hasRed) {
+        return {
+            status: 'wrong',
+            labelKey: 'results.wrong',
+            style: 'background:rgba(248,113,113,0.1); color:#dc2626; border:1px solid #f87171;',
+        };
+    }
+    if (hasOrange) {
+        return {
+            status: 'incomplete',
+            labelKey: 'results.incomplete',
+            style: 'background:rgba(251,146,60,0.1); color:#ea580c; border:1px solid #fb923c;',
+        };
+    }
+    if (hasGreen) {
+        return {
+            status: 'correct',
+            labelKey: 'results.correct',
+            style: 'background:rgba(74,222,128,0.1); color:#16a34a; border:1px solid #4ade80;',
+        };
+    }
+    return {
+        status: 'incomplete',
+        labelKey: 'results.incomplete',
+        style: 'background:rgba(251,146,60,0.1); color:#ea580c; border:1px solid #fb923c;',
+    };
+}
 
 const QuizView = new QuizViewClass();
 export default QuizView;
