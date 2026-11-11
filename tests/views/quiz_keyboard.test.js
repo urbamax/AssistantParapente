@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import QuizView from '../../js/views/quiz.js';
 
-// Keyboard shortcuts on the question screen: A-D / 1-4 tick an answer, Enter validates (or moves on
+// Keyboard shortcuts on the question screen: A-F / 1-6 tick an answer, Enter validates (or moves on
 // once corrected), arrows go back / forward. Each key clicks the matching on-screen button.
 describe('QCM keyboard shortcuts', () => {
     let clicks;
@@ -13,6 +13,8 @@ describe('QCM keyboard shortcuts', () => {
                 <button class="qcm-option" data-action="toggle-option" data-idx="0">A</button>
                 <button class="qcm-option" data-action="toggle-option" data-idx="1">B</button>
                 <button class="qcm-option" data-action="toggle-option" data-idx="2" disabled>C</button>
+                <button class="qcm-option" data-action="toggle-option" data-idx="3">D</button>
+                <button class="qcm-option" data-action="toggle-option" data-idx="4">E</button>
                 <button id="voice">Lire</button>
                 <input id="field" />
                 <div id="qcm-actions-container">${actions}</div>
@@ -50,13 +52,23 @@ describe('QCM keyboard shortcuts', () => {
         press('a');
         press('B');
         press('2');
-        expect(clicks).toEqual(['toggle-option', 'toggle-option', 'toggle-option']);
+        press('e');
+        press('E');
+        press('5');
+        expect(clicks).toEqual([
+            'toggle-option',
+            'toggle-option',
+            'toggle-option',
+            'toggle-option',
+            'toggle-option',
+            'toggle-option',
+        ]);
     });
 
     it('ignores a frozen (corrected) or missing answer', () => {
         render(CORRECTED_ACTIONS);
         press('c');
-        press('d');
+        press('f');
         expect(clicks).toEqual([]);
     });
 
