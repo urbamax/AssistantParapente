@@ -472,8 +472,9 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
         EXPLORE: 0,
         MASTERED: 0,
     };
-    // Pièges de tout le niveau : `axes` = nombre d'axes où au moins un piège est actif.
+    // Pièges et oublis de tout le niveau : `axes` = nombre d'axes où au moins un piège / oubli est actif.
     const trapTotals = { active: 0, consolidating: 0, overcome: 0, axes: 0 };
+    const omissionTotals = { active: 0, consolidating: 0, overcome: 0, axes: 0 };
 
     for (let idx = 0; idx < REVISION_AXES_CATALOG.length; idx++) {
         const def = REVISION_AXES_CATALOG[idx];
@@ -491,6 +492,7 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
         /** @type {Array<{ q: any, key: string, bucket: 'unattempted' | 'struggling' | 'hesitant' | 'due' | 'mastered', ratio: number }>} */
         const classified = [];
         const traps = { active: 0, consolidating: 0, overcome: 0, items: /** @type {any[]} */ ([]) };
+        const omissions = { active: 0, consolidating: 0, overcome: 0, items: /** @type {any[]} */ ([]) };
 
         for (const q of axisQuestions) {
             const key = getQuestionKey(q);
@@ -511,10 +513,12 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
 
             classified.push({ q, key, bucket, ratio });
 
-            for (const trap of diagnoseQuestionErrors(q, stat).traps) {
+            const diag = diagnoseQuestionErrors(q, stat);
+            for (const trap of diag.traps) {
                 traps[trap.status] += 1;
                 // Pas de texte de choix ni d'énoncé : cet écran n'expose jamais les réponses QCM.
                 traps.items.push({
+                    kind: 'trap',
                     questionId: key,
                     questionNum: q.num || key,
                     choiceIndex: trap.choiceIndex,
@@ -527,8 +531,30 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
                     ...courseLinkFor(q, coursesById),
                 });
             }
+            for (const omission of diag.omissions || []) {
+                omissions[omission.status] += 1;
+                omissions.items.push({
+                    kind: 'missed',
+                    questionId: key,
+                    questionNum: q.num || key,
+                    choiceIndex: omission.choiceIndex,
+                    count: omission.count,
+                    status: omission.status,
+                    relapse: omission.relapse,
+                    lastPickedDay: omission.lastPickedDay,
+                    explanation: omission.explanation ?? cleanAxisExplanation(q.explication),
+                    isOptionExplanation: omission.explanation !== null,
+                    ...courseLinkFor(q, coursesById),
+                });
+            }
         }
         traps.items.sort(
+            (a, b) =>
+                TRAP_STATUS_RANK[a.status] - TRAP_STATUS_RANK[b.status] ||
+                Number(b.relapse) - Number(a.relapse) ||
+                b.count - a.count,
+        );
+        omissions.items.sort(
             (a, b) =>
                 TRAP_STATUS_RANK[a.status] - TRAP_STATUS_RANK[b.status] ||
                 Number(b.relapse) - Number(a.relapse) ||
@@ -542,8 +568,8 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
 
         /** @type {'BLOCKER' | 'REFRESH' | 'EXPLORE' | 'MASTERED'} */
         let status = 'MASTERED';
-        // Un piège actif bloque l'axe même avec un bon taux de réussite : la fausse croyance persiste.
-        if (strugglingCount > 0 || hesitantCount > 0 || traps.active > 0) {
+        // Un piège ou oubli actif bloque l'axe même avec un bon taux de réussite : la faille persiste.
+        if (strugglingCount > 0 || hesitantCount > 0 || traps.active > 0 || omissions.active > 0) {
             status = 'BLOCKER';
         } else if (dueCount > 0) {
             status = 'REFRESH';
@@ -557,6 +583,11 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
         trapTotals.active += traps.active;
         trapTotals.consolidating += traps.consolidating;
         trapTotals.overcome += traps.overcome;
+
+        if (omissions.active > 0) omissionTotals.axes += 1;
+        omissionTotals.active += omissions.active;
+        omissionTotals.consolidating += omissions.consolidating;
+        omissionTotals.overcome += omissions.overcome;
 
         const copy = catalogCopy[def.id] || { title: def.id, subtitle: '' };
         const courseReadings = aggregateCourseReadings(classified, coursesById);
@@ -583,6 +614,7 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
             takeaways,
             workshopSize,
             traps,
+            omissions,
             questionIds: classified.map((c) => c.key),
         });
     }
@@ -600,8 +632,8 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
         if (sDiff !== 0) return sDiff;
 
         if (a.status === 'BLOCKER') {
-            const scoreA = a.strugglingCount * 3 + a.hesitantCount * 1.5 + a.traps.active * 2;
-            const scoreB = b.strugglingCount * 3 + b.hesitantCount * 1.5 + b.traps.active * 2;
+            const scoreA = a.strugglingCount * 3 + a.hesitantCount * 1.5 + (a.traps.active + a.omissions.active) * 2;
+            const scoreB = b.strugglingCount * 3 + b.hesitantCount * 1.5 + (b.traps.active + b.omissions.active) * 2;
             if (scoreB !== scoreA) return scoreB - scoreA;
             if (a.attemptedMasteryPct !== b.attemptedMasteryPct) return a.attemptedMasteryPct - b.attemptedMasteryPct;
         } else if (a.status === 'REFRESH') {
@@ -624,12 +656,16 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
         axes,
         counts,
         trapTotals,
+        omissionTotals,
     };
 }
 
-/** Poids d'une question à piège actif : rechute > nombre de fois piégé. */
+/** Poids d'une question à piège ou omission active : rechute > nombre de fois piégé / oublié. */
 function trapPriority(stat, q) {
-    const [top] = diagnoseQuestionErrors(q, stat).traps.filter((t) => t.status === 'active');
+    const diag = diagnoseQuestionErrors(q, stat);
+    const activeErrors = [...diag.traps, ...(diag.omissions || [])].filter((t) => t.status === 'active');
+    activeErrors.sort((a, b) => Number(b.relapse) - Number(a.relapse) || b.count - a.count);
+    const top = activeErrors[0];
     return top ? (top.relapse ? 1000 : 0) + top.count : 0;
 }
 

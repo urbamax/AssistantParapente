@@ -1475,6 +1475,18 @@ export const FirebaseAuthEngine = {
         };
     },
 
+    // Nombre de fois où chaque bonne réponse a été oubliée.
+    _mergeChoiceMisses: function (a, b) {
+        const valid = (v) => (Array.isArray(v) ? v : null);
+        const la = valid(a);
+        const lb = valid(b);
+        if (!la && !lb) return {};
+        const length = Math.max(la?.length || 0, lb?.length || 0);
+        return {
+            choiceMisses: Array.from({ length }, (_, i) => Math.max(Number(la?.[i]) || 0, Number(lb?.[i]) || 0)),
+        };
+    },
+
     // Journal daté des dernières réponses (voir answer_log.js) : omis si aucune des deux versions n'en a.
     _mergeAnswers: function (a, b) {
         if (!Array.isArray(a) && !Array.isArray(b)) return {};
@@ -1501,6 +1513,7 @@ export const FirebaseAuthEngine = {
                 correct: Math.max(lQ.correct, cQ.correct),
                 ...this._latestReviewState(lQ, cQ),
                 ...this._mergeChoicePicks(lQ.choicePicks, cQ.choicePicks),
+                ...this._mergeChoiceMisses(lQ.choiceMisses, cQ.choiceMisses),
                 ...this._mergeAnswers(lQ.answers, cQ.answers),
             };
         });

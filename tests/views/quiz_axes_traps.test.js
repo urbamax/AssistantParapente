@@ -99,3 +99,72 @@ describe('axes de révision : pièges', () => {
         expect(html).toContain('data-axis-id="pilotage-plan-vol-vent"');
     });
 });
+
+describe('axes de révision : oublis orange récurrents', () => {
+    it('adds the omission items to the report without the question or choice texts', () => {
+        // Bonne réponse (option 0) oubliée 3 fois
+        const { report } = render(
+            statsWith({
+                U1V: {
+                    ...good,
+                    choiceMisses: [3, 0, 0],
+                    answers: log([0, 0b000]),
+                },
+            }),
+        );
+        const axis = report.axes.find((a) => a.id === 'pilotage-plan-vol-vent');
+        expect(axis.omissions.active).toBe(1);
+        expect(axis.omissions.items[0]).toMatchObject({
+            questionId: 'U1V',
+            status: 'active',
+            count: 3,
+            kind: 'missed',
+            explanation: 'Pourquoi la bonne.',
+            isOptionExplanation: true,
+        });
+        expect(JSON.stringify(report)).not.toMatch(/PIEGE-SECRET|ENONCE-SECRET|BONNE-SECRET/);
+        expect(report.omissionTotals).toEqual({ active: 1, consolidating: 0, overcome: 0, axes: 1 });
+    });
+
+    it('shows the omission pill, the block and the count on the card, never the QCM texts', () => {
+        const { html } = render(
+            statsWith({
+                U1V: {
+                    ...good,
+                    choiceMisses: [2, 0, 0],
+                    answers: log([0, 0b000]),
+                },
+            }),
+        );
+        expect(html).toContain('1 oubli actif');
+        expect(html).toContain('revision-axis-omissions');
+        expect(html).toContain('Oublié 2 fois');
+        expect(html).toContain('Pourquoi la bonne.');
+        expect(html).not.toMatch(/PIEGE-SECRET|ENONCE-SECRET|BONNE-SECRET/);
+    });
+
+    it('stays silent when there is no omission', () => {
+        const { html } = render(statsWith({}));
+        expect(html).not.toContain('revision-axis-omissions');
+        expect(html).not.toContain('oubli actif');
+    });
+
+    it('folds non-urgent omissions and toggles them with omissions:<axisId>', () => {
+        const stats = statsWith({
+            U1V: {
+                ...good,
+                choiceMisses: [1, 0, 0],
+                answers: log([30, 0b000]).concat(log([29, 0b001], [25, 0b001], [20, 0b001])),
+            },
+            U2V: { ...good, choiceMisses: [1, 0, 0], answers: log([0, 0b000]) },
+            U3V: { ...good, choiceMisses: [1, 0, 0], answers: log([0, 0b000]) },
+            U4V: { ...good, choiceMisses: [1, 0, 0], answers: log([0, 0b000]) },
+        });
+        const folded = render(stats).html;
+        expect((folded.match(/revision-axis-omission-item"/g) || []).length).toBe(3);
+        expect(folded).toContain('Voir tous mes oublis (4)');
+        const unfolded = render(stats, { expandedIds: new Set(['omissions:pilotage-plan-vol-vent']) }).html;
+        expect((unfolded.match(/revision-axis-omission-item"/g) || []).length).toBe(4);
+        expect(unfolded).toContain('data-omission-status="overcome"');
+    });
+});
