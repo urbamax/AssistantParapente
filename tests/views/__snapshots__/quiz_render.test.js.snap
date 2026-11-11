@@ -424,17 +424,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             </div>
 
             <div class="qcm-results-exit" style="margin-bottom: 8px;"><button class="next-btn" data-action="finish-session" style="width:100%;">TERMINER</button></div>
-
-            <div style="margin-top: 32px; font-weight: 600; font-size: 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px; color:var(--text-main);">
-                Récapitulatif des questions
-            </div>
-            
-            <div class="bank-container" style="display: flex; flex-direction: column; gap: 20px;">
-                <div style="text-align: center; padding: 32px; background: rgba(74, 222, 128, 0.1); border-radius: var(--radius-md); border:1px solid #4ade80; color: #16a34a;">
-                        <i class="ri-trophy-line" style="font-size: 3rem; margin-bottom:16px; display:block;"></i>
-                        <span style="font-size:1.2rem; font-weight:bold;">Félicitations, vous n'avez fait aucune erreur !</span>
-                    </div>
-            </div>
         ",
     "label": "MODE EXAMEN",
   },
