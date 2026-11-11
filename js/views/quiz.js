@@ -58,22 +58,43 @@ class QuizViewClass extends QuizVoiceBase {
         });
 
         document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
+            if (document.hidden) {
+                if (!this.isExamInProgress()) return;
+                this._examHiddenAt = Date.now();
+                // Un appel entrant ou un changement d'appli très court ne doit pas annuler l'examen.
                 clearTimeout(this._examLeaveTimer);
-                this._examLeaveTimer = null;
-                if (this._examInvalidatedNotice) {
-                    this._examInvalidatedNotice = false;
-                    alert(tql('dialogs.examInvalidated'));
-                }
+                this._examLeaveTimer = setTimeout(() => {
+                    this._examLeaveTimer = null;
+                    if (document.hidden && this.isExamInProgress()) {
+                        this._examHiddenAt = null;
+                        this.invalidateExam();
+                    }
+                }, EXAM_LEAVE_GRACE_MS);
                 return;
             }
-            if (!this.isExamInProgress()) return;
-            // Un appel entrant ou un changement d'appli très court ne doit pas annuler l'examen.
+
+            // Retour sur la page : si le timer d'arrière-plan a été suspendu par le navigateur
+            // (ex. onglet Safari/Chrome inactif), on vérifie le temps réel écoulé depuis le départ.
             clearTimeout(this._examLeaveTimer);
-            this._examLeaveTimer = setTimeout(() => {
-                this._examLeaveTimer = null;
-                if (document.hidden && this.isExamInProgress()) this.invalidateExam();
-            }, EXAM_LEAVE_GRACE_MS);
+            this._examLeaveTimer = null;
+
+            const hiddenAt = this._examHiddenAt;
+            this._examHiddenAt = null;
+
+            if (this._examInvalidatedNotice) {
+                this._examInvalidatedNotice = false;
+                if (typeof alert === 'function') alert(tql('dialogs.examInvalidated'));
+                return;
+            }
+
+            if (hiddenAt && this.isExamInProgress()) {
+                const elapsed = Date.now() - hiddenAt;
+                if (elapsed >= EXAM_LEAVE_GRACE_MS) {
+                    this.invalidateExam();
+                    this._examInvalidatedNotice = false;
+                    if (typeof alert === 'function') alert(tql('dialogs.examInvalidated'));
+                }
+            }
         });
     }
 
@@ -210,6 +231,8 @@ class QuizViewClass extends QuizVoiceBase {
         this.stopVoice();
         clearTimeout(this._examLeaveTimer);
         this._examLeaveTimer = null;
+        this._examHiddenAt = null;
+        this._examInvalidatedNotice = false;
         if (typeof QuizService.abortExamIfIncomplete === 'function') {
             QuizService.abortExamIfIncomplete();
         }
@@ -477,6 +500,7 @@ class QuizViewClass extends QuizVoiceBase {
     showBankScreen() {
         clearTimeout(this._examLeaveTimer);
         this._examLeaveTimer = null;
+        this._examHiddenAt = null;
         if (typeof QuizService.abortExamIfIncomplete === 'function') {
             QuizService.abortExamIfIncomplete();
         }
@@ -760,6 +784,7 @@ class QuizViewClass extends QuizVoiceBase {
     showSetupScreen() {
         clearTimeout(this._examLeaveTimer);
         this._examLeaveTimer = null;
+        this._examHiddenAt = null;
         if (typeof QuizService.abortExamIfIncomplete === 'function') {
             QuizService.abortExamIfIncomplete();
         }

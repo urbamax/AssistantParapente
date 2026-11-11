@@ -52,6 +52,7 @@ export class QuizStatsBase extends BaseView {
     showStatsScreen() {
         clearTimeout(this._examLeaveTimer);
         this._examLeaveTimer = null;
+        this._examHiddenAt = null;
         if (typeof QuizService.abortExamIfIncomplete === 'function') {
             QuizService.abortExamIfIncomplete();
         }
@@ -64,6 +65,7 @@ export class QuizStatsBase extends BaseView {
     showRevisionAxesScreen() {
         clearTimeout(this._examLeaveTimer);
         this._examLeaveTimer = null;
+        this._examHiddenAt = null;
         if (typeof QuizService.abortExamIfIncomplete === 'function') {
             QuizService.abortExamIfIncomplete();
         }
