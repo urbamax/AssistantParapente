@@ -13,6 +13,7 @@ permissions:
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -41,27 +42,28 @@ jobs:
   # Tests de bout en bout sur Chromium et WebKit (constitution, principe IV ; spec 006).
   e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 0
 
-      # Une PR qui ne touche que les explications du QCM (lots d'audit) ne peut pas casser le parcours des
-      # écrans : lint-and-test lance déjà les tests de données (forme, lisibilité, style des explications).
+      # Une PR qui ne touche que les explications du QCM, la documentation ou les fichiers de projet
+      # ne peut pas casser le parcours des écrans : lint-and-test lance déjà les tests de données et de format.
       # Le job reste vert sans lancer les 8 minutes de navigateurs, pour ne pas bloquer une protection de branche.
       - id: scope
         run: |
           skip=false
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             changed="$(git diff --name-only "${{ github.event.pull_request.base.sha }}" HEAD)"
-            others="$(printf '%s\n' "$changed" | grep -vxc 'js/data/qcm_ffvl_explanations.csv' || true)"
-            if [ -n "$changed" ] && [ "$others" = "0" ]; then
+            others="$(printf '%s\n' "$changed" | grep -vE '^(js/data/qcm_ffvl_explanations\.csv|.*\.md|LICENSE|NOTICE|\.github/.*)$' || true)"
+            if [ -n "$changed" ] && [ -z "$others" ]; then
               skip=true
             fi
           fi
           echo "skip=$skip" >> "$GITHUB_OUTPUT"
-          echo "Tests e2e ignorés (explications du QCM seulement) : $skip"
+          echo "Tests e2e ignorés (doc / explications seulement) : $skip"
 
       - if: steps.scope.outputs.skip != 'true'
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
