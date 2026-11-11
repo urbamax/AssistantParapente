@@ -525,11 +525,20 @@ export function buildQuestionsHtml(
             }
         }
 
-        // Rien à dire tant qu'aucun examen n'a été passé (sinon « dont 0 posée en examen » sur chaque liste).
+        // Rien à dire tant qu'aucun examen n'a été passé (sinon « dont 0 posée en examen sur 0 examen » sur chaque liste).
+        const examStatsKey =
+            examQuestionsCount > 1
+                ? examsCount > 1
+                    ? 'stats.examStatsManyMany'
+                    : 'stats.examStatsManyOne'
+                : examsCount > 1
+                  ? 'stats.examStatsOneMany'
+                  : 'stats.examStatsOneOne';
         const examStatsHtml =
             examsCount > 0
-                ? `, ${tqh(examQuestionsCount > 1 ? 'stats.examStatsMany' : 'stats.examStatsOne', {
+                ? `, ${tqh(examStatsKey, {
                       questions: `<span style="font-weight:700; color:var(--text-main);">${examQuestionsCount}</span>`,
+                      exams: `<span style="font-weight:700; color:var(--text-main);">${examsCount}</span>`,
                   })}`
                 : '';
 
