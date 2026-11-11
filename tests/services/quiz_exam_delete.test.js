@@ -66,7 +66,7 @@ describe('Quiz Exam Deletion & Owner Access', () => {
         expect(merged.deletedExamIds).toContain('exam_zombie');
     });
 
-    it('QuizView.renderExamHistory shows delete button only when user is owner', () => {
+    it('QuizView.renderExamHistory masks delete button by default for owner', () => {
         vi.spyOn(GlobalState, 'get').mockReturnValue('ALL');
         vi.spyOn(QuizService, 'getExamHistory').mockReturnValue([
             { id: 'exam_1', date: '2026-10-30T14:00:00.000Z', level: 'BI', score: 25, total: 30, results: [] },
@@ -78,12 +78,11 @@ describe('Quiz Exam Deletion & Owner Access', () => {
         expect(html).not.toContain('QuizdeleteExam');
         expect(html).not.toContain('ri-delete-bin-line');
 
-        // 2. Owner
+        // 2. Owner : masqué par défaut
         AccessService.setRoles('admin_uid', [ROLES.OWNER]);
         html = QuizView.renderExamHistory();
-        expect(html).toContain('QuizdeleteExam');
-        expect(html).toContain('data-args="[\'exam_1\']"');
-        expect(html).toContain('ri-delete-bin-line');
+        expect(html).not.toContain('QuizdeleteExam');
+        expect(html).not.toContain('ri-delete-bin-line');
     });
 
     it('QuizView.deleteExam confirms, deletes exam and calls renderStats when owner', () => {
