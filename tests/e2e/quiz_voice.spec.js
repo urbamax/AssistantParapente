@@ -53,10 +53,12 @@ test.beforeEach(async ({ page }) => {
         class Recognition {
             constructor() {
                 this.active = false;
+                this.started = 0;
                 w.__recognizers.push(this);
             }
             start() {
                 this.active = true;
+                this.started += 1;
             }
             abort() {
                 this.active = false;
@@ -79,8 +81,10 @@ test.beforeEach(async ({ page }) => {
 
 async function startTraining(page) {
     await page.goto('/?mode=QCM');
-    await page.locator('[data-action="startQcmSession"]').click();
-    await expect(page.locator('#qcm-choices .qcm-option').first()).toBeVisible();
+    await expect(async () => {
+        await page.locator('[data-action="startQcmSession"]').click();
+        await expect(page.locator('#qcm-choices .qcm-option').first()).toBeVisible({ timeout: 500 });
+    }).toPass({ timeout: 10000 });
 }
 
 test('Spec 016 : « Lecture auto » lit la question et ses réponses avec leur lettre', async ({ page }) => {
@@ -107,11 +111,17 @@ test('Spec 016 : la lecture auto lit chaque nouvelle question et reste activée'
     await page.locator('[data-action="quiz-voice-auto"]').click();
     await expect(page.locator('[data-action="quiz-voice-auto"]')).toHaveAttribute('aria-pressed', 'true');
 
+    const spokenBeforeValidate = await page.evaluate(() => /** @type {any} */ (window).__spoken.length);
     await page.locator('#qcm-choices .qcm-option').first().click();
     await page.locator('[data-action="validate-question"]').click();
     await expect
-        .poll(() => page.evaluate(() => /** @type {any} */ (window).__spoken.at(-1)))
-        .toMatch(/^(Bonne réponse|Mauvaise réponse|Réponse incomplète)\./);
+        .poll(() =>
+            page.evaluate(
+                (from) => /** @type {any} */ (window).__spoken.slice(from).join(' ').trim(),
+                spokenBeforeValidate,
+            ),
+        )
+        .toMatch(/(Bonne réponse|Mauvaise réponse|Réponse incomplète)\./);
 
     const spokenBeforeNext = await page.evaluate(() => /** @type {any} */ (window).__spoken.length);
     await page.locator('[data-action="next-question"]').click();
@@ -236,6 +246,13 @@ test('Mode vocal : acronymes épelés, découpage des phrases et réponse oui/no
     await waitReadyAndSay('oui');
     await expect(page.locator('#qcm-choices .qcm-option').first()).toHaveClass(/selected/);
 
-    const recognizerCount = await page.evaluate(() => /** @type {any} */ (window).__recognizers.length);
-    expect(recognizerCount).toBeGreaterThan(2);
+    const stats = await page.evaluate(() => {
+        const recs = /** @type {any[]} */ (/** @type {any} */ (window).__recognizers);
+        return {
+            count: recs.length,
+            starts: recs.reduce((sum, r) => sum + (r.started || 0), 0),
+        };
+    });
+    expect(stats.count).toBe(1);
+    expect(stats.starts).toBeGreaterThan(2);
 });

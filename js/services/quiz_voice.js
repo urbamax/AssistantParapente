@@ -201,6 +201,9 @@ const COMMANDS = {
         'oui',
         'oui oui',
         'ouais',
+        'voui',
+        'mouais',
+        'ouep',
         'euh oui',
         'yes',
         'ok',
@@ -217,6 +220,18 @@ const COMMANDS = {
         'affirmatif',
         'cest ca',
         'oui cest ca',
+        'cest bon',
+        'oui cest bon',
+        'parfait',
+        'oui parfait',
+        'tout a fait',
+        'oui tout a fait',
+        'bien sur',
+        'voila',
+        'oui voila',
+        'bah oui',
+        'ben oui',
+        'je prends',
         'oui merci',
         'confirmer',
         'confirme',
@@ -229,22 +244,36 @@ const COMMANDS = {
         'no',
         'nom',
         'euh non',
+        'bah non',
+        'ben non',
         'non merci',
         'pas celle la',
         'pas celui la',
+        'pas celle ci',
+        'pas celui ci',
         'pas ca',
+        'pas bon',
         'non pas celle la',
+        'non pas celui la',
+        'non pas celle ci',
+        'non pas celui ci',
+        'non cest faux',
         'faux',
         'negatif',
         'passe',
         'passer',
         'passez',
         'je passe',
+        'non je passe',
+        'on passe',
         'ignore',
         'ignorer',
         'ne pas cocher',
         'decoche',
         'decocher',
+        'aucune',
+        'non aucune',
+        'pas du tout',
     ],
     validate: ['valider', 'valide', 'validez', 'validation', 'je valide'],
     next: ['suivante', 'suivant', 'question suivante', 'la suivante', 'suite'],
@@ -310,11 +339,7 @@ export function looksLikeEcho(transcript, spokenContext = '', { speaking = false
     if (rawWords.length === 1) {
         const w = rawWords[0];
         if (PHONETIC_HACK_WORDS.has(w) && spokenWordSet.has(w)) return true;
-        if (
-            speaking &&
-            (w in WEAK_LETTERS || w === 'oui' || w === 'non' || w === 'confirmer') &&
-            spokenWordSet.has(w)
-        ) {
+        if (speaking && (w === 'oui' || w === 'non') && spokenWordSet.has(w)) {
             return true;
         }
         return false;
