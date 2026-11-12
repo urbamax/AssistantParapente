@@ -9,7 +9,11 @@ import QuizService from '../../js/services/quiz_service.js';
 const explanations = QuizService.parseExplicationsCSV(readFileSync('js/data/qcm_ffvl_explanations.csv', 'utf8'));
 
 const VERDICT_WORD = '(?:Fausses?|Faux|Juste|Justes|Vrai|Vraie|Vrais|Neutre|Correcte?|Incorrecte?|Exacte?|Inexacte?)';
-const VERDICT_PREFIX = new RegExp(`^\\s*${VERDICT_WORD}(?:\\s+aussi)?\\s*[:,]`, 'i');
+// Le verdict peut être suivi de quelques mots avant la ponctuation (« Faux également, … »,
+// « Vrai dans la plupart des cas, … ») : c'est toujours un verdict en tête de ligne. « Juste avant le
+// décollage, … » reste permis : « juste » y est un adverbe, pas un verdict.
+const ADVERB = '(?!\\s+(?:avant|après|au|à|sous|sur|derrière|devant|assez)(?=[\\s-]))';
+const VERDICT_PREFIX = new RegExp(`^\\s*${VERDICT_WORD}(?![\\p{L}-])${ADVERB}[^.:,]{0,30}[:,]`, 'iu');
 const SELF_VERDICT = /^\s*Cet(?:te)? (?:réponse|option|proposition|affirmation) (?:est|n'est pas) /i;
 
 describe('quiz explanations do not announce the verdict', () => {
