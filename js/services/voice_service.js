@@ -202,8 +202,13 @@ const VoiceService = {
     _pendingResume: false,
     _hadResultInSession: false,
     _consecutiveQuickEnds: 0,
+    _consecutiveFailures: 0,
     _retryDelayMs: INITIAL_RETRY_MS,
     _transientErrorCount: 0,
+    _attemptStartedAt: 0,
+    _attemptGotResult: false,
+    _attemptHadAborted: false,
+    _attemptHadTransient: false,
     /** @type {ReturnType<typeof setTimeout> | null} */
     _resumeTimer: null,
     /** @type {'auto' | 'playback' | 'play-and-record'} */
@@ -357,21 +362,22 @@ const VoiceService = {
                 }
                 this._speaking = false;
                 this._lastSpeechEnd = Date.now();
-                if (!this._wantListen) this._setAudioSession('auto');
-                if (this._pendingResume && this._wantListen && !this._recognizerActive) {
-                    this._pendingResume = false;
-                    this._resumeRecognizer();
-                }
+                if (!this._wantListen && this._audioSessionType !== 'auto') this._setAudioSession('auto');
                 if (onEnd) onEnd();
+                if (this._pendingResume && this._wantListen && !this._recognizerActive && !this._speaking) {
+                    this._pendingResume = false;
+                    this._scheduleResume(80);
+                }
             };
 
             utterance.onend = finish;
             utterance.onerror = finish;
             // Garde-fou si le navigateur omet onend/onerror sur une phrase.
-            const watchdogMs = Math.max(10000, chunk.length * 160 + 5000);
+            const watchdogMs = Math.max(8000, chunk.length * 120 + 4000);
             this._speechWatchdog = setTimeout(() => {
                 if (id === this._speechId && !settled) finish();
             }, watchdogMs);
+            if (synth.paused && typeof synth.resume === 'function') synth.resume();
             synth.speak(utterance);
         };
 
@@ -379,21 +385,25 @@ const VoiceService = {
     },
 
     stopSpeaking() {
+        const wasActive =
+            this._speaking ||
+            (this.canSpeak() && (Boolean(window.speechSynthesis.speaking) || Boolean(window.speechSynthesis.pending)));
         this._speechId += 1;
         this._clearSpeechWatchdog();
         this._utterance = null;
         if (this._speaking) this._lastSpeechEnd = Date.now();
         this._speaking = false;
-        if (this.canSpeak()) window.speechSynthesis.cancel();
-        if (!this._wantListen) this._setAudioSession('auto');
+        if (wasActive && this.canSpeak()) window.speechSynthesis.cancel();
+        if (!this._wantListen && this._audioSessionType !== 'auto') this._setAudioSession('auto');
         if (this._pendingResume && this._wantListen && !this._recognizerActive) {
             this._pendingResume = false;
-            this._resumeRecognizer();
+            this._scheduleResume(80);
         }
     },
 
     /**
-     * Démarre l'écoute continue (relancée automatiquement avec une instance neuve après chaque phrase).
+     * Démarre l'écoute continue en réutilisant l'instance créée dans le geste utilisateur
+     * (requis par Safari iOS/macOS ; recréée seulement après plusieurs échecs consécutifs).
      * @param {{ onResult: (alternatives: string[]) => void, onError: (code: string) => void }} handlers
      * @returns {boolean} false si l'écoute ne peut pas démarrer (onError a été appelé)
      */
@@ -415,9 +425,9 @@ const VoiceService = {
         this._pendingResume = false;
         this._hadResultInSession = false;
         this._consecutiveQuickEnds = 0;
+        this._consecutiveFailures = 0;
         this._retryDelayMs = INITIAL_RETRY_MS;
         this._transientErrorCount = 0;
-        this._setAudioSession('play-and-record');
         this._resumeRecognizer();
         this._acquireWakeLock();
         return true;
@@ -430,17 +440,22 @@ const VoiceService = {
         this._listenHandlers = null;
         this._clearResumeTimer();
         this._releaseWakeLock();
-        const rec = this._recognizer;
+        this._discardRecognizer();
+        if (!this._speaking && this._audioSessionType !== 'auto') this._setAudioSession('auto');
+    },
+
+    _discardRecognizer() {
+        const old = this._recognizer;
         this._recognizer = null;
         this._recognizerActive = false;
-        if (rec) {
+        this._consecutiveFailures = 0;
+        if (old) {
             try {
-                rec.abort();
+                old.abort();
             } catch {
                 // déjà arrêtée
             }
         }
-        if (!this._speaking) this._setAudioSession('auto');
     },
 
     _scheduleResume(delayMs) {
@@ -458,6 +473,108 @@ const VoiceService = {
         }, delayMs);
     },
 
+    _createRecognizer(handlers, sessionId) {
+        const Recognition = recognitionClass();
+        const rec = new Recognition();
+        rec.lang = 'fr-FR';
+        rec.continuous = false;
+        rec.interimResults = false;
+        rec.maxAlternatives = 3;
+
+        rec.onresult = (event) => {
+            if (rec !== this._recognizer || sessionId !== this._listenSessionId) return;
+            const results = event?.results;
+            const result = results && results.length ? results[results.length - 1] : null;
+            if (!result) return;
+            this._attemptGotResult = true;
+            this._hadResultInSession = true;
+            this._consecutiveQuickEnds = 0;
+            this._consecutiveFailures = 0;
+            this._retryDelayMs = INITIAL_RETRY_MS;
+            this._transientErrorCount = 0;
+            const alternatives = [];
+            for (let i = 0; i < result.length; i += 1) {
+                const t = result[i]?.transcript;
+                if (t) alternatives.push(t);
+            }
+            if (alternatives.length) handlers.onResult(alternatives);
+        };
+
+        rec.onerror = (event) => {
+            if (rec !== this._recognizer || sessionId !== this._listenSessionId) return;
+            const rawCode = event?.error;
+            const code = rawCode === 'service-not-allowed' ? 'not-allowed' : rawCode;
+            if (code === 'aborted') {
+                this._attemptHadAborted = true;
+                this._consecutiveFailures += 1;
+            }
+            if (SILENT_ERRORS.has(code)) return;
+
+            // En voiture, le basculement Bluetooth ou une micro-coupure réseau peuvent provoquer une erreur
+            // transitoire après un premier échange réussi : on retente brièvement avant d'abandonner.
+            const isTransient = code === 'audio-capture' || code === 'network';
+            const canRetryTransient =
+                isTransient && (this._speaking || (this._hadResultInSession && this._transientErrorCount < 2));
+            if (canRetryTransient) {
+                this._transientErrorCount += 1;
+                this._consecutiveFailures += 1;
+                this._attemptHadTransient = true;
+                if (this._speaking) this._pendingResume = true;
+                return;
+            }
+
+            this._listenSessionId += 1;
+            this._wantListen = false;
+            this._pendingResume = false;
+            this._clearResumeTimer();
+            this._releaseWakeLock();
+            this._recognizer = null;
+            this._recognizerActive = false;
+            if (!this._speaking && this._audioSessionType !== 'auto') this._setAudioSession('auto');
+            handlers.onError(code);
+        };
+
+        rec.onend = () => {
+            if (rec !== this._recognizer || sessionId !== this._listenSessionId) return;
+            this._recognizerActive = false;
+            if (!this._wantListen) return;
+
+            const elapsed = Date.now() - this._attemptStartedAt;
+            const quickEnd = !this._attemptGotResult && elapsed < 350;
+            if (quickEnd) {
+                this._consecutiveQuickEnds += 1;
+            } else {
+                this._consecutiveQuickEnds = 0;
+                if (!this._attemptHadAborted && !this._attemptHadTransient) {
+                    this._consecutiveFailures = 0;
+                    this._retryDelayMs = INITIAL_RETRY_MS;
+                }
+            }
+
+            const hadCollision = this._attemptHadAborted || this._attemptHadTransient;
+            if (this._consecutiveFailures >= 2) {
+                this._discardRecognizer();
+            }
+
+            // En lecture active, ne mettre en pause que si le navigateur/Bluetooth coupe réellement le micro.
+            if (this._speaking && (hadCollision || quickEnd)) {
+                this._pendingResume = true;
+                return;
+            }
+
+            if (hadCollision || this._consecutiveQuickEnds >= 2) {
+                const delay = this._retryDelayMs;
+                this._retryDelayMs = Math.min(this._retryDelayMs * 2, MAX_RETRY_MS);
+                this._scheduleResume(delay);
+                return;
+            }
+
+            this._resumeRecognizer();
+        };
+
+        return rec;
+    },
+
     _resumeRecognizer() {
         if (!this._wantListen || this._recognizerActive) return;
         const Recognition = recognitionClass();
@@ -470,91 +587,39 @@ const VoiceService = {
         }
 
         const sessionId = this._listenSessionId;
-        const rec = new Recognition();
-        rec.lang = 'fr-FR';
-        rec.continuous = false;
-        rec.interimResults = false;
-        rec.maxAlternatives = 3;
+        if (!this._recognizer || this._consecutiveFailures >= 2) {
+            this._discardRecognizer();
+            this._recognizer = this._createRecognizer(handlers, sessionId);
+        }
+        const rec = this._recognizer;
 
-        let gotResult = false;
-        let hadAborted = false;
-        const startedAt = Date.now();
+        this._attemptStartedAt = Date.now();
+        this._attemptGotResult = false;
+        this._attemptHadAborted = false;
+        this._attemptHadTransient = false;
+        this._pendingResume = false;
 
-        rec.onresult = (event) => {
-            if (rec !== this._recognizer || sessionId !== this._listenSessionId) return;
-            const result = event.results[event.results.length - 1];
-            if (result && result.isFinal === false) return;
-            gotResult = true;
-            this._hadResultInSession = true;
-            this._consecutiveQuickEnds = 0;
-            this._retryDelayMs = INITIAL_RETRY_MS;
-            this._transientErrorCount = 0;
-            const alternatives = Array.from(result || [], (alt) => /** @type {any} */ (alt).transcript);
-            handlers.onResult(alternatives.filter(Boolean));
-        };
-
-        rec.onerror = (event) => {
-            if (rec !== this._recognizer || sessionId !== this._listenSessionId) return;
-            const code = event.error === 'service-not-allowed' ? 'not-allowed' : event.error;
-            if (code === 'aborted') hadAborted = true;
-            if (SILENT_ERRORS.has(code)) return;
-
-            // En voiture, le basculement Bluetooth ou une micro-coupure réseau peuvent provoquer une erreur
-            // transitoire après un premier échange réussi : on retente brièvement avant d'abandonner.
-            const isTransient = code === 'audio-capture' || code === 'network';
-            const canRetryTransient =
-                isTransient && (this._speaking || (this._hadResultInSession && this._transientErrorCount < 2));
-            if (canRetryTransient) {
-                this._transientErrorCount += 1;
-                if (this._speaking) this._pendingResume = true;
-                else hadAborted = true;
-                return;
-            }
-
-            this._listenSessionId += 1;
-            this._wantListen = false;
-            this._pendingResume = false;
-            this._clearResumeTimer();
-            this._releaseWakeLock();
-            if (!this._speaking) this._setAudioSession('auto');
-            handlers.onError(code);
-        };
-
-        rec.onend = () => {
-            if (rec !== this._recognizer || sessionId !== this._listenSessionId) return;
-            this._recognizerActive = false;
-            if (!this._wantListen) return;
-
-            // Ne pas relancer le micro pendant que l'app parle : évite les coupures Bluetooth/iOS en voiture.
-            if (this._speaking) {
-                this._pendingResume = true;
-                return;
-            }
-
-            const elapsed = Date.now() - startedAt;
-            if (!gotResult && elapsed < 350) {
-                this._consecutiveQuickEnds += 1;
-            } else {
-                this._consecutiveQuickEnds = 0;
-                this._retryDelayMs = INITIAL_RETRY_MS;
-            }
-
-            if (hadAborted || this._consecutiveQuickEnds >= 2) {
-                const delay = this._retryDelayMs;
-                this._retryDelayMs = Math.min(this._retryDelayMs * 2, MAX_RETRY_MS);
-                this._scheduleResume(delay);
-                return;
-            }
-
-            this._resumeRecognizer();
-        };
-
-        this._recognizer = rec;
         try {
-            rec.start();
             this._recognizerActive = true;
-        } catch {
+            rec.start();
+        } catch (err) {
             this._recognizerActive = false;
+            const name = err && typeof err === 'object' ? /** @type {any} */ (err).name : '';
+            if (name === 'NotAllowedError' || name === 'SecurityError') {
+                this._listenSessionId += 1;
+                this._wantListen = false;
+                this._pendingResume = false;
+                this._clearResumeTimer();
+                this._releaseWakeLock();
+                this._discardRecognizer();
+                if (!this._speaking && this._audioSessionType !== 'auto') this._setAudioSession('auto');
+                handlers.onError('not-allowed');
+                return;
+            }
+            this._consecutiveFailures += 1;
+            if (this._consecutiveFailures >= 2) {
+                this._discardRecognizer();
+            }
             if (this._speaking) {
                 this._pendingResume = true;
             } else {

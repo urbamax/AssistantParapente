@@ -423,7 +423,7 @@ export class QuizVoiceBase extends QuizStatsBase {
                 return;
             }
             if (!this._voiceStep || this._voiceStep.stage === 'question') {
-                if (echoWindow) return;
+                if (this._voiceStep?.stage === 'question' && speaking) return;
                 this._voiceStatus = t('quiz.voice.noInteractiveOption');
                 this.renderVoiceBar();
                 return;

@@ -163,12 +163,18 @@ describe('parseVoiceCommand (spec 016, FR-007, FR-008)', () => {
         ['ouais', 'yes'],
         ['ok', 'yes'],
         ["d'accord", 'yes'],
+        ["c'est bon", 'yes'],
+        ['parfait', 'yes'],
+        ['bah oui', 'yes'],
         ['confirmer', 'yes'],
         ['non', 'no'],
         ['nan', 'no'],
         ['nom', 'no'],
         ['passe', 'no'],
         ['pas celle-là', 'no'],
+        ['pas celle-ci', 'no'],
+        ['non je passe', 'no'],
+        ['pas du tout', 'no'],
     ])('« %s » is the command %s', (text, name) => {
         expect(letters(text)).toEqual({ type: 'command', name });
     });
@@ -212,6 +218,9 @@ describe('looksLikeEcho (spec 022, FR-006)', () => {
         expect(looksLikeEcho('oui', 'Réponse A : Oui.', { speaking: true })).toBe(true);
         expect(looksLikeEcho('oui', 'Réponse A : Oui.', { speaking: false })).toBe(false);
         expect(looksLikeEcho('non', 'Réponse B : Non.', { speaking: false })).toBe(false);
+        expect(looksLikeEcho('confirmer', 'Confirmer ?', { speaking: true })).toBe(false);
+        expect(looksLikeEcho('ce', 'Ce vent est fort.', { speaking: true })).toBe(false);
+        expect(looksLikeEcho('des', 'Des nuages sont bas.', { speaking: true })).toBe(false);
         expect(looksLikeEcho('vent de face', 'Réponse A : Vent de face.')).toBe(true);
     });
 });

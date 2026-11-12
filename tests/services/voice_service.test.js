@@ -277,7 +277,7 @@ describe('VoiceService (spec 016)', () => {
             expect(recognizers.length).toBe(0);
         });
 
-        it('listens in French and passes every alternative, then starts a fresh recognizer', () => {
+        it('listens in French and passes every alternative, then reuses the recognizer', () => {
             const onResult = vi.fn();
             expect(VoiceService.startListening({ onResult, onError: vi.fn() })).toBe(true);
             const rec = recognizers[0];
@@ -286,8 +286,9 @@ describe('VoiceService (spec 016)', () => {
             expect(VoiceService.isListening()).toBe(true);
             rec.hear('bédé', 'B et D');
             expect(onResult).toHaveBeenCalledWith(['bédé', 'B et D']);
-            expect(recognizers).toHaveLength(2);
-            expect(recognizers[1].active).toBe(true);
+            expect(recognizers).toHaveLength(1);
+            expect(rec.started).toBe(2);
+            expect(rec.active).toBe(true);
         });
 
         it('restarts silently after silence', () => {
@@ -295,8 +296,51 @@ describe('VoiceService (spec 016)', () => {
             VoiceService.startListening({ onResult: vi.fn(), onError });
             recognizers[0].fail('no-speech');
             expect(onError).not.toHaveBeenCalled();
+            expect(recognizers).toHaveLength(1);
+            expect(recognizers[0].started).toBe(2);
+            expect(recognizers[0].active).toBe(true);
+        });
+
+        it('replaces a wedged recognizer after two consecutive start failures', () => {
+            vi.useFakeTimers();
+            let failCount = 2;
+            class WedgedRecognition extends FakeRecognition {
+                start() {
+                    if (this === recognizers[0] && this.started > 0 && failCount > 0) {
+                        failCount -= 1;
+                        throw new Error('InvalidStateError');
+                    }
+                    super.start();
+                }
+            }
+            window.SpeechRecognition = WedgedRecognition;
+            VoiceService.startListening({ onResult: vi.fn(), onError: vi.fn() });
+            recognizers[0].hear('A');
+            expect(recognizers).toHaveLength(1);
+            expect(recognizers[0].active).toBe(false);
+
+            vi.advanceTimersByTime(150);
+            expect(recognizers).toHaveLength(1);
+            expect(recognizers[0].active).toBe(false);
+
+            vi.advanceTimersByTime(250);
             expect(recognizers).toHaveLength(2);
             expect(recognizers[1].active).toBe(true);
+        });
+
+        it('stops immediately on NotAllowedError thrown synchronously by start()', () => {
+            class DeniedRecognition extends FakeRecognition {
+                start() {
+                    const err = new Error('Permission denied');
+                    err.name = 'NotAllowedError';
+                    throw err;
+                }
+            }
+            window.SpeechRecognition = DeniedRecognition;
+            const onError = vi.fn();
+            VoiceService.startListening({ onResult: vi.fn(), onError });
+            expect(onError).toHaveBeenCalledWith('not-allowed');
+            expect(VoiceService.isListening()).toBe(false);
         });
 
         it('retries automatically when restarting throws InvalidStateError (iOS/Android)', () => {
@@ -324,14 +368,20 @@ describe('VoiceService (spec 016)', () => {
             expect(onResult).toHaveBeenLastCalledWith(['valider']);
         });
 
-        it('backs off after aborted errors and recovers', () => {
+        it('backs off after aborted errors and replaces the recognizer after two aborts', () => {
             vi.useFakeTimers();
             const onError = vi.fn();
             VoiceService.startListening({ onResult: vi.fn(), onError });
             recognizers[0].fail('aborted');
             expect(onError).not.toHaveBeenCalled();
-            expect(recognizers).toHaveLength(1);
+            expect(recognizers[0].active).toBe(false);
             vi.advanceTimersByTime(150);
+            expect(recognizers).toHaveLength(1);
+            expect(recognizers[0].started).toBe(2);
+            expect(recognizers[0].active).toBe(true);
+
+            recognizers[0].fail('aborted');
+            vi.advanceTimersByTime(250);
             expect(recognizers).toHaveLength(2);
             expect(recognizers[1].active).toBe(true);
         });
@@ -341,12 +391,13 @@ describe('VoiceService (spec 016)', () => {
             const onError = vi.fn();
             VoiceService.startListening({ onResult: vi.fn(), onError });
             recognizers[0].hear('oui');
-            recognizers[1].fail('network');
+            recognizers[0].fail('network');
             expect(onError).not.toHaveBeenCalled();
             expect(VoiceService.isListening()).toBe(true);
             vi.advanceTimersByTime(150);
-            expect(recognizers).toHaveLength(3);
-            expect(recognizers[2].active).toBe(true);
+            expect(recognizers).toHaveLength(1);
+            expect(recognizers[0].started).toBe(3);
+            expect(recognizers[0].active).toBe(true);
         });
 
         it.each([
@@ -363,9 +414,9 @@ describe('VoiceService (spec 016)', () => {
             expect(recognizers[0].started).toBe(1);
         });
 
-        // Spec 022 : on peut répondre sans attendre la fin de la lecture ; si la reco s'arrête
-        // pendant que l'app parle, la relance attend la fin de la phrase pour éviter les coupures Bluetooth.
-        it('keeps listening while speaking and resumes cleanly once speech ends', () => {
+        // Spec 022 : on peut répondre sans attendre la fin de la lecture ; le micro reste actif en continu,
+        // et ne diffère la relance jusqu'à la fin de la phrase qu'en cas de conflit réel avec le haut-parleur.
+        it('keeps listening while speaking on clean recognition cycles', () => {
             const synth = installSynthesis();
             const onResult = vi.fn();
             VoiceService.startListening({ onResult, onError: vi.fn() });
@@ -375,10 +426,46 @@ describe('VoiceService (spec 016)', () => {
             expect(rec.aborted).toBe(0);
             rec.hear('B');
             expect(onResult).toHaveBeenCalledWith(['B']);
-            expect(recognizers).toHaveLength(1);
+            expect(rec.started).toBe(2);
+            expect(rec.active).toBe(true);
             synth.finish();
-            expect(recognizers).toHaveLength(2);
-            expect(recognizers[1].active).toBe(true);
+            expect(rec.active).toBe(true);
+        });
+
+        it('defers resume after a TTS collision until speech ends and lets onEnd chain the next prompt first', () => {
+            vi.useFakeTimers();
+            const synth = installSynthesis();
+            VoiceService.startListening({ onResult: vi.fn(), onError: vi.fn() });
+            const rec = recognizers[0];
+
+            VoiceService.speak('Question 1 ?', {
+                onEnd: () => VoiceService.speak('Réponse A : Oui.'),
+            });
+            rec.fail('aborted');
+            expect(rec.active).toBe(false);
+            vi.advanceTimersByTime(400);
+            expect(rec.active).toBe(false);
+
+            synth.finish();
+            // onEnd lance immédiatement la phrase suivante : le micro attend encore la fin de Réponse A.
+            vi.advanceTimersByTime(100);
+            expect(VoiceService.isSpeaking()).toBe(true);
+            expect(rec.active).toBe(false);
+
+            synth.finish();
+            expect(rec.active).toBe(false);
+            vi.advanceTimersByTime(80);
+            expect(rec.started).toBe(2);
+            expect(rec.active).toBe(true);
+        });
+
+        it('does not call speechSynthesis.cancel() in stopSpeaking() when nothing is speaking', () => {
+            const synth = installSynthesis();
+            VoiceService.stopSpeaking();
+            expect(synth.cancel).not.toHaveBeenCalled();
+            VoiceService.speak('Question');
+            VoiceService.stopSpeaking();
+            expect(synth.cancel).toHaveBeenCalledTimes(1);
         });
 
         it('reports an echo window while speaking and shortly after (spec 022, FR-006)', () => {
