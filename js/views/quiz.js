@@ -910,6 +910,7 @@ class QuizViewClass extends QuizVoiceBase {
 
     renderQuestion(q) {
         this.cancelChainAdvance();
+        this.resetVoiceStep();
         VoiceService.stopSpeaking();
         this._voiceQuestion = q || null;
         this._voiceFeedback = null;
@@ -1089,6 +1090,7 @@ class QuizViewClass extends QuizVoiceBase {
     }
 
     validateQuestion() {
+        this.resetVoiceStep();
         const isExam = QuizService.state.qcmConfig.mode === 'EXAM';
         const shown = QuizService.getCurrentQuestion();
         // Diagnostic avant la réponse : sans lui, impossible de dire qu'un piège vient d'être évité.

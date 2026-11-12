@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
     optionLetter,
+    buildQuestionOnlySpeech,
+    buildOptionSpeech,
     buildQuestionSpeech,
     buildFeedbackSpeech,
     buildAutoFeedbackSpeech,
@@ -34,6 +36,14 @@ describe('spoken texts (spec 016, FR-001, FR-002)', () => {
     it('does not double the final punctuation of an answer', () => {
         const q = { question: 'Q ?', choices: [{ text: 'Oui.' }, { text: 'Non !' }] };
         expect(buildQuestionSpeech(q)).toBe('Q ? Réponse A : Oui. Réponse B : Non !');
+    });
+
+    it('formats standalone question and single-option speech for step-by-step confirmation', () => {
+        expect(buildQuestionOnlySpeech(QUESTION)).toBe('Que signifie un vent de travers ?');
+        expect(buildQuestionOnlySpeech({ question: 'Sans ponctuation' })).toBe('Sans ponctuation');
+        expect(buildOptionSpeech(QUESTION.choices[0], 0)).toBe('Réponse A : Vent de face.');
+        expect(buildOptionSpeech({ text: 'Oui.' }, 0)).toBe('Réponse A : Oui.');
+        expect(buildOptionSpeech({ text: 'Non !' }, 1)).toBe('Réponse B : Non !');
     });
 
     it('reads the verdict then the explanation', () => {
@@ -149,6 +159,16 @@ describe('parseVoiceCommand (spec 016, FR-007, FR-008)', () => {
         ['efface', 'clear'],
         ['stop', 'stop'],
         ['arrête', 'stop'],
+        ['oui', 'yes'],
+        ['ouais', 'yes'],
+        ['ok', 'yes'],
+        ["d'accord", 'yes'],
+        ['confirmer', 'yes'],
+        ['non', 'no'],
+        ['nan', 'no'],
+        ['nom', 'no'],
+        ['passe', 'no'],
+        ['pas celle-là', 'no'],
     ])('« %s » is the command %s', (text, name) => {
         expect(letters(text)).toEqual({ type: 'command', name });
     });
@@ -175,11 +195,24 @@ describe('looksLikeEcho (spec 022, FR-006)', () => {
         ['réponse A', true],
         ['réponses B et D', true],
         ['Sélection : B, Vent latéral', true],
+        ['A cochée.', true],
+        ['B passée.', true],
+        ['Dites oui ou non', true],
         ['B et D', false],
         ['A', false],
         ['valider', false],
     ])('« %s » → %s', (text, expected) => {
         expect(looksLikeEcho(text)).toBe(expected);
+    });
+
+    it('blocks yes/no homophones and spokenContext overlaps only while TTS is speaking', () => {
+        expect(looksLikeEcho('aider', 'Il faut aider le pilote.', { speaking: true })).toBe(true);
+        expect(looksLikeEcho('aider', 'Bonne réponse.', { speaking: true })).toBe(false);
+        expect(looksLikeEcho('céder', 'Priorité : il faut céder le passage.', { speaking: false })).toBe(true);
+        expect(looksLikeEcho('oui', 'Réponse A : Oui.', { speaking: true })).toBe(true);
+        expect(looksLikeEcho('oui', 'Réponse A : Oui.', { speaking: false })).toBe(false);
+        expect(looksLikeEcho('non', 'Réponse B : Non.', { speaking: false })).toBe(false);
+        expect(looksLikeEcho('vent de face', 'Réponse A : Vent de face.')).toBe(true);
     });
 });
 
