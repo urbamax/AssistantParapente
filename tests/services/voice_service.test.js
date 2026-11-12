@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import VoiceService from '../../js/services/voice_service.js';
+import VoiceService, { formatSpeechText, splitSpeechChunks } from '../../js/services/voice_service.js';
 
 // Spec 016 : enveloppe des API vocales du navigateur (lecture, écoute, préférences).
 
@@ -86,6 +86,7 @@ describe('VoiceService (spec 016)', () => {
     afterEach(() => {
         VoiceService.stopListening();
         VoiceService.stopSpeaking();
+        vi.useRealTimers();
         delete window.speechSynthesis;
         delete window.SpeechSynthesisUtterance;
         delete window.SpeechRecognition;
@@ -198,6 +199,62 @@ describe('VoiceService (spec 016)', () => {
             expect(() => VoiceService.speak('Bonjour')).not.toThrow();
             expect(VoiceService.isSpeaking()).toBe(false);
         });
+
+        it('normalizes acronyms and technical units for French TTS', () => {
+            expect(formatSpeechText('La norme CEN et le FL 100 ou FL115')).toBe(
+                'La norme C.E.N. et le F.L. 100 ou F.L. 115',
+            );
+            expect(formatSpeechText('Norme CEN.')).toBe('Norme C.E.N.');
+            expect(formatSpeechText('Ailes ENA, ENB-, ENB+ et EN 926-1')).toBe(
+                'Ailes E.N.A., E.N.B. moins, E.N.B. plus et E.N. 926-1',
+            );
+            expect(formatSpeechText('Par NOTAM ou SUP AIP sur eAIP, carte VAC et message AZBA')).toBe(
+                'Par notam ou sup A.I.P. sur e-A.I.P., carte vac et message azba',
+            );
+            expect(formatSpeechText('1013,25 hPa, 800 daN, 300 m/sol, 3500 m/mer, TMA LYON 6')).toBe(
+                '1013,25 hectopascals, 800 décanewtons, 300 mètres sol, 3500 mètres mer, T.M.A. Lyon 6',
+            );
+            expect(formatSpeechText('En tension ET sans tension, répond OUI, déjà U.L.M.')).toBe(
+                'En tension et sans tension, répond oui, déjà U.L.M.',
+            );
+        });
+
+        it('splits long texts into chunks without cutting off mid-sentence and calls onEnd at the very end', () => {
+            const synth = installSynthesis();
+            const onEnd = vi.fn();
+            const long =
+                'Un niveau de vol (FL, Flight Level) se mesure par rapport à la surface isobare 1 013,25 hPa. ' +
+                'Le FL115, soit 11 500 pieds ou environ 3 500 m, est la limite en VFR sauf dans les Alpes et les Pyrénées. ' +
+                'Au-dessus se trouve la LTA interdite au vol libre en dehors de quelques exceptions prévues par la FFVL.';
+            const chunks = splitSpeechChunks(formatSpeechText(long), 120);
+            expect(chunks.length).toBeGreaterThan(1);
+            expect(chunks.every((c) => c.length <= 120)).toBe(true);
+
+            VoiceService.speak(long, { onEnd });
+            expect(synth.spoken).toHaveLength(1);
+            expect(VoiceService.isSpeaking()).toBe(true);
+
+            // Déroule chaque segment jusqu'à la fin sans couper la phrase.
+            while (synth.current) {
+                expect(onEnd).not.toHaveBeenCalled();
+                synth.finish();
+            }
+            expect(synth.spoken.length).toBeGreaterThan(1);
+            expect(synth.spoken.map((u) => u.text).join(' ')).toContain('F.F.V.L.');
+            expect(onEnd).toHaveBeenCalledTimes(1);
+            expect(VoiceService.isSpeaking()).toBe(false);
+        });
+
+        it('recovers via watchdog if the browser drops onend', () => {
+            vi.useFakeTimers();
+            installSynthesis();
+            const onEnd = vi.fn();
+            VoiceService.speak('Bonjour', { onEnd });
+            expect(VoiceService.isSpeaking()).toBe(true);
+            vi.advanceTimersByTime(15000);
+            expect(VoiceService.isSpeaking()).toBe(false);
+            expect(onEnd).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe('listen', () => {
@@ -220,7 +277,7 @@ describe('VoiceService (spec 016)', () => {
             expect(recognizers.length).toBe(0);
         });
 
-        it('listens in French and passes every alternative, then listens again', () => {
+        it('listens in French and passes every alternative, then starts a fresh recognizer', () => {
             const onResult = vi.fn();
             expect(VoiceService.startListening({ onResult, onError: vi.fn() })).toBe(true);
             const rec = recognizers[0];
@@ -229,7 +286,8 @@ describe('VoiceService (spec 016)', () => {
             expect(VoiceService.isListening()).toBe(true);
             rec.hear('bédé', 'B et D');
             expect(onResult).toHaveBeenCalledWith(['bédé', 'B et D']);
-            expect(rec.started).toBe(2);
+            expect(recognizers).toHaveLength(2);
+            expect(recognizers[1].active).toBe(true);
         });
 
         it('restarts silently after silence', () => {
@@ -237,7 +295,58 @@ describe('VoiceService (spec 016)', () => {
             VoiceService.startListening({ onResult: vi.fn(), onError });
             recognizers[0].fail('no-speech');
             expect(onError).not.toHaveBeenCalled();
-            expect(recognizers[0].started).toBe(2);
+            expect(recognizers).toHaveLength(2);
+            expect(recognizers[1].active).toBe(true);
+        });
+
+        it('retries automatically when restarting throws InvalidStateError (iOS/Android)', () => {
+            vi.useFakeTimers();
+            let shouldThrow = false;
+            class FlakyRecognition extends FakeRecognition {
+                start() {
+                    if (shouldThrow) throw new Error('InvalidStateError');
+                    super.start();
+                }
+            }
+            window.SpeechRecognition = FlakyRecognition;
+            const onResult = vi.fn();
+            VoiceService.startListening({ onResult, onError: vi.fn() });
+
+            shouldThrow = true;
+            recognizers[0].hear('A');
+            expect(onResult).toHaveBeenCalledWith(['A']);
+            expect(recognizers.at(-1).active).toBe(false);
+
+            shouldThrow = false;
+            vi.advanceTimersByTime(150);
+            expect(recognizers.at(-1).active).toBe(true);
+            recognizers.at(-1).hear('valider');
+            expect(onResult).toHaveBeenLastCalledWith(['valider']);
+        });
+
+        it('backs off after aborted errors and recovers', () => {
+            vi.useFakeTimers();
+            const onError = vi.fn();
+            VoiceService.startListening({ onResult: vi.fn(), onError });
+            recognizers[0].fail('aborted');
+            expect(onError).not.toHaveBeenCalled();
+            expect(recognizers).toHaveLength(1);
+            vi.advanceTimersByTime(150);
+            expect(recognizers).toHaveLength(2);
+            expect(recognizers[1].active).toBe(true);
+        });
+
+        it('survives a transient network blip after an earlier exchange in a car', () => {
+            vi.useFakeTimers();
+            const onError = vi.fn();
+            VoiceService.startListening({ onResult: vi.fn(), onError });
+            recognizers[0].hear('oui');
+            recognizers[1].fail('network');
+            expect(onError).not.toHaveBeenCalled();
+            expect(VoiceService.isListening()).toBe(true);
+            vi.advanceTimersByTime(150);
+            expect(recognizers).toHaveLength(3);
+            expect(recognizers[2].active).toBe(true);
         });
 
         it.each([
@@ -254,8 +363,9 @@ describe('VoiceService (spec 016)', () => {
             expect(recognizers[0].started).toBe(1);
         });
 
-        // Spec 022 : on peut répondre sans attendre la fin de la lecture.
-        it('keeps listening while speaking (spec 022, FR-005)', () => {
+        // Spec 022 : on peut répondre sans attendre la fin de la lecture ; si la reco s'arrête
+        // pendant que l'app parle, la relance attend la fin de la phrase pour éviter les coupures Bluetooth.
+        it('keeps listening while speaking and resumes cleanly once speech ends', () => {
             const synth = installSynthesis();
             const onResult = vi.fn();
             VoiceService.startListening({ onResult, onError: vi.fn() });
@@ -265,9 +375,10 @@ describe('VoiceService (spec 016)', () => {
             expect(rec.aborted).toBe(0);
             rec.hear('B');
             expect(onResult).toHaveBeenCalledWith(['B']);
-            expect(rec.active).toBe(true);
+            expect(recognizers).toHaveLength(1);
             synth.finish();
-            expect(rec.active).toBe(true);
+            expect(recognizers).toHaveLength(2);
+            expect(recognizers[1].active).toBe(true);
         });
 
         it('reports an echo window while speaking and shortly after (spec 022, FR-006)', () => {

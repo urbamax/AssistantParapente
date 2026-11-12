@@ -156,6 +156,16 @@
     }
 }
 
+.qcm-option.voice-current {
+    border-color: var(--accent-orange);
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.35);
+
+    body.light-mode & {
+        border-color: #0369a1;
+        box-shadow: 0 0 0 2px rgba(3, 105, 161, 0.25);
+    }
+}
+
 .correct,
 .qcm-option.correct {
     background: rgba(74, 222, 128, 0.15) !important;

@@ -52,6 +52,7 @@ function mockVoice({ speak = true, listen = true } = {}) {
     });
     vi.spyOn(VoiceService, 'isSpeaking').mockImplementation(() => speech.speaking);
     vi.spyOn(VoiceService, 'isEchoWindow').mockImplementation(() => speech.speaking || speech.echo);
+    vi.spyOn(VoiceService, 'getSpokenContext').mockImplementation(() => speech.texts.at(-1) || '');
     vi.spyOn(VoiceService, 'startListening').mockImplementation((handlers) => {
         listening = true;
         listenHandlers = handlers;
@@ -523,5 +524,156 @@ describe('US3 - answer by voice (spec 016)', () => {
         hear('suivante');
         expect(VoiceService.stopListening).toHaveBeenCalled();
         expect(bar().hidden).toBe(true);
+    });
+});
+
+describe('US4 - option-by-option voice confirmation & hands-free chaining', () => {
+    const voiceCurrentIdx = () =>
+        [...document.querySelectorAll('.qcm-option')].findIndex((el) => el.classList.contains('voice-current'));
+
+    function startInteractive() {
+        mockVoice();
+        VoiceService.setPrefs({ voiceConsent: true, autoRead: true });
+        startSession('TRAINING', 2);
+        click('quiz-voice-mic');
+    }
+
+    it('reads question then pauses after each option for oui/non before confirming', () => {
+        startInteractive();
+        expect(speech.texts.at(-1)).toBe('Question Q1 ?');
+        expect(voiceCurrentIdx()).toBe(-1);
+
+        finishSpeech();
+        expect(speech.texts.at(-1)).toBe('Réponse A : Vent de face.');
+        expect(voiceCurrentIdx()).toBe(0);
+        expect(document.querySelector('.qcm-option[data-idx="0"]').getAttribute('aria-current')).toBe('step');
+        expect(status()).toBe('Réponse A : dites « oui » ou « non »…');
+
+        hear('oui');
+        expect(selectedLetters()).toEqual(['A']);
+        expect(speech.texts.at(-1)).toBe('A cochée. Réponse B : Vent latéral.');
+        expect(voiceCurrentIdx()).toBe(1);
+        expect(status()).toBe('Réponse B : dites « oui » ou « non »…');
+
+        hear('non');
+        expect(selectedLetters()).toEqual(['A']);
+        expect(speech.texts.at(-1)).toBe('Passée. Réponse C : Vent arrière.');
+        expect(voiceCurrentIdx()).toBe(2);
+
+        hear('non');
+        expect(speech.texts.at(-1)).toBe('Passée. Réponse D : Aucun vent.');
+        expect(voiceCurrentIdx()).toBe(3);
+
+        hear('oui');
+        expect(selectedLetters()).toEqual(['A', 'D']);
+        expect(voiceCurrentIdx()).toBe(-1);
+        expect(speech.texts.at(-1)).toBe('D cochée. Sélection : A, Vent de face. D, Aucun vent. Confirmer ?');
+        expect(status()).toBe('Confirmer ? Dites « oui » ou « valider », ou « non » pour reprendre…');
+
+        hear('oui');
+        expect(QuizService.state.examResults[0].isCorrect).toBe(true);
+        expect(speech.texts.at(-1)).toBe('Bonne réponse.');
+    });
+
+    it('« non » at « Confirmer ? » restarts from Réponse A keeping feedback clean', () => {
+        startInteractive();
+        finishSpeech();
+        hear('oui');
+        hear('non');
+        hear('non');
+        hear('non');
+        expect(speech.texts.at(-1)).toContain('Confirmer ?');
+
+        hear('non');
+        expect(speech.texts.at(-1)).toBe('On reprend. Réponse A : Vent de face.');
+        expect(voiceCurrentIdx()).toBe(0);
+    });
+
+    it('when all options are skipped (« non »), asks whether to retry and allows cancelling step mode', () => {
+        startInteractive();
+        finishSpeech();
+        hear('non');
+        hear('non');
+        hear('non');
+        hear('non');
+        expect(selectedLetters()).toEqual([]);
+        expect(speech.texts.at(-1)).toBe('Passée. Aucune réponse sélectionnée. On reprend ?');
+
+        hear('oui');
+        expect(speech.texts.at(-1)).toBe('On reprend. Réponse A : Vent de face.');
+
+        hear('non');
+        hear('non');
+        hear('non');
+        hear('non');
+        hear('non');
+        expect(status()).toContain('À l’écoute');
+        expect(voiceCurrentIdx()).toBe(-1);
+
+        hear('oui');
+        expect(status()).toContain('ou « répète »');
+    });
+
+    it('« répète » on an option re-reads only that option; direct letters interrupt step mode', () => {
+        startInteractive();
+        finishSpeech();
+        hear('oui');
+        speech.texts.length = 0;
+
+        hear('répète');
+        expect(speech.texts).toEqual(['Réponse B : Vent latéral.']);
+        expect(voiceCurrentIdx()).toBe(1);
+
+        hear('B et D');
+        expect(selectedLetters()).toEqual(['B', 'D']);
+        expect(voiceCurrentIdx()).toBe(-1);
+    });
+
+    it('turning on the microphone while autoRead is already active starts interactive reading', () => {
+        mockVoice();
+        VoiceService.setPrefs({ voiceConsent: true, autoRead: true });
+        startSession();
+        expect(speech.texts).toEqual([buildQuestionSpeech(QuizService.getCurrentQuestion())]);
+        speech.texts.length = 0;
+
+        click('quiz-voice-mic');
+        expect(speech.texts).toEqual(['Question Q1 ?']);
+        finishSpeech();
+        expect(speech.texts.at(-1)).toBe('Réponse A : Vent de face.');
+    });
+
+    it('hands-free car flow stays active from Q1 to Q2 when chain + autoRead + listening are enabled', () => {
+        vi.useFakeTimers();
+        try {
+            mockVoice();
+            VoiceService.setPrefs({ voiceConsent: true, autoRead: true, chain: true });
+            startSession('TRAINING', 2);
+            click('quiz-voice-mic');
+
+            // Q1 interactive flow -> A + D -> confirm -> Bonne réponse
+            finishSpeech();
+            hear('oui');
+            hear('non');
+            hear('non');
+            hear('oui');
+            hear('oui');
+            expect(QuizService.state.qcmIndex).toBe(0);
+            expect(QuizService.state.examResults[0].isCorrect).toBe(true);
+
+            // End of Q1 feedback triggers chain timer -> advances to Q2 and starts Q2 reading
+            finishSpeech();
+            vi.advanceTimersByTime(1500);
+            expect(QuizService.state.qcmIndex).toBe(1);
+            expect(VoiceService.isListening()).toBe(true);
+            expect(speech.texts.at(-1)).toBe('Question Q2 ?');
+
+            // Q2 still responds to voice commands
+            finishSpeech();
+            expect(speech.texts.at(-1)).toBe('Réponse A : Vent de face.');
+            hear('oui');
+            expect(selectedLetters()).toEqual(['A']);
+        } finally {
+            vi.useRealTimers();
+        }
     });
 });

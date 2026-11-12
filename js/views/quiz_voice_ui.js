@@ -4,6 +4,9 @@
 import QuizService from '../services/quiz_service.js';
 import VoiceService from '../services/voice_service.js';
 import {
+    optionLetter,
+    buildQuestionOnlySpeech,
+    buildOptionSpeech,
     buildQuestionSpeech,
     buildFeedbackSpeech,
     buildAutoFeedbackSpeech,
@@ -29,6 +32,11 @@ export class QuizVoiceBase extends QuizStatsBase {
         this._voiceFeedback = null;
         /** @type {any[]} Choix de la question affichée. */
         this._currentChoices = [];
+        /**
+         * Étape de la lecture interactive option par option (lorsque l'écoute vocale est active).
+         * @type {null | { stage: 'question' | 'option' | 'confirm', index: number }}
+         */
+        this._voiceStep = null;
     }
 
     /** À fournir par QuizView. */
@@ -50,6 +58,23 @@ export class QuizVoiceBase extends QuizStatsBase {
         return VoiceService.canSpeak() || VoiceService.canListen();
     }
 
+    resetVoiceStep() {
+        this._voiceStep = null;
+        this.syncVoiceOptionHighlight();
+    }
+
+    syncVoiceOptionHighlight() {
+        if (typeof document === 'undefined') return;
+        const activeIndex = this._voiceStep?.stage === 'option' ? this._voiceStep.index : -1;
+        document.querySelectorAll('#qcm-choices .qcm-option').forEach((btn) => {
+            const idx = parseInt(btn.getAttribute('data-idx'));
+            const isCurrent = idx === activeIndex;
+            btn.classList.toggle('voice-current', isCurrent);
+            if (isCurrent) btn.setAttribute('aria-current', 'step');
+            else btn.removeAttribute('aria-current');
+        });
+    }
+
     /**
      * Ce que « Lire » dit : la correction si la question est validée, sinon la question.
      * En lecture automatique, l'explication n'est lue qu'après une erreur (spec 022).
@@ -66,16 +91,166 @@ export class QuizVoiceBase extends QuizStatsBase {
     }
 
     readAloud({ auto = false } = {}) {
-        const text = this.currentSpeech({ auto });
-        if (!text || !VoiceService.canSpeak()) return;
-        const isFeedback = auto && Boolean(this._voiceFeedback);
+        if (this._voiceFeedback) {
+            this.resetVoiceStep();
+            const text = this.currentSpeech({ auto });
+            if (!text || !VoiceService.canSpeak()) return;
+            VoiceService.speak(text, {
+                onEnd: () => {
+                    this.renderVoiceBar();
+                    if (auto) this.scheduleChainAdvance();
+                },
+            });
+            this.renderVoiceBar();
+            return;
+        }
+
+        if (!this._voiceQuestion || !VoiceService.canSpeak()) return;
+        if (VoiceService.isListening() && (this._voiceQuestion.choices?.length || 0) > 0) {
+            this.startInteractiveQuestionRead();
+            return;
+        }
+
+        this.resetVoiceStep();
+        const text = buildQuestionSpeech(this._voiceQuestion);
+        if (!text) return;
         VoiceService.speak(text, {
             onEnd: () => {
                 this.renderVoiceBar();
-                if (isFeedback) this.scheduleChainAdvance();
             },
         });
         this.renderVoiceBar();
+    }
+
+    /**
+     * Lecture interactive (mode mains libres avec micro) : lit d'abord la question seule, puis
+     * chaque réponse l'une après l'autre en attendant « oui » ou « non » avant de lire la suivante.
+     */
+    startInteractiveQuestionRead() {
+        const q = this._voiceQuestion;
+        if (!q || !VoiceService.canSpeak()) return;
+        const questionText = buildQuestionOnlySpeech(q);
+        if (!questionText) {
+            this.promptOptionStep(0);
+            return;
+        }
+        this._voiceStep = { stage: 'question', index: 0 };
+        this.syncVoiceOptionHighlight();
+        VoiceService.speak(questionText, {
+            onEnd: () => {
+                if (
+                    this._voiceQuestion !== q ||
+                    this._voiceFeedback ||
+                    !VoiceService.isListening() ||
+                    this._voiceStep?.stage !== 'question'
+                ) {
+                    this.renderVoiceBar();
+                    return;
+                }
+                this.promptOptionStep(0);
+            },
+        });
+        this.renderVoiceBar();
+    }
+
+    /**
+     * Lit la proposition d'indice `index` et attend « oui » / « non ».
+     * @param {number} index
+     * @param {string} [prefix]
+     */
+    promptOptionStep(index, prefix = '') {
+        const q = this._voiceQuestion;
+        if (!q || this._voiceFeedback || !VoiceService.canSpeak()) return;
+        const choices = this._currentChoices.length ? this._currentChoices : q.choices || [];
+        if (index >= choices.length) {
+            this.promptConfirmStep(prefix);
+            return;
+        }
+        this._voiceStep = { stage: 'option', index };
+        this._voiceStatus = t('quiz.voice.awaitingOption', { letter: optionLetter(index) });
+        this.syncVoiceOptionHighlight();
+        const optionText = buildOptionSpeech(choices[index], index);
+        const spoken = prefix ? `${prefix} ${optionText}` : optionText;
+        VoiceService.speak(spoken, {
+            onEnd: () => {
+                this.renderVoiceBar();
+            },
+        });
+        this.renderVoiceBar();
+    }
+
+    /**
+     * Résume les choix cochés après la dernière proposition et demande confirmation avant de valider.
+     * @param {string} [prefix]
+     */
+    promptConfirmStep(prefix = '') {
+        const q = this._voiceQuestion;
+        if (!q || this._voiceFeedback || !VoiceService.canSpeak()) return;
+        const choices = this._currentChoices.length ? this._currentChoices : q.choices || [];
+        const selectedIndexes = choices
+            .map((c, i) => (QuizService.state.currentQcmSelection.has(c) ? i : -1))
+            .filter((i) => i >= 0);
+
+        this._voiceStep = { stage: 'confirm', index: choices.length };
+        this._voiceStatus = t('quiz.voice.awaitingConfirm');
+        this.syncVoiceOptionHighlight();
+
+        const summary = selectedIndexes.length
+            ? `${describeSelection(selectedIndexes, choices)} ${t('quiz.voice.speech.confirmSelection')}`
+            : t('quiz.voice.speech.retryReview');
+        const spoken = prefix ? `${prefix} ${summary}` : summary;
+        VoiceService.speak(spoken, {
+            onEnd: () => {
+                this.renderVoiceBar();
+            },
+        });
+        this.renderVoiceBar();
+    }
+
+    /**
+     * Applique « oui » ou « non » sur la proposition en cours ou à l'étape de confirmation.
+     * @param {boolean} isYes
+     * @returns {boolean}
+     */
+    applyStepYesNo(isYes) {
+        const step = this._voiceStep;
+        if (!step) return false;
+        const choices = this._currentChoices.length ? this._currentChoices : this._voiceQuestion?.choices || [];
+
+        if (step.stage === 'option') {
+            const idx = step.index;
+            const choice = choices[idx];
+            const btn = document.querySelector(`#qcm-choices .qcm-option[data-idx="${idx}"]`);
+            const isSelected = Boolean(choice && QuizService.state.currentQcmSelection.has(choice));
+            if (btn && choice && isSelected !== isYes) {
+                this.toggleOptionSelection(btn);
+            }
+            const prefix = isYes
+                ? t('quiz.voice.speech.optionChecked', { letter: optionLetter(idx) })
+                : t('quiz.voice.speech.optionSkipped');
+            this.promptOptionStep(idx + 1, prefix);
+            return true;
+        }
+
+        if (step.stage === 'confirm') {
+            const hasSelection = choices.some((c) => QuizService.state.currentQcmSelection.has(c));
+            if (hasSelection) {
+                if (isYes) {
+                    this.validateQuestion();
+                } else {
+                    this.promptOptionStep(0, t('quiz.voice.speech.restartReview'));
+                }
+            } else if (isYes) {
+                this.promptOptionStep(0, t('quiz.voice.speech.restartReview'));
+            } else {
+                this.resetVoiceStep();
+                this._voiceStatus = t('quiz.voice.listening');
+                this.renderVoiceBar();
+            }
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -118,6 +293,7 @@ export class QuizVoiceBase extends QuizStatsBase {
 
     toggleReadAloud() {
         if (VoiceService.isSpeaking()) {
+            this.resetVoiceStep();
             VoiceService.stopSpeaking();
             this.renderVoiceBar();
         } else {
@@ -130,6 +306,7 @@ export class QuizVoiceBase extends QuizStatsBase {
         VoiceService.setPrefs(next ? { autoRead: true } : { autoRead: false, chain: false });
         if (!next) {
             this.cancelChainAdvance();
+            this.resetVoiceStep();
             if (VoiceService.isSpeaking()) VoiceService.stopSpeaking();
         } else if (!VoiceService.isSpeaking()) {
             this.readAloud({ auto: true });
@@ -139,6 +316,7 @@ export class QuizVoiceBase extends QuizStatsBase {
 
     toggleVoiceAnswers() {
         if (VoiceService.isListening()) {
+            this.resetVoiceStep();
             VoiceService.stopListening();
             this._voiceStatus = t('quiz.voice.stopped');
         } else if (!VoiceService.getPrefs().voiceConsent) {
@@ -157,6 +335,7 @@ export class QuizVoiceBase extends QuizStatsBase {
     }
 
     revokeVoiceConsent() {
+        this.resetVoiceStep();
         VoiceService.stopListening();
         VoiceService.setPrefs({ voiceConsent: false });
         this._voiceNoticeOpen = false;
@@ -169,12 +348,23 @@ export class QuizVoiceBase extends QuizStatsBase {
             onResult: (alternatives) => this.handleVoiceResult(alternatives),
             onError: (code) => this.handleVoiceError(code),
         });
-        if (started) this._voiceStatus = t('quiz.voice.listening');
+        if (!started) return;
+        this._voiceStatus = t('quiz.voice.listening');
+        if (
+            VoiceService.getPrefs().autoRead &&
+            this._voiceQuestion &&
+            !this._voiceFeedback &&
+            !this._voiceStep &&
+            QuizService.state.currentQcmSelection.size === 0
+        ) {
+            this.readAloud();
+        }
     }
 
     /** Arrête lecture et écoute (changement d'écran, fin de session). */
     stopVoice() {
         this.cancelChainAdvance();
+        this.resetVoiceStep();
         VoiceService.stopSpeaking();
         VoiceService.stopListening();
         this._voiceNoticeOpen = false;
@@ -182,6 +372,7 @@ export class QuizVoiceBase extends QuizStatsBase {
     }
 
     handleVoiceError(code) {
+        this.resetVoiceStep();
         const keys = {
             'not-allowed': 'errorNotAllowed',
             network: 'errorNetwork',
@@ -197,12 +388,16 @@ export class QuizVoiceBase extends QuizStatsBase {
         const q = this._voiceQuestion;
         if (!q) return;
         // Spec 022 : l'écoute continue pendant la lecture. Pendant (et juste après) une lecture, une
-        // phrase non comprise ou qui reprend « Réponse A : … » est l'écho de l'application : ignorée.
+        // phrase non comprise ou qui reprend le texte lu par l'application est ignorée.
         const echoWindow = VoiceService.isEchoWindow();
+        const speaking = VoiceService.isSpeaking();
+        const spokenContext =
+            typeof VoiceService.getSpokenContext === 'function' ? VoiceService.getSpokenContext() : '';
+
         let heard = alternatives[0] || '';
         let command = /** @type {import('../services/quiz_voice.js').VoiceCommand} */ ({ type: 'unknown' });
         for (const alt of alternatives) {
-            if (echoWindow && looksLikeEcho(alt)) continue;
+            if (echoWindow && looksLikeEcho(alt, spokenContext, { speaking })) continue;
             const parsed = parseVoiceCommand(alt, q.choices.length);
             if (parsed.type !== 'unknown') {
                 heard = alt;
@@ -218,15 +413,36 @@ export class QuizVoiceBase extends QuizStatsBase {
             return;
         }
 
+        const isExam = QuizService.state.qcmConfig.mode === 'EXAM';
+        const answered = !isExam && !!QuizService.state.examResults[QuizService.state.qcmIndex];
+
+        if (command.type === 'command' && (command.name === 'yes' || command.name === 'no')) {
+            if (answered) {
+                this._voiceStatus = t('quiz.voice.frozen');
+                this.renderVoiceBar();
+                return;
+            }
+            if (!this._voiceStep || this._voiceStep.stage === 'question') {
+                if (echoWindow) return;
+                this._voiceStatus = t('quiz.voice.noInteractiveOption');
+                this.renderVoiceBar();
+                return;
+            }
+            this.cancelChainAdvance();
+            if (VoiceService.isSpeaking()) VoiceService.stopSpeaking();
+            this._voiceStatus = t('quiz.voice.heard', { text: heard.trim() });
+            this.applyStepYesNo(command.name === 'yes');
+            return;
+        }
+
         // Le pilote répond sans attendre la fin de la lecture : on se tait, et on n'enchaîne pas seul.
         this.cancelChainAdvance();
         if (VoiceService.isSpeaking()) VoiceService.stopSpeaking();
 
         this._voiceStatus = t('quiz.voice.heard', { text: heard.trim() });
-        const isExam = QuizService.state.qcmConfig.mode === 'EXAM';
-        const answered = !isExam && !!QuizService.state.examResults[QuizService.state.qcmIndex];
 
         if (command.type === 'letters') {
+            this.resetVoiceStep();
             if (answered) this._voiceStatus = t('quiz.voice.frozen');
             else this.selectOptionsByVoice(command.indexes);
             this.renderVoiceBar();
@@ -255,14 +471,26 @@ export class QuizVoiceBase extends QuizStatsBase {
                 else this.renderVoiceBar();
                 break;
             case 'repeat':
-                this.readAloud();
+                if (!this._voiceFeedback && this._voiceStep?.stage === 'option') {
+                    this.promptOptionStep(this._voiceStep.index);
+                } else {
+                    this.readAloud();
+                }
                 break;
             case 'clear':
-                if (answered) this._voiceStatus = t('quiz.voice.frozen');
-                else this.selectOptionsByVoice([]);
-                this.renderVoiceBar();
+                if (answered) {
+                    this._voiceStatus = t('quiz.voice.frozen');
+                    this.renderVoiceBar();
+                } else if (this._voiceStep) {
+                    this.syncSelectionIndexes([]);
+                    this.promptOptionStep(0, t('quiz.voice.speech.cleared'));
+                } else {
+                    this.selectOptionsByVoice([]);
+                    this.renderVoiceBar();
+                }
                 break;
             case 'stop':
+                this.resetVoiceStep();
                 VoiceService.stopListening();
                 this._voiceStatus = t('quiz.voice.stopped');
                 this.renderVoiceBar();
@@ -270,8 +498,11 @@ export class QuizVoiceBase extends QuizStatsBase {
         }
     }
 
-    /** Remplace la sélection par exactement ces réponses, comme si on les touchait. */
-    selectOptionsByVoice(indexes) {
+    /**
+     * Synchronise les cases sélectionnées avec exactement ces indices, sans prise de parole.
+     * @param {number[]} indexes
+     */
+    syncSelectionIndexes(indexes) {
         const wanted = new Set(indexes);
         /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('#qcm-choices .qcm-option')).forEach(
             (btn) => {
@@ -280,6 +511,11 @@ export class QuizVoiceBase extends QuizStatsBase {
                 if (isSelected !== wanted.has(idx)) this.toggleOptionSelection(btn);
             },
         );
+    }
+
+    /** Remplace la sélection par exactement ces réponses, comme si on les touchait. */
+    selectOptionsByVoice(indexes) {
+        this.syncSelectionIndexes(indexes);
         if (VoiceService.canSpeak()) VoiceService.speak(describeSelection(indexes, this._currentChoices));
     }
 

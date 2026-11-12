@@ -9,7 +9,7 @@ import { splitOptionExplanations } from './error_diagnostic.js';
 
 /**
  * @typedef {{ type: 'letters', indexes: number[] }
- *   | { type: 'command', name: 'validate' | 'next' | 'prev' | 'repeat' | 'clear' | 'stop' }
+ *   | { type: 'command', name: 'validate' | 'next' | 'prev' | 'repeat' | 'clear' | 'stop' | 'yes' | 'no' }
  *   | { type: 'unknown' }} VoiceCommand
  */
 
@@ -27,16 +27,36 @@ function withFinalStop(text) {
 }
 
 /**
+ * Texte de la question seule (sans les propositions).
+ * @param {{ question?: string }} q
+ * @returns {string}
+ */
+export function buildQuestionOnlySpeech(q) {
+    return String(q?.question || '').trim();
+}
+
+/**
+ * Texte d'une proposition précédée de sa lettre (« Réponse A : … »).
+ * @param {{ text?: string }} choice
+ * @param {number} index
+ * @returns {string}
+ */
+export function buildOptionSpeech(choice, index) {
+    const spoken = t('quiz.voice.speech.option', {
+        letter: optionLetter(index),
+        text: String(choice?.text || '').trim(),
+    });
+    // « Réponse A : Oui.. » : le catalogue ajoute un point, on évite de le doubler.
+    return /[.!?…:;]\.$/.test(spoken) ? spoken.slice(0, -1) : spoken;
+}
+
+/**
  * Question puis chaque réponse précédée de sa lettre, dans l'ordre affiché, sans reformulation.
  * @param {{ question: string, choices: { text: string }[] }} q
  */
 export function buildQuestionSpeech(q) {
-    const options = q.choices.map((c, i) => {
-        const spoken = t('quiz.voice.speech.option', { letter: optionLetter(i), text: String(c.text || '').trim() });
-        // « Réponse A : Oui.. » : le catalogue ajoute un point, on évite de le doubler.
-        return /[.!?…:;]\.$/.test(spoken) ? spoken.slice(0, -1) : spoken;
-    });
-    return [String(q.question || '').trim(), ...options].join(' ');
+    const options = (q.choices || []).map((c, i) => buildOptionSpeech(c, i));
+    return [buildQuestionOnlySpeech(q), ...options].join(' ');
 }
 
 // Ligne de fin « Aucune source trouvée… » de certaines explications : une note pour l'écran, pas à lire.
@@ -155,28 +175,77 @@ export function describeSelection(indexes, choices = []) {
 }
 
 /** Minuscules, sans accents, apostrophes et ponctuation remplacées par des espaces. */
-function normalize(text) {
-    let normalized = String(text || '')
+function normalizeRaw(text) {
+    return String(text || '')
         .toLowerCase()
         .normalize('NFD')
-        .replace(/[̀-ͯ]/g, '')
+        .replace(/[\u0300-\u036f]/g, '')
         .replace(/[’'`]/g, '')
         .replace(/[^a-z0-9]+/g, ' ')
         .trim();
+}
 
-    // Remplacements phonétiques pour les associations de lettres courantes
-    normalized = normalized
+/** Normalisation incluant les homophones de suites de lettres. */
+function normalize(text) {
+    return normalizeRaw(text)
         .replace(/\baider\b/g, 'a d')
         .replace(/\bassez\b/g, 'a c')
         .replace(/\babaisser\b/g, 'a b c')
         .replace(/\bbaisser\b/g, 'b c')
         .replace(/\bceder\b/g, 'c d')
         .replace(/\bdeces\b/g, 'd c');
-
-    return normalized;
 }
 
 const COMMANDS = {
+    yes: [
+        'oui',
+        'oui oui',
+        'ouais',
+        'euh oui',
+        'yes',
+        'ok',
+        'okay',
+        'daccord',
+        'dacord',
+        'coche',
+        'cocher',
+        'cochez',
+        'je coche',
+        'vrai',
+        'exact',
+        'positif',
+        'affirmatif',
+        'cest ca',
+        'oui cest ca',
+        'oui merci',
+        'confirmer',
+        'confirme',
+        'je confirme',
+    ],
+    no: [
+        'non',
+        'non non',
+        'nan',
+        'no',
+        'nom',
+        'euh non',
+        'non merci',
+        'pas celle la',
+        'pas celui la',
+        'pas ca',
+        'non pas celle la',
+        'faux',
+        'negatif',
+        'passe',
+        'passer',
+        'passez',
+        'je passe',
+        'ignore',
+        'ignorer',
+        'ne pas cocher',
+        'decoche',
+        'decocher',
+    ],
     validate: ['valider', 'valide', 'validez', 'validation', 'je valide'],
     next: ['suivante', 'suivant', 'question suivante', 'la suivante', 'suite'],
     prev: ['precedente', 'precedent', 'question precedente', 'la precedente', 'retour'],
@@ -203,19 +272,55 @@ const WEAK_LETTERS = {
     eu: 4,
     euh: 4,
 };
-const ECHO_WORDS = new Set(['reponse', 'reponses', 'selection']);
+const ECHO_WORDS = new Set([
+    'reponse',
+    'reponses',
+    'selection',
+    'cochee',
+    'passee',
+    'bonne',
+    'mauvaise',
+    'incomplete',
+    'terminee',
+    'dites',
+]);
+const PHONETIC_HACK_WORDS = new Set(['aider', 'assez', 'abaisser', 'baisser', 'ceder', 'deces']);
 const FILLERS = new Set(['reponse', 'reponses', 'et', 'la', 'le', 'les', 'lettre', 'lettres']);
 
 /**
  * Vrai si la phrase reprend des mots que l'application prononce (« Réponse A : … »,
- * « Sélection : … ») : pendant une lecture, c'est sans doute l'écho de sa propre voix (spec 022).
- * Le pilote, lui, dit seulement les lettres.
+ * « Sélection : … », ou des mots contenus dans le texte actuellement/récemment lu) :
+ * pendant une lecture (et juste après), c'est sans doute l'écho de sa propre voix.
  * @param {string} transcript
+ * @param {string} [spokenContext]
+ * @param {{ speaking?: boolean }} [options]
  */
-export function looksLikeEcho(transcript) {
-    return normalize(transcript)
-        .split(' ')
-        .some((w) => ECHO_WORDS.has(w));
+export function looksLikeEcho(transcript, spokenContext = '', { speaking = false } = {}) {
+    const raw = normalizeRaw(transcript);
+    if (!raw) return false;
+    const rawWords = raw.split(' ');
+    if (rawWords.some((w) => ECHO_WORDS.has(w))) return true;
+
+    const spokenRaw = normalizeRaw(spokenContext);
+    if (!spokenRaw) return false;
+    const spokenWordSet = new Set(spokenRaw.split(' '));
+
+    // Homophones (« aider », « céder », « baisser »…) ou mots de réponse (« oui », « non »)
+    // entendus depuis le haut-parleur alors que l'app est littéralement en train de les lire.
+    if (rawWords.length === 1) {
+        const w = rawWords[0];
+        if (PHONETIC_HACK_WORDS.has(w) && spokenWordSet.has(w)) return true;
+        if (
+            speaking &&
+            (w in WEAK_LETTERS || w === 'oui' || w === 'non' || w === 'confirmer') &&
+            spokenWordSet.has(w)
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    return ` ${spokenRaw} `.includes(` ${raw} `);
 }
 
 /**

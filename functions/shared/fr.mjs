@@ -1366,10 +1366,13 @@ export const FR = Object.freeze({
             noticeBody:
                 'Pour reconnaître ce que vous dites, votre navigateur envoie votre voix à son service de reconnaissance vocale (Google pour Chrome et Edge, Apple pour Safari). Une connexion internet est nécessaire. L’application ne conserve aucun enregistrement et vous pouvez retirer votre accord à tout moment.',
             noticeHelp:
-                'Dites les lettres des réponses (« A », « B et D »), puis « valider », « suivante », « précédente », « répète », « effacer » ou « stop ».',
+                'En lecture, répondez « oui » ou « non » à chaque proposition, ou dites les lettres (« A », « B et D »), puis « valider », « suivante », « précédente », « répète », « effacer » ou « stop ».',
             accept: 'J’accepte',
             cancel: 'Annuler',
             listening: 'À l’écoute… Dites « A », « B et D », « valider »…',
+            awaitingOption: 'Réponse {letter} : dites « oui » ou « non »…',
+            awaitingConfirm: 'Confirmer ? Dites « oui » ou « valider », ou « non » pour reprendre…',
+            noInteractiveOption: 'Dites les lettres (« A », « B et D ») ou « répète » pour lire une par une.',
             heard: 'Entendu : {text}',
             notUnderstood: 'Pas compris : {text}',
             frozen: 'Réponses déjà validées : dites « suivante ».',
@@ -1383,6 +1386,11 @@ export const FR = Object.freeze({
             errorOther: 'La reconnaissance vocale s’est arrêtée ({code}).',
             speech: Object.freeze({
                 option: 'Réponse {letter} : {text}.',
+                optionChecked: '{letter} cochée.',
+                optionSkipped: 'Passée.',
+                confirmSelection: 'Confirmer ?',
+                retryReview: 'Aucune réponse sélectionnée. On reprend ?',
+                restartReview: 'On reprend.',
                 correct: 'Bonne réponse.',
                 incorrect: 'Mauvaise réponse.',
                 incomplete: 'Réponse incomplète.',

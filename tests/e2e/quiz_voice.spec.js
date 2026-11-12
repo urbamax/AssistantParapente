@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { formatSpeechText } from '../../js/services/voice_service.js';
 
 // Spec 016 : mode vocal du QCM. Les API vocales du navigateur sont remplacées par des doublures :
 // la lecture est enregistrée dans window.__spoken, et window.__hear(texte) simule une phrase entendue.
@@ -27,6 +28,9 @@ test.beforeEach(async ({ page }) => {
         }
         let current = null;
         const synth = {
+            get speaking() {
+                return current !== null;
+            },
             speak(u) {
                 current = u;
                 w.__spoken.push(u.text);
@@ -89,9 +93,13 @@ test('Spec 016 : « Lecture auto » lit la question et ses réponses avec leur l
     const firstAnswer = (await page.locator('#qcm-choices .qcm-option').first().textContent())
         .trim()
         .replace(/^A\s*/, '');
-    const spoken = await page.evaluate(() => /** @type {any} */ (window).__spoken);
-    expect(spoken[0].startsWith(question)).toBe(true);
-    expect(spoken[0]).toContain(`Réponse A : ${firstAnswer}`);
+    await expect
+        .poll(() => page.evaluate(() => /** @type {any} */ (window).__spoken.join(' ').replace(/\s+/g, ' ').trim()))
+        .toContain(formatSpeechText(`Réponse A : ${firstAnswer}`).replace(/\s+/g, ' ').trim());
+    const spoken = await page.evaluate(() =>
+        /** @type {any} */ (window).__spoken.join(' ').replace(/\s+/g, ' ').trim(),
+    );
+    expect(spoken.startsWith(formatSpeechText(question).replace(/\s+/g, ' ').trim())).toBe(true);
 });
 
 test('Spec 016 : la lecture auto lit chaque nouvelle question et reste activée', async ({ page }) => {
@@ -105,9 +113,17 @@ test('Spec 016 : la lecture auto lit chaque nouvelle question et reste activée'
         .poll(() => page.evaluate(() => /** @type {any} */ (window).__spoken.at(-1)))
         .toMatch(/^(Bonne réponse|Mauvaise réponse|Réponse incomplète)\./);
 
+    const spokenBeforeNext = await page.evaluate(() => /** @type {any} */ (window).__spoken.length);
     await page.locator('[data-action="next-question"]').click();
     const question = (await page.locator('.quiz-question-text').textContent()).trim();
-    await expect.poll(() => page.evaluate(() => /** @type {any} */ (window).__spoken.at(-1))).toContain(question);
+    await expect
+        .poll(() =>
+            page.evaluate(
+                (from) => /** @type {any} */ (window).__spoken.slice(from).join(' ').replace(/\s+/g, ' ').trim(),
+                spokenBeforeNext,
+            ),
+        )
+        .toContain(formatSpeechText(question).replace(/\s+/g, ' ').trim());
 
     await page.reload();
     await page.locator('[data-action="startQcmSession"]').click();
@@ -147,4 +163,79 @@ test('Spec 016 : répondre à la voix après avoir accepté l’avertissement', 
     await page.locator('[data-action="quiz-voice-revoke"]').click();
     await expect(mic).toHaveAttribute('aria-pressed', 'false');
     await expect(page.locator('#qcm-voice-status')).toContainText('Accord retiré');
+});
+
+test('Mode vocal : acronymes épelés, découpage des phrases et réponse oui/non enchaînée sur plusieurs questions', async ({
+    page,
+}) => {
+    await startTraining(page);
+
+    // Vérifie dans le navigateur que la synthèse normalise les acronymes (CEN, FL, FFVL) sans casser NOTAM et découpe les longues phrases.
+    await page.evaluate(async () => {
+        const { default: VoiceService } = await import('/js/services/voice_service.js');
+        VoiceService.speak(
+            'Selon le CEN et la FFVL, le plafond FL 115 correspond à 1013 hPa ou 500 m/sol, et il faut impérativement consulter les NOTAM ainsi que les cartes AZBA avant le décollage en montagne.',
+        );
+    });
+    await expect
+        .poll(() =>
+            page.evaluate(() => {
+                const w = /** @type {any} */ (window);
+                return w.speechSynthesis.speaking ? '' : w.__spoken.join(' ');
+            }),
+        )
+        .toContain('montagne.');
+    const spokenSample = await page.evaluate(() => /** @type {any} */ (window).__spoken);
+    const normalizedSample = spokenSample.join(' ');
+    expect(spokenSample.length).toBeGreaterThan(1);
+    expect(normalizedSample).toContain('C.E.N.');
+    expect(normalizedSample).toContain('F.F.V.L.');
+    expect(normalizedSample).toContain('F.L. 115');
+    expect(normalizedSample).toContain('hectopascals');
+    expect(normalizedSample).toContain('mètres sol');
+    expect(normalizedSample).toContain('notam');
+    expect(normalizedSample).toContain('azba');
+
+    // Réinitialise l'écoute vocale en mode mains libres complet (Lecture auto + Enchaîner + Micro).
+    await page.locator('[data-action="quiz-voice-auto"]').click();
+    await page.locator('[data-action="quiz-voice-chain"]').click();
+    await page.locator('[data-action="quiz-voice-mic"]').click();
+    await page.locator('[data-action="quiz-voice-consent"]').click();
+
+    const waitReadyAndSay = async (text) => {
+        await expect
+            .poll(() =>
+                page.evaluate((phrase) => {
+                    const w = /** @type {any} */ (window);
+                    if (w.speechSynthesis.speaking) return false;
+                    return w.__hear(phrase);
+                }, text),
+            )
+            .toBe(true);
+    };
+
+    const optionCount = await page.locator('#qcm-choices .qcm-option').count();
+    await expect(page.locator('#qcm-choices .qcm-option').first()).toHaveClass(/voice-current/);
+    await expect(page.locator('#qcm-voice-status')).toContainText('Réponse A :');
+
+    await waitReadyAndSay('oui');
+    await expect(page.locator('#qcm-choices .qcm-option').first()).toHaveClass(/selected/);
+
+    for (let i = 1; i < optionCount; i++) {
+        await expect(page.locator('#qcm-choices .qcm-option').nth(i)).toHaveClass(/voice-current/);
+        await waitReadyAndSay('non');
+    }
+
+    await expect(page.locator('#qcm-voice-status')).toContainText('Confirmer ?');
+    const q1Text = (await page.locator('.quiz-question-text').textContent()).trim();
+    await waitReadyAndSay('oui');
+
+    // Le mode enchaîné passe automatiquement à la question 2 et maintient l'écoute active.
+    await expect(page.locator('.quiz-question-text')).not.toHaveText(q1Text, { timeout: 6000 });
+    await expect(page.locator('#qcm-choices .qcm-option').first()).toHaveClass(/voice-current/, { timeout: 6000 });
+    await waitReadyAndSay('oui');
+    await expect(page.locator('#qcm-choices .qcm-option').first()).toHaveClass(/selected/);
+
+    const recognizerCount = await page.evaluate(() => /** @type {any} */ (window).__recognizers.length);
+    expect(recognizerCount).toBeGreaterThan(2);
 });
