@@ -1,19 +1,7 @@
-import { deflateRawSync } from 'node:zlib';
+import { crc32, deflateRawSync } from 'node:zlib';
 
 // Builds a small .xlsx file (a zip of XML parts) the way the FFVL Intranet export is laid out: one worksheet, strings
 // in sharedStrings.xml, numbers (dates as Excel day numbers) written as `<v>46322.0</v>`. Only for tests.
-
-const CRC_TABLE = Array.from({ length: 256 }, (_, n) => {
-    let c = n;
-    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-    return c >>> 0;
-});
-
-function crc32(bytes) {
-    let crc = 0xffffffff;
-    for (const byte of bytes) crc = CRC_TABLE[(crc ^ byte) & 0xff] ^ (crc >>> 8);
-    return (crc ^ 0xffffffff) >>> 0;
-}
 
 const escapeXml = (text) =>
     String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -27,12 +15,14 @@ export function zip(parts, { stored = [] } = {}) {
         const data = Buffer.from(text, 'utf8');
         const method = stored.includes(name) ? 0 : 8;
         const body = method === 0 ? data : deflateRawSync(data);
+        // Native checksum, computed once: a hand-written loop over a 30 MB part took most of the test's time.
+        const checksum = crc32(data);
         const nameBytes = Buffer.from(name, 'utf8');
         const header = Buffer.alloc(30);
         header.writeUInt32LE(0x04034b50, 0);
         header.writeUInt16LE(20, 4);
         header.writeUInt16LE(method, 8);
-        header.writeUInt32LE(crc32(data), 14);
+        header.writeUInt32LE(checksum, 14);
         header.writeUInt32LE(body.length, 18);
         header.writeUInt32LE(data.length, 22);
         header.writeUInt16LE(nameBytes.length, 26);
@@ -42,7 +32,7 @@ export function zip(parts, { stored = [] } = {}) {
         entry.writeUInt16LE(20, 4);
         entry.writeUInt16LE(20, 6);
         entry.writeUInt16LE(method, 10);
-        entry.writeUInt32LE(crc32(data), 16);
+        entry.writeUInt32LE(checksum, 16);
         entry.writeUInt32LE(body.length, 20);
         entry.writeUInt32LE(data.length, 24);
         entry.writeUInt16LE(nameBytes.length, 28);

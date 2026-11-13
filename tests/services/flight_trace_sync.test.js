@@ -18,15 +18,24 @@ const ctx = (firestore, flightId = 'vol-1') => ({ firestore: firestore.module, d
 const partPaths = (firestore, flightId = 'vol-1') =>
     [...firestore.docs.keys()].filter((p) => p.startsWith(`users/u1/igcTraces/${flightId}_`)).sort();
 
-/** Texte quasi incompressible : de quoi forcer plusieurs morceaux de 700 000 caractères. */
-function noise(length) {
+/** Un bloc de bruit, bien plus long que la fenêtre de 32 Ko dans laquelle gzip cherche des répétitions. */
+const NOISE_BLOCK = (() => {
     let seed = 987654321;
     let out = '';
-    while (out.length < length) {
+    while (out.length < 1 << 20) {
         seed = (seed * 1103515245 + 12345) & 0x7fffffff;
         out += seed.toString(36);
     }
-    return out.slice(0, length);
+    return out;
+})();
+
+/**
+ * Texte quasi incompressible : de quoi forcer plusieurs morceaux de 700 000 caractères. Le bloc est répété
+ * au lieu de tirer chaque caractère : gzip ne voit pas une répétition aussi lointaine (le texte compressé
+ * garde la même taille), et fabriquer 12 millions de caractères ne coûte plus rien au test.
+ */
+function noise(length) {
+    return NOISE_BLOCK.repeat(Math.ceil(length / NOISE_BLOCK.length)).slice(0, length);
 }
 
 describe('stripTrace', () => {
