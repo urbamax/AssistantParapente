@@ -29,4 +29,26 @@ describe('quiz explanations do not announce the verdict', () => {
             );
         expect(offending).toEqual([]);
     });
+
+    // Même règle au milieu ou à la fin d'une phrase : « … est juste : », « ce qui rend fausse l'idée… »,
+    // « est une cause juste », « c'est la bonne réponse ». Ces mots ne restent permis que dans les emplois
+    // de NOT_A_VERDICT, où ils décrivent un fait et non la réponse. Pour un nouvel emploi légitime,
+    // ajoute-le à cette liste plutôt que de contourner le test.
+    it('no option explanation judges the choice in the middle of a sentence', () => {
+        const NOT_A_VERDICT =
+            /(?:incidence|navigation) correcte|valeur exacte|altitude vraie|ce qui fausse|juste (?:avant|après|au|à|sous|sur|derrière|devant|assez)(?![\p{L}])/giu;
+        const VERDICT_WORD_ANYWHERE =
+            /(?<![\p{L}-])(?:justes?|vrai|vraie|vrais|faux|fausses?|correcte?s?|incorrecte?s?|inexacte?s?|exacte?s?)(?![\p{L}-])|(?:bonne|mauvaise) réponse|à tort(?![\p{L}])/iu;
+        const offending = Object.entries(explanations)
+            .filter(([code]) => !/^[HRX]/.test(code))
+            .flatMap(([code, text]) =>
+                String(text)
+                    .split(/\r?\n|\\n/)
+                    .map((line, index) => [index, line])
+                    .filter(([, line]) => !/^\s*Aucune source trouvée/.test(line))
+                    .filter(([, line]) => VERDICT_WORD_ANYWHERE.test(line.replace(NOT_A_VERDICT, ' ')))
+                    .map(([index]) => `${code} (choix ${index + 1})`),
+            );
+        expect(offending).toEqual([]);
+    });
 });
