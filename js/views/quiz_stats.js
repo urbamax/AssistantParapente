@@ -39,6 +39,8 @@ export class QuizStatsBase extends BaseView {
         this._axesStatusFilter = 'ALL';
         this._expandedAxisTakeaways = new Set();
         this._activeWorkshopAxisId = null;
+        /** @type {ResizeObserver | null} */
+        this._examHistoryResizeObserver = null;
     }
 
     /**
@@ -450,6 +452,7 @@ export class QuizStatsBase extends BaseView {
                 </button>
             </div>
         `;
+            this.syncExamHistoryScrollHeight();
         } catch (e) {
             console.error('Critical Error in renderStats:', e);
             if (container) {
@@ -834,6 +837,71 @@ export class QuizStatsBase extends BaseView {
                 new ResizeObserver(syncRowHeight).observe(row);
             }
         });
+    }
+
+    /**
+     * Plafonne l'historique des examens à trois lignes visibles (mobile ou bureau)
+     * et active la barre de défilement dès qu'une quatrième ligne apparaît.
+     */
+    syncExamHistoryScrollHeight() {
+        if (this._examHistoryResizeObserver) {
+            this._examHistoryResizeObserver.disconnect();
+            this._examHistoryResizeObserver = null;
+        }
+        const container = document.getElementById('stats-content');
+        if (!container) return;
+        const firstCard = /** @type {HTMLElement | null} */ (container.querySelector('[data-exam-id]'));
+        const grid = /** @type {HTMLElement | null} */ (firstCard && firstCard.parentElement);
+        if (!grid) return;
+
+        const groupRows = (cards) => {
+            const gridRect = grid.getBoundingClientRect();
+            const scrollTop = grid.scrollTop || 0;
+            const rows = [];
+            for (const card of cards) {
+                const rect = card.getBoundingClientRect();
+                const top = rect.top - gridRect.top + scrollTop;
+                const bottom = rect.bottom - gridRect.top + scrollTop;
+                const lastRow = rows[rows.length - 1];
+                if (!lastRow || Math.abs(top - lastRow.top) > 4) {
+                    rows.push({ top, bottom });
+                } else {
+                    lastRow.bottom = Math.max(lastRow.bottom, bottom);
+                }
+            }
+            return rows;
+        };
+
+        const sync = () => {
+            const cards = Array.from(
+                /** @type {NodeListOf<HTMLElement>} */ (grid.querySelectorAll(':scope > [data-exam-id]')),
+            );
+            if (cards.length === 0 || cards[0].offsetHeight === 0) return;
+
+            let rows = groupRows(cards);
+            if (rows.length <= 3) {
+                grid.style.maxHeight = 'none';
+                grid.classList.remove('exam-history-scrollable');
+                return;
+            }
+
+            if (!grid.classList.contains('exam-history-scrollable')) {
+                grid.classList.add('exam-history-scrollable');
+                rows = groupRows(cards);
+            }
+
+            const padBottom = parseFloat(getComputedStyle(grid).paddingBottom) || 0;
+            const maxH = Math.ceil(rows[2].bottom + padBottom);
+            if (maxH > 0) {
+                grid.style.maxHeight = `${maxH}px`;
+            }
+        };
+
+        sync();
+        if (typeof ResizeObserver !== 'undefined') {
+            this._examHistoryResizeObserver = new ResizeObserver(sync);
+            this._examHistoryResizeObserver.observe(grid);
+        }
     }
 
     toggleQuestionDetails(code) {

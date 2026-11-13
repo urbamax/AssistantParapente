@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
+import QuizView from '../../js/views/quiz.js';
 
 describe('Quiz Stats Screen Mobile Layout & Overflow Rules (css/quiz.css)', () => {
     const css = readFileSync('css/quiz.css', 'utf8');
@@ -39,7 +40,10 @@ describe('Quiz Stats Screen Mobile Layout & Overflow Rules (css/quiz.css)', () =
             /#stats-content\s*>\s*div:has\(\[data-action="QuizsetThemeSort"\]\)\s*\{[^}]*grid-template-columns:\s*1fr\s+auto/,
         );
         expect(css).toMatch(
-            /#stats-content\s+div:has\(>\s*\[data-exam-id\]\)\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(440px,\s*1fr\)\)/,
+            /#stats-content\s+div:has\(>\s*\[data-exam-id\]\)\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(310px,\s*1fr\)\)/,
+        );
+        expect(css).toMatch(
+            /#stats-content\s+div\[data-exam-id\]\s*>\s*div:first-child\s*>\s*div:first-child\s*\{[^}]*min-width:\s*0/,
         );
         const desktopSection = css.slice(css.indexOf('@media (min-width: 960px)'));
         expect(desktopSection).toMatch(
@@ -53,5 +57,110 @@ describe('Quiz Stats Screen Mobile Layout & Overflow Rules (css/quiz.css)', () =
     it('ne fixe pas la hauteur des cartes de thème du bureau (texte coupé vers 1000 px de large)', () => {
         expect(css).toMatch(/#stats-content\s+\.theme-card\s*\{[^}]*min-height:\s*108px/);
         expect(css).not.toMatch(/\.theme-card\s*\{[^}]*[^-]height:\s*108px/);
+    });
+
+    it('limite la grille des examens à 3 lignes avec une barre de défilement discrète', () => {
+        expect(css).toMatch(/#stats-content\s+div:has\(>\s*\[data-exam-id\]\)\s*\{[^}]*overflow-y:\s*auto/);
+        expect(css).toMatch(/#stats-content\s+div:has\(>\s*\[data-exam-id\]\)\s*\{[^}]*scrollbar-width:\s*thin/);
+        expect(css).toMatch(
+            /#stats-content\s+div:has\(>\s*\[data-exam-id\]\)\.exam-history-scrollable\s*\{[^}]*padding-right:\s*8px/,
+        );
+        expect(css).toMatch(
+            /#stats-content\s+div:has\(>\s*\[data-exam-id\]\)::-webkit-scrollbar\s*\{[^}]*width:\s*6px/,
+        );
+    });
+});
+
+describe('QuizStatsBase.syncExamHistoryScrollHeight', () => {
+    afterEach(() => {
+        vi.unstubAllGlobals();
+        vi.restoreAllMocks();
+        document.body.innerHTML = '';
+    });
+
+    function setupExamGrid(rowTops, cardHeight = 65) {
+        document.body.innerHTML = '<div id="stats-content"><div id="exam-grid"></div></div>';
+        const grid = document.getElementById('exam-grid');
+        grid.style.paddingTop = '4px';
+        grid.style.paddingBottom = '4px';
+        vi.spyOn(grid, 'getBoundingClientRect').mockReturnValue(
+            /** @type {DOMRect} */ ({ top: 100, bottom: 500, left: 0, right: 1200, width: 1200, height: 400 }),
+        );
+        rowTops.forEach((relTop, idx) => {
+            const card = document.createElement('div');
+            card.setAttribute('data-exam-id', `e${idx}`);
+            Object.defineProperty(card, 'offsetHeight', { value: cardHeight, configurable: true });
+            vi.spyOn(card, 'getBoundingClientRect').mockReturnValue(
+                /** @type {DOMRect} */ ({
+                    top: 100 + relTop,
+                    bottom: 100 + relTop + cardHeight,
+                    left: 0,
+                    right: 310,
+                    width: 310,
+                    height: cardHeight,
+                }),
+            );
+            grid.appendChild(card);
+        });
+        return grid;
+    }
+
+    it("n'ajoute pas de défilement tant qu'il y a au plus 3 lignes", () => {
+        const grid = setupExamGrid([4, 4, 79, 79, 154, 154]);
+        QuizView.syncExamHistoryScrollHeight();
+
+        expect(grid.style.maxHeight).toBe('none');
+        expect(grid.classList.contains('exam-history-scrollable')).toBe(false);
+    });
+
+    it('plafonne la hauteur au bas de la 3e ligne et active le défilement dès la 4e ligne', () => {
+        const grid = setupExamGrid([4, 4, 79, 79, 154, 154, 229]);
+        QuizView.syncExamHistoryScrollHeight();
+
+        expect(grid.classList.contains('exam-history-scrollable')).toBe(true);
+        // 3e ligne : top=154, height=65 -> bottom=219 + paddingBottom 4 = 223px
+        expect(grid.style.maxHeight).toBe('223px');
+    });
+
+    it('débranche l’observateur précédent et retire le défilement si la grille repasse à 3 lignes', () => {
+        const disconnect = vi.fn();
+        let lastCallback = null;
+        vi.stubGlobal(
+            'ResizeObserver',
+            class {
+                constructor(cb) {
+                    lastCallback = cb;
+                }
+                observe() {}
+                disconnect() {
+                    disconnect();
+                }
+            },
+        );
+
+        const grid = setupExamGrid([4, 79, 154, 229]);
+        QuizView.syncExamHistoryScrollHeight();
+        expect(grid.classList.contains('exam-history-scrollable')).toBe(true);
+
+        // Réaffiche en 3 lignes lors d'un élargissement de fenêtre
+        const cards = Array.from(grid.querySelectorAll('[data-exam-id]'));
+        [4, 4, 79, 154].forEach((relTop, idx) => {
+            vi.spyOn(cards[idx], 'getBoundingClientRect').mockReturnValue(
+                /** @type {DOMRect} */ ({
+                    top: 100 + relTop,
+                    bottom: 100 + relTop + 65,
+                    left: 0,
+                    right: 310,
+                    width: 310,
+                    height: 65,
+                }),
+            );
+        });
+        lastCallback();
+        expect(grid.classList.contains('exam-history-scrollable')).toBe(false);
+        expect(grid.style.maxHeight).toBe('none');
+
+        QuizView.syncExamHistoryScrollHeight();
+        expect(disconnect).toHaveBeenCalledTimes(1);
     });
 });

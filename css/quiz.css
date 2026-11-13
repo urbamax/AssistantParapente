@@ -583,10 +583,58 @@ body.light-mode .bank-item-explication {
 }
 
 /* Compact outer containers for Exam History & Detailed Questions */
-#stats-content div:has(> #all-questions-list),
-#stats-content div:has(> div > [data-exam-id]) {
+#stats-content div:has(> #all-questions-list) {
     padding: 14px 16px !important;
     border-radius: 18px !important;
+}
+
+#stats-content div:has(> div > [data-exam-id]) {
+    padding: 10px 12px !important;
+    border-radius: 18px !important;
+}
+
+/* Liste des examens limitée à 3 lignes avec barre de défilement discrète au-delà */
+#stats-content div:has(> [data-exam-id]) {
+    box-sizing: border-box !important;
+    padding: 4px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    max-height: 245px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+
+#stats-content div:has(> [data-exam-id]).exam-history-scrollable {
+    padding-right: 8px !important;
+}
+
+#stats-content div:has(> [data-exam-id])::-webkit-scrollbar {
+    width: 6px;
+}
+
+#stats-content div:has(> [data-exam-id])::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#stats-content div:has(> [data-exam-id])::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.22);
+    border-radius: 9999px;
+}
+
+#stats-content div:has(> [data-exam-id])::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.36);
+}
+
+body.light-mode #stats-content div:has(> [data-exam-id]) {
+    scrollbar-color: rgba(0, 0, 0, 0.22) transparent;
+}
+
+body.light-mode #stats-content div:has(> [data-exam-id])::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+body.light-mode #stats-content div:has(> [data-exam-id])::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.35);
 }
 
 #stats-content > div:last-child {
@@ -594,48 +642,93 @@ body.light-mode .bank-item-explication {
     padding-bottom: 20px !important;
 }
 
-/* Multi-column Exam History grid on tablet & desktop with clean single-line text */
+/* Grille compacte d'historique des examens sur tablette et bureau (4 colonnes sur écran standard) */
 @media (min-width: 769px) {
     #stats-content div:has(> [data-exam-id]) {
         display: grid !important;
-        grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)) !important;
-        gap: 12px !important;
-        align-items: start !important;
+        grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)) !important;
+        gap: 10px !important;
+        align-items: stretch !important;
+        max-height: 223px;
     }
 
     #stats-content div[data-exam-id] {
-        padding: 14px 18px !important;
+        padding: 11px 14px !important;
         border-radius: 12px !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
     }
 
     #stats-content div[data-exam-id] > div:first-child {
-        gap: 16px !important;
+        gap: 10px !important;
+    }
+
+    #stats-content div[data-exam-id] > div:first-child > div:first-child {
+        min-width: 0 !important;
     }
 
     #stats-content div[data-exam-id] > div:first-child > div:first-child > div:first-child {
-        flex-wrap: nowrap !important;
+        flex-wrap: wrap !important;
+        gap: 4px 6px !important;
+        margin-bottom: 4px !important;
+        white-space: normal !important;
+    }
+
+    #stats-content div[data-exam-id] > div:first-child > div:first-child > div:first-child > span {
         white-space: nowrap !important;
+    }
+
+    #stats-content div[data-exam-id] > div:first-child > div:first-child > div:first-child > span:first-child {
+        font-size: 0.72rem !important;
+    }
+
+    #stats-content div[data-exam-id] > div:first-child > div:first-child > div:first-child > span:nth-child(2) {
+        font-size: 0.68rem !important;
+        padding: 2px 6px !important;
+    }
+
+    #stats-content div[data-exam-id] > div:first-child > div:first-child > div:first-child > span:nth-child(3) {
+        font-size: 0.65rem !important;
+        padding: 1px 5px !important;
     }
 
     #stats-content div[data-exam-id] > div:first-child > div:first-child > div:nth-child(2) {
         display: flex !important;
+        flex-wrap: wrap !important;
         align-items: baseline !important;
-        gap: 8px !important;
-        white-space: nowrap !important;
+        gap: 2px 6px !important;
+        white-space: normal !important;
     }
 
     #stats-content div[data-exam-id] > div:first-child > div:first-child > div:nth-child(2) > span {
-        margin-left: 0 !important;
         white-space: nowrap !important;
+    }
+
+    #stats-content div[data-exam-id] > div:first-child > div:first-child > div:nth-child(2) > span:first-child {
+        font-size: 0.98rem !important;
+    }
+
+    #stats-content div[data-exam-id] > div:first-child > div:first-child > div:nth-child(2) > span:nth-child(2) {
+        margin-left: 0 !important;
+        font-size: 0.74rem !important;
     }
 
     #stats-content div[data-exam-id] > div:first-child > div:last-child {
         flex-shrink: 0 !important;
     }
 
+    #stats-content div[data-exam-id] > div:first-child > div:last-child > div:first-child {
+        font-size: 1.25rem !important;
+        line-height: 1.1 !important;
+    }
+
     #stats-content div[data-exam-id]:has(> .exam-details[style*="display: block"]),
     #stats-content div[data-exam-id]:has(> .exam-details[style*="display:block"]) {
         grid-column: 1 / -1 !important;
+        justify-content: flex-start !important;
     }
 }
 
@@ -1280,9 +1373,16 @@ body.light-mode .sort-select-btn {
         border-radius: 12px !important;
     }
 
-    #stats-content div:has(> #all-questions-list),
-    #stats-content div:has(> div > [data-exam-id]) {
+    #stats-content div:has(> #all-questions-list) {
         padding: 14px 10px !important;
+        border-radius: 16px !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        min-width: 0 !important;
+    }
+
+    #stats-content div:has(> div > [data-exam-id]) {
+        padding: 10px 6px !important;
         border-radius: 16px !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
