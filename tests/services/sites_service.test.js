@@ -14,7 +14,34 @@ import { DEFAULT_LOCATION } from '../../js/data/weather_config.js';
 import AccessService from '../../js/services/access_service.js';
 
 // Ces tests couvrent la météo calculée, réservée au rôle « beta » (js/services/access_service.js).
-beforeEach(() => AccessService.setRoles('pilote-test', ['beta']));
+beforeEach(() => {
+    AccessService.setRoles('pilote-test', ['beta']);
+    // Recevoir le rôle programme un rechargement de la météo 400 ms plus tard (onAccessChanged). Sans cette
+    // annulation, sur une machine chargée, il se déclenche au milieu d'un test et fausse le compte des requêtes.
+    clearTimeout(SitesService._weatherRescopeTimer);
+});
+
+/**
+ * Lance un appel qui patiente entre deux tentatives et fait avancer l'horloge simulée, seconde par seconde,
+ * jusqu'à ce qu'il rende son résultat. Aucune durée n'est supposée entre le lancement et la première attente
+ * (le module des prévisions est chargé à la demande) : le test passe aussi lancé seul ou sur une machine lente.
+ * @template T
+ * @param {() => Promise<T>} call
+ * @returns {Promise<T>}
+ */
+async function settleWithFakeTimers(call) {
+    await import('../../js/services/sites_forecast_fetch.js'); // en horloge réelle, avant de la figer
+    vi.useFakeTimers();
+    try {
+        let settled = false;
+        const pending = call().finally(() => (settled = true));
+        for (let seconds = 0; seconds < 60 && !settled; seconds++) await vi.advanceTimersByTimeAsync(1000);
+        if (!settled) throw new Error('Appel toujours en attente après 60 s simulées.');
+        return await pending;
+    } finally {
+        vi.useRealTimers();
+    }
+}
 
 function currentHourIso() {
     return nearestHourIso();
@@ -157,34 +184,26 @@ describe('SitesService', () => {
     });
 
     it('fetchWeatherForSites retries a 429 with backoff and succeeds once the quota frees up', async () => {
-        vi.useFakeTimers();
         const mockApiResponse = [{ latitude: 45.9, longitude: 6.1, hourly: { time: [], wind_speed_10m: [] } }];
         global.fetch
             .mockResolvedValueOnce({ ok: false, status: 429 })
             .mockResolvedValueOnce({ ok: true, status: 200, json: vi.fn().mockResolvedValue(mockApiResponse) });
 
-        const pending = SitesService.fetchWeatherForSites();
-        await vi.advanceTimersByTimeAsync(3000);
-        await pending;
+        await settleWithFakeTimers(() => SitesService.fetchWeatherForSites());
 
         expect(global.fetch).toHaveBeenCalledTimes(2);
         expect(SitesService.state.weatherForecasts[1]).toBeDefined();
         expect(SitesService.getWeatherCooldownRemainingMs()).toBe(0);
-        vi.useRealTimers();
     });
 
     it('fetchWeatherForSites gives up after 3 attempts and starts a cooldown', async () => {
-        vi.useFakeTimers();
         global.fetch.mockResolvedValue({ ok: false, status: 429 });
 
-        const pending = SitesService.fetchWeatherForSites();
-        await vi.advanceTimersByTimeAsync(20000);
-        const result = await pending;
+        const result = await settleWithFakeTimers(() => SitesService.fetchWeatherForSites());
 
         expect(global.fetch).toHaveBeenCalledTimes(3);
         expect(result.success).toBe(false);
         expect(result.cooldownRemainingMs).toBeGreaterThan(0);
-        vi.useRealTimers();
     });
 
     it('fetchWeatherForSites skips the network entirely while the cooldown is active', async () => {
