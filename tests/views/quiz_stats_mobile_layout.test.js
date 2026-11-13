@@ -122,9 +122,11 @@ describe('QuizStatsBase.syncExamHistoryScrollHeight', () => {
         expect(grid.style.maxHeight).toBe('223px');
     });
 
-    it('débranche l’observateur précédent et retire le défilement si la grille repasse à 3 lignes', () => {
+    it('diffère le recalcul via requestAnimationFrame et débranche observateur + frame en attente', () => {
         const disconnect = vi.fn();
+        const cancelRaf = vi.fn();
         let lastCallback = null;
+        let pendingRaf = null;
         vi.stubGlobal(
             'ResizeObserver',
             class {
@@ -137,6 +139,11 @@ describe('QuizStatsBase.syncExamHistoryScrollHeight', () => {
                 }
             },
         );
+        vi.stubGlobal('requestAnimationFrame', (cb) => {
+            pendingRaf = cb;
+            return 42;
+        });
+        vi.stubGlobal('cancelAnimationFrame', cancelRaf);
 
         const grid = setupExamGrid([4, 79, 154, 229]);
         QuizView.syncExamHistoryScrollHeight();
@@ -156,11 +163,20 @@ describe('QuizStatsBase.syncExamHistoryScrollHeight', () => {
                 }),
             );
         });
+
+        // Ne doit pas muter le DOM synchronement dans le callback ResizeObserver (boucle WebKit/Safari)
         lastCallback();
+        expect(grid.classList.contains('exam-history-scrollable')).toBe(true);
+        expect(typeof pendingRaf).toBe('function');
+
+        pendingRaf(0);
         expect(grid.classList.contains('exam-history-scrollable')).toBe(false);
         expect(grid.style.maxHeight).toBe('none');
 
+        // Re-planifier puis débrancher avant la frame suivante doit annuler cancelAnimationFrame(42)
+        lastCallback();
         QuizView.syncExamHistoryScrollHeight();
         expect(disconnect).toHaveBeenCalledTimes(1);
+        expect(cancelRaf).toHaveBeenCalledWith(42);
     });
 });

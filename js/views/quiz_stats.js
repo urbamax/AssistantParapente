@@ -41,6 +41,10 @@ export class QuizStatsBase extends BaseView {
         this._activeWorkshopAxisId = null;
         /** @type {ResizeObserver | null} */
         this._examHistoryResizeObserver = null;
+        /** @type {number | null} */
+        this._examHistoryResizeRaf = null;
+        /** @type {HTMLElement | null} */
+        this._examHistoryGrid = null;
     }
 
     /**
@@ -161,6 +165,7 @@ export class QuizStatsBase extends BaseView {
 
     renderStats() {
         console.log('QuizEngine.renderStats v4.4 - Starting');
+        this.disconnectExamHistoryObserver();
         const container = document.getElementById('stats-content');
         if (!container) return;
 
@@ -840,19 +845,33 @@ export class QuizStatsBase extends BaseView {
     }
 
     /**
-     * Plafonne l'historique des examens à trois lignes visibles (mobile ou bureau)
-     * et active la barre de défilement dès qu'une quatrième ligne apparaît.
+     * Débranche l'observateur de redimensionnement de l'historique des examens et annule tout rafraîchissement en attente.
      */
-    syncExamHistoryScrollHeight() {
+    disconnectExamHistoryObserver() {
         if (this._examHistoryResizeObserver) {
             this._examHistoryResizeObserver.disconnect();
             this._examHistoryResizeObserver = null;
         }
+        if (this._examHistoryResizeRaf !== null && typeof cancelAnimationFrame === 'function') {
+            cancelAnimationFrame(this._examHistoryResizeRaf);
+        }
+        this._examHistoryResizeRaf = null;
+        this._examHistoryGrid = null;
+    }
+
+    /**
+     * Plafonne l'historique des examens à trois lignes visibles (mobile ou bureau)
+     * et active la barre de défilement dès qu'une quatrième ligne apparaît.
+     */
+    syncExamHistoryScrollHeight() {
+        this.disconnectExamHistoryObserver();
         const container = document.getElementById('stats-content');
         if (!container) return;
         const firstCard = /** @type {HTMLElement | null} */ (container.querySelector('[data-exam-id]'));
         const grid = /** @type {HTMLElement | null} */ (firstCard && firstCard.parentElement);
         if (!grid) return;
+
+        this._examHistoryGrid = grid;
 
         const groupRows = (cards) => {
             const gridRect = grid.getBoundingClientRect();
@@ -873,6 +892,7 @@ export class QuizStatsBase extends BaseView {
         };
 
         const sync = () => {
+            if (!grid.isConnected || this._examHistoryGrid !== grid) return;
             const cards = Array.from(
                 /** @type {NodeListOf<HTMLElement>} */ (grid.querySelectorAll(':scope > [data-exam-id]')),
             );
@@ -880,7 +900,9 @@ export class QuizStatsBase extends BaseView {
 
             let rows = groupRows(cards);
             if (rows.length <= 3) {
-                grid.style.maxHeight = 'none';
+                if (grid.style.maxHeight !== 'none') {
+                    grid.style.maxHeight = 'none';
+                }
                 grid.classList.remove('exam-history-scrollable');
                 return;
             }
@@ -893,14 +915,41 @@ export class QuizStatsBase extends BaseView {
             const padBottom = parseFloat(getComputedStyle(grid).paddingBottom) || 0;
             const maxH = Math.ceil(rows[2].bottom + padBottom);
             if (maxH > 0) {
-                grid.style.maxHeight = `${maxH}px`;
+                const nextMaxHeight = `${maxH}px`;
+                if (grid.style.maxHeight !== nextMaxHeight) {
+                    grid.style.maxHeight = nextMaxHeight;
+                }
             }
+        };
+
+        // Différer hors du cycle ResizeObserver (requestAnimationFrame) évite l'erreur WebKit/Safari
+        // « ResizeObserver loop completed with undelivered notifications » lors d'un changement de hauteur.
+        const scheduleSync = () => {
+            if (this._examHistoryGrid !== grid) return;
+            if (typeof requestAnimationFrame !== 'function') {
+                sync();
+                return;
+            }
+            if (this._examHistoryResizeRaf !== null) return;
+            this._examHistoryResizeRaf = requestAnimationFrame(() => {
+                this._examHistoryResizeRaf = null;
+                sync();
+            });
         };
 
         sync();
         if (typeof ResizeObserver !== 'undefined') {
-            this._examHistoryResizeObserver = new ResizeObserver(sync);
+            this._examHistoryResizeObserver = new ResizeObserver(scheduleSync);
             this._examHistoryResizeObserver.observe(grid);
+        }
+        if (
+            typeof document !== 'undefined' &&
+            document.fonts &&
+            document.fonts.status !== 'loaded' &&
+            document.fonts.ready &&
+            typeof document.fonts.ready.then === 'function'
+        ) {
+            document.fonts.ready.then(scheduleSync, () => {});
         }
     }
 

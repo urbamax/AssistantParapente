@@ -229,6 +229,7 @@ class QuizViewClass extends QuizVoiceBase {
     async unmount() {
         await super.unmount();
         this.stopVoice();
+        this.disconnectExamHistoryObserver();
         clearTimeout(this._examLeaveTimer);
         this._examLeaveTimer = null;
         this._examHiddenAt = null;
