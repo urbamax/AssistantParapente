@@ -30,21 +30,32 @@ CACHE="$HOME/.cache/ap-verify"
 IMAGE="$CACHE/ci.sparseimage"
 MNT="$CACHE/mnt"
 mkdir -p "$CACHE" "$MNT"
-if [[ ! -f "$IMAGE" ]]; then
-    step "Création du volume sensible à la casse (une seule fois)"
-    hdiutil create -size 6g -type SPARSE -fs "Case-sensitive APFS" -volname ap-verify "${IMAGE%.sparseimage}" >/dev/null
-fi
-mount | grep -q " on $MNT " || hdiutil attach "$IMAGE" -mountpoint "$MNT" -nobrowse -quiet \
-    || mount | grep -q " on $MNT " || die "Impossible de monter le volume de vérification."
 
-# Plusieurs vérifications peuvent tourner en même temps (plusieurs sessions, plusieurs dossiers de travail) :
-# chacune a son propre dossier `work-<pid>` dans le volume, et le volume n'est démonté que quand plus aucune
-# autre vérification vivante ne l'utilise (sinon l'une écrase le clone de l'autre ou démonte le volume sous ses
-# pieds : « Bus error », « destination path already exists », « Cannot find package chai »).
+# Plusieurs vérifications peuvent tourner en même temps (plusieurs sessions, plusieurs dossiers de travail) et
+# partagent ce volume. Chacune y a son propre dossier `work-<pid>`, et le volume n'est démonté que quand plus
+# aucune autre vérification vivante n'y a de dossier (sinon l'une écrase le clone de l'autre ou démonte le volume
+# sous ses pieds : « Bus error », « destination path already exists », « Cannot find package chai »).
+#
+# L'arrivée (création, montage, dossier `work-<pid>`) et le départ (démontage) se font une vérification à la fois,
+# derrière un verrou. Sans lui, deux vérifications lancées au même instant échouent (« hdiutil: attach failed -
+# Resource temporarily unavailable ») et une vérification qui part peut démonter le volume qu'une autre vient de
+# trouver monté. lockf : le système rend le verrou tout seul si la vérification est interrompue.
+LOCK="$CACHE/volume.lock"
 WORK="$MNT/work-$$"
-cleanup() {
+export IMAGE MNT WORK
+mounted() { mount | grep -q " on $MNT "; }
+join_volume() {
+    set -euo pipefail
+    if [[ ! -f "$IMAGE" ]]; then
+        step "Création du volume sensible à la casse (une seule fois)"
+        hdiutil create -size 6g -type SPARSE -fs "Case-sensitive APFS" -volname ap-verify "${IMAGE%.sparseimage}" >/dev/null
+    fi
+    mounted || hdiutil attach "$IMAGE" -mountpoint "$MNT" -nobrowse -quiet || mounted || return 1
+    rm -rf "$WORK"
+    mkdir "$WORK"   # dit aux autres vérifications que le volume sert encore
+}
+leave_volume() {
     rm -rf "$WORK" >/dev/null 2>&1 || true
-    cd /
     local other
     for other in "$MNT"/work-*; do
         [[ -e "$other" ]] || continue
@@ -53,9 +64,24 @@ cleanup() {
     done
     hdiutil detach "$MNT" -quiet -force >/dev/null 2>&1 || true
 }
+export -f step mounted join_volume leave_volume
+# Lance une de ces fonctions en tenant le verrou ; rend 75 si le verrou n'est pas libre au bout d'une minute.
+locked() { lockf -k -s -t 60 "$LOCK" bash -c "$1"; }
+
+JOINED=0
+cleanup() {
+    cd /
+    [[ "$JOINED" == 1 ]] || return 0
+    locked leave_volume || true
+}
 trap cleanup EXIT
 
-rm -rf "$WORK"
+locked join_volume || {
+    [[ $? == 75 ]] && die "Le volume de vérification est verrouillé depuis plus d'une minute (voir $LOCK)."
+    die "Impossible de monter le volume de vérification."
+}
+JOINED=1
+
 step "Clone propre de $(git rev-parse --short HEAD) + fusion avec origin/main"
 git clone -q "$ROOT" "$WORK"
 git -C "$WORK" checkout -q "$SHA"
