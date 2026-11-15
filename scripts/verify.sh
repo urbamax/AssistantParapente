@@ -9,6 +9,13 @@
 # Ce que ça ne peut pas reproduire : le noyau Linux lui-même (polices et WebKit de macOS, Python).
 set -euo pipefail
 
+# Lancé par le hook de pré-push, git exporte GIT_DIR (et parfois GIT_WORK_TREE, GIT_INDEX_FILE). Depuis un
+# dossier de travail secondaire (git worktree), GIT_DIR désigne ce dossier-là : les `git -C "$WORK"` plus bas
+# agiraient alors sur lui au lieu du clone (HEAD détaché à chaque push, commit de fusion parasite quand main a
+# avancé, puis « modifications non commitées » au push suivant). On repart d'un environnement neutre : chaque
+# commande git retrouve son dépôt d'après le dossier où elle tourne.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_PREFIX GIT_COMMON_DIR
+
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 WITH_E2E=0
 [[ "${1:-}" == "--e2e" ]] && WITH_E2E=1
