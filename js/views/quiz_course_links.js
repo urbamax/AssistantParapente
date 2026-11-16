@@ -1,4 +1,5 @@
 import { escapeHTML } from '../core/security.js';
+import { unsourcedChoiceIndexes } from '../services/error_diagnostic.js';
 import { tq } from './quiz_strings.js';
 
 const COURSE_BUTTON_STYLE =
@@ -27,6 +28,7 @@ export function courseLinksHtml(links) {
  * Boutons du cours sous une bonne réponse. Le rapprochement entre la question et les pages du cours
  * est établi pour la question entière, pas choix par choix : chaque bonne réponse reprend donc les
  * pages vérifiées de la question. Courts (« Cours · p. 45 ») quand tous viennent du même cours.
+ * Pour un choix précis, passer par choiceSourceHtml, qui écarte les choix déclarés sans source.
  */
 export function choiceCourseLinksHtml(links) {
     if (!links || !links.length) return '';
@@ -40,4 +42,21 @@ export function choiceCourseLinksHtml(links) {
         })
         .join('');
     return `<div class="course-links" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:6px;">${buttons}</div>`;
+}
+
+/**
+ * Ce qui s'affiche sous une bonne réponse pour dire d'où elle vient : les boutons du cours, ou la
+ * mention « Aucune source trouvée pour le moment. » quand la note de fin de l'explication déclare ce
+ * choix sans source. Sans cela, la page vérifiée de la question s'afficherait sous un choix qu'elle ne
+ * traite pas, et la note, retirée du découpage par choix, ne serait plus visible nulle part.
+ *
+ * @param {Array<{ url: string, title: string, page: number | string }>} links pages vérifiées de la question
+ * @param {{ choices?: any[], explication?: string }} question question d'origine (ordre du CSV)
+ * @param {number} index index du choix dans la question d'origine
+ */
+export function choiceSourceHtml(links, question, index) {
+    if (unsourcedChoiceIndexes(question).has(index)) {
+        return `<div class="course-no-source" style="margin-top:10px; font-size:0.75rem; font-style:italic; opacity:0.75;">${tq('question.noSource')}</div>`;
+    }
+    return choiceCourseLinksHtml(links);
 }

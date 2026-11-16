@@ -14,7 +14,7 @@ import { COURSES_DATA } from '../data/courses_data.js';
 import GdprEngine from '../gdpr_engine.js';
 import BaseView from '../core/base_view.js';
 import { tq, tql } from './quiz_strings.js';
-import { choiceCourseLinksHtml, courseLinksHtml } from './quiz_course_links.js';
+import { choiceSourceHtml, courseLinksHtml } from './quiz_course_links.js';
 import { explanationHtml, optionExplanationHtml, optionExplanations, optionOutcome } from './quiz_explanation.js';
 import { choiceIndex } from '../services/answer_log.js';
 import { buildRevisionAxes } from '../services/revision_axes.js';
@@ -560,7 +560,9 @@ export class QuizStatsBase extends BaseView {
                     const origIdx = choiceIndex(original, opt);
                     const text = perOption ? perOption[origIdx >= 0 ? origIdx : optIdx] : null;
                     const outcome = optionOutcome({ pts }, wasSelected);
-                    const links = isCorrectChoice ? choiceCourseLinksHtml(courseLinks) : '';
+                    const links = isCorrectChoice
+                        ? choiceSourceHtml(courseLinks, original, origIdx >= 0 ? origIdx : optIdx)
+                        : '';
                     const explHtml = text
                         ? optionExplanationHtml(text, outcome, tq('question.explanation'), links)
                         : '';

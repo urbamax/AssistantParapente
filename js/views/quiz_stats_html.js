@@ -10,7 +10,7 @@ import { readAnswerLog } from '../services/answer_log.js';
 import { toSorted } from '../utils/array_utils.js';
 import { formatDateOnly, parseDateToMs } from '../utils/date_utils.js';
 import { tq, tqh, tql } from './quiz_strings.js';
-import { choiceCourseLinksHtml, courseLinksHtml } from './quiz_course_links.js';
+import { choiceSourceHtml, courseLinksHtml } from './quiz_course_links.js';
 import { explanationHtml, optionExplanationHtml, optionExplanations } from './quiz_explanation.js';
 
 /**
@@ -622,7 +622,7 @@ export function buildQuestionsHtml(
                     const pts = parseInt(ans.pts || 0);
                     const isCorrect = pts > 0;
                     const text = perOption ? perOption[idx] : null;
-                    const links = isCorrect ? choiceCourseLinksHtml(courseLinks) : '';
+                    const links = isCorrect ? choiceSourceHtml(courseLinks, qObj, idx) : '';
                     const explHtml = text ? optionExplanationHtml(text, 'ok', tq('question.explanation'), links) : '';
                     const choiceHtml = `
                             <div class="bank-choice ${pts > 0 ? 'correct' : pts < 0 ? 'incorrect' : ''}">

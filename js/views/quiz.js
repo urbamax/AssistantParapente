@@ -14,7 +14,7 @@ import { pickAntiTrapQuestions, summarizeSessionTraps } from '../services/error_
 import GdprEngine from '../gdpr_engine.js';
 import { buildResultsTrapsHtml } from './quiz_traps_html.js';
 import { tq, tql } from './quiz_strings.js';
-import { choiceCourseLinksHtml, courseLinksHtml } from './quiz_course_links.js';
+import { choiceSourceHtml, courseLinksHtml } from './quiz_course_links.js';
 import { explanationHtml, optionExplanationHtml, optionExplanations, optionOutcome } from './quiz_explanation.js';
 import { buildTrapFeedback } from '../services/error_diagnostic.js';
 import { choiceIndex } from '../services/answer_log.js';
@@ -588,7 +588,7 @@ class QuizViewClass extends QuizVoiceBase {
                             .map((c, idx) => {
                                 const isCorrectChoice = c.pts > 0;
                                 const text = perOption ? perOption[idx] : null;
-                                const links = isCorrectChoice ? choiceCourseLinksHtml(courseLinks) : '';
+                                const links = isCorrectChoice ? choiceSourceHtml(courseLinks, q, idx) : '';
                                 const explHtml = text
                                     ? optionExplanationHtml(text, 'ok', tq('question.explanation'), links)
                                     : '';
@@ -1178,7 +1178,7 @@ class QuizViewClass extends QuizVoiceBase {
                     group = created;
                 }
                 // Les boutons du cours sont rattachés aux bonnes réponses, où se trouve ce que dit le cours.
-                const links = opt.pts > 0 ? choiceCourseLinksHtml(courseLinks) : '';
+                const links = opt.pts > 0 ? choiceSourceHtml(courseLinks, original, choiceIndex(original, opt)) : '';
                 group.insertAdjacentHTML(
                     'beforeend',
                     optionExplanationHtml(
@@ -1367,7 +1367,9 @@ class QuizViewClass extends QuizVoiceBase {
                                     const optIdx = choiceIndex(original, c);
                                     const text = perOption ? perOption[optIdx] : null;
                                     const outcome = optionOutcome(c, isUserSelected);
-                                    const links = isCorrectChoice ? choiceCourseLinksHtml(courseLinks) : '';
+                                    const links = isCorrectChoice
+                                        ? choiceSourceHtml(courseLinks, original, optIdx)
+                                        : '';
                                     const explHtml = text
                                         ? optionExplanationHtml(text, outcome, tq('question.explanation'), links)
                                         : '';
