@@ -1045,6 +1045,15 @@ html.dark-theme .bar-track {
     margin-top: 4px;
 }
 
+.batch-vario {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    font-size: 0.78rem;
+    color: var(--text-secondary, #666);
+}
+
 .batch-sensors {
     margin-top: 12px;
     font-size: 0.85rem;

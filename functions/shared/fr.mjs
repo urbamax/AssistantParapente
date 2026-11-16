@@ -362,6 +362,8 @@ export const FR = Object.freeze({
             siteSearching: 'Recherche du lieu…',
             wingSelect: 'Choisir',
             wingOther: 'Autre',
+            varioIn: 'Vario allumé pendant le vol',
+            varioOff: 'Vario éteint pendant le vol',
             wingOtherPlaceholder: 'Modèle',
             coursePlaceholder: 'Nom du stage',
             pilotPlaceholder: 'Ajouter un pilote',

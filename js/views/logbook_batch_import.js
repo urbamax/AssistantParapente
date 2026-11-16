@@ -235,12 +235,23 @@ export class LogbookBatchImportBase extends LogbookLearnedBase {
 
     _batchRowNote(row) {
         if (row.reason) return row.reason;
-        const air = row.warnings;
-        if (air.includes('startsAirborne') && air.includes('endsAirborne'))
-            return tl('batch.reasons.startsAndEndsAirborne');
-        if (air.includes('startsAirborne')) return tl('batch.reasons.startsAirborne');
-        if (air.includes('endsAirborne')) return tl('batch.reasons.endsAirborne');
+        // Le message suit les cases : décochée, la trace n'est plus signalée comme « en l'air »
+        const starts = row.warnings.includes('startsAirborne') && row.varioIn;
+        const ends = row.warnings.includes('endsAirborne') && row.varioOff;
+        if (starts && ends) return tl('batch.reasons.startsAndEndsAirborne');
+        if (starts) return tl('batch.reasons.startsAirborne');
+        if (ends) return tl('batch.reasons.endsAirborne');
         return '';
+    }
+
+    /** Cases « vario allumé / éteint en vol », proposées seulement quand la trace le laisse penser. */
+    _batchVarioToggles(row, label) {
+        const box = (field, checked, key) =>
+            `<label class="batch-vario"><input type="checkbox" data-batch-field="${field}" aria-label="${label(key)}"${checked ? ' checked' : ''}> ${tt(`batch.${key}`)}</label>`;
+        return [
+            row.warnings.includes('startsAirborne') ? box('varioIn', row.varioIn, 'varioIn') : '',
+            row.warnings.includes('endsAirborne') ? box('varioOff', row.varioOff, 'varioOff') : '',
+        ].join('');
     }
 
     _batchRowHtml(row) {
@@ -253,6 +264,7 @@ export class LogbookBatchImportBase extends LogbookLearnedBase {
                 <div class="batch-name">${file}</div>
                 <span class="batch-status">${tt(`batch.status.${row.status}`)}</span>
                 <div class="batch-reason">${escapeHTML(this._batchRowNote(row))}</div>
+                ${this._batchVarioToggles(row, label)}
                 <div class="batch-sensor">${row.sensor ? tt('batch.sensor.attached', { name: row.sensor.name }) : ''}</div>
             </td>`;
         if (!row.trace) {
@@ -384,6 +396,9 @@ export class LogbookBatchImportBase extends LogbookLearnedBase {
         this.batch.dirty = true;
         if (name === 'included') {
             row.included = target.checked;
+            this._syncBatchRow(row);
+        } else if (name === 'varioIn' || name === 'varioOff') {
+            row[name] = target.checked;
             this._syncBatchRow(row);
         } else if (name === 'voile' || name === 'sellette') {
             const other = /** @type {HTMLInputElement} */ (target.closest('td').querySelector('.batch-other'));
