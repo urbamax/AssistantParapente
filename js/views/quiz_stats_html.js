@@ -4,7 +4,8 @@
  * getCourseUrl…) et les chiffres déjà calculés, et rend un fragment HTML. Aucun accès au DOM.
  */
 import { escapeHTML } from '../core/security.js';
-import { BREVET_CODES, OFFICIAL_THEORY_TOTAL_POINTS } from '../services/brevet_service.js';
+import { BREVET_CODES, OFFICIAL_THEORY_TOTAL_POINTS, PROGRESSION_CHAIN } from '../services/brevet_service.js';
+import { isExamModeAvailable } from '../services/quiz_service.js';
 import { masteryRatio } from '../services/mastery.js';
 import { readAnswerLog } from '../services/answer_log.js';
 import { toSorted } from '../utils/array_utils.js';
@@ -14,22 +15,28 @@ import { choiceSourceHtml, courseLinksHtml } from './quiz_course_links.js';
 import { explanationHtml, optionExplanationHtml, optionExplanations } from './quiz_explanation.js';
 
 /**
- * Encart du statut officiel de l'examen théorique FFVL (affiché dans #qcm-setup-screen et #stats-screen).
+ * Encart du statut officiel (examen théorique pour BI/BP/BPC, ou qualification Treuil sans examen).
+ * Affiché dans #qcm-setup-screen et #stats-screen.
  * @param {string} level
  * @param {any} entry
  * @param {string} [attrName]
  */
 export function buildOfficialTheoryBannerHtml(level, entry, attrName = 'data-quiz-brevet-banner') {
     if (!BREVET_CODES.includes(level) || !entry) return '';
+    const isQualification = !PROGRESSION_CHAIN.includes(level);
     const th = entry.theory || {};
     const pr = entry.practical || {};
     const isValidated = Boolean(th.passed || pr.validated);
 
     if (isValidated) {
-        const rawDate = th.date || pr.date || '';
-        const title = rawDate
-            ? tq('officialTheory.validatedWithDate', { level, date: formatDateOnly(rawDate) })
-            : tq('officialTheory.validatedBadge', { level });
+        const rawDate = pr.date || th.date || '';
+        const title = isQualification
+            ? rawDate
+                ? tq('officialTheory.qualificationValidatedWithDate', { date: formatDateOnly(rawDate) })
+                : tq('officialTheory.qualificationValidatedBadge')
+            : th.date || pr.date
+              ? tq('officialTheory.validatedWithDate', { level, date: formatDateOnly(th.date || pr.date) })
+              : tq('officialTheory.validatedBadge', { level });
         let score = th.score;
         let total = th.total;
         const pct =
@@ -44,16 +51,21 @@ export function buildOfficialTheoryBannerHtml(level, entry, attrName = 'data-qui
             score = Math.round((pct / 100) * total);
         }
 
-        const scorePart =
-            score !== null && total !== null && typeof score !== 'undefined' && typeof total !== 'undefined'
-                ? tq('officialTheory.scoreBadge', { score, total, pct: pct ?? 0 })
-                : pct !== null
-                  ? tq('officialTheory.pctBadge', { pct })
-                  : '';
+        const scorePart = isQualification
+            ? ''
+            : score !== null && total !== null && typeof score !== 'undefined' && typeof total !== 'undefined'
+              ? tq('officialTheory.scoreBadge', { score, total, pct: pct ?? 0 })
+              : pct !== null
+                ? tq('officialTheory.pctBadge', { pct })
+                : '';
+        const hintText = isQualification
+            ? tq('officialTheory.qualificationRevisionHint')
+            : tq('officialTheory.revisionHint');
         const hintHtml =
             attrName === 'data-quiz-brevet-banner'
-                ? `<div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">${tq('officialTheory.revisionHint')}</div>`
+                ? `<div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">${hintText}</div>`
                 : '';
+        const editLabel = isQualification ? tq('officialTheory.qualificationEditBtn') : tq('officialTheory.editBtn');
 
         if (attrName === 'data-stats-brevet-banner') {
             return `
@@ -63,7 +75,7 @@ export function buildOfficialTheoryBannerHtml(level, entry, attrName = 'data-qui
                         ${scorePart ? `<span style="color: var(--text-main); font-weight: 600;">${scorePart}</span>` : ''}
                     </div>
                     <button type="button" data-action="openBrevetModal" data-args="${escapeHTML(level)}" style="background: transparent; border: 1px solid rgba(16, 185, 129, 0.5); color: #10b981; padding: 4px 8px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600;">
-                        <i class="ri-edit-line"></i> ${tq('officialTheory.editBtn')}
+                        <i class="ri-edit-line"></i> ${editLabel}
                     </button>
                 </div>`;
         }
@@ -78,25 +90,30 @@ export function buildOfficialTheoryBannerHtml(level, entry, attrName = 'data-qui
                     ${hintHtml}
                 </div>
                 <button type="button" data-action="openBrevetModal" data-args="${escapeHTML(level)}" style="background: transparent; border: 1px solid rgba(16, 185, 129, 0.5); color: #10b981; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                    <i class="ri-edit-line"></i> ${tq('officialTheory.editBtn')}
+                    <i class="ri-edit-line"></i> ${editLabel}
                 </button>
             </div>`;
     }
+
+    const recordLabel = isQualification ? tq('officialTheory.qualificationRecordBtn') : tq('officialTheory.recordBtn');
+    const promptText = isQualification
+        ? tq('officialTheory.qualificationPromptUnvalidated')
+        : tq('officialTheory.promptUnvalidated', { level });
 
     if (attrName === 'data-stats-brevet-banner') {
         return `
             <div ${attrName} style="display: flex; justify-content: center;">
                 <button type="button" data-action="openBrevetModal" data-args="${escapeHTML(level)}" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
-                    <i class="ri-checkbox-circle-line"></i> ${tq('officialTheory.recordBtn')}
+                    <i class="ri-checkbox-circle-line"></i> ${recordLabel}
                 </button>
             </div>`;
     }
 
     return `
         <div ${attrName} style="background: rgba(14, 165, 233, 0.07); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 14px; padding: 10px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> ${tq('officialTheory.promptUnvalidated', { level })}</span>
+            <span style="font-size: 0.86rem; color: var(--text-secondary);"><i class="ri-award-line" style="color: #0ea5e9;"></i> ${promptText}</span>
             <button type="button" data-action="openBrevetModal" data-args="${escapeHTML(level)}" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #0ea5e9; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                <i class="ri-checkbox-circle-line"></i> ${tq('officialTheory.recordBtn')}
+                <i class="ri-checkbox-circle-line"></i> ${recordLabel}
             </button>
         </div>`;
 }
@@ -542,6 +559,8 @@ export function buildQuestionsHtml(
                   })}`
                 : '';
 
+        const showExamSort = isExamModeAvailable(currentLevel) || examsCount > 0;
+
         allQuestionsHtml = `
                 <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-size:0.9rem; opacity:0.7;">
@@ -559,8 +578,12 @@ export function buildQuestionsHtml(
                                 <option value="streak-asc"${sortKey === 'streak' && sortDir === 'asc' ? ' selected' : ''}>${tq('stats.sortStreakAsc')}</option>
                                 <option value="date-desc"${sortKey === 'date' && sortDir === 'desc' ? ' selected' : ''}>${tq('stats.sortDateDesc')}</option>
                                 <option value="date-asc"${sortKey === 'date' && sortDir === 'asc' ? ' selected' : ''}>${tq('stats.sortDateAsc')}</option>
-                                <option value="exams-desc"${sortKey === 'exams' && sortDir === 'desc' ? ' selected' : ''}>${tq('stats.sortExamsDesc')}</option>
-                                <option value="exams-asc"${sortKey === 'exams' && sortDir === 'asc' ? ' selected' : ''}>${tq('stats.sortExamsAsc')}</option>
+                                ${
+                                    showExamSort
+                                        ? `<option value="exams-desc"${sortKey === 'exams' && sortDir === 'desc' ? ' selected' : ''}>${tq('stats.sortExamsDesc')}</option>
+                                <option value="exams-asc"${sortKey === 'exams' && sortDir === 'asc' ? ' selected' : ''}>${tq('stats.sortExamsAsc')}</option>`
+                                        : ''
+                                }
                             </select>
                         </div>
                     </div>

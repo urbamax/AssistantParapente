@@ -37,7 +37,7 @@
   - **Brevet Initial (BI)** : 30 questions $\times$ 6 pts = **180 points** (seuil de réussite : 135 pts / 75%).
   - **Brevet de Pilote (BP)** : 60 questions $\times$ 6 pts = **360 points** (seuil de réussite : 270 pts / 75%).
   - **Brevet de Pilote Confirmé (BPC)** : 30 questions QCM $\times$ 6 pts = **180 points** (+ questions ouvertes).
-  - **Qualification Treuil** : 30 questions $\times$ 6 pts = **180 points**.
+  - **Qualification Treuil** : questions officielles en entraînement, révision et perfectionnement (pas d'examen théorique QCM).
 - **Distribution Fédérale par Blocs de 10** : Respect strict des quotas par thème (Météo 20%, Mécavol 20%, Pilotage 20%, Matériel 10%, Réglementation 10%, Facteurs humains 10%, Milieu naturel 10%) avec exclusion des questions réservées au Delta.
 - **Modes d'Entraînement Multiples** :
   - **Mode Examen** : Conditions réelles d'examen (sans correction immédiate, détection anti-triche et bilan officiel en points).

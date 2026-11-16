@@ -14,7 +14,7 @@ import SitesService from '../services/sites_service.js';
 import AccessService, { ACCESS_EVENTS, applyRoleVisibility } from '../services/access_service.js';
 import { initAppUpdateNotifier } from './app_update.js';
 
-import QuizService from '../services/quiz_service.js';
+import QuizService, { isExamModeAvailable } from '../services/quiz_service.js';
 import { resolveStartMode } from './start_mode.js';
 import { installCourseLinkInterception, openLink } from './course_link.js';
 
@@ -110,8 +110,10 @@ async function bootApplication() {
     // QCM Events
     AppEvents.register('showQcmBank', () => QuizView.showBankScreen());
     AppEvents.register('setQcmMode', (mode, e, target) => {
-        QuizService.setMode(mode);
-        if (QuizView.updateModeUI) QuizView.updateModeUI(mode, target);
+        const level = GlobalState.get('level') || 'BI';
+        const effectiveMode = !isExamModeAvailable(level) && mode === 'EXAM' ? 'TRAINING' : mode;
+        QuizService.setMode(effectiveMode);
+        if (QuizView.updateModeUI) QuizView.updateModeUI(effectiveMode, effectiveMode === mode ? target : null);
     });
     AppEvents.register('setQcmCount', (count, e, target) => {
         QuizService.setCount(QuizView.parseCountChoice(count));

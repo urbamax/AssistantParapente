@@ -1,6 +1,6 @@
 import GlobalState from '../core/app_state.js';
 import AppRouter from '../core/router.js';
-import QuizService from '../services/quiz_service.js';
+import QuizService, { isExamModeAvailable } from '../services/quiz_service.js';
 import BrevetService from '../services/brevet_service.js';
 import StorageService from '../services/storage.js';
 import { escapeHTML } from '../core/security.js';
@@ -616,7 +616,23 @@ class QuizViewClass extends QuizVoiceBase {
         // Do not observe thousands of bank choices with individual ResizeObservers (causes severe reflow stalls).
     }
 
+    syncExamModeAvailability(level = (typeof GlobalState !== 'undefined' && GlobalState.get('level')) || 'BI') {
+        const examBtn = /** @type {HTMLButtonElement | null} */ (document.getElementById('mode-exam'));
+        if (!examBtn) return;
+        const available = isExamModeAvailable(level);
+        examBtn.hidden = !available;
+        examBtn.disabled = !available;
+        examBtn.setAttribute('aria-hidden', available ? 'false' : 'true');
+    }
+
     updateModeUI(mode, targetBtn) {
+        const level = (typeof GlobalState !== 'undefined' && GlobalState.get('level')) || 'BI';
+        this.syncExamModeAvailability(level);
+        if (!isExamModeAvailable(level) && mode === 'EXAM') {
+            mode = 'TRAINING';
+            QuizService.setMode('TRAINING');
+            targetBtn = null;
+        }
         document.querySelectorAll('.mode-toggle-btn').forEach((btn) => btn.classList.remove('active'));
         if (targetBtn) {
             targetBtn.classList.add('active');
@@ -801,12 +817,18 @@ class QuizViewClass extends QuizVoiceBase {
     syncOfficialTheoryForLevel() {
         const level = (typeof GlobalState !== 'undefined' && GlobalState.get('level')) || 'BI';
         const isValidated = BrevetService.isTheoryValidated(level);
-        if (
-            isValidated &&
-            (QuizService.state.qcmConfig.mode === 'TRAINING' || QuizService.state.qcmConfig.mode === 'EXAM')
-        ) {
-            QuizService.setMode('REVISION');
-            this.updateModeUI('REVISION');
+        this.syncExamModeAvailability(level);
+        if (!this.isExamInProgress()) {
+            if (
+                isValidated &&
+                (QuizService.state.qcmConfig.mode === 'TRAINING' || QuizService.state.qcmConfig.mode === 'EXAM')
+            ) {
+                QuizService.setMode('REVISION');
+                this.updateModeUI('REVISION');
+            } else if (!isExamModeAvailable(level) && QuizService.state.qcmConfig.mode === 'EXAM') {
+                QuizService.setMode('TRAINING');
+                this.updateModeUI('TRAINING');
+            }
         }
         this.renderOfficialTheoryBanner(level);
     }
