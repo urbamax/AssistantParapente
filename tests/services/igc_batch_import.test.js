@@ -89,6 +89,16 @@ describe('prepareRow: one file, one row', () => {
         expect(row.included).toBe(true);
     });
 
+    it('ticks the vario boxes from the trace, and stores them as the user leaves them', () => {
+        const row = prepareRow(igc('air.igc', makeFlight({ groundMinutes: 0 })));
+        row.values.site = 'Col';
+        row.values.voile = 'Voile';
+        expect(buildFlight(row)).toMatchObject({ varioInFlight: true, varioOffInFlight: true });
+        row.varioIn = false;
+        row.varioOff = false;
+        expect(buildFlight(row)).toMatchObject({ varioInFlight: false, varioOffInFlight: false });
+    });
+
     it('turns a file that is not a trace, or too short, into an unreadable row that cannot be included', () => {
         const junk = prepareRow({ name: 'junk.igc', kind: 'igc', text: CORRUPTED_IGC });
         expect(junk).toMatchObject({ status: 'unreadable', included: false, fileName: 'junk.igc' });

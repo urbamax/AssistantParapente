@@ -138,6 +138,9 @@ export function prepareRow(entry) {
     row.trace = { rawIgc: entry.text, parsed };
     if (parsed.startsAirborne) row.warnings.push('startsAirborne');
     if (parsed.endsAirborne) row.warnings.push('endsAirborne');
+    // Cochées d'après la trace, mais l'utilisateur peut les décocher ligne par ligne
+    row.varioIn = Boolean(parsed.startsAirborne);
+    row.varioOff = Boolean(parsed.endsAirborne);
     return row;
 }
 
@@ -552,8 +555,8 @@ export function buildFlight(row) {
         rawIgc: row.trace.rawIgc,
         // Date de la trace : la synchro la renvoie dans le compte si elle est plus récente que l'envoi (spec 037)
         traceUpdatedAt: Date.now(),
-        varioOffInFlight: Boolean(parsed.endsAirborne),
-        varioInFlight: Boolean(parsed.startsAirborne),
+        varioOffInFlight: row.varioOff ?? Boolean(parsed.endsAirborne),
+        varioInFlight: row.varioIn ?? Boolean(parsed.startsAirborne),
         altOffset: 0,
     };
     if (parsed.maxAltitude !== null) flight.altitudeMax = Math.trunc(parsed.maxAltitude);
