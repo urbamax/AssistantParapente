@@ -2333,7 +2333,13 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 23,
-    "verifiedAt": "2026-11-04"
+    "verifiedAt": "2026-11-16",
+    "others": [
+      {
+        "course_id": "general/affiches-pedagogiques-a3/19-secours2022/19-secours2022",
+        "verifiedPage": 1
+      }
+    ]
   },
   "N23B": {
     "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques",
@@ -2408,11 +2414,15 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 29,
-    "verifiedAt": "2026-11-04",
+    "verifiedAt": "2026-11-16",
     "others": [
       {
         "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
         "verifiedPage": 23
+      },
+      {
+        "course_id": "general/affiches-pedagogiques-a3/19-secours2022/19-secours2022",
+        "verifiedPage": 1
       }
     ]
   },
