@@ -50,6 +50,53 @@ export function splitOptionExplanations(question) {
     return parts;
 }
 
+/** Texte ramené à ses lettres et chiffres, pour comparer un choix à sa citation dans la note de fin. */
+const plain = (text) =>
+    String(text || '')
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '');
+
+/**
+ * Index (ordre du CSV) des choix que la note de fin de l'explication déclare sans source.
+ *
+ *  - « Aucune source trouvée pour le moment. » : toute la question, donc tous les choix ;
+ *  - « Aucune source trouvée pour les réponses « a » et « b ». » : les choix cités, retrouvés par leur
+ *    texte (la note peut n'en citer qu'un extrait). Une citation qui ne désigne pas un seul choix est
+ *    ignorée : tests/data/quiz_sources_declared.test.js garantit que cela n'arrive pas.
+ *
+ * La page vérifiée d'une question vaut pour la question entière : sans cette lecture, le bouton du
+ * cours s'afficherait aussi sous une bonne réponse que cette page ne traite pas.
+ *
+ * @param {{ choices?: Array<{ text?: string }>, explication?: string } | undefined} question
+ * @returns {Set<number>}
+ */
+export function unsourcedChoiceIndexes(question) {
+    const choices = question?.choices || [];
+    const raw = typeof question?.explication === 'string' ? question.explication : '';
+    const parts = raw
+        .split('\n')
+        .map((s) => s.trim())
+        .filter(Boolean);
+    const note = parts.length ? parts[parts.length - 1] : '';
+    if (!SOURCE_LINE.test(note)) return new Set();
+    const quoted = [...note.matchAll(/«([^»]*)»/g)].map((m) => plain(m[1])).filter(Boolean);
+    if (quoted.length === 0) return new Set(choices.map((_, i) => i));
+    const texts = choices.map((c) => plain(c?.text));
+    const found = new Set();
+    for (const fragment of quoted) {
+        let matches = texts.map((t, i) => (t === fragment ? i : -1)).filter((i) => i >= 0);
+        if (matches.length === 0) {
+            matches = texts
+                .map((t, i) => (t && (t.includes(fragment) || fragment.includes(t)) ? i : -1))
+                .filter((i) => i >= 0);
+        }
+        if (matches.length === 1) found.add(matches[0]);
+    }
+    return found;
+}
+
 /**
  * Réponse entièrement juste : toutes les bonnes réponses cochées, aucun choix négatif coché.
  * @param {number} mask

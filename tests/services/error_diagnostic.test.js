@@ -11,6 +11,7 @@ import {
     pickAntiTrapQuestions,
     summarizeSessionTraps,
     splitOptionExplanations,
+    unsourcedChoiceIndexes,
 } from '../../js/services/error_diagnostic.js';
 import { buildRevisionAxes, pickWorkshopQuestions } from '../../js/services/revision_axes.js';
 
@@ -51,6 +52,31 @@ describe('splitOptionExplanations', () => {
             null,
             null,
         ]);
+    });
+});
+
+describe('unsourcedChoiceIndexes', () => {
+    const lines = 'a\nb\nc\nd\n';
+    const noted = (note) => unsourcedChoiceIndexes(q('U1V', { explication: lines + note }));
+
+    it('is empty when the explanation has no "no source" note', () => {
+        expect([...unsourcedChoiceIndexes(q('U1V', { explication: 'a\nb\nc\nd' }))]).toEqual([]);
+        expect([...unsourcedChoiceIndexes(undefined)]).toEqual([]);
+    });
+
+    it('covers every choice for the whole-question note', () => {
+        expect([...noted('Aucune source trouvée pour le moment.')]).toEqual([0, 1, 2, 3]);
+    });
+
+    it('finds the quoted choices, with narrow no-break spaces and partial quotes', () => {
+        expect([...noted('Aucune source trouvée pour la réponse «\u202fbonne\u202f».')]).toEqual([0]);
+        expect([...noted('Aucune source trouvée pour les réponses « piège A » et « neutre ».')].sort()).toEqual([1, 3]);
+        expect([...noted('Aucune source trouvée pour la réponse « Piege B ».')]).toEqual([2]);
+    });
+
+    it('ignores a quote that names no choice, or more than one', () => {
+        expect([...noted('Aucune source trouvée pour la réponse « autre chose ».')]).toEqual([]);
+        expect([...noted('Aucune source trouvée pour la réponse « piège ».')]).toEqual([]);
     });
 });
 
