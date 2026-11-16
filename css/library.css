@@ -206,12 +206,21 @@ body.light-mode .library-section-header {
     background: rgba(255, 255, 255, 0.05);
 }
 
+.mode-toggle-btn[hidden] {
+    display: none;
+}
+
 @media (max-width: 768px) {
     /* 4 onglets de mode : grille 2x2 au lieu d'une ligne qui déborde de l'écran */
     .mode-toggle-container {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 6px;
+    }
+
+    /* Niveau Treuil (sans mode Examen) : 2 onglets en haut, Perfectionnement pleine largeur dessous */
+    .mode-toggle-container #mode-exam[hidden] ~ #mode-mastery {
+        grid-column: 1 / -1;
     }
 
     .count-selector {

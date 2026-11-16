@@ -653,7 +653,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             
             <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
                 <button type="button" data-action="openBrevetModal" data-args="TREUIL" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
-                    <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                    <i class="ri-checkbox-circle-line"></i> Valider ma qualification
                 </button>
             </div>
 
@@ -721,12 +721,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 </div>
             
 
-            <div style="margin-top:64px;">
-                <h3 class="library-section-header" style="border:none; margin-bottom:24px;">HISTORIQUE DES EXAMENS</h3>
-                <div style="background:var(--bg-card); padding:24px; border-radius:24px; border:1px solid var(--border-color);">
-                    <div style="opacity:0.6; font-style:italic; text-align:center; padding:40px;">Aucun examen complété pour le moment pour ce niveau.</div>
-                </div>
-            </div>
+            
 
             <div style="margin-top:64px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">LISTE DÉTAILLÉE DES QUESTIONS</h3>

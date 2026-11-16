@@ -89,6 +89,16 @@ export function getExamQuotas(level = 'BI') {
     return FFVL_EXAM_QUOTAS[level] || FFVL_EXAM_QUOTAS.BI;
 }
 
+/**
+ * Indique si le mode Examen blanc est proposé pour le niveau donné.
+ * La qualification Treuil ne comporte pas d'examen théorique QCM.
+ * @param {string} [level]
+ * @returns {boolean}
+ */
+export function isExamModeAvailable(level = 'BI') {
+    return level !== 'TREUIL';
+}
+
 // Compte, pour une question, combien de fois chaque choix a été coché (index = position dans les
 // choix d'origine du CSV, voir `choiceIndex`), et combien de fois chaque bonne réponse a été oubliée (`choiceMisses`).
 // `sign` à -1 retire une réponse déjà comptée (examen : réponse modifiée). Tableau plat d'entiers :
@@ -1039,6 +1049,10 @@ class QuizService {
     startSession(level = 'BI') {
         if (!this.state.isLoaded) throw new Error('Données QCM non chargées');
 
+        if (!isExamModeAvailable(level) && this.state.qcmConfig.mode === 'EXAM') {
+            this.state.qcmConfig.mode = 'TRAINING';
+        }
+
         let sourceData = this.getLevelQuestions(level);
 
         let count = this.state.qcmConfig.count;
@@ -1375,6 +1389,7 @@ class QuizService {
     // Une session d'examen ne produit qu'une entrée d'historique, et uniquement si l'examen est
     // allé jusqu'au bout sans être invalidé ni coupé en plein milieu.
     saveExamHistory(level) {
+        if (!isExamModeAvailable(level)) return;
         if (this.state.examSaved) return;
         const results = Array.isArray(this.state.examResults) ? this.state.examResults : [];
         const answeredResults = results.filter(Boolean);

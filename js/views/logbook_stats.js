@@ -7,6 +7,7 @@
 import LogbookService from '../services/logbook_service.js';
 import BrevetService, {
     BREVET_CODES,
+    PROGRESSION_CHAIN,
     brevetSummary,
     computeTheoryPercentage,
     unassignedSchoolSessionsFor,
@@ -226,20 +227,25 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
             const pr = entry.practical;
             const th = entry.theory;
 
+            const isQualification = !PROGRESSION_CHAIN.includes(code);
             let statusBadge;
             if (pr.validated) {
                 const label = pr.date
-                    ? tt('stats.brevets.statusValidatedOn', { date: formatDateOnly(pr.date) })
-                    : tt('stats.brevets.statusValidated');
+                    ? isQualification
+                        ? tt('stats.brevets.statusQualificationValidatedOn', { date: formatDateOnly(pr.date) })
+                        : tt('stats.brevets.statusValidatedOn', { date: formatDateOnly(pr.date) })
+                    : isQualification
+                      ? tt('stats.brevets.statusQualificationValidated')
+                      : tt('stats.brevets.statusValidated');
                 statusBadge = `<span style="background: rgba(16,185,129,0.14); color: #10b981; padding: 3px 8px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><i class="ri-medal-fill"></i> ${label}</span>`;
-            } else if (th.passed || sum.sessions > 0) {
+            } else if ((!isQualification && th.passed) || sum.sessions > 0) {
                 statusBadge = `<span style="background: rgba(245,158,11,0.14); color: #f59e0b; padding: 3px 8px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><i class="ri-time-line"></i> ${tt('stats.brevets.statusInProgress')}</span>`;
             } else {
                 statusBadge = `<span style="background: rgba(148,163,184,0.14); color: var(--text-muted); padding: 3px 8px; border-radius: 999px; font-size: 0.78rem; font-weight: 500;">${tt('stats.brevets.statusNotStarted')}</span>`;
             }
 
             let theoryBadge = '';
-            if (th.passed) {
+            if (!isQualification && th.passed) {
                 const thLabel = th.date
                     ? tt('stats.brevets.statusTheoryPassedOn', { date: formatDateOnly(th.date) })
                     : tt('stats.brevets.statusTheoryPassed');
@@ -282,7 +288,7 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
                     </button>`
                     : '';
 
-            const hasConfig = pr.validated || th.passed;
+            const hasConfig = pr.validated || (!isQualification && th.passed);
             return `
                 <div class="equip-card" data-brevet-card="${escapeHTML(code)}" style="display: flex; flex-direction: column; justify-content: space-between; gap: 6px;">
                     <div>
@@ -333,15 +339,9 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
         modal.style.display = 'flex';
         modal.className = 'gdpr-modal-overlay active';
 
-        modal.innerHTML = `
-            <div class="gdpr-modal" style="max-width: 560px; width: 95%; padding: 20px 22px;">
-                <div class="gdpr-modal-header" style="display: flex; align-items: center; justify-content: space-between;">
-                    <h3 style="margin: 0;"><i class="ri-medal-line" style="color: var(--accent-orange);"></i> ${tt('stats.brevets.modalTitle', { code, name: tl(`stats.brevets.names.${code}`) })}</h3>
-                    <button type="button" class="gdpr-modal-close-btn" data-action="closeBrevetModal">&times;</button>
-                </div>
-                <div class="gdpr-modal-body" style="max-height: 75vh; overflow-y: auto; padding: 14px 16px;">
-                    <input type="hidden" id="lb-brevet-code" value="${escapeHTML(code)}">
-
+        const hasTheoryExam = PROGRESSION_CHAIN.includes(code);
+        const theorySectionHtml = hasTheoryExam
+            ? `
                     <div style="padding: 12px; border: 1px solid var(--border-light, #ddd); border-radius: 8px; margin-bottom: 14px;">
                         <h4 style="margin: 0 0 10px; font-size: 0.95rem;"><i class="ri-book-open-line" style="color: #0ea5e9;"></i> ${tt('stats.brevets.theorySection')}</h4>
                         <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; margin-bottom: 10px;">
@@ -375,12 +375,23 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
                             <label for="lb-brevet-theory-examiner">${tt('stats.brevets.theoryExaminerLabel')}</label>
                             <input type="text" id="lb-brevet-theory-examiner" value="${escapeHTML(th.examiner)}" placeholder="${tt('stats.brevets.theoryExaminerPlaceholder')}" style="width: 100%;">
                         </div>
-                    </div>
+                    </div>`
+            : '';
+
+        modal.innerHTML = `
+            <div class="gdpr-modal" style="max-width: 560px; width: 95%; padding: 20px 22px;">
+                <div class="gdpr-modal-header" style="display: flex; align-items: center; justify-content: space-between;">
+                    <h3 style="margin: 0;"><i class="ri-medal-line" style="color: var(--accent-orange);"></i> ${tt('stats.brevets.modalTitle', { code, name: tl(`stats.brevets.names.${code}`) })}</h3>
+                    <button type="button" class="gdpr-modal-close-btn" data-action="closeBrevetModal">&times;</button>
+                </div>
+                <div class="gdpr-modal-body" style="max-height: 75vh; overflow-y: auto; padding: 14px 16px;">
+                    <input type="hidden" id="lb-brevet-code" value="${escapeHTML(code)}">
+                    ${theorySectionHtml}
 
                     <div style="padding: 12px; border: 1px solid var(--border-light, #ddd); border-radius: 8px;">
-                        <h4 style="margin: 0 0 10px; font-size: 0.95rem;"><i class="ri-medal-fill" style="color: #10b981;"></i> ${tt('stats.brevets.practicalSection')}</h4>
+                        <h4 style="margin: 0 0 10px; font-size: 0.95rem;"><i class="ri-medal-fill" style="color: #10b981;"></i> ${tt(hasTheoryExam ? 'stats.brevets.practicalSection' : 'stats.brevets.qualificationSection')}</h4>
                         <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; margin-bottom: 10px;">
-                            <input type="checkbox" id="lb-brevet-practical-validated" ${pr.validated ? 'checked' : ''}> ${tt('stats.brevets.practicalValidatedLabel')}
+                            <input type="checkbox" id="lb-brevet-practical-validated" ${pr.validated ? 'checked' : ''}> ${tt(hasTheoryExam ? 'stats.brevets.practicalValidatedLabel' : 'stats.brevets.qualificationValidatedLabel')}
                         </label>
                         <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
                             <div class="form-group" style="margin: 0;">
@@ -434,19 +445,22 @@ export class LogbookStatsBase extends LogbookEquipmentBase {
         const val = (id) => /** @type {HTMLInputElement|null} */ (document.getElementById(id))?.value || '';
         const checked = (id) => Boolean(/** @type {HTMLInputElement|null} */ (document.getElementById(id))?.checked);
 
+        const hasTheoryExam = PROGRESSION_CHAIN.includes(code);
         const practicalValidated = checked('lb-brevet-practical-validated');
-        const theoryPassed = checked('lb-brevet-theory-passed') || practicalValidated;
+        const theoryPatch = hasTheoryExam
+            ? {
+                  passed: checked('lb-brevet-theory-passed') || practicalValidated,
+                  date: val('lb-brevet-theory-date'),
+                  score: val('lb-brevet-theory-score'),
+                  total: val('lb-brevet-theory-total'),
+                  percentage: val('lb-brevet-theory-pct'),
+                  school: val('lb-brevet-theory-school') || val('lb-brevet-practical-school'),
+                  examiner: val('lb-brevet-theory-examiner'),
+              }
+            : BrevetService.getBrevet(code).theory;
 
         BrevetService.saveBrevet(code, {
-            theory: {
-                passed: theoryPassed,
-                date: val('lb-brevet-theory-date'),
-                score: val('lb-brevet-theory-score'),
-                total: val('lb-brevet-theory-total'),
-                percentage: val('lb-brevet-theory-pct'),
-                school: val('lb-brevet-theory-school') || val('lb-brevet-practical-school'),
-                examiner: val('lb-brevet-theory-examiner'),
-            },
+            theory: theoryPatch,
             practical: {
                 validated: practicalValidated,
                 date: val('lb-brevet-practical-date'),

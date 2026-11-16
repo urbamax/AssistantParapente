@@ -3,7 +3,7 @@
  * Un des morceaux de la vue du quiz (quiz.js) : QuizViewClass hérite de cette classe.
  */
 import GlobalState from '../core/app_state.js';
-import QuizService from '../services/quiz_service.js';
+import QuizService, { isExamModeAvailable } from '../services/quiz_service.js';
 import BrevetService from '../services/brevet_service.js';
 import StorageService from '../services/storage.js';
 import AccessService, { ROLES } from '../services/access_service.js';
@@ -413,6 +413,15 @@ export class QuizStatsBase extends BaseView {
                 stats,
                 levelTotalResponses,
             });
+            const showExamHistory = isExamModeAvailable(currentLevel) || levelExams.length > 0;
+            const examHistorySectionHtml = showExamHistory
+                ? `<div style="margin-top:64px;">
+                <h3 class="library-section-header" style="border:none; margin-bottom:24px;">${tq('stats.historyTitle')}</h3>
+                <div style="background:var(--bg-card); padding:24px; border-radius:24px; border:1px solid var(--border-color);">
+                    ${this.renderExamHistory()}
+                </div>
+            </div>`
+                : '';
             container.innerHTML = `
             ${successGaugeHtml}
             ${officialTheoryBannerHtml}
@@ -431,12 +440,7 @@ export class QuizStatsBase extends BaseView {
                 </div>
             </div>
 
-            <div style="margin-top:64px;">
-                <h3 class="library-section-header" style="border:none; margin-bottom:24px;">${tq('stats.historyTitle')}</h3>
-                <div style="background:var(--bg-card); padding:24px; border-radius:24px; border:1px solid var(--border-color);">
-                    ${this.renderExamHistory()}
-                </div>
-            </div>
+            ${examHistorySectionHtml}
 
             <div style="margin-top:64px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">${tq('stats.questionsTitle')}</h3>
