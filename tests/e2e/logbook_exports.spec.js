@@ -80,12 +80,24 @@ test.describe('E2E - Logbook exports', () => {
         await openHistory(page);
         await page.evaluate(async () => {
             const { default: LogbookService } = await import('/js/services/logbook_service.js');
+            const { default: BrevetService } = await import('/js/services/brevet_service.js');
+            BrevetService.saveBrevet('BI', {
+                theory: { passed: true, date: '2026-09-10', score: 28, total: 30 },
+                practical: { validated: true, date: '2026-09-13', school: 'École Mont Blanc', instructor: 'Paul' },
+            });
             LogbookService.addFlight({
                 type: 'vol',
-                datetime: '2026-09-14T10:00',
+                datetime: '2026-09-14T10:15',
                 site: 'Plaine Joux',
                 voile: 'Voile A',
+                sellette: 'Sellette X',
                 duree: 90,
+                typeVol: 'Thermique',
+                altitudeMax: 2150,
+                gain: 750,
+                distanceKm: 18.5,
+                ecole: 'École Mont Blanc',
+                brevetPrepare: 'BI',
             });
             LogbookService.addFlight({
                 type: 'gonflage',
@@ -102,5 +114,12 @@ test.describe('E2E - Logbook exports', () => {
         expect(report).toContain('Plaine Joux');
         expect(report).toContain('Parking');
         expect(report).toContain('2 sessions');
+        expect(report).toContain('10:15');
+        expect(report).toContain('Thermique');
+        expect(report).toContain('2150 m');
+        expect(report).toContain('18.5 km');
+        expect(report).toContain('Sellette X');
+        expect(report).toContain('28/30 (93%)');
+        expect(report).toContain('École Mont Blanc');
     });
 });
