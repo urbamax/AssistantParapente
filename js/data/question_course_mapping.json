@@ -403,17 +403,27 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 46,
-    "verifiedAt": "2026-11-09"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 39
+      }
+    ]
   },
   "A74B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 41,
-    "verifiedAt": "2026-11-09",
+    "verifiedAt": "2026-11-17",
     "others": [
       {
         "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/04-les-fronts2019/04-les-fronts2019",
         "verifiedPage": 1
+      },
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 46
       }
     ]
   },
@@ -486,7 +496,13 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 15,
-    "verifiedAt": "2026-11-04"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/05-les-pieges-aerologiques2019/05-les-pieges-aerologiques2019",
+        "verifiedPage": 1
+      }
+    ]
   },
   "A83V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
