@@ -6,6 +6,7 @@
  */
 import LogbookService from '../services/logbook_service.js';
 import SitesService from '../services/sites_service.js';
+import BrevetService from '../services/brevet_service.js';
 import { EXTENDED_WIND_DIRECTIONS } from '../data/weather_config.js';
 import { getSpotairWidgetId } from '../data/spotair_widgets.js';
 import { escapeHTML } from '../core/security.js';
@@ -457,7 +458,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
             return;
         }
         try {
-            await printHtml(buildLogbookReportHtml(flights));
+            await printHtml(buildLogbookReportHtml(flights, { brevets: BrevetService.getBrevets() }));
         } catch (error) {
             console.error('Logbook print failed', error);
             alert(tl('export.printError'));

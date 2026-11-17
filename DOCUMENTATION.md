@@ -342,6 +342,10 @@ Tracks the pilot's official FFVL certifications (`BI`, `BP`, `BPC`, `TREUIL`) in
 - Direct offline reading of `.xlsx` Excel spreadsheets exported from the FFVL intranet logbook (Passport > Logbook > Excel Export) without any third-party library.
 - Imported flights receive an import mark (`batch`, `date`, `fingerprint`), avoid duplication if re-imported, and can be cancelled as a whole batch from the logbook history.
 
+### 3f. Logbook Exports (`js/services/logbook_export.js`, specs 033 & 049)
+- **IGC Download**: Flights with an attached trace expose `Télécharger l'IGC`, downloading the original unmodified `.igc` text as `<YYYY-MM-DD>_<site-slug>.igc`.
+- **Detailed A4 Landscape PDF Report**: `buildLogbookReportHtml(flights, { generatedAt, brevets })` generates a printable, offline, XSS-escaped A4 landscape HTML document printed via `printHtml` (`js/utils/print.js`). It includes a top KPI summary (flight and ground-handling counts/durations separated, max altitude, cumulative gain and elevation drop, cumulative distance, longest flight, school sessions), wing breakdown, FFVL certifications (`BI`, `BP`, `BPC`, `TREUIL`) progression when present, and an 8-column chronological table covering exact date/time (omitted for `dateOnly` FFVL entries), flight type, site/techniques, full gear (`voile`, `sellette`, rescue openings, instrument), duration, altitudes/gain/descent (with `altOffset` applied once to raw `igcStats` altitudes), distance/vario/speeds/thermals/glide/G-load, school/course/brevet/instructors/companions/pilots, recorded weather, and comments.
+
 ### 4. Wing & Equipment Hours Tracking (`js/services/logbook_service.js`)
 Every logged flight automatically increments the total airtime (hours & minutes) of the associated wing and harness, triggering visual alerts when equipment passes maintenance thresholds (e.g., 100h inspection alert). For **emergency rescue parachutes**, wear is tracked by **openings** rather than airtime: an opened rescue immediately triggers a red maintenance alert until a repacking date on or after the deployment date is recorded.
 

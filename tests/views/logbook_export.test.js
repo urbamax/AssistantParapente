@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import LogbookService from '../../js/services/logbook_service.js';
 import SitesService from '../../js/services/sites_service.js';
+import BrevetService from '../../js/services/brevet_service.js';
 import LogbookView from '../../js/views/logbook.js';
 import { saveTextFile } from '../../js/utils/download.js';
 import { printHtml } from '../../js/utils/print.js';
@@ -80,13 +81,24 @@ describe('logbook export: PDF report', () => {
         expect(button).not.toBeNull();
     });
 
-    it('prints a report with every session', () => {
-        setup([withTrace, noTrace]);
+    it('prints a detailed report with every session and brevet progression', () => {
+        BrevetService.saveBrevet('BI', {
+            theory: { passed: true, date: '2026-09-10', score: 29, total: 30 },
+            practical: { validated: true, date: '2026-09-12', school: 'Cumulus', instructor: 'Jean' },
+        });
+        setup([
+            { ...withTrace, typeVol: 'Thermique', ecole: 'Cumulus', brevetPrepare: 'BI', altitudeMax: 2100, gain: 700 },
+            noTrace,
+        ]);
         LogbookView.exportLogbookPdf();
         expect(printHtml).toHaveBeenCalledTimes(1);
         const html = vi.mocked(printHtml).mock.calls[0][0];
         expect(html).toContain('Plaine Joux');
         expect(html).toContain('Dune');
+        expect(html).toContain('Thermique');
+        expect(html).toContain('2100 m');
+        expect(html).toContain('29/30 (97%)');
+        expect(html).toContain('Cumulus');
     });
 
     it('does not print an empty logbook and says so', () => {
