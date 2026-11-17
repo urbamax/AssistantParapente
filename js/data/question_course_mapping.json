@@ -2613,23 +2613,39 @@
     "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/07-parachute-de-secours2019/07-parachute-de-secours2019",
     "title": "Le Parachute de secours",
     "verifiedPage": 1,
-    "verifiedAt": "2026-11-04"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "general/secours/parachute-de-secours-snmvl-2021",
+        "verifiedPage": 66
+      }
+    ]
   },
   "N44B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 62,
-    "verifiedAt": "2026-11-07"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "general/secours/parachute-de-secours-snmvl-2021",
+        "verifiedPage": 55
+      }
+    ]
   },
   "N45B": {
     "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/07-parachute-de-secours2019/07-parachute-de-secours2019",
     "title": "Le Parachute de secours",
     "verifiedPage": 1,
-    "verifiedAt": "2026-11-09",
+    "verifiedAt": "2026-11-17",
     "others": [
       {
         "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
         "verifiedPage": 62
+      },
+      {
+        "course_id": "general/secours/parachute-de-secours-snmvl-2021",
+        "verifiedPage": 28
       }
     ]
   },
@@ -2637,17 +2653,31 @@
     "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques",
     "title": "Maitrise de l’aile en vol - Exercices spécifiques",
     "verifiedPage": 32,
-    "verifiedAt": "2026-11-09"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "general/secours/parachute-de-secours-snmvl-2021",
+        "verifiedPage": 22
+      },
+      {
+        "course_id": "general/secours/parachute-de-secours-snmvl-2021",
+        "verifiedPage": 51
+      }
+    ]
   },
   "N47M": {
     "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques",
     "title": "Maitrise de l’aile en vol - Exercices spécifiques",
     "verifiedPage": 31,
-    "verifiedAt": "2026-11-04",
+    "verifiedAt": "2026-11-17",
     "others": [
       {
         "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques",
         "verifiedPage": 32
+      },
+      {
+        "course_id": "general/secours/parachute-de-secours-snmvl-2021",
+        "verifiedPage": 50
       }
     ]
   },
@@ -2671,13 +2701,29 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 62,
-    "verifiedAt": "2026-11-04"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "general/secours/parachute-de-secours-snmvl-2021",
+        "verifiedPage": 35
+      }
+    ]
   },
   "N49M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 62,
-    "verifiedAt": "2026-10-10"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "general/secours/parachute-de-secours-snmvl-2021",
+        "verifiedPage": 15
+      },
+      {
+        "course_id": "general/secours/parachute-de-secours-snmvl-2021",
+        "verifiedPage": 30
+      }
+    ]
   },
   "N50B": {
     "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques",
@@ -2814,11 +2860,15 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 22,
-    "verifiedAt": "2026-11-03",
+    "verifiedAt": "2026-11-17",
     "others": [
       {
         "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques",
         "verifiedPage": 26
+      },
+      {
+        "course_id": "general/secours/parachute-de-secours-snmvl-2021",
+        "verifiedPage": 12
       }
     ]
   },
@@ -3619,11 +3669,15 @@
     "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/07-parachute-de-secours2019/07-parachute-de-secours2019",
     "title": "Le Parachute de secours",
     "verifiedPage": 1,
-    "verifiedAt": "2026-11-04",
+    "verifiedAt": "2026-11-17",
     "others": [
       {
         "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques",
         "verifiedPage": 31
+      },
+      {
+        "course_id": "general/secours/parachute-de-secours-snmvl-2021",
+        "verifiedPage": 66
       }
     ]
   },
