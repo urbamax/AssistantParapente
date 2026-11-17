@@ -1375,7 +1375,13 @@
     "course_id": "general/2014-livret-ffvl-9bd",
     "title": "Le guide des bonnes pratiques chez les libéristes",
     "verifiedPage": 17,
-    "verifiedAt": "2026-11-08"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+        "verifiedPage": 9
+      }
+    ]
   },
   "F2B": {
     "course_id": "brevet-de-pilote-confirme---marron/fiche-eval-2025/2025-fiche-cval-bpc-4-modules/2025-fiche-cval-bpc-4-modules",
@@ -1837,7 +1843,13 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 30,
-    "verifiedAt": "2026-11-04"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 152
+      }
+    ]
   },
   "G18M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
