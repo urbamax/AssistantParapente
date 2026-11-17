@@ -1,12 +1,34 @@
 import { escapeHTML } from '../core/security.js';
 import { splitOptionExplanations } from '../services/error_diagnostic.js';
+import { ACRONYMS_DATA } from '../data/acronyms_data.js';
+
+// Trié par ordre décroissant de longueur pour faire correspondre les sigles composés en premier (ex: 'SUP AIP' avant 'AIP')
+const ACRONYM_KEYS = Object.keys(ACRONYMS_DATA).sort((a, b) => b.length - a.length);
+const ACRONYM_REGEX = new RegExp(
+    `\\b(${ACRONYM_KEYS.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`,
+    'g',
+);
 
 /**
- * Explication d'une question en HTML : le texte est échappé, puis chaque changement de réponse
- * (retour à la ligne du CSV) devient un saut de ligne.
+ * Enveloppe les acronymes et sigles aéronautiques connus dans des balises <abbr> avec leur définition.
+ * @param {string} escapedText texte déjà échappé par escapeHTML
+ * @returns {string}
+ */
+export function annotateAcronyms(escapedText) {
+    if (!escapedText) return '';
+    return String(escapedText).replace(ACRONYM_REGEX, (match) => {
+        const def = ACRONYMS_DATA[match];
+        if (!def) return match;
+        return `<abbr class="qcm-acronym" title="${escapeHTML(def)}" data-acronym="${escapeHTML(match)}" tabindex="0">${match}</abbr>`;
+    });
+}
+
+/**
+ * Explication d'une question en HTML : le texte est échappé, les acronymes sont annotés,
+ * puis chaque changement de réponse (retour à la ligne du CSV) devient un saut de ligne.
  */
 export function explanationHtml(text) {
-    return escapeHTML(String(text || '')).replace(/\r?\n/g, '<br>');
+    return annotateAcronyms(escapeHTML(String(text || ''))).replace(/\r?\n/g, '<br>');
 }
 
 /**
@@ -49,5 +71,6 @@ export function optionOutcome(choice, selected) {
  */
 export function optionExplanationHtml(text, outcome, label, extraHtml = '') {
     const open = outcome === 'ok' ? '' : ' open';
-    return `<details class="qcm-option-explanation" data-kind="${outcome}"${open}><summary aria-label="${escapeHTML(label)}" title="${escapeHTML(label)}"></summary><div>${escapeHTML(String(text || ''))}</div>${extraHtml}</details>`;
+    const body = annotateAcronyms(escapeHTML(String(text || '')));
+    return `<details class="qcm-option-explanation" data-kind="${outcome}"${open}><summary aria-label="${escapeHTML(label)}" title="${escapeHTML(label)}"></summary><div>${body}</div>${extraHtml}</details>`;
 }

@@ -31,10 +31,10 @@ describe('ouverture des liens et des cours', () => {
         expect(isInstalledApp()).toBe(true);
     });
 
-    it('ouvre un cours dans un nouvel onglet quand on est dans le navigateur', () => {
+    it('ouvre un cours du site dans la visionneuse dans le navigateur', async () => {
         openLink('courses/abc.pdf#page=3');
-        expect(window.open).toHaveBeenCalledWith('courses/abc.pdf#page=3', '_blank', 'noopener,noreferrer');
-        expect(viewer.openCourseViewer).not.toHaveBeenCalled();
+        await vi.waitFor(() => expect(viewer.openCourseViewer).toHaveBeenCalledWith('courses/abc.pdf#page=3'));
+        expect(window.open).not.toHaveBeenCalled();
     });
 
     it("ouvre un cours dans la visionneuse quand l'application est installée", async () => {
@@ -52,7 +52,7 @@ describe('ouverture des liens et des cours', () => {
         expect(viewer.openCourseViewer).not.toHaveBeenCalled();
     });
 
-    it('intercepte les liens <a target="_blank"> vers un cours, seulement quand l’application est installée', async () => {
+    it('intercepte les liens <a target="_blank"> vers un cours du site', async () => {
         installCourseLinkInterception();
         document.body.innerHTML =
             '<a id="pdf" href="courses/abc.pdf#page=2" target="_blank"><span id="inner">x</span></a>' +
@@ -69,10 +69,7 @@ describe('ouverture des liens et des cours', () => {
             document.getElementById(id).dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
             return intercepted;
         };
-        // Dans le navigateur (hors installée), isInstalledApp() est faux : le lien n'est jamais touché.
-        expect(isInstalledApp()).toBe(false);
 
-        setDisplayMode('standalone');
         expect(click('web')).toBe(false);
         expect(click('inner')).toBe(true);
         await vi.waitFor(() => expect(viewer.openCourseViewer).toHaveBeenCalledTimes(1));

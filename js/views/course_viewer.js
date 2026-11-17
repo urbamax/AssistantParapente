@@ -51,12 +51,13 @@ export function describeCourseUrl(url) {
     return { pdfUrl: full.href, page, title: course?.title || t('courseViewer.fallbackTitle') };
 }
 
-function buildOverlay(title) {
+function buildOverlay(title, pdfUrl = '', firstPage = 1) {
     const overlay = document.createElement('div');
     overlay.className = 'course-viewer-overlay';
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-modal', 'true');
     overlay.setAttribute('aria-label', title);
+    const directUrl = pdfUrl ? `${pdfUrl}#page=${firstPage}` : '';
     overlay.innerHTML = `
         <div class="cv-bar">
             <button type="button" class="cv-back" aria-label="${escapeHTML(t('courseViewer.backLabel'))}">
@@ -70,6 +71,7 @@ function buildOverlay(title) {
             <button type="button" class="cv-zoom-in" aria-label="${escapeHTML(t('courseViewer.zoomIn'))}">
                 <i class="ri-add-line" aria-hidden="true"></i>
             </button>
+            ${directUrl ? `<a href="${escapeHTML(directUrl)}" target="_blank" rel="noopener noreferrer" class="cv-tab-link" aria-label="${escapeHTML(t('courseViewer.openDirect'))}" title="${escapeHTML(t('courseViewer.openDirect'))}"><i class="ri-external-link-line" aria-hidden="true"></i></a>` : ''}
         </div>
         <div class="cv-scroll" tabindex="0"><div class="cv-pages"></div></div>
         <div class="cv-status" role="status">${escapeHTML(t('courseViewer.loading'))}</div>`;
@@ -85,7 +87,7 @@ export async function openCourseViewer(url) {
     if (active) return;
     const { pdfUrl, page: firstPage, title } = describeCourseUrl(url);
 
-    const overlay = buildOverlay(title);
+    const overlay = buildOverlay(title, pdfUrl, firstPage);
     const $ = (selector) => /** @type {HTMLElement} */ (overlay.querySelector(selector));
     const scroller = $('.cv-scroll');
     const pagesEl = $('.cv-pages');

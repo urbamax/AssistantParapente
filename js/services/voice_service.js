@@ -57,6 +57,8 @@ const UPPERCASE_WORDS_LOWER = new Set([
     'MAIS',
     'SOIT',
     'SAUF',
+    'VOL',
+    'VOLS',
 ]);
 
 // Acronymes ou noms propres prononcés comme des mots en français.
@@ -99,6 +101,7 @@ export function formatSpeechText(text) {
         .replace(/\bm\/mer\b/g, 'mètres mer')
         .replace(/\bhPa\b/g, 'hectopascals')
         .replace(/\bdaN\b/g, 'décanewtons')
+        .replace(/\b([Vv]ols?)\./g, '$1 .')
         .replace(/\bEN([A-D])([+-])/g, (_m, cat, sign) => `E.N.${cat}. ${sign === '+' ? 'plus' : 'moins'}`)
         .replace(/\b([A-Z]{2,6})(\d+)\b/g, (match, prefix, num) => {
             if (UPPERCASE_WORDS_LOWER.has(prefix) || PRONOUNCEABLE_UPPERCASE.has(prefix)) return match;

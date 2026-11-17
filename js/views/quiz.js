@@ -15,7 +15,13 @@ import GdprEngine from '../gdpr_engine.js';
 import { buildResultsTrapsHtml } from './quiz_traps_html.js';
 import { tq, tql } from './quiz_strings.js';
 import { choiceSourceHtml, courseLinksHtml } from './quiz_course_links.js';
-import { explanationHtml, optionExplanationHtml, optionExplanations, optionOutcome } from './quiz_explanation.js';
+import {
+    annotateAcronyms,
+    explanationHtml,
+    optionExplanationHtml,
+    optionExplanations,
+    optionOutcome,
+} from './quiz_explanation.js';
 import { buildTrapFeedback } from '../services/error_diagnostic.js';
 import { choiceIndex } from '../services/answer_log.js';
 import { floorPercent1, formatPercent } from '../utils/text_utils.js';
@@ -309,8 +315,62 @@ class QuizViewClass extends QuizVoiceBase {
     }
 
     // --- EVENT DELEGATION ---
+    showAcronymPopover(el) {
+        const acronym = el.dataset.acronym || el.textContent;
+        const title = el.getAttribute('title') || '';
+        let popover = document.getElementById('qcm-acronym-popover');
+        if (!popover) {
+            popover = document.createElement('div');
+            popover.id = 'qcm-acronym-popover';
+            popover.className = 'qcm-acronym-popover';
+            document.body.appendChild(popover);
+            popover.addEventListener('click', (ev) => {
+                const clickTarget = /** @type {HTMLElement | null} */ (ev.target);
+                if (clickTarget?.closest?.('.qcm-acronym-close')) {
+                    popover.classList.remove('visible');
+                }
+            });
+            document.addEventListener('click', (ev) => {
+                const clickTarget = /** @type {HTMLElement | null} */ (ev.target);
+                if (!clickTarget?.closest?.('#qcm-acronym-popover') && !clickTarget?.closest?.('.qcm-acronym')) {
+                    popover.classList.remove('visible');
+                }
+            });
+        }
+        popover.innerHTML = `
+            <div class="qcm-acronym-popover-header">
+                <span class="qcm-acronym-tag">${escapeHTML(acronym)}</span>
+                <button type="button" class="qcm-acronym-close" aria-label="${tq('acronymClose')}"><i class="ri-close-line"></i></button>
+            </div>
+            <div class="qcm-acronym-popover-body">${escapeHTML(title)}</div>
+        `;
+        popover.classList.add('visible');
+
+        const rect = el.getBoundingClientRect();
+        const popoverWidth = Math.min(320, window.innerWidth - 24);
+        let left = rect.left + rect.width / 2 - popoverWidth / 2;
+        left = Math.max(12, Math.min(left, window.innerWidth - popoverWidth - 12));
+        let top = rect.bottom + 8;
+        if (top + 120 > window.innerHeight && rect.top > 120) {
+            top = rect.top - 100;
+        }
+        popover.style.width = `${popoverWidth}px`;
+        popover.style.left = `${left}px`;
+        popover.style.top = `${Math.max(12, top)}px`;
+    }
+
     handleClick(e) {
-        const optionRow = e.target.closest('.qcm-option-group > .bank-choice');
+        const clickedEl = /** @type {HTMLElement | null} */ (e.target);
+        const acronymEl = clickedEl?.closest?.('.qcm-acronym');
+        if (acronymEl) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.showAcronymPopover(acronymEl);
+            AppEvents.markHandled(e);
+            return;
+        }
+
+        const optionRow = /** @type {HTMLElement | null} */ (clickedEl?.closest?.('.qcm-option-group > .bank-choice'));
         if (optionRow && !e.target.closest('[data-action="openUrl"]')) {
             const group = optionRow.parentElement;
             const details = group
@@ -1025,7 +1085,7 @@ class QuizViewClass extends QuizVoiceBase {
                     <div class="quiz-progress" style="margin-left: auto;">${tq('question.progress', { index: qIdx, total })}</div>
                 </div>
             </div>
-            <div class="quiz-question-text">${escapeHTML(q.question)}</div>
+            <div class="quiz-question-text">${annotateAcronyms(escapeHTML(q.question))}</div>
         `;
 
         // Render choices (spec 016 : lettres affichées dès que le mode vocal est disponible)
