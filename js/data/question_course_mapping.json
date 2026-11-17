@@ -2353,7 +2353,13 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 92,
-    "verifiedAt": "2026-11-09"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 112
+      }
+    ]
   },
   "N10V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -2739,11 +2745,15 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 155,
-    "verifiedAt": "2026-11-04",
+    "verifiedAt": "2026-11-17",
     "others": [
       {
         "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
         "verifiedPage": 22
+      },
+      {
+        "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
+        "verifiedPage": 16
       }
     ]
   },
@@ -2882,13 +2892,25 @@
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
     "title": "Référentiel - Brevet de Pilote",
     "verifiedPage": 4,
-    "verifiedAt": "2026-11-09"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
+        "verifiedPage": 5
+      }
+    ]
   },
   "P11V": {
     "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
     "title": "Vol libre et milieux naturels - Référentiel de connaissances",
     "verifiedPage": 4,
-    "verifiedAt": "2026-11-04"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/20-milieux-naturels-rapaces2023/20-milieux-naturels-rapaces2023",
+        "verifiedPage": 1
+      }
+    ]
   },
   "P12BM": {
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
@@ -2996,11 +3018,15 @@
     "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
     "title": "Référentiel - Brevet de Pilote",
     "verifiedPage": 11,
-    "verifiedAt": "2026-11-04",
+    "verifiedAt": "2026-11-17",
     "others": [
       {
         "course_id": "brevet-initial---vert/affiches-pedagogiques-a3/18-milieux-naturels2022/18-milieux-naturels2022",
         "verifiedPage": 1
+      },
+      {
+        "course_id": "brevet-initial---vert/developpement-durable-0/rcfcrentiel-niveau-vert-brevet-initial-/rcfcrentiel-niveau-vert-brevet-initial-",
+        "verifiedPage": 6
       }
     ]
   },
