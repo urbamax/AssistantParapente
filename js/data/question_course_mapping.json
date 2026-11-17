@@ -4818,11 +4818,15 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 17,
-    "verifiedAt": "2026-11-07",
+    "verifiedAt": "2026-11-17",
     "others": [
       {
         "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
         "verifiedPage": 63
+      },
+      {
+        "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques",
+        "verifiedPage": 14
       }
     ]
   },
@@ -4830,7 +4834,13 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 17,
-    "verifiedAt": "2026-10-13"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 61
+      }
+    ]
   },
   "U77B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -5076,7 +5086,13 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 69,
-    "verifiedAt": "2026-11-07"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 70
+      }
+    ]
   },
   "W16V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
