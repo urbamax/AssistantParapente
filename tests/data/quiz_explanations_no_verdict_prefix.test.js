@@ -38,7 +38,7 @@ describe('quiz explanations do not announce the verdict', () => {
         const NOT_A_VERDICT =
             /(?:incidence|navigation) correcte|valeur exacte|altitude vraie|ce qui fausse|juste (?:avant|après|au|à|sous|sur|derrière|devant|assez)(?![\p{L}])/giu;
         const VERDICT_WORD_ANYWHERE =
-            /(?<![\p{L}-])(?:justes?|vrai|vraie|vrais|faux|fausses?|correcte?s?|incorrecte?s?|inexacte?s?|exacte?s?)(?![\p{L}-])|(?:bonne|mauvaise) réponse|à tort(?![\p{L}])/iu;
+            /(?<![\p{L}-])(?:justes?|vrai|vraie|vrais|faux|fausses?|correcte?s?|incorrecte?s?|inexacte?s?|exacte?s?)(?![\p{L}-])|(?:bonne|mauvaise) réponse|(?:est|sont) (?:un|le|les) (?:bons?|mauvais|meilleurs?) choix|cette (?:réponse|option|proposition)|à tort(?![\p{L}])/iu;
         const offending = Object.entries(explanations)
             .filter(([code]) => !/^[HRX]/.test(code))
             .flatMap(([code, text]) =>
