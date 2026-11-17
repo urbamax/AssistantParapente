@@ -3405,7 +3405,13 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 20,
-    "verifiedAt": "2026-11-09"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "treuil/ffvl-dossiertracte-2023",
+        "verifiedPage": 24
+      }
+    ]
   },
   "S29B": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3482,7 +3488,13 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 22,
-    "verifiedAt": "2026-11-09"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "treuil/ffvl-dossiertracte-2023",
+        "verifiedPage": 52
+      }
+    ]
   },
   "S37B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
