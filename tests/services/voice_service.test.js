@@ -217,6 +217,8 @@ describe('VoiceService (spec 016)', () => {
             expect(formatSpeechText('En tension ET sans tension, répond OUI, déjà U.L.M.')).toBe(
                 'En tension et sans tension, répond oui, déjà U.L.M.',
             );
+            expect(formatSpeechText('le niveau de vol. Les vols.')).toBe('le niveau de vol . Les vols .');
+            expect(formatSpeechText('VOL en parapente')).toBe('vol en parapente');
         });
 
         it('splits long texts into chunks without cutting off mid-sentence and calls onEnd at the very end', () => {
