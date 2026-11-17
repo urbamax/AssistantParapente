@@ -3859,7 +3859,13 @@
     "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025",
     "title": "Réglementation - La division de l’espace aérien",
     "verifiedPage": 1,
-    "verifiedAt": "2026-11-09"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "general/20240409-ffvl-formation-espacesaeriens",
+        "verifiedPage": 12
+      }
+    ]
   },
   "S68M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -6160,7 +6166,13 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 28,
-    "verifiedAt": "2026-11-04"
+    "verifiedAt": "2026-11-17",
+    "others": [
+      {
+        "course_id": "treuil/ffvl-dossiertracte-2023",
+        "verifiedPage": 29
+      }
+    ]
   },
   "S55T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
