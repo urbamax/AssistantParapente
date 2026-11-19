@@ -131,7 +131,7 @@ export async function redirectFromLegacyOrigin({
         const fragment = await buildMigrationFragment(maxChars);
         if (fragment) {
             target += `#${MIGRATION_PARAM}=${fragment.value}`;
-            console.info(`[Migration] Data sent to ${CANONICAL_ORIGIN} (${fragment.level}).`);
+            console.info('[Migration] Data sent to %s (%s).', CANONICAL_ORIGIN, fragment.level);
         }
     } catch (error) {
         // Never trap the user on the old address because packing failed.
