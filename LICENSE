@@ -2,11 +2,16 @@ Copyright (c) 2026 Maxime Urbaniak. All rights reserved.
 
 The source code, the user interface and the original texts of "Assistant Parapente"
 are the exclusive property of their author. No licence is granted: you may not copy,
-modify, redistribute, host, sublicense, fork or use this work, in whole or in part,
-without the prior written permission of the author.
+modify, redistribute, host, sublicense or use this work, in whole or in part, without
+the prior written permission of the author.
 
-Forking, mirroring, public reproduction or redistribution of this repository, in whole
-or in part, is strictly prohibited and constitutes an infringement of copyright.
+Forks: the author does not want this repository to be forked. GitHub's Terms of Service
+let its users view and fork a public repository within GitHub, and this notice does not
+change that. A fork, however, grants no licence of any kind: it does not give the right to
+use, copy, modify, host, deploy, publish or redistribute this code, in whole or in part,
+inside or outside GitHub. Any such use without the author's written permission infringes
+copyright, and the author will ask GitHub (DMCA notice) or the host concerned to take the
+copy down.
 
 This licence does NOT cover third-party content, which remains the property of its
 owners. See NOTICE.
