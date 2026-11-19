@@ -7,7 +7,9 @@
 > 
 > **Aucune licence libre ni droit d'utilisation n'est accordé** : vous n'êtes pas autorisé à copier, modifier, redistribuer, héberger, sous-licencier ou exploiter tout ou partie du code source, de l'interface ou des éléments graphiques sans l'autorisation écrite préalable de l'auteur (voir [`LICENSE`](LICENSE)).
 > 
-> **Contributions non acceptées** : les pull requests et issues extérieures ne sont pas acceptées. Un fork sur GitHub, que les conditions d'utilisation de GitHub permettent pour un dépôt public, ne donne aucun droit de réutiliser le code.
+> **Je ne souhaite pas que ce dépôt soit forké.** Les conditions d'utilisation de GitHub permettent techniquement de forker un dépôt public, mais un fork ne donne **aucun droit** d'utiliser, copier, modifier, héberger, déployer, publier ou redistribuer ce code, en tout ou en partie, sur GitHub ou ailleurs. Toute réutilisation sans mon autorisation écrite est une contrefaçon : je demanderai son retrait à GitHub (signalement DMCA) ou à l'hébergeur concerné.
+> 
+> **Contributions non acceptées** : les pull requests et issues extérieures ne sont pas acceptées.
 
 **Assistant Parapente** est une Progressive Web App (PWA) tout-en-un conçue pour accompagner les pilotes de vol libre du Brevet Initial jusqu'au Brevet de Pilote Confirmé : choix et exploitabilité des sites de vol, carnet de vol numérique avec analyse de traces GPS, entraînement aux examens théoriques FFVL officiels, check-lists de sécurité et bibliothèque de formation.
 
@@ -84,7 +86,7 @@ Pour consulter l'architecture logicielle, le cycle de vie des vues et les spéci
 ## ⚖️ Droits, Propriété & Contenus Tiers
 
 - **Propriété exclusive & Droits d'auteur** : Le code source, l'architecture logicielle, le design de l'interface utilisateur, la marque et les textes originaux sont © Maxime Urbaniak — **tous droits réservés** (voir [`LICENSE`](LICENSE)). Aucune autorisation de réutilisation, de reproduction ou de diffusion publique n'est concédée.
-- **Contributions non acceptées** : Ce dépôt est consultable en lecture seule à titre de vitrine personnelle. Les contributions extérieures (pull requests, issues) ne sont pas acceptées, et un fork ne confère aucun droit de réutilisation. Pour signaler une éventuelle vulnérabilité de sécurité en toute confidentialité, consultez [`SECURITY.md`](SECURITY.md).
+- **Contributions non acceptées** : Ce dépôt est consultable en lecture seule à titre de vitrine personnelle. Les contributions extérieures (pull requests, issues) ne sont pas acceptées. Je ne souhaite pas que ce dépôt soit forké ; un fork ne confère aucun droit de réutilisation, et toute copie réutilisée sans autorisation fera l'objet d'une demande de retrait (signalement DMCA auprès de GitHub ou de l'hébergeur). Pour signaler une éventuelle vulnérabilité de sécurité en toute confidentialité, consultez [`SECURITY.md`](SECURITY.md).
 - **Contenus tiers fédéraux** : Les cours, affiches, livrets de progression et questions officielles du QCM restent la **propriété intellectuelle exclusive de la FFVL et de leurs auteurs respectifs** (voir [`NOTICE`](NOTICE)). Ils sont référencés sans but lucratif uniquement pour faciliter la formation et la sécurité des pilotes. Toute demande de retrait ou de modification émanant d'un ayant droit est traitée sans délai.
 
 ---
