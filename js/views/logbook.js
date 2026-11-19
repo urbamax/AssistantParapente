@@ -263,6 +263,8 @@ class LogbookViewClass extends LogbookFormBase {
         try {
             await SitesService.ensureSitesLoaded();
             await LogbookService.whenReady();
+            // Les vols prennent le nom à jour de leur site (renommé par la FFVL depuis la saisie).
+            LogbookService.linkSites();
             if (this.init) {
                 this.init();
             }

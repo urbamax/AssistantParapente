@@ -55,6 +55,20 @@ class RefreshEntryTest(unittest.TestCase):
             "source": "FFVL (Licence Ouverte/Etalab 2.0) — snapshot 2022-12-05",
         }
 
+    def test_a_renamed_site_keeps_its_former_names(self):
+        old = {**self.old, "nom": "Mont  Test", "anciens_noms": ["MONT-TEST", "mont test"]}
+        merged = imp.refresh_entry(old, self.new)
+        self.assertEqual(merged["nom"], "MONT TEST - DECO NORD")
+        self.assertEqual(merged["anciens_noms"], ["MONT-TEST", "mont test"])
+
+    def test_a_site_whose_name_does_not_change_has_no_former_names(self):
+        merged = imp.refresh_entry({**self.old, "nom": "mont test - deco nord"}, self.new)
+        self.assertNotIn("anciens_noms", merged)
+
+    def test_a_site_renamed_back_drops_that_name_from_its_former_names(self):
+        old = {**self.old, "nom": "Mont Test", "anciens_noms": ["MONT TEST - DECO NORD"]}
+        self.assertEqual(imp.refresh_entry(old, self.new)["anciens_noms"], ["Mont Test"])
+
     def test_id_never_changes(self):
         merged = imp.refresh_entry(self.old, self.new)
         self.assertEqual(merged["id"], "mont-test-42")

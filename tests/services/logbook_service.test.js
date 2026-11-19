@@ -3,6 +3,7 @@ import LogbookService from '../../js/services/logbook_service.js';
 import StorageService from '../../js/services/storage.js';
 import IGCParser from '../../js/services/igc_parser.js';
 import IDBStorage from '../../js/services/idb_storage.js';
+import SitesService from '../../js/services/sites_service.js';
 
 describe('LogbookService - Core Functions', () => {
     beforeEach(() => {
@@ -419,5 +420,51 @@ describe('LogbookService.countEquipmentAlerts', () => {
             { id: 'f1', type: 'vol', datetime: '2026-09-01T10:00', rescueDeployed: true, rescueId: 'Secours' },
         ];
         expect(LogbookService.countEquipmentAlerts()).toBe(1);
+    });
+});
+
+describe('LogbookService - link flights to their site', () => {
+    const SITES = [{ id: 'planfait-1001', nom: 'PLANFAIT — Déco Sud', anciens_noms: ['PLANFAIT'] }];
+
+    beforeEach(() => {
+        localStorage.clear();
+        window.FirebaseAuthEngine = undefined;
+        SitesService.setSites(SITES);
+    });
+
+    afterEach(() => {
+        SitesService.setSites([]);
+        vi.restoreAllMocks();
+    });
+
+    it('gives a flight saved under a former name the current name of its site, and stores it', () => {
+        LogbookService.flights = [{ id: 'a', site: 'PLANFAIT', datetime: '2026-09-01T10:00', updatedAt: 7 }];
+        expect(LogbookService.linkSites()).toBe(1);
+        expect(LogbookService.flights[0]).toMatchObject({
+            site: 'PLANFAIT — DÉCO SUD',
+            siteId: 'planfait-1001',
+            updatedAt: 7,
+        });
+        expect(StorageService.get(StorageService.KEYS.LOGBOOK_DATA)[0].siteId).toBe('planfait-1001');
+        expect(LogbookService.linkSites()).toBe(0);
+    });
+
+    it('links flights that arrive from storage (another device, through the cloud merge)', () => {
+        StorageService.set(StorageService.KEYS.LOGBOOK_DATA, [
+            { id: 'b', site: 'PLANFAIT', datetime: '2026-09-01T10:00' },
+        ]);
+        LogbookService.loadData();
+        expect(LogbookService.flights[0].siteId).toBe('planfait-1001');
+    });
+
+    it('drops the link when the pilot types another place, and keeps it otherwise', () => {
+        LogbookService.flights = [
+            { id: 'c', site: 'PLANFAIT — DÉCO SUD', siteId: 'planfait-1001', datetime: '2026-09-01T10:00' },
+        ];
+        LogbookService.updateFlight('c', { duree: 30 });
+        expect(LogbookService.flights[0].siteId).toBe('planfait-1001');
+        LogbookService.updateFlight('c', { site: 'Prairie du voisin' });
+        expect(LogbookService.flights[0].site).toBe('Prairie du voisin');
+        expect(LogbookService.flights[0].siteId).toBeUndefined();
     });
 });
