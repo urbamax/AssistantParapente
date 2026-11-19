@@ -13,6 +13,7 @@ import { exportBackupAction, importBackupAction } from './backup_ui.js';
 import SitesService from '../services/sites_service.js';
 import AccessService, { ACCESS_EVENTS, applyRoleVisibility } from '../services/access_service.js';
 import { initAppUpdateNotifier } from './app_update.js';
+import { receiveMigration, redirectFromLegacyOrigin } from './domain_migration.js';
 
 import QuizService, { isExamModeAvailable } from '../services/quiz_service.js';
 import { resolveStartMode } from './start_mode.js';
@@ -44,6 +45,9 @@ async function bootApplication() {
     } catch {
         // ignore
     }
+    // Old address -> own domain, with the local data (js/core/domain_migration.js). Both leave the page.
+    if ((await redirectFromLegacyOrigin()) || (await receiveMigration())) return;
+
     console.time('BOOT_TOTAL');
     console.log('🚀 Booting Application...');
 

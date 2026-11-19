@@ -100,7 +100,7 @@ export async function collectTraces() {
             const { encoding, parts } = await encodeTrace(raw, { partChars: Infinity });
             traces[id] = { encoding, data: parts[0] };
         } catch (error) {
-            console.warn(`[Backup] Trace of flight ${id} left out:`, error);
+            console.warn('[Backup] Trace of flight %s left out:', id, error);
         }
     }
     return traces;
@@ -243,7 +243,7 @@ export async function applyBackupTraces(backup) {
             if (raw && (await IDBStorage.saveTrace(id, raw))) restored++;
             else failed++;
         } catch (error) {
-            console.warn(`[Backup] Trace of flight ${id} could not be restored:`, error);
+            console.warn('[Backup] Trace of flight %s could not be restored:', id, error);
             failed++;
         }
     }

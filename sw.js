@@ -101,6 +101,7 @@ const CRITICAL_ASSETS = [
     './js/core/backup_ui.js',
     './js/core/base_view.js',
     './js/core/course_link.js',
+    './js/core/domain_migration.js',
     './js/core/events.js',
     './js/core/main.js',
     './js/core/router.js',
