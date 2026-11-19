@@ -390,7 +390,31 @@ def refresh_entry(old, new):
     for key in KEEP_IF_EMPTY:
         if not merged.get(key) and old.get(key):
             merged[key] = old[key]
+    former = former_names(old, merged.get("nom"))
+    if former:
+        merged["anciens_noms"] = former
+    else:
+        merged.pop("anciens_noms", None)
     return merged
+
+
+def name_key(name):
+    """Nom comparé sans casse ni espaces superflus."""
+    return " ".join(str(name or "").split()).upper()
+
+
+def former_names(old, current_name):
+    """Noms que le terrain a portés avant `current_name` (anciens noms d'`old`, puis son nom), sans
+    doublon ni le nom actuel. Le carnet s'en sert pour retrouver le site d'un vol enregistré sous un
+    ancien nom et lui donner le nom à jour (js/services/flight_site_link.js)."""
+    names = []
+    seen = {name_key(current_name)}
+    for name in [*(old.get("anciens_noms") or []), old.get("nom")]:
+        key = name_key(name)
+        if key and key not in seen:
+            seen.add(key)
+            names.append(" ".join(str(name).split()))
+    return names
 
 
 def distance_m(lat1, lon1, lat2, lon2):

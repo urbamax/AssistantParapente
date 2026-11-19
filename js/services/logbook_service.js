@@ -3,6 +3,7 @@ import IDBStorage from './idb_storage.js';
 import IGCParser from './igc_parser.js';
 import SitesService from './sites_service.js';
 import { isNearKnownTakeoff } from './launch_sites.js';
+import { linkFlightsToSites } from './flight_site_link.js';
 import { t } from '../utils/i18n.js';
 
 // Garantit que les champs consommés directement par un rendu (ex: subtitle.toLowerCase()
@@ -16,6 +17,11 @@ function normalizeFlight(f) {
     if (f.typeVol === undefined || f.typeVol === null) f.typeVol = '';
     if (f.typeExercice === undefined || f.typeExercice === null) f.typeExercice = '';
     return f;
+}
+
+// Catalogue des sites tel qu'il est chargé ([] avant le chargement, ou si un test remplace SitesService).
+function loadedSites() {
+    return typeof SitesService?.getSites === 'function' ? SitesService.getSites() || [] : [];
 }
 
 function normalizeEquipment(e) {
@@ -38,6 +44,8 @@ class LogbookService {
         if (!Array.isArray(this.flights)) this.flights = [];
         this.flights.forEach(normalizeFlight);
         this.flights.sort((a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime());
+        // Un vol arrivé d'un autre appareil (fusion Firestore) est relié à son site dès son chargement.
+        this.linkSites();
 
         this.equipment = StorageService.get(StorageService.KEYS.EQUIPMENT_DATA) || [];
         if (!Array.isArray(this.equipment)) this.equipment = [];
@@ -96,7 +104,20 @@ class LogbookService {
         }
     }
 
+    /**
+     * Relie les vols aux sites de la base et leur donne le nom actuel de leur site
+     * (js/services/flight_site_link.js). Sans effet tant que la base des sites n'est pas chargée.
+     * @returns {number} nombre de vols modifiés (enregistrés s'il y en a)
+     */
+    linkSites() {
+        const changed = linkFlightsToSites(this.flights, loadedSites());
+        if (changed > 0) this.saveFlights();
+        return changed;
+    }
+
     saveFlights() {
+        // Un vol saisi ou importé sous le nom d'un site de la base est relié à ce site.
+        linkFlightsToSites(this.flights, loadedSites());
         // rawIgc (potentiellement plusieurs centaines de Ko par vol) ne part jamais dans
         // LocalStorage (quota strict de 5 Mo, partagé avec le reste de l'app) : il est
         // dédoublé dans IndexedDB juste en dessous (store `flights` complet + store `traces`
@@ -200,6 +221,11 @@ class LogbookService {
         if (index !== -1) {
             const before = this.flights[index];
             this.flights[index] = { ...before, ...updatedData, updatedAt: Date.now(), syncPending: true };
+            // Le pilote a changé le lieu : l'ancien lien au site ne vaut plus, le nom saisi est relié à nouveau.
+            const siteRenamed = ['site', 'lieu'].some(
+                (key) => key in updatedData && (updatedData[key] || '') !== (before[key] || ''),
+            );
+            if (siteRenamed && !('siteId' in updatedData)) delete this.flights[index].siteId;
             // Un vol importé sans heure (l'export FFVL n'en a pas) reçoit une vraie heure : il n'est plus « sans heure »
             if (before.dateOnly && updatedData.datetime && updatedData.datetime !== before.datetime) {
                 this.flights[index].dateOnly = false;

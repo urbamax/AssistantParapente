@@ -520,3 +520,12 @@ Some source texts were Windows-1252 decoded as Latin-1 (C1 control characters in
 `scripts/text_repair.py` (`repair_cp1252`) repairs them; both import scripts call it in `clean()`,
 and `tests/data/sites_data_text.test.js` fails in CI if any such character reappears in
 `js/data/sites_data.json` or its server copy. Python helper tests: `python3 -m unittest discover -s tests/scripts`.
+
+### Flights follow the name of their site
+
+A flight stores the name of its place as text (`site`, or `lieu` on old entries): statistics, history and exports read that text. When the text is the name of a site of `js/data/sites_data.json`, `js/services/flight_site_link.js` also stores the site `id` on the flight (`siteId`, stable even when the FFVL renames the terrain), and gives the flight the current name of its site whenever that name changes.
+
+- A flight without `siteId` is linked by its name: the current name first, then the former names (`anciens_noms`). The comparison ignores case, accents, punctuation and extra spaces. A name that several sites share is linked only if the flight position (`lat`/`lon`) points to one of them within 5 km.
+- A place that is not in the database keeps its free text. A flight whose site left the database keeps its last name.
+- `LogbookService` links the flights when it loads them (cloud merge included), on every save, and when the logbook opens (once the sites are loaded). `updatedAt` does not change: every device computes the same result, and an imported flight that was only renamed this way is not counted as edited since its import. Changing the place of a flight drops its `siteId`; the new text is linked again.
+- `scripts/import_ffvl_sites.py` keeps the names a site had before (`anciens_noms`) when it refreshes an entry. The names of earlier versions of the file (2026-09 to 2026-11) were added once from the git history.
