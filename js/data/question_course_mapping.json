@@ -3275,11 +3275,15 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 3,
-    "verifiedAt": "2026-11-07",
+    "verifiedAt": "2026-11-19",
     "others": [
       {
         "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
         "verifiedPage": 41
+      },
+      {
+        "course_id": "general/ffvl-textes/fascicule-aspirant-biplaceur-2026",
+        "verifiedPage": 8
       }
     ]
   },
@@ -3296,8 +3300,16 @@
     "verifiedAt": "2026-11-08"
   },
   "S10M": {
-    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote"
+    "course_id": "general/ffvl-textes/fascicule-aspirant-biplaceur-2026",
+    "title": "Fascicule de l’aspirant biplaceur parapente (FFVL, 2026)",
+    "verifiedPage": 16,
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/charte-efvl-2026",
+        "verifiedPage": 10
+      }
+    ]
   },
   "S10T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3318,13 +3330,16 @@
     "verifiedAt": "2026-11-09"
   },
   "S12M": {
-    "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques-1",
-    "score": 0.1706,
-    "title": "Pratique BI BP maitrise aile vol exercices spécifiques 1"
+    "course_id": "general/ffvl-textes/charte-cefvl-2026",
+    "title": "Charte des Clubs-Écoles Français de Vol Libre (CEFVL, 2026)",
+    "verifiedPage": 5,
+    "verifiedAt": "2026-11-19"
   },
   "S13B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "title": "Livret Pédagogique - Initiation"
+    "course_id": "general/ffvl-textes/charte-cefvl-2026",
+    "title": "Charte des Clubs-Écoles Français de Vol Libre (CEFVL, 2026)",
+    "verifiedPage": 1,
+    "verifiedAt": "2026-11-19"
   },
   "S13T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3333,9 +3348,20 @@
     "verifiedAt": "2026-11-04"
   },
   "S14B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.1706,
-    "title": "initiation 2025 web"
+    "course_id": "general/ffvl-textes/charte-efvl-2026",
+    "title": "Charte des Écoles Françaises de Vol Libre (EFVL, 2026)",
+    "verifiedPage": 1,
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/charte-cefvl-2026",
+        "verifiedPage": 1
+      },
+      {
+        "course_id": "general/ffvl-textes/charte-efvl-2026",
+        "verifiedPage": 10
+      }
+    ]
   },
   "S14T": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
@@ -3371,17 +3397,35 @@
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 33,
-    "verifiedAt": "2026-11-08"
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/charte-efvl-2026",
+        "verifiedPage": 10
+      }
+    ]
   },
   "S17B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.08,
-    "title": "initiation 2025 web"
+    "course_id": "general/ffvl-textes/charte-efvl-2026",
+    "title": "Charte des Écoles Françaises de Vol Libre (EFVL, 2026)",
+    "verifiedPage": 1,
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/charte-efvl-2026",
+        "verifiedPage": 6
+      },
+      {
+        "course_id": "general/ffvl-textes/charte-efvl-2026",
+        "verifiedPage": 5
+      }
+    ]
   },
   "S18B": {
-    "course_id": "brevet-initial---vert/developpement-durable-0/milieux-naturels2022/milieux-naturels2022",
-    "score": 0.0845,
-    "title": "milieux naturels2022"
+    "course_id": "general/ffvl-textes/reglement-interieur-2026",
+    "title": "Règlement intérieur de la FFVL (AG 2026)",
+    "verifiedPage": 4,
+    "verifiedAt": "2026-11-19"
   },
   "S18T": {
     "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/17-facteurs-humains2023/17-facteurs-humains2023",
@@ -3400,15 +3444,32 @@
     ]
   },
   "S19V": {
-    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
-    "verifiedPage": 28,
-    "verifiedAt": "2026-11-08"
+    "course_id": "general/ffvl-textes/statuts-2026",
+    "title": "Statuts de la FFVL (AG 2026)",
+    "verifiedPage": 6,
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/statuts-2026",
+        "verifiedPage": 4
+      },
+      {
+        "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+        "verifiedPage": 28
+      }
+    ]
   },
   "S20M": {
-    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "score": 0.045,
-    "title": "cycle2 2025web"
+    "course_id": "general/ffvl-textes/statuts-2026",
+    "title": "Statuts de la FFVL (AG 2026)",
+    "verifiedPage": 18,
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/statuts-2026",
+        "verifiedPage": 16
+      }
+    ]
   },
   "S20T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3441,9 +3502,20 @@
     "verifiedAt": "2026-10-22"
   },
   "S23M": {
-    "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
-    "score": 0.0761,
-    "title": "rcfcrentiel niveau bleu brevet de pilote "
+    "course_id": "general/ffvl-textes/statuts-types-ligue-cdvl-2015",
+    "title": "Statuts types des ligues et comités départementaux (FFVL, 2015)",
+    "verifiedPage": 3,
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/statuts-2026",
+        "verifiedPage": 33
+      },
+      {
+        "course_id": "general/ffvl-textes/statuts-types-ligue-cdvl-2015",
+        "verifiedPage": 18
+      }
+    ]
   },
   "S23T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3452,9 +3524,16 @@
     "verifiedAt": "2026-11-08"
   },
   "S24M": {
-    "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
-    "score": 0.0584,
-    "title": "rcfcrentiel niveau bleu brevet de pilote "
+    "course_id": "general/ffvl-textes/statuts-2026",
+    "title": "Statuts de la FFVL (AG 2026)",
+    "verifiedPage": 33,
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/statuts-2026",
+        "verifiedPage": 34
+      }
+    ]
   },
   "S25T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3469,8 +3548,20 @@
     ]
   },
   "S25V": {
-    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote"
+    "course_id": "general/ffvl-textes/statuts-2026",
+    "title": "Statuts de la FFVL (AG 2026)",
+    "verifiedPage": 11,
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/reglement-interieur-2026",
+        "verifiedPage": 3
+      },
+      {
+        "course_id": "general/ffvl-textes/statuts-2026",
+        "verifiedPage": 8
+      }
+    ]
   },
   "S26B": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3479,9 +3570,10 @@
     "verifiedAt": "2026-11-09"
   },
   "S27M": {
-    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "score": 0.1353,
-    "title": "cycle2 2025web"
+    "course_id": "general/ffvl-textes/reglement-interieur-2026",
+    "title": "Règlement intérieur de la FFVL (AG 2026)",
+    "verifiedPage": 16,
+    "verifiedAt": "2026-11-19"
   },
   "S27T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3574,9 +3666,16 @@
     "verifiedAt": "2026-11-04"
   },
   "S36B": {
-    "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques-1",
-    "score": 0.1509,
-    "title": "Pratique BI BP maitrise aile vol exercices spécifiques 1"
+    "course_id": "general/ffvl-textes/charte-cefvl-2026",
+    "title": "Charte des Clubs-Écoles Français de Vol Libre (CEFVL, 2026)",
+    "verifiedPage": 3,
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/declarer-un-accident",
+        "verifiedPage": 1
+      }
+    ]
   },
   "S36T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3655,9 +3754,16 @@
     "verifiedAt": "2026-11-09"
   },
   "S43M": {
-    "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
-    "score": 0.071,
-    "title": "cycle2 2025web"
+    "course_id": "general/ffvl-textes/charte-cefvl-2026",
+    "title": "Charte des Clubs-Écoles Français de Vol Libre (CEFVL, 2026)",
+    "verifiedPage": 4,
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/charte-efvl-2026",
+        "verifiedPage": 4
+      }
+    ]
   },
   "S43T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3853,7 +3959,13 @@
     "course_id": "general/20240409-ffvl-formation-espacesaeriens",
     "title": "Espaces Aériens - Les Fondamentaux",
     "verifiedPage": 6,
-    "verifiedAt": "2026-10-11"
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
+        "verifiedPage": 28
+      }
+    ]
   },
   "S59M": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -4052,9 +4164,16 @@
     "verifiedAt": "2026-11-07"
   },
   "S83B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
-    "score": 0.0733,
-    "title": "initiation 2025 web"
+    "course_id": "general/ffvl-textes/charte-efvl-2026",
+    "title": "Charte des Écoles Françaises de Vol Libre (EFVL, 2026)",
+    "verifiedPage": 4,
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/charte-cefvl-2026",
+        "verifiedPage": 4
+      }
+    ]
   },
   "S84B": {
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
@@ -4088,11 +4207,15 @@
     "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025",
     "title": "Réglementation - La division de l’espace aérien",
     "verifiedPage": 1,
-    "verifiedAt": "2026-10-12",
+    "verifiedAt": "2026-11-19",
     "others": [
       {
         "course_id": "brevet-de-pilote---bleu/developpement-durable-0/rcfcrentiel-niveau-bleu-brevet-de-pilote-/rcfcrentiel-niveau-bleu-brevet-de-pilote-",
         "verifiedPage": 4
+      },
+      {
+        "course_id": "general/passeport-telechargement-web/2012-passeportspeed12-hd/2012-passeportspeed12-hd",
+        "verifiedPage": 35
       }
     ]
   },
@@ -4160,7 +4283,17 @@
     "course_id": "general/pratique-bi-bp-maitrise-aile-vol-exercices-specifiques",
     "title": "Maitrise de l’aile en vol - Exercices spécifiques",
     "verifiedPage": 14,
-    "verifiedAt": "2026-10-11"
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/charte-efvl-2026",
+        "verifiedPage": 1
+      },
+      {
+        "course_id": "general/ffvl-textes/charte-cefvl-2026",
+        "verifiedPage": 1
+      }
+    ]
   },
   "S98V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -4175,9 +4308,16 @@
     "verifiedAt": "2026-10-11"
   },
   "S100B": {
-    "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
-    "score": 0.0787,
-    "title": "cycle1 2025web"
+    "course_id": "general/ffvl-textes/reglement-accompagnateur-federal-2025",
+    "title": "Règlement de l’accompagnateur fédéral parapente et delta (FFVL, 2025)",
+    "verifiedPage": 5,
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/reglement-accompagnateur-federal-2025",
+        "verifiedPage": 2
+      }
+    ]
   },
   "S101B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -4201,9 +4341,16 @@
     "verifiedAt": "2026-11-09"
   },
   "S105B": {
-    "course_id": "brevet-initial---vert/developpement-durable-0/milieux-naturels2022/milieux-naturels2022",
-    "score": 0.0401,
-    "title": "milieux naturels2022"
+    "course_id": "general/ffvl-textes/reglement-accompagnateur-federal-2025",
+    "title": "Règlement de l’accompagnateur fédéral parapente et delta (FFVL, 2025)",
+    "verifiedPage": 5,
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/reglement-accompagnateur-federal-2025",
+        "verifiedPage": 3
+      }
+    ]
   },
   "S106V": {
     "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025",
@@ -4339,7 +4486,13 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 132,
-    "verifiedAt": "2026-11-09"
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
+        "verifiedPage": 81
+      }
+    ]
   },
   "S128B": {
     "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025",
@@ -6208,7 +6361,13 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 19,
-    "verifiedAt": "2026-11-09"
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/statuts-types-ligue-cdvl-2015",
+        "verifiedPage": 16
+      }
+    ]
   },
   "S26T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -6345,5 +6504,23 @@
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 23,
     "verifiedAt": "2026-11-09"
+  },
+  "S21M": {
+    "course_id": "general/ffvl-textes/statuts-2026",
+    "title": "Statuts de la FFVL (AG 2026)",
+    "verifiedPage": 11,
+    "verifiedAt": "2026-11-19",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/statuts-2026",
+        "verifiedPage": 12
+      }
+    ]
+  },
+  "S35B": {
+    "course_id": "general/ffvl-textes/declarer-un-accident",
+    "title": "Déclarer un accident (FFVL)",
+    "verifiedPage": 1,
+    "verifiedAt": "2026-11-19"
   }
 }
