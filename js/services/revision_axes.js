@@ -369,6 +369,7 @@ function buildAxisTakeaways(classifiedQuestions, coursesById, maxItems = 6) {
     };
 
     const withExplanations = classifiedQuestions
+        .filter((item) => item.bucket !== 'mastered')
         .map((item) => ({
             ...item,
             cleanedExplanation: cleanAxisExplanation(item.q.explication),

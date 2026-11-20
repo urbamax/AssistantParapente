@@ -147,15 +147,6 @@ function buildAxisBreakdownPillsHtml(axis) {
             `<span style="background:rgba(56,189,248,0.14); color:#0ea5e9; border:1px solid rgba(56,189,248,0.35); padding:3px 9px; border-radius:999px; font-size:0.76rem; font-weight:700;">${label}</span>`,
         );
     }
-    if (axis.masteredCount > 0) {
-        const label =
-            axis.masteredCount === 1
-                ? tq('axes.pillMasteredOne')
-                : tq('axes.pillMasteredMany', { count: axis.masteredCount });
-        pills.push(
-            `<span style="background:rgba(74,222,128,0.14); color:#22c55e; border:1px solid rgba(74,222,128,0.35); padding:3px 9px; border-radius:999px; font-size:0.76rem; font-weight:700;">${label}</span>`,
-        );
-    }
     return pills.join('');
 }
 
@@ -546,20 +537,24 @@ export function buildRevisionAxisCardHtml(axis, expandedIds) {
  * @returns {string}
  */
 export function buildRevisionAxesDashboardHtml(report, uiState = {}) {
-    const activeFilter = uiState.statusFilter || 'ALL';
+    const activeFilter = !uiState.statusFilter || uiState.statusFilter === 'MASTERED' ? 'ALL' : uiState.statusFilter;
     const expandedIds = uiState.expandedIds instanceof Set ? uiState.expandedIds : new Set();
 
-    const filterDefs = [
-        { key: 'ALL', label: tq('axes.filterAll', { count: report.counts.ALL || 0 }) },
-        { key: 'BLOCKER', label: tq('axes.filterBlocker', { count: report.counts.BLOCKER || 0 }) },
-        { key: 'REFRESH', label: tq('axes.filterRefresh', { count: report.counts.REFRESH || 0 }) },
-        { key: 'EXPLORE', label: tq('axes.filterExplore', { count: report.counts.EXPLORE || 0 }) },
-        { key: 'MASTERED', label: tq('axes.filterMastered', { count: report.counts.MASTERED || 0 }) },
+    // Les chapitres déjà maîtrisés n'ont plus besoin d'apparaître dans les axes de révision.
+    const revisionAxes = report.axes.filter((axis) => axis.status !== 'MASTERED');
+
+    const candidateFilters = [
+        { key: 'TRAPS', count: report.trapTotals?.axes || 0, labelKey: 'axes.filterTraps' },
+        { key: 'BLOCKER', count: report.counts.BLOCKER || 0, labelKey: 'axes.filterBlocker' },
+        { key: 'REFRESH', count: report.counts.REFRESH || 0, labelKey: 'axes.filterRefresh' },
+        { key: 'EXPLORE', count: report.counts.EXPLORE || 0, labelKey: 'axes.filterExplore' },
     ];
-    const trapAxes = report.trapTotals?.axes || 0;
-    if (trapAxes > 0 || activeFilter === 'TRAPS') {
-        filterDefs.splice(1, 0, { key: 'TRAPS', label: tq('axes.filterTraps', { count: trapAxes }) });
-    }
+    const filterDefs = [
+        { key: 'ALL', label: tq('axes.filterAll', { count: revisionAxes.length }) },
+        ...candidateFilters
+            .filter((f) => f.count > 0 || activeFilter === f.key)
+            .map((f) => ({ key: f.key, label: tq(f.labelKey, { count: f.count }) })),
+    ];
 
     const filtersHtml = filterDefs
         .map((f) => {
@@ -577,10 +572,10 @@ export function buildRevisionAxesDashboardHtml(report, uiState = {}) {
 
     const visibleAxes =
         activeFilter === 'ALL'
-            ? report.axes
+            ? revisionAxes
             : activeFilter === 'TRAPS'
-              ? report.axes.filter((axis) => axis.traps?.active > 0)
-              : report.axes.filter((axis) => axis.status === activeFilter);
+              ? revisionAxes.filter((axis) => axis.traps?.active > 0)
+              : revisionAxes.filter((axis) => axis.status === activeFilter);
 
     const activeTraps = report.trapTotals?.active || 0;
     const trapsCtaHtml =
