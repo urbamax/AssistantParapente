@@ -1125,6 +1125,7 @@ export class QuizStatsBase extends BaseView {
             modal = document.createElement('dialog');
             modal.id = 'exam-details-modal';
             modal.className = 'gdpr-modal-overlay';
+            modal.setAttribute('aria-labelledby', 'exam-details-modal-title');
             modal.setAttribute('data-backdrop-action', 'QuizcloseExamModal');
             modal.style.display = 'none';
             modal.innerHTML = `

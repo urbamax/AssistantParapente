@@ -269,10 +269,10 @@ export class SitesMapBase extends BaseView {
                 <button class="action-btn-primary" data-action="openGpsMenu" data-args="'${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}'" style="flex: 1; padding: 6px 10px; font-size: 0.8rem; justify-content: center;">
                     <i class="ri-navigation-line"></i> ${tt('card.goThere')}
                 </button>
-                <button class="action-btn-secondary windy-btn" data-action="focusSiteWindy" data-args="'${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}', '${escapeHTML(String(site.nom || '').replace(/'/g, '’'))}'" style="padding: 6px 8px;" title="${tt('popup.windyTitle')}">
+                <button type="button" class="action-btn-secondary windy-btn" data-action="focusSiteWindy" data-args="'${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}', '${escapeHTML(String(site.nom || '').replace(/'/g, '’'))}'" style="padding: 6px 8px;" title="${tt('popup.windyTitle')}" aria-label="${tt('popup.windyTitle')}">
                     <i class="ri-windy-line"></i>
                 </button>
-                <button class="action-btn-secondary paraglidable-btn" data-action="focusSiteMap" data-args="'paraglidable', '${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}', '${escapeHTML(String(site.nom || '').replace(/'/g, '’'))}'" style="padding: 6px 8px;" title="${tt('popup.paraglidableTitle')}">
+                <button type="button" class="action-btn-secondary paraglidable-btn" data-action="focusSiteMap" data-args="'paraglidable', '${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}', '${escapeHTML(String(site.nom || '').replace(/'/g, '’'))}'" style="padding: 6px 8px;" title="${tt('popup.paraglidableTitle')}" aria-label="${tt('popup.paraglidableTitle')}">
                     <i class="ri-flight-takeoff-line"></i>
                 </button>
             </div>

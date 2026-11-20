@@ -15,12 +15,12 @@ function canSeeErrors() {
         return false;
     }
 }
-window.addEventListener('error', function (e) {
-    const msg = e && typeof e.message === 'string' ? e.message : '';
+function tryRecoverStaleModule(msg) {
     const isStaleBindingError =
         msg.indexOf('Importing binding name') !== -1 ||
         msg.indexOf('does not provide an export named') !== -1 ||
         msg.indexOf('import not found') !== -1;
+    if (!isStaleBindingError) return false;
     let alreadyReloaded;
     try {
         alreadyReloaded =
@@ -28,27 +28,33 @@ window.addEventListener('error', function (e) {
     } catch {
         alreadyReloaded = true;
     }
-    if (isStaleBindingError && !alreadyReloaded) {
-        try {
-            sessionStorage.setItem('ap_stale_module_reloaded', '1');
-        } catch {
-            // ignore
-        }
-        const clearCaches =
-            typeof caches !== 'undefined'
-                ? caches.keys().then(function (keys) {
-                      return Promise.all(
-                          keys.map(function (k) {
-                              return k.indexOf('parapente-app-') === 0 ? caches.delete(k) : null;
-                          }),
-                      );
-                  })
-                : Promise.resolve();
-        clearCaches.finally(function () {
+    if (alreadyReloaded) return false;
+    try {
+        sessionStorage.setItem('ap_stale_module_reloaded', '1');
+    } catch {
+        // ignore
+    }
+    const isOnline = typeof navigator === 'undefined' || navigator.onLine !== false;
+    const clearCaches =
+        typeof caches !== 'undefined' && isOnline
+            ? caches.keys().then(function (keys) {
+                  return Promise.all(
+                      keys.map(function (k) {
+                          return k.indexOf('parapente-app-') === 0 ? caches.delete(k) : null;
+                      }),
+                  );
+              })
+            : Promise.resolve();
+    clearCaches
+        .catch(function () {})
+        .finally(function () {
             window.location.reload();
         });
-        return;
-    }
+    return true;
+}
+window.addEventListener('error', function (e) {
+    const msg = e && typeof e.message === 'string' ? e.message : '';
+    if (tryRecoverStaleModule(msg)) return;
     if (!canSeeErrors()) return;
     const errDiv = document.createElement('div');
     errDiv.style.cssText =
@@ -67,6 +73,8 @@ window.addEventListener('error', function (e) {
     (document.body || document.documentElement).appendChild(errDiv);
 });
 window.addEventListener('unhandledrejection', function (e) {
+    const reasonText = e && e.reason ? String(e.reason.message || e.reason.stack || e.reason) : '';
+    if (tryRecoverStaleModule(reasonText)) return;
     if (!canSeeErrors()) return;
     const errDiv = document.createElement('div');
     errDiv.style.cssText =

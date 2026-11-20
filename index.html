@@ -176,7 +176,7 @@
                         </div>
 
                         <div class="setup-group setup-group-margin" id="qcm-theme-group">
-                            <label data-i18n="qcmSetupScreen.themeSpecifiqueOptionnel" class="setup-label" id="qcm-theme-label">THÈME SPÉCIFIQUE</label>
+                            <label data-i18n="qcmSetupScreen.themeSpecifiqueOptionnel" class="setup-label" id="qcm-theme-label" for="qcm-theme-select">THÈME SPÉCIFIQUE</label>
                             <select id="qcm-theme-select" autocomplete="off">
                                 <option data-i18n="qcmSetupScreen.tousLesThemes" value="ALL">Tous les thèmes</option>
                                 <!-- Injected by JS -->
@@ -309,10 +309,10 @@
                 <div class="library-toolbar">
                     <search role="search" class="search-box">
                         <i class="ri-search-line"></i>
-                        <input data-i18n-placeholder="qcmBankScreen.placeholderRechercherParMotCle" type="search" id="bank-search" placeholder="Rechercher par mot-clé (ex: cumulus)..." />
+                        <input data-i18n-placeholder="qcmBankScreen.placeholderRechercherParMotCle" data-i18n-aria-label="qcmBankScreen.placeholderRechercherParMotCle" aria-label="Rechercher par mot-clé (ex: cumulus)..." type="search" id="bank-search" placeholder="Rechercher par mot-clé (ex: cumulus)..." />
                     </search>
                     <div class="sort-controls">
-                        <select id="bank-theme-filter" class="sort-btn">
+                        <select id="bank-theme-filter" class="sort-btn" data-i18n-aria-label="qcmBankScreen.tousLesThemes" aria-label="Tous les thèmes">
                             <option data-i18n="qcmBankScreen.tousLesThemes" value="ALL">Tous les thèmes</option>
                             <option data-i18n="qcmBankScreen.meteo" value="Météo">Météo</option>
                             <option data-i18n="qcmBankScreen.mecavol" value="Mécavol">Mécavol</option>
@@ -455,7 +455,7 @@
                 <div class="library-toolbar">
                     <search role="search" class="search-box">
                         <i class="ri-search-line"></i>
-                        <input data-i18n-placeholder="libraryScreen.placeholderRechercherUnDossier" type="search" id="library-search" placeholder="Rechercher un dossier, une affiche..." />
+                        <input data-i18n-placeholder="libraryScreen.placeholderRechercherUnDossier" data-i18n-aria-label="libraryScreen.placeholderRechercherUnDossier" aria-label="Rechercher un dossier, une affiche..." type="search" id="library-search" placeholder="Rechercher un dossier, une affiche..." />
                     </search>
                     <div class="sort-controls">
                         <button type="button"
@@ -499,7 +499,7 @@
                 </div>
 
                 <div class="course-viewer" id="course-viewer-container">
-                    <iframe id="course-pdf-frame" src="" width="100%" height="100%" class="course-pdf-frame"></iframe>
+                    <iframe id="course-pdf-frame" src="" width="100%" height="100%" class="course-pdf-frame" data-i18n-title="manualModal.bibliotheque" title="Bibliothèque" referrerpolicy="no-referrer"></iframe>
                 </div>
             </div>
             <div class="app-footer-placeholder"></div>
@@ -637,7 +637,7 @@
                                 </a>
                             </div>
                         </div>
-                        <iframe id="windy-embed-iframe" src="" width="100%" height="100%" class="sites-iframe" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+                        <iframe id="windy-embed-iframe" src="" width="100%" height="100%" class="sites-iframe" data-i18n-title="sitesMapView.windy" title="Windy" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
                     </div>
                     <!-- Container Météo-Parapente Iframe -->
                     <div id="sites-meteoparapente-canvas" class="sites-map-canvas-custom" style="display: none">
@@ -665,6 +665,9 @@
                             width="100%"
                             height="100%"
                             class="sites-iframe"
+                            data-i18n-title="sitesMapView.meteoP"
+                            title="Météo-P."
+                            loading="lazy"
                             referrerpolicy="no-referrer"
                             sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
                         ></iframe>
@@ -696,6 +699,9 @@
                             width="100%"
                             height="100%"
                             class="sites-iframe"
+                            data-i18n-title="sitesMapView.pgEarth"
+                            title="PG Earth"
+                            loading="lazy"
                             referrerpolicy="no-referrer"
                             sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
                         ></iframe>
@@ -726,6 +732,9 @@
                             width="100%"
                             height="100%"
                             class="sites-iframe"
+                            data-i18n-title="sitesMapView.paraglidable"
+                            title="Paraglidable"
+                            loading="lazy"
                             referrerpolicy="no-referrer"
                             sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
                         ></iframe>
@@ -1055,6 +1064,7 @@
                     >
                         <div class="setting-item" style="display: flex; flex-direction: column; gap: 5px">
                             <label data-i18n="sitesScreen.modeleMeteo"
+                                for="weather-model-select"
                                 style="
                                     font-weight: bold;
                                     font-size: 0.85rem;
@@ -1085,6 +1095,7 @@
                         </div>
                         <div class="setting-item" style="display: flex; flex-direction: column; gap: 5px">
                             <label data-i18n="sitesScreen.dureeDesPrevisions"
+                                for="forecast-range-select"
                                 style="
                                     font-weight: bold;
                                     font-size: 0.85rem;
@@ -1115,6 +1126,7 @@
 
                         <div class="setting-item" style="display: flex; flex-direction: column; gap: 5px">
                             <label data-i18n="sitesScreen.modeDeCalculDu"
+                                for="filter-mode-select"
                                 style="
                                     font-weight: bold;
                                     font-size: 0.85rem;
@@ -1233,6 +1245,7 @@
                             style="display: flex; flex-direction: column; gap: 5px"
                         >
                             <label data-i18n="conditionsStrategyPanel.definitionDesMeilleuresConditions"
+                                for="select-sort-mode"
                                 style="
                                     font-weight: bold;
                                     font-size: 0.85rem;
@@ -1845,6 +1858,7 @@
         <dialog
             id="auth-modal-overlay"
             class="auth-modal-overlay"
+            aria-labelledby="auth-modal-title"
             data-backdrop-action="FirebaseAuthcloseAuthModal"
             style="display: none"
         >
@@ -1852,7 +1866,7 @@
                 <button type="button" class="auth-close-btn" data-action="FirebaseAuthcloseAuthModal" data-i18n-aria-label="common.fermer" aria-label="Fermer">
                     <i class="ri-close-line"></i>
                 </button>
-                <div data-i18n="common.espaceSynchro" class="auth-title">ESPACE SYNCHRO</div>
+                <div id="auth-modal-title" data-i18n="common.espaceSynchro" class="auth-title">ESPACE SYNCHRO</div>
 
                 <div id="auth-alert" class="auth-alert"></div>
 
@@ -2263,6 +2277,7 @@
         <dialog
             id="gdpr-settings-modal"
             class="gdpr-modal-overlay"
+            aria-labelledby="gdpr-settings-modal-title"
             data-backdrop-action="GdprhideModal"
             data-args="gdpr-settings-modal"
             style="display: none"
@@ -2271,7 +2286,7 @@
                 <div class="gdpr-modal-header">
                     <div class="gdpr-modal-title">
                         <i class="ri-settings-3-line"></i>
-                        <span data-i18n="gdprSettingsModal.optionsDeConfidentialite">Options de Confidentialité</span>
+                        <span id="gdpr-settings-modal-title" data-i18n="gdprSettingsModal.optionsDeConfidentialite">Options de Confidentialité</span>
                     </div>
                     <button
                         type="button"
@@ -2397,6 +2412,7 @@
         <dialog
             id="spotair-modal"
             class="gdpr-modal-overlay"
+            aria-labelledby="spotair-modal-title"
             data-backdrop-action="SitescloseSpotairModal"
             style="display: none"
         >
@@ -2415,6 +2431,9 @@
                         id="spotair-modal-iframe"
                         src=""
                         frameborder="0"
+                        data-i18n-title="spotairModal.ventEnDirect"
+                        title="Vent en direct — SpotAiR"
+                        loading="lazy"
                         referrerpolicy="no-referrer"
                         sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
                         style="width: 100%; height: 100%; min-height: 480px; border: 0; display: block"
@@ -2564,6 +2583,7 @@
         <dialog
             id="feedback-modal"
             class="gdpr-modal-overlay"
+            aria-labelledby="feedback-modal-title"
             data-backdrop-action="closeFeedbackModal"
             style="display: none"
         >
@@ -2571,7 +2591,7 @@
                 <div class="gdpr-modal-header">
                     <div class="gdpr-modal-title">
                         <i class="ri-feedback-line" aria-hidden="true"></i>
-                        <span data-i18n="feedbackModal.title">Signaler un problème / Suggestion</span>
+                        <span id="feedback-modal-title" data-i18n="feedbackModal.title">Signaler un problème / Suggestion</span>
                     </div>
                     <button
                         type="button"
@@ -2808,6 +2828,7 @@
         <dialog
             id="pwa-install-modal"
             class="gdpr-modal-overlay"
+            aria-labelledby="pwa-install-modal-title"
             data-backdrop-action="closePwaInstallModal"
             style="display: none"
         >
@@ -2815,7 +2836,7 @@
                 <div class="gdpr-modal-header">
                     <div class="gdpr-modal-title">
                         <i class="ri-download-2-line" aria-hidden="true"></i>
-                        <span data-i18n="pwaInstallModal.title">Installer Assistant Parapente</span>
+                        <span id="pwa-install-modal-title" data-i18n="pwaInstallModal.title">Installer Assistant Parapente</span>
                     </div>
                     <button
                         type="button"

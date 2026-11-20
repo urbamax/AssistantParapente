@@ -1117,8 +1117,8 @@ class QuizViewClass extends QuizVoiceBase {
 
         // Render Actions
         actionsDiv.innerHTML = `
-            ${qIdx > 1 ? '<button class="next-btn" data-action="prev-question" style="flex:0 0 60px;"><i class="ri-arrow-left-line"></i></button>' : ''}
-            <button class="next-btn" id="qcm-validate-btn" data-action="validate-question" style="flex:1;">${tq('question.validate')}</button>
+            ${qIdx > 1 ? `<button type="button" class="next-btn" data-action="prev-question" aria-label="${tq('question.prev')}" style="flex:0 0 60px;"><i class="ri-arrow-left-line"></i></button>` : ''}
+            <button type="button" class="next-btn" id="qcm-validate-btn" data-action="validate-question" style="flex:1;">${tq('question.validate')}</button>
         `;
 
         // Si on revient sur une question déjà validée (bouton "retour"), on réaffiche son état
@@ -1230,8 +1230,8 @@ class QuizViewClass extends QuizVoiceBase {
 
         const actionsDiv = document.getElementById('qcm-actions-container');
         actionsDiv.innerHTML = `
-            ${showBackButton ? '<button class="next-btn" data-action="prev-question" style="flex:0 0 60px;"><i class="ri-arrow-left-line"></i></button>' : ''}
-            <button class="next-btn" data-action="next-question" style="flex:1;">${tq('question.next')} <i class="ri-arrow-right-line"></i></button>
+            ${showBackButton ? `<button type="button" class="next-btn" data-action="prev-question" aria-label="${tq('question.prev')}" style="flex:0 0 60px;"><i class="ri-arrow-left-line"></i></button>` : ''}
+            <button type="button" class="next-btn" data-action="next-question" style="flex:1;">${tq('question.next')} <i class="ri-arrow-right-line"></i></button>
         `;
 
         const courseLinks = this.getCourseLinks(result.question.code);

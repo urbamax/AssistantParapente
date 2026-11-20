@@ -327,12 +327,12 @@ self.addEventListener('fetch', (event) => {
                     const preloadResponse = await event.preloadResponse;
                     if (preloadResponse) {
                         const copy = preloadResponse.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                        event.waitUntil?.(caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)));
                         return preloadResponse;
                     }
                     const response = await fetch(request);
                     const copy = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                    event.waitUntil?.(caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)));
                     return response;
                 } catch {
                     const cached = await caches.match(request);
@@ -353,7 +353,7 @@ self.addEventListener('fetch', (event) => {
                     .then((response) => {
                         if (response.ok) {
                             const copy = response.clone();
-                            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                            event.waitUntil?.(caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)));
                         }
                         return response;
                     })
@@ -376,7 +376,7 @@ self.addEventListener('fetch', (event) => {
                 .then((response) => {
                     if (response.ok) {
                         const copy = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(key, copy));
+                        event.waitUntil?.(caches.open(CACHE_NAME).then((cache) => cache.put(key, copy)));
                     }
                     return response;
                 })
@@ -398,7 +398,7 @@ self.addEventListener('fetch', (event) => {
                     .then((response) => {
                         if (response.ok) {
                             const copy = response.clone();
-                            caches.open(targetCache).then((cache) => cache.put(request, copy));
+                            event.waitUntil?.(caches.open(targetCache).then((cache) => cache.put(request, copy)));
                         }
                         return response;
                     })
@@ -420,7 +420,7 @@ self.addEventListener('fetch', (event) => {
                 .then((response) => {
                     if (response.ok) {
                         const copy = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(key, copy));
+                        event.waitUntil?.(caches.open(CACHE_NAME).then((cache) => cache.put(key, copy)));
                         return response;
                     }
                     return cached || response;

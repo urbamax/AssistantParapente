@@ -435,13 +435,13 @@ export class LogbookEquipmentBase extends BaseView {
                             </div>
                         </div>
                         <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid rgba(0,0,0,0.05); padding-top:8px; margin-top: auto;">
-                            <button class="action-btn" data-action="editEquipment" data-args="'${escapeHTML(equip.id)}'" title="${tt('equipment.edit')}" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-orange);">
+                            <button type="button" class="action-btn" data-action="editEquipment" data-args="'${escapeHTML(equip.id)}'" title="${tt('equipment.edit')}" aria-label="${tt('equipment.edit')}" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-orange);">
                                 ✏️
                             </button>
-                            <button class="action-btn" data-action="toggleEquipmentStatus" data-args="'${escapeHTML(equip.id)}'" title="${tt(isArchive ? 'equipment.unarchive' : 'equipment.archive')}" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#6b7280;">
+                            <button type="button" class="action-btn" data-action="toggleEquipmentStatus" data-args="'${escapeHTML(equip.id)}'" title="${tt(isArchive ? 'equipment.unarchive' : 'equipment.archive')}" aria-label="${tt(isArchive ? 'equipment.unarchive' : 'equipment.archive')}" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#6b7280;">
                                 <i class="${isArchive ? 'ri-arrow-go-back-line' : 'ri-archive-line'}"></i>
                             </button>
-                            <button class="action-btn" data-action="deleteEquipment" data-args="'${escapeHTML(equip.id)}'" title="${tt('equipment.deleteForever')}" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#ef4444;">
+                            <button type="button" class="action-btn" data-action="deleteEquipment" data-args="'${escapeHTML(equip.id)}'" title="${tt('equipment.deleteForever')}" aria-label="${tt('equipment.deleteForever')}" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#ef4444;">
                                 🗑️
                             </button>
                         </div>

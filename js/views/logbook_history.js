@@ -355,10 +355,10 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                         </div>
                         <div class="session-date">${session.dateOnly ? formatDateOnly(session.datetime) : formatDateTime(session.datetime)}</div>
                         <div style="display: flex; gap: 8px;">
-                            <button class="edit-btn" data-action="editEntry" data-args="${escapeHTML(session.id)}" title="${tt('history.edit')}" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
+                            <button type="button" class="edit-btn" data-action="editEntry" data-args="${escapeHTML(session.id)}" title="${tt('history.edit')}" aria-label="${tt('history.edit')}" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
                                 <i class="ri-edit-line"></i>
                             </button>
-                            <button class="delete-btn" data-action="deleteEntry" data-args="${escapeHTML(session.id)}" title="${tt('history.delete')}" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
+                            <button type="button" class="delete-btn" data-action="deleteEntry" data-args="${escapeHTML(session.id)}" title="${tt('history.delete')}" aria-label="${tt('history.delete')}" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
                                 <i class="ri-delete-bin-line"></i>
                             </button>
                         </div>
