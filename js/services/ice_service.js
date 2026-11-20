@@ -420,11 +420,20 @@ export function callingCodeForCountry(countryCode) {
  * @returns {string} '' si le numéro est vide
  */
 export function toInternationalPhone(phone, defaultCountry = '33') {
-    const clean = sanitizePhone(phone);
+    if (!phone || typeof phone !== 'string') return '';
+    const withoutTrunkParen = phone.replace(/^(\s*(?:\+|00)\s*\d{1,3})\s*\(0\)/, '$1');
+    const clean = sanitizePhone(withoutTrunkParen);
     if (!clean) return '';
     if (clean.startsWith('+')) return clean;
     if (clean.startsWith('00')) return `+${clean.slice(2)}`;
-    if (defaultCountry && clean.startsWith('0') && clean.length === 10) return `+${defaultCountry}${clean.slice(1)}`;
+    if (defaultCountry) {
+        if (defaultCountry === '39' && clean.startsWith('0') && clean.length >= 6 && clean.length <= 11) {
+            return `+39${clean}`;
+        }
+        if (clean.startsWith('0') && clean.length >= 9 && clean.length <= 13) {
+            return `+${defaultCountry}${clean.slice(1)}`;
+        }
+    }
     return clean;
 }
 
@@ -747,6 +756,8 @@ export const IceService = {
     buildIceVCard,
     clampProfile,
     sanitizePhone,
+    COUNTRY_CALLING_CODES,
+    callingCodeForCountry,
     toInternationalPhone,
     formatPhoneDisplay,
     flagEmoji,

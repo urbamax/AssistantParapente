@@ -467,4 +467,19 @@ describe('LogbookService - link flights to their site', () => {
         expect(LogbookService.flights[0].site).toBe('Prairie du voisin');
         expect(LogbookService.flights[0].siteId).toBeUndefined();
     });
+
+    it('computeEquipmentWear ignores NaN/negative durations and deleteFlight survives non-array deleted_flights', () => {
+        LogbookService.equipment = [{ id: 'w1', nom: 'Alpha 7', type: 'voile' }];
+        LogbookService.flights = [
+            { id: 'f1', type: 'vol', voile: 'Alpha 7', duree: 'invalid', datetime: '2026-09-01T10:00' },
+            { id: 'f2', type: 'vol', voile: 'Alpha 7', duree: -30, datetime: '2026-09-02T10:00' },
+            { id: 'f3', type: 'vol', voile: 'Alpha 7', duree: 60, datetime: '2026-09-03T10:00' },
+        ];
+        const wear = LogbookService.computeEquipmentWear();
+        expect(wear['alpha 7'].totalTime).toBe(60);
+
+        localStorage.setItem('deleted_flights', '{"not":"an-array"}');
+        LogbookService.deleteFlight('f1');
+        expect(JSON.parse(localStorage.getItem('deleted_flights'))).toEqual(['f1']);
+    });
 });

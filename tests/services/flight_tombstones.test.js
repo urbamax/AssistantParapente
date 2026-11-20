@@ -196,4 +196,39 @@ describe('Deleted flights are never overwritten in the cloud', () => {
         FirebaseAuthEngine.currentUser = null;
         FirebaseAuthEngine.enabled = false;
     });
+
+    it('coalesces concurrent syncDataWithCloud calls via _activeSyncPromise and respects LWW on pendingEquip', async () => {
+        const staleEquip = { id: 'eq-1', nom: 'Ancienne voile', type: 'voile', updatedAt: 1000, syncPending: true };
+        LogbookService.equipment = [staleEquip];
+        StorageService.set(StorageService.KEYS.EQUIPMENT_DATA, LogbookService.equipment);
+        LogbookService.flights = [];
+        StorageService.set(StorageService.KEYS.LOGBOOK_DATA, []);
+
+        const firestore = createFakeFirestore({
+            'users/u1/equipment/eq-1': { id: 'eq-1', nom: 'Voile récente cloud', type: 'voile', updatedAt: 5000 },
+        });
+        const defaultLoad = FirebaseAuthEngine._loadFirestore;
+        FirebaseAuthEngine._loadFirestore = async () => firestore.module;
+        FirebaseAuthEngine.currentUser = { uid: 'u1' };
+        FirebaseAuthEngine.enabled = true;
+        vi.spyOn(FirebaseAuthEngine, 'updateModalUI').mockImplementation(() => {});
+        vi.spyOn(FirebaseAuthEngine, 'showStatus').mockImplementation(() => {});
+        vi.spyOn(QuizView, 'renderStats').mockImplementation(() => {});
+        vi.spyOn(SitesService, 'loadUserPreferences').mockImplementation(() => {});
+        vi.spyOn(SitesService, 'renderList').mockImplementation(() => {});
+
+        const p1 = FirebaseAuthEngine.syncDataWithCloud(true);
+        const p2 = FirebaseAuthEngine.syncDataWithCloud(false);
+        expect(p1).toBe(p2);
+        await p1;
+
+        const storedEquip = StorageService.get(StorageService.KEYS.EQUIPMENT_DATA);
+        expect(storedEquip[0].nom).toBe('Voile récente cloud');
+        expect(firestore.docs.get('users/u1/equipment/eq-1')?.nom).toBe('Voile récente cloud');
+
+        vi.restoreAllMocks();
+        FirebaseAuthEngine._loadFirestore = defaultLoad;
+        FirebaseAuthEngine.currentUser = null;
+        FirebaseAuthEngine.enabled = false;
+    });
 });

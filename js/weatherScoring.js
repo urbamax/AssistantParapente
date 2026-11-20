@@ -21,7 +21,7 @@ const SCORING_WEIGHTS = {
  * @returns {string} Direction cardinale ("N", "NE", "E", "SE", "S", "SO", "O", "NO")
  */
 function degreesToCardinal(deg) {
-    if (typeof deg !== 'number' || isNaN(deg)) return '';
+    if (typeof deg !== 'number' || !Number.isFinite(deg)) return '';
 
     // Normaliser les degrés entre 0 et 360
     const normalizedDeg = ((deg % 360) + 360) % 360;
@@ -179,7 +179,7 @@ export function evaluateSpotForecast(site, weather, userPreferences) {
         const wings = Array.isArray(userPreferences.wings) ? userPreferences.wings : [];
         const flyableWings = wings.filter(
             (wing) =>
-                wing.type === 'voile' &&
+                wing?.type === 'voile' &&
                 Number.isFinite(wing.ventMin) &&
                 Number.isFinite(wing.ventMax) &&
                 windSpeed >= wing.ventMin &&
@@ -193,13 +193,21 @@ export function evaluateSpotForecast(site, weather, userPreferences) {
             ventMin: /** @type {number} */ (w.ventMin),
             ventMax: /** @type {number} */ (w.ventMax),
         }));
-    } else if (windSpeed < userPreferences.vMin || windSpeed > userPreferences.vMax) {
+    } else if (
+        !Number.isFinite(userPreferences?.vMin) ||
+        !Number.isFinite(userPreferences?.vMax) ||
+        windSpeed < userPreferences.vMin ||
+        windSpeed > userPreferences.vMax
+    ) {
         return unflyable('WIND_OUT_OF_LIMITS', t('weather.windOutOfLimits'));
     }
 
     // D. Limite de la turbulence (delta rafale de l'utilisateur)
     const rafalesEffectives = Math.max(windGust, windSpeed);
-    if (rafalesEffectives - windSpeed > userPreferences.deltaRafaleMax) {
+    if (
+        !Number.isFinite(userPreferences?.deltaRafaleMax) ||
+        rafalesEffectives - windSpeed > userPreferences.deltaRafaleMax
+    ) {
         return unflyable('GUST_OUT_OF_LIMITS', t('weather.gustOutOfLimits'));
     }
 
@@ -253,8 +261,7 @@ export function evaluateSpotForecast(site, weather, userPreferences) {
     // B. Note d'Orientation (0 à 100)
     // Plus le vent est aligné avec l'orientation de la pente, plus le score est élevé.
     const windDirDeg = resolveWindDirDeg(weather);
-    const hasOrientation =
-        site.orientation_ideale_deg !== undefined && site.orientation_ideale_deg !== null && windDirDeg !== null;
+    const hasOrientation = Number.isFinite(site.orientation_ideale_deg) && windDirDeg !== null;
     let scoreOrientation = 100; // orientations connues mais pas d'orientation idéale en degrés
 
     if (hasOrientation) {

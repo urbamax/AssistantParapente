@@ -51,7 +51,7 @@ export async function runCheckFavoriteSitesWeather({
             .doc('user_prefs')
             .get();
         const prefs = { ...DEFAULT_PREFS, ...(prefsSnap.exists ? prefsSnap.data() : {}) };
-        const favoriteIds = Array.isArray(prefs.favoriteSites) ? prefs.favoriteSites : [];
+        const favoriteIds = Array.isArray(prefs.favoriteSites) ? [...new Set(prefs.favoriteSites)] : [];
         if (favoriteIds.length === 0) continue;
 
         const stateRef = db.collection('users').doc(userDoc.id).collection('pushState').doc('favoriteSitesFlyable');

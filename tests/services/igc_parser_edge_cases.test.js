@@ -48,4 +48,27 @@ describe('IGCParser — validFix & UTC midnight rollover', () => {
         expect(parsed.points).toHaveLength(2);
         expect(parsed.points.every((p) => Number.isFinite(p.lat) && Number.isFinite(p.lon))).toBe(true);
     });
+
+    it('rejette les heures B invalides (25:00:00, 12A000) et les altitudes corrompues, et detectLandingApproach rejette NaN', async () => {
+        const igc = [
+            'HFDTE321326', // date invalide ignorée
+            'B2500004500100N00600100EA0100001000', // heure 25h invalide
+            'B12A0004500100N00600100EA0100001000', // heure non numérique
+            'B1200054500100N00600100EA01X0001X00', // altitudes corrompues
+            'B1200104500100N00600100EA0100001000', // valide
+            'B1200204500200N00600200EA0105001050', // valide
+        ].join('\n');
+
+        const parsed = IGCParser.parse(igc);
+        expect(parsed.points).toHaveLength(2);
+
+        const { detectLandingApproach } = await import('../../js/services/landing_approach.js');
+        const badTrace = Array.from({ length: 10 }, (_, i) => ({
+            lat: i === 5 ? NaN : 45.8,
+            lon: 6.2,
+            alt: 1000 - i * 10,
+            timestamp: 1000000 + i * 2000,
+        }));
+        expect(detectLandingApproach(badTrace)).toBeNull();
+    });
 });

@@ -201,5 +201,31 @@ describe('IceService (js/services/ice_service.js)', () => {
             expect(sanitizePhone('06+12+34')).toBe('061234');
             expect(sanitizePhone('+41 79+123')).toBe('+4179123');
         });
+
+        it('handles trunk (0) in international format and preserves Italian landline leading 0', () => {
+            expect(IceService.toInternationalPhone('+33 (0)6 12 34 56 78', '33')).toBe('+33612345678');
+            expect(IceService.toInternationalPhone('02 1234 5678', '39')).toBe('+390212345678');
+            expect(IceService.toInternationalPhone('0151 12345678', '49')).toBe('+4915112345678');
+        });
+
+        it('uses profile.pays calling code in IceViewer web page for Swiss/Belgian pilots', async () => {
+            const { IceViewClass } = await import('../../js/views/ice_viewer.js');
+            const view = new IceViewClass();
+            view.profile = {
+                nom: 'Müller',
+                prenom: 'Hans',
+                pays: 'CH',
+                tel: '078 987 65 43',
+                contact1Name: 'Heidi',
+                contact1Phone: '079 123 45 67',
+                contact2Name: 'Peter',
+                contact2Phone: '076 111 22 33',
+            };
+            const html = view.renderPage();
+            expect(html).toContain('href="tel:+41789876543"');
+            expect(html).toContain('href="tel:+41791234567"');
+            expect(html).toContain('href="tel:+41761112233"');
+            expect(html).not.toContain('tel:+33');
+        });
     });
 });

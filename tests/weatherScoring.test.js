@@ -472,10 +472,26 @@ describe('thunderstorm risk (spec 001, US3, FR-010)', () => {
         const prefs = {
             ...DEFAULT_PREFS,
             filterMode: 'hardware',
-            wings: [{ type: 'voile', nom: 'Voile sans bornes', ventMin: null, ventMax: 30 }],
+            wings: [null, { type: 'voile', nom: 'Voile sans bornes', ventMin: null, ventMax: 30 }],
         };
         const res = evaluateSpotForecast(SITE_SOUTH, completeHourWith({ windSpeed: 15 }), prefs);
         expect(res.status).toBe('unflyable');
         expect(res.reasonCode).toBe('WIND_OUT_OF_EQUIPMENT_LIMITS');
+    });
+
+    it('never bypasses wind or gust kill switches when vMin/vMax/deltaRafaleMax are non-finite', () => {
+        const resWind = evaluateSpotForecast(SITE_SOUTH, completeHourWith({ windSpeed: 50 }), {
+            ...DEFAULT_PREFS,
+            vMax: undefined,
+        });
+        expect(resWind.status).toBe('unflyable');
+        expect(resWind.reasonCode).toBe('WIND_OUT_OF_LIMITS');
+
+        const resGust = evaluateSpotForecast(SITE_SOUTH, completeHourWith({ windSpeed: 15, windGust: 60 }), {
+            ...DEFAULT_PREFS,
+            deltaRafaleMax: NaN,
+        });
+        expect(resGust.status).toBe('unflyable');
+        expect(resGust.reasonCode).toBe('GUST_OUT_OF_LIMITS');
     });
 });

@@ -168,6 +168,7 @@ export class QuizStatsBase extends BaseView {
     renderStats() {
         console.log('QuizEngine.renderStats v4.4 - Starting');
         this.disconnectExamHistoryObserver();
+        this._disconnectTrackedResizeObservers();
         const container = document.getElementById('stats-content');
         if (!container) return;
 

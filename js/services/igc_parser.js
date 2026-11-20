@@ -22,11 +22,16 @@ const IGCParser = {
                 const dateMatch = line.match(/(\d{2})(\d{2})(\d{2})/);
                 if (dateMatch) {
                     const day = parseInt(dateMatch[1], 10);
-                    const month = parseInt(dateMatch[2], 10) - 1; // 0-indexed
+                    const monthRaw = parseInt(dateMatch[2], 10);
                     let year = parseInt(dateMatch[3], 10);
                     // Hypothèse pour l'année : 80-99 -> 1980-1999, 00-79 -> 2000-2079
                     year += year < 80 ? 2000 : 1900;
-                    baseDate = new Date(Date.UTC(year, month, day));
+                    if (monthRaw >= 1 && monthRaw <= 12 && day >= 1 && day <= 31) {
+                        const candidate = new Date(Date.UTC(year, monthRaw - 1, day));
+                        if (candidate.getUTCMonth() === monthRaw - 1 && candidate.getUTCDate() === day) {
+                            baseDate = candidate;
+                        }
+                    }
                 }
                 break;
             }
@@ -41,7 +46,9 @@ const IGCParser = {
         const hasValidAFix = bLines.some((l) => l.substring(24, 25) === 'A');
         const validBLines = hasValidAFix ? bLines.filter((l) => l.substring(24, 25) === 'A') : bLines;
         const hasGnssAltitude = validBLines.some((l) => {
-            const gnss = parseInt(l.substring(30, 35), 10);
+            const raw = l.substring(30, 35);
+            if (!/^(?:\d{5}|-\d{4})$/.test(raw)) return false;
+            const gnss = parseInt(raw, 10);
             return !isNaN(gnss) && gnss !== 0;
         });
         let dayOffsetMs = 0;
@@ -49,6 +56,7 @@ const IGCParser = {
         for (const l of validBLines) {
             // Format B: B HHMMSS DDMMmmmN DDDMMmmmE A PPPPP GGGGG
             const timeStr = l.substring(1, 7);
+            if (!/^\d{6}$/.test(timeStr)) continue;
             const latStr = l.substring(7, 15);
             const lonStr = l.substring(15, 24);
             const altBaroStr = l.substring(25, 30);
@@ -57,8 +65,8 @@ const IGCParser = {
             const lat = this._parseCoordinate(latStr, true);
             const lon = this._parseCoordinate(lonStr, false);
 
-            const altGnss = parseInt(altGnssStr, 10);
-            const altBaro = parseInt(altBaroStr, 10);
+            const altGnss = /^(?:\d{5}|-\d{4})$/.test(altGnssStr) ? parseInt(altGnssStr, 10) : NaN;
+            const altBaro = /^(?:\d{5}|-\d{4})$/.test(altBaroStr) ? parseInt(altBaroStr, 10) : NaN;
             const alt = hasGnssAltitude && !isNaN(altGnss) ? altGnss : isNaN(altBaro) ? altGnss : altBaro;
 
             if (lat !== null && lon !== null && !isNaN(alt)) {
@@ -533,9 +541,7 @@ const IGCParser = {
     },
 
     /**
-     * Distance en km entre deux points GPS (formule de Haversine). Dupliquée depuis
-     * js/utils/geo_utils.js car ce fichier est chargé en script classique (pas en module ES)
-     * et ne peut donc pas faire d'import.
+     * Distance en km entre deux points GPS (formule de Haversine).
      */
     _distanceKm: function (lat1, lon1, lat2, lon2) {
         const R = 6371;
@@ -547,7 +553,7 @@ const IGCParser = {
                 Math.cos((lat2 * Math.PI) / 180) *
                 Math.sin(dLon / 2) *
                 Math.sin(dLon / 2);
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * 2 * Math.atan2(Math.sqrt(Math.max(0, a)), Math.sqrt(Math.max(0, 1 - a)));
     },
 
     /**
