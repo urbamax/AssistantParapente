@@ -14,6 +14,7 @@ import SitesService from '../services/sites_service.js';
 import AccessService, { ACCESS_EVENTS, applyRoleVisibility } from '../services/access_service.js';
 import { initAppUpdateNotifier } from './app_update.js';
 import { receiveMigration, redirectFromLegacyOrigin } from './domain_migration.js';
+import { initCrashReporter } from '../services/crash_reporter.js';
 
 import QuizService, { isExamModeAvailable } from '../services/quiz_service.js';
 import { resolveStartMode } from './start_mode.js';
@@ -42,6 +43,11 @@ const IceView = viewProxy(iceModule);
 const FeedbackView = viewProxy(feedbackModule);
 
 async function bootApplication() {
+    try {
+        initCrashReporter();
+    } catch {
+        // ignore
+    }
     try {
         sessionStorage.removeItem('ap_stale_module_reloaded');
     } catch {
