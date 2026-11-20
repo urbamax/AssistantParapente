@@ -143,43 +143,47 @@ select {
     }
 }
 
-/* --- Bannière de mise à jour de l'app (js/core/app_update.js) --- */
+/* --- Écran bloquant de mise à jour obligatoire de l'app (js/core/app_update.js) --- */
 #app-update-banner {
     position: fixed;
-    left: 50%;
-    /* Au-dessus de la barre de navigation flottante (fixe, en bas) qu'elle recouvrirait sinon */
-    bottom: calc(108px + env(safe-area-inset-bottom));
-    transform: translateX(-50%);
-    z-index: 10000;
+    inset: 0;
+    z-index: var(--z-toast, 300000);
     display: flex;
     align-items: center;
-    gap: 12px;
-    max-width: calc(100vw - 32px);
-    padding: 10px 12px 10px 16px;
-    background: var(--bg-surface);
-    color: var(--text-main);
-    border: var(--border-glass);
-    border-radius: 999px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-    font-size: 0.9rem;
+    justify-content: center;
+    padding: 24px;
+    background: var(--bg-overlay, rgba(2, 6, 23, 0.65));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 
     .app-update-reload {
         background: var(--accent-orange);
         color: #fff;
         border: 0;
         border-radius: 999px;
-        padding: 6px 14px;
-        font-weight: 600;
+        padding: 16px 32px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: 0.01em;
         cursor: pointer;
-    }
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+        transition:
+            transform 0.15s ease,
+            filter 0.15s ease;
 
-    .app-update-dismiss {
-        background: transparent;
-        color: var(--text-muted);
-        border: 0;
-        font-size: 1.2rem;
-        line-height: 1;
-        cursor: pointer;
+        &:hover {
+            filter: brightness(1.08);
+            transform: scale(1.03);
+        }
+
+        &:active {
+            transform: scale(0.98);
+        }
+
+        &:focus-visible {
+            outline: 3px solid #fff;
+            outline-offset: 4px;
+        }
     }
 }
 
