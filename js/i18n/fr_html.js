@@ -375,6 +375,9 @@ export const FR_HTML = Object.freeze({
         choixDuThemeSombreClair:
             'Choix du thème (sombre/clair) et niveau, conservés uniquement dans votre stockage local.',
         donneesTechniques: 'Données Techniques :',
+        signalementsEtSuggestionsOptionnel: 'Signalements et suggestions (optionnel) :',
+        uniquementLorsqueVousUtilisez:
+            "uniquement lorsque vous envoyez volontairement le formulaire « Signaler un problème / Suggestion », le texte saisi, l'éventuel contact et (si laissé coché) le contexte technique non personnel sont transmis directement au serveur de l'éditeur afin de traiter votre retour. Le brouillon est conservé localement jusqu'à l'envoi ou son effacement.",
         n3HebergementDesDonnees: '3. Hébergement des Données',
         leSiteWebEst:
             "Le site web est auto-hébergé localement par l'éditeur. Les données de synchronisation optionnelles (comptes et statistiques si consentis) sont hébergées et sécurisées via la plateforme cloud Firebase (Google Ireland Limited, Dublin, Irlande). Les serveurs de Firebase sont situés au sein de l'Union Européenne.",
@@ -387,7 +390,7 @@ export const FR_HTML = Object.freeze({
         conformementAuReglementGeneral:
             "Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez de droits d'accès, de rectification, de portabilité et de suppression de vos données, ainsi que du droit de retirer votre consentement à tout moment.",
         pourTouteQuestionOu:
-            "Pour toute question ou pour exercer vos droits, vous pouvez contacter le responsable par le biais de la page du club-école <em>Le Fil d'Ariane</em> ou directement dans l'Espace Synchro.",
+            "Pour toute question ou pour exercer vos droits, vous pouvez contacter le responsable via le formulaire « Signaler un problème / Suggestion », par le biais de la page du club-école <em>Le Fil d'Ariane</em> ou directement dans l'Espace Synchro.",
     }),
     gdprLegalModal: Object.freeze({
         mentionsLegales: 'Mentions Légales',
@@ -836,9 +839,40 @@ export const FR_HTML = Object.freeze({
         mentionsLegales: 'Mentions Légales',
         confidentialite: 'Confidentialité',
         gestionDesCookies: 'Gestion des cookies & données',
+        signalerProblemeSuggestion: 'Signaler un problème / Suggestion',
         leClubEtLa:
             "Le club et la FFVL déclinent toute responsabilité quant à l'édition, au contenu et à l'utilisation de cette application indépendante.",
         proprieteDesCours:
             'Cours, affiches et questions du QCM : propriété de la FFVL et de leurs auteurs, présentés ici pour faciliter la formation.',
+    }),
+    feedbackModal: Object.freeze({
+        title: 'Signaler un problème / Suggestion',
+        ariaLabelFermer: 'Fermer',
+        intro: "Signalez un bug, une erreur dans un QCM, un cours ou une fiche site, ou proposez une amélioration. Aucune adresse e-mail n'est requise.",
+        categoryLabel: 'Type de retour',
+        catBug: 'Bug / problème technique',
+        catQcmCourse: 'Erreur QCM ou cours',
+        catSiteWeather: 'Erreur site ou météo',
+        catSuggestion: "Suggestion d'amélioration",
+        catOther: 'Autre remarque',
+        defaultHelper: "Décrivez ce qui ne s'affiche pas ou ne réagit pas comme prévu (bouton, calcul, écran figé…).",
+        subjectLabel: 'Objet',
+        optionalTag: '(optionnel)',
+        subjectPlaceholder: 'Résumé court en une ligne…',
+        descriptionLabel: 'Description détaillée',
+        requiredTag: '(obligatoire, 10 car. min.)',
+        initialCharCount: '0 / 3000',
+        descriptionPlaceholder: 'Ex. : Sur mobile, après avoir ouvert un vol IGC, le bouton de fermeture reste masqué…',
+        contactLabel: 'Contact pour une réponse',
+        contactPlaceholder: 'E-mail ou pseudo (uniquement si vous souhaitez une réponse)',
+        includeContextLabel:
+            'Joindre le contexte technique non personnel (écran actif, version, navigateur — aucune donnée de vol ni position GPS)',
+        contextPreviewTitle: 'Aperçu des informations techniques jointes :',
+        privacyNote:
+            "Envoi déclenché uniquement lorsque vous cliquez sur « Envoyer ». Hors ligne ou en cas d'indisponibilité, utilisez « Copier le message » et transmettez-le sur Facebook.",
+        resetBtn: 'Effacer le brouillon',
+        facebookFallback: 'Contacter Maxime sur Facebook',
+        copyBtn: 'Copier le message',
+        submitBtn: 'Envoyer',
     }),
 });

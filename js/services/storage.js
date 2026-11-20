@@ -21,6 +21,7 @@ const StorageService = {
         EXAM_HISTORY: 'parapente_exam_history',
         PENDING_QUIZ: 'pending_quiz',
         ACCESS: 'parapente_access',
+        FEEDBACK_DRAFT: 'parapente_feedback_draft',
     },
 
     /**
