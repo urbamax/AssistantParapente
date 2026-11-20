@@ -15,6 +15,7 @@ import AccessService, { ACCESS_EVENTS, applyRoleVisibility } from '../services/a
 import { initAppUpdateNotifier } from './app_update.js';
 import { receiveMigration, redirectFromLegacyOrigin } from './domain_migration.js';
 import { initCrashReporter } from '../services/crash_reporter.js';
+import { initPwaInstaller, promptInstall, closeInstallModal } from '../services/pwa_installer.js';
 
 import QuizService, { isExamModeAvailable } from '../services/quiz_service.js';
 import { resolveStartMode } from './start_mode.js';
@@ -45,6 +46,7 @@ const FeedbackView = viewProxy(feedbackModule);
 async function bootApplication() {
     try {
         initCrashReporter();
+        initPwaInstaller();
     } catch {
         // ignore
     }
@@ -127,6 +129,10 @@ async function bootApplication() {
     AppEvents.register('submitFeedback', () => FeedbackView.submit());
     AppEvents.register('copyFeedbackMessage', () => FeedbackView.copyMessage());
     AppEvents.register('resetFeedbackForm', () => FeedbackView.resetForm());
+
+    // PWA Install Events (spec 051)
+    AppEvents.register('installPwa', () => promptInstall());
+    AppEvents.register('closePwaInstallModal', () => closeInstallModal());
 
     // QCM Events
     AppEvents.register('showQcmBank', () => QuizView.showBankScreen());

@@ -436,3 +436,232 @@ select {
         justify-content: flex-end;
     }
 }
+
+/* Spec 051 : Intégration Communauté Discord & PWA Installer */
+.discord-btn {
+    text-decoration: none;
+    color: var(--text-secondary);
+}
+
+.discord-btn:hover {
+    color: #5865f2;
+    border-color: rgba(88, 101, 242, 0.4);
+    box-shadow: 0 0 12px rgba(88, 101, 242, 0.25);
+}
+
+.footer-discord-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+}
+
+.footer-discord-link:hover {
+    color: #5865f2;
+    text-decoration: underline;
+}
+
+.feedback-discord-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: rgba(88, 101, 242, 0.08);
+    border: 1px solid rgba(88, 101, 242, 0.25);
+    border-radius: 10px;
+    margin-top: 2px;
+}
+
+body.dark-theme .feedback-discord-banner {
+    background: rgba(88, 101, 242, 0.12);
+    border-color: rgba(88, 101, 242, 0.35);
+}
+
+.feedback-discord-icon {
+    font-size: 2rem;
+    color: #5865f2;
+    flex-shrink: 0;
+}
+
+.feedback-discord-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+
+.feedback-discord-lead {
+    font-size: 0.86rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.feedback-discord-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    padding: 6px 12px;
+    background: #5865f2;
+    color: #ffffff !important;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.feedback-discord-btn:hover {
+    background: #4752c4;
+    transform: translateY(-1px);
+}
+
+/* Boutons et liens d'installation PWA */
+.pwa-install-btn {
+    color: var(--color-primary, #0ea5e9);
+}
+
+.pwa-install-btn:hover {
+    color: #38bdf8;
+    border-color: rgba(14, 165, 233, 0.4);
+    box-shadow: 0 0 12px rgba(14, 165, 233, 0.25);
+}
+
+.pwa-install-btn.highlight {
+    animation: pwa-install-pulse 2.5s infinite;
+}
+
+@keyframes pwa-install-pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 5px rgba(14, 165, 233, 0);
+    }
+}
+
+.footer-install-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-primary, #0ea5e9);
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.footer-install-link:hover {
+    text-decoration: underline;
+}
+
+/* Modale de guidage installation PWA */
+.pwa-install-modal-box {
+    max-width: 520px;
+    width: 92%;
+}
+
+.pwa-install-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 4px 0;
+}
+
+.pwa-install-lead {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    background: rgba(120, 120, 120, 0.06);
+    border: 1px solid rgba(150, 150, 150, 0.12);
+    border-radius: 12px;
+}
+
+.pwa-install-app-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+}
+
+.pwa-install-lead-text h3 {
+    margin: 0 0 4px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.pwa-install-lead-text p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.pwa-install-instructions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pwa-install-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 12px;
+    background: rgba(120, 120, 120, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(150, 150, 150, 0.08);
+}
+
+.pwa-step-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-primary, #0ea5e9);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pwa-step-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+}
+
+.pwa-step-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.pwa-step-desc {
+    margin: 0;
+    font-size: 0.84rem;
+    color: var(--text-secondary);
+    line-height: 1.45;
+}
+
+.pwa-step-icon {
+    font-size: 1rem;
+    color: var(--color-primary, #0ea5e9);
+    vertical-align: middle;
+    padding: 0 2px;
+}
+
+.pwa-install-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 10px;
+}
+
