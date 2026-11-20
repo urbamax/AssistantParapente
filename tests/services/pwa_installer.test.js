@@ -183,6 +183,30 @@ describe('PwaInstaller Service (spec 051)', () => {
 
             window.matchMedia = origMatchMedia;
         });
+
+        it('updates all footer install links when footer is rendered across multiple screens', () => {
+            document.body.innerHTML = `
+                <button id="pwa-install-btn" style="display: none;"></button>
+                <div class="screen-1">
+                    <span class="footer-pwa-install-separator" style="display: none;">•</span>
+                    <a class="footer-pwa-install-link" style="display: none;">Installer</a>
+                </div>
+                <div class="screen-2">
+                    <span class="footer-pwa-install-separator" style="display: none;">•</span>
+                    <a class="footer-pwa-install-link" style="display: none;">Installer</a>
+                </div>
+            `;
+            setDeferredPrompt({ prompt: vi.fn() });
+            updateInstallUI(document);
+
+            const links = [...document.querySelectorAll('.footer-pwa-install-link')];
+            const seps = [...document.querySelectorAll('.footer-pwa-install-separator')];
+            expect(links).toHaveLength(2);
+            expect(seps).toHaveLength(2);
+            for (const el of [...links, ...seps]) {
+                expect(/** @type {HTMLElement} */ (el).style.display).toBe('inline');
+            }
+        });
     });
 
     describe('promptInstall', () => {

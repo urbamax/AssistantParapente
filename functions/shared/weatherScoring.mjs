@@ -172,6 +172,8 @@ export function evaluateSpotForecast(site, weather, userPreferences) {
 
     // C. Limites de vitesse du vent moyen (vMin / vMax de l'utilisateur, ou voiles du pilote)
     let hardwareWingsNames = [];
+    /** @type {Array<{ventMin: number, ventMax: number}>} */
+    let hardwareFlyableWings = [];
     if (userPreferences.filterMode === 'hardware') {
         // Les voiles sont fournies par l'appelant (SitesService) : ce module reste pur et
         // partagé avec le serveur, il ne lit aucun stockage (constitution, principe VIII).
@@ -188,6 +190,10 @@ export function evaluateSpotForecast(site, weather, userPreferences) {
             return unflyable('WIND_OUT_OF_EQUIPMENT_LIMITS', t('weather.windOutOfEquipmentLimits'));
         }
         hardwareWingsNames = flyableWings.map((w) => w.nom);
+        hardwareFlyableWings = flyableWings.map((w) => ({
+            ventMin: /** @type {number} */ (w.ventMin),
+            ventMax: /** @type {number} */ (w.ventMax),
+        }));
     } else if (windSpeed < userPreferences.vMin || windSpeed > userPreferences.vMax) {
         return unflyable('WIND_OUT_OF_LIMITS', t('weather.windOutOfLimits'));
     }
@@ -228,17 +234,22 @@ export function evaluateSpotForecast(site, weather, userPreferences) {
     // ---------------------------------------------------------
 
     // A. Note de Vitesse du Vent (0 à 100)
-    const vIdeal = (userPreferences.vMin + userPreferences.vMax) / 2;
-    const demiPlage = (userPreferences.vMax - userPreferences.vMin) / 2;
-
-    let scoreVentMoyen;
-    if (demiPlage > 0) {
-        const ecartVent = Math.abs(windSpeed - vIdeal);
-        scoreVentMoyen = Math.max(0, 100 * (1 - ecartVent / demiPlage));
-    } else {
+    const windScoreForRange = (min, max) => {
+        const vIdeal = (min + max) / 2;
+        const demiPlage = (max - min) / 2;
+        if (demiPlage > 0) {
+            const ecartVent = Math.abs(windSpeed - vIdeal);
+            return Math.max(0, 100 * (1 - ecartVent / demiPlage));
+        }
         // Protection division par zéro si vMin == vMax
-        scoreVentMoyen = windSpeed === vIdeal ? 100 : 0;
-    }
+        return windSpeed === vIdeal ? 100 : 0;
+    };
+
+    // En mode matériel, noter la vitesse du vent par rapport à la plage de la voile la mieux adaptée.
+    const scoreVentMoyen =
+        hardwareFlyableWings.length > 0
+            ? Math.max(...hardwareFlyableWings.map((w) => windScoreForRange(w.ventMin, w.ventMax)))
+            : windScoreForRange(userPreferences.vMin, userPreferences.vMax);
 
     // B. Note d'Orientation (0 à 100)
     // Plus le vent est aligné avec l'orientation de la pente, plus le score est élevé.

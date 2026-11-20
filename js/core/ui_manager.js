@@ -35,18 +35,14 @@ class UIManager {
     async loadComponents(basePath = '.') {
         this.basePath = basePath;
 
-        // Add cache buster to bypass old components cache
-        const v = '?v=2026.07.10_v10';
-
         const componentMap = [
-            { id: 'app-header', url: basePath + '/components/header.html' + v },
-            { id: 'app-footer', url: basePath + '/components/footer.html' + v, selector: '.app-footer-placeholder' },
+            { id: 'app-header', url: `${basePath}/components/header.html` },
+            { id: 'app-footer', url: `${basePath}/components/footer.html`, selector: '.app-footer-placeholder' },
         ];
 
         for (const comp of componentMap) {
             try {
-                const fetchUrl = `${comp.url}&t=${Date.now()}`;
-                const response = await fetch(fetchUrl);
+                const response = await fetch(comp.url);
                 if (!response.ok) throw new Error(`Network response was not ok for ${comp.url}`);
                 const html = await response.text();
 

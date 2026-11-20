@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Configuration
 APP_NAME="AssistantParapente"
@@ -19,11 +20,20 @@ echo "Dossier source : $PROJECT_DIR"
 echo "Fichier de destination : $BACKUP_FILE"
 echo ""
 
-# Exécuter la commande tar en excluant les dossiers lourds, temporaires ou non nécessaires (git, node_modules, etc.)
+# Exécuter la commande tar en excluant les dossiers lourds, secrets (.env), temporaires ou non nécessaires
 tar -czvf "$BACKUP_FILE" \
     --exclude=".git" \
+    --exclude=".claude" \
     --exclude="node_modules" \
+    --exclude="functions/node_modules" \
     --exclude=".venv" \
+    --exclude="dist" \
+    --exclude="coverage" \
+    --exclude="playwright-report" \
+    --exclude="test-results" \
+    --exclude=".env" \
+    --exclude=".env.*" \
+    --exclude="deploy/feedback_server/logs" \
     --exclude=".DS_Store" \
     --exclude="*.log" \
     --exclude="*__pycache__*" \

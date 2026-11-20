@@ -182,6 +182,51 @@ describe('AppRouter avec un écran chargé à la demande', () => {
         expect(screen.textContent).toContain('boom au montage');
         expect(screen.querySelector('[data-action="reloadApp"]')).not.toBeNull();
     });
+
+    it('annule une navigation lente si une nouvelle navigation démarre entre-temps (pas de race condition)', async () => {
+        const [slowMode, fastMode] = [newMode(), newMode()];
+        addScreen(slowMode);
+        addScreen(fastMode);
+
+        let resolveSlow;
+        const slowView = makeView();
+        const fastView = makeView();
+
+        AppRouter.register(
+            slowMode,
+            lazyViewModule(
+                () =>
+                    new Promise((resolve) => {
+                        resolveSlow = () => resolve({ default: slowView });
+                    }),
+            ),
+        );
+        AppRouter.register(fastMode, fastView);
+
+        const slowNav = AppRouter.navigate(slowMode, { pushState: false });
+        const fastNav = AppRouter.navigate(fastMode, { pushState: false });
+        await fastNav;
+        resolveSlow();
+        await slowNav;
+
+        expect(fastView.mount).toHaveBeenCalledTimes(1);
+        expect(slowView.mount).not.toHaveBeenCalled();
+        expect(AppRouter.activeRoute).toBe(fastView);
+    });
+
+    it('affiche quand même un écran d’erreur visible si la route en échec n’a pas de div #<mode>-screen', async () => {
+        const mode = newMode(); // aucun addScreen(mode) dans le DOM
+        AppRouter.register(
+            mode,
+            lazyViewModule(async () => {
+                throw new Error('chunk offline manquant');
+            }),
+        );
+
+        await AppRouter.navigate(mode, { pushState: false });
+        expect(document.body.textContent).toContain('chunk offline manquant');
+        expect(document.querySelector('[data-action="reloadApp"]')).not.toBeNull();
+    });
 });
 
 describe('viewProxy', () => {

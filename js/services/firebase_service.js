@@ -595,7 +595,11 @@ export const FirebaseAuthEngine = {
                     await setDoc(sRef, deletedFlightMarker(delId));
                     await this._deleteFlightTrace(firestoreModule, uid, delId);
                 }
-                localStorage.setItem('deleted_flights', '[]');
+                const processedFlightIds = new Set(deletedFlights);
+                const remainingFlightTombstones = readTombstoneIds('deleted_flights').filter(
+                    (id) => !processedFlightIds.has(id),
+                );
+                localStorage.setItem('deleted_flights', JSON.stringify(remainingFlightTombstones));
                 console.log(`Removed ${deletedFlights.length} deleted flights from Cloud.`);
             }
 
@@ -715,7 +719,11 @@ export const FirebaseAuthEngine = {
                     const eRef = doc(db, 'users', uid, 'equipment', delId);
                     await deleteDoc(eRef);
                 }
-                localStorage.setItem('deleted_equipment', '[]');
+                const processedEquipIds = new Set(deletedEquip);
+                const remainingEquipTombstones = readTombstoneIds('deleted_equipment').filter(
+                    (id) => !processedEquipIds.has(id),
+                );
+                localStorage.setItem('deleted_equipment', JSON.stringify(remainingEquipTombstones));
                 console.log(`Removed ${deletedEquip.length} deleted equipment items from Cloud.`);
             }
 

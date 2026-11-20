@@ -91,12 +91,24 @@ export function viewProxy(module) {
 
 /** Écran d'erreur affiché à la place d'une vue qui n'a pas pu être chargée ou montée. */
 function renderCrashScreen(screenEl, mode, error) {
-    if (!screenEl) return;
+    let target = screenEl;
+    if (!target && typeof document !== 'undefined' && document.body) {
+        target = document.getElementById('router-crash-fallback');
+        if (!target) {
+            target = document.createElement('div');
+            target.id = 'router-crash-fallback';
+            target.className = 'mode-screen active';
+            document.body.appendChild(target);
+        } else {
+            target.classList.add('active');
+        }
+    }
+    if (!target) return;
     // Le détail technique de l'erreur n'est montré qu'à la bêta et au propriétaire.
     const technicalDetails = AccessService.has(ROLES.BETA)
         ? `<pre style="background: var(--surface-hover, rgba(0,0,0,0.05)); padding: 1rem; border-radius: 8px; text-align: left; max-width: 100%; overflow-x: auto; font-size: 0.8rem; margin-bottom: 2rem; border: 1px solid var(--border-color);">${escapeHTML(error.message || String(error))}</pre>`
         : '';
-    screenEl.innerHTML = `
+    target.innerHTML = `
                         <div class="container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; text-align: center; margin-top: 2rem;">
                             <div class="empty-icon" style="color: var(--danger-color); font-size: 4rem; margin-bottom: 1rem;">🔥</div>
                             <h2 style="margin-bottom: 1rem;">${escapeHTML(t('errors.crashTitle'))}</h2>
@@ -112,6 +124,7 @@ class Router {
         this.routes = new Map();
         this.activeRoute = null;
         this._activeTransition = null;
+        this._navSeq = 0;
     }
 
     /** @param {string} mode @param {object | ReturnType<typeof lazyViewModule>} viewModule une vue, ou un écran chargé à la demande */
@@ -142,6 +155,7 @@ class Router {
             if (mode !== DENIED_ROUTE_FALLBACK) this.navigate(DENIED_ROUTE_FALLBACK, { ...params, pushState: false });
             return;
         }
+        const navId = ++this._navSeq;
         console.time('ROUTER_NAVIGATE_TOTAL_' + mode);
         // Le téléchargement de l'écran démarre tout de suite, pendant le démontage de l'écran actuel
         // et la transition ; on n'attend son résultat qu'au moment de monter.
@@ -157,6 +171,10 @@ class Router {
             }
         }
         console.timeEnd('ROUTER_UNMOUNT_PREVIOUS');
+        if (navId !== this._navSeq) {
+            console.timeEnd('ROUTER_NAVIGATE_TOTAL_' + mode);
+            return;
+        }
 
         console.time('ROUTER_HIDE_SCREENS');
         const updateDOM = () => {
@@ -224,6 +242,11 @@ class Router {
         } catch (e) {
             loadError = e;
             console.error(`Error loading ${mode}:`, e);
+        }
+        if (navId !== this._navSeq) {
+            console.timeEnd('ROUTER_HIDE_SCREENS');
+            console.timeEnd('ROUTER_NAVIGATE_TOTAL_' + mode);
+            return;
         }
         this.activeRoute = view;
         const screenEl = document.getElementById(`${mode.toLowerCase()}-screen`);

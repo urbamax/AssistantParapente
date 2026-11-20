@@ -25,6 +25,10 @@ const baseRules = {
     'no-var': 'error',
     'prefer-const': 'error',
     eqeqeq: 'error',
+    'no-eval': 'error',
+    'no-implied-eval': 'error',
+    'no-new-func': 'error',
+    'no-script-url': 'error',
     // Swallowing a non-critical error in an empty catch is a real, common
     // pattern in this codebase (best-effort cloud sync, optional parsing) —
     // not a smell worth flagging here.
@@ -42,6 +46,7 @@ export default [
             'img/**',
             'playwright-report/**',
             'test-results/**',
+            'coverage/**',
             '.claude/**',
             'js/data/*.json',
             // Copies générées de js/ pour la Cloud Function (scripts/sync_functions_shared.mjs) :
@@ -112,7 +117,11 @@ export default [
                 vi: 'readonly',
             },
         },
-        rules: baseRules,
+        rules: {
+            ...baseRules,
+            // Les tests XSS utilisent volontairement des chaînes 'javascript:...' comme vecteurs d'attaque.
+            'no-script-url': 'off',
+        },
     },
     {
         // Aides ES de la Cloud Function et scripts Node en module ES.
@@ -125,11 +134,22 @@ export default [
         rules: baseRules,
     },
     {
-        files: ['scripts/**/*.js', '*.config.js'],
+        // Cloud Function CommonJS (Node.js)
+        files: ['functions/**/*.js'],
+        languageOptions: {
+            ecmaVersion: 2022,
+            sourceType: 'commonjs',
+            globals: { ...globals.node },
+        },
+        rules: baseRules,
+    },
+    {
+        files: ['scripts/**/*.js', '*.config.js', '*.config.mjs'],
         languageOptions: {
             ecmaVersion: 2022,
             sourceType: 'module',
             globals: { ...globals.node },
         },
+        rules: baseRules,
     },
 ];

@@ -38,50 +38,56 @@ const IGCParser = {
         // ce point-là sur le baromètre, souvent décalé de plus de 100 m faute de calage, créait des
         // sauts d'altitude et des varios de +40 m/s.
         const bLines = lines.map((line) => line.trim()).filter((l) => l.startsWith('B') && l.length >= 35);
-        const hasGnssAltitude = bLines.some((l) => {
+        const hasValidAFix = bLines.some((l) => l.substring(24, 25) === 'A');
+        const validBLines = hasValidAFix ? bLines.filter((l) => l.substring(24, 25) === 'A') : bLines;
+        const hasGnssAltitude = validBLines.some((l) => {
             const gnss = parseInt(l.substring(30, 35), 10);
             return !isNaN(gnss) && gnss !== 0;
         });
-        for (const line of lines) {
-            const l = line.trim();
-            if (l.startsWith('B')) {
-                // Format B: B HHMMSS DDMMmmmN DDDMMmmmE A PPPPP GGGGG
-                if (l.length < 35) continue; // Ligne invalide
+        let dayOffsetMs = 0;
+        let lastUtcSeconds = -1;
+        for (const l of validBLines) {
+            // Format B: B HHMMSS DDMMmmmN DDDMMmmmE A PPPPP GGGGG
+            const timeStr = l.substring(1, 7);
+            const latStr = l.substring(7, 15);
+            const lonStr = l.substring(15, 24);
+            const altBaroStr = l.substring(25, 30);
+            const altGnssStr = l.substring(30, 35);
 
-                const timeStr = l.substring(1, 7);
-                const latStr = l.substring(7, 15);
-                const lonStr = l.substring(15, 24);
-                // const validFix = l.substring(24, 25);
-                const altBaroStr = l.substring(25, 30);
-                const altGnssStr = l.substring(30, 35);
+            const lat = this._parseCoordinate(latStr, true);
+            const lon = this._parseCoordinate(lonStr, false);
 
-                const lat = this._parseCoordinate(latStr, true);
-                const lon = this._parseCoordinate(lonStr, false);
+            const altGnss = parseInt(altGnssStr, 10);
+            const altBaro = parseInt(altBaroStr, 10);
+            const alt = hasGnssAltitude && !isNaN(altGnss) ? altGnss : isNaN(altBaro) ? altGnss : altBaro;
 
-                const altGnss = parseInt(altGnssStr, 10);
-                const altBaro = parseInt(altBaroStr, 10);
-                const alt = hasGnssAltitude && !isNaN(altGnss) ? altGnss : isNaN(altBaro) ? altGnss : altBaro;
+            if (lat !== null && lon !== null && !isNaN(alt)) {
+                const hours = parseInt(timeStr.substring(0, 2), 10);
+                const mins = parseInt(timeStr.substring(2, 4), 10);
+                const secs = parseInt(timeStr.substring(4, 6), 10);
+                if (isNaN(hours) || isNaN(mins) || isNaN(secs)) continue;
 
-                if (lat !== null && lon !== null) {
-                    const hours = parseInt(timeStr.substring(0, 2), 10);
-                    const mins = parseInt(timeStr.substring(2, 4), 10);
-                    const secs = parseInt(timeStr.substring(4, 6), 10);
-
-                    // Calcul du timestamp absolu (les heures IGC sont toujours en UTC)
-                    const pointDate = new Date(baseDate.getTime());
-                    pointDate.setUTCHours(hours, mins, secs);
-
-                    // Heure affichée à l'utilisateur : convertie dans son fuseau local
-                    const localTime = `${String(pointDate.getHours()).padStart(2, '0')}:${String(pointDate.getMinutes()).padStart(2, '0')}:${String(pointDate.getSeconds()).padStart(2, '0')}`;
-
-                    trace.push({
-                        lat: lat,
-                        lon: lon,
-                        alt: alt,
-                        time: localTime,
-                        timestamp: pointDate.getTime(),
-                    });
+                // Gestion du passage à minuit UTC (ex. 23:59:50 -> 00:00:05)
+                const utcSeconds = hours * 3600 + mins * 60 + secs;
+                if (lastUtcSeconds !== -1 && utcSeconds < lastUtcSeconds - 43200) {
+                    dayOffsetMs += 86400000;
                 }
+                lastUtcSeconds = utcSeconds;
+
+                // Calcul du timestamp absolu (les heures IGC sont toujours en UTC)
+                const pointDate = new Date(baseDate.getTime() + dayOffsetMs);
+                pointDate.setUTCHours(hours, mins, secs);
+
+                // Heure affichée à l'utilisateur : convertie dans son fuseau local
+                const localTime = `${String(pointDate.getHours()).padStart(2, '0')}:${String(pointDate.getMinutes()).padStart(2, '0')}:${String(pointDate.getSeconds()).padStart(2, '0')}`;
+
+                trace.push({
+                    lat: lat,
+                    lon: lon,
+                    alt: alt,
+                    time: localTime,
+                    timestamp: pointDate.getTime(),
+                });
             }
         }
 

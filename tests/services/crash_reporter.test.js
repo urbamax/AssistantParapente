@@ -157,6 +157,35 @@ describe('CrashReporter Service (spec 050)', () => {
             expect(capturedBody.category).toBe('crash');
             expect(capturedBody.subject).toContain('RangeError in map.js:88');
         });
+
+        it('supprime les paramètres et fragments URL sensibles (ICE, migration) avant envoi', async () => {
+            let capturedBody = null;
+            const mockFetch = vi.fn().mockImplementation(async (_url, opts) => {
+                capturedBody = JSON.parse(opts.body);
+                return { ok: true };
+            });
+
+            await sendCrashReport(
+                {
+                    name: 'Error',
+                    message: 'Failed at https://assistantparapente.fr/?mode=ICE#n=Dupont&al=Penicilline',
+                    filename: 'https://assistantparapente.fr/js/views/ice_viewer.js?v=1#secret=123',
+                    lineno: 12,
+                    colno: 4,
+                    stack: 'Error: boom\n    at https://assistantparapente.fr/#migration=g.SUPERSECRETBASE64:12:4',
+                },
+                {
+                    endpoint: '/api/feedback',
+                    sendBeaconImpl: null,
+                    fetchImpl: mockFetch,
+                },
+            );
+
+            expect(capturedBody.description).not.toContain('Dupont');
+            expect(capturedBody.description).not.toContain('Penicilline');
+            expect(capturedBody.description).not.toContain('SUPERSECRETBASE64');
+            expect(capturedBody.subject).not.toContain('secret=123');
+        });
     });
 
     describe('initCrashReporter', () => {

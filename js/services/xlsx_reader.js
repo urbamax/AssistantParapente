@@ -78,6 +78,9 @@ function listEntries(bytes) {
 
 /** Décompresse des données « deflate » brutes, en s'arrêtant dès que la taille permise est dépassée. */
 async function inflate(data, limit) {
+    if (typeof DecompressionStream !== 'function') {
+        throw new Error('Ce navigateur ne sait pas lire les fichiers Excel compressés (DecompressionStream absent).');
+    }
     const reader = new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw')).getReader();
     const chunks = [];
     let total = 0;

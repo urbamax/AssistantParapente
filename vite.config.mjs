@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import { createHash } from 'node:crypto';
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+import { basename, join, relative, sep } from 'node:path';
 
 // Le code source reste servable tel quel (python3 -m http.server) : Vite ne sert qu'à produire
 // dist/ (fichiers hachés, minifiés, sw.js versionné). Voir DOCUMENTATION.md.
@@ -29,6 +29,7 @@ const NOT_PRECACHED = ['courses'];
 
 function listFiles(dir) {
     return readdirSync(dir).flatMap((name) => {
+        if (name.startsWith('.')) return [];
         const full = join(dir, name);
         return statSync(full).isDirectory() ? listFiles(full) : [full];
     });
@@ -65,7 +66,10 @@ function staticAndServiceWorker() {
                 if (!existsSync(source)) continue;
                 const target = join(outDir, path);
                 mkdirSync(join(target, '..'), { recursive: true });
-                cpSync(source, target, { recursive: true });
+                cpSync(source, target, {
+                    recursive: true,
+                    filter: (src) => !basename(src).startsWith('.'),
+                });
                 copied.push(...(statSync(source).isDirectory() ? listFiles(source) : [source]));
             }
 
