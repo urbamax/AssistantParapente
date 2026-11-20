@@ -16,14 +16,24 @@ function canSeeErrors() {
     }
 }
 window.addEventListener('error', function (e) {
-    if (
-        e &&
-        typeof e.message === 'string' &&
-        e.message.indexOf('Importing binding name') !== -1 &&
-        typeof sessionStorage !== 'undefined' &&
-        sessionStorage.getItem('ap_stale_module_reloaded') !== '1'
-    ) {
-        sessionStorage.setItem('ap_stale_module_reloaded', '1');
+    const msg = e && typeof e.message === 'string' ? e.message : '';
+    const isStaleBindingError =
+        msg.indexOf('Importing binding name') !== -1 ||
+        msg.indexOf('does not provide an export named') !== -1 ||
+        msg.indexOf('import not found') !== -1;
+    let alreadyReloaded;
+    try {
+        alreadyReloaded =
+            typeof sessionStorage !== 'undefined' && sessionStorage.getItem('ap_stale_module_reloaded') === '1';
+    } catch {
+        alreadyReloaded = true;
+    }
+    if (isStaleBindingError && !alreadyReloaded) {
+        try {
+            sessionStorage.setItem('ap_stale_module_reloaded', '1');
+        } catch {
+            // ignore
+        }
         const clearCaches =
             typeof caches !== 'undefined'
                 ? caches.keys().then(function (keys) {

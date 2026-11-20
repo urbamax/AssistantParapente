@@ -69,7 +69,13 @@ const StorageService = {
             console.error(`[StorageService] Erreur lors de l'écriture de la clé "${key}":`, error);
 
             // Gestion d'erreur spécifique si le cache du navigateur est plein
-            if (error.name === 'QuotaExceededError') {
+            const isQuotaError =
+                error &&
+                (error.name === 'QuotaExceededError' ||
+                    error.name === 'NS_ERROR_DOM_QUOTA_REACHED' ||
+                    error.code === 22 ||
+                    error.code === 1014);
+            if (isQuotaError) {
                 console.warn("[StorageService] Le quota de stockage local est dépassé ! L'enregistrement a échoué.");
                 if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
                     window.dispatchEvent(new CustomEvent('parapente:storage-quota', { detail: { key } }));

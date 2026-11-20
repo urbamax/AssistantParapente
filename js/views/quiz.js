@@ -1100,6 +1100,7 @@ class QuizViewClass extends QuizVoiceBase {
             }
             QuizService.state.currentQcmSelection = normalized;
         }
+        this._disconnectTrackedResizeObservers();
         choicesDiv.innerHTML = q.choices
             .map((opt, idx) => {
                 const isSelected = QuizService.state.currentQcmSelection?.has(opt);
@@ -1503,6 +1504,7 @@ class QuizViewClass extends QuizVoiceBase {
             <div class="qcm-results-exit" style="margin-bottom: 8px;">${exitButtonHtml}</div>${summaryHtml ? `\n\n            ${summaryHtml}` : ''}
         `;
 
+        this._disconnectTrackedResizeObservers();
         choicesDiv.innerHTML = '';
         // Le bouton de sortie est dans le contenu, avant le récapitulatif : sinon il faut faire défiler
         // toute la liste d'erreurs pour le trouver.

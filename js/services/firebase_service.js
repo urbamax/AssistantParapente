@@ -123,6 +123,7 @@ export const FirebaseAuthEngine = {
     _changeSeq: 0,
     _syncedSeq: 0,
     _syncsInFlight: 0,
+    _activeSyncPromise: null,
 
     /**
      * Safari : au rechargement ou à la fermeture de la page, le navigateur coupait lui-même les
@@ -573,6 +574,16 @@ export const FirebaseAuthEngine = {
     // MÉTHODE CENTRALE : Synchro Cloud complète (toutes les données)
     // -----------------------------------------------------------------------
     syncDataWithCloud: async function (silent = false) {
+        if (!this.currentUser) return { success: false, data: null, error: 'Not logged in' };
+        if (this._activeSyncPromise) return this._activeSyncPromise;
+
+        this._activeSyncPromise = this._runSyncDataWithCloud(silent).finally(() => {
+            this._activeSyncPromise = null;
+        });
+        return this._activeSyncPromise;
+    },
+
+    _runSyncDataWithCloud: async function (silent = false) {
         if (!this.currentUser) return { success: false, data: null, error: 'Not logged in' };
 
         // Toutes les modifications faites jusqu'ici partent avec cette synchro ; une modification

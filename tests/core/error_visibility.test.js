@@ -77,6 +77,18 @@ describe('bannière rouge des erreurs globales', () => {
         expect(deleteMock).toHaveBeenCalledTimes(1);
         expect(deleteMock).toHaveBeenCalledWith('parapente-app-v1');
         expect(sessionStorage.getItem('ap_stale_module_reloaded')).toBe('1');
+
+        // Also handles V8 "does not provide an export named" once marker is cleared
+        sessionStorage.removeItem('ap_stale_module_reloaded');
+        window.dispatchEvent(
+            new ErrorEvent('error', {
+                message: "SyntaxError: The requested module './x.js' does not provide an export named 'bar'",
+                filename: 'x.js',
+                lineno: 1,
+                colno: 1,
+            }),
+        );
+        await vi.waitFor(() => expect(reloadSpy).toHaveBeenCalledTimes(2));
         vi.unstubAllGlobals();
     });
 });
