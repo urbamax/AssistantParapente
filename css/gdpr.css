@@ -22,7 +22,7 @@
     /* Above .desktop-main-nav (z-index: 9999, css/header.css) — the consent
        banner shares the same bottom-anchored screen region as the pill nav,
        so it must paint (and stay clickable) above it, not behind it. */
-    z-index: 10000;
+    z-index: var(--z-overlay);
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -158,7 +158,7 @@ body.light-mode .gdpr-btn-settings:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 200000 !important;
+    z-index: var(--z-modal) !important;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);

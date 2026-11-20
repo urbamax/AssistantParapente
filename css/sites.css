@@ -189,7 +189,7 @@ body.light-mode .site-coords-badge:hover {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 10000;
+    z-index: var(--z-overlay);
     display: flex;
     align-items: flex-end;
     opacity: 0;
@@ -331,7 +331,7 @@ body.light-mode .filter-dropdown-btn:hover {
     border: 1px solid var(--border-color);
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+    z-index: var(--z-dropdown);
     padding: 8px 0;
     opacity: 0;
     visibility: hidden;
@@ -893,7 +893,7 @@ body.light-mode .leaflet-tile-pane {
 .mode-screen:has(.map-view-fullscreen) {
     padding: 0 !important;
     overflow: hidden !important;
-    z-index: 100000 !important;
+    z-index: var(--z-fullscreen-ui) !important;
 }
 
 .map-view-fullscreen {
@@ -908,7 +908,7 @@ body.light-mode .leaflet-tile-pane {
     padding: 0 !important;
     box-sizing: border-box !important;
     background: var(--bg-main) !important;
-    z-index: 99999 !important;
+    z-index: var(--z-fullscreen) !important;
     display: flex !important;
     flex-direction: column !important;
     gap: 0 !important;
@@ -1527,7 +1527,7 @@ body.light-mode .forecast-sticky-container {
     .forecast-sticky-container.js-fixed {
         position: fixed !important;
         top: calc(var(--header-height, 100px) + 8px) !important;
-        z-index: 1000 !important;
+        z-index: var(--z-dropdown) !important;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
         margin-top: 0 !important;
     }
@@ -2540,7 +2540,7 @@ body.light-mode .action-btn-spot:hover {
     display: flex;
     align-items: center;
     gap: 8px;
-    z-index: 99999;
+    z-index: var(--z-fullscreen);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease, transform 0.3s ease;
@@ -2589,7 +2589,7 @@ body.light-mode .action-btn-spot:hover {
     justify-content: center;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(14, 165, 233, 0.3);
     cursor: pointer;
-    z-index: 1000;
+    z-index: var(--z-dropdown);
     opacity: 0;
     pointer-events: none;
     transform: translateY(20px);

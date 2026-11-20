@@ -573,7 +573,7 @@ body.light-mode .library-list-item {
 .course-viewer-overlay {
     position: fixed;
     inset: 0;
-    z-index: 300000; /* au-dessus de l'en-tête, de la barre de navigation et des écrans plein cadre (≤ 200000) */
+    z-index: var(--z-toast); /* au-dessus de l'en-tête, de la barre de navigation et des écrans plein cadre (≤ 200000) */
     display: flex;
     flex-direction: column;
     /* Barre et fond sombres quel que soit le thème de l'application, comme une visionneuse PDF. */
