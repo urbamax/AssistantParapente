@@ -869,9 +869,8 @@ export const FR_HTML = Object.freeze({
             'Joindre le contexte technique non personnel (écran actif, version, navigateur — aucune donnée de vol ni position GPS)',
         contextPreviewTitle: 'Aperçu des informations techniques jointes :',
         privacyNote:
-            "Envoi déclenché uniquement lorsque vous cliquez sur « Envoyer ». Hors ligne ou en cas d'indisponibilité, utilisez « Copier le message » et transmettez-le sur Facebook.",
+            "Envoi déclenché uniquement lorsque vous cliquez sur « Envoyer ». Hors ligne ou en cas d'indisponibilité, vous pouvez copier le message pour le transmettre plus tard.",
         resetBtn: 'Effacer le brouillon',
-        facebookFallback: 'Contacter Maxime sur Facebook',
         copyBtn: 'Copier le message',
         submitBtn: 'Envoyer',
     }),

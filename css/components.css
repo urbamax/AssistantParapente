@@ -425,12 +425,6 @@ select {
     margin-left: auto;
 }
 
-.feedback-fb-link {
-    font-size: 0.82rem;
-    color: var(--accent-orange);
-    text-decoration: underline;
-}
-
 @media (max-width: 600px) {
     .feedback-modal-box {
         padding: 20px 16px;

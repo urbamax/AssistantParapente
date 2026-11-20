@@ -37,7 +37,6 @@ function renderModalDOM() {
                     <button type="button" id="feedback-reset-btn" data-action="resetFeedbackForm">Effacer le brouillon</button>
                     <button type="button" id="feedback-copy-btn" data-action="copyFeedbackMessage">Copier le message</button>
                     <button type="button" id="feedback-submit-btn" data-action="submitFeedback">Envoyer</button>
-                    <a id="feedback-facebook-link" href="https://www.facebook.com/maxime.urbaniak/" target="_blank" rel="noopener noreferrer">Facebook</a>
                 </div>
             </div>
         </dialog>
