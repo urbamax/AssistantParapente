@@ -125,7 +125,7 @@ sequenceDiagram
     UI->>Browser: fetch(header.html & footer.html)
     Main->>Events: Register action handlers (navigate, QCM, Logbook, Sites, Auth)
     Main->>Router: AppRouter.register(routes) & initHistory()
-    Main->>Router: AppRouter.navigate(LAST_ACTIVE_ROUTE || 'LIBRARY')
+    Main->>Router: AppRouter.navigate(resolveStartMode(...)) -- defaults to WELCOME
 ```
 
 ### 2. Reactive State Management (`js/core/app_state.js`)
@@ -282,10 +282,10 @@ The map popup, the site card and the favourites table show, next to each verdict
 - `SitesService.getSiteById(id)` provides constant-time $\mathcal{O}(1)$ resolution through an internal cached `Map`.
 
 ### 5. Calculated weather is reserved to a role (`js/services/access_service.js`)
-The list, the search, the filters and the map of the flight sites are public. Everything the app **calculates** from the forecasts (verdict, flyable hours and slots, hourly timeline, favourites comparator, calculation settings, forecast-hour slider, push alerts) is shown only to accounts holding the `beta` role; for everyone else (including visitors with no account) it is absent, not greyed out.
+The **Sites & Weather (`SITES`)** screen is gated to the `owner` role (`ROUTE_ROLES = { SITES: ROLES.OWNER }` in `js/core/router.js`): without it, navigation falls back to `WELCOME` and the screen is neither loaded nor mounted. Inside the sites module, everything the app **calculates** from the forecasts (verdict, flyable hours and slots, hourly timeline, favourites comparator, calculation settings, forecast-hour slider, push alerts) is shown only to accounts holding the `beta` (or `owner`) role; for everyone else it is absent, not greyed out.
 
-- **Granting the role** is manual, in the Firebase console (or with the admin SDK): create `users/{uid}/access/profile` with `roles: ["beta"]` (array of strings). No e-mail address or identifier is stored in the code. `firestore.rules` lets the owner read this document and refuses every client write, so a pilot cannot give themselves a role (tested in `tests/firestore_rules/`). **Publish the rules before the app version that reads it.**
-- **Owner**: the `owner` role (`roles: ["owner"]`) has every right of every other role, including roles added later (`AccessService.has()` returns true for it; `hasBetaRole` accepts it in the Cloud Function). It unlocks nothing of its own yet.
+- **Granting the role** is manual, in the Firebase console (or with the admin SDK): create `users/{uid}/access/profile` with `roles: ["beta"]` (array of strings). No e-mail address or identifier is stored in the code. `firestore.rules` lets the owner read this document and refuses every client write, so a pilot cannot give themselves a role (tested in `tests/firestore_rules/` via `npm run test:rules`, also run in CI). **Publish the rules before the app version that reads it.**
+- **Owner**: the `owner` role (`roles: ["owner"]`) unlocks the `SITES` route and inherits every right of every other role, including roles added later (`AccessService.has()` returns true for it; `hasBetaRole` accepts it in the Cloud Function).
 - **Technical errors**: the red global error banner (`js/error_overlay.js`, a classic script that reads the cached roles straight from `localStorage`) and the technical detail on the « screen could not load » page (`renderCrashScreen` in `js/core/router.js`) are shown only to `beta` and `owner`. Everyone else sees no banner (the error still goes to the console) and the crash page keeps its message and reload button without the detail. Unhandled errors and promise rejections across all sessions (spec 050, `js/services/crash_reporter.js`) filter out third-party extension noise and transient network failures, and transmit an anonymous, rate-limited crash report to the server (`/api/feedback` with category `crash`) to notify the operator via Discord. Messages meant for the user (form validation, sync or sign-in feedback) are unchanged. Tests: `tests/core/error_visibility.test.js`, `tests/services/crash_reporter.test.js`.
 - **User manual** (`#manual-modal` in `index.html`): without the role it does not mention calculated weather at all. The « Calcul Volabilité » tab and section, and sections 2–4 of the flight-sites chapter are hidden (`data-requires-role="beta"`); every sentence that mixes weather with other content has a replacement written for everyone else (`data-hidden-with-role="beta"`, catalogue keys ending in `SansMeteo` or with their own name in `js/i18n/fr_html.js`). When editing the manual, change **both** variants of a sentence. Tests: `tests/views/manual_by_role.test.js`. The external map services (Windy, Météo-Parapente…), the meteorology theory theme and the logbook's automatic weather capture stay described: they are visible to everyone.
 - **Reading it**: after sign-in, `FirebaseAuthEngine.refreshAccess()` reads the document and calls `AccessService.setRoles()`; sign-out calls `AccessService.clear()`. The roles are also kept in `localStorage` (`parapente_access`, tied to the uid) so the screen is right at startup and offline; offline or on a read error the last known roles stay. A role removed from Firestore takes effect at the next sign-in or page load.
@@ -393,7 +393,7 @@ Calculates overall success percentage, subject mastery radar, active day streak,
 
 ### 1. Hybrid Storage Strategy (`js/services/firebase_service.js`)
 - **Offline Mode (Guest)**: Data is immediately written to `LocalStorage` using `StorageService`.
-- **Authenticated Mode**: Automatically merges local data with Cloud Firestore (`users/{uid}/data`). Supports Google Auth and Email/Password sign-in.
+- **Authenticated Mode**: Automatically merges local data with Cloud Firestore under `users/{uid}` subcollections (`logbook`, `equipment`, `stats`, `preferences`, `igcTraces`, `ice`, read-only `access`, and server-only `pushState`), enforced by `firestore.rules` (tested via `npm run test:rules`). Supports Google Auth and Email/Password sign-in.
 
 ### 2. Local backup file, without an account (specs 041 and 042, `js/services/backup_service.js`, `js/core/backup_ui.js`)
 - **Where**: "Exporter" / "Importer" in the "Espace Synchro" dialog (always visible, even when the Firebase consent is refused) and in the privacy options. They never need an account or consent: the file stays on the device.
@@ -505,7 +505,7 @@ To produce an optimized build (hashed and minified JS/CSS, versioned service wor
 npm run build      # outputs dist/
 npm run preview    # serves dist/ locally
 ```
-The service worker also keeps two **runtime caches that survive app updates** (spec 008): `parapente-courses-v1` (course PDFs the pilot has opened — never downloaded in advance; a partial Range read triggers one full download; offline, the stored document is served, never `index.html`) and `parapente-tiles-v1` (Esri map tiles already displayed, requested with CORS via `crossOrigin: true`, capped at 1 500 tiles, oldest removed first; no area pre-download, as the tile provider's terms do not allow it). Activation deletes every other old cache.
+The service worker also keeps two **runtime caches that survive app updates** (spec 008): `parapente-courses-v2` (course PDFs the pilot has opened — never downloaded in advance; a partial Range read triggers one full download; offline, the stored document is served, never `index.html`) and `parapente-tiles-v1` (Esri map tiles already displayed, requested with CORS via `crossOrigin: true`, capped at 1 500 tiles, oldest removed first; no area pre-download, as the tile provider's terms do not allow it). Activation deletes every other old cache.
 
 The build rewrites `sw.js` into `dist/sw.js`: the precache list is generated from the emitted files and `CACHE_NAME` is derived from their names and contents, so no manual `bump.py` is needed for a `dist/` deployment.
 

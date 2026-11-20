@@ -17,11 +17,11 @@
 
 ## 🌟 Fonctionnalités Principales
 
-### 🗺️ Sites de Vol & Météo Pré-Vol
+### 🗺️ Sites de Vol & Météo Pré-Vol *(accès restreint au rôle propriétaire)*
 - **Cartographie 2D & 3D Relief** : Navigation interactive sur carte Leaflet 2D et rendu 3D haute performance avec relief DEM via MapLibre GL JS.
 - **Exploitabilité en temps réel** : Analyse croisée des modèles météo haute résolution AROME (0.01° et 0.025°) et GFS via l'API Open-Meteo pour chaque décollage et atterrissage.
 - **Balises & Brises** : Intégration des balises en temps réel (Pioupiou / FFVL) et des windgrams Spotair.
-- **Orientation & Aérologie** : Scoring visuel de l'exploitabilité par tranche horaire, alertes de vent fort, de rafales et d'inversion thermique.
+- **Orientation & Aérologie** : Scoring visuel de l'exploitabilité par tranche horaire, alertes de vent fort, de rafales et de risque orageux (CAPE), avec rappel systématique de décision pilote.
 - **Fonctionnement Hors-Ligne** : Mise en cache automatique des dernières prévisions consultées pour un accès sur le terrain hors réseau.
 
 ### 📓 Carnet de Vol & Analyseur de Traces GPS
@@ -50,10 +50,16 @@
 - **Synthèse Vocale Interactive** : Lecture audio des questions et options pour réviser les mains libres.
 - **Suivi de Progression Officielle** : Suivi des brevets théoriques et pratiques obtenus avec affichage des scores officiels en points et pourcentages.
 
-### 🛡️ Sécurité & Check-lists
+### 🛡️ Sécurité, Check-lists & Fiche d'Urgence ICE
 - **Check-lists interactives** : Méthode prévol 7 points de l'Initiation et grille 9BD.
 - **Test « Prêt à décoller ? »** : Verdict colorimétrique objectif (vert / orange / rouge) avant l'envol.
+- **Fiche d'urgence ICE & QR Code casque** : Génération d'étiquette QR (vCard hors-ligne + lecteur web `?mode=ICE#...`) avec contacts d'urgence, groupe sanguin, allergies, anticoagulants et licence.
 - **Urgences Aéronautiques** : Procédure d'appel de secours, coordonnées GPS instantanées, rappel de la fréquence sécurité FFVL (143.9875 MHz) et numéro d'urgence européen 112.
+
+### 📱 PWA, Sauvegarde & Communauté
+- **Installation 1-clic & Hors-Ligne** : Installable sur l'écran d'accueil (Android/Chromium natif + guide visuel iOS Safari), utilisable sans réseau au décollage.
+- **Sauvegarde locale sans compte** : Export/import JSON complet (carnet, matériel, traces IGC compressées, statistiques QCM) sans création de compte obligatoire.
+- **Retours pilotes & Communauté** : Modale intégrée de signalement/suggestion et accès direct au serveur Discord communautaire.
 
 ### 📚 Bibliothèque & Visionneuse de Cours
 - **Lecteur de documents intégré** : Consultation in-app des livrets de progression et manuels fédéraux officiels via PDF.js.

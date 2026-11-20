@@ -26,11 +26,11 @@
             http-equiv="Content-Security-Policy"
             content="
         default-src 'self';
-        script-src 'self' https://unpkg.com https://apis.google.com;
-        style-src 'self' 'unsafe-inline' https://unpkg.com;
+        script-src 'self' https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js https://unpkg.com/deck.gl@9.4.0/dist.min.js https://apis.google.com;
+        style-src 'self' 'unsafe-inline' https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css;
         font-src 'self' data:;
         img-src 'self' data: blob: https://server.arcgisonline.com https://www.spotair.mobi https://balisemeteo.com;
-        connect-src 'self' https://api.open-meteo.com https://archive-api.open-meteo.com https://nominatim.openstreetmap.org https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://fcmregistrations.googleapis.com https://firebaseinstallations.googleapis.com https://mt1.google.com https://s3.amazonaws.com https://demotiles.maplibre.org;
+        connect-src 'self' https://api.open-meteo.com https://archive-api.open-meteo.com https://nominatim.openstreetmap.org https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://fcmregistrations.googleapis.com https://firebaseinstallations.googleapis.com https://mt1.google.com https://s3.amazonaws.com/elevation-tiles-prod/ https://demotiles.maplibre.org;
         frame-src 'self' https://www.spotair.mobi https://embed.windy.com https://meteo-parapente.com https://www.paraglidingearth.com https://paraglidable.com https://assistantparapente.firebaseapp.com;
         worker-src 'self' blob:;
         manifest-src 'self';
@@ -1473,7 +1473,7 @@
             </div>
             <!-- End library-container -->
 
-            <button data-i18n-title="sitesScreen.titleRemonterEnHaut" id="btn-back-to-top" class="back-to-top-btn" data-action="scrollToTop" title="Remonter en haut">
+            <button data-i18n-title="sitesScreen.titleRemonterEnHaut" data-i18n-aria-label="sitesScreen.titleRemonterEnHaut" id="btn-back-to-top" class="back-to-top-btn" data-action="scrollToTop" title="Remonter en haut" aria-label="Remonter en haut">
                 <i class="ri-arrow-up-line"></i>
             </button>
 
@@ -1841,7 +1841,7 @@
             style="display: none"
         >
             <div class="auth-modal">
-                <button class="auth-close-btn" data-action="FirebaseAuthcloseAuthModal">
+                <button type="button" class="auth-close-btn" data-action="FirebaseAuthcloseAuthModal" data-i18n-aria-label="common.fermer" aria-label="Fermer">
                     <i class="ri-close-line"></i>
                 </button>
                 <div data-i18n="common.espaceSynchro" class="auth-title">ESPACE SYNCHRO</div>
@@ -2189,7 +2189,7 @@
                             Sélectionnez une carte supplémentaire
                         </div>
                     </div>
-                    <button class="close-bs-btn" data-action="closeMoreMapsDropdown">
+                    <button type="button" class="close-bs-btn" data-action="closeMoreMapsDropdown" data-i18n-aria-label="common.fermer" aria-label="Fermer">
                         <i class="ri-close-line"></i>
                     </button>
                 </div>
@@ -2201,7 +2201,7 @@
             <div class="bottom-sheet">
                 <div class="bs-header">
                     <h3 data-i18n="gpsBottomSheet.sYRendreAvec">S'y rendre avec...</h3>
-                    <button class="close-bs-btn" data-action="closeGpsMenu"><i class="ri-close-line"></i></button>
+                    <button type="button" class="close-bs-btn" data-action="closeGpsMenu" data-i18n-aria-label="common.fermer" aria-label="Fermer"><i class="ri-close-line"></i></button>
                 </div>
                 <div class="bs-options">
                     <button data-i18n="gpsBottomSheet.waze" class="bs-option-btn" data-action="launchGps" data-args="&#39;waze&#39;">
@@ -2266,9 +2266,12 @@
                         <span data-i18n="gdprSettingsModal.optionsDeConfidentialite">Options de Confidentialité</span>
                     </div>
                     <button
+                        type="button"
                         class="gdpr-modal-close-btn"
                         data-action="hideModal"
                         data-args="&#39;gdpr-settings-modal&#39;"
+                        data-i18n-aria-label="common.fermer"
+                        aria-label="Fermer"
                     >
                         <i class="ri-close-line"></i>
                     </button>
@@ -2393,9 +2396,12 @@
                         <span data-i18n="gdprPrivacyModal.politiqueDeConfidentialite">Politique de Confidentialité</span>
                     </div>
                     <button
+                        type="button"
                         class="gdpr-modal-close-btn"
                         data-action="hideModal"
                         data-args="&#39;gdpr-privacy-modal&#39;"
+                        data-i18n-aria-label="common.fermer"
+                        aria-label="Fermer"
                     >
                         <i class="ri-close-line"></i>
                     </button>
@@ -2499,7 +2505,7 @@
                         <i class="ri-government-line"></i>
                         <span data-i18n="gdprLegalModal.mentionsLegales">Mentions Légales</span>
                     </div>
-                    <button class="gdpr-modal-close-btn" data-action="hideModal" data-args="&#39;gdpr-legal-modal&#39;">
+                    <button type="button" class="gdpr-modal-close-btn" data-action="hideModal" data-args="&#39;gdpr-legal-modal&#39;" data-i18n-aria-label="common.fermer" aria-label="Fermer">
                         <i class="ri-close-line"></i>
                     </button>
                 </div>
@@ -2591,7 +2597,7 @@
                         <i class="ri-windy-line"></i>
                         <span data-i18n="spotairModal.ventEnDirect" id="spotair-modal-title">Vent en direct — SpotAiR</span>
                     </div>
-                    <button class="gdpr-modal-close-btn" data-action="SitescloseSpotairModal">
+                    <button type="button" class="gdpr-modal-close-btn" data-action="SitescloseSpotairModal" data-i18n-aria-label="common.fermer" aria-label="Fermer">
                         <i class="ri-close-line"></i>
                     </button>
                 </div>
@@ -2688,7 +2694,7 @@
                         <i class="ri-upload-cloud-line"></i>
                         <span id="logbook-batch-title"></span>
                     </div>
-                    <button type="button" id="logbook-batch-close" class="gdpr-modal-close-btn" data-action="closeBatchImport">
+                    <button type="button" id="logbook-batch-close" class="gdpr-modal-close-btn" data-action="closeBatchImport" data-i18n-aria-label="common.fermer" aria-label="Fermer">
                         <i class="ri-close-line"></i>
                     </button>
                 </div>
@@ -2720,7 +2726,7 @@
                         <i class="ri-file-excel-2-line"></i>
                         <span id="logbook-ffvl-title"></span>
                     </div>
-                    <button type="button" id="logbook-ffvl-close" class="gdpr-modal-close-btn" data-action="closeFfvlImport">
+                    <button type="button" id="logbook-ffvl-close" class="gdpr-modal-close-btn" data-action="closeFfvlImport" data-i18n-aria-label="common.fermer" aria-label="Fermer">
                         <i class="ri-close-line"></i>
                     </button>
                 </div>
@@ -3090,7 +3096,7 @@
                         <i class="ri-book-read-line"></i>
                         <span data-i18n="manualModal.modeDEmploi">Mode d'emploi</span>
                     </div>
-                    <button class="gdpr-modal-close-btn" data-action="hideManual">
+                    <button type="button" class="gdpr-modal-close-btn" data-action="hideManual" data-i18n-aria-label="common.fermer" aria-label="Fermer">
                         <i class="ri-close-line"></i>
                     </button>
                 </div>

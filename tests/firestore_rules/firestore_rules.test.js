@@ -386,3 +386,131 @@ describe("document de stats QCM (forme écrite par l'application)", () => {
         expect(String(error?.message)).toMatch(/Nested arrays/);
     });
 });
+
+// Helper pour fabriquer un objet avec N clés distinctes (test des bornes anti-abus).
+const manyKeys = (n, extra = {}) => {
+    const obj = { ...extra };
+    for (let i = 0; i < n; i++) obj[`k${i}`] = i;
+    return obj;
+};
+
+describe('durcissement des bornes et types (anti-abus)', () => {
+    describe('document racine users/{uid}', () => {
+        it('accepte un fcmToken valide jusqu’à 512 caractères', async () => {
+            await assertSucceeds(setDoc(doc(asMe(), 'users', ME), { fcmToken: 't'.repeat(512) }));
+        });
+
+        it('refuse un fcmToken non textuel ou trop long (> 512)', async () => {
+            await assertFails(setDoc(doc(asMe(), 'users', ME), { fcmToken: 12345 }));
+            await assertFails(setDoc(doc(asMe(), 'users', ME), { fcmToken: 't'.repeat(513) }));
+        });
+
+        it('refuse un document racine avec plus de 10 clés', async () => {
+            await assertFails(setDoc(doc(asMe(), 'users', ME), manyKeys(11)));
+        });
+    });
+
+    describe('préférences (preferences/user_prefs)', () => {
+        const prefsRef = (id = 'user_prefs') => doc(asMe(), 'users', ME, 'preferences', id);
+
+        it('accepte jusqu’à 100 sites favoris et des limites de vent numériques', async () => {
+            await assertSucceeds(
+                setDoc(prefsRef(), {
+                    favoriteSites: Array.from({ length: 100 }, (_, i) => `site-${i}`),
+                    limitWindMin: 5,
+                    limitWindMax: 25,
+                    limitGustDelta: 10,
+                }),
+            );
+        });
+
+        it('refuse un autre identifiant de document que user_prefs', async () => {
+            await assertFails(setDoc(prefsRef('other_prefs'), { limitWindMax: 25 }));
+        });
+
+        it('refuse plus de 100 sites favoris (anti-amplification Open-Meteo) ou un type invalide', async () => {
+            await assertFails(
+                setDoc(prefsRef(), {
+                    favoriteSites: Array.from({ length: 101 }, (_, i) => `site-${i}`),
+                }),
+            );
+            await assertFails(setDoc(prefsRef(), { favoriteSites: 'annecy' }));
+        });
+
+        it('refuse des limites de vent non numériques, iceProfile ou plus de 40 clés', async () => {
+            await assertFails(setDoc(prefsRef(), { limitWindMin: '0' }));
+            await assertFails(setDoc(prefsRef(), { limitWindMax: '25' }));
+            await assertFails(setDoc(prefsRef(), { limitGustDelta: '10' }));
+            await assertFails(setDoc(prefsRef(), { iceProfile: { nom: 'Dupont' } }));
+            await assertFails(setDoc(prefsRef(), manyKeys(41)));
+        });
+    });
+
+    describe('carnet de vol (logbook/{flightId})', () => {
+        const flightRef = (id = 'vol-1') => doc(asMe(), 'users', ME, 'logbook', id);
+
+        it('accepte un vol normal et un marqueur de suppression cloud (deleted: true)', async () => {
+            await assertSucceeds(setDoc(flightRef('vol-1'), { id: 'vol-1', site: 'Annecy', updatedAt: 1000 }));
+            await assertSucceeds(
+                setDoc(flightRef('vol-1'), { id: 'vol-1', deleted: true, deletedAt: 2000, updatedAt: 2000 }),
+            );
+        });
+
+        it('refuse un id absent, incohérent ou trop long (> 128)', async () => {
+            await assertFails(setDoc(flightRef('vol-1'), { site: 'Annecy' }));
+            await assertFails(setDoc(flightRef('vol-1'), { id: 'autre-vol', site: 'Annecy' }));
+            await assertFails(setDoc(flightRef('x'.repeat(129)), { id: 'x'.repeat(129) }));
+        });
+
+        it('refuse rawIgc dans un document de vol et plus de 60 clés', async () => {
+            await assertFails(setDoc(flightRef('vol-1'), { id: 'vol-1', rawIgc: 'AXXX...' }));
+            await assertFails(setDoc(flightRef('vol-1'), manyKeys(60, { id: 'vol-1' })));
+        });
+    });
+
+    describe('matériel (equipment/{itemId})', () => {
+        const equipRef = (id = 'e1') => doc(asMe(), 'users', ME, 'equipment', id);
+
+        it('refuse un id incohérent ou > 128 caractères et plus de 40 clés', async () => {
+            await assertFails(setDoc(equipRef('e1'), { id: 'e2' }));
+            await assertFails(setDoc(equipRef('e1'), { id: 42 }));
+            await assertFails(setDoc(equipRef('x'.repeat(129)), { id: 'x'.repeat(129) }));
+            await assertFails(setDoc(equipRef('e1'), manyKeys(40, { id: 'e1' })));
+        });
+    });
+
+    describe('statistiques (stats/{statId})', () => {
+        it('accepte exam_history valide et refuse un statId inconnu', async () => {
+            await assertSucceeds(
+                setDoc(doc(asMe(), 'users', ME, 'stats', 'exam_history'), {
+                    exams: [{ id: 'ex1', score: 90 }],
+                    deletedExamIds: [],
+                }),
+            );
+            await assertFails(setDoc(doc(asMe(), 'users', ME, 'stats', 'autre_stat'), { a: 1 }));
+        });
+
+        it('refuse les types invalides sur qcm_stats et exam_history', async () => {
+            await assertFails(setDoc(doc(asMe(), 'users', ME, 'stats', 'qcm_stats'), { totalQuestions: 'beaucoup' }));
+            await assertFails(setDoc(doc(asMe(), 'users', ME, 'stats', 'exam_history'), { exams: 'pas-une-liste' }));
+        });
+    });
+
+    describe('fiche ICE (ice/profile) — contraintes renforcées', () => {
+        it('accepte anticoag vide et pays vide', async () => {
+            await assertSucceeds(setDoc(iceRef(asMe(), ME), ice({ anticoag: '', pays: '' })));
+        });
+
+        it.each([
+            ['updatedAt nul', ice({ updatedAt: 0 })],
+            ['updatedAt négatif', ice({ updatedAt: -10 })],
+            ['anticoag invalide ("0")', ice({ anticoag: '0' })],
+            ['anticoag invalide ("x")', ice({ anticoag: 'x' })],
+            ['pays en minuscules ("fr")', ice({ pays: 'fr' })],
+            ['pays numérique ("12")', ice({ pays: '12' })],
+            ['pays d’une seule lettre ("F")', ice({ pays: 'F' })],
+        ])('refuse %s', async (_name, body) => {
+            await assertFails(setDoc(iceRef(asMe(), ME), body));
+        });
+    });
+});

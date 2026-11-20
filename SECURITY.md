@@ -10,6 +10,7 @@ Use GitHub's private reporting: **Security tab → "Report a vulnerability"** on
 
 - The web application served from the project's own domain.
 - The Firestore security rules (`firestore.rules`) and the scheduled Cloud Function (`functions/`).
+- The self-hosted pilot feedback and crash telemetry relay (`deploy/feedback_server/server.py`) and nginx reference configuration (`deploy/nginx/assistant-parapente.conf`).
 
 Out of scope: third-party content and services (FFVL documents, Open-Meteo, map providers, Firebase itself), social engineering, denial-of-service, and automated scanning of production at volume.
 
