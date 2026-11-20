@@ -17,7 +17,6 @@ function isPdfUrl(url) {
 
 /** Vrai quand l'application tourne sans interface de navigateur (installée sur l'écran d'accueil). */
 export function isInstalledApp() {
-    // @ts-ignore : navigator.standalone n'existe que sur Safari iOS
     if (window.navigator.standalone === true) return true;
     return ['standalone', 'fullscreen', 'minimal-ui', 'window-controls-overlay'].some(
         (mode) => window.matchMedia?.(`(display-mode: ${mode})`).matches,

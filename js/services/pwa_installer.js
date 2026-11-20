@@ -20,7 +20,6 @@ export function isStandalone(win = typeof window !== 'undefined' ? window : unde
     if (!win) return false;
     try {
         const isStandaloneMedia = win.matchMedia && win.matchMedia('(display-mode: standalone)').matches;
-        // @ts-ignore iOS Safari standalone property
         const isIosStandalone = win.navigator && win.navigator.standalone === true;
         const isTwa = typeof win.document?.referrer === 'string' && win.document.referrer.includes('android-app://');
         return Boolean(isStandaloneMedia || isIosStandalone || isTwa);
@@ -41,7 +40,6 @@ export function isIos(win = typeof window !== 'undefined' ? window : undefined) 
         const isIosDevice = /iPad|iPhone|iPod/.test(ua);
         // iPadOS 13+ se présente comme MacIntel avec du tactile
         const isIpadOs = win.navigator.platform === 'MacIntel' && win.navigator.maxTouchPoints > 1;
-        // @ts-ignore
         const isMsStream = Boolean(win.MSStream);
         return (isIosDevice || isIpadOs) && !isMsStream;
     } catch {
