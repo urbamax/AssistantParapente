@@ -18,7 +18,9 @@ nano .env
 Variables disponibles dans `.env` :
 ```env
 DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..."
+HOST=127.0.0.1
 PORT=8085
+ALLOWED_ORIGIN=https://assistantparapente.fr
 NOTIFY_ON_START=true
 ```
 
@@ -27,7 +29,7 @@ NOTIFY_ON_START=true
 ```bash
 python3 server.py
 ```
-Le serveur affiche : `Serveur feedback démarré sur http://0.0.0.0:8085`.
+Le serveur affiche : `Serveur feedback démarré sur http://127.0.0.1:8085`.
 
 ### Tester le Health Check :
 ```bash

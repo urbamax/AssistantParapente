@@ -6,7 +6,9 @@ Serveur de réception des retours, télémétrie des crashs et health check Assi
 import http.server
 import json
 import os
+import secrets
 import sys
+import threading
 import time
 import urllib.request
 from datetime import datetime, timezone
@@ -33,8 +35,13 @@ def load_env(env_path: Path):
 
 load_env(BASE_DIR / ".env")
 
+DEFAULT_HOST = "127.0.0.1"
+HOST = os.environ.get("HOST", DEFAULT_HOST)
 PORT = int(os.environ.get("PORT", 8085))
+ALLOWED_ORIGIN = os.environ.get("ALLOWED_ORIGIN", "https://assistantparapente.fr")
 DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL", "")
+AVATAR_URL = "https://assistantparapente.fr/img/icons/icon-192x192.png"
+REQUEST_TIMEOUT_SECONDS = 10
 
 LOGS_DIR = BASE_DIR / "logs"
 LOGS_DIR.mkdir(parents=True, exist_ok=True)
@@ -60,20 +67,62 @@ EMOJIS = {
     "other": "💬",
 }
 
-# Limiteur de débit en mémoire (max 10 requêtes par 10 minutes par IP)
+TRUSTED_PROXIES = frozenset({"127.0.0.1", "::1"})
+
+# Limiteur de débit en mémoire borné et thread-safe (max 10 requêtes par 10 minutes par IP)
 RATE_LIMIT_WINDOW_SECONDS = 600
 RATE_LIMIT_MAX_REQUESTS = 10
+RATE_LIMIT_MAX_KEYS = 10000
 _ip_requests = {}
+_rate_limit_lock = threading.Lock()
+
+
+def sanitize_category(raw) -> str:
+    """Restreint la catégorie à la liste blanche connue (prévient toute traversée de chemin)."""
+    if not isinstance(raw, str):
+        return "other"
+    cleaned = raw.strip().lower()
+    return cleaned if cleaned in COLORS else "other"
+
+
+def resolve_client_ip(headers, remote_addr: str) -> str:
+    """Ne fait confiance aux en-têtes proxy (Cloudflare/Nginx) que depuis un proxy local (loopback)."""
+    if remote_addr in TRUSTED_PROXIES and headers is not None:
+        cf_ip = headers.get("CF-Connecting-IP")
+        if cf_ip:
+            return cf_ip.strip()
+        real_ip = headers.get("X-Real-IP")
+        if real_ip:
+            return real_ip.strip()
+        xff = headers.get("X-Forwarded-For", "")
+        if xff:
+            first = xff.split(",")[0].strip()
+            if first:
+                return first
+    return remote_addr
 
 
 def is_rate_limited(ip: str) -> bool:
     now = time.time()
-    history = _ip_requests.setdefault(ip, [])
-    _ip_requests[ip] = [t for t in history if now - t < RATE_LIMIT_WINDOW_SECONDS]
-    if len(_ip_requests[ip]) >= RATE_LIMIT_MAX_REQUESTS:
-        return True
-    _ip_requests[ip].append(now)
-    return False
+    cutoff = now - RATE_LIMIT_WINDOW_SECONDS
+    with _rate_limit_lock:
+        # Purge des entrées expirées pour éviter toute fuite mémoire
+        expired = [k for k, ts_list in _ip_requests.items() if not ts_list or ts_list[-1] <= cutoff]
+        for k in expired:
+            del _ip_requests[k]
+
+        if ip not in _ip_requests and len(_ip_requests) >= RATE_LIMIT_MAX_KEYS:
+            # Éviction de l'entrée la plus ancienne si la table est pleine
+            oldest_key = min(_ip_requests, key=lambda k: _ip_requests[k][-1])
+            del _ip_requests[oldest_key]
+
+        history = [t for t in _ip_requests.get(ip, []) if t > cutoff]
+        if len(history) >= RATE_LIMIT_MAX_REQUESTS:
+            _ip_requests[ip] = history
+            return True
+        history.append(now)
+        _ip_requests[ip] = history
+        return False
 
 
 def format_uptime(seconds_elapsed: int) -> str:
@@ -88,6 +137,76 @@ def format_uptime(seconds_elapsed: int) -> str:
     if minutes:
         return f"{minutes}m {secs}s"
     return f"{secs}s"
+
+
+def _safe_inline(value, max_len: int = 120) -> str:
+    text = str(value if value is not None else "?").replace("`", "'").replace("\r", " ").replace("\n", " ").strip()
+    return text[:max_len] or "?"
+
+
+def _safe_codeblock(value: str, max_len: int = 2000) -> str:
+    # Empêche toute sortie du bloc ```javascript ... ```
+    return value.replace("```", "'''")[:max_len]
+
+
+def build_discord_payload(
+    *,
+    cat: str,
+    label: str,
+    subject: str,
+    description: str,
+    contact: str,
+    location: str = "",
+    ctx: dict | None = None,
+) -> dict:
+    emoji = EMOJIS.get(cat, "💬")
+    color = COLORS.get(cat, 0x6B7280)
+
+    fields = []
+    if cat == "crash":
+        embed_title = f"🚨 Crash Client JS — {subject}"[:256]
+        fields.append({"name": "🏷️ Type", "value": "Télémétrie d'erreur automatique", "inline": True})
+        if location:
+            fields.append({"name": "📍 Emplacement", "value": f"`{_safe_inline(location, 120)}`", "inline": True})
+        embed_desc = f"```javascript\n{_safe_codeblock(description, 2000)}\n```"
+        footer_text = "Assistant Parapente • Alerte Crash JS"
+    else:
+        embed_title = f"{emoji} {label} — {subject}"[:256]
+        fields.append({"name": "👤 Contact", "value": contact[:256], "inline": True})
+        fields.append({"name": "🏷️ Catégorie", "value": f"{emoji} {label}"[:256], "inline": True})
+        embed_desc = description[:3500]
+        footer_text = "Assistant Parapente • Retour pilote en direct"
+
+    if ctx:
+        tech_lines = [
+            f"**Version**: `{_safe_inline(ctx.get('version', 'inconnue'), 64)}` | **Écran**: `{_safe_inline(ctx.get('screen', '?'), 64)}`",
+            f"**Navigateur**: {_safe_inline(ctx.get('runtime', '?'), 80)} ({_safe_inline(ctx.get('viewport', '?'), 32)}) | **Réseau**: {_safe_inline(ctx.get('network', '?'), 32)}",
+        ]
+        if ctx.get("detail"):
+            tech_lines.append(f"**Élément actif**: `{_safe_inline(ctx.get('detail'), 120)}`")
+        fields.append(
+            {
+                "name": "📱 Contexte technique",
+                "value": "\n".join(tech_lines)[:1024],
+                "inline": False,
+            }
+        )
+
+    return {
+        "username": "Assistant Parapente",
+        "avatar_url": AVATAR_URL,
+        "allowed_mentions": {"parse": []},
+        "embeds": [
+            {
+                "title": embed_title,
+                "description": embed_desc,
+                "color": color,
+                "fields": fields,
+                "footer": {"text": footer_text},
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        ],
+    }
 
 
 def send_discord_payload(payload: dict, timeout: int = 10) -> bool:
@@ -114,11 +233,12 @@ def notify_startup():
         return
     payload = {
         "username": "Assistant Parapente",
-        "avatar_url": "https://assistantparapente.fr/img/logos/logo-192.png",
+        "avatar_url": AVATAR_URL,
+        "allowed_mentions": {"parse": []},
         "embeds": [
             {
                 "title": "🟢 Service Backend Démarré",
-                "description": f"Le microservice de retours et télémétrie tourne sur le Raspberry Pi.\n**Port** : `{PORT}` | **PID** : `{os.getpid()}`",
+                "description": f"Le microservice de retours et télémétrie tourne sur le Raspberry Pi.\n**Hôte** : `{HOST}:{PORT}` | **PID** : `{os.getpid()}`",
                 "color": 0x16A34A,
                 "footer": {"text": "Assistant Parapente • Surveillance système"},
                 "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -129,20 +249,26 @@ def notify_startup():
 
 
 class FeedbackHandler(http.server.BaseHTTPRequestHandler):
+    def setup(self):
+        super().setup()
+        self.request.settimeout(REQUEST_TIMEOUT_SECONDS)
+
+    def _send_cors_headers(self):
+        self.send_header("Access-Control-Allow-Origin", ALLOWED_ORIGIN)
+        self.send_header("Vary", "Origin")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Accept")
+
     def _send_json(self, status: int, data: dict):
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type, Accept")
+        self._send_cors_headers()
         self.end_headers()
         self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))
 
     def do_OPTIONS(self):
         self.send_response(204)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type, Accept")
+        self._send_cors_headers()
         self.end_headers()
 
     def do_GET(self):
@@ -162,16 +288,11 @@ class FeedbackHandler(http.server.BaseHTTPRequestHandler):
 
     def do_POST(self):
         clean_path = self.path.split("?")[0].rstrip("/") or "/"
-        if clean_path not in ("/api/feedback", "/api/crash", "/api/health", "/"):
+        if clean_path not in ("/api/feedback", "/api/crash", "/"):
             self._send_json(404, {"success": False, "message": "Route introuvable"})
             return
 
-        client_ip = (
-            self.headers.get("CF-Connecting-IP")
-            or self.headers.get("X-Real-IP")
-            or (self.headers.get("X-Forwarded-For", "").split(",")[0].strip())
-            or self.client_address[0]
-        )
+        client_ip = resolve_client_ip(self.headers, self.client_address[0])
 
         if is_rate_limited(client_ip):
             self._send_json(429, {"success": False, "message": "Trop de requêtes. Veuillez patienter."})
@@ -185,33 +306,37 @@ class FeedbackHandler(http.server.BaseHTTPRequestHandler):
 
             raw_body = self.rfile.read(content_length).decode("utf-8")
             body = json.loads(raw_body)
+            if not isinstance(body, dict):
+                self._send_json(400, {"success": False, "message": "Charge utile JSON attendue."})
+                return
 
             # Honeypot anti-spam : si botcheck est renseigné, valider silencieusement sans notifier
             if body.get("botcheck"):
                 self._send_json(200, {"success": True, "message": "OK"})
                 return
 
-            cat = str(body.get("category", "other"))[:32]
+            cat = "crash" if clean_path == "/api/crash" else sanitize_category(body.get("category", "other"))
             label = str(body.get("categoryLabel") or cat)[:64]
             subject = str(body.get("subject") or "").strip()[:120] or "Sans objet"
             description = str(body.get("description") or "").strip()[:3500]
             contact = str(body.get("contact") or "").strip()[:120] or "Non renseigné"
+            location = str(body.get("location") or "").strip()[:120]
             ctx = body.get("context") if isinstance(body.get("context"), dict) else {}
 
             if not description or len(description) < 5:
                 self._send_json(400, {"success": False, "message": "Description trop courte."})
                 return
 
-            # Sauvegarde locale JSON horodatée
-            timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+            # Sauvegarde locale JSON horodatée (sans IP brute pour conformité RGPD)
+            timestamp_str = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
             target_dir = CRASHES_DIR if cat == "crash" else LOGS_DIR
-            log_file = target_dir / f"{timestamp_str}_{cat}.json"
+            log_file = target_dir / f"{timestamp_str}_{cat}_{secrets.token_hex(4)}.json"
             try:
                 with open(log_file, "w", encoding="utf-8") as f:
                     json.dump(
                         {
                             "received_at": datetime.now(timezone.utc).isoformat(),
-                            "ip": client_ip,
+                            "category": cat,
                             "payload": body,
                         },
                         f,
@@ -223,64 +348,24 @@ class FeedbackHandler(http.server.BaseHTTPRequestHandler):
 
             # Envoi vers Discord Webhook
             if DISCORD_WEBHOOK_URL:
-                emoji = EMOJIS.get(cat, "💬")
-                color = COLORS.get(cat, 0x6B7280)
-
-                fields = []
-                if cat == "crash":
-                    # Spécifique crash JS
-                    embed_title = f"🚨 Crash Client JS — {subject}"
-                    fields.append({"name": "🏷️ Type", "value": "Télémétrie d'erreur automatique", "inline": True})
-                    if body.get("location"):
-                        fields.append({"name": "📍 Emplacement", "value": f"`{str(body.get('location'))[:120]}`", "inline": True})
-                    embed_desc = f"```javascript\n{description[:2000]}\n```"
-                    footer_text = "Assistant Parapente • Alerte Crash JS"
-                else:
-                    embed_title = f"{emoji} {label} — {subject}"
-                    fields.append({"name": "👤 Contact", "value": contact, "inline": True})
-                    fields.append({"name": "🏷️ Catégorie", "value": f"{emoji} {label}", "inline": True})
-                    embed_desc = description
-                    footer_text = "Assistant Parapente • Retour pilote en direct"
-
-                if ctx:
-                    tech_lines = [
-                        f"**Version**: `{ctx.get('version', 'inconnue')}` | **Écran**: `{ctx.get('screen', '?')}`",
-                        f"**Navigateur**: {ctx.get('runtime', '?')} ({ctx.get('viewport', '?')}) | **Réseau**: {ctx.get('network', '?')}",
-                    ]
-                    if ctx.get("detail"):
-                        tech_lines.append(f"**Élément actif**: `{ctx.get('detail')}`")
-                    fields.append(
-                        {
-                            "name": "📱 Contexte technique",
-                            "value": "\n".join(tech_lines),
-                            "inline": False,
-                        }
-                    )
-
-                discord_payload = {
-                    "username": "Assistant Parapente",
-                    "avatar_url": "https://assistantparapente.fr/img/logos/logo-192.png",
-                    "embeds": [
-                        {
-                            "title": embed_title,
-                            "description": embed_desc,
-                            "color": color,
-                            "fields": fields,
-                            "footer": {"text": footer_text},
-                            "timestamp": datetime.now(timezone.utc).isoformat(),
-                        }
-                    ],
-                }
-
+                discord_payload = build_discord_payload(
+                    cat=cat,
+                    label=label,
+                    subject=subject,
+                    description=description,
+                    contact=contact,
+                    location=location,
+                    ctx=ctx,
+                )
                 send_discord_payload(discord_payload)
 
             self._send_json(200, {"success": True, "message": "Signalement transmis avec succès."})
 
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, ValueError, UnicodeDecodeError):
             self._send_json(400, {"success": False, "message": "JSON invalide."})
         except Exception as e:
             print(f"[ERR] Erreur traitement feedback: {e}", file=sys.stderr)
-            self._send_json(500, {"success": False, "message": f"Erreur serveur: {e}"})
+            self._send_json(500, {"success": False, "message": "Erreur interne du serveur."})
 
 
 if __name__ == "__main__":
@@ -289,8 +374,8 @@ if __name__ == "__main__":
 
     notify_startup()
 
-    server = http.server.ThreadingHTTPServer(("0.0.0.0", PORT), FeedbackHandler)
-    print(f"Serveur feedback démarré sur http://0.0.0.0:{PORT}")
+    server = http.server.ThreadingHTTPServer((HOST, PORT), FeedbackHandler)
+    print(f"Serveur feedback démarré sur http://{HOST}:{PORT}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
