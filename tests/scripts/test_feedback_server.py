@@ -217,6 +217,28 @@ class TestFeedbackServerHTTP(unittest.TestCase):
         self.assertEqual(ctx_short.exception.code, 400)
         ctx_short.exception.close()
 
+    def test_post_rejects_non_json_content_type_and_whitelists_context(self):
+        with self.assertRaises(urllib.error.HTTPError) as ctx_ct:
+            self._post(
+                "/api/feedback",
+                {"description": "Tentative no-cors text/plain"},
+                headers={"Content-Type": "text/plain"},
+            )
+        self.assertEqual(ctx_ct.exception.code, 415)
+        ctx_ct.exception.close()
+
+        with self._post(
+            "/api/feedback",
+            {
+                "description": "Message avec contexte filtré",
+                "context": {"version": "1.0", "extraSecret": "should-be-dropped"},
+            },
+        ) as resp:
+            self.assertEqual(resp.status, 200)
+        latest = max(server_mod.LOGS_DIR.glob("*.json"), key=lambda p: p.stat().st_mtime)
+        stored = json.loads(latest.read_text(encoding="utf-8"))
+        self.assertEqual(stored["payload"]["context"], {"version": "1.0"})
+
     def test_post_rate_limit_429(self):
         for _ in range(server_mod.RATE_LIMIT_MAX_REQUESTS):
             with self._post("/api/feedback", {"description": "Message valide de test"}) as resp:

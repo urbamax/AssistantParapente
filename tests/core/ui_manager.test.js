@@ -1,8 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import UIManagerModule from '../../js/core/ui_manager.js';
 import GlobalState from '../../js/core/app_state.js';
 
 describe('UIManager', () => {
+    afterEach(() => {
+        vi.useRealTimers();
+    });
     beforeEach(() => {
         document.body.innerHTML = `
             <div id="app-header"></div>

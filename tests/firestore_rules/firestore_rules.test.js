@@ -405,7 +405,8 @@ describe('durcissement des bornes et types (anti-abus)', () => {
             await assertFails(setDoc(doc(asMe(), 'users', ME), { fcmToken: 't'.repeat(513) }));
         });
 
-        it('refuse un document racine avec plus de 10 clés', async () => {
+        it('refuse un document racine avec un champ inconnu ou plus de 10 clés', async () => {
+            await assertFails(setDoc(doc(asMe(), 'users', ME), { fcmToken: 'ok', extra: 'x' }));
             await assertFails(setDoc(doc(asMe(), 'users', ME), manyKeys(11)));
         });
     });
@@ -413,13 +414,32 @@ describe('durcissement des bornes et types (anti-abus)', () => {
     describe('préférences (preferences/user_prefs)', () => {
         const prefsRef = (id = 'user_prefs') => doc(asMe(), 'users', ME, 'preferences', id);
 
-        it('accepte jusqu’à 100 sites favoris et des limites de vent numériques', async () => {
+        it('accepte jusqu’à 100 sites favoris, des limites de vent numériques et tous les réglages de l’application', async () => {
             await assertSucceeds(
                 setDoc(prefsRef(), {
+                    pilotLevel: 'BP',
+                    themeMode: 'auto',
                     favoriteSites: Array.from({ length: 100 }, (_, i) => `site-${i}`),
+                    minimizedSites: ['site-0'],
+                    savedLocations: [{ name: 'Annecy', lat: 45.9, lon: 6.1 }],
+                    activeMapLayers: ['leaflet', 'windy'],
                     limitWindMin: 5,
                     limitWindMax: 25,
                     limitGustDelta: 10,
+                    filterWindInclude: [],
+                    filterWindExclude: [],
+                    filterTypeInclude: [],
+                    filterTypeExclude: [],
+                    filterFavoritesOnly: false,
+                    forecastMaxRange: 120,
+                    hideUnflyable: false,
+                    radiusLimit: 50,
+                    sortMode: 'CONDITIONS',
+                    conditionsStrategy: 'CONSECUTIVE',
+                    weatherModel: 'meteofrance',
+                    filterMode: 'all',
+                    brevets: { BP: { theory: { passed: true }, practical: {} } },
+                    updatedAt: '2026-11-20T22:00:00.000Z',
                 }),
             );
         });
@@ -437,11 +457,14 @@ describe('durcissement des bornes et types (anti-abus)', () => {
             await assertFails(setDoc(prefsRef(), { favoriteSites: 'annecy' }));
         });
 
-        it('refuse des limites de vent non numériques, iceProfile ou plus de 40 clés', async () => {
+        it('refuse des limites de vent non numériques, iceProfile, un champ inconnu, une chaîne trop longue ou plus de 40 clés', async () => {
             await assertFails(setDoc(prefsRef(), { limitWindMin: '0' }));
             await assertFails(setDoc(prefsRef(), { limitWindMax: '25' }));
             await assertFails(setDoc(prefsRef(), { limitGustDelta: '10' }));
             await assertFails(setDoc(prefsRef(), { iceProfile: { nom: 'Dupont' } }));
+            await assertFails(setDoc(prefsRef(), { unknownPref: true }));
+            await assertFails(setDoc(prefsRef(), { pilotLevel: 'x'.repeat(21) }));
+            await assertFails(setDoc(prefsRef(), { weatherModel: 'x'.repeat(41) }));
             await assertFails(setDoc(prefsRef(), manyKeys(41)));
         });
     });
@@ -449,8 +472,32 @@ describe('durcissement des bornes et types (anti-abus)', () => {
     describe('carnet de vol (logbook/{flightId})', () => {
         const flightRef = (id = 'vol-1') => doc(asMe(), 'users', ME, 'logbook', id);
 
-        it('accepte un vol normal et un marqueur de suppression cloud (deleted: true)', async () => {
-            await assertSucceeds(setDoc(flightRef('vol-1'), { id: 'vol-1', site: 'Annecy', updatedAt: 1000 }));
+        it('accepte un vol complet de l’application et un marqueur de suppression cloud (deleted: true)', async () => {
+            await assertSucceeds(
+                setDoc(flightRef('vol-1'), {
+                    id: 'vol-1',
+                    type: 'vol',
+                    datetime: '2026-11-20T14:00',
+                    site: 'Annecy',
+                    siteId: 123,
+                    lat: 45.8,
+                    lon: 6.2,
+                    voile: 'Advance Epsilon 10',
+                    sellette: 'Supair Evo',
+                    duree: 45,
+                    commentaire: 'Beau vol thermique',
+                    moniteur: ['Jean'],
+                    pilotes: [],
+                    typeExercice: [],
+                    rescueDeployed: false,
+                    rescueId: '',
+                    vache: false,
+                    meteo: { windSpeed: 12 },
+                    traceCloud: { at: 1000, parts: 1, bytes: 500, digest: 'abc', encoding: 'gzip-base64' },
+                    igcStats: { thermals: 3 },
+                    updatedAt: 1000,
+                }),
+            );
             await assertSucceeds(
                 setDoc(flightRef('vol-1'), { id: 'vol-1', deleted: true, deletedAt: 2000, updatedAt: 2000 }),
             );
@@ -462,8 +509,11 @@ describe('durcissement des bornes et types (anti-abus)', () => {
             await assertFails(setDoc(flightRef('x'.repeat(129)), { id: 'x'.repeat(129) }));
         });
 
-        it('refuse rawIgc dans un document de vol et plus de 60 clés', async () => {
+        it('refuse rawIgc, un champ inconnu, une chaîne trop longue et plus de 60 clés', async () => {
             await assertFails(setDoc(flightRef('vol-1'), { id: 'vol-1', rawIgc: 'AXXX...' }));
+            await assertFails(setDoc(flightRef('vol-1'), { id: 'vol-1', unknownField: 'x' }));
+            await assertFails(setDoc(flightRef('vol-1'), { id: 'vol-1', commentaire: 'c'.repeat(5001) }));
+            await assertFails(setDoc(flightRef('vol-1'), { id: 'vol-1', site: 's'.repeat(151) }));
             await assertFails(setDoc(flightRef('vol-1'), manyKeys(60, { id: 'vol-1' })));
         });
     });
@@ -471,10 +521,36 @@ describe('durcissement des bornes et types (anti-abus)', () => {
     describe('matériel (equipment/{itemId})', () => {
         const equipRef = (id = 'e1') => doc(asMe(), 'users', ME, 'equipment', id);
 
-        it('refuse un id incohérent ou > 128 caractères et plus de 40 clés', async () => {
+        it('accepte un élément de matériel complet de l’application', async () => {
+            await assertSucceeds(
+                setDoc(equipRef('e1'), {
+                    id: 'e1',
+                    nom: 'Advance Epsilon 10',
+                    marque: 'Advance',
+                    modele: 'Epsilon 10',
+                    taille: 'M',
+                    couleur: 'Bleu',
+                    type: 'voile',
+                    dateAchat: '2024-03-01',
+                    derniereRevision: '2025-03-01',
+                    periodicite: 24,
+                    periodiciteHeures: 100,
+                    statut: 'actif',
+                    ventMin: 0,
+                    ventMax: 25,
+                    linkedRescueId: null,
+                    updatedAt: 1000,
+                    syncPending: false,
+                }),
+            );
+        });
+
+        it('refuse un id incohérent ou > 128, un champ inconnu, un nom > 150 caractères et plus de 40 clés', async () => {
             await assertFails(setDoc(equipRef('e1'), { id: 'e2' }));
             await assertFails(setDoc(equipRef('e1'), { id: 42 }));
             await assertFails(setDoc(equipRef('x'.repeat(129)), { id: 'x'.repeat(129) }));
+            await assertFails(setDoc(equipRef('e1'), { id: 'e1', extraField: 'x' }));
+            await assertFails(setDoc(equipRef('e1'), { id: 'e1', nom: 'n'.repeat(151) }));
             await assertFails(setDoc(equipRef('e1'), manyKeys(40, { id: 'e1' })));
         });
     });
