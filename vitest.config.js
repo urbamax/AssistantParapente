@@ -20,6 +20,12 @@ export default defineConfig({
             include: ['js/**/*.js'],
             exclude: ['js/data/**', 'js/firebase_config.js'],
             reporter: ['text-summary', 'html'],
+            thresholds: {
+                statements: 75,
+                branches: 70,
+                functions: 75,
+                lines: 75,
+            },
         },
     },
 });
