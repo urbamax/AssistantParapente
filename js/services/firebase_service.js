@@ -624,21 +624,11 @@ export const FirebaseAuthEngine = {
                 return true;
             });
 
-            // 1. Process Pending Queue (Local -> Cloud)
-            const pendingLogbook = localLogbook.filter((s) => s.syncPending);
-            for (const session of pendingLogbook) {
-                const sRef = doc(db, 'users', uid, 'logbook', session.id);
-                delete session.syncPending;
-                await setDoc(sRef, stripTrace(session));
-            }
-            if (pendingLogbook.length > 0) {
-                StorageService.set(StorageService.KEYS.LOGBOOK_DATA, localLogbook);
-            }
-
             const logbookColRef = collection(db, 'users', uid, 'logbook');
             const logbookSnap = await getDocs(logbookColRef);
 
             const cloudLogbook = [];
+            const cloudLogbookById = new Map();
             // Vols supprimés sur un autre appareil : id -> date de suppression
             const cloudDeletedAt = new Map();
             // Traces restées dans d'anciens documents de vol (avant specs/037) : récupérées, puis jamais fusionnées
@@ -651,10 +641,29 @@ export const FirebaseAuthEngine = {
                     if (data.deleted === true) cloudDeletedAt.set(data.id, data.deletedAt || 0);
                     else {
                         if (typeof data.rawIgc === 'string' && data.rawIgc) legacyTraces.set(data.id, data.rawIgc);
-                        cloudLogbook.push(stripTrace(data));
+                        const stripped = stripTrace(data);
+                        cloudLogbook.push(stripped);
+                        cloudLogbookById.set(data.id, stripped);
                     }
                 }
             });
+
+            // 1. Process Pending Queue (Local -> Cloud) en respectant LWW et les tombstones cloud
+            const pendingLogbook = localLogbook.filter((s) => s.syncPending);
+            for (const session of pendingLogbook) {
+                delete session.syncPending;
+                if (cloudDeletedAt.has(session.id)) continue;
+                const cloudExisting = cloudLogbookById.get(session.id);
+                if (cloudExisting && (cloudExisting.updatedAt || 0) > (session.updatedAt || 0)) continue;
+                const sRef = doc(db, 'users', uid, 'logbook', session.id);
+                const stripped = stripTrace(session);
+                await setDoc(sRef, stripped);
+                if (!cloudExisting) cloudLogbook.push(stripped);
+                cloudLogbookById.set(session.id, stripped);
+            }
+            if (pendingLogbook.length > 0) {
+                StorageService.set(StorageService.KEYS.LOGBOOK_DATA, localLogbook);
+            }
 
             // 2. Smart Merge: Compare updatedAt
             // Re-read tombstones here in case a deletion happened concurrently while this sync
@@ -669,7 +678,10 @@ export const FirebaseAuthEngine = {
             localLogbook.forEach((session) => {
                 if (deletedFlightsSet.has(session.id)) return;
                 // Supprimé ailleurs : définitif, un appareil resté en retard ne le ressuscite pas.
-                if (cloudDeletedAt.has(session.id)) return;
+                if (cloudDeletedAt.has(session.id)) {
+                    if (IDBStorage.isSupported()) IDBStorage.deleteFlight(session.id).catch(() => {});
+                    return;
+                }
                 mergedLogbookMap.set(session.id, session);
             });
             cloudLogbook.forEach((cloudSession) => {

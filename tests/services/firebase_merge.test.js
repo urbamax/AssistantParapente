@@ -93,4 +93,21 @@ describe('firebase_merge.js pure merge & local state helpers', () => {
         expect(prefs.pilotLevel).toBe('ALL');
         expect(Array.isArray(prefs.favoriteSites)).toBe(true);
     });
+
+    it('mergeQcmStats guards against missing total/correct fields without producing NaN', () => {
+        const local = { questions: { Q1: { streak: 1 } }, themes: { Météo: {} } };
+        const cloud = { questions: { Q1: { total: 4, correct: 3 } }, themes: { Météo: { total: 4 } } };
+        const res = mergeQcmStats(local, cloud);
+        expect(res.questions.Q1.total).toBe(4);
+        expect(res.questions.Q1.correct).toBe(3);
+        expect(res.themes.Météo.total).toBe(4);
+        expect(res.themes.Météo.correct).toBe(0);
+    });
+
+    it('mergePreferences preserves newer local scalar preferences when local.updatedAt > cloud.updatedAt', () => {
+        const local = { limitWindMax: 35, updatedAt: 2000 };
+        const cloud = { limitWindMax: 25, updatedAt: 1000 };
+        const merged = mergePreferences(local, cloud);
+        expect(merged.limitWindMax).toBe(35);
+    });
 });

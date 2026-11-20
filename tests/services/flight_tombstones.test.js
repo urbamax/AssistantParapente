@@ -144,6 +144,35 @@ describe('Deleted flight marker in the cloud', () => {
         FirebaseAuthEngine.currentUser = null;
         FirebaseAuthEngine.enabled = false;
     });
+
+    it('does not let an older local syncPending flight overwrite a newer cloud edit or deletion marker', async () => {
+        localStorage.clear();
+        LogbookService.equipment = [];
+        const stalePending = { ...structuredClone(oldFlight), site: 'Ancien nom', updatedAt: 1000, syncPending: true };
+        LogbookService.flights = [stalePending];
+        StorageService.set(StorageService.KEYS.LOGBOOK_DATA, LogbookService.flights);
+        const firestore = createFakeFirestore({
+            'users/u1/logbook/vol-old': { ...structuredClone(oldFlight), site: 'Nouveau nom cloud', updatedAt: 5000 },
+        });
+        const defaultLoad = FirebaseAuthEngine._loadFirestore;
+        FirebaseAuthEngine._loadFirestore = async () => firestore.module;
+        FirebaseAuthEngine.currentUser = { uid: 'u1' };
+        FirebaseAuthEngine.enabled = true;
+        vi.spyOn(FirebaseAuthEngine, 'updateModalUI').mockImplementation(() => {});
+        vi.spyOn(QuizView, 'renderStats').mockImplementation(() => {});
+        vi.spyOn(SitesService, 'loadUserPreferences').mockImplementation(() => {});
+        vi.spyOn(SitesService, 'renderList').mockImplementation(() => {});
+
+        await FirebaseAuthEngine.syncDataWithCloud(true);
+
+        const stored = StorageService.get(StorageService.KEYS.LOGBOOK_DATA);
+        expect(stored[0].site).toBe('Nouveau nom cloud');
+        expect(firestore.docs.get('users/u1/logbook/vol-old')?.site).toBe('Nouveau nom cloud');
+        vi.restoreAllMocks();
+        FirebaseAuthEngine._loadFirestore = defaultLoad;
+        FirebaseAuthEngine.currentUser = null;
+        FirebaseAuthEngine.enabled = false;
+    });
 });
 
 describe('Deleted flights are never overwritten in the cloud', () => {
