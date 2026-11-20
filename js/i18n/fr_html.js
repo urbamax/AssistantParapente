@@ -826,6 +826,10 @@ export const FR_HTML = Object.freeze({
         treuil: 'Treuil',
         titleModeAutoSysteme: 'Mode: Auto (Système)',
         titleEspacePersonnel: 'Espace Personnel / Connexion',
+        titleInstallerApp: "Installer l'application sur l'écran d'accueil",
+        ariaLabelInstallerApp: "Installer l'application sur l'écran d'accueil",
+        titleDiscord: 'Rejoindre la communauté Discord',
+        ariaLabelDiscord: 'Rejoindre la communauté Discord',
     }),
     footer: Object.freeze({
         titleVisiterLeSite: "Visiter le site du Club Le Fil d'Ariane",
@@ -840,6 +844,9 @@ export const FR_HTML = Object.freeze({
         confidentialite: 'Confidentialité',
         gestionDesCookies: 'Gestion des cookies & données',
         signalerProblemeSuggestion: 'Signaler un problème / Suggestion',
+        installerApp: "Installer l'application",
+        discordTitle: 'Rejoindre la communauté Discord Assistant Parapente',
+        discordText: 'Discord',
         leClubEtLa:
             "Le club et la FFVL déclinent toute responsabilité quant à l'édition, au contenu et à l'utilisation de cette application indépendante.",
         proprieteDesCours:
@@ -873,5 +880,27 @@ export const FR_HTML = Object.freeze({
         resetBtn: 'Effacer le brouillon',
         copyBtn: 'Copier le message',
         submitBtn: 'Envoyer',
+        discordLead: 'Échangez également en direct avec la communauté de pilotes :',
+        discordBtn: 'Rejoindre le Discord',
+    }),
+    pwaInstallModal: Object.freeze({
+        title: 'Installer Assistant Parapente',
+        ariaLabelFermer: 'Fermer',
+        altLogo: 'Assistant Parapente',
+        leadTitle: "Ajouter à l'écran d'accueil",
+        leadDesc:
+            "Profitez d'une expérience plein écran, plus fluide et accessible hors connexion comme une véritable application native.",
+        step1Title: 'Bouton Partager',
+        step1Desc:
+            'Touchez le bouton de partage <i class="ri-share-box-line pwa-step-icon" aria-hidden="true"></i> dans la barre de navigation de Safari (en bas sur iPhone, en haut sur iPad).',
+        step2Title: "Sur l'écran d'accueil",
+        step2Desc:
+            'Faites défiler le menu des options et touchez <strong>« Sur l\'écran d\'accueil »</strong> <i class="ri-add-box-line pwa-step-icon" aria-hidden="true"></i>.',
+        step3Title: 'Valider',
+        step3Desc: "Touchez « Ajouter » en haut à droite pour finaliser l'installation sur votre écran d'accueil.",
+        genericTitle: 'Depuis votre navigateur',
+        genericDesc:
+            "Cliquez sur l'icône d'installation dans la barre d'adresse ou ouvrez le menu de votre navigateur puis sélectionnez « Installer Assistant Parapente ».",
+        btnUnderstood: "J'ai compris",
     }),
 });

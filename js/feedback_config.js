@@ -8,4 +8,5 @@
 export const FEEDBACK_CONFIG = Object.freeze({
     web3FormsAccessKey: '',
     customEndpoint: '/api/feedback',
+    discordInviteUrl: 'https://discord.gg/mZsjqXmGn3',
 });

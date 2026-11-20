@@ -8,6 +8,7 @@ import GlobalState from './app_state.js';
 import StorageService from '../services/storage.js';
 import { capitalizeFirstLetter } from '../utils/text_utils.js';
 import { t } from '../utils/i18n.js';
+import { updateInstallUI } from '../services/pwa_installer.js';
 
 class UIManager {
     constructor() {
@@ -78,6 +79,7 @@ class UIManager {
         this.updateHeaderNavigation();
         this.applyThemeMode(GlobalState.get('themeMode'));
         this.restoreLevelUI();
+        updateInstallUI();
 
         if (window.FirebaseAuthEngine && typeof window.FirebaseAuthEngine.updateHeaderUI === 'function') {
             window.FirebaseAuthEngine.updateHeaderUI();

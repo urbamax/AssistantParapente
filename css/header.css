@@ -360,6 +360,18 @@ body {
     }
 }
 
+@media (max-width: 480px) {
+    .floating-user-menu {
+        gap: 4px;
+        padding: 3px 6px;
+    }
+    .floating-user-menu .icon-btn {
+        width: 34px;
+        height: 34px;
+        font-size: 1.1rem;
+    }
+}
+
 /* Hide back button on desktop since we have the top nav */
 @media (min-width: 1025px) {
     .header-nav-slot {

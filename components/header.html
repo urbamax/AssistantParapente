@@ -20,6 +20,33 @@
         </div>
     </button>
     
+    <button
+        id="pwa-install-btn"
+        class="icon-btn pwa-install-btn"
+        data-action="installPwa"
+        data-i18n-title="header.titleInstallerApp"
+        data-i18n-aria-label="header.ariaLabelInstallerApp"
+        title="Installer l'application sur l'écran d'accueil"
+        aria-label="Installer l'application sur l'écran d'accueil"
+        style="display: none;"
+    >
+        <i class="ri-download-2-line" aria-hidden="true"></i>
+    </button>
+
+    <a
+        id="discord-header-btn"
+        class="icon-btn discord-btn"
+        href="https://discord.gg/mZsjqXmGn3"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-i18n-title="header.titleDiscord"
+        data-i18n-aria-label="header.ariaLabelDiscord"
+        title="Rejoindre la communauté Discord"
+        aria-label="Rejoindre la communauté Discord"
+    >
+        <i class="ri-discord-fill" aria-hidden="true"></i>
+    </a>
+    
     <div class="auth-btn-wrapper">
         <button data-i18n-title="header.titleEspacePersonnel" id="auth-btn" class="icon-btn" data-action="FirebaseAuthopenAuthModal" title="Espace Personnel / Connexion">
             <i class="ri-user-line"></i>

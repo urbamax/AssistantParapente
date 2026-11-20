@@ -2915,6 +2915,23 @@
                         amélioration. Aucune adresse e-mail n'est requise.
                     </p>
 
+                    <div class="feedback-discord-banner">
+                        <i class="ri-discord-fill feedback-discord-icon" aria-hidden="true"></i>
+                        <div class="feedback-discord-info">
+                            <span class="feedback-discord-lead" data-i18n="feedbackModal.discordLead"
+                                >Échangez également en direct avec la communauté de pilotes :</span
+                            >
+                            <a
+                                href="https://discord.gg/mZsjqXmGn3"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="feedback-discord-btn"
+                                data-i18n="feedbackModal.discordBtn"
+                                ><i class="ri-discord-fill" aria-hidden="true"></i> Rejoindre le Discord</a
+                            >
+                        </div>
+                    </div>
+
                     <form id="feedback-form" class="feedback-form" novalidate>
                         <div class="feedback-field">
                             <span class="feedback-label" data-i18n="feedbackModal.categoryLabel">Type de retour</span>
@@ -3108,6 +3125,102 @@
                             <span data-i18n="feedbackModal.submitBtn">Envoyer</span>
                         </button>
                     </div>
+                </div>
+            </div>
+        </dialog>
+
+        <!-- PWA INSTALL MODAL (spec 051) -->
+        <dialog
+            id="pwa-install-modal"
+            class="gdpr-modal-overlay"
+            data-backdrop-action="closePwaInstallModal"
+            style="display: none"
+        >
+            <div class="gdpr-modal pwa-install-modal-box">
+                <div class="gdpr-modal-header">
+                    <div class="gdpr-modal-title">
+                        <i class="ri-download-2-line" aria-hidden="true"></i>
+                        <span data-i18n="pwaInstallModal.title">Installer Assistant Parapente</span>
+                    </div>
+                    <button
+                        type="button"
+                        class="gdpr-modal-close-btn"
+                        data-action="closePwaInstallModal"
+                        data-i18n-aria-label="pwaInstallModal.ariaLabelFermer"
+                        aria-label="Fermer"
+                    >
+                        <i class="ri-close-line" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <div class="gdpr-modal-body pwa-install-modal-body">
+                    <div class="pwa-install-lead">
+                        <img
+                            src="img/icons/icon-192x192.png"
+                            alt="Assistant Parapente"
+                            class="pwa-install-app-icon"
+                            data-i18n-alt="pwaInstallModal.altLogo"
+                        />
+                        <div class="pwa-install-lead-text">
+                            <h3 data-i18n="pwaInstallModal.leadTitle">Ajouter à l'écran d'accueil</h3>
+                            <p data-i18n="pwaInstallModal.leadDesc">
+                                Profitez d'une expérience plein écran, plus fluide et accessible hors connexion comme une véritable application native.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="pwa-install-ios-instructions" class="pwa-install-instructions">
+                        <div class="pwa-install-step">
+                            <span class="pwa-step-badge">1</span>
+                            <div class="pwa-step-detail">
+                                <span class="pwa-step-title" data-i18n="pwaInstallModal.step1Title">Bouton Partager</span>
+                                <p class="pwa-step-desc" data-i18n-html="pwaInstallModal.step1Desc">
+                                    Touchez le bouton de partage <i class="ri-share-box-line pwa-step-icon" aria-hidden="true"></i> dans la barre de navigation de Safari (en bas sur iPhone, en haut sur iPad).
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pwa-install-step">
+                            <span class="pwa-step-badge">2</span>
+                            <div class="pwa-step-detail">
+                                <span class="pwa-step-title" data-i18n="pwaInstallModal.step2Title">Sur l'écran d'accueil</span>
+                                <p class="pwa-step-desc" data-i18n-html="pwaInstallModal.step2Desc">
+                                    Faites défiler le menu des options et touchez <strong>« Sur l'écran d'accueil »</strong> <i class="ri-add-box-line pwa-step-icon" aria-hidden="true"></i>.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pwa-install-step">
+                            <span class="pwa-step-badge">3</span>
+                            <div class="pwa-step-detail">
+                                <span class="pwa-step-title" data-i18n="pwaInstallModal.step3Title">Valider</span>
+                                <p class="pwa-step-desc" data-i18n="pwaInstallModal.step3Desc">
+                                    Touchez « Ajouter » en haut à droite pour finaliser l'installation sur votre écran d'accueil.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="pwa-install-generic-instructions" class="pwa-install-instructions" style="display: none">
+                        <div class="pwa-install-step">
+                            <span class="pwa-step-badge"><i class="ri-computer-line" aria-hidden="true"></i></span>
+                            <div class="pwa-step-detail">
+                                <span class="pwa-step-title" data-i18n="pwaInstallModal.genericTitle">Depuis votre navigateur</span>
+                                <p class="pwa-step-desc" data-i18n="pwaInstallModal.genericDesc">
+                                    Cliquez sur l'icône d'installation dans la barre d'adresse ou ouvrez le menu de votre navigateur puis sélectionnez « Installer Assistant Parapente ».
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gdpr-modal-footer pwa-install-modal-footer">
+                    <button
+                        type="button"
+                        class="modal-btn modal-btn-primary"
+                        data-action="closePwaInstallModal"
+                        data-i18n="pwaInstallModal.btnUnderstood"
+                    >
+                        J'ai compris
+                    </button>
                 </div>
             </div>
         </dialog>
