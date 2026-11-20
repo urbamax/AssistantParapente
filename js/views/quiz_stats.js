@@ -41,6 +41,8 @@ export class QuizStatsBase extends BaseView {
         this._activeWorkshopAxisId = null;
         /** @type {ResizeObserver | null} */
         this._examHistoryResizeObserver = null;
+        /** @type {ResizeObserver[]} */
+        this._trackedResizeObservers = [];
         /** @type {number | null} */
         this._examHistoryResizeRaf = null;
         /** @type {HTMLElement | null} */
@@ -845,9 +847,29 @@ export class QuizStatsBase extends BaseView {
             // Un seul observateur par ligne, même si la section est ouverte plusieurs fois.
             if (typeof ResizeObserver !== 'undefined' && !row.dataset.rhObserved) {
                 row.dataset.rhObserved = '1';
-                new ResizeObserver(syncRowHeight).observe(row);
+                const observer = new ResizeObserver(syncRowHeight);
+                observer.observe(row);
+                this._trackResizeObserver(observer);
             }
         });
+    }
+
+    /** @param {ResizeObserver} observer */
+    _trackResizeObserver(observer) {
+        if (!Array.isArray(this._trackedResizeObservers)) this._trackedResizeObservers = [];
+        this._trackedResizeObservers.push(observer);
+    }
+
+    _disconnectTrackedResizeObservers() {
+        if (!Array.isArray(this._trackedResizeObservers)) return;
+        for (const obs of this._trackedResizeObservers) {
+            try {
+                obs.disconnect();
+            } catch {
+                // ignore
+            }
+        }
+        this._trackedResizeObservers = [];
     }
 
     /**

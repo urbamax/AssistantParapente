@@ -50,72 +50,89 @@ async function fetchWeatherForSite(site, { forecastUrl, buildHourlyForecast }) {
     const lon = parseFloat(site.longitude || site.lon);
     if (isNaN(lat) || isNaN(lon)) return null;
 
-    const res = await fetch(forecastUrl(lat, lon));
+    const res = await fetch(forecastUrl(lat, lon), { signal: AbortSignal.timeout(10_000) });
     if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
     return buildHourlyForecast(await res.json(), Date.now());
 }
 
-exports.checkFavoriteSitesWeather = onSchedule('every 30 minutes', async () => {
-    const shared = await loadShared();
-    // Une seule requête Open-Meteo par site et par exécution, même si plusieurs pilotes l'ont en favori.
-    const weatherCache = shared.createSiteWeatherCache((site) => fetchWeatherForSite(site, shared));
-    const usersSnap = await db.collection('users').get();
+const DEAD_FCM_ERROR_CODES = new Set([
+    'messaging/registration-token-not-registered',
+    'messaging/invalid-registration-token',
+]);
 
-    for (const userDoc of usersSnap.docs) {
-        const user = userDoc.data();
-        if (!user.fcmToken) continue;
+exports.checkFavoriteSitesWeather = onSchedule(
+    { schedule: 'every 30 minutes', timeoutSeconds: 300, memory: '512MiB' },
+    async () => {
+        const shared = await loadShared();
+        // Une seule requête Open-Meteo par site et par exécution, même si plusieurs pilotes l'ont en favori.
+        const weatherCache = shared.createSiteWeatherCache((site) => fetchWeatherForSite(site, shared));
+        const usersSnap = await db.collection('users').where('fcmToken', '!=', '').get();
 
-        // Réservé aux pilotes ayant le rôle « beta » (users/{uid}/access/profile, donné à la main).
-        const accessSnap = await db.collection('users').doc(userDoc.id).collection('access').doc('profile').get();
-        if (!shared.hasBetaRole(accessSnap.exists ? accessSnap.data() : undefined)) continue;
+        for (const userDoc of usersSnap.docs) {
+            const user = userDoc.data();
+            if (!user.fcmToken || typeof user.fcmToken !== 'string') continue;
 
-        const prefsSnap = await db
-            .collection('users')
-            .doc(userDoc.id)
-            .collection('preferences')
-            .doc('user_prefs')
-            .get();
-        const prefs = { ...DEFAULT_PREFS, ...(prefsSnap.exists ? prefsSnap.data() : {}) };
-        const favoriteIds = prefs.favoriteSites || [];
-        if (favoriteIds.length === 0) continue;
+            // Réservé aux pilotes ayant le rôle « beta » (users/{uid}/access/profile, donné à la main).
+            const accessSnap = await db.collection('users').doc(userDoc.id).collection('access').doc('profile').get();
+            if (!shared.hasBetaRole(accessSnap.exists ? accessSnap.data() : undefined)) continue;
 
-        const stateRef = db.collection('users').doc(userDoc.id).collection('pushState').doc('favoriteSitesFlyable');
-        const stateSnap = await stateRef.get();
-        const previousState = stateSnap.exists ? stateSnap.data() : {};
-        const newState = {};
+            const prefsSnap = await db
+                .collection('users')
+                .doc(userDoc.id)
+                .collection('preferences')
+                .doc('user_prefs')
+                .get();
+            const prefs = { ...DEFAULT_PREFS, ...(prefsSnap.exists ? prefsSnap.data() : {}) };
+            const favoriteIds = Array.isArray(prefs.favoriteSites) ? prefs.favoriteSites : [];
+            if (favoriteIds.length === 0) continue;
 
-        for (const siteId of favoriteIds) {
-            const site = sitesById.get(siteId);
-            if (!site) continue;
+            const stateRef = db.collection('users').doc(userDoc.id).collection('pushState').doc('favoriteSitesFlyable');
+            const stateSnap = await stateRef.get();
+            const previousState = stateSnap.exists ? stateSnap.data() : {};
+            const newState = {};
+            let tokenInvalidated = false;
 
-            try {
-                const weather = await weatherCache.get(siteId, site);
-                const outcome = shared.evaluateSpotForecast(site, weather, shared.toScoringPrefs(prefs));
-                newState[siteId] = shared.nextState(previousState[siteId], outcome);
+            for (const siteId of favoriteIds) {
+                const site = sitesById.get(siteId);
+                if (!site) continue;
 
-                // Notification uniquement sur la transition non-volable -> volable, avec des données
-                // complètes et une orientation connue (spec 001, FR-011) ; jamais à chaque exécution
-                // tant que ça reste volable (sinon spam toutes les 30 min).
-                if (shared.shouldNotify(previousState[siteId], outcome)) {
-                    await messaging
-                        .send({
-                            token: user.fcmToken,
-                            // Informe sans autoriser : ni « volable », ni certitude (spec 005, audit A3).
-                            notification: shared.buildNotification(site, weather, weather.timeMs),
-                        })
-                        .catch((err) => console.error(`Échec envoi push (${userDoc.id}/${siteId}):`, err.message));
+                try {
+                    const weather = await weatherCache.get(siteId, site);
+                    const outcome = shared.evaluateSpotForecast(site, weather, shared.toScoringPrefs(prefs));
+                    newState[siteId] = shared.nextState(previousState[siteId], outcome);
+
+                    // Notification uniquement sur la transition non-volable -> volable, avec des données
+                    // complètes et une orientation connue (spec 001, FR-011) ; jamais à chaque exécution
+                    // tant que ça reste volable (sinon spam toutes les 30 min).
+                    if (!tokenInvalidated && shared.shouldNotify(previousState[siteId], outcome)) {
+                        await messaging
+                            .send({
+                                token: user.fcmToken,
+                                // Informe sans autoriser : ni « volable », ni certitude (spec 005, audit A3).
+                                notification: shared.buildNotification(site, weather, weather.timeMs),
+                            })
+                            .catch(async (err) => {
+                                console.error(`Échec envoi push (${userDoc.id}/${siteId}):`, err.message);
+                                if (DEAD_FCM_ERROR_CODES.has(err?.code)) {
+                                    tokenInvalidated = true;
+                                    await userDoc.ref
+                                        .update({ fcmToken: admin.firestore.FieldValue.delete() })
+                                        .catch(() => {});
+                                }
+                            });
+                    }
+                } catch (e) {
+                    console.error(`Erreur météo pour le site ${siteId} (utilisateur ${userDoc.id}):`, e.message);
+                    // Erreur réseau : on garde le dernier état connu plutôt que de l'effacer.
+                    if (previousState[siteId] !== undefined) newState[siteId] = previousState[siteId];
                 }
-            } catch (e) {
-                console.error(`Erreur météo pour le site ${siteId} (utilisateur ${userDoc.id}):`, e.message);
-                // Erreur réseau : on garde le dernier état connu plutôt que de l'effacer.
-                if (previousState[siteId] !== undefined) newState[siteId] = previousState[siteId];
             }
+
+            await stateRef.set(newState);
         }
 
-        await stateRef.set(newState);
-    }
-
-    console.log(
-        `Météo des favoris : ${weatherCache.requests} site(s) interrogé(s) pour ${usersSnap.size} utilisateur(s).`,
-    );
-});
+        console.log(
+            `Météo des favoris : ${weatherCache.requests} site(s) interrogé(s) pour ${usersSnap.size} utilisateur(s).`,
+        );
+    },
+);

@@ -366,6 +366,26 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Ressources immuables (bundles Vite hachés sous /assets/ et bibliothèques versionnées sous /vendor/) :
+    // Cache-First en production pour éviter d'attendre le réseau mobile au démarrage.
+    const isImmutableAsset =
+        url.origin === location.origin && (url.pathname.includes('/assets/') || url.pathname.includes('/vendor/'));
+    if (isImmutableAsset) {
+        event.respondWith(
+            caches.match(request).then((cached) => {
+                if (cached) return cached;
+                return fetch(request).then((response) => {
+                    if (response.ok) {
+                        const copy = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                    }
+                    return response;
+                });
+            }),
+        );
+        return;
+    }
+
     // Fichiers du site (production) : réseau d'abord, cache seulement hors ligne. En cache d'abord,
     // un site servi depuis les sources (nom de cache inchangé d'une version à l'autre) affichait
     // l'ancienne version jusqu'au deuxième rechargement. `cache: 'no-cache'` fait revalider le

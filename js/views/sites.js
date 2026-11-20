@@ -115,6 +115,10 @@ class SitesViewClass extends SitesListBase {
         clearInterval(this._forecastAgeInterval);
         clearTimeout(this._radiusTimeout);
         clearTimeout(this._progZoomTimeout);
+        if (this._onDropdownOutsideClick) {
+            document.removeEventListener('click', this._onDropdownOutsideClick);
+            this._onDropdownOutsideClick = null;
+        }
         if (this.state.mapResizeObserver) {
             this.state.mapResizeObserver.disconnect();
             this.state.mapResizeObserver = null;
@@ -491,11 +495,15 @@ class SitesViewClass extends SitesListBase {
     }
 
     setupDropdowns() {
-        document.addEventListener('click', (e) => {
+        if (this._onDropdownOutsideClick) {
+            document.removeEventListener('click', this._onDropdownOutsideClick);
+        }
+        this._onDropdownOutsideClick = (e) => {
             if (!(/** @type {HTMLElement} */ (e.target).closest('.filter-dropdown-container'))) {
                 document.querySelectorAll('.filter-dropdown-menu.show').forEach((m) => m.classList.remove('show'));
             }
-        });
+        };
+        document.addEventListener('click', this._onDropdownOutsideClick);
         this.renderDropdowns();
     }
 
