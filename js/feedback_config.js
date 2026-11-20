@@ -8,5 +8,4 @@
 export const FEEDBACK_CONFIG = Object.freeze({
     web3FormsAccessKey: '',
     customEndpoint: '/api/feedback',
-    fallbackFacebookUrl: 'https://www.facebook.com/maxime.urbaniak/',
 });

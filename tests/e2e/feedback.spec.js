@@ -133,8 +133,5 @@ test.describe('E2E - Modale de signalement et suggestion', () => {
             expect(copied).toContain('Souci hors ligne');
             expect(copied).toContain('Description détaillée conservée même hors ligne.');
         }
-
-        const fbHref = await modal.locator('#feedback-facebook-link').getAttribute('href');
-        expect(fbHref).toBe('https://www.facebook.com/maxime.urbaniak/');
     });
 });
