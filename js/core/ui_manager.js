@@ -9,11 +9,13 @@ import StorageService from '../services/storage.js';
 import { capitalizeFirstLetter } from '../utils/text_utils.js';
 import { t } from '../utils/i18n.js';
 import { updateInstallUI } from '../services/pwa_installer.js';
+import { applyRoleVisibility } from '../services/access_service.js';
 
 class UIManager {
     constructor() {
         this.basePath = '.';
         this._quotaListenerBound = false;
+        this._manualLoadPromise = null;
     }
 
     async init() {
@@ -247,7 +249,37 @@ class UIManager {
         }
     }
 
-    showManual(section = 'about') {
+    async _ensureManualModal() {
+        const existing = document.getElementById('manual-modal');
+        if (existing) return existing;
+
+        if (!this._manualLoadPromise) {
+            const url = `${this.basePath}/components/manual_modal.html`;
+            this._manualLoadPromise = (async () => {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`Network response was not ok for ${url}`);
+                    const html = await response.text();
+                    const tpl = document.createElement('template');
+                    tpl.innerHTML = html.trim();
+                    const modal = tpl.content.querySelector('#manual-modal');
+                    if (modal) {
+                        document.body.appendChild(modal);
+                        applyRoleVisibility(modal);
+                    }
+                    return document.getElementById('manual-modal');
+                } catch (error) {
+                    console.warn('Error loading manual modal:', url, error);
+                    return null;
+                } finally {
+                    this._manualLoadPromise = null;
+                }
+            })();
+        }
+        return this._manualLoadPromise;
+    }
+
+    async showManual(section = 'about') {
         if (section === 'contextual') {
             const activeScreen = document.querySelector('.mode-screen.active');
             if (activeScreen) {
@@ -264,9 +296,7 @@ class UIManager {
             }
         }
 
-        const modal = /** @type {HTMLDialogElement & { _cancelBound?: boolean }} */ (
-            document.getElementById('manual-modal')
-        );
+        const modal = /** @type {HTMLDialogElement & { _cancelBound?: boolean }} */ (await this._ensureManualModal());
         if (modal) {
             if (typeof modal.showModal === 'function' && !modal.open) {
                 modal.showModal();

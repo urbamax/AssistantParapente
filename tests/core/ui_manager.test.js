@@ -93,4 +93,28 @@ describe('UIManager', () => {
         closeBtn.click();
         expect(document.getElementById('storage-quota-alert')).toBeNull();
     });
+
+    it('lazily fetches and injects components/manual_modal.html on first showManual() call', async () => {
+        const manualHtml = `
+            <dialog id="manual-modal" style="display: none">
+                <button id="manual-tab-qcm" class="manual-tab-btn"></button>
+                <div id="manual-section-qcm" class="manual-section" style="display: none"></div>
+            </dialog>`;
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            text: vi.fn().mockResolvedValue(manualHtml),
+        });
+
+        await UIManagerModule.showManual('qcm');
+
+        expect(global.fetch).toHaveBeenCalledTimes(1);
+        expect(global.fetch).toHaveBeenCalledWith('./components/manual_modal.html');
+        expect(document.getElementById('manual-modal')).not.toBeNull();
+        expect(document.getElementById('manual-tab-qcm').classList.contains('active')).toBe(true);
+        expect(document.getElementById('manual-section-qcm').style.display).toBe('block');
+
+        // Second call reuses the injected modal without re-fetching
+        await UIManagerModule.showManual('qcm');
+        expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
 });

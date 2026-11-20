@@ -1,0 +1,1402 @@
+<dialog id="manual-modal" class="gdpr-modal-overlay" data-backdrop-action="hideManual" style="display: none">
+            <div class="gdpr-modal gdpr-modal--large" style="max-width: 1100px; max-height: 92vh; display: flex; flex-direction: column">
+                <div class="gdpr-modal-header">
+                    <div class="gdpr-modal-title">
+                        <i class="ri-book-read-line"></i>
+                        <span data-i18n="manualModal.modeDEmploi">Mode d'emploi</span>
+                    </div>
+                    <button type="button" class="gdpr-modal-close-btn" data-action="hideManual" data-i18n-aria-label="common.fermer" aria-label="Fermer">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+                <div class="gdpr-modal-body" style="padding-top: 16px; overflow-y: auto; flex: 1">
+                    <div class="manual-nav">
+                        <button data-i18n="manualModal.aPropos"
+                            class="manual-tab-btn active"
+                            data-action="showManualSection"
+                            data-args="'about'"
+                            id="manual-tab-about"
+                        >
+                            À propos
+                        </button>
+                        <button data-i18n="manualModal.general"
+                            class="manual-tab-btn"
+                            data-action="showManualSection"
+                            data-args="'dashboard'"
+                            id="manual-tab-dashboard"
+                        >
+                            Général
+                        </button>
+                        <button data-requires-role="owner" hidden data-i18n="manualModal.sitesDeVol"
+                            class="manual-tab-btn"
+                            data-action="showManualSection"
+                            data-args="'sites'"
+                            id="manual-tab-sites"
+                        >
+                            Sites de vol
+                        </button>
+                        <button data-requires-role="beta" hidden data-i18n="manualModal.calculVolabilite"
+                            class="manual-tab-btn"
+                            data-action="showManualSection"
+                            data-args="'scoring'"
+                            id="manual-tab-scoring"
+                        >
+                            Calcul Volabilité
+                        </button>
+                        <button data-i18n="manualModal.carnetDeVol"
+                            class="manual-tab-btn"
+                            data-action="showManualSection"
+                            data-args="'logbook'"
+                            id="manual-tab-logbook"
+                        >
+                            Carnet de Vol
+                        </button>
+                        <button data-i18n="manualModal.materielUsure"
+                            class="manual-tab-btn"
+                            data-action="showManualSection"
+                            data-args="'equipment'"
+                            id="manual-tab-equipment"
+                        >
+                            Matériel &amp; Usure
+                        </button>
+                        <button data-i18n="manualModal.securite"
+                            class="manual-tab-btn"
+                            data-action="showManualSection"
+                            data-args="'safety'"
+                            id="manual-tab-safety"
+                        >
+                            Sécurité
+                        </button>
+                        <button data-i18n="manualModal.qcm"
+                            class="manual-tab-btn"
+                            data-action="showManualSection"
+                            data-args="'qcm'"
+                            id="manual-tab-qcm"
+                        >
+                            QCM
+                        </button>
+                        <button data-i18n="manualModal.bibliotheque"
+                            class="manual-tab-btn"
+                            data-action="showManualSection"
+                            data-args="'library'"
+                            id="manual-tab-library"
+                        >
+                            Bibliothèque
+                        </button>
+                        <button data-i18n="manualModal.statistiques"
+                            class="manual-tab-btn"
+                            data-action="showManualSection"
+                            data-args="'stats'"
+                            id="manual-tab-stats"
+                        >
+                            Statistiques
+                        </button>
+                    </div>
+
+                    <div class="manual-content">
+                        <!-- A PROPOS -->
+                        <div id="manual-section-about" class="manual-section active">
+                            <div
+                                style="
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 16px;
+                                    margin-bottom: 20px;
+                                    padding: 20px;
+                                    background: rgba(14, 165, 233, 0.07);
+                                    border-radius: var(--radius-lg);
+                                    border: 1px solid rgba(14, 165, 233, 0.2);
+                                "
+                            >
+                                <i
+                                    class="ri-umbrella-line"
+                                    style="font-size: 3rem; color: var(--accent-orange); flex-shrink: 0"
+                                ></i>
+                                <div>
+                                    <h4
+                                        style="
+                                            margin: 0 0 4px 0;
+                                            color: var(--text-main);
+                                            font-size: 1.1rem;
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 8px;
+                                            flex-wrap: wrap;
+                                        "
+                                    >
+                                        <span data-i18n="manualModal.assistantParapente">Assistant Parapente</span>
+                                        <span data-i18n="manualModal.n100Gratuit"
+                                            style="
+                                                font-size: 0.72rem;
+                                                font-weight: 800;
+                                                background: var(--accent-orange);
+                                                color: white;
+                                                padding: 2px 8px;
+                                                border-radius: var(--radius-pill);
+                                                text-transform: uppercase;
+                                                letter-spacing: 0.5px;
+                                            "
+                                            >100% Gratuit</span
+                                        >
+                                    </h4>
+                                    <p data-i18n-html="manualModal.unProjetBenevoleEntierement"
+                                        style="
+                                            margin: 0;
+                                            color: var(--text-secondary);
+                                            font-size: 0.88rem;
+                                            line-height: 1.4;
+                                        "
+                                    >
+                                        Un projet bénévole, entièrement gratuit et sans publicité, conçu pour les élèves
+                                        et pilotes du club-école <strong>Le Fil d'Ariane</strong> (Nord-Pas-de-Calais),
+                                        mais dédié à toute la communauté de vol libre francophone.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <h5 data-i18n="manualModal.pourquoiCetteApplication" style="margin-top: 0; margin-bottom: 8px">Pourquoi cette application ?</h5>
+                            <p data-requires-role="beta" hidden data-i18n="manualModal.laPreparationAuxBrevets"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 12px;
+                                "
+                            >
+                                La préparation aux brevets de parapente peut être longue et morcelée : les questions
+                                officielles de la FFVL sont dispersées dans des documents PDF peu pratiques sur
+                                téléphone, les cours théoriques ne sont pas toujours réunis au même endroit, et la
+                                lecture des conditions météo sur un décollage demande de jongler entre plusieurs outils
+                                différents (Windy, Météo-Parapente, PiouPiou, les données FFVL...).
+                            </p>
+                            <p data-hidden-with-role="beta" data-i18n="manualModal.laPreparationAuxBrevetsSansMeteo"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 12px;
+                                ">La préparation aux brevets de parapente peut être longue et morcelée : les questions officielles de la FFVL sont dispersées dans des documents PDF peu pratiques sur téléphone, et les cours théoriques ne sont pas toujours réunis au même endroit.</p>
+                            <p data-i18n-html="manualModal.lEstNeDe"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 20px;
+                                "
+                            >
+                                L'<strong>Assistant Parapente</strong> est né de la volonté de regrouper tout cela en un
+                                seul endroit, pensé pour fonctionner parfaitement sur mobile depuis le décollage, et
+                                adapté à toutes les étapes du parcours d'un pilote — du tout débutant (BI) au confirmé
+                                (BPC).
+                            </p>
+
+                            <h5 data-i18n="manualModal.uneApplication100Gratuite" style="margin-top: 0; margin-bottom: 8px">
+                                Une application 100% gratuite &amp; sans publicité
+                            </h5>
+                            <p data-i18n-html="manualModal.lEstMisA"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 20px;
+                                "
+                            >
+                                L'<strong>Assistant Parapente</strong> est mis à disposition de la communauté
+                                <strong>entièrement gratuitement</strong>. Il n'y a aucune fonctionnalité payante,
+                                aucune collecte de données commerciales, aucun abonnement, et aucune publicité. Il
+                                s'agit d'une initiative bénévole et personnelle pour soutenir l'apprentissage théorique
+                                et la sécurité des pilotes de vol libre.
+                            </p>
+
+                            <h5 data-i18n="manualModal.ceQueLApplicationFait" style="margin-top: 0; margin-bottom: 8px">Ce que l'application fait concrètement</h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.7;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 20px;
+                                "
+                            >
+                                <li data-i18n-html="manualModal.elleCentraliseLesDans" style="margin-bottom: 6px">
+                                    Elle centralise les <strong>questions officielles FFVL</strong> dans un QCM
+                                    interactif avec correction et explications pédagogiques, accessible à tout moment,
+                                    même hors ligne.
+                                </li>
+                                <li data-requires-role="owner" hidden data-i18n-html="manualModal.elleCroiseEnTemps" style="margin-bottom: 6px">
+                                    Elle croise en temps réel les
+                                    <strong>données géographiques des sites de vol</strong> (orientation des décollages,
+                                    altitude, type) avec les <strong>prévisions météo multi-modèles</strong> (AROME,
+                                    ICON, GFS…) pour indiquer quels sites sont potentiellement volables et à quelle
+                                    heure.
+                                </li>
+                                <li data-i18n-html="manualModal.elleRegroupeLesDu" style="margin-bottom: 6px">
+                                    Elle regroupe les <strong>cours, manuels et fiches synthèse</strong> du brevet de
+                                    pilote dans une bibliothèque consultable et téléchargeable.
+                                </li>
+                                <li data-i18n-html="manualModal.elleTientVotreImport" style="margin-bottom: 6px">
+                                    Elle tient votre <strong>carnet de vol</strong> (import de traces .igc, météo du
+                                    jour enregistrée automatiquement) et suit l'<strong>usure de votre matériel</strong>.
+                                </li>
+                                <li data-i18n-html="manualModal.elleRassembleSurUn" style="margin-bottom: 6px">
+                                    Elle rassemble sur un écran <strong>Sécurité</strong> la conduite à tenir en cas
+                                    d'accident, votre position GPS et les check-lists avant le décollage.
+                                </li>
+                                <li data-i18n-html="manualModal.elleSuitVotreEt" style="margin-bottom: 6px">
+                                    Elle suit votre <strong>progression dans le temps</strong>, détecte vos <strong>pièges récurrents</strong> et vous guide chapitre par chapitre avec les <strong>Axes de révision</strong> pour orienter vos révisions efficacement.
+                                </li>
+                            </ul>
+
+                            <h5 data-i18n="manualModal.ceQueLApplicationNe" style="margin-top: 0; margin-bottom: 8px">Ce que l'application ne fait PAS</h5>
+                            <p data-requires-role="beta" hidden data-i18n-html="manualModal.lApplicationEstUn"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 12px;
+                                "
+                            >
+                                L'application est un <strong>outil d'accompagnement et d'aide à la décision</strong>,
+                                pas un outil de décision. Les prévisions météo affichées proviennent de modèles
+                                automatiques et ne remplacent pas une analyse aérologique complète et officielle.
+                                <strong>La décision de voler reste toujours et uniquement celle du pilote.</strong>
+                            </p>
+                            <p data-hidden-with-role="beta" data-i18n-html="manualModal.lApplicationEstUnSansMeteo"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 12px;
+                                ">L'application est un <strong>outil d'accompagnement et d'aide à la décision</strong>, pas un outil de décision. <strong>La décision de voler reste toujours et uniquement celle du pilote.</strong></p>
+                            <p data-i18n="manualModal.deMemeLaReussite"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 20px;
+                                "
+                            >
+                                De même, la réussite aux QCM de l'application ne garantit pas la réussite aux examens
+                                officiels organisés par la FFVL.
+                            </p>
+
+                            <h5 data-i18n="manualModal.quiLADeveloppee" style="margin-top: 0; margin-bottom: 8px">Qui l'a développée ?</h5>
+                            <p data-i18n-html="manualModal.cetteApplicationAEte"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 12px;
+                                "
+                            >
+                                Cette application a été développée bénévolement par <strong>Maxime Urbaniak</strong>,
+                                élève pilote du club-école <em>Le Fil d'Ariane</em> (Nord - Pas-de-Calais, France). Elle
+                                n'a aucune vocation commerciale. Le club décline toute responsabilité éditoriale sur le
+                                contenu de cette application.
+                            </p>
+                            <p data-i18n-html="manualModal.lesDonneesDeQuestions" style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem">
+                                Les données de questions QCM et les informations sur les sites de vol libre sont issues
+                                de la <strong>FFVL (Fédération Française de Vol Libre)</strong> et sont utilisées à des
+                                fins strictement éducatives.
+                            </p>
+                        </div>
+
+                        <!-- GENERAL -->
+                        <div id="manual-section-dashboard" class="manual-section" style="display: none">
+                            <h4 data-i18n="manualModal.bienvenueSurLAssistantParapente" style="margin-top: 0; color: var(--accent-orange)">
+                                Bienvenue sur l'Assistant Parapente
+                            </h4>
+                            <p data-requires-role="beta" hidden data-i18n="manualModal.lAssistantParapenteEstUne" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                L'Assistant Parapente est une application tout-en-un conçue pour accompagner les pilotes
+                                de vol libre, de l'apprentissage théorique jusqu'à la préparation météo de leurs vols.
+                                Voici les concepts clés du fonctionnement général :
+                            </p>
+                            <p data-hidden-with-role="beta" data-i18n="manualModal.lAssistantParapenteEstUneSansMeteo" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">L'Assistant Parapente est une application tout-en-un conçue pour accompagner les pilotes de vol libre, de l'apprentissage théorique jusqu'à la préparation de leurs vols. Voici les concepts clés du fonctionnement général :</p>
+
+                            <h5 data-i18n="manualModal.n1ProfilEtNiveau" style="margin-top: 16px; margin-bottom: 8px">1. Profil et Niveau de Pilotage</h5>
+                            <p data-i18n="manualModal.enHautDeLEcran"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.5;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 8px;
+                                "
+                            >En haut de l'écran, un menu déroulant vous permet de sélectionner votre niveau actuel (Brevet Initial, Brevet Pilote, Brevet Pilote Confirmé, Treuil, ou Tous les niveaux). Il est proposé dès votre première visite sur l'écran d'accueil, et vous pouvez le changer à tout moment. Ce réglage adapte automatiquement le contenu de l'application : les questions des QCM, les axes de révision et les cours de la bibliothèque sont filtrés selon votre niveau, le nombre de questions de l'examen blanc est ajusté, et la couleur dominante de l'interface change pour refléter votre progression (Vert pour BI, Bleu pour BP, Marron pour BPC). Dès que vous validez l'examen théorique officiel d'un brevet, le QCM passe automatiquement au niveau supérieur, tandis que votre niveau de vol pratique dans le carnet évolue selon vos brevets pratiques validés.</p>
+
+                            <h5 data-i18n="manualModal.n2ThemeVisuelClair" style="margin-top: 16px; margin-bottom: 8px">2. Thème Visuel (Clair / Sombre)</h5>
+                            <p data-i18n="manualModal.lApplicationDisposeDUnBouton"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.5;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 8px;
+                                "
+                            >
+                                L'application dispose d'un bouton ☀️/🌙 (en haut à droite). Il bascule entre le mode
+                                Clair, le mode Sombre, et le mode "Auto" (qui suit les réglages de votre système
+                                d'exploitation). Le mode sombre est particulièrement recommandé pour réduire la fatigue
+                                visuelle et économiser la batterie sur le terrain.
+                            </p>
+
+                            <h5 data-i18n="manualModal.n3CreerSonCompte" style="margin-top: 16px; margin-bottom: 8px">
+                                3. Créer son compte : pourquoi c'est important
+                            </h5>
+
+                            <!-- CTA Banner -->
+                            <div
+                                style="
+                                    margin-bottom: 16px;
+                                    padding: 16px 20px;
+                                    background: linear-gradient(
+                                        135deg,
+                                        rgba(14, 165, 233, 0.12),
+                                        rgba(99, 102, 241, 0.08)
+                                    );
+                                    border-radius: var(--radius-lg);
+                                    border: 1px solid rgba(14, 165, 233, 0.3);
+                                    display: flex;
+                                    align-items: flex-start;
+                                    gap: 14px;
+                                "
+                            >
+                                <i
+                                    class="ri-user-add-line"
+                                    style="font-size: 2rem; color: var(--accent-orange); flex-shrink: 0; margin-top: 2px"
+                                ></i>
+                                <div>
+                                    <p data-i18n="manualModal.sansCompteVousPerdez"
+                                        style="
+                                            margin: 0 0 6px 0;
+                                            color: var(--text-main);
+                                            font-weight: 700;
+                                            font-size: 0.95rem;
+                                        "
+                                    >
+                                        Sans compte, vous perdez tout en changeant d'appareil.
+                                    </p>
+                                    <p data-i18n="manualModal.vosScoresVotreHistorique"
+                                        style="
+                                            margin: 0;
+                                            color: var(--text-secondary);
+                                            font-size: 0.88rem;
+                                            line-height: 1.5;
+                                        "
+                                    >
+                                        Vos scores, votre historique d'examens, vos sites favoris et vos préférences
+                                        sont stockés localement dans votre navigateur. Si vous changez de téléphone,
+                                        effacez le cache, ou passez de votre mobile à votre PC, tout disparaît. Un
+                                        compte résout ce problème en 30 secondes.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <p data-i18n="manualModal.concretementVoiciCeQuUn"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 12px;
+                                "
+                            >
+                                Concrètement, voici ce qu'un compte vous apporte :
+                            </p>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.7;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 16px;
+                                "
+                            >
+                                <li data-i18n="manualModal.commencezVotreRevisionQcm" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.continuiteParfaite">Continuité parfaite :</strong> Commencez votre révision QCM sur votre
+                                    téléphone au décollage, et retrouvez exactement le même état de progression le soir
+                                    sur votre ordinateur — sans aucune manipulation manuelle.
+                                </li>
+                                <li data-i18n="manualModal.leModeRevisionSe" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.memoireLongueDureeDu">Mémoire longue durée du mode Révision :</strong> Le mode Révision se base
+                                    sur l'historique de vos erreurs pour vous reposer les bonnes questions. Sans compte,
+                                    cet historique ne survit pas à un changement d'appareil. Avec un compte,
+                                    l'algorithme garde une mémoire complète de toutes vos sessions passées.
+                                </li>
+                                <li data-i18n="manualModal.vosVolsVosSessions" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.carnetDeVol2">Carnet de Vol &amp; Équipement :</strong> Vos vols (et leurs traces GPS .igc), vos sessions de gonflage, vos brevets FFVL, vos voiles/sellettes enregistrées et l'usure calculée de votre matériel sont sauvegardés de manière sécurisée.
+                                </li>
+                                <li data-requires-role="beta" hidden data-i18n="manualModal.votreNiveauDeBrevet" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.sauvegardeDeVosPreferences">Sauvegarde de vos préférences :</strong> Votre niveau de brevet sélectionné,
+                                    vos filtres de recherche météo, votre thème visuel, et vos configurations météo
+                                    personnalisées (limites de vent, modèle préféré, rayon GPS, tri) sont synchronisés
+                                    automatiquement.
+                                </li>
+                                <li data-hidden-with-role="beta" data-i18n="manualModal.votreNiveauDeBrevetSansMeteo" style="margin-bottom: 8px">Votre niveau de brevet sélectionné, vos filtres de recherche, votre thème visuel et vos réglages de recherche de sites (rayon GPS) sont synchronisés automatiquement.</li>
+                                <li data-i18n="manualModal.unEffacementAccidentelDu" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.protectionContreLaPerte">Protection contre la perte de données :</strong> Un effacement accidentel du
+                                    cache du navigateur, un reset de téléphone, ou un changement d'appareil en urgence
+                                    ne vous feront plus perdre des semaines de progression.
+                                </li>
+                            </ul>
+
+                            <p data-i18n-html="manualModal.pourCreerVotreCompte"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 8px;
+                                "
+                            >
+                                Pour créer votre compte (ce qui est <strong>100% gratuit</strong>), cliquez sur l'icône
+                                <strong>👤</strong> en haut à droite de l'application (Espace Synchro). La création
+                                prend moins d'une minute : une adresse e-mail et un mot de passe suffisent. Aucune
+                                information personnelle supplémentaire n'est requise.
+                            </p>
+                            <p data-i18n="manualModal.ellesSontHebergeesSur" style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem">
+                                <strong data-i18n="manualModal.vosDonneesRestentLes">Vos données restent les vôtres :</strong> elles sont hébergées sur
+                                l'infrastructure Firebase (Google Ireland, serveurs européens) et ne sont jamais
+                                partagées ni vendues. Vous pouvez les supprimer à tout moment depuis l'Espace Synchro ou
+                                en contactant l'éditeur.
+                            </p>
+                            <p data-i18n-html="manualModal.uneFoisConnecteUn" style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem">
+                                Une fois connecté, un petit point dans l'en-tête indique qu'une synchronisation est en cours ou que des modifications n'ont pas encore pu être envoyées (hors ligne) : l'application réessaie automatiquement. Les boutons <strong>Exporter</strong> et <strong>Importer</strong> de l'Espace Synchro, disponibles aussi sans compte, permettent de garder une copie complète de vos données (y compris vos traces GPS .igc) dans un fichier et de les restaurer plus tard.
+                            </p>
+
+                            <h5 data-i18n="manualModal.n4HorsLigneEt" style="margin-top: 16px; margin-bottom: 8px">4. Hors ligne et mises à jour</h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.7;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 8px;
+                                "
+                            >
+                                <li data-requires-role="beta" hidden data-i18n="manualModal.lesQcmLeCarnet" style="margin-bottom: 6px">
+                                    <strong data-i18n="manualModal.sansReseau">Sans réseau :</strong> les QCM, le carnet de vol et l'écran Sécurité
+                                    fonctionnent hors ligne. La dernière prévision météo chargée, les cours déjà ouverts
+                                    et les zones de carte déjà consultées restent disponibles sur l'appareil.
+                                </li>
+                                <li data-hidden-with-role="beta" data-i18n="manualModal.lesQcmLeCarnetSansMeteo" style="margin-bottom: 6px">les QCM, le carnet de vol et l'écran Sécurité fonctionnent hors ligne. Les cours déjà ouverts et les zones de carte déjà consultées restent disponibles sur l'appareil.</li>
+                                <li data-i18n="manualModal.lorsquUneMiseAJour" style="margin-bottom: 6px">
+                                    <strong data-i18n="manualModal.nouvelleVersion">Nouvelle version :</strong> lorsqu'une mise à jour de l'application est
+                                    disponible, un message vous le signale pour que vous puissiez recharger la page.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div data-requires-role="owner" hidden id="manual-section-sites" class="manual-section" style="display: none">
+                            <h4 data-requires-role="beta" hidden data-i18n="manualModal.preparationDesVolsSites" style="margin-top: 0; color: var(--accent-orange)">
+                                Préparation des Vols (Sites &amp; Météo)
+                            </h4>
+                            <h4 data-hidden-with-role="beta" data-i18n="manualModal.preparationDesVolsSitesSeuls" style="margin-top: 0; color: var(--accent-orange)">Sites de Vol</h4>
+                            <p data-requires-role="beta" hidden data-i18n="manualModal.ceModuleCroiseLes" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Ce module croise les données géographiques des sites de vol libre (fournies par la FFVL)
+                                avec les prévisions de plusieurs modèles météorologiques, pour indiquer quels sites sont
+                                potentiellement volables autour de vous et à quelle heure.
+                            </p>
+                            <p data-hidden-with-role="beta" data-i18n="manualModal.ceModulePresenteLesSites" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">Ce module présente les sites de vol libre (données fournies par la FFVL) sur une carte et dans une liste, autour de vous.</p>
+
+                            <h5 data-i18n="manualModal.n1PointDeReference" style="margin-top: 16px; margin-bottom: 8px">
+                                1. Point de Référence et Rayon de Recherche
+                            </h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                "
+                            >
+                                <li data-i18n="manualModal.autorisezLeGpsBouton" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.leGpsOuUne">Le GPS ou une adresse :</strong> Autorisez le GPS (bouton "GPS") pour
+                                    centrer la recherche sur vous, ou tapez le nom d'une ville ou d'une adresse (ex :
+                                    Annecy) puis cliquez sur "Valider". Sans GPS ni adresse, la recherche est centrée
+                                    sur Boulogne-sur-Mer et un message vous le rappelle.
+                                </li>
+                                <li data-i18n="manualModal.lEtoileACoteDu" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.lieuxEnregistres">Lieux enregistrés :</strong> L'étoile à côté du champ d'adresse mémorise le
+                                    lieu courant pour le recharger en un clic plus tard.
+                                </li>
+                                <li data-requires-role="beta" hidden data-i18n="manualModal.leCurseurRayonMaximal" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.leRayon">Le Rayon :</strong> Le curseur "Rayon maximal" définit la zone de recherche
+                                    autour de ce point, de 10 à 200 km (50 km par défaut). La météo n'est demandée que
+                                    pour les sites de cette zone (et vos favoris) ; la carte suit le rayon choisi.
+                                </li>
+                                <li data-hidden-with-role="beta" data-i18n="manualModal.leCurseurRayonMaximalSansMeteo" style="margin-bottom: 8px"><strong data-i18n="manualModal.leRayon">Le Rayon :</strong> Le curseur "Rayon maximal" définit la zone de recherche autour de ce point, de 10 à 200 km (50 km par défaut) ; la carte suit le rayon choisi.</li>
+                                <li data-i18n="manualModal.laBarreDeRecherche" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.rechercheEtFiltres">Recherche et filtres :</strong> La barre de recherche trouve un site par son
+                                    nom, sa ville ou son code postal. Les menus "Orientation" et "Type" (site naturel,
+                                    atterrissage, dune, piste de treuil, gonflage…) affinent la liste.
+                                </li>
+                            </ul>
+
+                            <div data-requires-role="beta" hidden>
+<h5 data-i18n="manualModal.n2ParametresDeCalcul" style="margin-top: 16px; margin-bottom: 8px">2. Paramètres de Calcul Météo</h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                "
+                            >
+                                <li data-i18n="manualModal.aromeMeteoFranceHauteDefinition" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.modeleMeteo">Modèle Météo :</strong> AROME (Météo-France, haute définition, très précis
+                                    à courte échéance en France), ICON-EU et ICON (DWD), ECMWF (IFS), GFS (NOAA, long
+                                    terme mondial), ou une sélection automatique multi-modèles d'Open-Meteo. Changer de
+                                    modèle recalcule les prévisions.
+                                </li>
+                                <li data-i18n="manualModal.de24HeuresA" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.dureeDesPrevisions">Durée des prévisions :</strong> De 24 heures à 7 jours. Elle fixe la fenêtre
+                                    sur laquelle les créneaux volables sont recherchés.
+                                </li>
+                                <li data-i18n="manualModal.enFiltresPersonnelsVous" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.modeDeCalculDu">Mode de calcul du vent :</strong> En "Filtres Personnels", vous définissez
+                                    votre plage de vent (Vent Min, Vent Max) et l'écart maximal toléré entre rafales et
+                                    vent moyen (Rafales Max). En "Mon Matériel", ce sont les plages de vent des voiles
+                                    enregistrées dans votre carnet qui servent de limites : un site est volable si au
+                                    moins une de vos voiles accepte le vent prévu.
+                                </li>
+                            </ul>
+
+                            <h5 data-i18n="manualModal.n3TriEtDefinition" style="margin-top: 16px; margin-bottom: 8px">3. Tri et Définition des Meilleures Conditions</h5>
+                            <p data-i18n="manualModal.laListePeutEtre" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                La liste peut être triée par meilleures conditions, par distance (GPS) ou par nom. Vos
+                                sites favoris (étoile ⭐ sur une fiche) restent toujours en tête. En tri "Meilleures
+                                conditions", quatre stratégies sont proposées :
+                            </p>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                "
+                            >
+                                <li data-i18n="manualModal.chercheLaPlusLongue" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.creneauContinu">Créneau continu :</strong> Cherche la plus longue période d'heures
+                                    consécutives volables (idéal pour un long vol).
+                                </li>
+                                <li data-i18n="manualModal.compteLesHeuresVolables" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.demiJournee">Demi-journée :</strong> Compte les heures volables de l'après-midi (de 12 h
+                                    à 18 h).
+                                </li>
+                                <li data-i18n="manualModal.verifieQueLeSite" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.journeeComplete">Journée complète :</strong> Vérifie que le site est volable le matin, en
+                                    début d'après-midi et en fin de journée (10 h, 14 h et 18 h).
+                                </li>
+                                <li data-i18n="manualModal.cumuleToutesLesHeures" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.volumeTotal">Volume total :</strong> Cumule toutes les heures volables sur la durée des
+                                    prévisions, même si elles sont hachées.
+                                </li>
+                            </ul>
+
+                            <h5 data-i18n="manualModal.n4HeureDeVol" style="margin-top: 16px; margin-bottom: 8px">4. Heure de Vol et Fiabilité des Prévisions</h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                "
+                            >
+                                <li data-i18n="manualModal.leCurseurHeureDe" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.heureDeVol">Heure de vol :</strong> Le curseur "Heure de vol" choisit l'heure
+                                    affichée pour tous les sites. La case "Masquer les sites sans créneau volable"
+                                    retire ceux qui n'ont aucune heure volable sur la durée des prévisions.
+                                </li>
+                                <li data-i18n="manualModal.chaqueAvisIndiqueLe" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.contexteDeLaPrevision">Contexte de la prévision :</strong> Chaque avis indique le modèle utilisé,
+                                    l'heure à laquelle la prévision a été récupérée et l'heure de calcul du modèle (run).
+                                    Au-delà de 3 heures, la prévision est signalée comme ancienne, avec un bouton
+                                    "Actualiser".
+                                </li>
+                                <li data-i18n="manualModal.pourLHeureAfficheeLApplication" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.secondAvis">Second avis :</strong> Pour l'heure affichée, l'application compare avec un
+                                    second modèle (GFS, ou AROME si GFS est déjà choisi) et indique s'il est d'accord
+                                    ou non.
+                                </li>
+                                <li data-i18n="manualModal.siUneDonneeManque" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.previsionIncomplete">Prévision incomplète :</strong> Si une donnée manque (vent, rafales,
+                                    pluie, risque d'orage…), aucun avis n'est donné pour cette heure plutôt que
+                                    d'inventer une valeur, et les données manquantes sont listées.
+                                </li>
+                                <li data-i18n="manualModal.laDernierePrevisionChargee" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.horsLigne">Hors ligne :</strong> La dernière prévision chargée reste consultable sans
+                                    réseau, avec la date de récupération pour rappeler qu'elle peut être dépassée.
+                                </li>
+                            </ul>
+
+                            </div>
+<h5 data-requires-role="beta" hidden data-i18n="manualModal.n5FicheSiteFavoris" style="margin-top: 16px; margin-bottom: 8px">5. Fiche Site, Favoris et Comparateur</h5>
+
+                            <h5 data-hidden-with-role="beta" data-i18n="manualModal.n2FicheSiteEtFavoris" style="margin-top: 16px; margin-bottom: 8px">2. Fiche Site et Favoris</h5>
+                            <p data-requires-role="beta" hidden data-i18n-html="manualModal.chaqueFicheSiteAffiche" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Chaque fiche site affiche l'altitude, les prochains créneaux volables, et donne accès à
+                                la fiche officielle FFVL, au vent en direct de la balise la plus proche (SpotAiR), à
+                                l'itinéraire ("S'y rendre" avec Waze, Google Maps ou Apple Plans) et aux détails du
+                                site (praticabilité, dangers signalés, réglementation…). Un <strong>brief
+                                pré-vol</strong> rappelle votre niveau et l'état de révision de votre matériel. Le
+                                bouton <strong>Comparer</strong> met vos sites favoris côte à côte : météo de l'heure
+                                affichée, heures volables, meilleur créneau et accord entre les deux modèles.
+                            </p>
+                            <p data-hidden-with-role="beta" data-i18n-html="manualModal.chaqueFicheSiteAfficheSansMeteo" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">Chaque fiche site affiche l'altitude et donne accès à la fiche officielle FFVL, au vent en direct de la balise la plus proche (SpotAiR), à l'itinéraire ("S'y rendre" avec Waze, Google Maps ou Apple Plans) et aux détails du site (praticabilité, dangers signalés, réglementation…). Un <strong>brief pré-vol</strong> rappelle votre niveau et l'état de révision de votre matériel.</p>
+
+                            <h5 data-requires-role="beta" hidden data-i18n="manualModal.n6CartographieCartes" style="margin-top: 16px; margin-bottom: 8px">6. Cartographie &amp; Cartes Externes</h5>
+
+                            <h5 data-hidden-with-role="beta" data-i18n="manualModal.n3CartographieCartes" style="margin-top: 16px; margin-bottom: 8px">3. Cartographie &amp; Cartes Externes</h5>
+                            <p data-i18n-html="manualModal.auDessusDeLaListe" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Au-dessus de la liste, la carte interactive affiche les sites autour de vous avec les
+                                icônes officielles FFVL. Des onglets permettent d'afficher en un clic des services
+                                météo externes : <strong>Windy</strong> (vent animé), <strong>Météo-Parapente</strong>
+                                (émagrammes &amp; thermiques), <strong>Paragliding Earth</strong>,
+                                <strong>Paraglidable</strong>, les cartes <strong>Fronts &amp; Isobares</strong> de
+                                Météo-France, et d'autres cartes via le bouton "Plus". Le bouton
+                                <strong>Spot It</strong> d'une fiche site centre toutes ces cartes sur ce site.
+                            </p>
+                        </div>
+
+                        <div data-requires-role="beta" hidden id="manual-section-scoring" class="manual-section" style="display: none">
+                            <h4 data-i18n="manualModal.calculDeLaVolabilite" style="margin-top: 0; color: var(--accent-orange)">
+                                Calcul de la Volabilité (Scoring météo)
+                            </h4>
+                            <p data-i18n="manualModal.lApplicationEvalueEnTemps" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                L'application évalue en temps réel la "volabilité" de chaque spot de parapente selon un
+                                algorithme qui croise les prévisions météo avec vos filtres personnels. Ce calcul
+                                s'effectue en deux étapes successives.
+                            </p>
+                            <p data-i18n-html="manualModal.auPrealableChaqueHeure" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Au préalable, chaque heure doit disposer de toutes les données nécessaires (vent moyen,
+                                rafales, direction du vent, précipitations, risque d'orage, heures de jour). S'il en
+                                manque une, l'heure est marquée <strong>"Prévision incomplète"</strong> : aucun avis
+                                n'est donné et aucune valeur par défaut n'est inventée.
+                            </p>
+
+                            <h5 data-i18n="manualModal.n1LesVerrousDe" style="margin-top: 16px; margin-bottom: 8px">
+                                1. Les Verrous de Sécurité (Kill Switches)
+                            </h5>
+                            <p data-i18n="manualModal.avantDEstimerUnScore" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Avant d'estimer un score de vol, l'application vérifie 6 verrous de sécurité
+                                fondamentaux.
+                                <strong data-i18n="manualModal.siUnSeulVerrou"
+                                    >Si un seul verrou est actif, le spot est déclaré "Non Volable" (0/100) :</strong
+                                >
+                            </p>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 16px;
+                                "
+                            >
+                                <li data-i18n="manualModal.leVolEstBloque" style="margin-bottom: 6px">
+                                    <strong data-i18n="manualModal.nuit">🌙 Nuit :</strong> Le vol est bloqué si le soleil est couché.
+                                </li>
+                                <li data-i18n="manualModal.bloqueDesLePremier" style="margin-bottom: 6px">
+                                    <strong data-i18n="manualModal.pluie">🌧️ Pluie :</strong> Bloqué dès le premier millimètre de pluie (> 0 mm).
+                                </li>
+                                <li data-i18n="manualModal.bloqueSiLeVent" style="margin-bottom: 6px">
+                                    <strong data-i18n="manualModal.ventMoyenHors">💨 Vent moyen hors limites :</strong> Bloqué si le vent moyen est inférieur
+                                    à votre limite minimale (vMin) ou supérieur à votre limite maximale (vMax). En mode
+                                    "Mon Matériel", bloqué si aucune de vos voiles n'accepte ce vent.
+                                </li>
+                                <li data-i18n="manualModal.bloqueSiLEcartEntre" style="margin-bottom: 6px">
+                                    <strong data-i18n="manualModal.rafalesExcessives">🌪️ Rafales excessives :</strong> Bloqué si l'écart entre les rafales et le
+                                    vent moyen dépasse votre seuil de rafales toléré.
+                                </li>
+                                <li data-i18n="manualModal.bloqueSiLEnergiePotentielle" style="margin-bottom: 6px">
+                                    <strong data-i18n="manualModal.risqueOrageux">⚡ Risque orageux :</strong> Bloqué si l'énergie potentielle convective
+                                    (CAPE) de l'air dépasse 1000 J/kg, signe d'une forte instabilité convective et de
+                                    danger.
+                                </li>
+                                <li data-i18n="manualModal.bloqueSiLaDirection" style="margin-bottom: 6px">
+                                    <strong data-i18n="manualModal.orientationIncompatible">🧭 Orientation incompatible :</strong> Bloqué si la direction d'où vient le
+                                    vent ne correspond pas à l'orientation de décollage enregistrée pour ce site.
+                                </li>
+                            </ul>
+                            <p data-i18n-html="manualModal.siLOrientationDuDecollage" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Si l'orientation du décollage n'est pas connue, l'application ne la suppose jamais
+                                idéale : les autres verrous s'appliquent, mais le site est affiché
+                                <strong>"Orientation du décollage inconnue : à vérifier"</strong>, sans score.
+                            </p>
+
+                            <h5 data-i18n="manualModal.n2CalculDuScore" style="margin-top: 16px; margin-bottom: 8px">
+                                2. Calcul du Score Continu (de 0 à 100)
+                            </h5>
+                            <p data-i18n="manualModal.siTousLesVerrous" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Si tous les verrous sont au vert, l'algorithme calcule un score de qualité du vol basé
+                                sur deux critères pondérés à 50% chacun :
+                            </p>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 16px;
+                                "
+                            >
+                                <li data-i18n="manualModal.plusLeVentMoyen" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.noteDeLaVitesse">Note de la Vitesse du Vent (50%) :</strong> Plus le vent moyen est proche du
+                                    milieu de votre plage idéale, plus la note se rapproche de 100/100. À l'extrême
+                                    limite (vent égal à vMin ou vMax), la note descend à 0/100. <br /><span data-i18n="manualModal.ventIdealVmin"
+                                        style="font-size: 0.85rem; opacity: 0.8; font-style: italic"
+                                        >Vent idéal = (vMin + vMax) / 2</span
+                                    >
+                                </li>
+                                <li data-i18n="manualModal.evalueeSelonLaPrecision" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.noteDeLOrientation50">Note de l'Orientation (50%) :</strong> Évaluée selon la précision de
+                                    l'alignement face à la pente :
+                                    <ul style="margin-top: 6px; padding-left: 16px; font-size: 0.88rem; opacity: 0.9">
+                                        <li data-i18n="manualModal.ventDeFaceA"><strong data-i18n="manualModal.parfait100100">Parfait (100/100) :</strong> Vent de face à ±11.25° près.</li>
+                                        <li data-i18n="manualModal.ecartEntre1125Et"><strong data-i18n="manualModal.bon100A70100">Bon (100 à 70/100) :</strong> Écart entre 11.25° et 22.5°.</li>
+                                        <li data-i18n="manualModal.ecartEntre225Et"><strong data-i18n="manualModal.passable70A0100">Passable (70 à 0/100) :</strong> Écart entre 22.5° et 45°.</li>
+                                        <li data-i18n="manualModal.ecartSuperieurA45">
+                                            <strong data-i18n="manualModal.horsJeu0100">Hors-jeu (0/100) :</strong> Écart supérieur à 45° (ou rejeté par le
+                                            filtre cardinal).
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <div data-i18n="manualModal.scoreFinal"
+                                style="
+                                    padding: 12px;
+                                    background: rgba(14, 165, 233, 0.07);
+                                    border-left: 4px solid var(--accent-orange);
+                                    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+                                    margin-top: 16px;
+                                    font-size: 0.9rem;
+                                    color: var(--text-main);
+                                    font-weight: 500;
+                                "
+                            >
+                                💡 Score Final = (Note Vent * 0.5) + (Note Orientation * 0.5).
+                                <br /><span data-i18n="manualModal.unSpotJugeSecuritaire" style="font-size: 0.82rem; font-weight: 400; color: var(--text-secondary)"
+                                    >Un spot jugé sécuritaire (volable) aura son score global pondéré de manière fluide
+                                    selon la force du vent et son alignement : Excellent à partir de 80/100, Bon de 50
+                                    à 79/100, Passable en dessous de 50/100.</span
+                                >
+                            </div>
+                            <p data-i18n="manualModal.cetAvisRepose"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.5;
+                                    font-size: 0.9rem;
+                                    margin-top: 16px;
+                                "
+                            >
+                                ⚠️ Cet avis repose sur des prévisions et le risque d'orage n'est qu'une estimation : la
+                                décision de voler vous appartient, vérifiez toujours les conditions sur place.
+                            </p>
+                        </div>
+
+                        <!-- CARNET DE VOL -->
+                        <div id="manual-section-logbook" class="manual-section" style="display: none">
+                            <h4 data-i18n="manualModal.leCarnetDeVol" style="margin-top: 0; color: var(--accent-orange)">
+                                Le Carnet de Vol (Logbook) &amp; Traces 3D
+                            </h4>
+                            <p data-i18n-html="manualModal.ceModuleVousPermet" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Ce module vous permet d'enregistrer et de conserver l'historique complet de vos
+                                activités en vol libre et au sol (vols et sessions de gonflage). Le bouton
+                                <strong>Carnet</strong> de la barre de navigation ouvre un sous-menu :
+                                <strong>Activités</strong>, <strong>Statistiques</strong> et
+                                <strong>Matériel</strong>. Le bouton <strong>Ajouter une session</strong>, en haut de
+                                la page Activités, ouvre une fenêtre de saisie ; la modification d'une session se fait dans
+                                la même fenêtre, fermée par <strong>Annuler</strong>, la croix ou la touche Échap.
+                            </p>
+
+                            <h5 data-i18n="manualModal.n1AjouterUnVol" style="margin-top: 16px; margin-bottom: 8px">1. Ajouter un Vol</h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 16px;
+                                "
+                            >
+                                <li data-i18n-html="manualModal.importerTraceIgc" style="margin-bottom: 8px"><strong>Importer une trace GPS (.igc) :</strong> Glissez-déposez ou sélectionnez le fichier IGC de votre vario. L'application repère le vrai décollage et le vrai atterrissage (ni le parking, ni la marche du retour, même avec des virages serrés en approche), puis calcule la date, la durée, l'altitude max, le gain, la distance, le vario max et les vitesses. Un <strong>départ au treuil</strong> est reconnu tout seul (montée régulière en ligne droite dès le décollage) : le type de vol passe alors à <strong>Treuil</strong>. Si votre vario était mal calé (par exemple une altitude d'atterrissage négative), elle vous le signale et vous pouvez corriger les altitudes en saisissant l'altitude réelle du décollage ou de l'atterrissage. <strong>Plusieurs vols d'un coup :</strong> sélectionnez ou déposez plusieurs fichiers ensemble (avec leurs fichiers .sdf si vous en avez) : un tableau s'ouvre avec une ligne par vol, rangée par date. Chaque ligne part de la trace et de vos habitudes ; corrigez-la directement (date, site, durée, voile, sellette, type de vol, école et stage, pilotes), ou recopiez une colonne sur les autres lignes avec « Appliquer à toutes ». Un fichier illisible, un doublon ou un vol déjà dans le carnet est signalé et décoché. Rien n'est ajouté avant de cliquer sur « Importer ».</li>
+                                <li data-i18n-html="manualModal.importerFfvl" style="margin-bottom: 8px"><strong>Importer votre carnet FFVL (Excel) :</strong> Dans l'historique, « Importer un export FFVL » lit le fichier Excel du carnet de vols de l'Intranet FFVL (Passeport, Carnet de vols, Export Excel). Un tableau s'ouvre avec une ligne par vol ; rien n'est ajouté avant de cliquer sur « Importer ». L'export ne donne ni l'heure, ni la voile, ni le type de vol : ils restent vides et le vol s'affiche avec sa date seule ; complétez-les en modifiant le vol. Le dénivelé, l'analyse et le formateur sont recopiés dans le commentaire (le formateur devient moniteur si vous indiquez l'école). Un vol importé porte la mention « Importé FFVL ». Importer le même export une seconde fois ne crée aucun doublon (les vols déjà importés sont signalés et décochés), et « Annuler cet import », en haut de l'historique, retire tous les vols de cet import, et eux seuls.</li>
+                                <li data-i18n-html="manualModal.capteursSyride" style="margin-bottom: 8px"><strong>Capteurs Syride (.sdf) :</strong> Avec un vario Syride, ajoutez le fichier <strong>.sdf</strong> exporté avec le .igc (sélectionnez ou glissez les deux fichiers ensemble). Il apporte ce que l'IGC ne contient pas : le <strong>facteur de charge</strong> (G) mesuré par l'accéléromètre, y compris au largage du treuil. Vous pouvez aussi l'ajouter plus tard en modifiant le vol. L'application vérifie qu'il s'agit bien du même vol : sa trace doit suivre celle du .igc sur toute sa longueur, sinon il est refusé.</li>
+                                <li data-i18n-html="manualModal.uneProposeLesSites" style="margin-bottom: 8px"><strong>Site de vol :</strong> Une <strong>autocomplétion</strong> propose les sites de la base officielle FFVL, vos sites habituels en tête. À l'import d'une trace, l'application choisit le site connu le plus proche du décollage, dans un rayon de 120 m ; si plusieurs sites sont possibles, ils s'affichent en boutons sous le champ pour changer d'un clic. Pour un lieu absent de la base, le bouton <strong>"Placer sur la carte"</strong> permet de le pointer sur une carte (vue carte ou satellite) ou de coller des coordonnées, y compris un lien Google Maps. La position est ensuite reprise automatiquement lors de vos prochaines sessions à ce lieu.</li>
+                                <li data-i18n-html="manualModal.materielSession" style="margin-bottom: 8px"><strong>Matériel :</strong> Associez la voile et la sellette utilisées, choisies parmi vos équipements enregistrés ou saisies librement (les saisies précédentes sont proposées).</li>
+                                <li data-i18n-html="manualModal.indiquezLeTypeDe" style="margin-bottom: 8px"><strong>Type de vol, décollage et prise de terrain :</strong> Indiquez le type de vol (Plouf, Thermique, Soaring, Restit, Cross, Treuil) et la technique de décollage, obligatoire : <strong>"Face voile"</strong>, <strong>"Dos voile"</strong> ou une autre technique. Vous pouvez aussi renseigner la <strong>prise de terrain</strong> (Directe, En U, En S, En huit, ou une approche saisie librement et mémorisée) ainsi qu'un éventuel <strong>posé hors terrain (vache)</strong> ; à l'import d'une trace IGC, la prise de terrain est suggérée automatiquement d'après l'approche finale. Pour un vol au treuil, indiquez aussi le <strong>treuilleur</strong> : la liste propose d'abord ceux de la journée sur ce site.</li>
+                                <li data-i18n-html="manualModal.sessionEcoleExercices" style="margin-bottom: 8px"><strong>Session encadrée par une école :</strong> Cochez cette case et indiquez le <strong>brevet préparé</strong> (BI, BP, BPC, Treuil), le nom de l'école, des moniteurs (plusieurs possibles) et, s'il y en a, des accompagnateurs lorsque la séance a eu lieu en stage (ceux de votre dernière session avec cette école au même endroit sont proposés). Cochez « C'est un stage » pour donner son nom et sa spécialité (choisie dans la liste ou saisie librement via « Autre ») : en choisissant ensuite le nom d'un stage déjà saisi, ou pour une session à moins de 3 h d'une session de stage au même endroit, l'école, la spécialité, le brevet préparé, les moniteurs, les accompagnateurs et les pilotes de ce stage sont repris. Les stages et les brevets préparés sont aussi comptés dans les statistiques. Pour un vol, cochez aussi les <strong>exercices travaillés</strong> ; un exercice absent de la liste s'ajoute avec le bouton <strong>Ajouter</strong> et sera proposé aux sessions suivantes.</li>
+                                <li data-i18n-html="manualModal.pilotesSession" style="margin-bottom: 8px"><strong>Pilotes :</strong> Choisissez dans la liste déroulante les pilotes présents, en école ou non, ou saisissez un nouveau nom : il rejoint la liste pour les sessions suivantes. Chaque pilote choisi s'affiche en étiquette, retirée d'un clic sur sa croix. Pour un vol à moins de 3 h d'une autre session au même endroit, les pilotes de cette session sont déjà sélectionnés.</li>
+                                <li data-i18n-html="manualModal.formulaireQuiApprend" style="margin-bottom: 8px"><strong>Un formulaire qui apprend de vous :</strong> Pour une nouvelle session, l'application pré-remplit ce que vous faites d'habitude dans la même situation : type de vol et technique de décollage sur ce site, voile et sellette utilisées la dernière fois à cet endroit, école si vous y volez en stage en ce moment. Vos vols récents comptent davantage, et vos propres vols l'emportent sur les règles générales (par exemple « au treuil, on décolle dos voile »). Une ligne sous le formulaire indique ce qui a été pré-rempli et pourquoi. Tout reste modifiable : un champ que vous changez n'est jamais remplacé, et une session existante n'est jamais complétée. À l'import d'une trace IGC, le type de vol est aussi déduit de la trace (thermiques, distance, départ au treuil) et la ligne le précise ; « Restit » ne se lit pas dans une trace, il reste à choisir vous-même.</li>
+                                <li data-i18n-html="manualModal.commentaireSession" style="margin-bottom: 8px"><strong>Commentaire :</strong> Notez vos impressions, conditions aérologiques locales, ou faits marquants de votre vol.</li>
+                            </ul>
+
+                            <h5 data-i18n="manualModal.n2SessionDeGonflage" style="margin-top: 16px; margin-bottom: 8px">
+                                2. Session de Gonflage (Jeux de Voile / Groundhandling)
+                            </h5>
+                            <p data-i18n="manualModal.leTravailAuSol" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Le travail au sol est crucial pour la sécurité. Enregistrez vos sessions de gonflage :
+                            </p>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 16px;
+                                "
+                            >
+                                <li data-i18n-html="manualModal.lieuGonflage" style="margin-bottom: 6px"><strong>Lieu &amp; Autocomplétion :</strong> Saisissez le lieu où vous avez gonflé, assisté par l'autocomplétion des sites, ou placez-le sur la carte. Votre lieu habituel est pré-rempli.</li>
+                                <li data-i18n-html="manualModal.exercicesGonflage" style="margin-bottom: 6px"><strong>Exercices travaillés (Multi-sélection) :</strong> Cochez les exercices de la séance (face voile, dos voile, tangage/roulis, affalage, vent fort, prégonflage/démêlage) ou ajoutez-en un avec le bouton <strong>Ajouter</strong>, pour garder une trace précise de votre progression technique.</li>
+                            </ul>
+
+                            <h5 data-i18n="manualModal.n3Historique" style="margin-top: 16px; margin-bottom: 8px">3. Activités</h5>
+                            <p data-i18n="manualModal.toutesVosSessionsSont" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Toutes vos sessions sont répertoriées chronologiquement sous forme de cartes repliables (affichant d'un coup d'œil la date, le site, la voile, la durée, le dénivelé et les étiquettes) qui se déplient au clic, avec un code couleur clair :
+                            </p>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 16px;
+                                "
+                            >
+                                <li data-i18n="manualModal.sessionsDeVolEn" style="margin-bottom: 6px">
+                                    <span
+                                        style="
+                                            display: inline-block;
+                                            width: 12px;
+                                            height: 12px;
+                                            border-radius: 50%;
+                                            background-color: var(--accent-orange);
+                                            margin-right: 8px;
+                                            vertical-align: middle;
+                                        "
+                                    ></span
+                                    ><strong data-i18n="manualModal.bleuVols">Bleu (Vols) :</strong> Sessions de vol en conditions réelles.
+                                </li>
+                                <li data-i18n="manualModal.seancesDEntrainementAuSol" style="margin-bottom: 6px">
+                                    <span
+                                        style="
+                                            display: inline-block;
+                                            width: 12px;
+                                            height: 12px;
+                                            border-radius: 50%;
+                                            background-color: #f59e0b;
+                                            margin-right: 8px;
+                                            vertical-align: middle;
+                                        "
+                                    ></span
+                                    ><strong data-i18n="manualModal.orangeGonflages">Orange (Gonflages) :</strong> Séances d'entraînement au sol.
+                                </li>
+                                <li data-i18n-html="manualModal.pourUnVolImporte" style="margin-bottom: 6px">
+                                    <strong>Trace 3D :</strong> Pour un vol importé, le bouton
+                                    <strong>"Voir la trace"</strong> ouvre un lecteur 3D (propulsé par
+                                    <strong>MapLibre GL JS</strong>) qui rejoue le vol sur le relief réel.
+                                </li>
+                                <li data-i18n-html="manualModal.statsDetaillees" style="margin-bottom: 6px"><strong>Statistiques détaillées :</strong> Sous chaque vol avec une trace, un bloc repliable détaille le remorquage au treuil (durée, hauteur de largage, montée), les altitudes et le dénivelé cumulé, le vario et le taux de chute, les thermiques enroulés (nombre, montée moyenne, meilleur thermique, tours à gauche et à droite), la finesse en transition, les distances (dont la distance libre à 3 points), ainsi que le facteur de charge mesuré si le .sdf a été ajouté (sinon un facteur de charge estimé d'après les virages), et l'instrument qui a enregistré le vol : marque, modèle, numéro de série et version du logiciel, lus dans le fichier IGC.</li>
+                                <li data-i18n-html="manualModal.chaqueEntreePeutEtre" style="margin-bottom: 6px"><strong>Modification et Suppression :</strong> Chaque entrée peut être modifiée (le formulaire se préremplit, avec un bouton <strong>Annuler</strong>) ou supprimée. Les heures d'usure de votre matériel sont ajustées automatiquement. En modification, le bouton <strong>Recalculer depuis la trace IGC</strong> refait les calculs à partir de la trace enregistrée (date, durée, altitudes, statistiques, site, et type Treuil si besoin) sans toucher au reste.</li>
+                                <li data-i18n-html="manualModal.exporterCarnet" style="margin-bottom: 6px"><strong>Exporter :</strong> le bouton <strong>Exporter en PDF</strong> ouvre un bilan A4 paysage détaillé de tout le carnet (synthèse vols et gonflages, heures par voile, suivi des brevets FFVL, puis tableau complet par session : date et heure, type de vol, décollage et prise de terrain, matériel, durée, altitudes/gain/dénivelé, distance/vario/vitesse, formation, météo et commentaire) : choisissez « Enregistrer au format PDF » dans la fenêtre d'impression. Sur une session avec trace, <strong>Télécharger l'IGC</strong> redonne le fichier d'origine, prêt à être déclaré sur CFD ou XContest.</li>
+                            </ul>
+
+                            <h5 data-i18n="manualModal.n4StatistiquesDuCarnet" style="margin-top: 16px; margin-bottom: 8px">4. Statistiques du Carnet</h5>
+                            <p data-i18n-html="manualModal.statistiquesEtRecords" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">La partie Statistiques résume votre activité : nombre et temps de vol, sessions de gonflage, altitude maximale et gain cumulé, utilisation de chaque voile et heures restantes avant révision, lieux les plus fréquentés, part des sessions en école et stages effectués, types de vols, techniques de décollage et exercices de gonflage. L'encart <strong>Brevets FFVL</strong> permet d'enregistrer vos validations officielles (théorie et pratique pour BI, BP, BPC et Treuil), de suivre le volume de séances en école rattachées à chaque brevet (cliquable pour filtrer les activités) et de rattacher en lot vos anciennes séances d'école. La section <strong>Records personnels</strong> donne vos meilleurs vols (plus long, plus haut, distance libre, meilleur thermique, meilleure finesse, plus haut largage au treuil, facteur de charge…) avec leur date et leur site, et les cumuls de vos vols avec trace. Le bouton <strong>Tout recalculer</strong>, à côté d’<strong>Ajouter une session</strong> (ou sous les records), recalcule tous vos vols depuis leur trace : date, durée, altitude max, gain, position du décollage et statistiques. Vos saisies sont gardées : site, type de vol, matériel, école, pilotes, commentaire et correction d’altitude.</p>
+
+                            <!-- CAPTURE METEO AUTOMATIQUE -->
+                            <div
+                                style="
+                                    margin-top: 24px;
+                                    padding: 16px 20px;
+                                    background: rgba(34, 197, 94, 0.07);
+                                    border-radius: var(--radius-lg);
+                                    border: 1px solid rgba(34, 197, 94, 0.2);
+                                    display: flex;
+                                    align-items: flex-start;
+                                    gap: 14px;
+                                "
+                            >
+                                <i
+                                    class="ri-cloud-windy-line"
+                                    style="font-size: 2rem; color: #22c55e; flex-shrink: 0; margin-top: 2px"
+                                ></i>
+                                <div>
+                                    <h5 data-i18n="manualModal.captureMeteoAutomatiqueOpenMeteo"
+                                        style="
+                                            margin: 0 0 6px 0;
+                                            color: var(--text-main);
+                                            font-weight: 700;
+                                            font-size: 1rem;
+                                        "
+                                    >
+                                        Capture Météo Automatique (Open-Meteo)
+                                    </h5>
+                                    <p data-i18n-html="manualModal.lorsDeLEnregistrementDUn"
+                                        style="
+                                            margin: 0;
+                                            color: var(--text-secondary);
+                                            font-size: 0.88rem;
+                                            line-height: 1.5;
+                                        "
+                                    >
+                                        Lors de l'enregistrement d'un vol ou d'une session de gonflage, l'application
+                                        interroge automatiquement le service météorologique <strong>Open-Meteo</strong>
+                                        (modèles de Météo-France pour les dates récentes, archives pour les plus anciennes). À
+                                        partir des coordonnées du site et de l'heure de votre activité, elle enregistre
+                                        les conditions au <strong>décollage et à l'atterrissage</strong> (ou au début
+                                        et à la fin d'un gonflage) :
+                                        <strong
+                                            >vitesse du vent, rafales, direction (en degrés et cardinal), température,
+                                            et état du ciel</strong
+                                        >. Lorsque les deux relevés sont identiques, une seule ligne est affichée. Si
+                                        le site dispose d'une balise FFVL, le graphique du <strong>vent réellement
+                                        mesuré</strong> ce jour-là est aussi consultable. Pas besoin de saisie
+                                        manuelle !
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MATERIEL & USURE -->
+                        <div id="manual-section-equipment" class="manual-section" style="display: none">
+                            <h4 data-i18n="manualModal.gestionDuMateriel" style="margin-top: 0; color: var(--accent-orange)">
+                                Gestion du Matériel &amp; Suivi d'Usure
+                            </h4>
+                            <p data-i18n="manualModal.pourVolerSereinementLApplication" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Pour voler sereinement, l'application intègre un suivi complet de la durée de vie et de
+                                la périodicité de maintenance de vos équipements (ailes, sellettes, secours,
+                                accessoires).
+                            </p>
+
+                            <h5 data-i18n="manualModal.n1EnregistrerSonEquipement" style="margin-top: 16px; margin-bottom: 8px">1. Enregistrer son Équipement</h5>
+                            <p data-requires-role="beta" hidden data-i18n-html="manualModal.pourChaqueMaterielCarnet" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Pour chaque matériel (Carnet &gt; Matériel), vous pouvez définir : le type (Voile,
+                                Sellette, Parachute de Secours, Accessoire), la marque, le modèle, la taille et la
+                                couleur (choisis dans une liste ou saisis librement, le nom du matériel est composé
+                                automatiquement), la date d'achat, ainsi que la date de sa dernière révision en atelier
+                                certifié. Pour une voile, renseignez aussi sa <strong>plage de vent</strong> (vent min
+                                et max) : elle sert au mode de calcul "Mon Matériel" de l'écran Sites de vol.
+                            </p>
+                            <p data-hidden-with-role="beta" data-i18n-html="manualModal.pourChaqueMaterielCarnetSansMeteo" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">Pour chaque matériel (Carnet &gt; Matériel), vous pouvez définir : le type (Voile, Sellette, Parachute de Secours, Accessoire), la marque, le modèle, la taille et la couleur (choisis dans une liste ou saisis librement, le nom du matériel est composé automatiquement), la date d'achat, ainsi que la date de sa dernière révision en atelier certifié.</p>
+
+                            <h5 data-i18n="manualModal.n2PeriodiciteCombineeTemps" style="margin-top: 16px; margin-bottom: 8px">
+                                2. Périodicité Combinée (Temps et Heures)
+                            </h5>
+                            <p data-i18n-html="manualModal.selectionnezLIntervalleTemporelRecommand" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Sélectionnez l'intervalle temporel recommandé par le constructeur (<strong
+                                    >6 mois</strong
+                                >, <strong>12 mois</strong>, <strong>24 mois</strong>, ou aucun contrôle requis) ET la
+                                limite d'heures de vol (<strong>50h</strong>, <strong>100h</strong>,
+                                <strong>150h</strong>, <strong>200h</strong>, ou non applicable). L'application
+                                surveillera les deux compteurs en temps réel grâce au carnet de vol, et déclenchera une
+                                alerte au premier des deux termes échu. Un badge sur le bouton
+                                <strong>Carnet</strong> de la barre de navigation signale le matériel à réviser.
+                            </p>
+
+                            <h5 data-i18n="manualModal.n3CodeCouleur" style="margin-top: 16px; margin-bottom: 8px">
+                                3. Code Couleur &amp; Alertes Visuelles de Maintenance
+                            </h5>
+                            <p data-i18n="manualModal.pourRepererRapidementLe" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Pour repérer rapidement le matériel nécessitant votre attention, l'application utilise
+                                des indicateurs visuels :
+                            </p>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 16px;
+                                "
+                            >
+                                <li data-i18n="manualModal.materielReviseRecemmentLa" style="margin-bottom: 6px">
+                                    <span
+                                        style="
+                                            display: inline-block;
+                                            width: 12px;
+                                            height: 12px;
+                                            border-radius: 50%;
+                                            background-color: var(--accent-green);
+                                            margin-right: 8px;
+                                            vertical-align: middle;
+                                        "
+                                    ></span
+                                    ><strong data-i18n="manualModal.vertOk">Vert (OK) :</strong> Matériel révisé récemment. La date de prochaine
+                                    révision est lointaine et le compteur d'heures est dans la norme.
+                                </li>
+                                <li data-i18n-html="manualModal.dateDeRevisionPrevue" style="margin-bottom: 6px">
+                                    <span
+                                        style="
+                                            display: inline-block;
+                                            width: 12px;
+                                            height: 12px;
+                                            border-radius: 50%;
+                                            background-color: #f59e0b;
+                                            margin-right: 8px;
+                                            vertical-align: middle;
+                                        "
+                                    ></span
+                                    ><strong>Orange (Proche) :</strong> Date de révision prévue dans
+                                    <strong>moins de 30 jours</strong> OU limite d'heures de vol approchant à
+                                    <strong>moins de 15h</strong>. Préparez votre envoi en atelier.
+                                </li>
+                                <li data-i18n="manualModal.dateDeRevisionExpiree" style="margin-bottom: 6px">
+                                    <span
+                                        style="
+                                            display: inline-block;
+                                            width: 12px;
+                                            height: 12px;
+                                            border-radius: 50%;
+                                            background-color: #ef4444;
+                                            margin-right: 8px;
+                                            vertical-align: middle;
+                                        "
+                                    ></span
+                                    ><strong data-i18n="manualModal.rougeDepassee">Rouge (Dépassée) :</strong> Date de révision expirée OU volume d'heures
+                                    maximum atteint. Par sécurité, faites contrôler votre équipement.
+                                </li>
+                            </ul>
+
+                            <h5 data-i18n="manualModal.n4ArchiverOuSupprimer" style="margin-top: 16px; margin-bottom: 8px">
+                                4. Archiver ou Supprimer définitivement
+                            </h5>
+                            <p data-i18n="manualModal.lorsqueVousChangezDe"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 16px;
+                                "
+                            >
+                                Lorsque vous changez de matériel, vous avez deux options :
+                            </p>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 16px;
+                                "
+                            >
+                                <li data-i18n="manualModal.masqueLEquipementDesMenus" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.archiver">Archiver :</strong> Masque l'équipement des menus d'ajout (lors de la saisie
+                                    d'un nouveau vol), mais conserve tout son historique d'heures de vol et de gonflage
+                                    associés. Idéal pour garder des statistiques correctes de vos anciennes ailes.
+                                </li>
+                                <li data-i18n="manualModal.effaceCompletementLeMateriel" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.supprimerDefinitivement">Supprimer définitivement :</strong> Efface complètement le matériel et rompt
+                                    l'association avec vos vols passés.
+                                </li>
+                            </ul>
+
+                            <h5 data-i18n="manualModal.n5UsureEnHeures" style="margin-top: 16px; margin-bottom: 8px">
+                                5. Usure en Heures d'Utilisation Réelles
+                            </h5>
+                            <p data-i18n-html="manualModal.leSystemeCroiseAutomatiquement"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.5;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 24px;
+                                "
+                            >
+                                Le système croise automatiquement chaque équipement avec votre carnet de vol. Pour chaque aile ou sellette, il affiche le <strong>cumul d'heures réelles passées en l'air</strong> ainsi que le nombre de séances de gonflage au sol. Pour un <strong>parachute de secours</strong>, le suivi compte les <strong>ouvertures</strong> : un secours ouvert en vol passe immédiatement en alerte rouge jusqu'à ce qu'une date de repliage postérieure soit enregistrée. Un indicateur fiable et automatisé de l'usure de votre matériel !
+                            </p>
+
+                            <!-- SYNCHRONISATION CLOUD & PREFERENCES -->
+                            <div
+                                style="
+                                    padding: 16px 20px;
+                                    background: linear-gradient(
+                                        135deg,
+                                        rgba(14, 165, 233, 0.12),
+                                        rgba(99, 102, 241, 0.08)
+                                    );
+                                    border-radius: var(--radius-lg);
+                                    border: 1px solid rgba(14, 165, 233, 0.3);
+                                    display: flex;
+                                    align-items: flex-start;
+                                    gap: 14px;
+                                "
+                            >
+                                <i
+                                    class="ri-cloud-line"
+                                    style="
+                                        font-size: 2.2rem;
+                                        color: var(--accent-orange);
+                                        flex-shrink: 0;
+                                        margin-top: 2px;
+                                    "
+                                ></i>
+                                <div>
+                                    <h5 data-i18n="manualModal.synchronisationCloudFirebase"
+                                        style="
+                                            margin: 0 0 6px 0;
+                                            color: var(--text-main);
+                                            font-weight: 700;
+                                            font-size: 1rem;
+                                        "
+                                    >
+                                        Synchronisation Cloud (Firebase) &amp; Préférences
+                                    </h5>
+                                    <p data-requires-role="beta" hidden data-i18n-html="manualModal.desQueVousEtes"
+                                        style="
+                                            margin: 0;
+                                            color: var(--text-secondary);
+                                            font-size: 0.88rem;
+                                            line-height: 1.5;
+                                        "
+                                    >
+                                        Dès que vous êtes connecté à votre compte, l'application synchronise
+                                        instantanément en tâche de fond votre <strong>Carnet de Vol</strong>, votre
+                                        <strong>Équipement</strong>, et l'intégralité de vos configurations : modèles de
+                                        prévision météo préférés, rayon GPS, tri des sites, limites de vent moyen et de
+                                        rafales personnalisées. Retrouvez votre espace de pilotage personnalisé sur
+                                        n'importe quel ordinateur, tablette ou smartphone sans aucune perte de données.
+                                    </p>
+                                    <p data-hidden-with-role="beta" data-i18n-html="manualModal.desQueVousEtesSansMeteo"
+                                        style="
+                                            margin: 0;
+                                            color: var(--text-secondary);
+                                            font-size: 0.88rem;
+                                            line-height: 1.5;
+                                        ">Dès que vous êtes connecté à votre compte, l'application synchronise instantanément en tâche de fond votre <strong>Carnet de Vol</strong>, votre <strong>Équipement</strong>, et l'intégralité de vos configurations : rayon GPS, tri des sites. Retrouvez votre espace de pilotage personnalisé sur n'importe quel ordinateur, tablette ou smartphone sans aucune perte de données.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECURITE -->
+                        <div id="manual-section-safety" class="manual-section" style="display: none">
+                            <h4 data-i18n="manualModal.lEcranSecurite" style="margin-top: 0; color: var(--accent-orange)">L'Écran Sécurité</h4>
+                            <p data-i18n-html="manualModal.cetEcranReprendDes" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Cet écran reprend des contenus officiels de la FFVL (source indiquée sur chaque
+                                rubrique). Le bouton <strong>Sécurité</strong> de la barre de navigation ouvre un
+                                sous-menu donnant accès à ses trois rubriques.
+                            </p>
+
+                            <h5 data-i18n="manualModal.n1Urgence" style="margin-top: 16px; margin-bottom: 8px">1. Urgence</h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 16px;
+                                "
+                            >
+                                <li data-i18n="manualModal.enUnGesteEt" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.appelerLe112">Appeler le 112</strong> en un geste, et la fréquence radio sécurité vol
+                                    libre de la FFVL (143,9875 MHz).
+                                </li>
+                                <li data-i18n="manualModal.elleUtiliseLeGps" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.maPositionGps">Ma position GPS :</strong> Elle utilise le GPS du téléphone et fonctionne
+                                    donc sans réseau mobile. Les coordonnées sont affichées en degrés minutes (format
+                                    utilisé par les secours aériens), en degrés décimaux et en degrés minutes secondes,
+                                    avec l'altitude et la précision. Elles peuvent être copiées ou partagées par
+                                    message.
+                                </li>
+                                <li data-i18n="manualModal.lesEtapesDeLAlerte" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.conduiteATenir">Conduite à tenir :</strong> Les étapes de l'alerte, que faire si vous êtes
+                                    posé dans un arbre ou bloqué en falaise, les signes YES / NO à faire à
+                                    l'hélicoptère, les règles lorsqu'un hélicoptère intervient et le contenu du kit de
+                                    secours personnel.
+                                </li>
+                            </ul>
+
+                            <h5 data-i18n="manualModal.n2CheckLists" style="margin-top: 16px; margin-bottom: 8px">2. Check-lists</h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 16px;
+                                "
+                            >
+                                <li data-i18n="manualModal.les7PointsA" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.visitePrevol">Visite prévol :</strong> Les 7 points à vérifier avant chaque décollage, à
+                                    cocher un par un, avec une lecture à voix haute possible.
+                                </li>
+                                <li data-i18n="manualModal.unCourtQuestionnaireSur" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.pretPourLeDeco">Prêt pour le déco ? :</strong> Un court questionnaire sur votre forme, votre
+                                    matériel et les conditions, à remplir franchement avant de vous équiper. Chaque
+                                    domaine passe au vert, au jaune ou au rouge ; un rouge invite à renoncer ou à
+                                    différer.
+                                </li>
+                            </ul>
+
+                            <h5 data-i18n="manualModal.n3MaSigr" style="margin-top: 16px; margin-bottom: 8px">3. Ma SIGR</h5>
+                            <p data-i18n="manualModal.laStrategieIndividuelleDe" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                La Stratégie Individuelle de Gestion des Risques vous fait évaluer honnêtement sept
+                                "plaques" de protection (pilotage, aérologie, accidentologie, matériel, condition
+                                physique, rapport à la communauté, mental) comme solides ou à renforcer. L'application
+                                résume celles à travailler en priorité. Votre bilan reste sur cet appareil.
+                            </p>
+                        </div>
+
+                        <div id="manual-section-qcm" class="manual-section" style="display: none">
+                            <h4 data-i18n="manualModal.entrainementAuxQcmOfficiels" style="margin-top: 0; color: var(--accent-orange)">Entraînement aux QCM Officiels</h4>
+                            <p data-i18n="manualModal.ceModuleUtiliseLa" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Ce module utilise la base de données officielle des questions de la Fédération Française
+                                de Vol Libre (FFVL) pour préparer vos brevets théoriques.
+                            </p>
+
+                            <h5 data-i18n="manualModal.n1LesQuatreModes" style="margin-top: 16px; margin-bottom: 8px">1. Les Quatre Modes d'Apprentissage</h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                "
+                            >
+                                <li data-i18n="manualModal.cEstLeModePar" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.modeEntrainement">Mode Entraînement :</strong> C'est le mode par défaut. Lorsque vous répondez à une question, la correction est affichée immédiatement : chaque proposition peut être dépliée pour lire son explication pédagogique détaillée, avec sous les bonnes réponses un accès direct à la page exacte du manuel officiel. Si vous tombez plusieurs fois dans le même piège, un bandeau Piège récurrent met en évidence la proposition fautive et la question vous est reposée plus loin dans la série. Il n'y a pas de limite de temps.
+                                </li>
+                                <li data-i18n="manualModal.uneSimulationDeLExamen" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.modeExamen">Mode Examen :</strong> Une simulation de l'examen théorique en conditions officielles FFVL (BI, BP et BPC — il n'y a pas d'examen en niveau Treuil) : 30 questions tirées dans tous les thèmes (60 pour le BP), sans correction immédiate. Le score est calculé selon le barème officiel en points FFVL (seuil de réussite fixé à 75 % exacts, affiché avec une décimale). Vous pouvez revenir aux questions précédentes pour modifier vos réponses tant que l'examen n'est pas terminé. Seul un examen mené jusqu'au bout et valide (sans quitter l'onglet plus de quelques secondes) est enregistré dans votre historique et comptabilisé dans vos statistiques par question. Un rapport détaillé avec les explications par proposition est fourni à la fin.
+                                </li>
+                                <li data-i18n="manualModal.revisionEspaceeUneQuestion" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.modeRevision">Mode Révision :</strong> Révision espacée. Une question ratée revient dès la session suivante ; à chaque bonne réponse d'affilée, elle revient plus tard (1, 3, 7, 14 puis 30 jours). Les questions jamais tentées passent en premier, puis celles dont la date de révision est dépassée. Ce mode est aussi sélectionné automatiquement lorsque vous révisez un niveau dont vous avez déjà validé l'examen théorique officiel.
+                                </li>
+                                <li data-i18n="manualModal.choisissezUnNiveauGlobal" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.modePerfectionnement">Mode Perfectionnement :</strong> Choisissez un niveau global ou un thème précis, puis un palier cible (50%, 75% ou 100% de réussite ; une question atteint 100% après un cycle complet de 10 réponses sans erreur). L'application pioche en priorité vos questions non maîtrisées ou en échec, et recalcule après chaque réponse validée le nombre de questions restantes pour atteindre ce palier.
+                                </li>
+                            </ul>
+
+                            <h5 data-i18n="manualModal.n2ParametrageAvance" style="margin-top: 16px; margin-bottom: 8px">2. Paramétrage Avancé</h5>
+                            <p data-i18n="manualModal.enModeEntrainementOu"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.5;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 8px;
+                                "
+                            >
+                                En mode Entraînement ou Révision, vous pouvez choisir le nombre de questions (10, 20, 30, 40 ou TOUTES) et filtrer sur un thème précis (ex: uniquement la Météo, ou uniquement la Réglementation). En mode Perfectionnement, ce nombre est calculé automatiquement selon le périmètre et le palier choisis. Dans tous les modes, l'ordre des réponses est mélangé à chaque session pour retenir la théorie plutôt que la position de la bonne réponse. Sur ordinateur, vous pouvez aussi répondre entièrement au clavier : touches A à D (ou 1 à 4) pour cocher les choix, Entrée pour valider puis passer à la suite, et flèches gauche/droite pour naviguer.
+                            </p>
+
+                            <h5 data-i18n="manualModal.n3LectureEtReponses" style="margin-top: 16px; margin-bottom: 8px">3. Lecture et Réponses à la Voix</h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 8px;
+                                "
+                            >
+                                <li data-i18n-html="manualModal.leBoutonLitLa" style="margin-bottom: 8px">
+                                    <strong>Lecture à voix haute :</strong> Le bouton <strong>Lecture auto</strong> lit chaque question et ses réponses. Le bouton <strong>Enchaîner</strong> active la lecture automatique, maintient l'écran allumé et passe tout seul à la question suivante après la lecture de la correction, jusqu'à l'annonce vocale du score final. Après validation, seul le verdict est lu pour une bonne réponse ; en cas d'erreur ou d'oubli, seules les explications des propositions manquées (ainsi que l'alerte de piège récurrent) sont lues.
+                                </li>
+                                <li data-i18n="manualModal.ditesLesLettresDes" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.repondreALaVoix">Répondre à la voix (expérimental) :</strong> Dites les lettres des réponses
+                                    (« A », « B et D »), puis « valider », « suivante », « précédente », « répète »,
+                                    « effacer » ou « stop ». Vous pouvez répondre pendant la lecture. Une connexion
+                                    internet est nécessaire : votre navigateur envoie votre voix à son service de
+                                    reconnaissance vocale (Google pour Chrome et Edge, Apple pour Safari).
+                                    L'application ne conserve aucun enregistrement et vous pouvez retirer votre accord à
+                                    tout moment.
+                                </li>
+                            </ul>
+
+                            <h5 data-i18n="manualModal.n4LaBanqueDe" style="margin-top: 16px; margin-bottom: 8px">4. La Banque de Questions</h5>
+                            <p data-i18n="manualModal.accessibleDepuisLeMenu"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.5;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 8px;
+                                "
+                            >
+                                Accessible depuis l'écran d'accueil du QCM, ce répertoire permet de consulter librement l'intégralité des questions du niveau sélectionné. Une barre de recherche retrouve instantanément une question par mot-clé ou par code (ex: "Cumulonimbus", "Finesse"), et un menu filtre par thème. Cliquez sur n'importe quelle proposition pour déplier son explication détaillée et ouvrir le manuel officiel à la page correspondante.
+                            </p>
+
+                            <h5 data-i18n="manualModal.n5LesAxesDeRevision" style="margin-top: 16px; margin-bottom: 8px">5. Les Axes de Révision</h5>
+                            <p data-i18n-html="manualModal.axesDeRevisionDescription"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.5;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 8px;
+                                "
+                            >Accessible depuis le menu <strong>Théorie &gt; Axes de révision</strong>, cet écran découpe les questions en <strong>21 sous-chapitres</strong> classés par priorité selon vos résultats (<strong>Point bloquant</strong>, <strong>À rafraîchir</strong>, <strong>À découvrir</strong>, <strong>Maîtrisé</strong>) et signale vos <strong>pièges récurrents</strong>. Chaque axe propose un parcours en 3 étapes contre le bachotage : lire les pages exactes des manuels officiels, réviser les points clés du cours (rédigés sans dévoiler l'énoncé des questions), puis lancer un atelier ciblé de 5 à 8 questions (ou un <strong>atelier anti-pièges</strong> dédié à vos erreurs répétées).</p>
+                        </div>
+
+                        <div id="manual-section-library" class="manual-section" style="display: none">
+                            <h4 data-i18n="manualModal.laBibliothequeDeCours" style="margin-top: 0; color: var(--accent-orange)">La Bibliothèque de Cours</h4>
+                            <p data-i18n="manualModal.unEspaceCentralisantDe" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
+                                Un espace centralisant de nombreux supports de cours, manuels de vol libre et affiches
+                                pédagogiques pour consolider la théorie.
+                            </p>
+
+                            <h5 data-i18n="manualModal.n1NavigationEtTri" style="margin-top: 16px; margin-bottom: 8px">1. Navigation et Tri</h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                "
+                            >
+                                <li data-i18n="manualModal.lesDocumentsSontClasses" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.categorisation">Catégorisation :</strong> Les documents sont classés de manière logique (Mécanique de vol, Météorologie, Matériel, Réglementation...). Utilisez les boutons "Par catégorie", "Par niveau" ou "A-Z" pour les regrouper par thème, par niveau de brevet ou par ordre alphabétique. Seuls les cours de votre niveau (et les cours généraux) sont affichés.
+                                </li>
+                                <li data-i18n="manualModal.laBarreDeRecherche2" style="margin-bottom: 8px">
+                                    <strong data-i18n="manualModal.rechercheRapide">Recherche Rapide :</strong> La barre de recherche filtre instantanément les
+                                    documents selon leur titre ou leur catégorie.
+                                </li>
+                            </ul>
+
+                            <h5 data-i18n="manualModal.n2LectureDesCours" style="margin-top: 16px; margin-bottom: 8px">2. Lecture des Cours</h5>
+                            <p data-i18n="manualModal.enCliquantSurUn"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.5;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 8px;
+                                "
+                            >En cliquant sur un cours (ou sur un lien de cours depuis une explication du QCM ou un axe de révision), le document PDF s'ouvre à la page demandée. Sur l'application installée sur téléphone ou tablette, une visionneuse intégrée avec bouton Retour et zoom par pincement permet de lire le cours sans quitter votre session ; dans un navigateur classique, le PDF s'ouvre dans un nouvel onglet. Un cours déjà ouvert reste ensuite consultable hors ligne.</p>
+                        </div>
+
+                        <div id="manual-section-stats" class="manual-section" style="display: none">
+                            <h4 data-i18n="manualModal.suiviEtStatistiques" style="margin-top: 0; color: var(--accent-orange)">Suivi et Statistiques</h4>
+                            <p data-i18n="manualModal.ceTableauDeBord" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">Ce tableau de bord personnel agrège l'ensemble de vos résultats aux QCM (sessions d'entraînement, de révision et examens blancs terminés) du niveau sélectionné pour vous aider à cibler vos révisions. En haut, une jauge affiche votre taux de réussite global et permet d'enregistrer la validation de votre examen théorique officiel, à côté de la répartition de vos questions par degré de maîtrise (non tentées, maîtrisées à 100%, excellentes, très bonnes, satisfaisantes, fragiles, en difficulté, en échec) d'où vous pouvez filtrer la liste ou lancer directement une série de Perfectionnement.</p>
+
+                            <h5 data-i18n="manualModal.n1AnalyseParTheme" style="margin-top: 16px; margin-bottom: 8px">1. Analyse par Thème</h5>
+                            <p data-i18n="manualModal.lApplicationCalculeVotrePourcentage"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.5;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 8px;
+                                "
+                            >L'application calcule votre pourcentage de réussite exact et le nombre de questions tentées pour chaque grande famille (Météo, Mécavol, Pilotage...), triables par ordre alphabétique ou par taux de réussite. Cliquez sur une carte de thème pour filtrer la liste détaillée des questions ci-dessous.</p>
+
+                            <h5 data-i18n="manualModal.n2HistoriqueDesExamens" style="margin-top: 16px; margin-bottom: 8px">2. Historique des Examens</h5>
+                            <p data-i18n="manualModal.vousRetrouverezLHistoriqueDe"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.5;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 8px;
+                                "
+                            >Vous retrouverez l'historique complet de vos examens blancs terminés pour le niveau sélectionné, avec la date, le score en points FFVL et le pourcentage exact : cliquez sur un examen pour ouvrir dans une fenêtre le détail de toutes ses questions et leurs explications. En dessous, la liste détaillée de toutes les questions du niveau (triable par taux de réussite, nombre de tentatives, date de dernière réponse ou code) permet de déplier chaque question pour consulter ses propositions, leurs explications, les liens vers les cours et l'historique daté de vos dernières tentatives.</p>
+
+                            <h5 data-i18n="manualModal.n3Reinitialisation" style="margin-top: 16px; margin-bottom: 8px">3. Réinitialisation</h5>
+                            <p data-i18n="manualModal.siVousSouhaitezRecommencer"
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.5;
+                                    font-size: 0.95rem;
+                                    margin-bottom: 8px;
+                                "
+                            >
+                                Si vous souhaitez recommencer à zéro (par exemple pour préparer le niveau supérieur
+                                l'année suivante), un bouton de réinitialisation vous permet d'effacer vos statistiques
+                                locales. Attention, cette action est irréversible !
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </dialog>
