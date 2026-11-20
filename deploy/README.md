@@ -33,3 +33,22 @@ Keep the old hostname in the tunnel for months: people who have not opened the a
 carry their data. `?rester` keeps the old address open (to export a backup file by hand). Do not let the
 old hostname redirect at the HTTP level (Cloudflare redirect rule, nginx `return 301`): the data would stay
 behind, since only the app can read it.
+
+## Feedback & Crash Server (systemd)
+
+The Python microservice (`deploy/feedback_server/server.py`) receives pilot feedback and crash telemetry and
+forwards alerts to Discord. It listens on loopback (`HOST=127.0.0.1`, `PORT=8085`) behind Cloudflare Tunnel,
+restricts CORS to `ALLOWED_ORIGIN=https://assistantparapente.fr`, and runs sandboxed under systemd
+(`ProtectSystem=strict`, `NoNewPrivileges=true`).
+
+1. Configure secrets in `deploy/feedback_server/.env` (never committed; see `.env.example`).
+2. Install/update the unit and restart:
+   `sudo cp deploy/feedback_server/assistant-parapente-feedback.service /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl restart assistant-parapente-feedback`
+3. Verify health: `curl -i http://127.0.0.1:8085/api/health`
+
+## Firebase Firestore Rules
+
+Security rules (`firestore.rules`) are tested locally via `npm run test:rules` (and in CI). Deploy manually
+after review:
+
+`npx --yes firebase-tools@15.33.0 deploy --only firestore:rules --project assistantparapente`
