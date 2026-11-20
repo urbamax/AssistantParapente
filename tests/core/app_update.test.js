@@ -102,4 +102,23 @@ describe('watchSiteVersion (version.json, any change of the repository)', () => 
         await vi.waitFor(() => expect(reload).toHaveBeenCalled());
         expect(deleted).toEqual(['parapente-app-v1']);
     });
+
+    it('preserves app caches if the user clicks "Mettre à jour" after going offline', async () => {
+        serve('abc', 'def');
+        const deleted = [];
+        vi.stubGlobal('caches', {
+            keys: async () => ['parapente-app-v1'],
+            delete: async (k) => deleted.push(k),
+        });
+        const reload = vi.fn();
+        Object.defineProperty(window, 'location', { configurable: true, value: { ...window.location, reload } });
+        Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => false });
+
+        const check = await watchSiteVersion({ intervalMs: 0 });
+        await check();
+        document.querySelector('.app-update-reload').click();
+        await vi.waitFor(() => expect(reload).toHaveBeenCalled());
+        expect(deleted).toEqual([]);
+        Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => true });
+    });
 });

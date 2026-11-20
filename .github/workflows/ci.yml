@@ -32,7 +32,7 @@ jobs:
 
       - run: npm run typecheck
 
-      - run: npm test
+      - run: npm run test:coverage
 
       # Tests Python de la réparation des caractères des données de sites (spec 003).
       - run: python3 -m unittest discover -s tests/scripts

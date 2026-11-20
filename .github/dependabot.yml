@@ -38,8 +38,8 @@ updates:
         update-types: ['version-update:semver-major']
 
   # Cloud Function : ses dépendances sont figées à leur version majeure. La CI n'exécute jamais
-  # functions/index.js ; une mise à jour majeure (ex. firebase-admin 14 exige Node 22, la fonction
-  # déclare Node 20) ne doit venir que d'une montée de version volontaire, testée avec l'émulateur.
+  # functions/index.js ; une mise à jour majeure (la fonction tourne sur Node 22)
+  # ne doit venir que d'une montée de version volontaire, testée avec l'émulateur.
   - package-ecosystem: npm
     directory: /functions
     schedule:

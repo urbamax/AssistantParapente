@@ -21,7 +21,7 @@ echo "Fichier de destination : $BACKUP_FILE"
 echo ""
 
 # Exécuter la commande tar en excluant les dossiers lourds, secrets (.env), temporaires ou non nécessaires
-tar -czvf "$BACKUP_FILE" \
+if tar -czvf "$BACKUP_FILE" \
     --exclude=".git" \
     --exclude=".claude" \
     --exclude="node_modules" \
@@ -37,10 +37,8 @@ tar -czvf "$BACKUP_FILE" \
     --exclude=".DS_Store" \
     --exclude="*.log" \
     --exclude="*__pycache__*" \
-    -C "${PROJECT_DIR}/.." "$(basename "$PROJECT_DIR")"
-
-# Vérification du résultat
-if [ $? -eq 0 ]; then
+    -C "${PROJECT_DIR}/.." "$(basename "$PROJECT_DIR")"; then
+    chmod 600 "$BACKUP_FILE"
     echo ""
     echo "✅ Sauvegarde terminée avec succès !"
     echo "Emplacement : $BACKUP_FILE"

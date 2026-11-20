@@ -31,7 +31,7 @@ async function fetchVersion() {
 
 async function reloadWithFreshFiles() {
     try {
-        if (typeof caches !== 'undefined') {
+        if (typeof caches !== 'undefined' && navigator.onLine !== false) {
             const keys = await caches.keys();
             await Promise.all(keys.filter((k) => k.startsWith(APP_CACHE_PREFIX)).map((k) => caches.delete(k)));
         }
@@ -57,6 +57,13 @@ function showUpdateBanner() {
     reloadBtn.className = 'app-update-reload';
     reloadBtn.textContent = t('update.reload');
     reloadBtn.addEventListener('click', () => reloadWithFreshFiles());
+
+    banner.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            reloadBtn.focus();
+        }
+    });
 
     banner.append(reloadBtn);
     document.body.appendChild(banner);
