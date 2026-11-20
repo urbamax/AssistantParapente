@@ -41,6 +41,7 @@ describe('GdprEngine', () => {
     it('refuseAll revokes categories, clears declined stats, and signs out Firebase if active', () => {
         localStorage.setItem('parapente_qcm_stats', '{"total":10}');
         localStorage.setItem('parapente_exam_history', '{"exams":[]}');
+        localStorage.setItem('pending_quiz', '{"mode":"EXAM"}');
         const signOut = vi.fn();
         window.FirebaseAuthEngine = {
             enabled: true,
@@ -57,6 +58,7 @@ describe('GdprEngine', () => {
         expect(GdprEngine.isConsentGranted('gps')).toBe(false);
         expect(localStorage.getItem('parapente_qcm_stats')).toBeNull();
         expect(localStorage.getItem('parapente_exam_history')).toBeNull();
+        expect(localStorage.getItem('pending_quiz')).toBeNull();
         expect(signOut).toHaveBeenCalledTimes(1);
         expect(window.FirebaseAuthEngine.enabled).toBe(false);
     });

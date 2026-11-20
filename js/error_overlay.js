@@ -24,11 +24,7 @@ window.addEventListener('error', function (e) {
         sessionStorage.getItem('ap_stale_module_reloaded') !== '1'
     ) {
         sessionStorage.setItem('ap_stale_module_reloaded', '1');
-        Promise.all([
-            fetch('./js/utils/text_utils.js', { cache: 'reload' }).catch(function () {}),
-            fetch('./js/services/quiz_service.js', { cache: 'reload' }).catch(function () {}),
-            fetch('./js/views/quiz.js', { cache: 'reload' }).catch(function () {}),
-            fetch('./js/views/quiz_stats.js', { cache: 'reload' }).catch(function () {}),
+        const clearCaches =
             typeof caches !== 'undefined'
                 ? caches.keys().then(function (keys) {
                       return Promise.all(
@@ -37,8 +33,8 @@ window.addEventListener('error', function (e) {
                           }),
                       );
                   })
-                : Promise.resolve(),
-        ]).finally(function () {
+                : Promise.resolve();
+        clearCaches.finally(function () {
             window.location.reload();
         });
         return;

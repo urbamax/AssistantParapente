@@ -54,6 +54,31 @@ describe('bannière rouge des erreurs globales', () => {
         throwGlobalError();
         expect(banner()).toBe('');
     });
+
+    it('purge les caches parapente-app-* une seule fois par session sur une erreur Importing binding name', async () => {
+        sessionStorage.removeItem('ap_stale_module_reloaded');
+        const deleteMock = vi.fn().mockResolvedValue(true);
+        vi.stubGlobal('caches', {
+            keys: vi.fn().mockResolvedValue(['parapente-app-v1', 'parapente-vendor-v1']),
+            delete: deleteMock,
+        });
+        const reloadSpy = vi.spyOn(window.location, 'reload').mockImplementation(() => {});
+
+        window.dispatchEvent(
+            new ErrorEvent('error', {
+                message: "SyntaxError: Importing binding name 'foo' is not found.",
+                filename: 'x.js',
+                lineno: 1,
+                colno: 1,
+            }),
+        );
+
+        await vi.waitFor(() => expect(reloadSpy).toHaveBeenCalledTimes(1));
+        expect(deleteMock).toHaveBeenCalledTimes(1);
+        expect(deleteMock).toHaveBeenCalledWith('parapente-app-v1');
+        expect(sessionStorage.getItem('ap_stale_module_reloaded')).toBe('1');
+        vi.unstubAllGlobals();
+    });
 });
 
 describe("écran d'erreur d'une vue qui plante", () => {
