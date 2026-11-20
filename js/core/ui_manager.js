@@ -30,6 +30,7 @@ class UIManager {
             this.restoreLevelUI();
         });
         GlobalState.subscribe('mode', () => this.updateHeaderNavigation());
+        GlobalState.subscribe('isOnline', (online) => this.updateOfflineIndicator(online));
 
         if (!this._quotaListenerBound && typeof window !== 'undefined') {
             this._quotaListenerBound = true;
@@ -38,6 +39,11 @@ class UIManager {
 
         // Load Header and Footer
         await this.loadComponents();
+    }
+
+    updateOfflineIndicator(online = GlobalState.get('isOnline')) {
+        const pill = document.getElementById('offline-pill');
+        if (pill) pill.hidden = online !== false;
     }
 
     showStorageQuotaAlert() {
@@ -107,6 +113,7 @@ class UIManager {
 
         // Post-load initialization
         this.updateHeaderNavigation();
+        this.updateOfflineIndicator();
         this.applyThemeMode(GlobalState.get('themeMode'));
         this.restoreLevelUI();
         updateInstallUI();

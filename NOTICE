@@ -39,13 +39,16 @@ make the training of paragliding pilots easier, free of charge and without profi
 - Flying-site data: derived from the FFVL open data, "Licence Ouverte / Etalab 2.0",
   attribution "Source : FFVL"; completed with ParaglidingEarth data (Creative Commons
   BY-SA 3.0).
-- Weather forecasts: Open-Meteo (CC BY 4.0). Maps: their respective providers.
+- Weather forecasts: Open-Meteo (CC BY 4.0).
+- Maps, geocoding & 3D terrain: OpenStreetMap / Nominatim (ODbL), Esri World Imagery
+  (ArcGIS Online), AWS Terrain Tiles (Terrarium / Mapzen).
 - Libraries in vendor/ keep their own licences:
   - Firebase JS SDK (`vendor/firebase-12.19.0/`): Apache-2.0.
   - Leaflet (`vendor/leaflet-1.9.4/`): BSD-2-Clause.
   - PDF.js by Mozilla (`vendor/pdfjs-6.4.299/`): Apache-2.0, used to display courses inside the installed application.
   - Remix Icon (`vendor/remixicon-3.5.0/`): Apache-2.0.
   - Inter font (`vendor/inter/`): SIL Open Font License 1.1 (OFL-1.1).
+- 3D trace viewer libraries (loaded on demand): MapLibre GL JS (BSD-3-Clause), deck.gl (MIT).
 - QR Code generator (`js/utils/qrcode.js`): Project Nayuki QR Code generator library (MIT License, Copyright (c) Project Nayuki).
 
 Removal requests: contact the author of the application, the content is withdrawn or

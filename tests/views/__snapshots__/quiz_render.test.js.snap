@@ -656,6 +656,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-checkbox-circle-line"></i> Valider ma qualification
                 </button>
             </div>
+            <div style="text-align:center; margin: 16px 0 8px;">
+                <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -797,6 +802,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             </div>
         
             
+            <div style="text-align:center; margin: 16px 0 8px;">
+                <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -1001,6 +1011,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
                 <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
+            <div style="text-align:center; margin: 16px 0 8px;">
+                <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
                 </button>
             </div>
 
@@ -1434,6 +1449,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
                 </button>
             </div>
+            <div style="text-align:center; margin: 16px 0 8px;">
+                <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -1756,6 +1776,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
                 <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
+            <div style="text-align:center; margin: 16px 0 8px;">
+                <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
                 </button>
             </div>
 
@@ -2111,6 +2136,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
                 </button>
             </div>
+            <div style="text-align:center; margin: 16px 0 8px;">
+                <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -2433,6 +2463,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
                 <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
+            <div style="text-align:center; margin: 16px 0 8px;">
+                <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
                 </button>
             </div>
 
@@ -2793,6 +2828,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
                 </button>
             </div>
+            <div style="text-align:center; margin: 16px 0 8px;">
+                <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -3115,6 +3155,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
                 <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
+            <div style="text-align:center; margin: 16px 0 8px;">
+                <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
                 </button>
             </div>
 
@@ -3514,6 +3559,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
                 </button>
             </div>
+            <div style="text-align:center; margin: 16px 0 8px;">
+                <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">RÉPARTITION PAR MAÎTRISE</h3>
@@ -3836,6 +3886,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             <div data-stats-brevet-banner="" style="display: flex; justify-content: center;">
                 <button type="button" data-action="openBrevetModal" data-args="BI" style="width: 100%; justify-content: center; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); color: #0ea5e9; padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
+                </button>
+            </div>
+            <div style="text-align:center; margin: 16px 0 8px;">
+                <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
                 </button>
             </div>
 

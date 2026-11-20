@@ -1404,7 +1404,17 @@ class QuizService {
 
         for (const r of answeredResults) {
             if (r && r.question) {
-                this.updateStats(r.question, Boolean(r.isCorrect), Array.isArray(r.selected) ? r.selected : []);
+                this.updateStats(
+                    r.question,
+                    Boolean(r.isCorrect),
+                    Array.isArray(r.selected) ? r.selected : [],
+                    null,
+                    Date.now(),
+                    {
+                        userScore: r.userPoints,
+                        maxScore: r.maxPoints,
+                    },
+                );
             }
         }
 

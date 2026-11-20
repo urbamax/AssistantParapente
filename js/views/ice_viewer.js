@@ -125,19 +125,7 @@ export class IceViewClass extends BaseView {
                     </div>
                 </section>
 
-                <!-- Boutons d'appel direct contacts d'urgence -->
-                <section class="ice-card ice-card-contacts">
-                    <h3><i class="ri-contacts-fill" aria-hidden="true"></i> ${th('contactsTitle')}</h3>
-                    ${this.renderContacts(p)}
-                </section>
-
-                <!-- Données médicales vitales -->
-                ${this.renderMedical(p)}
-
-                <!-- Infos fédérales & Assurance -->
-                ${this.renderInsurance(p)}
-
-                <!-- Rappel secours d'urgence -->
+                <!-- Rappel secours d'urgence (en haut pour un accès immédiat sous stress) -->
                 <section class="ice-card ice-card-emergency-actions">
                     <div class="ice-emergency-grid">
                         <a class="safety-call-btn" href="tel:112">
@@ -150,6 +138,18 @@ export class IceViewClass extends BaseView {
                         </div>
                     </div>
                 </section>
+
+                <!-- Boutons d'appel direct contacts d'urgence -->
+                <section class="ice-card ice-card-contacts">
+                    <h3><i class="ri-contacts-fill" aria-hidden="true"></i> ${th('contactsTitle')}</h3>
+                    ${this.renderContacts(p)}
+                </section>
+
+                <!-- Données médicales vitales -->
+                ${this.renderMedical(p)}
+
+                <!-- Infos fédérales & Assurance -->
+                ${this.renderInsurance(p)}
 
                 <!-- Actions de bas de page -->
                 <footer class="ice-actions-footer">

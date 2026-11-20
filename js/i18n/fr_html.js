@@ -365,18 +365,27 @@ export const FR_HTML = Object.freeze({
         donneesTechniques: 'Données Techniques :',
         signalementsEtSuggestionsOptionnel: 'Signalements et suggestions (optionnel) :',
         uniquementLorsqueVousUtilisez:
-            "uniquement lorsque vous envoyez volontairement le formulaire « Signaler un problème / Suggestion », le texte saisi, l'éventuel contact et (si laissé coché) le contexte technique non personnel sont transmis directement au serveur de l'éditeur afin de traiter votre retour. Le brouillon est conservé localement jusqu'à l'envoi ou son effacement.",
+            "uniquement lorsque vous envoyez volontairement le formulaire « Signaler un problème / Suggestion », le texte saisi, l'éventuel contact et (si laissé coché) le contexte technique non personnel sont transmis au serveur de l'éditeur puis relayés vers un salon privé Discord (Discord Inc., États-Unis) afin de traiter votre retour. Le brouillon est conservé localement jusqu'à l'envoi ou son effacement.",
+        ficheUrgenceIceLabel: "Fiche d'urgence ICE (données de santé, Art. 9 RGPD) :",
+        ficheUrgenceIceOptionnel:
+            'si vous renseignez votre fiche ICE (groupe sanguin, allergies, traitement, contacts), elle reste stockée uniquement sur votre appareil par défaut et encodée dans le QR code de votre casque (lisible par toute personne qui le scanne). Sa sauvegarde dans Firebase est strictement facultative et nécessite votre consentement explicite.',
+        telemetrieCrashLabel: "Télémétrie technique d'erreurs :",
+        telemetrieCrashAutomatique:
+            "en cas de plantage JavaScript (intérêt légitime, Art. 6(1)(f)), un rapport technique anonymisé (message d'erreur, pile d'exécution, URL nettoyée de ses paramètres et fragments) est envoyé automatiquement via le serveur de l'éditeur vers un salon privé Discord (Discord Inc., États-Unis) pour corriger les pannes.",
+        servicesTiersLabel: 'Services tiers à la demande :',
+        servicesTiersALaDemande:
+            'selon les écrans consultés, votre navigateur interroge directement Open-Meteo (prévisions météo), OpenStreetMap / Nominatim (géocodage), Esri / AWS Terrarium / MapLibre / deck.gl (fonds de carte et relief 3D) ou les cartes externes intégrées (Windy, Météo-Parapente, ParaglidingEarth, Paraglidable, SpotAiR), et peut enregistrer un jeton FCM si vous activez les alertes météo.',
         n3HebergementDesDonnees: '3. Hébergement des Données',
         leSiteWebEst:
             "Le site web est auto-hébergé localement par l'éditeur. Les données de synchronisation optionnelles (comptes et statistiques si consentis) sont hébergées et sécurisées via la plateforme cloud Firebase (Google Ireland Limited, Dublin, Irlande). Les serveurs de Firebase sont situés au sein de l'Union Européenne.",
         n4DureeDeConservation: '4. Durée de Conservation des Données',
         lesDonneesStockeesLocalement:
-            "Les données stockées localement (LocalStorage) restent stockées sur votre navigateur jusqu'à ce que vous effaciez les données de votre site ou révoquiez votre consentement.",
+            "Les données stockées localement (LocalStorage) restent stockées sur votre navigateur jusqu'à ce que vous effaciez les données de votre site ou révoquiez votre consentement (la révocation du consentement « Statistiques » efface les scores QCM, mais conserve votre carnet de vol, matériel et fiche ICE locaux).",
         lesComptesUtilisateursInactifs:
-            "Les comptes utilisateurs inactifs sur Firebase sont supprimés au bout de 24 mois. Vous pouvez à tout moment demander la suppression définitive de votre compte depuis l'interface ou en nous contactant.",
+            'Les données synchronisées sur Firebase sont conservées tant que votre compte existe. Vous pouvez demander la suppression définitive de votre compte et de ses données à tout moment en nous contactant.',
         n5VosDroitsRgpd: '5. Vos Droits (RGPD)',
         conformementAuReglementGeneral:
-            "Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez de droits d'accès, de rectification, de portabilité et de suppression de vos données, ainsi que du droit de retirer votre consentement à tout moment.",
+            "Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez de droits d'accès, de rectification, de portabilité et de suppression de vos données, ainsi que du droit de retirer votre consentement à tout moment. Vous pouvez également introduire une réclamation auprès de la CNIL (cnil.fr).",
         pourTouteQuestionOu:
             "Pour toute question ou pour exercer vos droits, vous pouvez contacter le responsable via le formulaire « Signaler un problème / Suggestion », par le biais de la page du club-école <em>Le Fil d'Ariane</em> ou directement dans l'Espace Synchro.",
     }),
@@ -403,7 +412,7 @@ export const FR_HTML = Object.freeze({
         leCodeSourceDe:
             "Le code source de l'application et les éléments d'interface sont la propriété de l'éditeur. Les questionnaires QCM et les données relatives aux sites de vol libre proviennent de la <strong>Fédération Française de Vol Libre (FFVL)</strong> et sont mis à disposition à des fins de formation pour la préparation des brevets théoriques de parapente.",
         laBaseDesSites:
-            'La base des sites de vol est dérivée des données ouvertes de la <strong>FFVL</strong> (<em >Source : FFVL</em >, Licence Ouverte / Etalab 2.0) complétées par <strong>ParaglidingEarth</strong> (licence Creative Commons BY-SA 3.0). Ces données sont fournies à titre indicatif et ne remplacent pas les informations officielles des structures gestionnaires.',
+            "La base des sites de vol est dérivée des données ouvertes de la <strong>FFVL</strong> (<em >Source : FFVL</em >, Licence Ouverte / Etalab 2.0) complétées par <strong>ParaglidingEarth</strong> (licence Creative Commons BY-SA 3.0). Les prévisions météo proviennent d'<strong>Open-Meteo</strong> (CC BY 4.0) et les fonds cartographiques d'<strong>OpenStreetMap</strong> (ODbL), <strong>Esri World Imagery</strong>, <strong>AWS Terrarium</strong>, <strong>MapLibre GL JS</strong> et <strong>deck.gl</strong>. Ces données sont fournies à titre indicatif et ne remplacent pas les informations officielles des structures gestionnaires.",
         touteReproductionOuUtilisation:
             "Toute reproduction ou utilisation non autorisée des cours et des affiches à des fins commerciales est interdite sans l'accord préalable des auteurs ou de la FFVL.",
         lesCoursAffichesEtDocuments:
@@ -807,6 +816,7 @@ export const FR_HTML = Object.freeze({
     }),
     header: Object.freeze({
         altAssistantParapente: 'Assistant Parapente',
+        horsLigne: 'Hors ligne',
         tousLesNiveaux: 'Tous les niveaux',
         brevetInitial: 'Brevet Initial',
         brevetPilote: 'Brevet Pilote',

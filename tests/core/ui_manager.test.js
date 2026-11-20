@@ -206,4 +206,15 @@ describe('UIManager', () => {
         expect(img.getAttribute('src')).toBe('/sub/img/logo.png');
         expect(link.getAttribute('href')).toBe('#top');
     });
+
+    it('updateOfflineIndicator toggles #offline-pill hidden attribute based on online state', () => {
+        document.body.innerHTML += '<span id="offline-pill" hidden>Hors ligne</span>';
+        const pill = document.getElementById('offline-pill');
+
+        UIManagerModule.updateOfflineIndicator(false);
+        expect(pill.hidden).toBe(false);
+
+        UIManagerModule.updateOfflineIndicator(true);
+        expect(pill.hidden).toBe(true);
+    });
 });
