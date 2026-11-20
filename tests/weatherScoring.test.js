@@ -467,4 +467,15 @@ describe('thunderstorm risk (spec 001, US3, FR-010)', () => {
         const res = evaluateSpotForecast(SITE_NO_ORIENTATION, completeHourWith({ cape: 2500 }), DEFAULT_PREFS);
         expect(res.reasonCode).toBe('STORM_RISK');
     });
+
+    it('rejects hardware wings whose ventMin or ventMax is null instead of coercing null to 0', () => {
+        const prefs = {
+            ...DEFAULT_PREFS,
+            filterMode: 'hardware',
+            wings: [{ type: 'voile', nom: 'Voile sans bornes', ventMin: null, ventMax: 30 }],
+        };
+        const res = evaluateSpotForecast(SITE_SOUTH, completeHourWith({ windSpeed: 15 }), prefs);
+        expect(res.status).toBe('unflyable');
+        expect(res.reasonCode).toBe('WIND_OUT_OF_EQUIPMENT_LIMITS');
+    });
 });

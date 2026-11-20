@@ -346,15 +346,77 @@ export function decodeLocalIce(raw) {
  */
 export function sanitizePhone(phone) {
     if (!phone || typeof phone !== 'string') return '';
-    return phone.replace(/[^\d+]/g, '');
+    const trimmed = phone.trim();
+    const hasLeadingPlus = trimmed.startsWith('+');
+    const digits = trimmed.replace(/\D/g, '');
+    return digits ? (hasLeadingPlus ? `+${digits}` : digits) : '';
+}
+
+export const COUNTRY_CALLING_CODES = Object.freeze({
+    FR: '33',
+    CH: '41',
+    BE: '32',
+    LU: '352',
+    DE: '49',
+    AT: '43',
+    IT: '39',
+    ES: '34',
+    PT: '351',
+    GB: '44',
+    IE: '353',
+    NL: '31',
+    DK: '45',
+    NO: '47',
+    SE: '46',
+    FI: '358',
+    PL: '48',
+    CZ: '420',
+    SK: '421',
+    HU: '36',
+    SI: '386',
+    HR: '385',
+    RO: '40',
+    BG: '359',
+    GR: '30',
+    TR: '90',
+    RU: '7',
+    UA: '380',
+    MA: '212',
+    DZ: '213',
+    TN: '216',
+    ZA: '27',
+    US: '1',
+    CA: '1',
+    MX: '52',
+    BR: '55',
+    AR: '54',
+    CL: '56',
+    CO: '57',
+    IN: '91',
+    NP: '977',
+    JP: '81',
+    KR: '82',
+    AU: '61',
+    NZ: '64',
+});
+
+/**
+ * Indicatif téléphonique international d'un code pays ISO (France '33' par défaut si non renseigné ; '' si pays inconnu).
+ * @param {unknown} countryCode
+ * @returns {string}
+ */
+export function callingCodeForCountry(countryCode) {
+    const c = normalizeCountry(countryCode);
+    if (!c) return '33';
+    return COUNTRY_CALLING_CODES[c] || '';
 }
 
 /**
  * Numéro au format international (E.164 : +33612345678), pour les liens d'appel et la fiche contact du QR.
  * Un numéro national (06 12 34 56 78) est mal interprété par le téléphone d'un secouriste dont la carte SIM est
- * d'un autre pays : « 00 » devient « + », et un numéro français à 10 chiffres reçoit « +33 ».
+ * d'un autre pays : « 00 » devient « + », et un numéro national à 10 chiffres reçoit l'indicatif du pays du pilote.
  * @param {string} phone
- * @param {string} [defaultCountry] indicatif pays des numéros nationaux (France par défaut)
+ * @param {string} [defaultCountry] indicatif pays des numéros nationaux (France '33' par défaut)
  * @returns {string} '' si le numéro est vide
  */
 export function toInternationalPhone(phone, defaultCountry = '33') {
@@ -362,7 +424,7 @@ export function toInternationalPhone(phone, defaultCountry = '33') {
     if (!clean) return '';
     if (clean.startsWith('+')) return clean;
     if (clean.startsWith('00')) return `+${clean.slice(2)}`;
-    if (clean.startsWith('0') && clean.length === 10) return `+${defaultCountry}${clean.slice(1)}`;
+    if (defaultCountry && clean.startsWith('0') && clean.length === 10) return `+${defaultCountry}${clean.slice(1)}`;
     return clean;
 }
 
@@ -524,8 +586,9 @@ export function buildIceVCard(profile = {}) {
         `ORG:URGENCE ICE PARAPENTE${flagEmoji(p.pays) ? ` ${flagEmoji(p.pays)}` : ''}`,
     ];
     let item = 0;
+    const callingCode = callingCodeForCountry(p.pays);
     const contact = (name, phone, rel, fallback) => {
-        const digits = toInternationalPhone(phone);
+        const digits = toInternationalPhone(phone, callingCode);
         if (!digits) return;
         item += 1;
         const label = [name, rel ? `(${rel})` : ''].filter(Boolean).join(' ') || fallback;
@@ -538,7 +601,7 @@ export function buildIceVCard(profile = {}) {
         item = 1;
     }
     // Le numéro du pilote lui-même, en dernier : les secours appellent d'abord les contacts d'urgence.
-    const pilotPhone = toInternationalPhone(p.tel);
+    const pilotPhone = toInternationalPhone(p.tel, callingCode);
     if (pilotPhone) lines.push(`item${item + 1}.TEL:${pilotPhone}`, `item${item + 1}.X-ABLabel:Pilote`);
 
     // Les informations vitales d'abord : c'est ce que lit un secouriste.

@@ -33,4 +33,19 @@ describe('IGCParser — validFix & UTC midnight rollover', () => {
         expect(parsed.duration).toBeGreaterThanOrEqual(3);
         expect(parsed.duration).toBeLessThanOrEqual(5);
     });
+
+    it('rejette les coordonnées B corrompues (NaN, hémisphère invalide, hors bornes) au lieu de polluer la trace', () => {
+        const igc = [
+            'HFDTE201126',
+            'B120000XX00000N00600000EA0100001000', // lat NaN
+            'B1200059500000N00600000EA0100001000', // lat > 90°
+            'B1200084500000X00600000EA0100001000', // hémisphère X invalide
+            'B1200104500100N00600100EA0100001000', // valide
+            'B1200204500200N00600200EA0105001050', // valide
+        ].join('\n');
+
+        const parsed = IGCParser.parse(igc);
+        expect(parsed.points).toHaveLength(2);
+        expect(parsed.points.every((p) => Number.isFinite(p.lat) && Number.isFinite(p.lon))).toBe(true);
+    });
 });

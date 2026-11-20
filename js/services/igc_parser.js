@@ -65,7 +65,19 @@ const IGCParser = {
                 const hours = parseInt(timeStr.substring(0, 2), 10);
                 const mins = parseInt(timeStr.substring(2, 4), 10);
                 const secs = parseInt(timeStr.substring(4, 6), 10);
-                if (isNaN(hours) || isNaN(mins) || isNaN(secs)) continue;
+                if (
+                    isNaN(hours) ||
+                    isNaN(mins) ||
+                    isNaN(secs) ||
+                    hours < 0 ||
+                    hours > 23 ||
+                    mins < 0 ||
+                    mins > 59 ||
+                    secs < 0 ||
+                    secs > 59
+                ) {
+                    continue;
+                }
 
                 // Gestion du passage à minuit UTC (ex. 23:59:50 -> 00:00:05)
                 const utcSeconds = hours * 3600 + mins * 60 + secs;
@@ -690,12 +702,21 @@ const IGCParser = {
     _parseCoordinate: function (coordStr, isLat) {
         try {
             const degLen = isLat ? 2 : 3;
-            const deg = parseInt(coordStr.substring(0, degLen), 10);
+            if (typeof coordStr !== 'string' || coordStr.length < degLen + 6) return null;
+            const degStr = coordStr.substring(0, degLen);
             const minStr = coordStr.substring(degLen, degLen + 5);
-            const min = parseInt(minStr, 10) / 1000;
             const dir = coordStr.substring(degLen + 5, degLen + 6);
+            if (!/^\d+$/.test(degStr) || !/^\d+$/.test(minStr)) return null;
+            const validDirs = isLat ? ['N', 'S'] : ['E', 'W'];
+            if (!validDirs.includes(dir)) return null;
+
+            const deg = parseInt(degStr, 10);
+            const min = parseInt(minStr, 10) / 1000;
+            if (!Number.isFinite(deg) || !Number.isFinite(min) || min < 0 || min >= 60) return null;
 
             let decimal = deg + min / 60;
+            const maxAbs = isLat ? 90 : 180;
+            if (decimal > maxAbs) return null;
 
             if (dir === 'S' || dir === 'W') {
                 decimal = decimal * -1;

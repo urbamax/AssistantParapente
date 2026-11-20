@@ -119,6 +119,17 @@ export function turnSwings(headings, minTurnDeg = APPROACH.minTurnDeg) {
  */
 export function detectLandingApproach(flight, { endsAirborne = false } = {}) {
     if (!flight || flight.length < 10 || endsAirborne) return null;
+    if (
+        flight.some(
+            (p) =>
+                !Number.isFinite(p?.lat) ||
+                !Number.isFinite(p?.lon) ||
+                !Number.isFinite(p?.alt) ||
+                !Number.isFinite(p?.timestamp),
+        )
+    ) {
+        return null;
+    }
     const landingAlt = flight[flight.length - 1].alt;
     const height = (p) => p.alt - landingAlt;
 
