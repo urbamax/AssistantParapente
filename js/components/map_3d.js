@@ -439,8 +439,13 @@ const Map3DComponent = {
 
     // --- Variomètre ---------------------------------------------------------------
     _timeToSeconds: function (tStr) {
+        if (typeof tStr !== 'string') return 0;
         const p = tStr.split(':');
-        return parseInt(p[0], 10) * 3600 + parseInt(p[1], 10) * 60 + parseInt(p[2], 10);
+        if (p.length < 3) return 0;
+        const h = parseInt(p[0], 10);
+        const m = parseInt(p[1], 10);
+        const s = parseInt(p[2], 10);
+        return Number.isFinite(h) && Number.isFinite(m) && Number.isFinite(s) ? h * 3600 + m * 60 + s : 0;
     },
 
     // Vario instantané par point (m/s), lissé légèrement pour ne pas scintiller entre
@@ -449,7 +454,9 @@ const Map3DComponent = {
         const raw = traceGps.map((pt, i) => {
             if (i === 0) return 0;
             const prev = traceGps[i - 1];
-            const dt = this._timeToSeconds(pt.time) - this._timeToSeconds(prev.time);
+            let dt = this._timeToSeconds(pt.time) - this._timeToSeconds(prev.time);
+            // Passage minuit UTC (ex. 23:59:58 -> 00:00:00)
+            if (dt < -43200) dt += 86400;
             if (dt <= 0) return 0;
             return (pt.alt - prev.alt) / dt;
         });
@@ -610,7 +617,7 @@ const Map3DComponent = {
     },
 
     _errorHtml: function (message) {
-        return `<div style="padding: 20px; text-align: center; color: var(--text-secondary);">${message}</div>`;
+        return `<div style="padding: 20px; text-align: center; color: var(--text-secondary);">${escapeHTML(message || '')}</div>`;
     },
 
     clearPlayback: function () {
