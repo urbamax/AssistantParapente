@@ -271,6 +271,7 @@ const GdprEngine = {
             console.log('GdprEngine: Clearing progression statistics & exam history from localStorage.');
             localStorage.removeItem('parapente_qcm_stats');
             localStorage.removeItem('parapente_exam_history');
+            localStorage.removeItem('pending_quiz');
 
             // Refresh QCM UI if stats screen is active
             if (GlobalState.state.mode === 'STATS') {

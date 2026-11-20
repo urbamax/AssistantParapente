@@ -156,7 +156,7 @@ class EventDelegator {
         } else {
             // Fallback for Engine methods
             let handled = false;
-            const engines = [window.LibraryEngine, window.FirebaseAuthEngine, GdprEngine];
+            const engines = [window.FirebaseAuthEngine, GdprEngine];
 
             for (const engine of engines) {
                 if (engine && typeof engine[action] === 'function') {
