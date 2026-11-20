@@ -430,6 +430,7 @@
                     synchroniser.
                 </p>
             </div>
+            <div class="app-footer-placeholder"></div>
         </div>
 
         <!-- SAFETY SCREEN (urgence, check-lists, SIGR : rendu par js/views/safety.js) -->
@@ -2585,6 +2586,9 @@
                             <strong data-i18n="gdprPrivacyModal.donneesTechniques">Données Techniques :</strong> Choix du thème (sombre/clair) et niveau, conservés
                             uniquement dans votre stockage local.
                         </li>
+                        <li data-i18n="gdprPrivacyModal.uniquementLorsqueVousUtilisez">
+                            <strong data-i18n="gdprPrivacyModal.signalementsEtSuggestionsOptionnel">Signalements et suggestions (optionnel) :</strong> uniquement lorsque vous envoyez volontairement le formulaire « Signaler un problème / Suggestion », le texte saisi, l'éventuel contact et (si laissé coché) le contexte technique non personnel sont transmis directement au serveur de l'éditeur afin de traiter votre retour. Le brouillon est conservé localement jusqu'à l'envoi ou son effacement.
+                        </li>
                     </ul>
 
                     <h4 data-i18n="gdprPrivacyModal.n3HebergementDesDonnees">3. Hébergement des Données</h4>
@@ -2615,8 +2619,9 @@
                         de retirer votre consentement à tout moment.
                     </p>
                     <p data-i18n-html="gdprPrivacyModal.pourTouteQuestionOu">
-                        Pour toute question ou pour exercer vos droits, vous pouvez contacter le responsable par le
-                        biais de la page du club-école <em>Le Fil d'Ariane</em> ou directement dans l'Espace Synchro.
+                        Pour toute question ou pour exercer vos droits, vous pouvez contacter le responsable via le
+                        formulaire « Signaler un problème / Suggestion », par le biais de la page du club-école
+                        <em>Le Fil d'Ariane</em> ou directement dans l'Espace Synchro.
                     </p>
                 </div>
             </div>
@@ -2877,6 +2882,241 @@
                     <span id="logbook-ffvl-live" class="batch-live" aria-live="polite"></span>
                     <button type="button" id="logbook-ffvl-cancel" class="action-btn-secondary" data-action="closeFfvlImport"></button>
                     <button type="button" id="logbook-ffvl-import" class="action-btn-primary" data-action="importFfvl"></button>
+                </div>
+            </div>
+        </dialog>
+
+        <dialog
+            id="feedback-modal"
+            class="gdpr-modal-overlay"
+            data-backdrop-action="closeFeedbackModal"
+            style="display: none"
+        >
+            <div class="gdpr-modal feedback-modal-box">
+                <div class="gdpr-modal-header">
+                    <div class="gdpr-modal-title">
+                        <i class="ri-feedback-line" aria-hidden="true"></i>
+                        <span data-i18n="feedbackModal.title">Signaler un problème / Suggestion</span>
+                    </div>
+                    <button
+                        type="button"
+                        class="gdpr-modal-close-btn"
+                        data-action="closeFeedbackModal"
+                        data-i18n-aria-label="feedbackModal.ariaLabelFermer"
+                        aria-label="Fermer"
+                    >
+                        <i class="ri-close-line" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <div class="gdpr-modal-body feedback-modal-body">
+                    <p class="feedback-intro" data-i18n="feedbackModal.intro">
+                        Signalez un bug, une erreur dans un QCM, un cours ou une fiche site, ou proposez une
+                        amélioration. Aucune adresse e-mail n'est requise.
+                    </p>
+
+                    <form id="feedback-form" class="feedback-form" novalidate>
+                        <div class="feedback-field">
+                            <span class="feedback-label" data-i18n="feedbackModal.categoryLabel">Type de retour</span>
+                            <div id="feedback-categories" class="feedback-categories">
+                                <button
+                                    type="button"
+                                    class="feedback-category-btn"
+                                    data-action="setFeedbackCategory"
+                                    data-args="bug"
+                                    data-feedback-category="bug"
+                                    aria-pressed="true"
+                                >
+                                    <i class="ri-bug-line" aria-hidden="true"></i>
+                                    <span data-i18n="feedbackModal.catBug">Bug / problème technique</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="feedback-category-btn"
+                                    data-action="setFeedbackCategory"
+                                    data-args="qcm_course"
+                                    data-feedback-category="qcm_course"
+                                    aria-pressed="false"
+                                >
+                                    <i class="ri-book-open-line" aria-hidden="true"></i>
+                                    <span data-i18n="feedbackModal.catQcmCourse">Erreur QCM ou cours</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="feedback-category-btn"
+                                    data-action="setFeedbackCategory"
+                                    data-args="site_weather"
+                                    data-feedback-category="site_weather"
+                                    aria-pressed="false"
+                                >
+                                    <i class="ri-map-pin-line" aria-hidden="true"></i>
+                                    <span data-i18n="feedbackModal.catSiteWeather">Erreur site ou météo</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="feedback-category-btn"
+                                    data-action="setFeedbackCategory"
+                                    data-args="suggestion"
+                                    data-feedback-category="suggestion"
+                                    aria-pressed="false"
+                                >
+                                    <i class="ri-lightbulb-line" aria-hidden="true"></i>
+                                    <span data-i18n="feedbackModal.catSuggestion">Suggestion d'amélioration</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="feedback-category-btn"
+                                    data-action="setFeedbackCategory"
+                                    data-args="other"
+                                    data-feedback-category="other"
+                                    aria-pressed="false"
+                                >
+                                    <i class="ri-feedback-line" aria-hidden="true"></i>
+                                    <span data-i18n="feedbackModal.catOther">Autre remarque</span>
+                                </button>
+                            </div>
+                            <p id="feedback-category-helper" class="feedback-helper" data-i18n="feedbackModal.defaultHelper">
+                                Décrivez ce qui ne s'affiche pas ou ne réagit pas comme prévu (bouton, calcul, écran
+                                figé…).
+                            </p>
+                        </div>
+
+                        <div class="feedback-field">
+                            <label class="feedback-label" for="feedback-subject">
+                                <span data-i18n="feedbackModal.subjectLabel">Objet</span>
+                                <span class="feedback-tag" data-i18n="feedbackModal.optionalTag">(optionnel)</span>
+                            </label>
+                            <input
+                                id="feedback-subject"
+                                class="feedback-input"
+                                type="text"
+                                maxlength="120"
+                                data-input-action="feedbackFieldInput"
+                                data-i18n-placeholder="feedbackModal.subjectPlaceholder"
+                                placeholder="Résumé court en une ligne…"
+                            />
+                        </div>
+
+                        <div class="feedback-field">
+                            <label class="feedback-label" for="feedback-description">
+                                <span>
+                                    <span data-i18n="feedbackModal.descriptionLabel">Description détaillée</span>
+                                    <span class="feedback-tag" data-i18n="feedbackModal.requiredTag"
+                                        >(obligatoire, 10 car. min.)</span
+                                    >
+                                </span>
+                                <span
+                                    id="feedback-description-count"
+                                    class="feedback-char-count"
+                                    data-i18n="feedbackModal.initialCharCount"
+                                    >0 / 3000</span
+                                >
+                            </label>
+                            <textarea
+                                id="feedback-description"
+                                class="feedback-textarea"
+                                maxlength="3000"
+                                minlength="10"
+                                required
+                                data-input-action="feedbackFieldInput"
+                                data-i18n-placeholder="feedbackModal.descriptionPlaceholder"
+                                placeholder="Ex. : Sur mobile, après avoir ouvert un vol IGC, le bouton de fermeture reste masqué…"
+                            ></textarea>
+                        </div>
+
+                        <div class="feedback-field">
+                            <label class="feedback-label" for="feedback-contact">
+                                <span data-i18n="feedbackModal.contactLabel">Contact pour une réponse</span>
+                                <span class="feedback-tag" data-i18n="feedbackModal.optionalTag">(optionnel)</span>
+                            </label>
+                            <input
+                                id="feedback-contact"
+                                class="feedback-input"
+                                type="text"
+                                maxlength="120"
+                                autocomplete="email"
+                                data-input-action="feedbackFieldInput"
+                                data-i18n-placeholder="feedbackModal.contactPlaceholder"
+                                placeholder="E-mail ou pseudo (uniquement si vous souhaitez une réponse)"
+                            />
+                        </div>
+
+                        <div class="feedback-context-block">
+                            <label class="feedback-checkbox-label" for="feedback-include-context">
+                                <input
+                                    id="feedback-include-context"
+                                    type="checkbox"
+                                    checked
+                                    data-change-action="feedbackFieldChange"
+                                />
+                                <span data-i18n="feedbackModal.includeContextLabel"
+                                    >Joindre le contexte technique non personnel (écran actif, version, navigateur —
+                                    aucune donnée de vol ni position GPS)</span
+                                >
+                            </label>
+                            <div
+                                class="feedback-context-preview-title"
+                                data-i18n="feedbackModal.contextPreviewTitle"
+                            >
+                                Aperçu des informations techniques jointes :
+                            </div>
+                            <pre id="feedback-context-preview" class="feedback-context-preview"></pre>
+                        </div>
+
+                        <div class="feedback-honeypot" aria-hidden="true">
+                            <input id="feedback-botcheck" type="text" tabindex="-1" autocomplete="off" />
+                        </div>
+
+                        <p class="feedback-privacy-note" data-i18n="feedbackModal.privacyNote">
+                            Envoi déclenché uniquement lorsque vous cliquez sur « Envoyer ». Hors ligne ou en cas
+                            d'indisponibilité, utilisez « Copier le message » et transmettez-le sur Facebook.
+                        </p>
+
+                        <div id="feedback-status" class="feedback-status" role="status" aria-live="polite" hidden></div>
+                    </form>
+                </div>
+
+                <div class="gdpr-modal-footer feedback-modal-footer">
+                    <div class="feedback-footer-secondary">
+                        <button
+                            type="button"
+                            id="feedback-reset-btn"
+                            class="gdpr-btn-settings"
+                            data-action="resetFeedbackForm"
+                        >
+                            <i class="ri-delete-bin-line" aria-hidden="true"></i>
+                            <span data-i18n="feedbackModal.resetBtn">Effacer le brouillon</span>
+                        </button>
+                        <a
+                            id="feedback-facebook-link"
+                            class="feedback-fb-link"
+                            href="https://www.facebook.com/maxime.urbaniak/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-i18n="feedbackModal.facebookFallback"
+                            >Contacter Maxime sur Facebook</a
+                        >
+                    </div>
+                    <div class="feedback-footer-primary">
+                        <button
+                            type="button"
+                            id="feedback-copy-btn"
+                            class="gdpr-btn-settings"
+                            data-action="copyFeedbackMessage"
+                        >
+                            <i class="ri-file-copy-line" aria-hidden="true"></i>
+                            <span data-i18n="feedbackModal.copyBtn">Copier le message</span>
+                        </button>
+                        <button
+                            type="button"
+                            id="feedback-submit-btn"
+                            class="gdpr-btn-accept"
+                            data-action="submitFeedback"
+                        >
+                            <i class="ri-send-plane-line" aria-hidden="true"></i>
+                            <span data-i18n="feedbackModal.submitBtn">Envoyer</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </dialog>

@@ -29,6 +29,7 @@ const libraryModule = lazyViewModule(() => import('../views/manual.js'));
 const welcomeModule = lazyViewModule(() => import('../views/welcome.js'));
 const safetyModule = lazyViewModule(() => import('../views/safety.js'));
 const iceModule = lazyViewModule(() => import('../views/ice_viewer.js'));
+const feedbackModule = lazyViewModule(() => import('../views/feedback.js'));
 
 // Mêmes noms qu'avant pour les gestionnaires de clics ci-dessous : chaque méthode appelée charge l'écran
 // si besoin puis l'exécute (immédiat si l'écran est déjà chargé, asynchrone sinon ; méthode absente = null).
@@ -38,6 +39,7 @@ const SitesView = viewProxy(sitesModule);
 const LibraryView = viewProxy(libraryModule);
 const SafetyView = viewProxy(safetyModule);
 const IceView = viewProxy(iceModule);
+const FeedbackView = viewProxy(feedbackModule);
 
 async function bootApplication() {
     try {
@@ -47,7 +49,6 @@ async function bootApplication() {
     }
     // Old address -> own domain, with the local data (js/core/domain_migration.js). Both leave the page.
     if ((await redirectFromLegacyOrigin()) || (await receiveMigration())) return;
-
     console.time('BOOT_TOTAL');
     console.log('🚀 Booting Application...');
 
@@ -110,6 +111,16 @@ async function bootApplication() {
     AppEvents.register('showManual', (section) => UIManager.showManual(section || 'about'));
     AppEvents.register('hideManual', () => UIManager.hideManual());
     AppEvents.register('showManualSection', (section) => UIManager.showManualSection(section));
+
+    // Feedback Modal Events (spec 048)
+    AppEvents.register('openFeedbackModal', () => FeedbackView.open());
+    AppEvents.register('closeFeedbackModal', () => FeedbackView.close());
+    AppEvents.register('setFeedbackCategory', (category) => FeedbackView.setCategory(category));
+    AppEvents.register('feedbackFieldInput', () => FeedbackView.onFieldInput());
+    AppEvents.register('feedbackFieldChange', () => FeedbackView.onFieldChange());
+    AppEvents.register('submitFeedback', () => FeedbackView.submit());
+    AppEvents.register('copyFeedbackMessage', () => FeedbackView.copyMessage());
+    AppEvents.register('resetFeedbackForm', () => FeedbackView.resetForm());
 
     // QCM Events
     AppEvents.register('showQcmBank', () => QuizView.showBankScreen());

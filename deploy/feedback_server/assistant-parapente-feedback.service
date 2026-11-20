@@ -1,0 +1,15 @@
+[Unit]
+Description=Assistant Parapente - Service de notification Discord des retours pilotes
+After=network.target
+
+[Service]
+Type=simple
+User=maximeurbaniak
+WorkingDirectory=/home/maximeurbaniak/AssistantParapente/deploy/feedback_server
+ExecStart=/usr/bin/python3 /home/maximeurbaniak/AssistantParapente/deploy/feedback_server/server.py
+Restart=always
+RestartSec=5
+EnvironmentFile=-/home/maximeurbaniak/AssistantParapente/deploy/feedback_server/.env
+
+[Install]
+WantedBy=multi-user.target

@@ -107,6 +107,8 @@ const SCREENS = [
         ['js/services/logbook_service.js', []],
         ['js/services/logbook_export.js', []],
         ['js/services/sites_service.js', ['Inconnu']],
+        ['js/services/feedback_service.js', ['MENU', 'ALL', 'auto']],
+        ['js/views/feedback.js', []],
     ].map(([file, dataValues]) => ({ file, spec: '029', prefix: '', dataValues, minKeys: 1 })),
 ];
 

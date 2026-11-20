@@ -76,6 +76,9 @@ function showUpdateBanner() {
  */
 export async function watchSiteVersion({ intervalMs = VERSION_CHECK_INTERVAL_MS } = {}) {
     const loaded = await fetchVersion();
+    if (loaded && typeof document !== 'undefined' && document.documentElement) {
+        document.documentElement.dataset.appVersion = loaded;
+    }
     let shown = false;
     const check = async () => {
         if (shown || !loaded) return;
