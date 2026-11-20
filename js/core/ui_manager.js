@@ -231,6 +231,7 @@ class UIManager {
     }
 
     restoreLevelUI(attempts = 0) {
+        if (typeof document === 'undefined') return;
         const levelSelect = /** @type {HTMLSelectElement} */ (document.getElementById('global-level-select'));
         const currentLevel = GlobalState.get('level');
 
