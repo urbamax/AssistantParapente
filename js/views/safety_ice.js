@@ -24,8 +24,13 @@ import {
 } from '../services/ice_cloud_state.js';
 import { escapeHTML } from '../core/security.js';
 import AppRouter from '../core/router.js';
+import { t } from '../utils/i18n.js';
 
 const esc = (text) => escapeHTML(text || '');
+/** @param {string} k @param {Record<string, string|number>} [p] */
+const tt = (k, p) => t(`ice.${k}`, p);
+/** @param {string} k @param {Record<string, string|number>} [p] */
+const th = (k, p) => escapeHTML(tt(k, p));
 
 /** Drapeau de la nationalité (emoji) pour une étiquette : '' si aucune nationalité n'est renseignée. */
 function stickerFlag(p) {
@@ -38,30 +43,31 @@ function stickerFlag(p) {
 /** « Né le 12/03/1988 » (date complète) ou « Né en 1988 » (anciennes fiches) ; '' sans date. */
 function stickerBirth(p) {
     const date = formatBirthDate(p.birthDate);
-    if (date) return `Né le ${date}`;
-    return /^\d{4}$/.test(p.birthYear || '') ? `Né en ${p.birthYear}` : '';
+    if (date) return tt('stickerBornOn', { date });
+    return /^\d{4}$/.test(p.birthYear || '') ? tt('stickerBornIn', { year: p.birthYear }) : '';
 }
 
 export function renderIceSticker(profile) {
     const p = profile || IceService.getProfile();
-    const fullName = `${p.prenom || ''} ${p.nom || ''}`.trim() || 'Pilote';
+    const fullName = `${p.prenom || ''} ${p.nom || ''}`.trim() || tt('pilotBadge');
     // Une fiche trop longue ne tient pas dans un QR lisible : on le dit au lieu de faire échouer tout l'onglet.
     let qrSvg;
     try {
         qrSvg = IceService.generateQrSvg(p, { size: 140, border: 1 });
     } catch {
-        qrSvg =
-            '<p class="ice-qr-error" role="alert">Fiche trop longue pour un QR lisible : raccourcissez les allergies ou les remarques.</p>';
+        qrSvg = `<p class="ice-qr-error" role="alert">${th('stickerQrTooLong')}</p>`;
     }
 
     // Les informations vitales sont écrites en toutes lettres, pas seulement dans le QR.
     const bloodTag =
         p.bloodGroup && p.bloodGroup !== 'Inconnu'
-            ? `<span class="ice-sticker-vital">SANG ${esc(p.bloodGroup)}</span>`
+            ? `<span class="ice-sticker-vital">${th('stickerBlood', { value: p.bloodGroup })}</span>`
             : '';
-    const anticoagTag = p.anticoag ? '<span class="ice-sticker-vital">ANTICOAGULANT</span>' : '';
+    const anticoagTag = p.anticoag ? `<span class="ice-sticker-vital">${th('stickerAnticoag')}</span>` : '';
     const blood = bloodTag || anticoagTag ? `<div class="ice-sticker-tags">${bloodTag}${anticoagTag}</div>` : '';
-    const allergy = p.allergies ? `<div class="ice-sticker-allergy">ALLERGIES : ${esc(p.allergies)}</div>` : '';
+    const allergy = p.allergies
+        ? `<div class="ice-sticker-allergy">${th('stickerAllergies', { value: p.allergies })}</div>`
+        : '';
     // Numéros au format international (+33 …) : un secouriste étranger ou une carte SIM d'un autre pays les compose tels quels.
     const contact = (name, phone) => {
         const intl = toInternationalPhone(phone);
@@ -83,8 +89,8 @@ export function renderIceSticker(profile) {
     return `
         <div class="ice-helmet-sticker" id="ice-helmet-sticker">
             <div class="ice-sticker-header">
-                <span class="ice-sticker-title">URGENCE · ICE</span>
-                <span class="ice-sticker-sos">SOS 112</span>
+                <span class="ice-sticker-title">${th('stickerTitle')}</span>
+                <span class="ice-sticker-sos">${th('stickerSos')}</span>
             </div>
             <div class="ice-sticker-body">
                 <div class="ice-sticker-qr">${qrSvg}</div>
@@ -98,7 +104,7 @@ export function renderIceSticker(profile) {
             </div>
             <div class="ice-sticker-foot">
                 <span class="ice-sticker-licence">${esc(licenceLine(p))}</span>
-                <span>Mis à jour ${updated}</span>
+                <span>${th('stickerUpdated', { date: updated })}</span>
             </div>
         </div>
     `;
@@ -112,19 +118,18 @@ export function renderIceSticker(profile) {
  */
 export function renderIceStickerCompact(profile) {
     const p = profile || IceService.getProfile();
-    const fullName = `${p.prenom || ''} ${p.nom || ''}`.trim() || 'Pilote';
+    const fullName = `${p.prenom || ''} ${p.nom || ''}`.trim() || tt('pilotBadge');
     const birth = stickerBirth(p);
     let qrSvg;
     try {
         qrSvg = IceService.generateQrSvg(p, { size: 140, border: 1 });
     } catch {
-        qrSvg =
-            '<p class="ice-qr-error" role="alert">Fiche trop longue pour un QR lisible : raccourcissez les allergies ou les remarques.</p>';
+        qrSvg = `<p class="ice-qr-error" role="alert">${th('stickerQrTooLong')}</p>`;
     }
     return `
         <div class="ice-helmet-sticker ice-sticker-compact" id="ice-helmet-sticker-compact">
             <div class="ice-sticker-header ice-sticker-header-compact">
-                <span class="ice-sticker-title">URGENCE</span>
+                <span class="ice-sticker-title">${th('stickerCompactTitle')}</span>
             </div>
             <div class="ice-sticker-qr">${qrSvg}</div>
             <div class="ice-sticker-id">
@@ -147,7 +152,7 @@ export function renderIceTabHtml() {
           ? [...ICE_COUNTRIES, [currentCountry, currentCountry]]
           : ICE_COUNTRIES;
     const countryOptions =
-        `<option value=""${currentCountry ? '' : ' selected'}>Non précisée</option>` +
+        `<option value=""${currentCountry ? '' : ' selected'}>${th('countryUnspecified')}</option>` +
         countries
             .map(
                 ([code, name]) =>
@@ -161,143 +166,139 @@ export function renderIceTabHtml() {
 
     return `
         <div class="safety-card ice-card-intro">
-            <h3><i class="ri-qr-code-line" aria-hidden="true"></i> Fiche d'Urgence Pilote &amp; Étiquette Casque</h3>
-            <p class="safety-hint">
-                Générez une étiquette étanche avec QR Code à coller sur votre casque ou votre sellette. En cas d'accident,
-                les témoins ou les secouristes peuvent la scanner avec n'importe quel smartphone pour joindre immédiatement
-                vos proches et connaître vos données médicales vitales. Le QR contient une fiche contact : l'appareil photo du téléphone l'ouvre sans réseau et sans ce site, avec vos contacts d'urgence et vos informations médicales dans les notes. Votre fiche reste sur cet appareil : elle n'est ni synchronisée ni exportée.
-            </p>
+            <h3><i class="ri-qr-code-line" aria-hidden="true"></i> ${th('introTitle')}</h3>
+            <p class="safety-hint">${th('introHint')}</p>
         </div>
 
         <div class="ice-grid-layout">
             <!-- Formulaire Pilote -->
             <div class="safety-card ice-form-card">
-                <h3><i class="ri-user-settings-line" aria-hidden="true"></i> Mes Informations d'Urgence</h3>
+                <h3><i class="ri-user-settings-line" aria-hidden="true"></i> ${th('formTitle')}</h3>
                 
                 <fieldset class="ice-fieldset">
-                    <legend>Identité</legend>
+                    <legend>${th('fieldsetIdentity')}</legend>
                     <div class="ice-form-row ice-form-row-2">
-                        <label>Prénom
-                            <input type="text" id="ice-prenom" maxlength="${ICE_LIMITS.name}" value="${esc(p.prenom)}" placeholder="Ex: Thomas" />
+                        <label>${th('fieldFirstName')}
+                            <input type="text" id="ice-prenom" maxlength="${ICE_LIMITS.name}" value="${esc(p.prenom)}" placeholder="${th('placeholderFirstName')}" />
                         </label>
-                        <label>Nom
-                            <input type="text" id="ice-nom" maxlength="${ICE_LIMITS.name}" value="${esc(p.nom)}" placeholder="Ex: Dupont" />
+                        <label>${th('fieldLastName')}
+                            <input type="text" id="ice-nom" maxlength="${ICE_LIMITS.name}" value="${esc(p.nom)}" placeholder="${th('placeholderLastName')}" />
                         </label>
                     </div>
                     <div class="ice-form-row">
-                        <label>Nationalité (drapeau à côté du nom)
+                        <label>${th('fieldNationality')}
                             <select id="ice-pays">${countryOptions}</select>
                         </label>
                     </div>
                     <div class="ice-form-row ice-form-row-2">
-                        <label>Date de naissance
+                        <label>${th('fieldBirthDate')}
                             <input type="date" id="ice-birthDate" value="${esc(normalizeBirthDate(p.birthDate))}" min="1900-01-01" max="${new Date().toISOString().slice(0, 10)}" />
                         </label>
-                        <label>Mon numéro de téléphone
-                            <input type="tel" id="ice-tel" maxlength="${ICE_LIMITS.phone}" value="${esc(p.tel)}" placeholder="Ex: 06 00 11 22 33" />
+                        <label>${th('fieldPilotPhone')}
+                            <input type="tel" id="ice-tel" maxlength="${ICE_LIMITS.phone}" value="${esc(p.tel)}" placeholder="${th('placeholderPilotPhone')}" />
                         </label>
                     </div>
                     <div class="ice-form-row">
-                        <label>Langues parlées
-                            <input type="text" id="ice-langues" maxlength="${ICE_LIMITS.langues}" value="${esc(p.langues)}" placeholder="Ex: Français, Anglais" />
+                        <label>${th('fieldLanguages')}
+                            <input type="text" id="ice-langues" maxlength="${ICE_LIMITS.langues}" value="${esc(p.langues)}" placeholder="${th('placeholderLanguages')}" />
                         </label>
                     </div>
                 </fieldset>
 
                 <fieldset class="ice-fieldset">
-                    <legend>Contact d'urgence 1 (Prioritaire)</legend>
+                    <legend>${th('fieldsetContact1')}</legend>
                     <div class="ice-form-row ice-form-row-2">
-                        <label>Nom du contact
-                            <input type="text" id="ice-c1-name" maxlength="${ICE_LIMITS.name}" value="${esc(p.contact1Name)}" placeholder="Ex: Sophie" />
+                        <label>${th('fieldContactName')}
+                            <input type="text" id="ice-c1-name" maxlength="${ICE_LIMITS.name}" value="${esc(p.contact1Name)}" placeholder="${th('placeholderContact1Name')}" />
                         </label>
-                        <label>Lien / Parenté
-                            <input type="text" id="ice-c1-rel" maxlength="${ICE_LIMITS.relation}" value="${esc(p.contact1Rel)}" placeholder="Ex: Conjointe" />
+                        <label>${th('fieldContactRel')}
+                            <input type="text" id="ice-c1-rel" maxlength="${ICE_LIMITS.relation}" value="${esc(p.contact1Rel)}" placeholder="${th('placeholderContact1Rel')}" />
                         </label>
                     </div>
                     <div class="ice-form-row">
-                        <label>Téléphone d'urgence *
-                            <input type="tel" id="ice-c1-phone" maxlength="${ICE_LIMITS.phone}" value="${esc(p.contact1Phone)}" placeholder="Ex: 06 12 34 56 78" />
+                        <label>${th('fieldContact1Phone')}
+                            <input type="tel" id="ice-c1-phone" maxlength="${ICE_LIMITS.phone}" value="${esc(p.contact1Phone)}" placeholder="${th('placeholderContact1Phone')}" />
                         </label>
                     </div>
                 </fieldset>
 
                 <fieldset class="ice-fieldset">
-                    <legend>Contact d'urgence 2 (Optionnel)</legend>
+                    <legend>${th('fieldsetContact2')}</legend>
                     <div class="ice-form-row ice-form-row-2">
-                        <label>Nom du contact
-                            <input type="text" id="ice-c2-name" maxlength="${ICE_LIMITS.name}" value="${esc(p.contact2Name)}" placeholder="Ex: Pierre" />
+                        <label>${th('fieldContactName')}
+                            <input type="text" id="ice-c2-name" maxlength="${ICE_LIMITS.name}" value="${esc(p.contact2Name)}" placeholder="${th('placeholderContact2Name')}" />
                         </label>
-                        <label>Lien / Parenté
-                            <input type="text" id="ice-c2-rel" maxlength="${ICE_LIMITS.relation}" value="${esc(p.contact2Rel)}" placeholder="Ex: Frère / Ami" />
+                        <label>${th('fieldContactRel')}
+                            <input type="text" id="ice-c2-rel" maxlength="${ICE_LIMITS.relation}" value="${esc(p.contact2Rel)}" placeholder="${th('placeholderContact2Rel')}" />
                         </label>
                     </div>
                     <div class="ice-form-row">
-                        <label>Téléphone
-                            <input type="tel" id="ice-c2-phone" maxlength="${ICE_LIMITS.phone}" value="${esc(p.contact2Phone)}" placeholder="Ex: 06 98 76 54 32" />
+                        <label>${th('fieldContact2Phone')}
+                            <input type="tel" id="ice-c2-phone" maxlength="${ICE_LIMITS.phone}" value="${esc(p.contact2Phone)}" placeholder="${th('placeholderContact2Phone')}" />
                         </label>
                     </div>
                 </fieldset>
 
                 <fieldset class="ice-fieldset">
-                    <legend>Données Médicales Vitales</legend>
+                    <legend>${th('fieldsetMedical')}</legend>
                     <div class="ice-form-row">
-                        <label>Groupe sanguin
+                        <label>${th('fieldBloodGroup')}
                             <select id="ice-bloodGroup">${bloodOptions}</select>
                         </label>
                     </div>
                     <div class="ice-form-row">
-                        <label>Allergies majeures / Contre-indications
-                            <input type="text" id="ice-allergies" maxlength="${ICE_LIMITS.allergies}" value="${esc(p.allergies)}" placeholder="Ex: Pénicilline, aspirine, asthme..." />
+                        <label>${th('fieldAllergies')}
+                            <input type="text" id="ice-allergies" maxlength="${ICE_LIMITS.allergies}" value="${esc(p.allergies)}" placeholder="${th('placeholderAllergies')}" />
                         </label>
                     </div>
                     <div class="ice-form-row">
-                        <label>Antécédents / Traitements réguliers
-                            <input type="text" id="ice-remarques" maxlength="${ICE_LIMITS.remarques}" value="${esc(p.remarques || p.medical)}" placeholder="Ex: Diabète, anticoagulant..." />
+                        <label>${th('fieldHistory')}
+                            <input type="text" id="ice-remarques" maxlength="${ICE_LIMITS.remarques}" value="${esc(p.remarques || p.medical)}" placeholder="${th('placeholderHistory')}" />
                         </label>
                     </div>
                     <div class="ice-form-row ice-form-row-2">
                         <label class="ice-check-label">
                             <input type="checkbox" id="ice-anticoag" ${p.anticoag ? 'checked' : ''} />
-                            Traitement anticoagulant (saignement à risque)
+                            ${th('fieldAnticoag')}
                         </label>
-                        <label>Dernier rappel antitétanique (année)
-                            <input type="number" id="ice-tetanos" value="${esc(p.tetanos)}" placeholder="Ex: 2022" min="1950" max="${new Date().getFullYear()}" />
+                        <label>${th('fieldTetanos')}
+                            <input type="number" id="ice-tetanos" value="${esc(p.tetanos)}" placeholder="${th('placeholderTetanos')}" min="1950" max="${new Date().getFullYear()}" />
                         </label>
                     </div>
                 </fieldset>
 
                 <fieldset class="ice-fieldset">
-                    <legend>Informations Fédérales &amp; Assurance</legend>
+                    <legend>${th('fieldsetFederal')}</legend>
                     <div class="ice-form-row ice-form-row-2">
-                        <label>Fédération
-                            <input type="text" id="ice-federation" list="ice-federations" maxlength="${ICE_LIMITS.federation}" value="${esc(federation)}" placeholder="Ex: FFVL" autocomplete="off" />
+                        <label>${th('fieldFederation')}
+                            <input type="text" id="ice-federation" list="ice-federations" maxlength="${ICE_LIMITS.federation}" value="${esc(federation)}" placeholder="${th('placeholderFederation')}" autocomplete="off" />
                             <datalist id="ice-federations">${ICE_FEDERATIONS.map((f) => `<option value="${esc(f)}"></option>`).join('')}</datalist>
                         </label>
-                        <label>N° de licence
-                            <input type="text" id="ice-ffvl" maxlength="${ICE_LIMITS.ffvl}" value="${esc(p.ffvl)}" placeholder="Ex: 1234567" />
+                        <label>${th('fieldLicenceNumber')}
+                            <input type="text" id="ice-ffvl" maxlength="${ICE_LIMITS.ffvl}" value="${esc(p.ffvl)}" placeholder="${th('placeholderLicenceNumber')}" />
                         </label>
                     </div>
                     <div class="ice-form-row">
-                        <label>Assurance assistance / Rapatriement
-                            <input type="text" id="ice-insurance" maxlength="${ICE_LIMITS.insurance}" value="${esc(p.insurance)}" placeholder="Ex: Europ Assistance FFVL" />
+                        <label>${th('fieldInsurance')}
+                            <input type="text" id="ice-insurance" maxlength="${ICE_LIMITS.insurance}" value="${esc(p.insurance)}" placeholder="${th('placeholderInsurance')}" />
                         </label>
                     </div>
                 </fieldset>
 
                 <div class="ice-form-actions">
                     <button type="button" class="safety-btn safety-btn-primary" data-action="SafetysaveIceProfile">
-                        <i class="ri-save-3-line" aria-hidden="true"></i> Enregistrer dans mon profil
+                        <i class="ri-save-3-line" aria-hidden="true"></i> ${th('saveProfileBtn')}
                     </button>
                     <button type="button" class="safety-btn" data-action="SafetyclearIceProfile">
-                        <i class="ri-delete-bin-line" aria-hidden="true"></i> Réinitialiser
+                        <i class="ri-delete-bin-line" aria-hidden="true"></i> ${th('resetProfileBtn')}
                     </button>
                 </div>
             </div>
 
             <!-- Aperçu & Impression Étiquette Casque -->
             <div class="safety-card ice-preview-card">
-                <h3><i class="ri-printer-line" aria-hidden="true"></i> Mon Étiquette Casque</h3>
-                <p class="safety-hint">Aperçu en taille réelle de l'étiquette à découper :</p>
+                <h3><i class="ri-printer-line" aria-hidden="true"></i> ${th('previewTitle')}</h3>
+                <p class="safety-hint">${th('previewHint')}</p>
 
                 <div id="ice-sticker-wrapper" class="ice-sticker-wrapper">
                     ${renderIceSticker(p)}
@@ -306,19 +307,19 @@ export function renderIceTabHtml() {
 
                 <div class="ice-sticker-actions">
                     <button type="button" class="safety-btn safety-btn-primary" data-action="SafetyprintIceSticker">
-                        <i class="ri-printer-fill" aria-hidden="true"></i> Imprimer l'étiquette casque
+                        <i class="ri-printer-fill" aria-hidden="true"></i> ${th('printStickerBtn')}
                     </button>
                     <button type="button" class="safety-btn" data-action="SafetytestIceView">
-                        <i class="ri-eye-line" aria-hidden="true"></i> Tester la vue Secours
+                        <i class="ri-eye-line" aria-hidden="true"></i> ${th('testViewBtn')}
                     </button>
                 </div>
 
                 <div class="ice-print-tips">
-                    <h4>💡 Conseils de pose pour le vol :</h4>
+                    <h4>${th('tipsTitle')}</h4>
                     <ul>
-                        <li>Découpez l'étiquette en suivant les pointillés.</li>
-                        <li>Collez-la sur le côté ou l'arrière du casque (ou sur le côté de la sellette).</li>
-                        <li>Recouvrez-la d'un morceau d'adhésif transparent large pour la rendre 100% étanche à l'eau et aux frottements.</li>
+                        <li>${th('tip1')}</li>
+                        <li>${th('tip2')}</li>
+                        <li>${th('tip3')}</li>
                     </ul>
                 </div>
             </div>
@@ -343,32 +344,27 @@ export function renderIceCloudCard() {
     const state = getIceCloudState();
     let body;
     if (!engine?.enabled) {
-        body =
-            '<p class="safety-hint">La synchronisation en ligne est désactivée (réglages de confidentialité) : votre fiche reste uniquement sur cet appareil.</p>';
+        body = `<p class="safety-hint">${th('cloudDisabledHint')}</p>`;
     } else if (!engine.currentUser) {
-        body =
-            '<p class="safety-hint">Connectez-vous à votre compte pour pouvoir enregistrer votre fiche dans votre profil en ligne.</p>';
+        body = `<p class="safety-hint">${th('cloudSignInHint')}</p>`;
     } else if (state.enabled) {
-        const when = state.lastSyncedAt ? ` le ${formatDateTime(state.lastSyncedAt)}` : '';
+        const when = state.lastSyncedAt ? tt('cloudSyncedOn', { date: formatDateTime(state.lastSyncedAt) }) : '';
         body = `
-            <p class="ice-cloud-status" role="status"><i class="ri-cloud-fill" aria-hidden="true"></i> Fiche enregistrée dans votre profil en ligne${when}. Elle suit vos modifications et se retrouve sur vos autres appareils.</p>
+            <p class="ice-cloud-status" role="status"><i class="ri-cloud-fill" aria-hidden="true"></i> ${th('cloudStatus', { when })}</p>
             <button type="button" class="safety-btn" data-action="SafetydisableIceCloud">
-                <i class="ri-delete-bin-line" aria-hidden="true"></i> Supprimer ma fiche en ligne
+                <i class="ri-delete-bin-line" aria-hidden="true"></i> ${th('cloudDeleteBtn')}
             </button>`;
     } else {
         body = `
             <button type="button" class="safety-btn safety-btn-primary" data-action="SafetyenableIceCloud">
-                <i class="ri-cloud-line" aria-hidden="true"></i> Enregistrer ma fiche dans mon profil en ligne
+                <i class="ri-cloud-line" aria-hidden="true"></i> ${th('cloudEnableBtn')}
             </button>`;
     }
     return `
         <div class="safety-card ice-cloud-card" id="ice-cloud-card">
-            <h3><i class="ri-cloud-line" aria-hidden="true"></i> Sauvegarde en ligne (facultative)</h3>
+            <h3><i class="ri-cloud-line" aria-hidden="true"></i> ${th('cloudTitle')}</h3>
             <p class="safety-hint">
-                Votre fiche contient des données de santé : par défaut elle reste <strong>uniquement sur cet appareil</strong>.
-                Vous pouvez l'enregistrer dans votre profil en ligne pour la retrouver sur vos autres appareils. Dans
-                l'application, elle n'est lisible que par vous (l'éditeur, qui administre la base de données, y a techniquement
-                accès), et vous pouvez la supprimer à tout moment.
+                ${th('cloudIntroPrefix')} <strong>${th('cloudIntroLocalOnly')}</strong>${th('cloudIntroSuffix')}
             </p>
             ${body}
         </div>
@@ -400,32 +396,26 @@ function refreshIcePanelStatus() {
 export async function enableIceCloud() {
     const engine = window.FirebaseAuthEngine;
     if (!engine?.enabled || !engine.currentUser) {
-        alert('Connectez-vous à votre compte (avec la synchronisation en ligne activée) pour enregistrer votre fiche.');
+        alert(tt('cloudSignInAlert'));
         return;
     }
-    const agreed = confirm(
-        'Enregistrer votre fiche d’urgence dans votre profil en ligne ?\n\n' +
-            'Elle contient des données de santé (groupe sanguin, allergies, traitements…). Elle sera stockée dans votre compte : ' +
-            'dans l’application, vous seul pouvez la lire ; l’éditeur de l’application, qui administre la base de données, y a ' +
-            'techniquement accès. Vous pourrez la supprimer à tout moment.\n\n' +
-            'Vous donnez votre accord exprès à cette sauvegarde.',
-    );
+    const agreed = confirm(tt('cloudConsentConfirm'));
     if (!agreed) return;
 
     const local = IceService.getProfile();
     const hasLocal = Boolean(local.nom || local.prenom || local.contact1Phone || local.contact2Phone);
     const remote = await engine.fetchIceFromCloud();
     if (!remote.success) {
-        alert('Impossible de joindre votre profil en ligne pour le moment. Réessayez plus tard.');
+        alert(tt('cloudUnreachableAlert'));
         return;
     }
 
     let useRemote = false;
     if (remote.data && hasLocal) {
-        const date = remote.data.updatedAt ? ` (modifiée le ${formatDateTime(remote.data.updatedAt)})` : '';
-        useRemote = !confirm(
-            `Une fiche est déjà enregistrée en ligne${date}.\n\nOK : la remplacer par celle de cet appareil.\nAnnuler : reprendre celle du profil en ligne.`,
-        );
+        const date = remote.data.updatedAt
+            ? tt('cloudConflictDate', { date: formatDateTime(remote.data.updatedAt) })
+            : '';
+        useRemote = !confirm(tt('cloudConflictConfirm', { date }));
     } else if (remote.data) {
         useRemote = true;
     }
@@ -438,7 +428,7 @@ export async function enableIceCloud() {
         const sent = await engine.saveIceToCloud();
         if (!sent.success) {
             clearIceCloudState();
-            alert('L’enregistrement en ligne a échoué : votre fiche reste uniquement sur cet appareil.');
+            alert(tt('cloudSaveFailedAlert'));
             refreshIcePanel();
             return;
         }
@@ -448,11 +438,11 @@ export async function enableIceCloud() {
 
 /** Supprime la fiche du profil en ligne (elle reste sur cet appareil) et arrête la sauvegarde. */
 export async function disableIceCloud() {
-    if (!confirm('Supprimer votre fiche de votre profil en ligne ? Elle restera sur cet appareil.')) return;
+    if (!confirm(tt('cloudDisableConfirm'))) return;
     const engine = window.FirebaseAuthEngine;
     const deleted = engine?.deleteIceFromCloud ? await engine.deleteIceFromCloud() : { success: false };
     if (!deleted.success) {
-        alert('Impossible de supprimer la fiche en ligne pour le moment (hors ligne ?). Réessayez plus tard.');
+        alert(tt('cloudDeleteFailedAlert'));
         return;
     }
     clearIceCloudState();
@@ -490,27 +480,16 @@ export function saveIceProfile() {
     IceService.saveProfile(values);
     updateIceStickerPreview(values);
     pushIceIfEnabled();
-    alert(
-        IceService.qrFits(values)
-            ? 'Fiche d’urgence enregistrée sur cet appareil. Votre étiquette casque a été mise à jour.'
-            : 'Fiche enregistrée, mais trop longue pour tenir dans un QR lisible : raccourcissez les allergies ou les remarques avant d’imprimer.',
-    );
+    alert(IceService.qrFits(values) ? tt('saveOkAlert') : tt('saveTooLongAlert'));
 }
 
 export async function clearIceProfile() {
     const online = getIceCloudState().enabled;
-    if (
-        !confirm(
-            online
-                ? 'Voulez-vous réinitialiser votre fiche d’urgence ? Sa copie dans votre profil en ligne sera aussi supprimée.'
-                : 'Voulez-vous réinitialiser votre fiche d’urgence ?',
-        )
-    )
-        return;
+    if (!confirm(online ? tt('clearConfirmOnline') : tt('clearConfirmLocal'))) return;
     if (online) {
         const deleted = await window.FirebaseAuthEngine?.deleteIceFromCloud?.();
         if (!deleted?.success) {
-            alert('Impossible de supprimer la copie en ligne pour le moment (hors ligne ?). Réessayez plus tard.');
+            alert(tt('clearDeleteOnlineFailedAlert'));
             return;
         }
         clearIceCloudState();
