@@ -599,8 +599,8 @@ const Map3DComponent = {
                 </div>
                 <div style="padding: 10px; background: var(--bg-card); display: flex; flex-direction: column; gap: 10px; margin-top: 10px; border-radius: var(--radius-md);">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <button type="button" id="play-btn-${safeId}" class="action-btn-primary" style="padding: 4px 12px; min-width: 60px;"><i class="ri-play-fill"></i></button>
-                        <input type="range" id="slider-${safeId}" min="0" max="${safeMax}" value="0" style="flex: 1; cursor: pointer;">
+                        <button type="button" id="play-btn-${safeId}" class="action-btn-primary" aria-label="${escapeHTML(t('map3d.playPause'))}" style="padding: 4px 12px; min-width: 60px;"><i class="ri-play-fill"></i></button>
+                        <input type="range" id="slider-${safeId}" min="0" max="${safeMax}" value="0" aria-label="${escapeHTML(t('map3d.timeEmpty'))}" style="flex: 1; cursor: pointer;">
                     </div>
                     <div id="info-${safeId}" style="font-size: 0.85rem; font-family: monospace; color: var(--text-secondary); text-align: center;">
                         ${escapeHTML(t('map3d.timeEmpty'))}

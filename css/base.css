@@ -39,11 +39,6 @@
     --text-muted: #94a3b8;
     --text-secondary: #cbd5e1;
 
-    /* FFVL Branded Colors */
-    --accent-orange: #ff7a00;
-    --accent-red: #e2001a;
-    --accent-green: #22c55e;
-
     --border-color: var(--p-dark-border);
     --border-glass: 1px solid var(--p-dark-border);
 
@@ -154,7 +149,13 @@ button {
     color: inherit;
 }
 
-button:focus-visible {
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[role='button']:focus-visible {
     outline: 2px solid var(--accent-orange, #0ea5e9);
     outline-offset: 2px;
 }
@@ -163,7 +164,7 @@ button:focus-visible {
 .mode-screen {
     position: fixed;
     inset: 0;
-    z-index: 100;
+    z-index: var(--z-sticky);
     transition: opacity 0.4s ease;
     display: none;
     padding: 0 40px 80px 40px;

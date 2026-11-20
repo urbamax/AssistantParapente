@@ -226,10 +226,10 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
                 <button class="action-btn-primary" data-action="openGpsMenu" data-args="'50.7', '1.65'" style="flex: 1; padding: 6px 10px; font-size: 0.8rem; justify-content: center;">
                     <i class="ri-navigation-line"></i> S'y rendre
                 </button>
-                <button class="action-btn-secondary windy-btn" data-action="focusSiteWindy" data-args="'50.7', '1.65', 'Mont Lambert'" style="padding: 6px 8px;" title="Afficher le vent sur le radar">
+                <button type="button" class="action-btn-secondary windy-btn" data-action="focusSiteWindy" data-args="'50.7', '1.65', 'Mont Lambert'" style="padding: 6px 8px;" title="Afficher le vent sur le radar" aria-label="Afficher le vent sur le radar">
                     <i class="ri-windy-line"></i>
                 </button>
-                <button class="action-btn-secondary paraglidable-btn" data-action="focusSiteMap" data-args="'paraglidable', '50.7', '1.65', 'Mont Lambert'" style="padding: 6px 8px;" title="Afficher sur Paraglidable">
+                <button type="button" class="action-btn-secondary paraglidable-btn" data-action="focusSiteMap" data-args="'paraglidable', '50.7', '1.65', 'Mont Lambert'" style="padding: 6px 8px;" title="Afficher sur Paraglidable" aria-label="Afficher sur Paraglidable">
                     <i class="ri-flight-takeoff-line"></i>
                 </button>
             </div>
@@ -301,10 +301,10 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
-                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'arbas-665'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: #fbbf24; cursor: pointer; padding: 0;">
+                        <button type="button" class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'arbas-665'" title="Ajouter aux favoris" aria-label="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: #fbbf24; cursor: pointer; padding: 0;">
                             <i class="ri-star-fill"></i>
                         </button>
-                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'arbas-665'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'arbas-665'" title="Réduire/Agrandir ce site" aria-label="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-subtract-line"></i>
                         </button>
                         <h3 class="site-card-title">Mont Lambert</h3>
@@ -504,10 +504,10 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
-                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'2'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'2'" title="Ajouter aux favoris" aria-label="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-star-line"></i>
                         </button>
-                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'2'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'2'" title="Réduire/Agrandir ce site" aria-label="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-subtract-line"></i>
                         </button>
                         <h3 class="site-card-title">Dune du Pyla</h3>
@@ -615,10 +615,10 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
-                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'3'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'3'" title="Ajouter aux favoris" aria-label="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-star-line"></i>
                         </button>
-                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'3'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'3'" title="Réduire/Agrandir ce site" aria-label="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-add-line"></i>
                         </button>
                         <h3 class="site-card-title">Sans météo</h3>
@@ -654,10 +654,10 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
-                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'4'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'4'" title="Ajouter aux favoris" aria-label="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-star-line"></i>
                         </button>
-                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'4'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'4'" title="Réduire/Agrandir ce site" aria-label="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-subtract-line"></i>
                         </button>
                         <h3 class="site-card-title">Hors couverture</h3>
@@ -758,10 +758,10 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
-                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'3'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'3'" title="Ajouter aux favoris" aria-label="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-star-line"></i>
                         </button>
-                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'3'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'3'" title="Réduire/Agrandir ce site" aria-label="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-subtract-line"></i>
                         </button>
                         <h3 class="site-card-title">Sans météo</h3>
@@ -876,10 +876,10 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
-                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'arbas-665'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: #fbbf24; cursor: pointer; padding: 0;">
+                        <button type="button" class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'arbas-665'" title="Ajouter aux favoris" aria-label="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: #fbbf24; cursor: pointer; padding: 0;">
                             <i class="ri-star-fill"></i>
                         </button>
-                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'arbas-665'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'arbas-665'" title="Réduire/Agrandir ce site" aria-label="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-subtract-line"></i>
                         </button>
                         <h3 class="site-card-title">Mont Lambert</h3>
@@ -1064,10 +1064,10 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
-                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'2'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'2'" title="Ajouter aux favoris" aria-label="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-star-line"></i>
                         </button>
-                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'2'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'2'" title="Réduire/Agrandir ce site" aria-label="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-subtract-line"></i>
                         </button>
                         <h3 class="site-card-title">Dune du Pyla</h3>
@@ -1164,10 +1164,10 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
-                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'3'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'3'" title="Ajouter aux favoris" aria-label="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-star-line"></i>
                         </button>
-                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'3'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'3'" title="Réduire/Agrandir ce site" aria-label="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-add-line"></i>
                         </button>
                         <h3 class="site-card-title">Sans météo</h3>
@@ -1203,10 +1203,10 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
-                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'4'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'4'" title="Ajouter aux favoris" aria-label="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-star-line"></i>
                         </button>
-                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'4'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'4'" title="Réduire/Agrandir ce site" aria-label="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-subtract-line"></i>
                         </button>
                         <h3 class="site-card-title">Hors couverture</h3>
@@ -1312,10 +1312,10 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
-                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'arbas-665'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: #fbbf24; cursor: pointer; padding: 0;">
+                        <button type="button" class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'arbas-665'" title="Ajouter aux favoris" aria-label="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: #fbbf24; cursor: pointer; padding: 0;">
                             <i class="ri-star-fill"></i>
                         </button>
-                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'arbas-665'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'arbas-665'" title="Réduire/Agrandir ce site" aria-label="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-subtract-line"></i>
                         </button>
                         <h3 class="site-card-title">Mont Lambert</h3>
@@ -1500,10 +1500,10 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
-                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'2'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'2'" title="Ajouter aux favoris" aria-label="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-star-line"></i>
                         </button>
-                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'2'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'2'" title="Réduire/Agrandir ce site" aria-label="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-subtract-line"></i>
                         </button>
                         <h3 class="site-card-title">Dune du Pyla</h3>
@@ -1600,10 +1600,10 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
-                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'3'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'3'" title="Ajouter aux favoris" aria-label="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-star-line"></i>
                         </button>
-                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'3'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'3'" title="Réduire/Agrandir ce site" aria-label="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-add-line"></i>
                         </button>
                         <h3 class="site-card-title">Sans météo</h3>
@@ -1639,10 +1639,10 @@ exports[`sites renders (spec 015: identical before and after moving the texts) >
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
-                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'4'" title="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'4'" title="Ajouter aux favoris" aria-label="Ajouter aux favoris" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-star-line"></i>
                         </button>
-                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'4'" title="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'4'" title="Réduire/Agrandir ce site" aria-label="Réduire/Agrandir ce site" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="ri-subtract-line"></i>
                         </button>
                         <h3 class="site-card-title">Hors couverture</h3>

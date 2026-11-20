@@ -121,4 +121,13 @@ describe('watchSiteVersion (version.json, any change of the repository)', () => 
         expect(deleted).toEqual([]);
         Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => true });
     });
+
+    it('marks #app-header and #app-main as inert when the mandatory update banner is shown', async () => {
+        document.body.innerHTML = '<header id="app-header"></header><main id="app-main"></main>';
+        serve('abc', 'def');
+        const check = await watchSiteVersion({ intervalMs: 0 });
+        await check();
+        expect(document.getElementById('app-header').hasAttribute('inert')).toBe(true);
+        expect(document.getElementById('app-main').hasAttribute('inert')).toBe(true);
+    });
 });

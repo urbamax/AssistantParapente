@@ -1390,6 +1390,7 @@ export const FR = Object.freeze({
             new: 'Nouveau',
             toReview: 'À revoir',
             progress: 'Question {index} / {total}',
+            prev: 'Question précédente',
             validate: 'VALIDER',
             next: 'QUESTION SUIVANTE',
             explanation: 'Explication',
@@ -1851,6 +1852,7 @@ export const FR = Object.freeze({
         label: '{alt} m\n{vario} m/s',
         sink: 'Chute',
         climb: 'Ascendance',
+        playPause: 'Lecture / pause',
     }),
     dates: Object.freeze({ dateAtTime: '{date} à {time}' }),
     notification: Object.freeze({

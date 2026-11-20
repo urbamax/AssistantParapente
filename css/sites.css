@@ -646,7 +646,7 @@ body.light-mode .site-tab-btn.active {
     pointer-events: none;
     transition: all 0.15s ease;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    z-index: 100;
+    z-index: var(--z-sticky);
 }
 
 .timeline-hour-dot:hover::after {
@@ -1053,7 +1053,7 @@ body.light-mode .leaflet-tile-pane {
     border: var(--border-glass);
     backdrop-filter: blur(10px);
     position: relative;
-    z-index: 110;
+    z-index: var(--z-sticky);
 }
 
 .map-toggles-left {
@@ -1375,7 +1375,7 @@ body.light-mode .isofronts-footer {
     top: calc(var(--header-height, 100px) + 10px);
     align-self: flex-start;
     width: 100%;
-    z-index: 990;
+    z-index: var(--z-dropdown);
     background: var(--bg-card);
     border: var(--border-glass);
     padding: 16px 24px;

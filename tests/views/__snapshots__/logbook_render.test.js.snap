@@ -87,13 +87,13 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             </div>
                         </div>
                         <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid rgba(0,0,0,0.05); padding-top:8px; margin-top: auto;">
-                            <button class="action-btn" data-action="editEquipment" data-args="'e1'" title="Modifier" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-orange);">
+                            <button type="button" class="action-btn" data-action="editEquipment" data-args="'e1'" title="Modifier" aria-label="Modifier" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-orange);">
                                 ✏️
                             </button>
-                            <button class="action-btn" data-action="toggleEquipmentStatus" data-args="'e1'" title="Archiver" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#6b7280;">
+                            <button type="button" class="action-btn" data-action="toggleEquipmentStatus" data-args="'e1'" title="Archiver" aria-label="Archiver" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#6b7280;">
                                 <i class="ri-archive-line"></i>
                             </button>
-                            <button class="action-btn" data-action="deleteEquipment" data-args="'e1'" title="Supprimer définitivement" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#ef4444;">
+                            <button type="button" class="action-btn" data-action="deleteEquipment" data-args="'e1'" title="Supprimer définitivement" aria-label="Supprimer définitivement" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#ef4444;">
                                 🗑️
                             </button>
                         </div>
@@ -124,13 +124,13 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             </div>
                         </div>
                         <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid rgba(0,0,0,0.05); padding-top:8px; margin-top: auto;">
-                            <button class="action-btn" data-action="editEquipment" data-args="'e2'" title="Modifier" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-orange);">
+                            <button type="button" class="action-btn" data-action="editEquipment" data-args="'e2'" title="Modifier" aria-label="Modifier" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-orange);">
                                 ✏️
                             </button>
-                            <button class="action-btn" data-action="toggleEquipmentStatus" data-args="'e2'" title="Archiver" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#6b7280;">
+                            <button type="button" class="action-btn" data-action="toggleEquipmentStatus" data-args="'e2'" title="Archiver" aria-label="Archiver" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#6b7280;">
                                 <i class="ri-archive-line"></i>
                             </button>
-                            <button class="action-btn" data-action="deleteEquipment" data-args="'e2'" title="Supprimer définitivement" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#ef4444;">
+                            <button type="button" class="action-btn" data-action="deleteEquipment" data-args="'e2'" title="Supprimer définitivement" aria-label="Supprimer définitivement" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#ef4444;">
                                 🗑️
                             </button>
                         </div>
@@ -161,13 +161,13 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                             </div>
                         </div>
                         <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid rgba(0,0,0,0.05); padding-top:8px; margin-top: auto;">
-                            <button class="action-btn" data-action="editEquipment" data-args="'e3'" title="Modifier" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-orange);">
+                            <button type="button" class="action-btn" data-action="editEquipment" data-args="'e3'" title="Modifier" aria-label="Modifier" style="background:none; border:none; cursor:pointer; font-size:1rem; color:var(--accent-orange);">
                                 ✏️
                             </button>
-                            <button class="action-btn" data-action="toggleEquipmentStatus" data-args="'e3'" title="Désarchiver" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#6b7280;">
+                            <button type="button" class="action-btn" data-action="toggleEquipmentStatus" data-args="'e3'" title="Désarchiver" aria-label="Désarchiver" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#6b7280;">
                                 <i class="ri-arrow-go-back-line"></i>
                             </button>
-                            <button class="action-btn" data-action="deleteEquipment" data-args="'e3'" title="Supprimer définitivement" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#ef4444;">
+                            <button type="button" class="action-btn" data-action="deleteEquipment" data-args="'e3'" title="Supprimer définitivement" aria-label="Supprimer définitivement" style="background:none; border:none; cursor:pointer; font-size:1rem; color:#ef4444;">
                                 🗑️
                             </button>
                         </div>
@@ -534,10 +534,10 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                         <div class="session-date">20/09/2026 à 14:30</div>
                         <div style="display: flex; gap: 8px;">
-                            <button class="edit-btn" data-action="editEntry" data-args="f1" title="Modifier" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
+                            <button type="button" class="edit-btn" data-action="editEntry" data-args="f1" title="Modifier" aria-label="Modifier" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
                                 <i class="ri-edit-line"></i>
                             </button>
-                            <button class="delete-btn" data-action="deleteEntry" data-args="f1" title="Supprimer" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
+                            <button type="button" class="delete-btn" data-action="deleteEntry" data-args="f1" title="Supprimer" aria-label="Supprimer" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
                                 <i class="ri-delete-bin-line"></i>
                             </button>
                         </div>
@@ -630,10 +630,10 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                         <div class="session-date">18/09/2026 à 18:00</div>
                         <div style="display: flex; gap: 8px;">
-                            <button class="edit-btn" data-action="editEntry" data-args="g1" title="Modifier" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
+                            <button type="button" class="edit-btn" data-action="editEntry" data-args="g1" title="Modifier" aria-label="Modifier" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
                                 <i class="ri-edit-line"></i>
                             </button>
-                            <button class="delete-btn" data-action="deleteEntry" data-args="g1" title="Supprimer" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
+                            <button type="button" class="delete-btn" data-action="deleteEntry" data-args="g1" title="Supprimer" aria-label="Supprimer" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
                                 <i class="ri-delete-bin-line"></i>
                             </button>
                         </div>
@@ -682,10 +682,10 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                         <div class="session-date">10/09/2026 à 11:00</div>
                         <div style="display: flex; gap: 8px;">
-                            <button class="edit-btn" data-action="editEntry" data-args="n1" title="Modifier" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
+                            <button type="button" class="edit-btn" data-action="editEntry" data-args="n1" title="Modifier" aria-label="Modifier" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
                                 <i class="ri-edit-line"></i>
                             </button>
-                            <button class="delete-btn" data-action="deleteEntry" data-args="n1" title="Supprimer" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
+                            <button type="button" class="delete-btn" data-action="deleteEntry" data-args="n1" title="Supprimer" aria-label="Supprimer" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
                                 <i class="ri-delete-bin-line"></i>
                             </button>
                         </div>

@@ -533,10 +533,10 @@ export class SitesListBase extends SitesMapBase {
             <div class="site-card-header site-card-header-row">
                 <div class="site-info site-info-row">
                     <div class="site-title-row">
-                        <button class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'${site.id}'" title="${tt('card.favorite')}" style="background: none; border: none; font-size: 1.4rem; color: ${starColor}; cursor: pointer; padding: 0;">
+                        <button type="button" class="favorite-toggle-btn" data-action="toggleFavorite" data-args="'${site.id}'" title="${tt('card.favorite')}" aria-label="${tt('card.favorite')}" style="background: none; border: none; font-size: 1.4rem; color: ${starColor}; cursor: pointer; padding: 0;">
                             <i class="${starIcon}"></i>
                         </button>
-                        <button class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'${site.id}'" title="${tt('card.minimize')}" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
+                        <button type="button" class="minimize-toggle-btn" data-action="toggleMinimize" data-args="'${site.id}'" title="${tt('card.minimize')}" aria-label="${tt('card.minimize')}" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer; padding: 0;">
                             <i class="${minIcon}"></i>
                         </button>
                         <h3 class="site-card-title">${escapeHTML(site.nom)}</h3>

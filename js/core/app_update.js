@@ -66,6 +66,8 @@ function showUpdateBanner() {
     });
 
     banner.append(reloadBtn);
+    document.getElementById('app-header')?.setAttribute('inert', '');
+    document.getElementById('app-main')?.setAttribute('inert', '');
     document.body.appendChild(banner);
     reloadBtn.focus();
 }

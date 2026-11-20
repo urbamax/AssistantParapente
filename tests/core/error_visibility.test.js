@@ -89,6 +89,20 @@ describe('bannière rouge des erreurs globales', () => {
             }),
         );
         await vi.waitFor(() => expect(reloadSpy).toHaveBeenCalledTimes(2));
+
+        // Offline guard: does not delete caches when navigator.onLine === false
+        sessionStorage.removeItem('ap_stale_module_reloaded');
+        deleteMock.mockClear();
+        Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => false });
+        const rejEvent = new Event('unhandledrejection');
+        Object.assign(rejEvent, {
+            reason: new Error("SyntaxError: Importing binding name 'baz' is not found."),
+        });
+        window.dispatchEvent(rejEvent);
+        await vi.waitFor(() => expect(reloadSpy).toHaveBeenCalledTimes(3));
+        expect(deleteMock).not.toHaveBeenCalled();
+
+        Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => true });
         vi.unstubAllGlobals();
     });
 });
