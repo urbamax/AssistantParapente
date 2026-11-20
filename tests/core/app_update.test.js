@@ -29,21 +29,20 @@ describe('initAppUpdateNotifier', () => {
         expect(document.getElementById('app-update-banner')).toBeNull();
     });
 
-    it('shows one banner when a new worker takes over an already-controlled page', () => {
+    it('shows one mandatory modal overlay with only the "Mettre à jour" button when a new worker takes over', () => {
         const listeners = stubServiceWorker({});
         initAppUpdateNotifier(Promise.resolve(null));
         listeners.controllerchange();
         listeners.controllerchange();
-        expect(document.querySelectorAll('#app-update-banner')).toHaveLength(1);
-        expect(document.getElementById('app-update-banner').textContent).toContain('Nouvelle version disponible');
-    });
 
-    it('lets the user dismiss the banner without reloading', () => {
-        const listeners = stubServiceWorker({});
-        initAppUpdateNotifier(Promise.resolve(null));
-        listeners.controllerchange();
-        document.querySelector('.app-update-dismiss').click();
-        expect(document.getElementById('app-update-banner')).toBeNull();
+        const overlay = document.getElementById('app-update-banner');
+        expect(document.querySelectorAll('#app-update-banner')).toHaveLength(1);
+        expect(overlay.getAttribute('role')).toBe('alertdialog');
+        expect(overlay.getAttribute('aria-modal')).toBe('true');
+        expect(overlay.textContent.trim()).toBe('Mettre à jour');
+        expect(overlay.textContent).not.toContain('Nouvelle version disponible');
+        expect(overlay.querySelector('.app-update-dismiss')).toBeNull();
+        expect(document.activeElement).toBe(overlay.querySelector('.app-update-reload'));
     });
 });
 

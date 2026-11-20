@@ -48,10 +48,9 @@ function showUpdateBanner() {
 
     const banner = document.createElement('div');
     banner.id = 'app-update-banner';
-    banner.setAttribute('role', 'status');
-
-    const label = document.createElement('span');
-    label.textContent = t('update.available');
+    banner.setAttribute('role', 'alertdialog');
+    banner.setAttribute('aria-modal', 'true');
+    banner.setAttribute('aria-label', t('update.reload'));
 
     const reloadBtn = document.createElement('button');
     reloadBtn.type = 'button';
@@ -59,15 +58,9 @@ function showUpdateBanner() {
     reloadBtn.textContent = t('update.reload');
     reloadBtn.addEventListener('click', () => reloadWithFreshFiles());
 
-    const dismissBtn = document.createElement('button');
-    dismissBtn.type = 'button';
-    dismissBtn.className = 'app-update-dismiss';
-    dismissBtn.setAttribute('aria-label', t('update.later'));
-    dismissBtn.textContent = '×';
-    dismissBtn.addEventListener('click', () => banner.remove());
-
-    banner.append(label, reloadBtn, dismissBtn);
+    banner.append(reloadBtn);
     document.body.appendChild(banner);
+    reloadBtn.focus();
 }
 
 /**
