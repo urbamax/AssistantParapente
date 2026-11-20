@@ -4,11 +4,8 @@ import AccessService, { applyRoleVisibility } from '../../js/services/access_ser
 
 // Le mode d'emploi ne parle de la météo calculée (js/services/access_service.js, rôle « beta »)
 // qu'aux comptes qui y ont droit : pour les autres, ni onglet, ni section, ni phrase.
-const INDEX = readFileSync('index.html', 'utf8');
-const MANUAL = INDEX.slice(
-    INDEX.indexOf('<dialog id="manual-modal"'),
-    INDEX.indexOf('</dialog>', INDEX.indexOf('<dialog id="manual-modal"')),
-);
+const MANUAL_FILE = readFileSync('components/manual_modal.html', 'utf8');
+const MANUAL = MANUAL_FILE.slice(0, MANUAL_FILE.lastIndexOf('</dialog>'));
 
 // Mots qui n'existent que dans la partie météo calculée (verdict, réglages, modèles, créneaux).
 const CALCULATED_WEATHER =
