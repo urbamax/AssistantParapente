@@ -118,6 +118,13 @@ const SCREENS = [
         dataValues: ['Inconnu', '143,9875 MHz'],
         minKeys: 20,
     },
+    {
+        file: 'js/views/safety_ice.js',
+        spec: '029',
+        prefix: 'ice.',
+        dataValues: ['Inconnu', '112'],
+        minKeys: 50,
+    },
 ];
 
 const resolves = (key) => typeof key.split('.').reduce((node, part) => node?.[part], FR) === 'string';
