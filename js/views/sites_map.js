@@ -503,7 +503,9 @@ export class SitesMapBase extends BaseView {
             } else if (mode === 'windfinder') {
                 url = `https://fr.windfinder.com/#11/${lat}/${lon}`;
             } else if (mode === 'spotair') {
-                url = extraId ? `https://www.spotair.mobi/spot/ffvl/${extraId}` : `https://www.spotair.mobi/`;
+                url = extraId
+                    ? `https://www.spotair.mobi/spot/ffvl/${encodeURIComponent(extraId)}`
+                    : `https://www.spotair.mobi/`;
             } else if (mode === 'paraglidingmap') {
                 url = `https://www.paraglidingmap.com/app/?lat=${lat}&lng=${lon}&zoom=11`;
             }
@@ -676,7 +678,7 @@ export class SitesMapBase extends BaseView {
                 label: tl('maps.labels.spotair'),
                 icon: 'ri-radar-line',
                 cls: 'sa-btn',
-                url: 'https://www.spotair.mobi/spot/ffvl/' + extraId,
+                url: 'https://www.spotair.mobi/spot/ffvl/' + encodeURIComponent(extraId),
             });
         }
 
@@ -729,10 +731,7 @@ export class SitesMapBase extends BaseView {
         if (grid) {
             grid.innerHTML = links
                 .map(function (link) {
-                    if (link.onclick) {
-                        return `<a href="#" class="external-link-btn ${link.cls} more-map-link" ${link.onclick}><i class="${link.icon}"></i> ${link.label}</a>`;
-                    }
-                    return `<a href="${link.url}" target="_blank" rel="noopener noreferrer" class="external-link-btn ${link.cls} more-map-link" data-action="closeMoreMapsDropdown"><i class="${link.icon}"></i> ${link.label}</a>`;
+                    return `<a href="${escapeHTML(link.url)}" target="_blank" rel="noopener noreferrer" class="external-link-btn ${link.cls} more-map-link" data-action="closeMoreMapsDropdown"><i class="${link.icon}"></i> ${link.label}</a>`;
                 })
                 .join('');
         }
