@@ -114,7 +114,12 @@ test.describe('Sauvegarde locale sans compte', () => {
     });
 
     test('does not overwrite anything when the user cancels the confirmation', async ({ page }) => {
-        page.on('dialog', (dialog) => dialog.dismiss());
+        const dialogDismissed = new Promise((resolve) => {
+            page.once('dialog', async (dialog) => {
+                await dialog.dismiss();
+                resolve();
+            });
+        });
         await openSyncSpace(page);
 
         await page.locator('#backup-import-input').setInputFiles({
@@ -128,7 +133,7 @@ test.describe('Sauvegarde locale sans compte', () => {
             ),
         });
 
-        await page.waitForTimeout(300);
+        await dialogDismissed;
         const logbook = await page.evaluate(() => JSON.parse(localStorage.getItem('tp_logbook_data')));
         expect(logbook).toEqual([FLIGHT]);
     });
