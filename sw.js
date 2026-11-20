@@ -72,6 +72,7 @@ const CRITICAL_ASSETS = [
     './components/header.html',
     './components/footer.html',
     './components/manual_modal.html',
+    './components/legal_modals.html',
     './css/fonts.css',
     './vendor/inter/inter-latin.woff2',
     './vendor/remixicon-3.5.0/remixicon.css',

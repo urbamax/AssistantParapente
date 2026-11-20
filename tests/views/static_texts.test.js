@@ -6,7 +6,13 @@ import { applyStaticTexts, STATIC_TEXT_ATTRIBUTES } from '../../js/utils/i18n_do
 
 // Spec 026 (contrainte « Language », écart d'audit C8) : chaque texte fixe de index.html et des
 // composants porte une clé du catalogue, et le texte affiché est identique au catalogue.
-const FILES = ['index.html', 'components/header.html', 'components/footer.html', 'components/manual_modal.html'];
+const FILES = [
+    'index.html',
+    'components/header.html',
+    'components/footer.html',
+    'components/manual_modal.html',
+    'components/legal_modals.html',
+];
 const SKIPPED = 'script, style, svg, noscript, title, template';
 
 /** Fichier HTML lu sans rien charger ni exécuter (un <template> n'exécute aucun script). */

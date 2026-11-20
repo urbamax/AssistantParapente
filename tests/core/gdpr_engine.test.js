@@ -98,4 +98,27 @@ describe('GdprEngine', () => {
         localStorage.setItem(CONSENT_KEY, '{corrupt');
         expect(() => GdprEngine.init()).not.toThrow();
     });
+
+    it('lazily fetches and injects components/legal_modals.html when opening privacy or legal modal', async () => {
+        const legalHtml = `
+            <dialog id="gdpr-privacy-modal" style="display: none"></dialog>
+            <dialog id="gdpr-legal-modal" style="display: none"></dialog>`;
+        const fetchMock = vi.fn().mockResolvedValue({
+            ok: true,
+            text: vi.fn().mockResolvedValue(legalHtml),
+        });
+        vi.stubGlobal('fetch', fetchMock);
+
+        await GdprEngine.showModal('gdpr-legal-modal');
+
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        expect(fetchMock).toHaveBeenCalledWith('./components/legal_modals.html');
+        expect(document.getElementById('gdpr-legal-modal').classList.contains('active')).toBe(true);
+
+        // Opening the privacy modal reuses the already-injected DOM without re-fetching
+        await GdprEngine.showModal('gdpr-privacy-modal');
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        expect(document.getElementById('gdpr-privacy-modal').classList.contains('active')).toBe(true);
+        vi.unstubAllGlobals();
+    });
 });
