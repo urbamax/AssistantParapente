@@ -15,6 +15,8 @@ import { t } from '../utils/i18n.js';
 import { escapeHTML } from '../core/security.js';
 const Map3DComponent = {
     activeInterval: null,
+    activeMap: null,
+    activeOverlay: null,
     _smoothProtocolRegistered: false,
 
     // --- Configuration ---------------------------------------------------------
@@ -169,7 +171,7 @@ const Map3DComponent = {
             return;
         }
 
-        this.clearPlayback();
+        this.destroy();
         this._registerSmoothTerrainProtocol();
         container.innerHTML = this._playerHtml(sessionId, traceGps.length - 1);
 
@@ -192,6 +194,7 @@ const Map3DComponent = {
                 bearing: 0,
                 interactive: true,
             });
+            this.activeMap = map3D;
         } catch (err) {
             console.error('[Map3D] Échec de création de la carte :', err);
             container.innerHTML = this._errorHtml(t('map3d.initError'));
@@ -278,6 +281,7 @@ const Map3DComponent = {
                 interleaved: true,
                 layers: this._buildDeckLayers(traceGps, pathSegments, varioSeries, parseInt(slider.value, 10)),
             });
+            this.activeOverlay = deckOverlay;
             map3D.addControl(deckOverlay);
 
             updatePosition();
@@ -580,18 +584,20 @@ const Map3DComponent = {
 
     // --- Markup --------------------------------------------------------------------
     _playerHtml: function (sessionId, maxIndex) {
+        const safeId = escapeHTML(String(sessionId ?? ''));
+        const safeMax = Number.isFinite(Number(maxIndex)) ? Number(maxIndex) : 0;
         const gradientStops = this._varioLegendGradient();
         return `
-            <div id="player-3d-wrapper-${sessionId}" style="display: flex; flex-direction: column; width: 100%; height: 100%; background: var(--bg-surface);">
+            <div id="player-3d-wrapper-${safeId}" style="display: flex; flex-direction: column; width: 100%; height: 100%; background: var(--bg-surface);">
                 <div style="position: relative; flex: 1; min-height: 400px; width: 100%; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-light);">
-                    <div id="map-3d-container-${sessionId}" style="position: absolute; top: 0; left: 0; height: 100%; width: 100%; background: #dde3e8;"></div>
+                    <div id="map-3d-container-${safeId}" style="position: absolute; top: 0; left: 0; height: 100%; width: 100%; background: #dde3e8;"></div>
                 </div>
                 <div style="padding: 10px; background: var(--bg-card); display: flex; flex-direction: column; gap: 10px; margin-top: 10px; border-radius: var(--radius-md);">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <button id="play-btn-${sessionId}" class="action-btn-primary" style="padding: 4px 12px; min-width: 60px;"><i class="ri-play-fill"></i></button>
-                        <input type="range" id="slider-${sessionId}" min="0" max="${maxIndex}" value="0" style="flex: 1; cursor: pointer;">
+                        <button type="button" id="play-btn-${safeId}" class="action-btn-primary" style="padding: 4px 12px; min-width: 60px;"><i class="ri-play-fill"></i></button>
+                        <input type="range" id="slider-${safeId}" min="0" max="${safeMax}" value="0" style="flex: 1; cursor: pointer;">
                     </div>
-                    <div id="info-${sessionId}" style="font-size: 0.85rem; font-family: monospace; color: var(--text-secondary); text-align: center;">
+                    <div id="info-${safeId}" style="font-size: 0.85rem; font-family: monospace; color: var(--text-secondary); text-align: center;">
                         ${escapeHTML(t('map3d.timeEmpty'))}
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px; font-size: 0.7rem; color: var(--text-secondary); justify-content: center;">
@@ -624,6 +630,26 @@ const Map3DComponent = {
         if (this.activeInterval) {
             clearInterval(this.activeInterval);
             this.activeInterval = null;
+        }
+    },
+
+    destroy: function () {
+        this.clearPlayback();
+        if (this.activeOverlay) {
+            try {
+                this.activeOverlay.finalize?.();
+            } catch {
+                // ignore cleanup errors
+            }
+            this.activeOverlay = null;
+        }
+        if (this.activeMap) {
+            try {
+                this.activeMap.remove?.();
+            } catch {
+                // ignore cleanup errors
+            }
+            this.activeMap = null;
         }
     },
 };

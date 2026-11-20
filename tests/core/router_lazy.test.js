@@ -227,6 +227,37 @@ describe('AppRouter avec un écran chargé à la demande', () => {
         expect(document.body.textContent).toContain('chunk offline manquant');
         expect(document.querySelector('[data-action="reloadApp"]')).not.toBeNull();
     });
+
+    it('n’écrase pas window.history si une nouvelle navigation démarre pendant un view.mount() asynchrone', async () => {
+        const [slowMountMode, fastMode] = [newMode(), newMode()];
+        addScreen(slowMountMode);
+        addScreen(fastMode);
+
+        let resolveSlowMount;
+        const slowMountView = makeView({
+            mount: vi.fn(
+                () =>
+                    new Promise((resolve) => {
+                        resolveSlowMount = resolve;
+                    }),
+            ),
+        });
+        const fastView = makeView();
+
+        AppRouter.register(slowMountMode, slowMountView);
+        AppRouter.register(fastMode, fastView);
+
+        const slowNav = AppRouter.navigate(slowMountMode);
+        await vi.waitFor(() => expect(slowMountView.mount).toHaveBeenCalledTimes(1));
+
+        const fastNav = AppRouter.navigate(fastMode);
+        await fastNav;
+        resolveSlowMount();
+        await slowNav;
+
+        const currentUrl = new URL(window.location.href);
+        expect(currentUrl.searchParams.get('mode')).toBe(fastMode);
+    });
 });
 
 describe('viewProxy', () => {

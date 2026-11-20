@@ -20,7 +20,13 @@ import { tt, tl } from './logbook_strings.js';
 import { LogbookStatsBase } from './logbook_stats.js';
 
 // Le visualiseur 3D (28 Ko) ne sert qu'au clic sur « Voir la trace » : il est téléchargé à ce moment-là.
-const loadMap3D = () => import('../components/map_3d.js').then((m) => m.default);
+let _loadedMap3D = null;
+const loadMap3D = () =>
+    import('../components/map_3d.js').then((m) => {
+        _loadedMap3D = m.default;
+        return m.default;
+    });
+export const destroyLoadedMap3D = () => _loadedMap3D?.destroy?.();
 
 export class LogbookHistoryBase extends LogbookStatsBase {
     constructor() {
@@ -471,7 +477,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
 
         if (container.style.display === 'block') {
             container.style.display = 'none';
-            (await loadMap3D()).clearPlayback();
+            (await loadMap3D()).destroy();
             return;
         }
 
