@@ -241,6 +241,7 @@ export const FR_HTML = Object.freeze({
         annuler: 'Annuler',
     }),
     common: Object.freeze({
+        fermer: 'Fermer',
         espaceSynchro: 'ESPACE SYNCHRO',
         theorie: 'Théorie',
         qcm: 'QCM',
