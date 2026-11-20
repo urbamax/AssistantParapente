@@ -80,7 +80,7 @@ test('historique des examens : 4 colonnes desktop, 3 lignes visibles et aucune e
     // Balayage de largeurs critique (bureau -> tablette -> mobile -> bureau) pour WebKit/Safari
     for (const width of [900, 768, 390, 1440]) {
         await page.setViewportSize({ width, height: 900 });
-        await page.waitForTimeout(80);
+        await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
     }
 
     expect(pageErrors).toEqual([]);

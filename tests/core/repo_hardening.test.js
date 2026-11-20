@@ -111,3 +111,12 @@ describe('configuration nginx de référence', () => {
         expect(conf).toMatch(/\/version\.json\s+"no-store"/);
     });
 });
+
+describe('tests E2E sans attente arbitraire (waitForTimeout)', () => {
+    const e2eSpecs = readdirSync('tests/e2e').filter((f) => f.endsWith('.spec.js'));
+
+    it.each(e2eSpecs)('%s n’utilise aucun waitForTimeout()', (file) => {
+        const text = read(`tests/e2e/${file}`);
+        expect(text).not.toMatch(/\bwaitForTimeout\s*\(/);
+    });
+});

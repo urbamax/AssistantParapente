@@ -54,7 +54,6 @@ async function openSitesAndSearch(page, name) {
     const searchInput = page.locator('#site-search');
     await expect(searchInput).toBeVisible();
     await searchInput.fill(name);
-    await page.waitForTimeout(500); // debounce
     const card = page.locator('.site-card', { hasText: name }).first();
     await expect(card).toBeVisible();
     // Les sites non favoris sont réduits par défaut : on déplie la carte pour voir sa météo.
@@ -112,7 +111,6 @@ test.describe('E2E - Sites Flow', () => {
 
         // Search for AUTEUIL
         await searchInput.fill('AUTEUIL');
-        await page.waitForTimeout(500); // debounce
 
         // Verify that AUTEUIL is in the list
         const sitesList = page.locator('#sites-list-container');
@@ -123,7 +121,7 @@ test.describe('E2E - Sites Flow', () => {
         const filterBtnN = page.locator('.wind-compass-btn[data-value="N"]');
         if (await filterBtnN.isVisible()) {
             await filterBtnN.click();
-            await page.waitForTimeout(500);
+            await expect(filterBtnN).toHaveClass(/\bactive\b/);
             // We just ensure the UI didn't crash
             await expect(sitesList).toBeVisible();
         }
@@ -293,7 +291,7 @@ test.describe('E2E - Sites Flow', () => {
         // fois la réponse 429 reçue, donc on avance l'horloge par petits pas en laissant la page réagir.
         for (let elapsed = 0; elapsed < 20000; elapsed += 1000) {
             await page.clock.runFor(1000);
-            await page.waitForTimeout(50);
+            await page.evaluate(() => new Promise((r) => requestAnimationFrame(r)));
         }
         const failed = page
             .locator('.site-card:not(.minimized)', { hasText: 'AUTEUIL' })
@@ -383,6 +381,8 @@ test.describe('E2E - Sites Flow', () => {
         if (await gdprBanner.isVisible()) await page.locator('[data-action="refuseAll"]').first().click();
         await page.locator('.nav-menu-btn[data-target="SITES"]').click();
         await expect(page.locator('#sites-map-canvas')).toBeVisible();
+        await page.waitForFunction(async () => Boolean((await import('/js/views/sites.js')).default?.state?.map));
+        await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
     }
     const mapState = (page) =>
         page.evaluate(async () => {
@@ -400,10 +400,9 @@ test.describe('E2E - Sites Flow', () => {
 
     test('Spec 004 : sans interaction, le rayon reste à 50 km et la carte sur Boulogne-sur-Mer', async ({ page }) => {
         await openSitesWithoutPosition(page, null);
-        await page.waitForTimeout(5000);
         await expect(page.locator('#radius-val-label')).toHaveText('50 km');
         await page.setViewportSize({ width: 900, height: 700 });
-        await page.waitForTimeout(3000);
+        await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
         await expect(page.locator('#radius-val-label')).toHaveText('50 km');
         const state = await mapState(page);
         expect(state.centerKm).toBeLessThan(5);
@@ -411,7 +410,6 @@ test.describe('E2E - Sites Flow', () => {
 
     test('Spec 004 : un favori lointain ne fait pas dézoomer la carte', async ({ page }) => {
         await openSitesWithoutPosition(page, { favoriteSites: ['sorgia-601'] });
-        await page.waitForTimeout(3000);
         const state = await mapState(page);
         expect(state.centerKm).toBeLessThan(5);
         expect(state.north45).toBe(true);
@@ -498,7 +496,7 @@ test.describe('E2E - Sites sans le rôle « owner »', () => {
         await expect(page.locator('#sites-screen')).not.toHaveClass(/active/);
         await expect(page.locator('#welcome-screen')).toHaveClass(/active/);
 
-        await page.waitForTimeout(800);
+        await page.waitForLoadState('networkidle');
         expect(openMeteoCalls).toEqual([]);
     });
 });
