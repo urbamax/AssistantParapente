@@ -69,7 +69,7 @@
 
     <body>
         <!-- Top Controls (Level Select & Theme) -->
-        <div id="app-header" class="top-controls"></div>
+        <div id="app-header" class="top-controls" role="banner"></div>
 
         <div id="qcm-setup-screen" class="mode-screen">
             <div class="course-container">
@@ -112,7 +112,7 @@
                     <!-- MODE SELECTION -->
                     <div class="setup-group">
                         <div class="mode-toggle-container">
-                            <button data-i18n="qcmSetupScreen.entrainement"
+                            <button type="button" data-i18n="qcmSetupScreen.entrainement"
                                 id="mode-training"
                                 class="mode-toggle-btn active"
                                 data-action="setQcmMode"
@@ -120,7 +120,7 @@
                             >
                                 <i class="ri-edit-circle-line"></i> Entraînement
                             </button>
-                            <button data-i18n="qcmSetupScreen.examen"
+                            <button type="button" data-i18n="qcmSetupScreen.examen"
                                 id="mode-exam"
                                 class="mode-toggle-btn"
                                 data-action="setQcmMode"
@@ -128,7 +128,7 @@
                             >
                                 <i class="ri-timer-flash-line"></i> Examen
                             </button>
-                            <button data-i18n="qcmSetupScreen.revision"
+                            <button type="button" data-i18n="qcmSetupScreen.revision"
                                 id="mode-revision"
                                 class="mode-toggle-btn"
                                 data-action="setQcmMode"
@@ -136,7 +136,7 @@
                             >
                                 <i class="ri-refresh-line"></i> Révision
                             </button>
-                            <button data-i18n="qcmSetupScreen.perfectionnement"
+                            <button type="button" data-i18n="qcmSetupScreen.perfectionnement"
                                 id="mode-mastery"
                                 class="mode-toggle-btn"
                                 data-action="setQcmMode"
@@ -203,11 +203,11 @@
                     </div>
 
                     <!-- START BUTTON -->
-                    <button id="qcm-start-btn" data-i18n="qcmSetupScreen.commencer" class="next-btn next-btn-large" data-action="startQcmSession" aria-describedby="mastery-target-hint">
+                    <button type="button" id="qcm-start-btn" data-i18n="qcmSetupScreen.commencer" class="next-btn next-btn-large" data-action="startQcmSession" aria-describedby="mastery-target-hint">
                         COMMENCER <i class="ri-arrow-right-line"></i>
                     </button>
 
-                    <button data-i18n="qcmSetupScreen.consulterLaBanqueDe" class="bank-btn" data-action="showQcmBank">
+                    <button type="button" data-i18n="qcmSetupScreen.consulterLaBanqueDe" class="bank-btn" data-action="showQcmBank">
                         <i class="ri-book-2-line"></i> Consulter la Banque de Questions
                     </button>
                 </div>
@@ -457,7 +457,7 @@
                         <input data-i18n-placeholder="libraryScreen.placeholderRechercherUnDossier" type="search" id="library-search" placeholder="Rechercher un dossier, une affiche..." />
                     </search>
                     <div class="sort-controls">
-                        <button
+                        <button type="button"
                             id="sort-TITLE"
                             class="sort-btn"
                             data-action="setLibrarySort"
@@ -465,7 +465,7 @@
                         >
                             A-Z
                         </button>
-                        <button data-i18n="libraryScreen.parCategorie"
+                        <button type="button" data-i18n="libraryScreen.parCategorie"
                             id="sort-CATEGORY"
                             class="sort-btn active"
                             data-action="setLibrarySort"
@@ -489,7 +489,7 @@
         <div id="course-screen" class="mode-screen">
             <div class="course-container">
                 <div class="course-controls-top">
-                    <button data-i18n="courseScreen.retourALaBibliotheque" class="action-btn" data-action="goBack">
+                    <button type="button" data-i18n="courseScreen.retourALaBibliotheque" class="action-btn" data-action="goBack">
                         <i class="ri-arrow-left-line"></i> Retour à la bibliothèque
                     </button>
                     <div class="course-actions-group" id="course-actions-bar">
@@ -514,7 +514,7 @@
                     <!-- Map Toggle Tabs & Fullscreen -->
                     <div class="map-toggles-container">
                         <div class="map-toggles-left">
-                            <button
+                            <button type="button"
                                 id="map-toggle-leaflet"
                                 class="action-btn-primary map-toggle-btn"
                                 data-action="switchMapMode"
@@ -522,7 +522,7 @@
                             >
                                 <i class="ri-map-2-line"></i> <span data-i18n="sitesMapView.cartographie">Cartographie</span>
                             </button>
-                            <button
+                            <button type="button"
                                 id="map-toggle-windy"
                                 class="action-btn-secondary map-toggle-btn"
                                 data-action="switchMapMode"
@@ -531,7 +531,7 @@
                             >
                                 <i class="ri-windy-line"></i> <span data-i18n="sitesMapView.windy">Windy</span>
                             </button>
-                            <button
+                            <button type="button"
                                 id="map-toggle-meteoparapente"
                                 class="action-btn-secondary map-toggle-btn"
                                 data-action="switchMapMode"
@@ -540,7 +540,7 @@
                             >
                                 <i class="ri-temp-hot-line"></i> <span data-i18n="sitesMapView.meteoP">Météo-P.</span>
                             </button>
-                            <button
+                            <button type="button"
                                 id="map-toggle-paraglidingearth"
                                 class="action-btn-secondary map-toggle-btn"
                                 data-action="switchMapMode"
@@ -549,7 +549,7 @@
                             >
                                 <i class="ri-earth-line"></i> <span data-i18n="sitesMapView.pgEarth">PG Earth</span>
                             </button>
-                            <button
+                            <button type="button"
                                 id="map-toggle-paraglidable"
                                 class="action-btn-secondary map-toggle-btn"
                                 data-action="switchMapMode"
@@ -558,7 +558,7 @@
                             >
                                 <i class="ri-windy-line"></i> <span data-i18n="sitesMapView.paraglidable">Paraglidable</span>
                             </button>
-                            <button
+                            <button type="button"
                                 id="map-toggle-isofronts"
                                 class="action-btn-secondary map-toggle-btn"
                                 data-action="switchMapMode"
@@ -568,7 +568,7 @@
                                 <i class="ri-cloud-line"></i> <span data-i18n="sitesMapView.frontsIsobares">Fronts &amp; Isobares</span>
                             </button>
 
-                            <button
+                            <button type="button"
                                 id="map-toggle-more"
                                 class="action-btn-secondary map-toggle-btn map-toggle-more-btn"
                                 data-action="openMoreMapsDropdown"
@@ -579,7 +579,7 @@
                             </button>
                         </div>
                         <div class="map-toggles-right" style="display: flex; gap: 8px; align-items: center">
-                            <button
+                            <button type="button"
                                 id="map-toggle-fullscreen"
                                 class="action-btn-secondary map-toggle-btn"
                                 data-action="toggleFullscreen"
@@ -588,7 +588,7 @@
                                 <i class="ri-fullscreen-line"></i> <span data-i18n="mapToggleFullscreen.pleinEcran">Plein écran</span>
                             </button>
                             <div class="filter-dropdown-container" id="dropdown-map-settings">
-                                <button data-i18n-title="sitesMapView.titleCartesActives"
+                                <button type="button" data-i18n-title="sitesMapView.titleCartesActives"
                                     class="action-btn-secondary map-toggle-btn"
                                     data-action="toggleDropdown"
                                     data-args="&#39;map-settings&#39;"
@@ -884,7 +884,7 @@
                                     "
                                     data-enter-action="SitesServicegeocodeAddress"
                                 />
-                                <button data-i18n="sitesScreen.valider"
+                                <button type="button" data-i18n="sitesScreen.valider"
                                     class="action-btn-primary"
                                     data-action="SitesvalidateAddress"
                                     style="
@@ -899,7 +899,7 @@
                                 >
                                     Valider
                                 </button>
-                                <button data-i18n-title="sitesScreen.titleEnregistrerCeLieu"
+                                <button type="button" data-i18n-title="sitesScreen.titleEnregistrerCeLieu"
                                     id="btn-save-location"
                                     data-action="saveCurrentLocation"
                                     title="Enregistrer ce lieu"
@@ -915,7 +915,7 @@
                                     <i class="ri-star-line" style="font-size: 1.2rem"></i>
                                 </button>
                             </search>
-                            <button data-i18n="sitesScreen.gps"
+                            <button type="button" data-i18n="sitesScreen.gps"
                                 id="btn-use-gps"
                                 class="action-btn-secondary"
                                 data-action="requestGpsLocation"
@@ -961,7 +961,7 @@
                         "
                     >
                         <div class="filter-dropdown-container" id="dropdown-wind" style="flex: 1">
-                            <button
+                            <button type="button"
                                 class="filter-dropdown-btn"
                                 data-action="toggleDropdown"
                                 data-args="'wind'"
@@ -986,7 +986,7 @@
                         </div>
 
                         <div class="filter-dropdown-container" id="dropdown-type" style="flex: 1">
-                            <button
+                            <button type="button"
                                 class="filter-dropdown-btn"
                                 data-action="toggleDropdown"
                                 data-args="'type'"
@@ -1012,7 +1012,7 @@
                     </div>
 
                     <!-- 2C. Bouton Accordéon -->
-                    <button
+                    <button type="button"
                         data-requires-role="beta" hidden
                         data-action="toggleAdvancedSettings"
                         style="
@@ -1252,7 +1252,7 @@
                                 <option data-i18n="conditionsStrategyPanel.nomAZ" value="AZ">Nom (A - Z)</option>
                             </select>
                             <div class="strategy-buttons" style="display: flex; flex-wrap: wrap; gap: 8px">
-                                <button data-i18n="conditionsStrategyPanel.creneauContinu"
+                                <button type="button" data-i18n="conditionsStrategyPanel.creneauContinu"
                                     class="strategy-btn active"
                                     id="strat-CONSECUTIVE"
                                     data-action="changeStrategy"
@@ -1275,7 +1275,7 @@
                                 >
                                     <i class="ri-time-line"></i> Créneau continu
                                 </button>
-                                <button data-i18n="conditionsStrategyPanel.demiJournee"
+                                <button type="button" data-i18n="conditionsStrategyPanel.demiJournee"
                                     class="strategy-btn"
                                     id="strat-HALF_DAY"
                                     data-action="changeStrategy"
@@ -1298,7 +1298,7 @@
                                 >
                                     <i class="ri-sun-cloudy-line"></i> Demi-journée
                                 </button>
-                                <button data-i18n="conditionsStrategyPanel.journeeComplete"
+                                <button type="button" data-i18n="conditionsStrategyPanel.journeeComplete"
                                     class="strategy-btn"
                                     id="strat-DAILY"
                                     data-action="changeStrategy"
@@ -1321,7 +1321,7 @@
                                 >
                                     <i class="ri-sun-line"></i> Journée complète
                                 </button>
-                                <button data-i18n="conditionsStrategyPanel.volumeTotal"
+                                <button type="button" data-i18n="conditionsStrategyPanel.volumeTotal"
                                     class="strategy-btn"
                                     id="strat-TOTAL"
                                     data-action="changeStrategy"
@@ -1387,7 +1387,7 @@
                             data-input-action="SitesServiceupdateSearchQuery"
                         />
                     </search>
-                    <button data-i18n="sitesScreen.favoris"
+                    <button type="button" data-i18n="sitesScreen.favoris"
                         id="btn-filter-favorites"
                         class="action-btn-secondary"
                         data-action="toggleFilterFavoritesOnly"
@@ -1408,7 +1408,7 @@
                     >
                         <i class="ri-star-line"></i> Favoris
                     </button>
-                    <button data-i18n-title="sitesScreen.titleComparerMesSites" data-i18n="sitesScreen.comparer"
+                    <button type="button" data-i18n-title="sitesScreen.titleComparerMesSites" data-i18n="sitesScreen.comparer"
                         data-requires-role="beta" hidden
                         id="btn-compare-favorites"
                         class="action-btn-secondary"
@@ -1473,7 +1473,7 @@
             </div>
             <!-- End library-container -->
 
-            <button data-i18n-title="sitesScreen.titleRemonterEnHaut" data-i18n-aria-label="sitesScreen.titleRemonterEnHaut" id="btn-back-to-top" class="back-to-top-btn" data-action="scrollToTop" title="Remonter en haut" aria-label="Remonter en haut">
+            <button type="button" data-i18n-title="sitesScreen.titleRemonterEnHaut" data-i18n-aria-label="sitesScreen.titleRemonterEnHaut" id="btn-back-to-top" class="back-to-top-btn" data-action="scrollToTop" title="Remonter en haut" aria-label="Remonter en haut">
                 <i class="ri-arrow-up-line"></i>
             </button>
 
@@ -1488,7 +1488,7 @@
                 <!-- Tab: History -->
                 <div id="logbook-tab-history" class="logbook-tab-content active">
                     <div class="logbook-history-actions">
-                        <button data-i18n="logbookScreen.ajouterUneSession"
+                        <button type="button" data-i18n="logbookScreen.ajouterUneSession"
                             id="logbook-add-btn"
                             class="action-btn-secondary"
                             data-action="LogbookswitchTab"
@@ -1496,7 +1496,7 @@
                         >
                             <i class="ri-add-line"></i> Ajouter une session
                         </button>
-                        <button data-i18n="logbookScreen.importerFfvl"
+                        <button type="button" data-i18n="logbookScreen.importerFfvl"
                             id="logbook-ffvl-btn"
                             class="action-btn-secondary"
                             data-action="triggerFfvlImport"
@@ -1510,14 +1510,14 @@
                             hidden
                             data-change-action="handleFfvlFile"
                         />
-                        <button data-i18n="logbookScreen.toutRecalculer"
+                        <button type="button" data-i18n="logbookScreen.toutRecalculer"
                             id="logbook-recompute-btn"
                             class="action-btn-secondary"
                             data-action="recomputeAllTraceStats"
                         >
                             <i class="ri-refresh-line"></i> Tout recalculer
                         </button>
-                        <button data-i18n="logbookScreen.exporterEnPdf"
+                        <button type="button" data-i18n="logbookScreen.exporterEnPdf"
                             id="logbook-export-pdf-btn"
                             class="action-btn-secondary"
                             data-action="exportLogbookPdf"
@@ -1908,7 +1908,7 @@
                             Pour créer un compte et synchroniser vos statistiques, vous devez accepter le stockage de
                             vos informations d'authentification et de vos scores sur nos serveurs sécurisés (Firebase).
                         </p>
-                        <button data-i18n="authSetupRequiredView.gererMesPreferences"
+                        <button type="button" data-i18n="authSetupRequiredView.gererMesPreferences"
                             class="btn-btn-primary"
                             data-action="openGdprSettingsFromAuth"
                             style="
@@ -2011,7 +2011,7 @@
                                 Mot de passe oublié ?
                             </div>
                         </div>
-                        <button data-i18n="authAnonymousView.seConnecter"
+                        <button type="button" data-i18n="authAnonymousView.seConnecter"
                             class="auth-submit-btn"
                             data-action="FirebaseAuthsignIn"
                         >
@@ -2088,7 +2088,7 @@
                             <input type="checkbox" id="register-remember-me" class="auth-remember-checkbox" checked />
                             <span data-i18n="authAnonymousView.resterConnecte2">Rester connecté</span>
                         </label>
-                        <button data-i18n="authAnonymousView.sInscrireGratuitement"
+                        <button type="button" data-i18n="authAnonymousView.sInscrireGratuitement"
                             class="auth-submit-btn"
                             data-action="FirebaseAuthsignUp"
                         >
@@ -2126,17 +2126,17 @@
                     </div>
 
                     <div class="auth-action-row">
-                        <button data-i18n="authLoggedInView.synchro" class="action-btn primary" data-action="FirebaseAuthsyncDataWithCloud">
+                        <button type="button" data-i18n="authLoggedInView.synchro" class="action-btn primary" data-action="FirebaseAuthsyncDataWithCloud">
                             <i class="ri-refresh-line"></i> Synchro
                         </button>
-                        <button data-i18n="authLoggedInView.deconnexion" class="action-btn secondary" data-action="FirebaseAuthsignOut">
+                        <button type="button" data-i18n="authLoggedInView.deconnexion" class="action-btn secondary" data-action="FirebaseAuthsignOut">
                             <i class="ri-logout-box-r-line"></i> Déconnexion
                         </button>
                     </div>
 
                     <!-- Alertes météo push (FCM) sur les sites favoris -->
                     <div class="auth-action-row" style="margin-top: 8px">
-                        <button data-i18n-title="authLoggedInView.titleRecevoirUneNotification" data-i18n="authLoggedInView.activerLesAlertesMeteo"
+                        <button type="button" data-i18n-title="authLoggedInView.titleRecevoirUneNotification" data-i18n="authLoggedInView.activerLesAlertesMeteo"
                             class="action-btn secondary"
                             data-action="FirebaseAuthenablePushNotifications"
                             title="Recevoir une notification quand un site favori devient volable, même app fermée"
@@ -2154,10 +2154,10 @@
                         statistiques, préférences) dans un fichier, puis restaurez-les quand vous voulez.
                     </p>
                     <div class="auth-action-row">
-                        <button data-i18n="localBackup.exporter" class="action-btn secondary" data-action="exportBackup">
+                        <button type="button" data-i18n="localBackup.exporter" class="action-btn secondary" data-action="exportBackup">
                             <i class="ri-download-2-line"></i> Exporter
                         </button>
-                        <button data-i18n="localBackup.importer"
+                        <button type="button" data-i18n="localBackup.importer"
                             class="action-btn secondary"
                             data-action="triggerClick"
                             data-args="backup-import-input"
@@ -2204,13 +2204,13 @@
                     <button type="button" class="close-bs-btn" data-action="closeGpsMenu" data-i18n-aria-label="common.fermer" aria-label="Fermer"><i class="ri-close-line"></i></button>
                 </div>
                 <div class="bs-options">
-                    <button data-i18n="gpsBottomSheet.waze" class="bs-option-btn" data-action="launchGps" data-args="&#39;waze&#39;">
+                    <button type="button" data-i18n="gpsBottomSheet.waze" class="bs-option-btn" data-action="launchGps" data-args="&#39;waze&#39;">
                         <i class="ri-navigation-fill" style="color: #33ccff"></i> Waze
                     </button>
-                    <button data-i18n="gpsBottomSheet.googleMaps" class="bs-option-btn" data-action="launchGps" data-args="&#39;gmaps&#39;">
+                    <button type="button" data-i18n="gpsBottomSheet.googleMaps" class="bs-option-btn" data-action="launchGps" data-args="&#39;gmaps&#39;">
                         <i class="ri-google-fill" style="color: #ea4335"></i> Google Maps
                     </button>
-                    <button data-i18n="gpsBottomSheet.applePlans" class="bs-option-btn" data-action="launchGps" data-args="&#39;apple&#39;">
+                    <button type="button" data-i18n="gpsBottomSheet.applePlans" class="bs-option-btn" data-action="launchGps" data-args="&#39;apple&#39;">
                         <i class="ri-apple-fill" style="color: #a2aaad"></i> Apple Plans
                     </button>
                 </div>
@@ -2239,13 +2239,13 @@
                 </div>
             </div>
             <div class="gdpr-banner-actions">
-                <button data-i18n="gdprBanner.parametrer" class="gdpr-btn-settings" data-action="showModal" data-args="&#39;gdpr-settings-modal&#39;">
+                <button type="button" data-i18n="gdprBanner.parametrer" class="gdpr-btn-settings" data-action="showModal" data-args="&#39;gdpr-settings-modal&#39;">
                     <i class="ri-settings-3-line"></i> Paramétrer
                 </button>
-                <button data-i18n="gdprBanner.toutRefuser" class="gdpr-btn-refuse" data-action="refuseAll">
+                <button type="button" data-i18n="gdprBanner.toutRefuser" class="gdpr-btn-refuse" data-action="refuseAll">
                     <i class="ri-close-circle-line"></i> Tout refuser
                 </button>
-                <button data-i18n="gdprBanner.toutAccepter" class="gdpr-btn-accept" data-action="acceptAll">
+                <button type="button" data-i18n="gdprBanner.toutAccepter" class="gdpr-btn-accept" data-action="acceptAll">
                     <i class="ri-checkbox-circle-line"></i> Tout accepter
                 </button>
             </div>
@@ -2359,10 +2359,10 @@
                                 statistiques, préférences) dans un fichier, puis restaurez-les quand vous voulez.
                             </div>
                             <div class="auth-action-row">
-                                <button data-i18n="localBackup.exporter" class="action-btn secondary" data-action="exportBackup">
+                                <button type="button" data-i18n="localBackup.exporter" class="action-btn secondary" data-action="exportBackup">
                                     <i class="ri-download-2-line"></i> Exporter
                                 </button>
-                                <button data-i18n="localBackup.importer"
+                                <button type="button" data-i18n="localBackup.importer"
                                     class="action-btn secondary"
                                     data-action="triggerClick"
                                     data-args="backup-import-input"
@@ -2375,8 +2375,8 @@
                     </div>
                 </div>
                 <div class="gdpr-modal-footer">
-                    <button data-i18n="gdprSettingsModal.toutRefuser" class="gdpr-btn-settings" data-action="refuseAll">Tout Refuser</button>
-                    <button data-i18n="gdprSettingsModal.enregistrer" class="gdpr-btn-accept" data-action="saveCustomSettings">Enregistrer</button>
+                    <button type="button" data-i18n="gdprSettingsModal.toutRefuser" class="gdpr-btn-settings" data-action="refuseAll">Tout Refuser</button>
+                    <button type="button" data-i18n="gdprSettingsModal.enregistrer" class="gdpr-btn-accept" data-action="saveCustomSettings">Enregistrer</button>
                 </div>
             </div>
         </dialog>
@@ -2426,14 +2426,14 @@
                         <i class="ri-add-circle-line"></i>
                         <span data-i18n="logbookSessionModal.nouvelleSession" id="logbook-session-modal-title">Nouvelle session</span>
                     </div>
-                    <button data-i18n-aria-label="logbookSessionModal.ariaLabelFermer" class="gdpr-modal-close-btn" data-action="LogbookcloseSessionModal" aria-label="Fermer">
+                    <button type="button" data-i18n-aria-label="logbookSessionModal.ariaLabelFermer" class="gdpr-modal-close-btn" data-action="LogbookcloseSessionModal" aria-label="Fermer">
                         <i class="ri-close-line"></i>
                     </button>
                 </div>
                 <div class="gdpr-modal-body" style="padding-top: 16px; overflow-y: auto; flex: 1">
                     <div class="logbook-form-container">
                         <div class="logbook-type-toggle">
-                            <button data-i18n="logbookSessionModal.vol"
+                            <button type="button" data-i18n="logbookSessionModal.vol"
                                 id="btn-type-vol"
                                 class="type-btn active"
                                 data-action="LogbooksetFormType"
@@ -2441,7 +2441,7 @@
                             >
                                 Vol
                             </button>
-                            <button data-i18n="logbookSessionModal.gonflage"
+                            <button type="button" data-i18n="logbookSessionModal.gonflage"
                                 id="btn-type-gonflage"
                                 class="type-btn"
                                 data-action="LogbooksetFormType"
@@ -2895,7 +2895,7 @@
         <!-- Floating Main Navigation -->
         <nav class="desktop-main-nav" id="desktop-main-nav">
             <div class="nav-dropdown">
-                <button
+                <button type="button"
                     class="nav-menu-btn"
                     data-target="THEORY"
                     data-action="toggleNavSubMenu"
@@ -2907,25 +2907,25 @@
                     <i class="ri-graduation-cap-line"></i> <span data-i18n="common.theorie" class="nav-text">Théorie</span>
                 </button>
                 <div id="theory-sub-bar" class="sub-bar nav-dropdown-menu">
-                    <button class="nav-menu-btn" data-target="QCM" data-action="navigate" data-args="QCM">
+                    <button type="button" class="nav-menu-btn" data-target="QCM" data-action="navigate" data-args="QCM">
                         <i class="ri-file-list-3-line"></i> <span data-i18n="common.qcm" class="nav-text">QCM</span>
                     </button>
-                    <button class="nav-menu-btn" data-target="REVISION_AXES" data-action="navigate" data-args="REVISION_AXES">
+                    <button type="button" class="nav-menu-btn" data-target="REVISION_AXES" data-action="navigate" data-args="REVISION_AXES">
                         <i class="ri-compass-3-line"></i> <span data-i18n="common.axesDeRevision" class="nav-text">Axes de révision</span>
                     </button>
-                    <button class="nav-menu-btn" data-target="LIBRARY" data-action="navigate" data-args="LIBRARY">
+                    <button type="button" class="nav-menu-btn" data-target="LIBRARY" data-action="navigate" data-args="LIBRARY">
                         <i class="ri-book-open-line"></i> <span data-i18n="common.biblio" class="nav-text">Biblio</span>
                     </button>
-                    <button class="nav-menu-btn" data-target="STATS" data-action="navigate" data-args="STATS">
+                    <button type="button" class="nav-menu-btn" data-target="STATS" data-action="navigate" data-args="STATS">
                         <i class="ri-bar-chart-2-line"></i> <span data-i18n="common.stats" class="nav-text">Stats</span>
                     </button>
                 </div>
             </div>
-            <button class="nav-menu-btn" data-target="SITES" data-requires-role="owner" hidden data-action="navigate" data-args="SITES">
+            <button type="button" class="nav-menu-btn" data-target="SITES" data-requires-role="owner" hidden data-action="navigate" data-args="SITES">
                 <i class="ri-map-pin-line"></i> <span data-i18n="common.sites" class="nav-text">Sites</span>
             </button>
             <div class="nav-dropdown">
-                <button
+                <button type="button"
                     class="nav-menu-btn"
                     data-target="LOGBOOK"
                     data-action="toggleNavSubMenu"
@@ -2938,7 +2938,7 @@
                     <span data-i18n-title="common.titleMaterielAReviser" id="logbook-nav-badge" class="nav-badge" title="Matériel à réviser"></span>
                 </button>
                 <div id="logbook-sub-bar" class="sub-bar nav-dropdown-menu">
-                    <button
+                    <button type="button"
                         class="nav-menu-btn"
                         data-action="openLogbookSection"
                         data-args="'history'"
@@ -2946,7 +2946,7 @@
                     >
                         <i class="ri-history-line"></i> <span data-i18n="common.historique" class="nav-text">Activités</span>
                     </button>
-                    <button
+                    <button type="button"
                         class="nav-menu-btn"
                         data-action="openLogbookSection"
                         data-args="'stats'"
@@ -2954,7 +2954,7 @@
                     >
                         <i class="ri-bar-chart-box-line"></i> <span data-i18n="common.statistiques" class="nav-text">Statistiques</span>
                     </button>
-                    <button
+                    <button type="button"
                         class="nav-menu-btn"
                         data-action="openLogbookSection"
                         data-args="'equip'"
@@ -2965,7 +2965,7 @@
                 </div>
             </div>
             <div class="nav-dropdown">
-                <button
+                <button type="button"
                     class="nav-menu-btn nav-menu-btn-safety"
                     data-target="SAFETY"
                     data-action="toggleNavSubMenu"
@@ -2977,7 +2977,7 @@
                     <i class="ri-alarm-warning-line"></i> <span data-i18n="common.securite" class="nav-text">Sécurité</span>
                 </button>
                 <div id="safety-sub-bar" class="sub-bar nav-dropdown-menu nav-dropdown-menu-end">
-                    <button
+                    <button type="button"
                         class="nav-menu-btn nav-menu-btn-urgent"
                         data-action="openSafetySection"
                         data-args="urgence"
@@ -2985,7 +2985,7 @@
                     >
                         <i class="ri-alarm-warning-line"></i> <span data-i18n="common.urgence" class="nav-text">Urgence</span>
                     </button>
-                    <button
+                    <button type="button"
                         class="nav-menu-btn"
                         data-action="openSafetySection"
                         data-args="prevol"
@@ -2993,7 +2993,7 @@
                     >
                         <i class="ri-checkbox-multiple-line"></i> <span data-i18n="common.checkLists" class="nav-text">Check-lists</span>
                     </button>
-                    <button
+                    <button type="button"
                         class="nav-menu-btn"
                         data-action="openSafetySection"
                         data-args="sigr"
@@ -3001,7 +3001,7 @@
                     >
                         <i class="ri-shield-check-line"></i> <span data-i18n="common.maSigr" class="nav-text">Ma SIGR</span>
                     </button>
-                    <button
+                    <button type="button"
                         class="nav-menu-btn"
                         data-action="openSafetySection"
                         data-args="ice"
@@ -3011,7 +3011,7 @@
                     </button>
                 </div>
             </div>
-            <button class="nav-menu-btn" data-target="MANUAL" data-action="showManual" data-args="'contextual'">
+            <button type="button" class="nav-menu-btn" data-target="MANUAL" data-action="showManual" data-args="'contextual'">
                 <i class="ri-information-line"></i> <span data-i18n="common.manuel" class="nav-text">Manuel</span>
             </button>
         </nav>

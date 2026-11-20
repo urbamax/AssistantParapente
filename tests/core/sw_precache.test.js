@@ -90,6 +90,25 @@ describe('pré-cache du service worker (sw.js)', () => {
         expect(nginxConf).toMatch(/immutable/);
         expect(nginxConf).toMatch(/version\.json.*no-store/);
     });
+
+    it('déclare explicitement type="button" (ou submit) sur chaque <button> HTML et les landmarks ARIA principaux', () => {
+        const htmlFiles = [
+            'index.html',
+            'components/header.html',
+            'components/footer.html',
+            'components/manual_modal.html',
+            'components/legal_modals.html',
+        ];
+        for (const f of htmlFiles) {
+            const src = readFileSync(f, 'utf8');
+            const untyped = [...src.matchAll(/<button\b[^>]*>/gi)]
+                .map((m) => m[0])
+                .filter((b) => !/\btype\s*=/i.test(b));
+            expect(untyped, `Untyped <button> in ${f}`).toEqual([]);
+        }
+        expect(readFileSync('index.html', 'utf8')).toContain('role="banner"');
+        expect(readFileSync('components/footer.html', 'utf8')).toContain('role="contentinfo"');
+    });
 });
 
 describe("fichiers de js/ non chargés par l'application", () => {

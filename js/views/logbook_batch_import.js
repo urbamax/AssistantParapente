@@ -268,7 +268,8 @@ export class LogbookBatchImportBase extends LogbookLearnedBase {
                 <div class="batch-sensor">${row.sensor ? tt('batch.sensor.attached', { name: row.sensor.name }) : ''}</div>
             </td>`;
         if (!row.trace) {
-            return `<tr data-row="${row.id}" class="batch-row batch-${row.status}">${first}${'<td></td>'.repeat(9)}</tr>`;
+            const emptyCells = '<td></td>'.repeat(9);
+            return `<tr data-row="${row.id}" class="batch-row batch-${row.status}">${first}${emptyCells}</tr>`;
         }
         const v = row.values;
         const field = (name, extra = '') => `data-batch-field="${name}" ${extra}`;
