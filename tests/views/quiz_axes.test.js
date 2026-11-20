@@ -119,29 +119,51 @@ describe('QuizView — Écran Axes de révision anti-bachotage (Spec 043)', () =
         vi.restoreAllMocks();
     });
 
-    it('affiche les axes triés par priorité avec Étape 1 (liens PDF #page=N), Étape 2 (points clés) et Étape 3 (atelier)', () => {
+    it('affiche les axes à réviser triés par priorité (en masquant les chapitres maîtrisés) avec Étape 1, Étape 2 et Étape 3', () => {
         QuizView.showRevisionAxesScreen();
 
         const screen = document.getElementById('revision-axes-screen');
         expect(screen.classList.contains('active')).toBe(true);
 
         const cards = [...document.querySelectorAll('.revision-axis-card')];
-        expect(cards).toHaveLength(4);
+        // Le chapitre 'milieu-naturel' (MASTERED) est masqué des révisions
+        expect(cards).toHaveLength(3);
         expect(cards.map((c) => c.getAttribute('data-axis-id'))).toEqual([
             'meteo-brises-aerologie',
             'mecavol-polaire-finesse',
             'facteurs-humains',
-            'milieu-naturel',
         ]);
         expect(cards[0].getAttribute('data-axis-status')).toBe('BLOCKER');
         expect(cards[1].getAttribute('data-axis-status')).toBe('REFRESH');
         expect(cards[2].getAttribute('data-axis-status')).toBe('EXPLORE');
-        expect(cards[3].getAttribute('data-axis-status')).toBe('MASTERED');
+        expect(document.querySelector('[data-action="QuizsetAxesFilter"][data-args="MASTERED"]')).toBeNull();
 
         // Étape 1 : liens directs vers les pages vérifiées du PDF (et pas de page non vérifiée)
         const pdfLinks = [...cards[0].querySelectorAll('a[href*="#page="]')].map((a) => a.getAttribute('href'));
         expect(pdfLinks).toContain('courses/d2e39ba7e74b.pdf#page=4');
         expect(pdfLinks).toContain('courses/d2e39ba7e74b.pdf#page=5');
+    });
+
+    it('masque les boutons de filtre dont le compteur est à zéro ainsi que les points clés déjà maîtrisés', () => {
+        // On retire la question E35V (REFRESH) et F1V (EXPLORE) pour que REFRESH=0 et EXPLORE=0
+        vi.spyOn(QuizService, 'getQuestions').mockReturnValue(
+            QUESTIONS.filter((q) => q.code !== 'E35V' && q.code !== 'F1V'),
+        );
+        QuizView.showRevisionAxesScreen();
+
+        expect(document.querySelector('[data-action="QuizsetAxesFilter"][data-args="ALL"]')).not.toBeNull();
+        expect(document.querySelector('[data-action="QuizsetAxesFilter"][data-args="BLOCKER"]')).not.toBeNull();
+        expect(document.querySelector('[data-action="QuizsetAxesFilter"][data-args="REFRESH"]')).toBeNull();
+        expect(document.querySelector('[data-action="QuizsetAxesFilter"][data-args="EXPLORE"]')).toBeNull();
+        expect(document.querySelector('[data-action="QuizsetAxesFilter"][data-args="MASTERED"]')).toBeNull();
+
+        // En dépliant les points clés de meteo-brises-aerologie, la question maîtrisée A82V n'est pas listée
+        const toggleBtn = document.querySelector(
+            '[data-action="QuiztoggleAxisTakeaways"][data-args="meteo-brises-aerologie"]',
+        );
+        QuizView.handleClick({ target: toggleBtn });
+        const takeawaysText = document.querySelector('.revision-axis-takeaways-list').textContent;
+        expect(takeawaysText).not.toContain('Venturi');
     });
 
     it('déplie les points clés à retenir sans afficher les choix A/B/C/D ni la mention "Aucune source trouvée"', () => {
