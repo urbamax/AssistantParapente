@@ -1073,7 +1073,7 @@ export const FR = Object.freeze({
             examDescription:
                 "Mode Examen : Simulation dans les conditions réelles d'examen (volume et thèmes imposés).",
             revisionDescription:
-                'Mode Révision (répétition espacée) : les questions jamais tentées passent en premier, puis celles qui sont à réviser. Une question réussie revient à intervalles de plus en plus longs (1, 3, 7, 14 puis 30 jours) ; après une erreur, elle revient bien plus tôt.',
+                'Mode Révision (répétition espacée SM-2) : les questions jamais tentées passent en premier, puis celles qui sont à réviser. Une question réussie revient à intervalles adaptés (1 jour, 6 jours, puis selon votre facilité) ; après une erreur, elle revient dès le lendemain.',
             revisionSummary: 'À réviser : {due} · Nouvelles : {fresh}',
             revisionNothingDue:
                 "Rien à réviser pour l'instant : prochaine échéance le {date}. La session proposera les questions les plus proches de leur échéance.",

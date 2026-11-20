@@ -83,7 +83,7 @@ export const FR_HTML = Object.freeze({
             'Aucun compte requis : vos données restent sur cet appareil, sauf si vous vous connectez pour les synchroniser.',
     }),
     libraryScreen: Object.freeze({
-        bibliotheque: 'BIBLIOTHEQUE',
+        bibliotheque: 'BIBLIOTHÈQUE',
         placeholderRechercherUnDossier: 'Rechercher un dossier, une affiche...',
         parCategorie: 'PAR CATÉGORIE',
         avisProprieteDocuments:

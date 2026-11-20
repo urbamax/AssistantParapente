@@ -1015,13 +1015,21 @@ html.dark-theme .bar-track {
     font-size: 0.75rem;
     font-weight: bold;
     background: rgba(16, 185, 129, 0.15);
-    color: #047857;
+    color: #34d399;
+
+    body.light-mode & {
+        color: #047857;
+    }
 }
 
 .batch-fix .batch-status,
 .batch-similar .batch-status {
     background: rgba(245, 158, 11, 0.2);
-    color: #b45309;
+    color: #fbbf24;
+
+    body.light-mode & {
+        color: #b45309;
+    }
 }
 
 .batch-duplicate .batch-status,

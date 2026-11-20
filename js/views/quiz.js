@@ -1222,9 +1222,15 @@ class QuizViewClass extends QuizVoiceBase {
                     }
                 } else {
                     btn.classList.add('missed');
+                    if (!btn.innerHTML.includes('ri-error-warning-line')) {
+                        btn.innerHTML += ' <i class="ri-error-warning-line" aria-hidden="true"></i>';
+                    }
                 }
             } else if (opt.pts < 0 && isSelected) {
                 btn.classList.add('incorrect');
+                if (!btn.innerHTML.includes('ri-close-circle-line')) {
+                    btn.innerHTML += ' <i class="ri-close-circle-line" aria-hidden="true"></i>';
+                }
             }
         });
 

@@ -366,8 +366,8 @@ body {
         padding: 3px 6px;
     }
     .floating-user-menu .icon-btn {
-        width: 34px;
-        height: 34px;
+        min-width: 44px;
+        min-height: 44px;
         font-size: 1.1rem;
     }
 }

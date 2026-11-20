@@ -166,10 +166,10 @@ body.light-mode .site-coords-badge:hover {
         flex: 1 1 auto;
         min-width: calc(25% - 4px) !important;
         justify-content: center;
-        padding: 5px 4px !important;
-        font-size: 0.72rem !important;
+        padding: 8px 6px !important;
+        font-size: 0.78rem !important;
         border-radius: var(--radius-sm) !important;
-        height: 28px !important;
+        min-height: 44px !important;
         display: inline-flex !important;
         align-items: center !important;
         gap: 4px !important;
@@ -800,6 +800,11 @@ body.light-mode .leaflet-tile-pane {
 .site-spotair-badge {
     border: 1px solid rgba(14, 165, 233, 0.35);
     color: #38bdf8;
+
+    body.light-mode & {
+        color: #0369a1;
+        border-color: rgba(3, 105, 161, 0.4);
+    }
 }
 
 .site-spotair-badge:hover {
@@ -1781,6 +1786,11 @@ body.light-mode .forecast-sticky-container {
     background: rgba(14, 165, 233, 0.15);
     border-color: rgba(14, 165, 233, 0.3);
     color: #38bdf8;
+
+    body.light-mode & {
+        color: #0369a1;
+        border-color: rgba(3, 105, 161, 0.35);
+    }
 }
 
 .copy-coords-btn {
@@ -1898,6 +1908,11 @@ body.light-mode .forecast-sticky-container {
     color: var(--accent-green);
     border-color: rgba(34, 197, 94, 0.3);
     background: rgba(34, 197, 94, 0.05);
+
+    body.light-mode & {
+        color: #15803d;
+        border-color: rgba(21, 128, 61, 0.35);
+    }
 }
 
 .creneaux-list.incomplete {

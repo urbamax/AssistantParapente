@@ -314,7 +314,9 @@ class SitesService {
             filterMode: this.state.filterMode,
             wings:
                 this.state.filterMode === 'hardware'
-                    ? StorageService.get(StorageService.KEYS.EQUIPMENT_DATA, []) || []
+                    ? (StorageService.get(StorageService.KEYS.EQUIPMENT_DATA, []) || []).filter(
+                          (e) => e && e.statut !== 'inactif',
+                      )
                     : [],
         };
 

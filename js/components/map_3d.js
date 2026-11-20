@@ -32,7 +32,7 @@ const Map3DComponent = {
         'maplibre-gl.js': 'sha384-5+cfbwT0iiub6VsQAdn6yz16nr6sDiQoHx6tm4O8OVYXHYOxcffFmCJBL0dgdvGp',
         'deck.gl.js': 'sha384-NrpHmp6N6IhXZ+gSV+uRLo+Hqprkw4BfdGzmxgWXhjakjkAabyfQxokSmn/aK0VB',
     },
-    SATELLITE_TILES: ['https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'],
+    SATELLITE_TILES: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
     // Tuiles de relief brutes (AWS Terrarium / Mapzen). Elles sont servies à MapLibre
     // via un protocole personnalisé (voir _registerSmoothTerrainProtocol) qui les lisse
     // avant de les donner au moteur de terrain : sur cette source gratuite, le bruit du

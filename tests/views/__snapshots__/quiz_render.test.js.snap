@@ -120,7 +120,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
     "theme": "NIVEAU (TOUT) OU THÈME CIBLÉ",
   },
   "REVISION": {
-    "description": "Mode Révision (répétition espacée) : les questions jamais tentées passent en premier, puis celles qui sont à réviser. Une question réussie revient à intervalles de plus en plus longs (1, 3, 7, 14 puis 30 jours) ; après une erreur, elle revient bien plus tôt.",
+    "description": "Mode Révision (répétition espacée SM-2) : les questions jamais tentées passent en premier, puis celles qui sont à réviser. Une question réussie revient à intervalles adaptés (1 jour, 6 jours, puis selon votre facilité) ; après une erreur, elle revient dès le lendemain.",
     "theme": "THÈME SPÉCIFIQUE",
   },
   "TRAINING": {

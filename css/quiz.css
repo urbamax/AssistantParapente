@@ -171,6 +171,11 @@
     background: rgba(74, 222, 128, 0.15) !important;
     border-color: var(--accent-green) !important;
     color: var(--accent-green) !important;
+
+    body.light-mode & {
+        color: #15803d !important;
+        border-color: #15803d !important;
+    }
 }
 
 .incorrect,
@@ -189,6 +194,11 @@
     color: #fdba74 !important;
     /* Light orange text */
     font-weight: 500;
+
+    body.light-mode & {
+        color: #c2410c !important;
+        border-color: #c2410c !important;
+    }
 }
 
 
@@ -300,8 +310,13 @@ body.course-open #course-pdf-frame {
 }
 
 .level-BPC {
-    color: #92400e;
-    border-color: rgba(146, 64, 14, 0.3);
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.35);
+
+    body.light-mode & {
+        color: #92400e;
+        border-color: rgba(146, 64, 14, 0.3);
+    }
 }
 
 .level-TREUIL {

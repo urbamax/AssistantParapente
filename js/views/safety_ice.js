@@ -8,6 +8,7 @@ import IceService, {
     ICE_COUNTRIES,
     ICE_FEDERATIONS,
     ICE_LIMITS,
+    callingCodeForCountry,
     countryName,
     flagEmoji,
     formatBirthDate,
@@ -69,8 +70,9 @@ export function renderIceSticker(profile) {
         ? `<div class="ice-sticker-allergy">${th('stickerAllergies', { value: p.allergies })}</div>`
         : '';
     // Numéros au format international (+33 …) : un secouriste étranger ou une carte SIM d'un autre pays les compose tels quels.
+    const callingCode = callingCodeForCountry(p.pays);
     const contact = (name, phone) => {
-        const intl = toInternationalPhone(phone);
+        const intl = toInternationalPhone(phone, callingCode);
         if (!intl) return '';
         return `<div class="ice-sticker-contact">${name ? `${esc(name)} : ` : ''}<strong>${esc(formatPhoneDisplay(intl))}</strong></div>`;
     };

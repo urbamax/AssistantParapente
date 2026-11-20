@@ -82,7 +82,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                                 <span class="detail-item"><strong>Achat:</strong> 01/03/2020</span>
                                 <span class="detail-item"><strong>Dernière révision:</strong> 10/01/2023</span>
                                 <span class="detail-item"><strong>Prochaine révision:</strong> 10/01/2025</span>
-                                <span class="detail-item"><strong>Heures avant révision:</strong> <span style="color:#ef4444; font-weight:bold;">Dépassé de 1h</span> (sur 1h)</span>
+                                <span class="detail-item"><strong>Heures avant révision:</strong> <span style="color:#ef4444; font-weight:bold;">Dépassé de 0.2h</span> (sur 1h)</span>
                                 <span class="detail-item"><strong>Plage de Vent:</strong> 0 - 25 km/h</span>
                             </div>
                         </div>

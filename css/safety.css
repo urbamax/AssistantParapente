@@ -535,7 +535,7 @@
         padding: 0 8px;
         font-weight: 600;
         font-size: 0.9rem;
-        color: var(--text-color);
+        color: var(--text-main);
     }
 }
 
@@ -560,14 +560,14 @@
         padding: 10px 12px;
         border-radius: 8px;
         border: 1px solid var(--border-color);
-        background: var(--input-bg, var(--surface-card, #ffffff));
-        color: var(--text-color);
+        background: var(--bg-input);
+        color: var(--text-main);
         font-size: 0.95rem;
         transition: border-color 0.2s ease;
 
         &:focus {
             outline: none;
-            border-color: var(--accent-primary, #0ea5e9);
+            border-color: var(--accent-orange);
         }
     }
 }
@@ -811,7 +811,7 @@
 .ice-print-tips {
     margin-top: 18px;
     padding: 12px;
-    background: color-mix(in srgb, var(--accent-primary, #0ea5e9) 8%, transparent);
+    background: color-mix(in srgb, var(--accent-orange) 8%, transparent);
     border-radius: 10px;
     font-size: 0.85rem;
 
@@ -876,7 +876,7 @@
 }
 
 .ice-card {
-    background: var(--surface-card, #ffffff);
+    background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 20px;
     padding: 20px;
@@ -906,8 +906,8 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 2px 8px;
-    background: color-mix(in srgb, var(--accent-primary, #0ea5e9) 15%, transparent);
-    color: var(--accent-primary, #0ea5e9);
+    background: color-mix(in srgb, var(--accent-orange) 15%, transparent);
+    color: var(--accent-orange);
     border-radius: 6px;
     margin-bottom: 6px;
 }
@@ -970,7 +970,7 @@
 .ice-contact-num {
     font-size: 1.05rem;
     font-weight: 700;
-    color: var(--text-color);
+    color: var(--text-main);
 }
 
 .ice-contact-rel {
