@@ -109,6 +109,7 @@ const SCREENS = [
         ['js/services/sites_service.js', ['Inconnu']],
         ['js/services/feedback_service.js', ['MENU', 'ALL', 'auto']],
         ['js/views/feedback.js', []],
+        ['js/views/course_viewer.js', []],
     ].map(([file, dataValues]) => ({ file, spec: '029', prefix: '', dataValues, minKeys: 1 })),
     {
         file: 'js/views/ice_viewer.js',
