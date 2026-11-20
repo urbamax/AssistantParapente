@@ -533,6 +533,7 @@ class LogbookService {
                 equip: e,
                 totalSessions: 0,
                 totalTime: 0,
+                timeSinceRevision: 0,
                 openings: 0,
                 lastOpening: '',
                 nextRevisionDate: this._calculateNextRevision(e),
@@ -550,19 +551,24 @@ class LogbookService {
             const sellette = (f.sellette || '').toLowerCase();
             const rawDuree = parseInt(f.duree || 0, 10);
             const duree = Number.isFinite(rawDuree) && rawDuree > 0 ? rawDuree : 0;
+            const flightDate = (f.datetime || '').slice(0, 10);
+            const isFlight = f.type !== 'gonflage';
 
             [voile, sellette].forEach((key) => {
                 if (!stats[key]) return;
                 stats[key].totalSessions++;
                 stats[key].totalTime += duree;
+                const revDate = stats[key].equip.derniereRevision || '';
+                if (isFlight && (!revDate || !flightDate || flightDate >= revDate)) {
+                    stats[key].timeSinceRevision += duree;
+                }
             });
 
             // Un secours ne s'use qu'à l'ouverture : on compte les ouvertures, pas les heures de vol.
             const opened = f.rescueDeployed && stats[(f.rescueId || '').toLowerCase()];
             if (opened && opened.equip.type === 'secours') {
                 opened.openings++;
-                const date = (f.datetime || '').slice(0, 10);
-                if (date > opened.lastOpening) opened.lastOpening = date;
+                if (flightDate > opened.lastOpening) opened.lastOpening = flightDate;
             }
         });
 
@@ -574,6 +580,9 @@ class LogbookService {
 
             s.diffDays = Infinity;
             s.revisionDateStr = '';
+            s.hoursRemaining = null;
+
+            if (e.statut === 'inactif') return;
 
             // Date alerts
             if (s.nextRevisionDate) {
@@ -589,11 +598,10 @@ class LogbookService {
             // l'ouverture ou après).
             if (s.lastOpening && !((e.derniereRevision || '') >= s.lastOpening)) s.alerts.openedAlert = 'red';
 
-            // Hours alerts
-            s.hoursRemaining = null;
+            // Hours alerts (heures de vol depuis la dernière révision, hors gonflage)
             if (e.periodiciteHeures && e.periodiciteHeures > 0) {
-                const totalHours = s.totalTime / 60;
-                s.hoursRemaining = e.periodiciteHeures - totalHours;
+                const hoursSinceRevision = s.timeSinceRevision / 60;
+                s.hoursRemaining = e.periodiciteHeures - hoursSinceRevision;
 
                 if (s.hoursRemaining <= 0) s.alerts.hoursAlert = 'red';
                 else if (s.hoursRemaining <= 15) s.alerts.hoursAlert = 'orange';

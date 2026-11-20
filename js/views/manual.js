@@ -66,7 +66,10 @@ class LibraryViewClass extends BaseView {
         // 1. Search Filter
         if (search) {
             results = results.filter(
-                (c) => c.title.toLowerCase().includes(search) || c.category.toLowerCase().includes(search),
+                (c) =>
+                    c.title.toLowerCase().includes(search) ||
+                    c.category.toLowerCase().includes(search) ||
+                    (Array.isArray(c.keywords) && c.keywords.some((kw) => String(kw).toLowerCase().includes(search))),
             );
         }
 

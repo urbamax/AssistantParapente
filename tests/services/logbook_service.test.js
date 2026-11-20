@@ -482,4 +482,29 @@ describe('LogbookService - link flights to their site', () => {
         LogbookService.deleteFlight('f1');
         expect(JSON.parse(localStorage.getItem('deleted_flights'))).toEqual(['f1']);
     });
+
+    it('computeEquipmentWear counts only flights since derniereRevision for hoursRemaining and ignores inactive equipment alerts', () => {
+        LogbookService.equipment = [
+            {
+                id: 'w1',
+                nom: 'Active Wing',
+                type: 'voile',
+                periodiciteHeures: 50,
+                derniereRevision: '2026-09-10',
+                statut: 'actif',
+            },
+            { id: 'w2', nom: 'Old Wing', type: 'voile', periodiciteHeures: 10, statut: 'inactif' },
+        ];
+        LogbookService.flights = [
+            { id: 'f1', type: 'vol', voile: 'Active Wing', duree: 6000, datetime: '2026-09-01T10:00' }, // avant révision
+            { id: 'f2', type: 'gonflage', voile: 'Active Wing', duree: 120, datetime: '2026-09-15T10:00' }, // gonflage ignoré
+            { id: 'f3', type: 'vol', voile: 'Active Wing', duree: 180, datetime: '2026-09-20T10:00' }, // 3h depuis révision
+            { id: 'f4', type: 'vol', voile: 'Old Wing', duree: 1200, datetime: '2026-09-20T10:00' },
+        ];
+        const wear = LogbookService.computeEquipmentWear();
+        expect(wear['active wing'].hoursRemaining).toBe(47);
+        expect(wear['active wing'].alerts.hoursAlert).toBe(false);
+        expect(wear['old wing'].alerts).toEqual({ dateAlert: false, hoursAlert: false, openedAlert: false });
+        expect(LogbookService.countEquipmentAlerts(wear)).toBe(0);
+    });
 });

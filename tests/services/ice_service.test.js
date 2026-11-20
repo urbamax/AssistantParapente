@@ -227,5 +227,18 @@ describe('IceService (js/services/ice_service.js)', () => {
             expect(html).toContain('href="tel:+41761112233"');
             expect(html).not.toContain('tel:+33');
         });
+
+        it('uses profile.pays calling code in printed ICE helmet sticker', async () => {
+            const { renderIceSticker } = await import('../../js/views/safety_ice.js');
+            const html = renderIceSticker({
+                nom: 'Peeters',
+                prenom: 'Luc',
+                pays: 'BE',
+                contact1Name: 'Anne',
+                contact1Phone: '0470 12 34 56',
+            });
+            expect(html).toContain('+32470123456');
+            expect(html).not.toContain('+33');
+        });
     });
 });

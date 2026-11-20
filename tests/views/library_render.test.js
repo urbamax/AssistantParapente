@@ -32,4 +32,16 @@ describe('library renders (spec 021: identical before and after moving the texts
         LibraryView.render();
         expect(results()).toMatchSnapshot();
     });
+
+    it('matches course keywords in search filter', () => {
+        LibraryView.state.courses = {
+            ...COURSES,
+            a: { ...COURSES.a, keywords: ['foehn', 'brise'] },
+        };
+        LibraryView.state.sort = 'TITLE';
+        LibraryView.state.search = 'foehn';
+        LibraryView.render();
+        expect(results()).toContain('Aérologie');
+        expect(results()).not.toContain('Pilotage');
+    });
 });
