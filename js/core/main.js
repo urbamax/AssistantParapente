@@ -43,7 +43,7 @@ const SafetyView = viewProxy(safetyModule);
 const IceView = viewProxy(iceModule);
 const FeedbackView = viewProxy(feedbackModule);
 
-async function bootApplication() {
+export async function bootApplication() {
     try {
         initCrashReporter();
         initPwaInstaller();
