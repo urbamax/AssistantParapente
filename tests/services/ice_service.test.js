@@ -177,5 +177,29 @@ describe('IceService (js/services/ice_service.js)', () => {
             expect(decoded.contact1Phone).toBe('0612345678');
             expect(decoded.contact1Rel).toBe('Conjointe');
         });
+
+        it('uses profile.pays calling code in vCard instead of forcing +33 on Swiss/Belgian national numbers', () => {
+            const chVcard = IceService.buildIceVCard({
+                nom: 'Müller',
+                pays: 'CH',
+                contact1Phone: '079 123 45 67',
+                tel: '078 987 65 43',
+            });
+            expect(chVcard).toContain('TEL:+41791234567');
+            expect(chVcard).toContain('TEL:+41789876543');
+            expect(chVcard).not.toContain('+33');
+
+            const beVcard = IceService.buildIceVCard({
+                nom: 'Peeters',
+                pays: 'BE',
+                contact1Phone: '0470 12 34 56',
+            });
+            expect(beVcard).toContain('TEL:+32470123456');
+        });
+
+        it('strips internal + signs in sanitizePhone while preserving a leading +', () => {
+            expect(sanitizePhone('06+12+34')).toBe('061234');
+            expect(sanitizePhone('+41 79+123')).toBe('+4179123');
+        });
     });
 });

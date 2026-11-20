@@ -181,8 +181,8 @@ export function evaluateSpotForecast(site, weather, userPreferences) {
         const flyableWings = wings.filter(
             (wing) =>
                 wing.type === 'voile' &&
-                wing.ventMin !== undefined &&
-                wing.ventMax !== undefined &&
+                Number.isFinite(wing.ventMin) &&
+                Number.isFinite(wing.ventMax) &&
                 windSpeed >= wing.ventMin &&
                 windSpeed <= wing.ventMax,
         );
