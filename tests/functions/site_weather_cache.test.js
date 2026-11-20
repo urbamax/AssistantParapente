@@ -80,4 +80,11 @@ describe('la fonction planifiée utilise ce cache', () => {
         expect(source).toContain('weatherCache.get(siteId, site)');
         expect(source).not.toMatch(/await fetchWeatherForSite\(site, shared\)/);
     });
+
+    it('borne les appels Open-Meteo par timeout, filtre les utilisateurs avec token et purge les tokens morts', () => {
+        expect(source).toContain('AbortSignal.timeout');
+        expect(source).toContain('timeoutSeconds');
+        expect(source).toMatch(/\.where\(\s*'fcmToken'/);
+        expect(source).toContain('registration-token-not-registered');
+    });
 });

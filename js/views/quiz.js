@@ -236,6 +236,7 @@ class QuizViewClass extends QuizVoiceBase {
         await super.unmount();
         this.stopVoice();
         this.disconnectExamHistoryObserver();
+        this._disconnectTrackedResizeObservers();
         clearTimeout(this._examLeaveTimer);
         this._examLeaveTimer = null;
         this._examHiddenAt = null;
@@ -1256,7 +1257,11 @@ class QuizViewClass extends QuizVoiceBase {
                     // La flèche se centre sur la hauteur de la ligne du choix, qui varie avec le texte et la largeur.
                     const syncRowHeight = () => created.style.setProperty('--row-h', `${btn.offsetHeight}px`);
                     syncRowHeight();
-                    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(syncRowHeight).observe(btn);
+                    if (typeof ResizeObserver !== 'undefined') {
+                        const obs = new ResizeObserver(syncRowHeight);
+                        obs.observe(btn);
+                        this._trackResizeObserver(obs);
+                    }
                     group = created;
                 }
                 // Les boutons du cours sont rattachés aux bonnes réponses, où se trouve ce que dit le cours.
@@ -1511,7 +1516,11 @@ class QuizViewClass extends QuizVoiceBase {
                 if (row.offsetHeight) group.style.setProperty('--row-h', `${row.offsetHeight}px`);
             };
             syncRowHeight();
-            if (typeof ResizeObserver !== 'undefined') new ResizeObserver(syncRowHeight).observe(row);
+            if (typeof ResizeObserver !== 'undefined') {
+                const obs = new ResizeObserver(syncRowHeight);
+                obs.observe(row);
+                this._trackResizeObserver(obs);
+            }
         });
     }
 

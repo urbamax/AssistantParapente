@@ -204,12 +204,21 @@ button {
     }
 }
 
-/* --- VIEW TRANSITIONS (SMOOTH SPA NAVIGATION) --- */
+/* --- VIEW TRANSITIONS & GLOBAL REDUCED MOTION --- */
 @media (prefers-reduced-motion: reduce) {
     ::view-transition-group(*),
     ::view-transition-old(*),
     ::view-transition-new(*) {
         animation: none !important;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }
 
