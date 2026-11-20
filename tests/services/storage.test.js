@@ -1,9 +1,13 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import StorageService from '../../js/services/storage.js';
 
 describe('StorageService', () => {
     beforeEach(() => {
         localStorage.clear();
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
     });
 
     it('set and get work correctly with JSON data', () => {
@@ -34,5 +38,33 @@ describe('StorageService', () => {
 
         StorageService.remove('test_key');
         expect(StorageService.get('test_key')).toBeNull();
+    });
+
+    it('clear wipes all keys and returns true', () => {
+        StorageService.set('k1', 'v1');
+        StorageService.set('k2', { a: 1 });
+        expect(StorageService.clear()).toBe(true);
+        expect(StorageService.get('k1')).toBeNull();
+        expect(StorageService.get('k2')).toBeNull();
+    });
+
+    it('returns false and dispatches parapente:storage-quota on QuotaExceededError', () => {
+        const quotaErr = new Error('Quota exceeded');
+        quotaErr.name = 'QuotaExceededError';
+        vi.spyOn(localStorage, 'setItem').mockImplementation(() => {
+            throw quotaErr;
+        });
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+        vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+        const onQuota = vi.fn();
+        window.addEventListener('parapente:storage-quota', onQuota);
+        try {
+            expect(StorageService.set('tp_logbook_data', [{ id: '1' }])).toBe(false);
+            expect(onQuota).toHaveBeenCalledTimes(1);
+            expect(onQuota.mock.calls[0][0].detail).toEqual({ key: 'tp_logbook_data' });
+        } finally {
+            window.removeEventListener('parapente:storage-quota', onQuota);
+        }
     });
 });

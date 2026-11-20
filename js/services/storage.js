@@ -71,6 +71,9 @@ const StorageService = {
             // Gestion d'erreur spécifique si le cache du navigateur est plein
             if (error.name === 'QuotaExceededError') {
                 console.warn("[StorageService] Le quota de stockage local est dépassé ! L'enregistrement a échoué.");
+                if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+                    window.dispatchEvent(new CustomEvent('parapente:storage-quota', { detail: { key } }));
+                }
             }
             return false;
         }
