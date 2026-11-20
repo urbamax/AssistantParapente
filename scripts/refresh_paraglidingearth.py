@@ -197,7 +197,7 @@ def main():
             "source": "ParaglidingEarth (CC BY-SA 3.0)",
         }
         sites.append(new)
-        geo.append({"latitude": new["latitude"], "longitude": new["longitude"]})
+        geo.append(new)
         added += 1
 
     sites.sort(key=lambda s: (s.get("nom") or "").lower())

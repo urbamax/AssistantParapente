@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 # Le jeton de la CI ne peut que lire le dépôt (jamais écrire, jamais publier).
 permissions:
   contents: read

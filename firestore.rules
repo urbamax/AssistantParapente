@@ -13,20 +13,22 @@ rules_version = '2';
 //
 // Collections :
 //   - users/{userId}
-//       fcmToken?: string (<= 512 chars), total keys <= 10
+//       hasOnly(['fcmToken']), fcmToken?: string (<= 512 chars)
 //   - users/{userId}/logbook/{flightId}
-//       id: string (1..128 chars, == flightId), deleted?: bool, deletedAt?: number,
-//       updatedAt?: number, no rawIgc (traces stockées dans igcTraces), total keys <= 60
+//       hasOnly(52 allowed flight fields), id: string (1..128 chars, == flightId),
+//       deleted?: bool, deletedAt?: number, updatedAt?: number, no rawIgc (traces stockées dans igcTraces),
+//       per-string and per-list/map size bounds
 //   - users/{userId}/equipment/{itemId}
-//       id?: string (1..128 chars, == itemId), updatedAt?: number, total keys <= 40
+//       hasOnly(17 allowed equipment fields), id?: string (1..128 chars, == itemId),
+//       updatedAt?: number, per-string size bounds
 //   - users/{userId}/stats/{statId}
 //       statId in ['qcm_stats', 'exam_history']
 //       qcm_stats: total keys <= 2000, questions map (<= 2000), themes map (<= 100), appliedExamIds list (<= 1000)
 //       exam_history: total keys <= 20, exams list (<= 1000), deletedExamIds list (<= 200)
 //   - users/{userId}/preferences/{prefId}
-//       prefId == 'user_prefs', total keys <= 40, no iceProfile,
+//       prefId == 'user_prefs', hasOnly(24 allowed preference fields), no iceProfile,
 //       favoriteSites?: list (<= 100), minimizedSites?: list (<= 200), savedLocations?: list (<= 50),
-//       limitWindMin?: number, limitWindMax?: number, limitGustDelta?: number
+//       limitWindMin?: number, limitWindMax?: number, limitGustDelta?: number, per-string size bounds
 //   - users/{userId}/access/{docId}
 //       read-only for owner (managed manually / Admin SDK)
 //   - users/{userId}/igcTraces/{partId}
@@ -58,9 +60,46 @@ service cloud.firestore {
       return !(key in data) || (data[key] is string && data[key].size() <= max);
     }
 
+    // Texte facultatif ou null.
+    function optTextOrNull(data, key, max) {
+      return !(key in data) || data[key] == null || (data[key] is string && data[key].size() <= max);
+    }
+
     // Nombre facultatif : absent, ou un nombre (int ou float).
     function optNumber(data, key) {
       return !(key in data) || data[key] is number;
+    }
+
+    // Nombre facultatif ou null.
+    function optNumberOrNull(data, key) {
+      return !(key in data) || data[key] == null || data[key] is number;
+    }
+
+    // Nombre, texte court ou null (champs numériques parfois sérialisés en chaîne dans d'anciens exports).
+    function optNumOrTextOrNull(data, key, max) {
+      return !(key in data) || data[key] == null || data[key] is number || (data[key] is string && data[key].size() <= max);
+    }
+
+    // Booléen facultatif.
+    function optBool(data, key) {
+      return !(key in data) || data[key] is bool;
+    }
+
+    // Liste facultative bornée.
+    function optList(data, key, max) {
+      return !(key in data) || (data[key] is list && data[key].size() <= max);
+    }
+
+    // Liste bornée ou texte court (anciens formats avant passage en tableau).
+    function optListOrText(data, key, maxList, maxStr) {
+      return !(key in data)
+        || (data[key] is list && data[key].size() <= maxList)
+        || (data[key] is string && data[key].size() <= maxStr);
+    }
+
+    // Map facultative (ou null) avec nombre maximal de clés.
+    function optMap(data, key, maxKeys) {
+      return !(key in data) || data[key] == null || (data[key] is map && data[key].keys().size() <= maxKeys);
     }
 
     // ===============================================================
@@ -69,28 +108,104 @@ service cloud.firestore {
 
     // Document racine du compte (jeton de notification fcmToken).
     function isValidUserRoot(data) {
-      return data.keys().size() <= 10
+      return data.keys().hasOnly(['fcmToken'])
         && optText(data, 'fcmToken', 512);
     }
 
     // Entrée du carnet de vol (vol normal ou marqueur de suppression cloud `deleted: true`).
     // Les traces brutes IGC ne sont plus stockées dans le document de vol (voir igcTraces).
     function isValidLogbookEntry(flightId, data) {
-      return data.keys().size() <= 60
+      return data.keys().hasOnly([
+          'id', 'type', 'datetime', 'date', 'dateOnly', 'site', 'lieu', 'siteId', 'lat', 'lon',
+          'voile', 'sellette', 'duree', 'commentaire', 'ecole', 'brevetPrepare', 'moniteur',
+          'stageName', 'stageSpecialty', 'accompagnateur', 'pilotes', 'typeVol', 'treuilleur',
+          'rescueDeployed', 'rescueId', 'techDecollage', 'priseTerrain', 'vache', 'typeExercice',
+          'altitudeMax', 'gain', 'altOffset', 'distanceKm', 'maxClimbRate', 'maxSpeedKmh',
+          'avgSpeedKmh', 'igcStats', 'sensorStats', 'instrument', 'meteo', 'meteoAtterro',
+          'meteoAtterroSame', 'traceCloud', 'traceGps', 'traceUpdatedAt', 'varioInFlight',
+          'varioOffInFlight', 'import', 'deleted', 'deletedAt', 'updatedAt', 'syncPending'
+        ])
         && 'id' in data
         && data.id is string && data.id.size() > 0 && data.id.size() <= 128
         && data.id == flightId
         && !('rawIgc' in data)
-        && (!('deleted' in data) || data.deleted is bool)
+        && optText(data, 'type', 40)
+        && optText(data, 'datetime', 40)
+        && optText(data, 'date', 40)
+        && optBool(data, 'dateOnly')
+        && optText(data, 'site', 150)
+        && optText(data, 'lieu', 150)
+        && (!('siteId' in data) || data.siteId == null || data.siteId is number || (data.siteId is string && data.siteId.size() <= 128))
+        && optNumberOrNull(data, 'lat')
+        && optNumberOrNull(data, 'lon')
+        && optText(data, 'voile', 150)
+        && optText(data, 'sellette', 150)
+        && optNumOrTextOrNull(data, 'duree', 20)
+        && optText(data, 'commentaire', 5000)
+        && optText(data, 'ecole', 150)
+        && optText(data, 'brevetPrepare', 40)
+        && optListOrText(data, 'moniteur', 30, 150)
+        && optText(data, 'stageName', 150)
+        && optText(data, 'stageSpecialty', 100)
+        && optListOrText(data, 'accompagnateur', 30, 150)
+        && optListOrText(data, 'pilotes', 50, 150)
+        && optText(data, 'typeVol', 80)
+        && optText(data, 'treuilleur', 150)
+        && optBool(data, 'rescueDeployed')
+        && optText(data, 'rescueId', 128)
+        && optText(data, 'techDecollage', 100)
+        && optText(data, 'priseTerrain', 100)
+        && optBool(data, 'vache')
+        && optListOrText(data, 'typeExercice', 50, 150)
+        && optNumOrTextOrNull(data, 'altitudeMax', 20)
+        && optNumOrTextOrNull(data, 'gain', 20)
+        && optNumOrTextOrNull(data, 'altOffset', 20)
+        && optNumOrTextOrNull(data, 'distanceKm', 20)
+        && optNumOrTextOrNull(data, 'maxClimbRate', 20)
+        && optNumOrTextOrNull(data, 'maxSpeedKmh', 20)
+        && optNumOrTextOrNull(data, 'avgSpeedKmh', 20)
+        && optMap(data, 'igcStats', 40)
+        && optMap(data, 'sensorStats', 30)
+        && (!('instrument' in data) || data.instrument == null || (data.instrument is string && data.instrument.size() <= 200) || (data.instrument is map && data.instrument.keys().size() <= 20))
+        && optMap(data, 'meteo', 30)
+        && optMap(data, 'meteoAtterro', 30)
+        && optBool(data, 'meteoAtterroSame')
+        && optMap(data, 'traceCloud', 10)
+        && (!('traceGps' in data) || data.traceGps == null || (data.traceGps is list && data.traceGps.size() <= 20000))
+        && optNumber(data, 'traceUpdatedAt')
+        && optBool(data, 'varioInFlight')
+        && optBool(data, 'varioOffInFlight')
+        && optMap(data, 'import', 10)
+        && optBool(data, 'deleted')
+        && optNumber(data, 'deletedAt')
         && optNumber(data, 'updatedAt')
-        && optNumber(data, 'deletedAt');
+        && optBool(data, 'syncPending');
     }
 
     // Élément de matériel du pilote.
     function isValidEquipmentItem(itemId, data) {
-      return data.keys().size() <= 40
+      return data.keys().hasOnly([
+          'id', 'nom', 'marque', 'modele', 'taille', 'couleur', 'type', 'dateAchat',
+          'derniereRevision', 'periodicite', 'periodiciteHeures', 'statut', 'ventMin',
+          'ventMax', 'linkedRescueId', 'updatedAt', 'syncPending'
+        ])
         && (!('id' in data) || (data.id is string && data.id.size() > 0 && data.id.size() <= 128 && data.id == itemId))
-        && optNumber(data, 'updatedAt');
+        && optText(data, 'nom', 150)
+        && optText(data, 'marque', 100)
+        && optText(data, 'modele', 100)
+        && optText(data, 'taille', 50)
+        && optText(data, 'couleur', 50)
+        && optText(data, 'type', 40)
+        && optText(data, 'dateAchat', 20)
+        && optText(data, 'derniereRevision', 20)
+        && optNumberOrNull(data, 'periodicite')
+        && optNumberOrNull(data, 'periodiciteHeures')
+        && optText(data, 'statut', 20)
+        && optNumberOrNull(data, 'ventMin')
+        && optNumberOrNull(data, 'ventMax')
+        && optTextOrNull(data, 'linkedRescueId', 128)
+        && optNumber(data, 'updatedAt')
+        && optBool(data, 'syncPending');
     }
 
     // Statistiques QCM (`qcm_stats`, ~850 questions) et historique d'examens (`exam_history`).
@@ -115,14 +230,38 @@ service cloud.firestore {
     // d'appels Open-Meteo dans la Cloud Function, et interdit d'y stocker la fiche ICE.
     function isValidPreferences(prefId, data) {
       return prefId == 'user_prefs'
-        && data.keys().size() <= 40
+        && data.keys().hasOnly([
+          'id', 'pilotLevel', 'themeMode', 'favoriteSites', 'minimizedSites', 'savedLocations',
+          'activeMapLayers', 'limitWindMin', 'limitWindMax', 'limitGustDelta',
+          'filterWindInclude', 'filterWindExclude', 'filterTypeInclude', 'filterTypeExclude',
+          'filterFavoritesOnly', 'forecastMaxRange', 'hideUnflyable', 'radiusLimit',
+          'sortMode', 'conditionsStrategy', 'weatherModel', 'filterMode', 'brevets', 'updatedAt'
+        ])
         && !('iceProfile' in data)
-        && (!('favoriteSites' in data) || (data.favoriteSites is list && data.favoriteSites.size() <= 100))
-        && (!('minimizedSites' in data) || (data.minimizedSites is list && data.minimizedSites.size() <= 200))
-        && (!('savedLocations' in data) || (data.savedLocations is list && data.savedLocations.size() <= 50))
+        && (!('id' in data) || (data.id is string && data.id == 'user_prefs'))
+        && optText(data, 'pilotLevel', 20)
+        && optText(data, 'themeMode', 20)
+        && optList(data, 'favoriteSites', 100)
+        && optList(data, 'minimizedSites', 200)
+        && optList(data, 'savedLocations', 50)
+        && optList(data, 'activeMapLayers', 30)
         && optNumber(data, 'limitWindMin')
         && optNumber(data, 'limitWindMax')
-        && optNumber(data, 'limitGustDelta');
+        && optNumber(data, 'limitGustDelta')
+        && optList(data, 'filterWindInclude', 30)
+        && optList(data, 'filterWindExclude', 30)
+        && optList(data, 'filterTypeInclude', 30)
+        && optList(data, 'filterTypeExclude', 30)
+        && optBool(data, 'filterFavoritesOnly')
+        && optNumber(data, 'forecastMaxRange')
+        && optBool(data, 'hideUnflyable')
+        && optNumber(data, 'radiusLimit')
+        && optText(data, 'sortMode', 40)
+        && optText(data, 'conditionsStrategy', 40)
+        && optText(data, 'weatherModel', 40)
+        && optText(data, 'filterMode', 40)
+        && optMap(data, 'brevets', 10)
+        && optNumOrTextOrNull(data, 'updatedAt', 40);
     }
 
     // Un morceau de trace : mêmes champs et mêmes limites que js/utils/trace_codec.js

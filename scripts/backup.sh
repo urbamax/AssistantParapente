@@ -21,6 +21,7 @@ echo "Fichier de destination : $BACKUP_FILE"
 echo ""
 
 # Exécuter la commande tar en excluant les dossiers lourds, secrets (.env), temporaires ou non nécessaires
+umask 077
 if tar -czvf "$BACKUP_FILE" \
     --exclude=".git" \
     --exclude=".claude" \
@@ -46,6 +47,7 @@ if tar -czvf "$BACKUP_FILE" \
     echo "Taille :"
     du -h "$BACKUP_FILE"
 else
+    rm -f "$BACKUP_FILE"
     echo ""
     echo "❌ Erreur lors de la création de la sauvegarde."
     exit 1

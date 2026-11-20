@@ -122,7 +122,7 @@ run_ci() {
     step "lint";                      npm run --silent lint
     step "format";                    npm run --silent format:check
     step "typecheck";                 npm run --silent typecheck
-    step "tests";                     npm test --silent
+    step "tests";                     npm run --silent test:coverage
     step "tests python ($(python3 -V))"; python3 -m unittest discover -s tests/scripts
     step "build";                     npm run --silent build
     if [[ "$2" == "1" ]]; then

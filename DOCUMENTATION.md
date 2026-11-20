@@ -487,11 +487,11 @@ AppEvents.register('myCustomAction', (args, event, target) => {
 
 ## 🔍 Verification & Debugging Toolkit
 
-Automated checks (all run in CI on every pull request and push to `main`: job `lint-and-test`, and job `e2e` for Playwright on Chromium + WebKit with the HTML report uploaded on failure; the Python tests of `scripts/` run in `lint-and-test`):
+Automated checks (all run in CI on every pull request and push to `main`: job `lint-and-test`, job `rules` for Firestore Security Rules on emulator, and job `e2e` for Playwright on Chromium + WebKit with the HTML report uploaded on failure; the Python tests of `scripts/` run in `lint-and-test`):
 ```bash
 npm run lint && npm run format:check && npm run typecheck
 npm run test:coverage # Vitest unit tests + V8 coverage thresholds (tests/**, happy-dom; tests/functions/** run under node)
-npm run test:rules    # Firestore security rules against local emulator (34 tests)
+npm run test:rules    # Firestore security rules against local emulator (49 tests)
 npm run test:e2e      # Playwright (tests/e2e/**) — mocks Open-Meteo, blocks the service worker
 npm run build
 ```
