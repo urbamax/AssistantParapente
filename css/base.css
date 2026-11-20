@@ -70,7 +70,10 @@
     /* Z-index scale */
     --z-sticky: 100;
     --z-dropdown: 1000;
+    --z-nav: 9999;
     --z-overlay: 10000;
+    --z-fullscreen: 99999;
+    --z-fullscreen-ui: 100000;
     --z-modal: 200000;
     --z-toast: 300000;
 

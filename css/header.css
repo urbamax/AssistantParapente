@@ -7,13 +7,13 @@
     position: absolute;
     top: 0; left: 0; right: 0;
     pointer-events: none;
-    z-index: 99999;
+    z-index: var(--z-fullscreen);
 }
 
 /* 1. FLOATING LOGO (Top Left) */
 .floating-logo {
     position: fixed !important; top: 15px !important; left: 20px !important;
-    z-index: 9999 !important; background: transparent !important;
+    z-index: var(--z-nav) !important; background: transparent !important;
     width: max-content !important; height: auto !important;
     overflow: visible !important; box-shadow: none !important;
 
@@ -34,7 +34,7 @@
     position: fixed;
     top: 15px;
     right: 15px;
-    z-index: 9999;
+    z-index: var(--z-nav);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -218,7 +218,7 @@ body.dark-theme .level-select-container:hover {
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-    z-index: 9999;
+    z-index: var(--z-nav);
 }
 
 body.dark-theme .desktop-main-nav {
@@ -439,7 +439,7 @@ body {
     border: 1px solid var(--border-color, #eee);
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-    z-index: 1000;
+    z-index: var(--z-dropdown);
 }
 
 /* Sous-menu d'un bouton proche du bord droit : il s'ouvre vers la gauche. */
