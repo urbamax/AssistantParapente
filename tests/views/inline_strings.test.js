@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { FR } from '../../js/i18n/fr.js';
 import { stripDeveloperText, findInlineTexts, catalogueKeys } from '../helpers/inline_texts.js';
 
@@ -21,6 +21,9 @@ const SCREENS = [
         ['js/views/logbook_checklists.js', 14],
         ['js/views/logbook_learned.js', 1],
         ['js/views/logbook_igc_import.js', 12],
+        ['js/views/logbook_batch_import.js', 40],
+        ['js/views/logbook_ffvl_import.js', 25],
+        ['js/views/logbook_strings.js', 0],
     ].map(([file, minKeys]) => ({ file, spec: '014', prefix: 'logbook.', dataValues: ['Autre', 'Plouf'], minKeys })),
     // Code de niveau enregistré dans les préférences.
     // sites.js a été découpé : chaque fichier reste contrôlé.
@@ -29,6 +32,7 @@ const SCREENS = [
         ['js/views/sites_list.js', 64],
         ['js/views/sites_forecast.js', 16],
         ['js/views/sites_map.js', 21],
+        ['js/views/sites_strings.js', 0],
     ].map(([file, minKeys]) => ({ file, spec: '015', prefix: 'sites.', dataValues: ['ALL'], minKeys })),
     { file: 'js/views/safety.js', spec: '019', prefix: 'safety.', dataValues: [], minKeys: 15 },
     // Codes d'erreur renvoyés au code appelant (jamais affichés) et codes de niveau / catégorie.
@@ -54,6 +58,10 @@ const SCREENS = [
         ['js/views/quiz_stats.js', 35],
         ['js/views/quiz_stats_html.js', 30],
         ['js/views/quiz_voice_ui.js', 6],
+        ['js/views/quiz_course_links.js', 4],
+        ['js/views/quiz_explanation.js', 0],
+        ['js/views/quiz_strings.js', 0],
+        ['js/views/quiz_traps_html.js', 7],
     ].map(([file, minKeys]) => ({
         file,
         spec: '024',
@@ -125,7 +133,24 @@ const SCREENS = [
         dataValues: ['Inconnu', '112'],
         minKeys: 50,
     },
+    {
+        file: 'js/views/welcome.js',
+        spec: '029',
+        prefix: '',
+        dataValues: [],
+        minKeys: 0,
+    },
 ];
+
+describe('exhaustive coverage of js/views/*.js', () => {
+    it('covers every file in js/views/ so no new view can bypass i18n checks', () => {
+        const covered = new Set(SCREENS.map((s) => s.file));
+        const allViews = readdirSync('js/views')
+            .filter((f) => f.endsWith('.js'))
+            .map((f) => `js/views/${f}`);
+        expect(allViews.filter((f) => !covered.has(f))).toEqual([]);
+    });
+});
 
 const resolves = (key) => typeof key.split('.').reduce((node, part) => node?.[part], FR) === 'string';
 
