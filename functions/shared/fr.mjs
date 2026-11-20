@@ -1832,6 +1832,11 @@ export const FR = Object.freeze({
         reloadApp: "Recharger l'Application",
     }),
     theme: Object.freeze({ auto: 'Mode: Auto', mode: 'Mode: {mode}' }),
+    storage: Object.freeze({
+        quotaExceeded:
+            "Stockage local saturé : certaines données n'ont pas pu être enregistrées. Exportez puis allégez votre carnet.",
+        dismiss: "Fermer l'alerte",
+    }),
     privacy: Object.freeze({ gpsDisabled: 'Géolocalisation désactivée par vos choix de confidentialité.' }),
     map3d: Object.freeze({
         loading: 'Chargement du moteur 3D (MapLibre & deck.gl)...',

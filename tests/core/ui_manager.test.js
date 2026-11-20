@@ -76,4 +76,21 @@ describe('UIManager', () => {
         expect(setTimeoutSpy).not.toHaveBeenCalled();
         setTimeoutSpy.mockRestore();
     });
+
+    it('shows a single accessible alert banner when parapente:storage-quota fires', async () => {
+        await UIManagerModule.init();
+
+        window.dispatchEvent(new CustomEvent('parapente:storage-quota', { detail: { key: 'parapente_logbook' } }));
+        window.dispatchEvent(new CustomEvent('parapente:storage-quota', { detail: { key: 'parapente_logbook' } }));
+
+        const alerts = document.querySelectorAll('#storage-quota-alert');
+        expect(alerts).toHaveLength(1);
+        expect(alerts[0].getAttribute('role')).toBe('alert');
+        expect(alerts[0].textContent).toMatch(/stockage/i);
+
+        const closeBtn = alerts[0].querySelector('button');
+        expect(closeBtn).not.toBeNull();
+        closeBtn.click();
+        expect(document.getElementById('storage-quota-alert')).toBeNull();
+    });
 });

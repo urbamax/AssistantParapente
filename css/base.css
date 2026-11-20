@@ -67,6 +67,13 @@
     --radius-md: 8px;
     --radius-sm: 4px;
 
+    /* Z-index scale */
+    --z-sticky: 100;
+    --z-dropdown: 1000;
+    --z-overlay: 10000;
+    --z-modal: 200000;
+    --z-toast: 300000;
+
     /* Progressive enhancement: native light-dark() (Baseline 2024) */
     @supports (color: light-dark(#fff, #000)) {
         --bg-app: light-dark(var(--p-light-deep), var(--p-dark-deep));
@@ -227,4 +234,34 @@ button {
 [data-requires-role][hidden],
 [data-hidden-with-role][hidden] {
     display: none !important;
+}
+
+/* Alerte non bloquante en cas de saturation du stockage local (QuotaExceededError) */
+.storage-quota-alert {
+    position: fixed;
+    left: 50%;
+    bottom: 16px;
+    transform: translateX(-50%);
+    z-index: var(--z-toast);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: min(92vw, 560px);
+    padding: 12px 16px;
+    border-radius: var(--radius-lg);
+    background: var(--bg-surface);
+    color: var(--text-main);
+    border: 1px solid var(--accent-red);
+    box-shadow: var(--shadow-card);
+    font-size: 0.9rem;
+}
+
+.storage-quota-alert-close {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 6px;
 }

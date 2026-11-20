@@ -13,6 +13,7 @@ import { updateInstallUI } from '../services/pwa_installer.js';
 class UIManager {
     constructor() {
         this.basePath = '.';
+        this._quotaListenerBound = false;
     }
 
     async init() {
@@ -28,8 +29,39 @@ class UIManager {
         });
         GlobalState.subscribe('mode', () => this.updateHeaderNavigation());
 
+        if (!this._quotaListenerBound && typeof window !== 'undefined') {
+            this._quotaListenerBound = true;
+            window.addEventListener('parapente:storage-quota', () => this.showStorageQuotaAlert());
+        }
+
         // Load Header and Footer
         await this.loadComponents();
+    }
+
+    showStorageQuotaAlert() {
+        if (typeof document === 'undefined' || !document.body) return;
+        if (document.getElementById('storage-quota-alert')) return;
+
+        const banner = document.createElement('div');
+        banner.id = 'storage-quota-alert';
+        banner.className = 'storage-quota-alert';
+        banner.setAttribute('role', 'alert');
+
+        const msg = document.createElement('span');
+        msg.textContent = t('storage.quotaExceeded');
+
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'storage-quota-alert-close';
+        closeBtn.setAttribute('aria-label', t('storage.dismiss'));
+        const closeIcon = document.createElement('i');
+        closeIcon.className = 'ri-close-line';
+        closeIcon.setAttribute('aria-hidden', 'true');
+        closeBtn.appendChild(closeIcon);
+        closeBtn.addEventListener('click', () => banner.remove());
+
+        banner.append(msg, closeBtn);
+        document.body.appendChild(banner);
     }
 
     async loadComponents(basePath = '.') {
