@@ -65,22 +65,10 @@ test.describe('E2E - Modale de signalement et suggestion', () => {
         await expect(modal.locator('#feedback-context-preview')).toContainText('Écran : WELCOME');
     });
 
-    test('envoie via Web3Forms lorsqu une clé est configurée et efface le brouillon', async ({ page }) => {
+    test('envoie via le relais auto-hébergé /api/feedback et efface le brouillon', async ({ page }) => {
         let submittedPayload = null;
 
-        await page.route('**/js/feedback_config.js*', async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/javascript',
-                body: `export const FEEDBACK_CONFIG = Object.freeze({
-                    web3FormsAccessKey: 'e2e-test-access-key',
-                    customEndpoint: '',
-                    fallbackFacebookUrl: 'https://www.facebook.com/maxime.urbaniak/',
-                });`,
-            });
-        });
-
-        await page.route('https://api.web3forms.com/submit', async (route) => {
+        await page.route('**/api/feedback', async (route) => {
             submittedPayload = route.request().postDataJSON();
             await route.fulfill({
                 status: 200,
@@ -106,8 +94,9 @@ test.describe('E2E - Modale de signalement et suggestion', () => {
         await modal.locator('#feedback-submit-btn').click();
 
         await expect.poll(() => submittedPayload).not.toBeNull();
-        expect(submittedPayload.access_key).toBe('e2e-test-access-key');
-        expect(submittedPayload.replyto).toBe('pilote@example.com');
+        expect(submittedPayload.category).toBe('qcm_course');
+        expect(submittedPayload.contact).toBe('pilote@example.com');
+        expect(submittedPayload.description).toContain('La réponse C semble inversée');
         expect(submittedPayload.message).toContain('La réponse C semble inversée');
 
         await expect(modal.locator('#feedback-status')).toHaveAttribute('data-status-type', 'success');
