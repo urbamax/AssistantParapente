@@ -1,16 +1,128 @@
 rules_version = '2';
 
+// ===============================================================
+// Assumed Data Model — Assistant Parapente
+// ===============================================================
+//
 // Règles Firestore d'Assistant Parapente. À déployer avec : firebase deploy --only firestore:rules
 // (ou à coller dans la console Firebase > Firestore > Règles). Testées en local : npm run test:rules.
 //
 // Principe : chaque pilote n'accède qu'à ses propres données, sous users/{son uid}. Tout le reste
 // est refusé (refus par défaut), y compris users/{uid}/pushState, réservé à la Cloud Function
 // (le SDK admin ignore ces règles).
+//
+// Collections :
+//   - users/{userId}
+//       fcmToken?: string (<= 512 chars), total keys <= 10
+//   - users/{userId}/logbook/{flightId}
+//       id: string (1..128 chars, == flightId), deleted?: bool, deletedAt?: number,
+//       updatedAt?: number, no rawIgc (traces stockées dans igcTraces), total keys <= 60
+//   - users/{userId}/equipment/{itemId}
+//       id?: string (1..128 chars, == itemId), updatedAt?: number, total keys <= 40
+//   - users/{userId}/stats/{statId}
+//       statId in ['qcm_stats', 'exam_history']
+//       qcm_stats: total keys <= 2000, questions map (<= 2000), themes map (<= 100), appliedExamIds list (<= 1000)
+//       exam_history: total keys <= 20, exams list (<= 1000), deletedExamIds list (<= 200)
+//   - users/{userId}/preferences/{prefId}
+//       prefId == 'user_prefs', total keys <= 40, no iceProfile,
+//       favoriteSites?: list (<= 100), minimizedSites?: list (<= 200), savedLocations?: list (<= 50),
+//       limitWindMin?: number, limitWindMax?: number, limitGustDelta?: number
+//   - users/{userId}/access/{docId}
+//       read-only for owner (managed manually / Admin SDK)
+//   - users/{userId}/igcTraces/{partId}
+//       flightId, index (0..11), total (1..12, index < total), encoding, data (1..700000), updatedAt?
+//       partId == flightId + '_' + string(index)
+//   - users/{userId}/ice/{docId}
+//       docId == 'profile', updatedAt: number (> 0), consentAt: string (1..40),
+//       anticoag?: '' | '1', pays?: '' | /^[A-Z]{2}$/, strict allowed fields and lengths
+//
+// ===============================================================
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
     function isOwner(userId) {
-      return request.auth != null && request.auth.uid == userId;
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Texte facultatif : absent, ou une chaîne d'au plus `max` caractères.
+    function optText(data, key, max) {
+      return !(key in data) || (data[key] is string && data[key].size() <= max);
+    }
+
+    // Nombre facultatif : absent, ou un nombre (int ou float).
+    function optNumber(data, key) {
+      return !(key in data) || data[key] is number;
+    }
+
+    // ===============================================================
+    // Domain Validators (appelés sur create ET update)
+    // ===============================================================
+
+    // Document racine du compte (jeton de notification fcmToken).
+    function isValidUserRoot(data) {
+      return data.keys().size() <= 10
+        && optText(data, 'fcmToken', 512);
+    }
+
+    // Entrée du carnet de vol (vol normal ou marqueur de suppression cloud `deleted: true`).
+    // Les traces brutes IGC ne sont plus stockées dans le document de vol (voir igcTraces).
+    function isValidLogbookEntry(flightId, data) {
+      return data.keys().size() <= 60
+        && 'id' in data
+        && data.id is string && data.id.size() > 0 && data.id.size() <= 128
+        && data.id == flightId
+        && !('rawIgc' in data)
+        && (!('deleted' in data) || data.deleted is bool)
+        && optNumber(data, 'updatedAt')
+        && optNumber(data, 'deletedAt');
+    }
+
+    // Élément de matériel du pilote.
+    function isValidEquipmentItem(itemId, data) {
+      return data.keys().size() <= 40
+        && (!('id' in data) || (data.id is string && data.id.size() > 0 && data.id.size() <= 128 && data.id == itemId))
+        && optNumber(data, 'updatedAt');
+    }
+
+    // Statistiques QCM (`qcm_stats`, ~850 questions) et historique d'examens (`exam_history`).
+    function isValidStatsDoc(statId, data) {
+      return statId in ['qcm_stats', 'exam_history']
+        && data.keys().size() <= 2000
+        && (statId != 'qcm_stats' || (
+          optNumber(data, 'totalQuestions')
+          && optNumber(data, 'totalCorrect')
+          && (!('questions' in data) || (data.questions is map && data.questions.keys().size() <= 2000))
+          && (!('themes' in data) || (data.themes is map && data.themes.keys().size() <= 100))
+          && (!('appliedExamIds' in data) || (data.appliedExamIds is list && data.appliedExamIds.size() <= 1000))
+        ))
+        && (statId != 'exam_history' || (
+          data.keys().size() <= 20
+          && (!('exams' in data) || (data.exams is list && data.exams.size() <= 1000))
+          && (!('deletedExamIds' in data) || (data.deletedExamIds is list && data.deletedExamIds.size() <= 200))
+        ));
+    }
+
+    // Préférences utilisateur (`user_prefs`) : borne `favoriteSites` pour éviter toute amplification
+    // d'appels Open-Meteo dans la Cloud Function, et interdit d'y stocker la fiche ICE.
+    function isValidPreferences(prefId, data) {
+      return prefId == 'user_prefs'
+        && data.keys().size() <= 40
+        && !('iceProfile' in data)
+        && (!('favoriteSites' in data) || (data.favoriteSites is list && data.favoriteSites.size() <= 100))
+        && (!('minimizedSites' in data) || (data.minimizedSites is list && data.minimizedSites.size() <= 200))
+        && (!('savedLocations' in data) || (data.savedLocations is list && data.savedLocations.size() <= 50))
+        && optNumber(data, 'limitWindMin')
+        && optNumber(data, 'limitWindMax')
+        && optNumber(data, 'limitGustDelta');
     }
 
     // Un morceau de trace : mêmes champs et mêmes limites que js/utils/trace_codec.js
@@ -27,11 +139,6 @@ service cloud.firestore {
         && partId == data.flightId + '_' + string(data.index);
     }
 
-    // Texte facultatif d'une fiche d'urgence : absent, ou une chaîne d'au plus `max` caractères.
-    function optText(data, key, max) {
-      return !(key in data) || (data[key] is string && data[key].size() <= max);
-    }
-
     // Fiche d'urgence (ICE) du pilote : données de santé, enregistrées seulement à sa demande expresse
     // (case « Enregistrer ma fiche dans mon profil en ligne »). Même champs que js/services/ice_service.js, avec
     // une marge sur les longueurs ; `updatedAt` départage les appareils, `consentAt` date son accord.
@@ -43,34 +150,46 @@ service cloud.firestore {
           'contact1Rel', 'contact2Name', 'contact2Phone', 'contact2Rel', 'bloodGroup', 'allergies', 'anticoag',
           'tetanos', 'pays', 'remarques', 'ffvl', 'federation', 'insurance', 'updatedAt', 'consentAt'
         ])
-        && data.updatedAt is number
+        && data.updatedAt is number && data.updatedAt > 0
         && data.consentAt is string && data.consentAt.size() > 0 && data.consentAt.size() <= 40
         && optText(data, 'nom', 80) && optText(data, 'prenom', 80)
         && optText(data, 'birthYear', 4) && optText(data, 'birthDate', 10)
         && optText(data, 'tel', 40) && optText(data, 'langues', 80)
         && optText(data, 'contact1Name', 80) && optText(data, 'contact1Phone', 40) && optText(data, 'contact1Rel', 60)
         && optText(data, 'contact2Name', 80) && optText(data, 'contact2Phone', 40) && optText(data, 'contact2Rel', 60)
-        && optText(data, 'bloodGroup', 8) && optText(data, 'allergies', 300) && optText(data, 'anticoag', 1)
-        && optText(data, 'tetanos', 4) && optText(data, 'pays', 2) && optText(data, 'remarques', 500)
+        && optText(data, 'bloodGroup', 8) && optText(data, 'allergies', 300)
+        && (!('anticoag' in data) || (data.anticoag is string && data.anticoag in ['', '1']))
+        && optText(data, 'tetanos', 4)
+        && (!('pays' in data) || (data.pays is string && data.pays.matches('^([A-Z]{2})?$')))
+        && optText(data, 'remarques', 500)
         && optText(data, 'ffvl', 40) && optText(data, 'federation', 24) && optText(data, 'insurance', 120);
     }
 
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
     match /users/{userId} {
       // Le document du compte (jeton de notification fcmToken).
-      allow read, write: if isOwner(userId);
+      allow read, delete: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidUserRoot(request.resource.data);
 
       // Seuls les sous-ensembles utilisés par l'application (js/services/firebase_service.js).
       match /logbook/{flightId} {
-        allow read, write: if isOwner(userId);
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidLogbookEntry(flightId, request.resource.data);
       }
       match /equipment/{itemId} {
-        allow read, write: if isOwner(userId);
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidEquipmentItem(itemId, request.resource.data);
       }
       match /stats/{statId} {
-        allow read, write: if isOwner(userId);
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidStatsDoc(statId, request.resource.data);
       }
       match /preferences/{prefId} {
-        allow read, write: if isOwner(userId);
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidPreferences(prefId, request.resource.data);
       }
 
       // Rôles du pilote (ex. { roles: ['beta'] } dans le document « profile ») : donnés à la main
