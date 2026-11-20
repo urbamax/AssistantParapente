@@ -68,23 +68,26 @@ describe('createSiteWeatherCache', () => {
 });
 
 describe('la fonction planifiée utilise ce cache', () => {
-    const source = readFileSync('functions/index.js', 'utf8');
+    const indexSource = readFileSync('functions/index.js', 'utf8');
+    const runnerSource = readFileSync('functions/runner.mjs', 'utf8');
 
     it('crée un cache par exécution, dans le gestionnaire (pas au niveau du module)', () => {
-        const handler = source.slice(source.indexOf('checkFavoriteSitesWeather'));
+        const handler = runnerSource.slice(runnerSource.indexOf('runCheckFavoriteSitesWeather'));
         expect(handler).toContain('createSiteWeatherCache');
-        expect(source.slice(0, source.indexOf('checkFavoriteSitesWeather'))).not.toContain('createSiteWeatherCache(');
+        expect(runnerSource.slice(0, runnerSource.indexOf('runCheckFavoriteSitesWeather'))).not.toContain(
+            'createSiteWeatherCache(',
+        );
     });
 
     it('lit la météo via le cache, jamais directement dans la boucle des pilotes', () => {
-        expect(source).toContain('weatherCache.get(siteId, site)');
-        expect(source).not.toMatch(/await fetchWeatherForSite\(site, shared\)/);
+        expect(runnerSource).toContain('weatherCache.get(siteId, site)');
+        expect(runnerSource).not.toMatch(/await fetchWeatherForSite\(site, shared\)/);
     });
 
     it('borne les appels Open-Meteo par timeout, filtre les utilisateurs avec token et purge les tokens morts', () => {
-        expect(source).toContain('AbortSignal.timeout');
-        expect(source).toContain('timeoutSeconds');
-        expect(source).toMatch(/\.where\(\s*'fcmToken'/);
-        expect(source).toContain('registration-token-not-registered');
+        expect(runnerSource).toContain('AbortSignal.timeout');
+        expect(indexSource).toContain('timeoutSeconds');
+        expect(runnerSource).toMatch(/\.where\(\s*'fcmToken'/);
+        expect(runnerSource).toContain('registration-token-not-registered');
     });
 });

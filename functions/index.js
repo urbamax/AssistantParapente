@@ -28,111 +28,37 @@ const messaging = admin.messaging();
 
 const sitesById = new Map(sitesData.map((s) => [s.id, s]));
 
-const DEFAULT_PREFS = { limitWindMin: 0, limitWindMax: 25, limitGustDelta: 10 };
-
 // Calcul météo partagé avec l'application (spec 001, US4) : functions/shared/ est une copie
 // générée de js/weatherScoring.js (scripts/sync_functions_shared.mjs, lancé avant chaque
 // déploiement). Modules ES chargés à la demande depuis ce fichier CommonJS.
 let sharedModules = null;
 async function loadShared() {
     if (!sharedModules) {
-        const [scoring, evaluate] = await Promise.all([
+        const [scoring, evaluate, runner] = await Promise.all([
             import('./shared/weatherScoring.mjs'),
             import('./evaluate.mjs'),
+            import('./runner.mjs'),
         ]);
-        sharedModules = { evaluateSpotForecast: scoring.evaluateSpotForecast, ...evaluate };
+        sharedModules = {
+            evaluateSpotForecast: scoring.evaluateSpotForecast,
+            runCheckFavoriteSitesWeather: runner.runCheckFavoriteSitesWeather,
+            ...evaluate,
+        };
     }
     return sharedModules;
 }
-
-async function fetchWeatherForSite(site, { forecastUrl, buildHourlyForecast }) {
-    const lat = parseFloat(site.latitude || site.lat);
-    const lon = parseFloat(site.longitude || site.lon);
-    if (isNaN(lat) || isNaN(lon)) return null;
-
-    const res = await fetch(forecastUrl(lat, lon), { signal: AbortSignal.timeout(10_000) });
-    if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
-    return buildHourlyForecast(await res.json(), Date.now());
-}
-
-const DEAD_FCM_ERROR_CODES = new Set([
-    'messaging/registration-token-not-registered',
-    'messaging/invalid-registration-token',
-]);
 
 exports.checkFavoriteSitesWeather = onSchedule(
     { schedule: 'every 30 minutes', timeoutSeconds: 300, memory: '512MiB' },
     async () => {
         const shared = await loadShared();
-        // Une seule requête Open-Meteo par site et par exécution, même si plusieurs pilotes l'ont en favori.
-        const weatherCache = shared.createSiteWeatherCache((site) => fetchWeatherForSite(site, shared));
-        const usersSnap = await db.collection('users').where('fcmToken', '!=', '').get();
-
-        for (const userDoc of usersSnap.docs) {
-            const user = userDoc.data();
-            if (!user.fcmToken || typeof user.fcmToken !== 'string') continue;
-
-            // Réservé aux pilotes ayant le rôle « beta » (users/{uid}/access/profile, donné à la main).
-            const accessSnap = await db.collection('users').doc(userDoc.id).collection('access').doc('profile').get();
-            if (!shared.hasBetaRole(accessSnap.exists ? accessSnap.data() : undefined)) continue;
-
-            const prefsSnap = await db
-                .collection('users')
-                .doc(userDoc.id)
-                .collection('preferences')
-                .doc('user_prefs')
-                .get();
-            const prefs = { ...DEFAULT_PREFS, ...(prefsSnap.exists ? prefsSnap.data() : {}) };
-            const favoriteIds = Array.isArray(prefs.favoriteSites) ? prefs.favoriteSites : [];
-            if (favoriteIds.length === 0) continue;
-
-            const stateRef = db.collection('users').doc(userDoc.id).collection('pushState').doc('favoriteSitesFlyable');
-            const stateSnap = await stateRef.get();
-            const previousState = stateSnap.exists ? stateSnap.data() : {};
-            const newState = {};
-            let tokenInvalidated = false;
-
-            for (const siteId of favoriteIds) {
-                const site = sitesById.get(siteId);
-                if (!site) continue;
-
-                try {
-                    const weather = await weatherCache.get(siteId, site);
-                    const outcome = shared.evaluateSpotForecast(site, weather, shared.toScoringPrefs(prefs));
-                    newState[siteId] = shared.nextState(previousState[siteId], outcome);
-
-                    // Notification uniquement sur la transition non-volable -> volable, avec des données
-                    // complètes et une orientation connue (spec 001, FR-011) ; jamais à chaque exécution
-                    // tant que ça reste volable (sinon spam toutes les 30 min).
-                    if (!tokenInvalidated && shared.shouldNotify(previousState[siteId], outcome)) {
-                        await messaging
-                            .send({
-                                token: user.fcmToken,
-                                // Informe sans autoriser : ni « volable », ni certitude (spec 005, audit A3).
-                                notification: shared.buildNotification(site, weather, weather.timeMs),
-                            })
-                            .catch(async (err) => {
-                                console.error(`Échec envoi push (${userDoc.id}/${siteId}):`, err.message);
-                                if (DEAD_FCM_ERROR_CODES.has(err?.code)) {
-                                    tokenInvalidated = true;
-                                    await userDoc.ref
-                                        .update({ fcmToken: admin.firestore.FieldValue.delete() })
-                                        .catch(() => {});
-                                }
-                            });
-                    }
-                } catch (e) {
-                    console.error(`Erreur météo pour le site ${siteId} (utilisateur ${userDoc.id}):`, e.message);
-                    // Erreur réseau : on garde le dernier état connu plutôt que de l'effacer.
-                    if (previousState[siteId] !== undefined) newState[siteId] = previousState[siteId];
-                }
-            }
-
-            await stateRef.set(newState);
-        }
-
-        console.log(
-            `Météo des favoris : ${weatherCache.requests} site(s) interrogé(s) pour ${usersSnap.size} utilisateur(s).`,
-        );
+        const { weatherRequests, userCount } = await shared.runCheckFavoriteSitesWeather({
+            db,
+            messaging,
+            fieldValueDelete: () => admin.firestore.FieldValue.delete(),
+            sitesById,
+            shared,
+        });
+        console.log(`Météo des favoris : ${weatherRequests} site(s) interrogé(s) pour ${userCount} utilisateur(s).`);
     },
 );
