@@ -124,6 +124,9 @@ export const FirebaseAuthEngine = {
     _syncedSeq: 0,
     _syncsInFlight: 0,
     _activeSyncPromise: null,
+    _activeSyncSilent: true,
+    _initPromise: null,
+    _syncDotSubscribed: false,
 
     /**
      * Safari : au rechargement ou à la fermeture de la page, le navigateur coupait lui-même les
@@ -174,13 +177,19 @@ export const FirebaseAuthEngine = {
         // Petit point de statut dans le header (à côté du bouton profil) : bleu clignotant
         // pendant une synchro, orange fixe s'il reste des modifications non envoyées, caché
         // quand tout est dans le cloud (voir getSyncStatus).
-        GlobalState.subscribe('syncStatus', (status) => {
-            const dot = document.getElementById('sync-active-dot');
-            if (!dot) return;
-            dot.classList.toggle('active', status === 'syncing' || status === 'pending');
-            dot.classList.toggle('pending', status === 'pending');
-            dot.title = SYNC_DOT_TITLES[status] || '';
-        });
+        if (!this._syncDotSubscribed) {
+            this._syncDotSubscribed = true;
+            GlobalState.subscribe('syncStatus', (status) => {
+                const dot = document.getElementById('sync-active-dot');
+                if (!dot) return;
+                dot.classList.toggle('active', status === 'syncing' || status === 'pending');
+                dot.classList.toggle('pending', status === 'pending');
+                dot.title = SYNC_DOT_TITLES[status] || '';
+            });
+        }
+
+        if (isInitialized) return;
+        if (this._initPromise) return this._initPromise;
 
         if (typeof IS_FIREBASE_ENABLED === 'undefined' || !IS_FIREBASE_ENABLED) {
             console.log('Firebase sync is disabled (IS_FIREBASE_ENABLED is false).');
@@ -196,79 +205,85 @@ export const FirebaseAuthEngine = {
             return;
         }
 
-        try {
-            // Import Firebase SDKs dynamically from CDN
-            const { initializeApp } = await loadAppModule();
-            const { getAuth, onAuthStateChanged } = await loadAuthModule();
-            const { initializeFirestore, terminate } = await loadFirestoreModule();
+        this._initPromise = (async () => {
+            try {
+                // Import Firebase SDKs dynamically from CDN
+                const { initializeApp } = await loadAppModule();
+                const { getAuth, onAuthStateChanged } = await loadAuthModule();
+                const { initializeFirestore, terminate } = await loadFirestoreModule();
 
-            app = initializeApp(FIREBASE_CONFIG);
-            auth = getAuth(app);
-            // Fix Safari CORS/ITP issues with WebChannel by forcing Long Polling
-            db = initializeFirestore(app, {
-                experimentalForceLongPolling: true,
-            });
-            this._closeFirestoreOnPageHide(db, terminate);
-            this.enabled = true;
-            isInitialized = true;
-            console.log('Firebase successfully initialized.');
+                app = initializeApp(FIREBASE_CONFIG);
+                auth = getAuth(app);
+                // Fix Safari CORS/ITP issues with WebChannel by forcing Long Polling
+                db = initializeFirestore(app, {
+                    experimentalForceLongPolling: true,
+                });
+                this._closeFirestoreOnPageHide(db, terminate);
+                this.enabled = true;
+                isInitialized = true;
+                console.log('Firebase successfully initialized.');
 
-            // Listen to auth state changes
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    console.log('User logged in:', user.email);
-                    this.currentUser = user;
-                    this.updateHeaderUI();
-                    this.updateModalUI();
+                // Listen to auth state changes
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        console.log('User logged in:', user.email);
+                        this.currentUser = user;
+                        this.updateHeaderUI();
+                        this.updateModalUI();
 
-                    // Rôles du compte (météo calculée) : lus avant la synchro, qui peut être longue.
-                    AccessService.expectUser(user.uid);
-                    this.refreshAccess();
+                        // Rôles du compte (météo calculée) : lus avant la synchro, qui peut être longue.
+                        AccessService.expectUser(user.uid);
+                        this.refreshAccess();
 
-                    // Synchro complète initiale à la connexion
-                    await this.syncDataWithCloud();
+                        // Synchro complète initiale à la connexion
+                        await this.syncDataWithCloud();
 
-                    // 1. Synchro automatique silencieuse toutes les 30 secondes
-                    if (!this._syncInterval) {
-                        this._syncInterval = setInterval(() => {
-                            if (navigator.onLine && this.currentUser) {
-                                this.syncDataWithCloud(true); // silent sync
-                            }
-                        }, 30 * 1000); // 30 secondes (réduit depuis 2 min)
+                        // 1. Synchro automatique silencieuse toutes les 30 secondes
+                        if (!this._syncInterval) {
+                            this._syncInterval = setInterval(() => {
+                                if (navigator.onLine && this.currentUser) {
+                                    this.syncDataWithCloud(true); // silent sync
+                                }
+                            }, 30 * 1000); // 30 secondes (réduit depuis 2 min)
+                        }
+
+                        // 2. Synchro instantanée dès le retour de la connexion internet
+                        if (!this._onlineListenerAttached) {
+                            window.addEventListener('online', () => {
+                                if (this.currentUser) {
+                                    console.log('Réseau de retour : synchronisation de rattrapage en cours...');
+                                    this.syncDataWithCloud(true);
+                                }
+                            });
+                            this._onlineListenerAttached = true;
+                        }
+                    } else {
+                        console.log('User logged out');
+                        this.currentUser = null;
+                        AccessService.clear();
+                        this._updateSyncStatus(); // déconnecté : plus de voyant
+                        // On réinitialise lastSyncTime à la déconnexion pour ne pas afficher
+                        // une heure de synchro qui appartient à une autre session.
+                        this.lastSyncTime = null;
+
+                        if (this._syncInterval) {
+                            clearInterval(this._syncInterval);
+                            this._syncInterval = null;
+                        }
+
+                        this.updateHeaderUI();
+                        this.updateModalUI();
                     }
+                });
+            } catch (error) {
+                console.error('Error initializing Firebase:', error);
+                this.enabled = false;
+            }
+        })().finally(() => {
+            this._initPromise = null;
+        });
 
-                    // 2. Synchro instantanée dès le retour de la connexion internet
-                    if (!this._onlineListenerAttached) {
-                        window.addEventListener('online', () => {
-                            if (this.currentUser) {
-                                console.log('Réseau de retour : synchronisation de rattrapage en cours...');
-                                this.syncDataWithCloud(true);
-                            }
-                        });
-                        this._onlineListenerAttached = true;
-                    }
-                } else {
-                    console.log('User logged out');
-                    this.currentUser = null;
-                    AccessService.clear();
-                    this._updateSyncStatus(); // déconnecté : plus de voyant
-                    // On réinitialise lastSyncTime à la déconnexion pour ne pas afficher
-                    // une heure de synchro qui appartient à une autre session.
-                    this.lastSyncTime = null;
-
-                    if (this._syncInterval) {
-                        clearInterval(this._syncInterval);
-                        this._syncInterval = null;
-                    }
-
-                    this.updateHeaderUI();
-                    this.updateModalUI();
-                }
-            });
-        } catch (error) {
-            console.error('Error initializing Firebase:', error);
-            this.enabled = false;
-        }
+        return this._initPromise;
     },
 
     // UI Helpers
@@ -573,12 +588,20 @@ export const FirebaseAuthEngine = {
     // -----------------------------------------------------------------------
     // MÉTHODE CENTRALE : Synchro Cloud complète (toutes les données)
     // -----------------------------------------------------------------------
-    syncDataWithCloud: async function (silent = false) {
-        if (!this.currentUser) return { success: false, data: null, error: 'Not logged in' };
-        if (this._activeSyncPromise) return this._activeSyncPromise;
+    syncDataWithCloud: function (silent = false) {
+        if (!this.currentUser) return Promise.resolve({ success: false, data: null, error: 'Not logged in' });
+        if (this._activeSyncPromise) {
+            if (!silent && this._activeSyncSilent) {
+                this._activeSyncSilent = false;
+                this.showStatus(t('account.sync.inProgress'), 'info');
+            }
+            return this._activeSyncPromise;
+        }
 
+        this._activeSyncSilent = Boolean(silent);
         this._activeSyncPromise = this._runSyncDataWithCloud(silent).finally(() => {
             this._activeSyncPromise = null;
+            this._activeSyncSilent = true;
         });
         return this._activeSyncPromise;
     },
@@ -686,15 +709,15 @@ export const FirebaseAuthEngine = {
             // The local snapshot was read before this point too: a flight deleted meanwhile must
             // not come back from it either (it would then be re-uploaded on the next sync).
             const mergedLogbookMap = new Map();
-            localLogbook.forEach((session) => {
-                if (deletedFlightsSet.has(session.id)) return;
+            for (const session of localLogbook) {
+                if (deletedFlightsSet.has(session.id)) continue;
                 // Supprimé ailleurs : définitif, un appareil resté en retard ne le ressuscite pas.
                 if (cloudDeletedAt.has(session.id)) {
-                    if (IDBStorage.isSupported()) IDBStorage.deleteFlight(session.id).catch(() => {});
-                    return;
+                    if (IDBStorage.isSupported()) await IDBStorage.deleteFlight(session.id).catch(() => {});
+                    continue;
                 }
                 mergedLogbookMap.set(session.id, session);
-            });
+            }
             cloudLogbook.forEach((cloudSession) => {
                 // Never re-insert a flight the user just deleted (tombstone guard)
                 if (deletedFlightsSet.has(cloudSession.id)) return;
@@ -772,30 +795,36 @@ export const FirebaseAuthEngine = {
                 return !deletedEquip.includes(e.id);
             });
 
-            // 1. Process Pending Queue (Local -> Cloud)
-            const pendingEquip = localEquip.filter((e) => e.syncPending);
-            for (const item of pendingEquip) {
-                // Guard : ID obligatoire en string
-                if (!item.id || typeof item.id !== 'string') continue;
-                const eRef = doc(db, 'users', uid, 'equipment', item.id);
-                delete item.syncPending;
-                await setDoc(eRef, item);
-            }
-            if (pendingEquip.length > 0) {
-                StorageService.set(StorageService.KEYS.EQUIPMENT_DATA, localEquip);
-            }
-
             const equipColRef = collection(db, 'users', uid, 'equipment');
             const equipSnap = await getDocs(equipColRef);
 
             const cloudEquip = [];
+            const cloudEquipById = new Map();
             equipSnap.forEach((docSnap) => {
                 const data = docSnap.data();
                 // Guard : on n'accepte que les docs avec un ID string valide
                 if (data && data.id && typeof data.id === 'string') {
                     cloudEquip.push(data);
+                    cloudEquipById.set(data.id, data);
                 }
             });
+
+            // 1. Process Pending Queue (Local -> Cloud) en respectant LWW
+            const pendingEquip = localEquip.filter((e) => e.syncPending);
+            for (const item of pendingEquip) {
+                // Guard : ID obligatoire en string
+                if (!item.id || typeof item.id !== 'string') continue;
+                delete item.syncPending;
+                const cloudExisting = cloudEquipById.get(item.id);
+                if (cloudExisting && (cloudExisting.updatedAt || 0) > (item.updatedAt || 0)) continue;
+                const eRef = doc(db, 'users', uid, 'equipment', item.id);
+                await setDoc(eRef, item);
+                if (!cloudExisting) cloudEquip.push(item);
+                cloudEquipById.set(item.id, item);
+            }
+            if (pendingEquip.length > 0) {
+                StorageService.set(StorageService.KEYS.EQUIPMENT_DATA, localEquip);
+            }
 
             // 2. Smart Merge: Compare updatedAt
             // Re-read tombstones (same race-condition guard as logbook above).
@@ -916,7 +945,8 @@ export const FirebaseAuthEngine = {
             // AUCUN rafraîchissement automatique de vue en tâche de fond (silent = true) :
             // l'utilisateur ne doit jamais voir son écran ou ses listes se réinitialiser
             // sans action explicite de sa part. Les vues se mettent à jour lors des navigations.
-            if (!silent) {
+            const effectiveSilent = Boolean(silent && this._activeSyncSilent);
+            if (!effectiveSilent) {
                 const activeMode = GlobalState ? GlobalState.get('mode') : null;
                 if (activeMode === 'STATS') {
                     AppRouter.getView('STATS')?.renderStats?.();
@@ -939,7 +969,7 @@ export const FirebaseAuthEngine = {
             // y compris les synchros silencieuses, pour que l'heure soit à jour.
             this.updateModalUI();
 
-            if (!silent) {
+            if (!effectiveSilent) {
                 this.showStatus(t('account.sync.done'), 'success');
             }
             this._syncsInFlight--;
@@ -1178,23 +1208,26 @@ export const FirebaseAuthEngine = {
     },
 
     syncLogbookData: async function (data) {
-        if (!this.currentUser || !this.enabled || this.syncingData)
+        if (!this.currentUser || !this.enabled || this.syncingData || this._activeSyncPromise)
             return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
             const { doc, setDoc, collection, getDocs } = await this._loadFirestore();
             const uid = this.currentUser.uid;
 
-            // Un vol supprimé est définitif : on n'écrase jamais son marqueur cloud
+            // Un vol supprimé est définitif : on n'écrase jamais son marqueur cloud ni un vol cloud plus récent (LWW)
             const deletedIds = new Set();
+            const cloudUpdatedAt = new Map();
             (await getDocs(collection(db, 'users', uid, 'logbook'))).forEach((d) => {
-                const data = d.data();
-                if (data?.deleted === true && data.id) deletedIds.add(data.id);
+                const docData = d.data();
+                if (docData?.deleted === true && docData.id) deletedIds.add(docData.id);
+                else if (docData?.id) cloudUpdatedAt.set(docData.id, Number(docData.updatedAt) || 0);
             });
 
             // Save all locally present to cloud
             for (const session of data) {
                 if (deletedIds.has(session.id)) continue;
+                if ((cloudUpdatedAt.get(session.id) || 0) > (Number(session.updatedAt) || 0)) continue;
                 const docRef = doc(db, 'users', uid, 'logbook', session.id);
                 await setDoc(docRef, stripTrace(session));
             }
@@ -1229,7 +1262,7 @@ export const FirebaseAuthEngine = {
     },
 
     syncEquipmentData: async function (data) {
-        if (!this.currentUser || !this.enabled || this.syncingData)
+        if (!this.currentUser || !this.enabled || this.syncingData || this._activeSyncPromise)
             return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
@@ -1271,7 +1304,7 @@ export const FirebaseAuthEngine = {
     },
 
     syncEquipmentEntry: async function (item) {
-        if (!this.currentUser || !this.enabled || this.syncingData)
+        if (!this.currentUser || !this.enabled || this.syncingData || this._activeSyncPromise)
             return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
@@ -1292,7 +1325,7 @@ export const FirebaseAuthEngine = {
     },
 
     syncLogbookEntry: async function (session) {
-        if (!this.currentUser || !this.enabled || this.syncingData)
+        if (!this.currentUser || !this.enabled || this.syncingData || this._activeSyncPromise)
             return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {

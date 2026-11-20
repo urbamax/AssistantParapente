@@ -313,13 +313,16 @@ export async function bootApplication() {
             target?.setAttribute('aria-expanded', 'true');
         }
     });
-    document.addEventListener('click', (e) => {
-        const target = /** @type {HTMLElement} */ (e.target);
-        if (target.closest('.nav-dropdown-menu') || !target.closest('.nav-dropdown')) closeNavSubMenus();
-    });
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeNavSubMenus();
-    });
+    if (!document.documentElement.dataset.navSubMenuBound) {
+        document.documentElement.dataset.navSubMenuBound = '1';
+        document.addEventListener('click', (e) => {
+            const target = /** @type {HTMLElement} */ (e.target);
+            if (target.closest('.nav-dropdown-menu') || !target.closest('.nav-dropdown')) closeNavSubMenus();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeNavSubMenus();
+        });
+    }
     AppEvents.register('openLogbookSection', async (section) => {
         // La vue doit exister avant d'écrire dans son état : on la charge explicitement.
         const logbook = await AppRouter.loadView('LOGBOOK');

@@ -9,6 +9,7 @@
 import BaseView from '../core/base_view.js';
 import {
     decodePayload,
+    callingCodeForCountry,
     toInternationalPhone,
     formatPhoneDisplay,
     ageOf,
@@ -76,10 +77,11 @@ export class IceViewClass extends BaseView {
         }
 
         const country = normalizeCountry(p.pays);
+        const callingCode = callingCodeForCountry(p.pays);
         const flag = country
             ? `<span class="ice-flag" role="img" aria-label="${esc(countryName(country))}">${flagEmoji(country)}</span> `
             : '';
-        const pilotPhone = toInternationalPhone(p.tel);
+        const pilotPhone = toInternationalPhone(p.tel, callingCode);
         const pilotLines = [
             pilotPhone
                 ? `<p class="ice-pilot-origin">${th('pilotPhone')} <a href="tel:${esc(pilotPhone)}">${esc(formatPhoneDisplay(pilotPhone))}</a></p>`
@@ -164,8 +166,9 @@ export class IceViewClass extends BaseView {
 
     /** @param {Partial<import('../services/ice_service.js').IceProfile>} p */
     renderContacts(p) {
-        const c1Phone = toInternationalPhone(p.contact1Phone);
-        const c2Phone = toInternationalPhone(p.contact2Phone);
+        const callingCode = callingCodeForCountry(p.pays);
+        const c1Phone = toInternationalPhone(p.contact1Phone, callingCode);
+        const c2Phone = toInternationalPhone(p.contact2Phone, callingCode);
 
         if (!c1Phone && !c2Phone) {
             return `<p class="ice-empty-hint">${th('noContacts')}</p>`;

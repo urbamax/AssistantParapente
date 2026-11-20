@@ -104,10 +104,38 @@ describe('firebase_merge.js pure merge & local state helpers', () => {
         expect(res.themes.Météo.correct).toBe(0);
     });
 
-    it('mergePreferences preserves newer local scalar preferences when local.updatedAt > cloud.updatedAt', () => {
+    it('mergePreferences preserves newer local scalar preferences when local.updatedAt > cloud.updatedAt (numeric or ISO)', () => {
         const local = { limitWindMax: 35, updatedAt: 2000 };
         const cloud = { limitWindMax: 25, updatedAt: 1000 };
         const merged = mergePreferences(local, cloud);
         expect(merged.limitWindMax).toBe(35);
+
+        const isoLocal = { limitWindMax: 32, updatedAt: '2026-11-20T22:00:00.000Z' };
+        const isoCloud = { limitWindMax: 20, updatedAt: '2026-11-20T20:00:00.000Z' };
+        expect(mergePreferences(isoLocal, isoCloud).limitWindMax).toBe(32);
+    });
+
+    it('mergeQcmStats and mergeExamHistory avoid NaN on corrupted strings and do not mutate inputs', () => {
+        const res = mergeQcmStats(
+            { totalQuestions: 'abc', totalCorrect: 'xyz', questions: { Q1: { streak: 'bad', lastSeen: 'bad' } } },
+            {
+                totalQuestions: 5,
+                totalCorrect: 4,
+                questions: { Q1: { total: 5, correct: 4, streak: 2, lastSeen: 10 } },
+            },
+        );
+        expect(res.totalQuestions).toBe(5);
+        expect(res.totalCorrect).toBe(4);
+        expect(res.questions.Q1.streak).toBe(2);
+
+        const localExam = Object.freeze({
+            id: 'ex1',
+            date: '2026-11-20T10:00:00Z',
+            qcmRevision: 1,
+            appliedToStats: true,
+        });
+        const cloudExam = Object.freeze({ id: 'ex1', date: '2026-11-20T10:00:00Z', qcmRevision: 2 });
+        const history = mergeExamHistory({ exams: [localExam] }, { exams: [cloudExam] });
+        expect(history.exams[0].appliedToStats).toBe(true);
     });
 });

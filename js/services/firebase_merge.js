@@ -17,8 +17,10 @@ import { compactExam } from './quiz_service.js';
 // et les répétitions (`repetitions`) suivent la même règle : ils viennent de l'appareil le plus récent,
 // et on n'écrit jamais de champ indéfini (Firestore le refuse).
 export function latestReviewState(a, b) {
-    const aSeen = a.lastSeen || 0;
-    const bSeen = b.lastSeen || 0;
+    const aSeen = Number(a.lastSeen) || 0;
+    const bSeen = Number(b.lastSeen) || 0;
+    const aStreak = Number(a.streak) || 0;
+    const bStreak = Number(b.streak) || 0;
     // `recent` vient de la source retenue ; le facteur de facilité, l'intervalle et les répétitions aussi,
     // et à défaut de la première copie qui en a un. Jamais de champ indéfini (Firestore le refuse).
     const withExtra = (state, source) => {
@@ -31,14 +33,14 @@ export function latestReviewState(a, b) {
     };
     if (!aSeen && !bSeen) {
         const longest = (a.recent?.length || 0) >= (b.recent?.length || 0) ? a : b;
-        return withExtra({ streak: Math.max(a.streak || 0, b.streak || 0) }, longest);
+        return withExtra({ streak: Math.max(aStreak, bStreak) }, longest);
     }
     if (aSeen === bSeen) {
         const longest = (a.recent?.length || 0) >= (b.recent?.length || 0) ? a : b;
-        return withExtra({ streak: Math.max(a.streak || 0, b.streak || 0), lastSeen: aSeen }, longest);
+        return withExtra({ streak: Math.max(aStreak, bStreak), lastSeen: aSeen }, longest);
     }
     const latest = aSeen > bSeen ? a : b;
-    return withExtra({ streak: latest.streak || 0, lastSeen: latest.lastSeen }, latest);
+    return withExtra({ streak: Number(latest.streak) || 0, lastSeen: Number(latest.lastSeen) || 0 }, latest);
 }
 
 // Nombre de fois où chaque choix a été coché. Comme `total` et `correct`, on prend le max par
@@ -117,8 +119,18 @@ export function mergeQcmStats(local, cloud) {
     const themesTotal = Object.values(merged.themes).reduce((sum, t) => sum + (t.total || 0), 0);
     const themesCorrect = Object.values(merged.themes).reduce((sum, t) => sum + (t.correct || 0), 0);
 
-    merged.totalQuestions = Math.max(local.totalQuestions || 0, cloud.totalQuestions || 0, questionsTotal, themesTotal);
-    merged.totalCorrect = Math.max(local.totalCorrect || 0, cloud.totalCorrect || 0, questionsCorrect, themesCorrect);
+    merged.totalQuestions = Math.max(
+        Number(local.totalQuestions) || 0,
+        Number(cloud.totalQuestions) || 0,
+        questionsTotal,
+        themesTotal,
+    );
+    merged.totalCorrect = Math.max(
+        Number(local.totalCorrect) || 0,
+        Number(cloud.totalCorrect) || 0,
+        questionsCorrect,
+        themesCorrect,
+    );
     merged.appliedExamIds = Array.from(
         new Set([...(local.appliedExamIds || []), ...(cloud.appliedExamIds || [])].map(String)),
     );
@@ -152,10 +164,9 @@ export function mergeExamHistory(local, cloud) {
         if (existing) {
             // Même examen des deux côtés : on garde la copie dont les points sont à jour du QCM
             // (révision la plus récente), sans perdre le marquage « déjà compté dans les statistiques ».
-            const winner = (Number(exam.qcmRevision) || 0) > (Number(existing.qcmRevision) || 0) ? exam : existing;
-            if (exam.appliedToStats || existing.appliedToStats) {
-                winner.appliedToStats = true;
-            }
+            const baseWinner = (Number(exam.qcmRevision) || 0) > (Number(existing.qcmRevision) || 0) ? exam : existing;
+            const winner =
+                exam.appliedToStats || existing.appliedToStats ? { ...baseWinner, appliedToStats: true } : baseWinner;
             examMap.set(key, winner);
         } else {
             examMap.set(key, exam);
@@ -178,12 +189,23 @@ export function mergeExamHistory(local, cloud) {
     };
 }
 
+function toEpochMs(val) {
+    if (typeof val === 'number' && Number.isFinite(val)) return val;
+    if (typeof val === 'string' && val.trim() !== '') {
+        const asNum = Number(val);
+        if (Number.isFinite(asNum)) return asNum;
+        const parsed = Date.parse(val);
+        if (Number.isFinite(parsed)) return parsed;
+    }
+    return 0;
+}
+
 export function mergePreferences(local, cloud) {
     if (!cloud) return local;
     if (!local) return cloud;
 
-    // 1. LWW si horodaté, sinon le Cloud fait foi pour les clés communes
-    const localNewer = (Number(local.updatedAt) || 0) > (Number(cloud.updatedAt) || 0);
+    // 1. LWW si horodaté (numérique ms ou chaîne ISO), sinon le Cloud fait foi pour les clés communes
+    const localNewer = toEpochMs(local.updatedAt) > toEpochMs(cloud.updatedAt);
     const merged = localNewer ? { ...cloud, ...local } : { ...cloud };
 
     // 2. On récupère les valeurs locales qui n'existent pas du tout dans le cloud

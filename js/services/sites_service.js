@@ -286,6 +286,7 @@ class SitesService {
         for (const key of this.PREFERENCE_KEYS) {
             this.state.userPreferences[key] = this.state[key];
         }
+        this.state.userPreferences.updatedAt = Date.now();
         // savedLocations is mutated directly in the array, but let's be sure
 
         StorageService.set(StorageService.KEYS.USER_PREFS, this.state.userPreferences);

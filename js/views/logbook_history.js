@@ -153,15 +153,16 @@ export class LogbookHistoryBase extends LogbookStatsBase {
             <div class="logbook-card-weather" style="margin-top: 10px; padding: 10px; background: rgba(14,165,233,0.06); border-radius: var(--radius-sm); border: 1px solid rgba(14,165,233,0.15); font-size: 0.85rem; color: var(--text-secondary);">
                 ${decollageRow}
                 ${atterroRow}
-                <button data-action="forceWeatherRefresh" data-args="${session.id}" title="${tt('weather.refreshTitle')}" style="margin-top: 6px; color: var(--text-muted); cursor: pointer; border: none; background: none; padding: 2px 4px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px;">
+                <button data-action="forceWeatherRefresh" data-args="${escapeHTML(session.id)}" title="${tt('weather.refreshTitle')}" style="margin-top: 6px; color: var(--text-muted); cursor: pointer; border: none; background: none; padding: 2px 4px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px;">
                     <i class="ri-refresh-line"></i> ${tt('weather.refresh')}
                 </button>
             </div>
             ${baliseHtml}`;
         } else {
+            const safeSessionId = escapeHTML(session.id);
             return `
-            <div id="weather-container-${session.id}" class="logbook-card-weather-empty" style="margin-top: 10px; font-size: 0.85rem;">
-                <button id="refresh-weather-btn-${session.id}" class="action-btn-text" data-action="forceWeatherRefresh" data-args="${session.id}" style="color: var(--text-muted); cursor: pointer; border: none; background: rgba(0,0,0,0.03); border-radius: var(--radius-sm); padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+            <div id="weather-container-${safeSessionId}" class="logbook-card-weather-empty" style="margin-top: 10px; font-size: 0.85rem;">
+                <button id="refresh-weather-btn-${safeSessionId}" class="action-btn-text" data-action="forceWeatherRefresh" data-args="${safeSessionId}" style="color: var(--text-muted); cursor: pointer; border: none; background: rgba(0,0,0,0.03); border-radius: var(--radius-sm); padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
                     <i class="ri-refresh-line"></i> ${tt('weather.fetch')}
                 </button>
             </div>`;
@@ -209,6 +210,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
 
         const allFlights = LogbookService.getFlights();
         if (allFlights.length === 0) {
+            destroyLoadedMap3D();
             container.innerHTML = `
                 <div class="empty-state">
                     <i class="ri-history-line"></i>
@@ -251,6 +253,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
         }
 
         if (flights.length === 0) {
+            destroyLoadedMap3D();
             container.innerHTML =
                 filterBannerHtml +
                 `
@@ -352,10 +355,10 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                         </div>
                         <div class="session-date">${session.dateOnly ? formatDateOnly(session.datetime) : formatDateTime(session.datetime)}</div>
                         <div style="display: flex; gap: 8px;">
-                            <button class="edit-btn" data-action="editEntry" data-args="${session.id}" title="${tt('history.edit')}" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
+                            <button class="edit-btn" data-action="editEntry" data-args="${escapeHTML(session.id)}" title="${tt('history.edit')}" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
                                 <i class="ri-edit-line"></i>
                             </button>
-                            <button class="delete-btn" data-action="deleteEntry" data-args="${session.id}" title="${tt('history.delete')}" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
+                            <button class="delete-btn" data-action="deleteEntry" data-args="${escapeHTML(session.id)}" title="${tt('history.delete')}" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
                                 <i class="ri-delete-bin-line"></i>
                             </button>
                         </div>
@@ -386,8 +389,8 @@ export class LogbookHistoryBase extends LogbookStatsBase {
                             ${Array.isArray(session.pilotes) && session.pilotes.length > 0 ? `<div><strong>${tt('history.pilots')}</strong> ${escapeHTML(session.pilotes.join(', '))}</div>` : ''}
                         </div>
                         ${session.commentaire ? `<div class="session-comment">"${escapeHTML(session.commentaire)}"</div>` : ''}
-                        ${session.rawIgc || session.traceCloud || (session.traceGps && session.traceGps.length > 0) ? `<button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-orange); color: var(--accent-orange); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="${session.id}"><i class="ri-route-line"></i> ${tt('history.showTrace')}</button><button class="btn-download-trace action-btn-secondary" style="margin-top: 6px; width: 100%; padding: 8px; border-radius: 6px; cursor: pointer;" data-action="downloadTrace" data-args="${session.id}"><i class="ri-download-2-line"></i> ${tt('history.downloadIgc')}</button><div id="trace-container-${session.id}" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>` : ''}
-                        <div data-session-weather="${session.id}">${meteoHtml}</div>
+                        ${session.rawIgc || session.traceCloud || (session.traceGps && session.traceGps.length > 0) ? `<button class="btn-view-trace action-btn-secondary" style="margin-top: 10px; width: 100%; border: 1px solid var(--accent-orange); color: var(--accent-orange); padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s;" data-action="showTrace" data-args="${escapeHTML(session.id)}"><i class="ri-route-line"></i> ${tt('history.showTrace')}</button><button class="btn-download-trace action-btn-secondary" style="margin-top: 6px; width: 100%; padding: 8px; border-radius: 6px; cursor: pointer;" data-action="downloadTrace" data-args="${escapeHTML(session.id)}"><i class="ri-download-2-line"></i> ${tt('history.downloadIgc')}</button><div id="trace-container-${escapeHTML(session.id)}" style="display:none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);"></div>` : ''}
+                        <div data-session-weather="${escapeHTML(session.id)}">${meteoHtml}</div>
                         </div>
                     </div>
                 </div>
@@ -401,6 +404,7 @@ export class LogbookHistoryBase extends LogbookStatsBase {
         });
 
         const state = this._captureHistoryState(container);
+        destroyLoadedMap3D();
         container.innerHTML = html;
         this._restoreHistoryState(container, state);
     }

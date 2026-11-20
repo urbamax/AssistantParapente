@@ -284,10 +284,13 @@ class LogbookService {
         try {
             deleted = JSON.parse(localStorage.getItem('deleted_flights') || '[]');
         } catch {}
+        if (!Array.isArray(deleted)) deleted = [];
         const pending = ids.filter((id) => !deleted.includes(id));
         if (pending.length > 0) {
             deleted.push(...pending);
-            localStorage.setItem('deleted_flights', JSON.stringify(deleted));
+            try {
+                localStorage.setItem('deleted_flights', JSON.stringify(deleted));
+            } catch {}
         }
 
         this.saveFlights();
@@ -485,7 +488,9 @@ class LogbookService {
         if (!Array.isArray(deleted)) deleted = [];
         if (!deleted.includes(id)) {
             deleted.push(id);
-            localStorage.setItem('deleted_equipment', JSON.stringify(deleted));
+            try {
+                localStorage.setItem('deleted_equipment', JSON.stringify(deleted));
+            } catch {}
         }
 
         this.saveEquipment();

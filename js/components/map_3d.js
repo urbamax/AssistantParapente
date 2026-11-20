@@ -17,6 +17,7 @@ const Map3DComponent = {
     activeInterval: null,
     activeMap: null,
     activeOverlay: null,
+    _renderSeq: 0,
     _smoothProtocolRegistered: false,
 
     // --- Configuration ---------------------------------------------------------
@@ -149,6 +150,7 @@ const Map3DComponent = {
      */
     showTrace: async function (sessionId, traceGps, container) {
         if (!traceGps || traceGps.length === 0) return;
+        const renderId = ++this._renderSeq;
 
         if (typeof maplibregl === 'undefined' || typeof deck === 'undefined') {
             container.innerHTML = `
@@ -160,10 +162,12 @@ const Map3DComponent = {
             try {
                 await this.ensureDependenciesLoaded();
             } catch (err) {
+                if (renderId !== this._renderSeq) return;
                 console.error('[Map3D] Échec de chargement des dépendances 3D :', err);
                 container.innerHTML = this._errorHtml(t('map3d.librariesError'));
                 return;
             }
+            if (renderId !== this._renderSeq || (container && container.isConnected === false)) return;
         }
 
         if (typeof maplibregl.supported === 'function' && !maplibregl.supported()) {
@@ -171,7 +175,7 @@ const Map3DComponent = {
             return;
         }
 
-        this.destroy();
+        this._cleanupActiveResources();
         this._registerSmoothTerrainProtocol();
         container.innerHTML = this._playerHtml(sessionId, traceGps.length - 1);
 
@@ -277,6 +281,7 @@ const Map3DComponent = {
         // soit prêt : on attend l'évènement 'load' plutôt que de les appeler juste après
         // le constructeur.
         map3D.on('load', () => {
+            if (this.activeMap !== map3D || renderId !== this._renderSeq) return;
             deckOverlay = new deck.MapboxOverlay({
                 interleaved: true,
                 layers: this._buildDeckLayers(traceGps, pathSegments, varioSeries, parseInt(slider.value, 10)),
@@ -633,7 +638,7 @@ const Map3DComponent = {
         }
     },
 
-    destroy: function () {
+    _cleanupActiveResources: function () {
         this.clearPlayback();
         if (this.activeOverlay) {
             try {
@@ -651,6 +656,11 @@ const Map3DComponent = {
             }
             this.activeMap = null;
         }
+    },
+
+    destroy: function () {
+        this._renderSeq++;
+        this._cleanupActiveResources();
     },
 };
 

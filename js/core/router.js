@@ -178,7 +178,8 @@ class Router {
             return;
         }
 
-        console.time('ROUTER_HIDE_SCREENS');
+        const hideTimerLabel = 'ROUTER_HIDE_SCREENS_' + navId;
+        console.time(hideTimerLabel);
         const updateDOM = () => {
             // Hide all screens
             document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
@@ -201,14 +202,6 @@ class Router {
             typeof document !== 'undefined' &&
             typeof document.startViewTransition === 'function'
         ) {
-            // Une navigation qui arrive pendant qu'une transition précédente est encore en
-            // cours (double clic, navigation rapide) la ferait sinon avorter implicitement :
-            // le navigateur rejette `ready` (et potentiellement `updateCallbackDone`/`finished`)
-            // avec une AbortError/InvalidStateError, qui remonte comme rejet de promesse non géré
-            // (bannière GLOBAL ERROR) si personne ne l'écoute. On l'arrête nous-mêmes
-            // explicitement puis on avale ces trois rejets attendus (vérifié en direct : seul
-            // `ready` rejetait réellement ici, mais rien ne garantit que ce soit toujours le cas
-            // selon le moteur).
             if (this._activeTransition) {
                 this._activeTransition.skipTransition();
             }
@@ -222,13 +215,9 @@ class Router {
                         this._activeTransition = null;
                     }
                 });
-            // Le callback de transition est asynchrone : on attend qu'il ait basculé les
-            // écrans AVANT de monter la vue, sinon il écraserait l'écran activé par mount()
-            // (ex. QuizView active qcm-setup-screen, puis le callback réactivait qcm-screen
-            // → écran bloqué sur « Chargement… »).
             await transition.updateCallbackDone.catch(() => {});
             if (navId !== this._navSeq) {
-                console.timeEnd('ROUTER_HIDE_SCREENS');
+                console.timeEnd(hideTimerLabel);
                 console.timeEnd('ROUTER_NAVIGATE_TOTAL_' + mode);
                 return;
             }
@@ -251,14 +240,14 @@ class Router {
             console.error(`Error loading ${mode}:`, e);
         }
         if (navId !== this._navSeq) {
-            console.timeEnd('ROUTER_HIDE_SCREENS');
+            console.timeEnd(hideTimerLabel);
             console.timeEnd('ROUTER_NAVIGATE_TOTAL_' + mode);
             return;
         }
         this.activeRoute = view;
         const screenEl = document.getElementById(`${mode.toLowerCase()}-screen`);
 
-        console.timeEnd('ROUTER_HIDE_SCREENS');
+        console.timeEnd(hideTimerLabel);
 
         if (loadError) {
             renderCrashScreen(screenEl, mode, loadError);
@@ -267,8 +256,10 @@ class Router {
             try {
                 await view.mount(params);
             } catch (e) {
-                console.error(`Error mounting ${mode}:`, e);
-                renderCrashScreen(screenEl, mode, e);
+                if (navId === this._navSeq) {
+                    console.error(`Error mounting ${mode}:`, e);
+                    renderCrashScreen(screenEl, mode, e);
+                }
             }
         }
         if (navId !== this._navSeq) {

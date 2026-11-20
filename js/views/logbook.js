@@ -179,10 +179,13 @@ class LogbookViewClass extends LogbookFormBase {
         // Trigger Render
         if (tabName === 'history') {
             this.renderHistory();
-        } else if (tabName === 'stats') {
-            this.renderStats();
-        } else if (tabName === 'equip') {
-            this.renderEquipment();
+        } else {
+            destroyLoadedMap3D();
+            if (tabName === 'stats') {
+                this.renderStats();
+            } else if (tabName === 'equip') {
+                this.renderEquipment();
+            }
         }
         this.updateEquipmentAlertBadge();
     }
