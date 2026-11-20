@@ -66,7 +66,40 @@ const GdprEngine = {
         }
     },
 
-    showModal: function (modalId) {
+    _legalLoadPromise: null,
+
+    _ensureLegalModals: async function () {
+        if (document.getElementById('gdpr-privacy-modal') && document.getElementById('gdpr-legal-modal')) {
+            return;
+        }
+        if (!this._legalLoadPromise) {
+            const url = './components/legal_modals.html';
+            this._legalLoadPromise = (async () => {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`Network response was not ok for ${url}`);
+                    const html = await response.text();
+                    const tpl = document.createElement('template');
+                    tpl.innerHTML = html.trim();
+                    for (const dialog of tpl.content.querySelectorAll('dialog[id]')) {
+                        if (!document.getElementById(dialog.id)) {
+                            document.body.appendChild(dialog);
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Error loading legal modals:', url, error);
+                } finally {
+                    this._legalLoadPromise = null;
+                }
+            })();
+        }
+        await this._legalLoadPromise;
+    },
+
+    showModal: async function (modalId) {
+        if (modalId === 'gdpr-privacy-modal' || modalId === 'gdpr-legal-modal') {
+            await this._ensureLegalModals();
+        }
         const modal = /** @type {HTMLDialogElement & { _cancelBound?: boolean }} */ (document.getElementById(modalId));
         if (modal) {
             if (typeof modal.showModal === 'function' && !modal.open) {

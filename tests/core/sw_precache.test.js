@@ -29,11 +29,15 @@ describe('pré-cache du service worker (sw.js)', () => {
         expect(missing).toEqual([]);
     });
 
-    it('contient les composants HTML partagés (header, footer et manuel) pour le hors-ligne', () => {
+    it('contient les composants HTML partagés (header, footer, manuel et mentions légales) pour le hors-ligne', () => {
         expect(precached.has('components/header.html')).toBe(true);
         expect(precached.has('components/footer.html')).toBe(true);
         expect(precached.has('components/manual_modal.html')).toBe(true);
-        expect(readFileSync('index.html', 'utf8')).not.toContain('id="manual-modal"');
+        expect(precached.has('components/legal_modals.html')).toBe(true);
+        const indexHtml = readFileSync('index.html', 'utf8');
+        expect(indexHtml).not.toContain('id="manual-modal"');
+        expect(indexHtml).not.toContain('id="gdpr-privacy-modal"');
+        expect(indexHtml).not.toContain('id="gdpr-legal-modal"');
     });
 
     it('normalise les clés de cache de /components/ dans dataKey() pour le hors-ligne', () => {
