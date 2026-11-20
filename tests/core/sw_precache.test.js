@@ -29,6 +29,35 @@ describe('pré-cache du service worker (sw.js)', () => {
         expect(missing).toEqual([]);
     });
 
+    it('contient les composants HTML partagés (header et footer) pour le hors-ligne', () => {
+        expect(precached.has('components/header.html')).toBe(true);
+        expect(precached.has('components/footer.html')).toBe(true);
+    });
+
+    it('normalise les clés de cache de /components/ dans dataKey() pour le hors-ligne', () => {
+        expect(SW_SOURCE).toMatch(/url\.pathname\.includes\('\/components\/'\)/);
+    });
+
+    it('ne laisse pas les dotfiles (.DS_Store) entrer dans dist/ via vite.config.mjs', () => {
+        const viteSource = readFileSync('vite.config.mjs', 'utf8');
+        expect(viteSource).toMatch(/startsWith\('\.'\)/);
+    });
+
+    it('ne contient aucun attribut id dupliqué dans index.html ni aucun id dans components/footer.html', () => {
+        const indexHtml = readFileSync('index.html', 'utf8');
+        const counts = new Map();
+        for (const m of indexHtml.matchAll(/\bid="([^"]+)"/g)) {
+            counts.set(m[1], (counts.get(m[1]) || 0) + 1);
+        }
+        const duplicates = [...counts.entries()].filter(([, n]) => n > 1);
+        expect(duplicates).toEqual([]);
+
+        // footer.html est injecté dans chaque écran (.app-footer-placeholder) : il ne doit contenir aucun id
+        const footerHtml = readFileSync('components/footer.html', 'utf8');
+        const footerIds = [...footerHtml.matchAll(/\bid="([^"]+)"/g)].map((m) => m[1]);
+        expect(footerIds).toEqual([]);
+    });
+
     it('ne référence aucun fichier inexistant', () => {
         const unknown = [...precached].filter((file) => {
             try {

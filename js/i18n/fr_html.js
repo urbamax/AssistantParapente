@@ -162,19 +162,6 @@ export const FR_HTML = Object.freeze({
         meteoFranceNAutorisePasLIntegration:
             "Météo-France n'autorise pas l'intégration directe de cette carte interactive.",
         ouvrirLaCarteIsobares: 'Ouvrir la carte Isobares',
-        paraglidingEarth2: 'Paragliding Earth :',
-        general5: 'Général',
-        ouvrir6: 'Ouvrir',
-        paraglidable3: 'Paraglidable :',
-        general6: 'Général',
-        ouvrir7: 'Ouvrir',
-        frontsIsobares3: 'Fronts & Isobares :',
-        meteoFrance2: 'Météo-France',
-        ouvrir8: 'Ouvrir',
-        carteInteractiveDesFronts2: 'Carte Interactive des Fronts',
-        meteoFranceProposeUneExcellente:
-            "Météo-France propose une excellente carte interactive pour visualiser les fronts et isobares de manière détaillée.<br /><br />Le chargement direct n'étant pas autorisé par Météo-France, vous pouvez la consulter sur leur site.",
-        ouvrirSurMeteoFrance: 'Ouvrir sur Météo-France',
     }),
     mapToggleFullscreen: Object.freeze({
         pleinEcran: 'Plein écran',

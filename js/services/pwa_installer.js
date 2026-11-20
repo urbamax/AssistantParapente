@@ -91,16 +91,24 @@ export function updateInstallUI(doc = typeof document !== 'undefined' ? document
     if (!doc) return;
 
     const installBtn = doc.getElementById('pwa-install-btn');
-    const footerLink = doc.getElementById('footer-pwa-install-link');
-    const footerSeparator = doc.getElementById('footer-pwa-install-separator');
+    const footerLinks = /** @type {NodeListOf<HTMLElement>} */ (
+        doc.querySelectorAll('.footer-pwa-install-link, #footer-pwa-install-link')
+    );
+    const footerSeparators = /** @type {NodeListOf<HTMLElement>} */ (
+        doc.querySelectorAll('.footer-pwa-install-separator, #footer-pwa-install-separator')
+    );
 
     const standalone = isStandalone();
     const available = canInstall();
 
     if (standalone || !available) {
         if (installBtn) installBtn.style.display = 'none';
-        if (footerLink) footerLink.style.display = 'none';
-        if (footerSeparator) footerSeparator.style.display = 'none';
+        footerLinks.forEach((el) => {
+            el.style.display = 'none';
+        });
+        footerSeparators.forEach((el) => {
+            el.style.display = 'none';
+        });
         return;
     }
 
@@ -113,12 +121,12 @@ export function updateInstallUI(doc = typeof document !== 'undefined' ? document
         }
     }
 
-    if (footerLink) {
-        footerLink.style.display = 'inline';
-    }
-    if (footerSeparator) {
-        footerSeparator.style.display = 'inline';
-    }
+    footerLinks.forEach((el) => {
+        el.style.display = 'inline';
+    });
+    footerSeparators.forEach((el) => {
+        el.style.display = 'inline';
+    });
 }
 
 /**

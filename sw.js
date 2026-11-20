@@ -68,12 +68,19 @@ const CRITICAL_ASSETS = [
     './',
     './index.html',
     './manifest.json',
+    './components/header.html',
+    './components/footer.html',
     './css/fonts.css',
     './vendor/inter/inter-latin.woff2',
     './vendor/remixicon-3.5.0/remixicon.css',
     './vendor/remixicon-3.5.0/remixicon.woff2',
     './vendor/leaflet-1.9.4/leaflet.css',
     './vendor/leaflet-1.9.4/leaflet.js',
+    './vendor/leaflet-1.9.4/images/layers.png',
+    './vendor/leaflet-1.9.4/images/layers-2x.png',
+    './vendor/leaflet-1.9.4/images/marker-icon.png',
+    './vendor/leaflet-1.9.4/images/marker-icon-2x.png',
+    './vendor/leaflet-1.9.4/images/marker-shadow.png',
     './vendor/pdfjs-6.4.299/pdf.min.js',
     './vendor/pdfjs-6.4.299/pdf.worker.min.js',
     './vendor/firebase-12.19.0/firebase-app.js',
@@ -289,7 +296,7 @@ self.addEventListener('fetch', (event) => {
 
     // Morceaux de fond de carte : cache d'abord, dans le cache des zones affichées (spec 008).
     if (url.hostname === TILE_HOSTNAME) {
-        event.respondWith(serveTile(request));
+        event.respondWith(serveTile(event, request));
         return;
     }
 
@@ -338,7 +345,7 @@ self.addEventListener('fetch', (event) => {
                         }
                         return response;
                     })
-                    .catch(() => cached);
+                    .catch(() => cached || Response.error());
             }),
         );
         return;
@@ -374,28 +381,31 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
         (async () => {
             const cached = await caches.match(key);
-            const network = fetch(request, { cache: 'no-cache' }).then((response) => {
-                if (response.ok) {
-                    const copy = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(key, copy));
-                }
-                return response;
-            });
+            const network = fetch(request, { cache: 'no-cache' })
+                .then((response) => {
+                    if (response.ok) {
+                        const copy = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(key, copy));
+                        return response;
+                    }
+                    return cached || response;
+                })
+                .catch(() => cached || Response.error());
             if (!cached) return network;
             const slow = new Promise((resolve) => setTimeout(() => resolve(cached), 4000));
-            return Promise.race([network, slow]).catch(() => cached);
+            return Promise.race([network, slow]);
         })(),
     );
 });
 
 /**
- * Clé de cache d'une requête du site. Les fichiers de données (questions du QCM, sites…) sont
- * demandés avec « ?v=<heure> » pour contourner le cache HTTP du navigateur : chaque visite a une
- * adresse différente, que le cache ne retrouvait jamais hors ligne (QCM vide sans réseau). Pour
- * eux, la clé est l'adresse sans cette suite, celle sous laquelle l'installation les a rangés.
+ * Clé de cache d'une requête du site. Les fichiers de données (questions du QCM, sites…) et les
+ * composants HTML (header, footer) peuvent être demandés avec une chaîne de requête (?v=...) :
+ * on normalise sur l'URL sans query string pour retrouver la copie pré-cachée hors ligne.
  */
 function dataKey(request, url) {
-    return url.origin === location.origin && url.pathname.includes('/js/data/')
+    return url.origin === location.origin &&
+        (url.pathname.includes('/js/data/') || url.pathname.includes('/components/'))
         ? `${url.origin}${url.pathname}`
         : request;
 }
@@ -439,18 +449,26 @@ async function serveCourse(event, request, url) {
     }
 }
 
-async function serveTile(request) {
+async function serveTile(event, request) {
     const cache = await caches.open(TILE_CACHE);
     const cached = await cache.match(request);
     if (cached) return cached;
-    const response = await fetch(request);
-    // Seules les réponses lisibles (CORS) sont gardées : une réponse « opaque » occupe beaucoup
-    // de place et ne peut pas être vérifiée.
-    if (response.ok && response.type !== 'opaque') {
-        await cache.put(request, response.clone());
-        trimCache(cache, TILE_CACHE_MAX);
+    try {
+        const response = await fetch(request);
+        // Seules les réponses lisibles (CORS) sont gardées : une réponse « opaque » occupe beaucoup
+        // de place et ne peut pas être vérifiée.
+        if (response.ok && response.type !== 'opaque') {
+            event.waitUntil(
+                cache
+                    .put(request, response.clone())
+                    .then(() => trimCache(cache, TILE_CACHE_MAX))
+                    .catch(() => {}),
+            );
+        }
+        return response;
+    } catch {
+        return Response.error();
     }
-    return response;
 }
 
 /**
