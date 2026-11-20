@@ -105,7 +105,11 @@ def main():
 
     out_path = Path(args.out)
     sites = json.loads(out_path.read_text(encoding="utf-8"))
-    by_ref = {str(s.get("reference_terrain")): s for s in sites}
+    by_ref = {
+        str(s["reference_terrain"]).strip(): s
+        for s in sites
+        if s.get("reference_terrain") is not None and str(s.get("reference_terrain")).strip() not in ("", "None")
+    }
     geo = [s for s in sites
            if s.get("latitude") is not None and s.get("longitude") is not None]
 
@@ -124,8 +128,9 @@ def main():
             continue
 
         target = None
-        ffvl_id = str(props.get("ffvl_site_id", "0")).strip()
-        if ffvl_id and ffvl_id != "0" and ffvl_id in by_ref:
+        raw_ffvl_id = props.get("ffvl_site_id")
+        ffvl_id = str(raw_ffvl_id).strip() if raw_ffvl_id is not None else "0"
+        if ffvl_id and ffvl_id not in ("0", "None") and ffvl_id in by_ref:
             target = by_ref[ffvl_id]
         else:
             best, best_d = None, MATCH_RADIUS_M

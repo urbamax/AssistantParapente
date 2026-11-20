@@ -20,15 +20,18 @@ test.describe('Mobile viewport smoke (390x844)', () => {
 
         await page.goto('/?mode=WELCOME');
         await expect(page.locator('#welcome-screen.active')).toBeVisible();
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 
         // Navigation vers QCM
         await page.goto('/?mode=QCM');
         await expect(page.locator('#qcm-setup-screen.active')).toBeVisible();
         await expect(page.locator('#mode-training')).toBeVisible();
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 
         // Navigation vers Sécurité
         await page.goto('/?mode=SAFETY');
         await expect(page.locator('#safety-screen.active')).toBeVisible();
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 
         // Ouverture & fermeture de la modale feedback depuis le footer
         const feedbackLink = page.locator('#safety-screen [data-action="openFeedbackModal"]').first();
