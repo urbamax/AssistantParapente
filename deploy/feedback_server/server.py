@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Serveur de réception des retours Assistant Parapente vers Discord.
+Serveur de réception des retours, télémétrie des crashs et health check Assistant Parapente.
 100% Python standard (aucune dépendance tierce requise).
 """
 import http.server
@@ -9,12 +9,13 @@ import os
 import sys
 import time
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
+SERVER_START_TIME = time.time()
 
-# Chargement d'un fichier .env simple si présent
+
 def load_env(env_path: Path):
     if not env_path.is_file():
         return
@@ -29,6 +30,7 @@ def load_env(env_path: Path):
     except Exception as e:
         print(f"[WARN] Impossible de lire {env_path}: {e}", file=sys.stderr)
 
+
 load_env(BASE_DIR / ".env")
 
 PORT = int(os.environ.get("PORT", 8085))
@@ -36,10 +38,13 @@ DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL", "")
 
 LOGS_DIR = BASE_DIR / "logs"
 LOGS_DIR.mkdir(parents=True, exist_ok=True)
+CRASHES_DIR = LOGS_DIR / "crashes"
+CRASHES_DIR.mkdir(parents=True, exist_ok=True)
 
 # Couleurs Discord par catégorie (format décimal)
 COLORS = {
     "bug": 0xE02424,          # Rouge
+    "crash": 0xDC2626,        # Rouge vif
     "qcm_course": 0xFF7A00,   # Orange
     "site_weather": 0x2563EB, # Bleu
     "suggestion": 0x16A34A,   # Vert
@@ -48,6 +53,7 @@ COLORS = {
 
 EMOJIS = {
     "bug": "🐛",
+    "crash": "🚨",
     "qcm_course": "🎓",
     "site_weather": "🌤️",
     "suggestion": "💡",
@@ -59,10 +65,10 @@ RATE_LIMIT_WINDOW_SECONDS = 600
 RATE_LIMIT_MAX_REQUESTS = 10
 _ip_requests = {}
 
+
 def is_rate_limited(ip: str) -> bool:
     now = time.time()
     history = _ip_requests.setdefault(ip, [])
-    # Nettoyer les anciennes entrées
     _ip_requests[ip] = [t for t in history if now - t < RATE_LIMIT_WINDOW_SECONDS]
     if len(_ip_requests[ip]) >= RATE_LIMIT_MAX_REQUESTS:
         return True
@@ -70,12 +76,64 @@ def is_rate_limited(ip: str) -> bool:
     return False
 
 
+def format_uptime(seconds_elapsed: int) -> str:
+    days = seconds_elapsed // 86400
+    hours = (seconds_elapsed % 86400) // 3600
+    minutes = (seconds_elapsed % 3600) // 60
+    secs = seconds_elapsed % 60
+    if days:
+        return f"{days}j {hours}h {minutes}m {secs}s"
+    if hours:
+        return f"{hours}h {minutes}m {secs}s"
+    if minutes:
+        return f"{minutes}m {secs}s"
+    return f"{secs}s"
+
+
+def send_discord_payload(payload: dict, timeout: int = 10) -> bool:
+    if not DISCORD_WEBHOOK_URL:
+        return False
+    try:
+        req = urllib.request.Request(
+            DISCORD_WEBHOOK_URL,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": "AssistantParapente-Server/1.0",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return resp.status in (200, 204)
+    except Exception as e:
+        print(f"[WARN] Envoi Discord échoué: {e}", file=sys.stderr)
+        return False
+
+
+def notify_startup():
+    if not DISCORD_WEBHOOK_URL or os.environ.get("NOTIFY_ON_START", "true").lower() not in ("true", "1", "yes"):
+        return
+    payload = {
+        "username": "Assistant Parapente",
+        "avatar_url": "https://assistantparapente.fr/img/logos/logo-192.png",
+        "embeds": [
+            {
+                "title": "🟢 Service Backend Démarré",
+                "description": f"Le microservice de retours et télémétrie tourne sur le Raspberry Pi.\n**Port** : `{PORT}` | **PID** : `{os.getpid()}`",
+                "color": 0x16A34A,
+                "footer": {"text": "Assistant Parapente • Surveillance système"},
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        ],
+    }
+    send_discord_payload(payload, timeout=5)
+
+
 class FeedbackHandler(http.server.BaseHTTPRequestHandler):
     def _send_json(self, status: int, data: dict):
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Accept")
         self.end_headers()
         self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))
@@ -83,13 +141,28 @@ class FeedbackHandler(http.server.BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Accept")
         self.end_headers()
 
+    def do_GET(self):
+        clean_path = self.path.split("?")[0].rstrip("/") or "/"
+        if clean_path in ("/api/health", "/api/feedback", "/health", "/"):
+            uptime_secs = int(time.time() - SERVER_START_TIME)
+            self._send_json(200, {
+                "status": "healthy",
+                "service": "Assistant Parapente Backend",
+                "version": "1.0.0",
+                "uptime_seconds": uptime_secs,
+                "uptime": format_uptime(uptime_secs),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            })
+            return
+        self._send_json(404, {"success": False, "message": "Route introuvable"})
+
     def do_POST(self):
-        # Accepter /api/feedback ou la racine si monté directement
-        if self.path not in ("/api/feedback", "/"):
+        clean_path = self.path.split("?")[0].rstrip("/") or "/"
+        if clean_path not in ("/api/feedback", "/api/crash", "/api/health", "/"):
             self._send_json(404, {"success": False, "message": "Route introuvable"})
             return
 
@@ -125,18 +198,19 @@ class FeedbackHandler(http.server.BaseHTTPRequestHandler):
             contact = str(body.get("contact") or "").strip()[:120] or "Non renseigné"
             ctx = body.get("context") if isinstance(body.get("context"), dict) else {}
 
-            if not description or len(description) < 10:
+            if not description or len(description) < 5:
                 self._send_json(400, {"success": False, "message": "Description trop courte."})
                 return
 
             # Sauvegarde locale JSON horodatée
             timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-            log_file = LOGS_DIR / f"{timestamp_str}_{cat}.json"
+            target_dir = CRASHES_DIR if cat == "crash" else LOGS_DIR
+            log_file = target_dir / f"{timestamp_str}_{cat}.json"
             try:
                 with open(log_file, "w", encoding="utf-8") as f:
                     json.dump(
                         {
-                            "received_at": datetime.now().isoformat(),
+                            "received_at": datetime.now(timezone.utc).isoformat(),
                             "ip": client_ip,
                             "payload": body,
                         },
@@ -152,10 +226,21 @@ class FeedbackHandler(http.server.BaseHTTPRequestHandler):
                 emoji = EMOJIS.get(cat, "💬")
                 color = COLORS.get(cat, 0x6B7280)
 
-                fields = [
-                    {"name": "👤 Contact", "value": contact, "inline": True},
-                    {"name": "🏷️ Catégorie", "value": f"{emoji} {label}", "inline": True},
-                ]
+                fields = []
+                if cat == "crash":
+                    # Spécifique crash JS
+                    embed_title = f"🚨 Crash Client JS — {subject}"
+                    fields.append({"name": "🏷️ Type", "value": "Télémétrie d'erreur automatique", "inline": True})
+                    if body.get("location"):
+                        fields.append({"name": "📍 Emplacement", "value": f"`{str(body.get('location'))[:120]}`", "inline": True})
+                    embed_desc = f"```javascript\n{description[:2000]}\n```"
+                    footer_text = "Assistant Parapente • Alerte Crash JS"
+                else:
+                    embed_title = f"{emoji} {label} — {subject}"
+                    fields.append({"name": "👤 Contact", "value": contact, "inline": True})
+                    fields.append({"name": "🏷️ Catégorie", "value": f"{emoji} {label}", "inline": True})
+                    embed_desc = description
+                    footer_text = "Assistant Parapente • Retour pilote en direct"
 
                 if ctx:
                     tech_lines = [
@@ -177,27 +262,17 @@ class FeedbackHandler(http.server.BaseHTTPRequestHandler):
                     "avatar_url": "https://assistantparapente.fr/img/logos/logo-192.png",
                     "embeds": [
                         {
-                            "title": f"{emoji} {label} — {subject}",
-                            "description": description,
+                            "title": embed_title,
+                            "description": embed_desc,
                             "color": color,
                             "fields": fields,
-                            "footer": {"text": "Assistant Parapente • Retour pilote en direct"},
-                            "timestamp": datetime.utcnow().isoformat() + "Z",
+                            "footer": {"text": footer_text},
+                            "timestamp": datetime.now(timezone.utc).isoformat(),
                         }
                     ],
                 }
 
-                req = urllib.request.Request(
-                    DISCORD_WEBHOOK_URL,
-                    data=json.dumps(discord_payload).encode("utf-8"),
-                    headers={
-                        "Content-Type": "application/json",
-                        "User-Agent": "AssistantParapente-Feedback/1.0",
-                    },
-                )
-                with urllib.request.urlopen(req, timeout=10) as resp:
-                    if resp.status not in (200, 204):
-                        print(f"[WARN] Réponse Discord inattendue: {resp.status}", file=sys.stderr)
+                send_discord_payload(discord_payload)
 
             self._send_json(200, {"success": True, "message": "Signalement transmis avec succès."})
 
@@ -211,6 +286,8 @@ class FeedbackHandler(http.server.BaseHTTPRequestHandler):
 if __name__ == "__main__":
     if not DISCORD_WEBHOOK_URL:
         print("[AVERTISSEMENT] DISCORD_WEBHOOK_URL n'est pas configuré dans .env !", file=sys.stderr)
+
+    notify_startup()
 
     server = http.server.ThreadingHTTPServer(("0.0.0.0", PORT), FeedbackHandler)
     print(f"Serveur feedback démarré sur http://0.0.0.0:{PORT}")

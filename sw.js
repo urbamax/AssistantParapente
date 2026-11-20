@@ -136,6 +136,7 @@ const CRITICAL_ASSETS = [
     './js/services/access_service.js',
     './js/services/backup_service.js',
     './js/services/feedback_service.js',
+    './js/services/crash_reporter.js',
     './js/services/brevet_service.js',
     './js/services/sites_service.js',
     './js/services/sites_forecast_fetch.js',

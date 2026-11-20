@@ -26,8 +26,10 @@ ui-debug.log
 # Contenus de la FFVL et de leurs auteurs : servis par le site, jamais dans le dépôt (voir NOTICE)
 courses/
 
-# Secrets et variables d'environnement
+# Secrets et variables d'environnement (tokens bot, clés api)
 .env
+.env.*
+.env.local
 *.env
 !.env.example
 deploy/feedback_server/logs/
