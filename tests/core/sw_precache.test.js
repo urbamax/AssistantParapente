@@ -69,6 +69,21 @@ describe('pré-cache du service worker (sw.js)', () => {
         });
         expect(unknown).toEqual([]);
     });
+
+    it('isole les bibliothèques /vendor/ dans un cache dédié persistant entre versions', () => {
+        expect(SW_SOURCE).toMatch(/const VENDOR_CACHE\s*=\s*'parapente-vendor-v\d+'/);
+        expect(SW_SOURCE).toMatch(/RUNTIME_CACHES\s*=\s*\[[^\]]*VENDOR_CACHE[^\]]*\]/);
+    });
+
+    it('déclare une icône maskable dans manifest.json et un cache immutable Nginx pour /assets/ et /vendor/', () => {
+        const manifest = JSON.parse(readFileSync('manifest.json', 'utf8'));
+        expect(manifest.icons.some((i) => String(i.purpose || '').includes('maskable'))).toBe(true);
+        expect(manifest.display_override || []).not.toContain('window-controls-overlay');
+
+        const nginxConf = readFileSync('deploy/nginx/assistant-parapente.conf', 'utf8');
+        expect(nginxConf).toMatch(/immutable/);
+        expect(nginxConf).toMatch(/version\.json.*no-store/);
+    });
 });
 
 describe("fichiers de js/ non chargés par l'application", () => {

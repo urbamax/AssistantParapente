@@ -20,10 +20,11 @@ const WEATHER_API_HOSTNAME = 'api.open-meteo.com';
 // que le pilote a réellement ouvert ou affiché, jamais de téléchargement d'avance.
 const COURSE_CACHE = 'parapente-courses-v2'; // cours (PDF) déjà ouverts
 const TILE_CACHE = 'parapente-tiles-v1'; // zones de carte déjà affichées
+const VENDOR_CACHE = 'parapente-vendor-v1'; // bibliothèques tierces versionnées (/vendor/), conservées entre mises à jour
 const COURSE_CACHE_MAX_BYTES = 80 * 1024 * 1024; // ≈ 4 gros livrets ; le cours le plus anciennement ouvert part d'abord
 const TILE_CACHE_MAX = 1500; // ≈ 35 Mo à ≈ 23 Ko par morceau ; les plus anciens partent d'abord
 const TILE_HOSTNAME = 'server.arcgisonline.com';
-const RUNTIME_CACHES = [COURSE_CACHE, TILE_CACHE];
+const RUNTIME_CACHES = [COURSE_CACHE, TILE_CACHE, VENDOR_CACHE];
 
 // --- Firebase Cloud Messaging : réception des alertes météo en arrière-plan (app fermée) ---
 // importScripts (et non `import`) car ce SW est un script classique, pas un module worker.
@@ -222,9 +223,17 @@ const CRITICAL_ASSETS = [
 ];
 
 async function precacheWithFreshNetwork(cache) {
+    const vendorCache = await caches.open(VENDOR_CACHE);
     await Promise.all(
         CRITICAL_ASSETS.map(async (url) => {
             try {
+                if (url.startsWith('./vendor/')) {
+                    const existing = await vendorCache.match(url);
+                    if (existing) return;
+                    const response = await fetch(url);
+                    if (response.ok) await vendorCache.put(url, response);
+                    return;
+                }
                 const response = await fetch(url, { cache: 'reload' });
                 if (response.ok) await cache.put(url, response);
             } catch (e) {
@@ -375,19 +384,22 @@ self.addEventListener('fetch', (event) => {
 
     // Ressources immuables (bundles Vite hachés sous /assets/ et bibliothèques versionnées sous /vendor/) :
     // Cache-First en production pour éviter d'attendre le réseau mobile au démarrage.
-    const isImmutableAsset =
-        url.origin === location.origin && (url.pathname.includes('/assets/') || url.pathname.includes('/vendor/'));
+    const isVendorAsset = url.origin === location.origin && url.pathname.includes('/vendor/');
+    const isImmutableAsset = isVendorAsset || (url.origin === location.origin && url.pathname.includes('/assets/'));
     if (isImmutableAsset) {
+        const targetCache = isVendorAsset ? VENDOR_CACHE : CACHE_NAME;
         event.respondWith(
             caches.match(request).then((cached) => {
                 if (cached) return cached;
-                return fetch(request).then((response) => {
-                    if (response.ok) {
-                        const copy = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-                    }
-                    return response;
-                });
+                return fetch(request)
+                    .then((response) => {
+                        if (response.ok) {
+                            const copy = response.clone();
+                            caches.open(targetCache).then((cache) => cache.put(request, copy));
+                        }
+                        return response;
+                    })
+                    .catch(() => Response.error());
             }),
         );
         return;
