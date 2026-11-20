@@ -279,10 +279,6 @@ class LogbookService {
     _removeFlights(ids) {
         const gone = new Set(ids);
         this.flights = this.flights.filter((f) => !gone.has(f.id));
-        this.saveFlights();
-        if (IDBStorage.isSupported()) {
-            ids.forEach((id) => IDBStorage.deleteFlight(id).catch(() => {}));
-        }
 
         let deleted = [];
         try {
@@ -292,6 +288,11 @@ class LogbookService {
         if (pending.length > 0) {
             deleted.push(...pending);
             localStorage.setItem('deleted_flights', JSON.stringify(deleted));
+        }
+
+        this.saveFlights();
+        if (IDBStorage.isSupported()) {
+            ids.forEach((id) => IDBStorage.deleteFlight(id).catch(() => {}));
         }
 
         if (
@@ -474,7 +475,6 @@ class LogbookService {
 
     deleteEquipment(id) {
         this.equipment = this.equipment.filter((e) => e.id !== id);
-        this.saveEquipment();
 
         // Tombstone : si la suppression cloud ci-dessous n'aboutit pas (hors ligne, connexion pas
         // prête), la prochaine synchro la termine au lieu de re-télécharger l'équipement (spec 015).
@@ -487,6 +487,8 @@ class LogbookService {
             deleted.push(id);
             localStorage.setItem('deleted_equipment', JSON.stringify(deleted));
         }
+
+        this.saveEquipment();
 
         if (
             window.FirebaseAuthEngine &&
@@ -541,7 +543,8 @@ class LogbookService {
         this.flights.forEach((f) => {
             const voile = (f.voile || '').toLowerCase();
             const sellette = (f.sellette || '').toLowerCase();
-            const duree = parseInt(f.duree || 0, 10);
+            const rawDuree = parseInt(f.duree || 0, 10);
+            const duree = Number.isFinite(rawDuree) && rawDuree > 0 ? rawDuree : 0;
 
             [voile, sellette].forEach((key) => {
                 if (!stats[key]) return;

@@ -89,8 +89,8 @@ export function mergeQcmStats(local, cloud) {
         const cQ = (cloud.questions || {})[qCode] || { total: 0, correct: 0, streak: 0 };
 
         merged.questions[qCode] = {
-            total: Math.max(lQ.total, cQ.total),
-            correct: Math.max(lQ.correct, cQ.correct),
+            total: Math.max(Number(lQ.total) || 0, Number(cQ.total) || 0),
+            correct: Math.max(Number(lQ.correct) || 0, Number(cQ.correct) || 0),
             ...latestReviewState(lQ, cQ),
             ...mergeChoicePicks(lQ.choicePicks, cQ.choicePicks),
             ...mergeChoiceMisses(lQ.choiceMisses, cQ.choiceMisses),
@@ -106,8 +106,8 @@ export function mergeQcmStats(local, cloud) {
         const cT = (cloud.themes || {})[theme] || { total: 0, correct: 0 };
 
         merged.themes[theme] = {
-            total: Math.max(lT.total, cT.total),
-            correct: Math.max(lT.correct, cT.correct),
+            total: Math.max(Number(lT.total) || 0, Number(cT.total) || 0),
+            correct: Math.max(Number(lT.correct) || 0, Number(cT.correct) || 0),
         };
     });
 
@@ -182,8 +182,9 @@ export function mergePreferences(local, cloud) {
     if (!cloud) return local;
     if (!local) return cloud;
 
-    // 1. Le Cloud est la source de vérité absolue (recharge à la connexion)
-    const merged = { ...cloud };
+    // 1. LWW si horodaté, sinon le Cloud fait foi pour les clés communes
+    const localNewer = (Number(local.updatedAt) || 0) > (Number(cloud.updatedAt) || 0);
+    const merged = localNewer ? { ...cloud, ...local } : { ...cloud };
 
     // 2. On récupère les valeurs locales qui n'existent pas du tout dans le cloud
     // (Utile pour rétrocompatibilité lors de l'ajout d'une nouvelle option locale)
