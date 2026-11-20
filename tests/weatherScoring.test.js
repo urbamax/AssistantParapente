@@ -177,6 +177,23 @@ describe('equipment ("hardware") mode (spec 001, research R6)', () => {
         expect(res.flyable).toBe(false);
         expect(res.reason).toBe('Vent hors limites (Matériel)');
     });
+
+    it('scores wind speed against the matching wing range rather than manual vMin/vMax', () => {
+        const res = evaluateSpotForecast(
+            site,
+            { ...weather, windSpeed: 35, windGust: 38 },
+            {
+                filterMode: 'hardware',
+                vMin: 0,
+                vMax: 25,
+                deltaRafaleMax: 15,
+                wings: [{ type: 'voile', nom: 'Mini-voile', ventMin: 25, ventMax: 45 }],
+            },
+        );
+        expect(res.flyable).toBe(true);
+        expect(res.score).toBe(100);
+        expect(res.reasonCode).toBe('EXCELLENT');
+    });
 });
 
 describe('normalizeForecastValue (spec 001, FR-001)', () => {

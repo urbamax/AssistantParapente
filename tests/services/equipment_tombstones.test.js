@@ -117,6 +117,22 @@ describe('Deleted equipment and cloud sync (spec 015)', () => {
         expect(firestore.docs.has('users/u1/equipment/wing-old')).toBe(false);
     });
 
+    it('preserves a tombstone added while the deletion loop is awaiting cloud deleteDoc', async () => {
+        LogbookService.deleteEquipment('wing-old');
+        const origDeleteDoc = firestore.module.deleteDoc;
+        firestore.module.deleteDoc = vi.fn(async (ref) => {
+            // Pendant que wing-old est supprimé dans Firestore, le pilote supprime aussi wing-new.
+            if (ref.path === 'users/u1/equipment/wing-old') {
+                LogbookService.deleteEquipment('wing-new');
+            }
+            return origDeleteDoc(ref);
+        });
+
+        await FirebaseAuthEngine.syncDataWithCloud(true);
+        expect(pendingDeletions()).toEqual(['wing-new']);
+        expect(localEquipmentIds()).not.toContain('wing-new');
+    });
+
     it('records each deleted id once and survives a corrupted list', () => {
         localStorage.setItem('deleted_equipment', '{corrupted');
         LogbookService.deleteEquipment('wing-old');
