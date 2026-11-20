@@ -68,7 +68,16 @@
                             uniquement dans votre stockage local.
                         </li>
                         <li data-i18n="gdprPrivacyModal.uniquementLorsqueVousUtilisez">
-                            <strong data-i18n="gdprPrivacyModal.signalementsEtSuggestionsOptionnel">Signalements et suggestions (optionnel) :</strong> uniquement lorsque vous envoyez volontairement le formulaire « Signaler un problème / Suggestion », le texte saisi, l'éventuel contact et (si laissé coché) le contexte technique non personnel sont transmis directement au serveur de l'éditeur afin de traiter votre retour. Le brouillon est conservé localement jusqu'à l'envoi ou son effacement.
+                            <strong data-i18n="gdprPrivacyModal.signalementsEtSuggestionsOptionnel">Signalements et suggestions (optionnel) :</strong> uniquement lorsque vous envoyez volontairement le formulaire « Signaler un problème / Suggestion », le texte saisi, l'éventuel contact et (si laissé coché) le contexte technique non personnel sont transmis au serveur de l'éditeur puis relayés vers un salon privé Discord (Discord Inc., États-Unis) afin de traiter votre retour. Le brouillon est conservé localement jusqu'à l'envoi ou son effacement.
+                        </li>
+                        <li data-i18n="gdprPrivacyModal.ficheUrgenceIceOptionnel">
+                            <strong data-i18n="gdprPrivacyModal.ficheUrgenceIceLabel">Fiche d'urgence ICE (données de santé, Art. 9 RGPD) :</strong> si vous renseignez votre fiche ICE (groupe sanguin, allergies, traitement, contacts), elle reste stockée uniquement sur votre appareil par défaut et encodée dans le QR code de votre casque (lisible par toute personne qui le scanne). Sa sauvegarde dans Firebase est strictement facultative et nécessite votre consentement explicite.
+                        </li>
+                        <li data-i18n="gdprPrivacyModal.telemetrieCrashAutomatique">
+                            <strong data-i18n="gdprPrivacyModal.telemetrieCrashLabel">Télémétrie technique d'erreurs :</strong> en cas de plantage JavaScript (intérêt légitime, Art. 6(1)(f)), un rapport technique anonymisé (message d'erreur, pile d'exécution, URL nettoyée de ses paramètres et fragments) est envoyé automatiquement via le serveur de l'éditeur vers un salon privé Discord (Discord Inc., États-Unis) pour corriger les pannes.
+                        </li>
+                        <li data-i18n="gdprPrivacyModal.servicesTiersALaDemande">
+                            <strong data-i18n="gdprPrivacyModal.servicesTiersLabel">Services tiers à la demande :</strong> selon les écrans consultés, votre navigateur interroge directement Open-Meteo (prévisions météo), OpenStreetMap / Nominatim (géocodage), Esri / AWS Terrarium / MapLibre / deck.gl (fonds de carte et relief 3D) ou les cartes externes intégrées (Windy, Météo-Parapente, ParaglidingEarth, Paraglidable, SpotAiR), et peut enregistrer un jeton FCM si vous activez les alertes météo.
                         </li>
                     </ul>
 
@@ -84,12 +93,12 @@
                     <ul>
                         <li data-i18n="gdprPrivacyModal.lesDonneesStockeesLocalement">
                             Les données stockées localement (LocalStorage) restent stockées sur votre navigateur jusqu'à
-                            ce que vous effaciez les données de votre site ou révoquiez votre consentement.
+                            ce que vous effaciez les données de votre site ou révoquiez votre consentement (la révocation du consentement « Statistiques » efface les scores QCM, mais conserve votre carnet de vol, matériel et fiche ICE locaux).
                         </li>
                         <li data-i18n="gdprPrivacyModal.lesComptesUtilisateursInactifs">
-                            Les comptes utilisateurs inactifs sur Firebase sont supprimés au bout de 24 mois. Vous
-                            pouvez à tout moment demander la suppression définitive de votre compte depuis l'interface
-                            ou en nous contactant.
+                            Les données synchronisées sur Firebase sont conservées tant que votre compte existe. Vous
+                            pouvez demander la suppression définitive de votre compte et de ses données à tout moment en
+                            nous contactant.
                         </li>
                     </ul>
 
@@ -97,7 +106,8 @@
                     <p data-i18n="gdprPrivacyModal.conformementAuReglementGeneral">
                         Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez de droits
                         d'accès, de rectification, de portabilité et de suppression de vos données, ainsi que du droit
-                        de retirer votre consentement à tout moment.
+                        de retirer votre consentement à tout moment. Vous pouvez également introduire une réclamation
+                        auprès de la CNIL (cnil.fr).
                     </p>
                     <p data-i18n-html="gdprPrivacyModal.pourTouteQuestionOu">
                         Pour toute question ou pour exercer vos droits, vous pouvez contacter le responsable via le
@@ -183,8 +193,7 @@
                         La base des sites de vol est dérivée des données ouvertes de la <strong>FFVL</strong> (<em
                             >Source : FFVL</em
                         >, Licence Ouverte / Etalab 2.0) complétées par <strong>ParaglidingEarth</strong> (licence
-                        Creative Commons BY-SA 3.0). Ces données sont fournies à titre indicatif et ne remplacent pas
-                        les informations officielles des structures gestionnaires.
+                        Creative Commons BY-SA 3.0). Les prévisions météo proviennent d'<strong>Open-Meteo</strong> (CC BY 4.0) et les fonds cartographiques d'<strong>OpenStreetMap</strong> (ODbL), <strong>Esri World Imagery</strong>, <strong>AWS Terrarium</strong>, <strong>MapLibre GL JS</strong> et <strong>deck.gl</strong>. Ces données sont fournies à titre indicatif et ne remplacent pas les informations officielles des structures gestionnaires.
                     </p>
                     <p data-i18n="gdprLegalModal.touteReproductionOuUtilisation">
                         Toute reproduction ou utilisation non autorisée des cours et des affiches à des fins

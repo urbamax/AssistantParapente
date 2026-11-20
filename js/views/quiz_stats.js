@@ -428,6 +428,11 @@ export class QuizStatsBase extends BaseView {
             container.innerHTML = `
             ${successGaugeHtml}
             ${officialTheoryBannerHtml}
+            <div style="text-align:center; margin: 16px 0 8px;">
+                <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-compass-3-line" aria-hidden="true"></i> ${tq('axes.openFromStats')}
+                </button>
+            </div>
 
             <div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">${tq('stats.distributionTitle')}</h3>

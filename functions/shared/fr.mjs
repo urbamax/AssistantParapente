@@ -1100,6 +1100,7 @@ export const FR = Object.freeze({
         }),
         axes: Object.freeze({
             title: 'AXES DE RÉVISION',
+            openFromStats: 'Travailler mes axes prioritaires',
             subtitle:
                 'Révisez chapitre par chapitre sans bachotage : relisez d’abord les pages exactes du cours officiel, parcourez les points clés sans les réponses QCM sous les yeux, puis vérifiez votre compréhension sur un court atelier.',
             methodStep1Title: '1. Lire le cours ciblé',

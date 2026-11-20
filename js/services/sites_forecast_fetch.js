@@ -44,7 +44,7 @@ export async function fetchSecondaryModel() {
             const chunkSites = sites.slice(i, i + CHUNK_SIZE);
             const lats = chunkSites.map((x) => parseFloat(x.latitude || x.lat)).join(',');
             const lons = chunkSites.map((x) => parseFloat(x.longitude || x.lon)).join(',');
-            const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${lats}&longitude=${lons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,cape&timezone=Europe%2FParis&forecast_days=8${modelParam}`;
+            const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${lats}&longitude=${lons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,cape&timezone=auto&forecast_days=8${modelParam}`;
 
             let results;
             const cached = this._weatherCache.get(url);
@@ -256,7 +256,7 @@ export async function fetchWeatherForSites({ force = false } = {}) {
             const chunkLons = chunkSites.map((s) => parseFloat(s.longitude || s.lon)).join(',');
             // forecast_days=8 (et non 6) pour garder ~168h (7 jours) de marge même quand
             // l'heure courante tombe tard dans la journée 1 (cf. digest 7 jours, forecastMaxRange=168).
-            const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${chunkLats}&longitude=${chunkLons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,cape&daily=sunrise,sunset&timezone=Europe%2FParis&forecast_days=8${modelParam}`;
+            const url = `https://api.open-meteo.com/v1/${apiEndpoint}?latitude=${chunkLats}&longitude=${chunkLons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,cape&daily=sunrise,sunset&timezone=auto&forecast_days=8${modelParam}`;
 
             const cached = this._weatherCache.get(url);
             if (!force && cached && Date.now() - cached.timestamp < WEATHER_CACHE_TTL_MS) {

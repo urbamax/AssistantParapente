@@ -334,7 +334,17 @@ describe('QuizService - Choix cochés (choicePicks)', () => {
         const q = makeQuestion();
         answer('EXAM', q, [1, 2]);
         expect(stored()).toBeUndefined();
+        const updateSpy = vi.spyOn(QuizService, 'updateStats');
         QuizService.saveExamHistory('BI');
+        expect(updateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({ code: 'P1V' }),
+            false,
+            expect.any(Array),
+            null,
+            expect.any(Number),
+            { userScore: -3, maxScore: 9 },
+        );
+        updateSpy.mockRestore();
         expect(stored()).toMatchObject({ choicePicks: [0, 1, 1], total: 1, correct: 0, streak: 0 });
         expect(StorageService.get(StorageService.KEYS.QCM_STATS).totalQuestions).toBe(1);
     });

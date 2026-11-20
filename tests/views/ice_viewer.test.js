@@ -44,10 +44,11 @@ describe('IceView (js/views/ice_viewer.js)', () => {
         expect(root.textContent).toContain('Pénicilline');
         expect(root.textContent).toContain('1234567');
 
-        // Vérifie les liens d'appel direct
+        // Vérifie les liens d'appel direct et l'ordre prioritaire du 112 avant les détails médicaux
         const callBtn = root.querySelector('a[href="tel:+33612345678"]');
         expect(callBtn).not.toBeNull();
         expect(root.querySelector('a[href="tel:112"]')).not.toBeNull();
+        expect(root.innerHTML.indexOf('tel:112')).toBeLessThan(root.innerHTML.indexOf('Pénicilline'));
     });
 
     it('imports profile data into local storage on importToProfile()', async () => {
