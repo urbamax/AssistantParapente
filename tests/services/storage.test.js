@@ -63,6 +63,11 @@ describe('StorageService', () => {
             expect(StorageService.set('tp_logbook_data', [{ id: '1' }])).toBe(false);
             expect(onQuota).toHaveBeenCalledTimes(1);
             expect(onQuota.mock.calls[0][0].detail).toEqual({ key: 'tp_logbook_data' });
+
+            // Firefox NS_ERROR_DOM_QUOTA_REACHED also triggers the event
+            quotaErr.name = 'NS_ERROR_DOM_QUOTA_REACHED';
+            expect(StorageService.set('tp_logbook_data', [{ id: '2' }])).toBe(false);
+            expect(onQuota).toHaveBeenCalledTimes(2);
         } finally {
             window.removeEventListener('parapente:storage-quota', onQuota);
         }
