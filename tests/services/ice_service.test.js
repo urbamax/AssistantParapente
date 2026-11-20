@@ -154,4 +154,28 @@ describe('IceService (js/services/ice_service.js)', () => {
             expect(svg).toContain('<path');
         });
     });
+
+    describe('Robustness & edge cases (audit P2)', () => {
+        it('removes localStorage key cleanly in clearProfile()', () => {
+            IceService.saveProfile({ nom: 'Dupont', contact1Phone: '0601020304' });
+            IceService.clearProfile();
+            expect(localStorage.getItem('parapente_ice_profile')).toBeNull();
+        });
+
+        it('strips CR (\\r) characters when building vCard', () => {
+            const vcard = IceService.buildIceVCard({ nom: 'Test', remarques: 'Ligne 1\r\nLigne 2' });
+            expect(vcard).not.toContain('\r');
+        });
+
+        it('prevents pipe (|) in contact name from corrupting phone on encode/decode round-trip', () => {
+            const encoded = IceService.encodePayload({
+                contact1Name: 'Marie | Secours',
+                contact1Phone: '0612345678',
+                contact1Rel: 'Conjointe',
+            });
+            const decoded = IceService.decodePayload(encoded);
+            expect(decoded.contact1Phone).toBe('0612345678');
+            expect(decoded.contact1Rel).toBe('Conjointe');
+        });
+    });
 });

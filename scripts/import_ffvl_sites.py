@@ -482,7 +482,10 @@ def main():
     by_ref = {}
     purged_non_parapente = 0
     for s in existing:
-        ref = str(s.get("reference_terrain"))
+        raw_ref = s.get("reference_terrain")
+        # Les sites communautaires (ex. ParaglidingEarth) n'ont pas de reference_terrain FFVL :
+        # les indexer par leur id pour éviter qu'ils ne s'écrasent mutuellement sur la clé "None".
+        ref = str(raw_ref) if raw_ref is not None and str(raw_ref).strip() != "" else f"id:{s.get('id')}"
         if parapente_only:
             if ref in dump_by_ref and not is_parapente(dump_by_ref[ref]):
                 purged_non_parapente += 1

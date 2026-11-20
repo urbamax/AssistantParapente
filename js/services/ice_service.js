@@ -404,20 +404,21 @@ export function encodePayload(profile = {}) {
     if (profile.tel) params.set('tp', String(profile.tel).trim());
     if (profile.langues) params.set('lg', String(profile.langues).trim());
 
+    const cleanContactPart = (val) => cleanStr(val).replace(/\|/g, ' ');
     if (profile.contact1Phone) {
         const c1 = [
-            cleanStr(profile.contact1Name),
-            cleanStr(profile.contact1Phone),
-            cleanStr(profile.contact1Rel),
+            cleanContactPart(profile.contact1Name),
+            cleanContactPart(profile.contact1Phone),
+            cleanContactPart(profile.contact1Rel),
         ].join('|');
         params.set('c1', c1);
     }
 
     if (profile.contact2Phone) {
         const c2 = [
-            cleanStr(profile.contact2Name),
-            cleanStr(profile.contact2Phone),
-            cleanStr(profile.contact2Rel),
+            cleanContactPart(profile.contact2Name),
+            cleanContactPart(profile.contact2Phone),
+            cleanContactPart(profile.contact2Rel),
         ].join('|');
         params.set('c2', c2);
     }
@@ -495,9 +496,14 @@ export function decodePayload(rawString = '') {
     return clampProfile(result);
 }
 
-/** Échappement d'une valeur de fiche contact (vCard 3.0) : \\ ; , et retours à la ligne. */
+/** Échappement d'une valeur de fiche contact (vCard 3.0) : \\ ; , et retours à la ligne (CR supprimé). */
 const vcardEscape = (value) =>
-    String(value).replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/;/g, '\\;').replace(/,/g, '\\,');
+    String(value)
+        .replace(/\r\n?/g, '\n')
+        .replace(/\\/g, '\\\\')
+        .replace(/\n/g, '\\n')
+        .replace(/;/g, '\\;')
+        .replace(/,/g, '\\,');
 
 /**
  * Fiche contact (vCard 3.0) pour le QR code du casque. L'appareil photo d'un téléphone la reconnaît et ouvre
@@ -575,7 +581,7 @@ export function buildIceUrl(profile, baseUrl) {
             const pathname = window.location.pathname || '';
             base = `${window.location.origin}${pathname}`;
         } else {
-            base = 'https://assistant-parapente.web.app/';
+            base = 'https://assistantparapente.fr/';
         }
     }
 
@@ -638,7 +644,7 @@ export const IceService = {
      * Efface le profil ICE local.
      */
     clearProfile() {
-        StorageService.set(ICE_STORAGE_KEY, null);
+        StorageService.remove(ICE_STORAGE_KEY);
         removeLegacyPrefsCopy();
     },
 

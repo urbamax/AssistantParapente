@@ -2,7 +2,6 @@
   "name": "assistantparapente",
   "version": "1.0.0",
   "description": "**Assistant Parapente** est une application web progressive (SPA) moderne dédiée aux pilotes de parapente. Elle centralise la recherche de sites de vol avec calcul d'exploitabilité météo en temps réel (AROME/GFS), un carnet de vol numérique avec analyseur de traces GPS `.igc` et suivi d'usure des voiles, la préparation aux brevets théoriques FFVL (BI, BP, BPC), ainsi qu'une bibliothèque de cours et de manuels.",
-  "main": "index.js",
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",

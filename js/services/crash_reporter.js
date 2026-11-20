@@ -49,13 +49,26 @@ export function isIgnoredError(errInfo) {
 }
 
 /**
+ * Retire les paramètres de requête (?...) et fragments (#...) des URLs dans un texte d'erreur
+ * pour qu'aucune donnée sensible (fiche ICE, migration de domaine) ne parte dans un rapport de crash.
+ * @param {string} text
+ * @returns {string}
+ */
+export function sanitizeCrashText(text) {
+    if (!text || typeof text !== 'string') return '';
+    return text.replace(/(https?:\/\/[^\s?#):]+)([?#][^\s):]*)/gi, '$1');
+}
+
+/**
  * Calcule une signature unique pour éviter d'envoyer 50 fois la même erreur en boucle.
  * @param {{message?: string, filename?: string, lineno?: number, colno?: number}} errInfo
  * @returns {string}
  */
 export function computeErrorSignature(errInfo) {
-    const msg = (errInfo?.message || 'unknown_error').trim().slice(0, 80);
-    const file = (errInfo?.filename || 'inline').split('?')[0].split('/').pop() || 'file';
+    const msg = sanitizeCrashText(errInfo?.message || 'unknown_error')
+        .trim()
+        .slice(0, 80);
+    const file = (errInfo?.filename || 'inline').split('#')[0].split('?')[0].split('/').pop() || 'file';
     const line = errInfo?.lineno || 0;
     const col = errInfo?.colno || 0;
     return `${msg}@${file}:${line}:${col}`;
@@ -118,11 +131,14 @@ export async function sendCrashReport(errInfo, options = {}) {
     const endpoint = options.endpoint || customUrl || '/api/feedback';
 
     const ctx = options.context || collectFeedbackContext();
-    const file = (errInfo.filename || 'app').split('?')[0].split('/').pop() || 'app';
+    const file = (errInfo.filename || 'app').split('#')[0].split('?')[0].split('/').pop() || 'app';
     const locationStr = `${file}:${errInfo.lineno || '?'}:${errInfo.colno || '?'}`;
     const errorName = errInfo.name || 'Error';
-    const cleanMsg = (errInfo.message || 'Erreur inconnue').trim();
-    const cleanStack = (errInfo.stack || cleanMsg).slice(0, CRASH_REPORTER_LIMITS.MAX_DESCRIPTION_LENGTH);
+    const cleanMsg = sanitizeCrashText(errInfo.message || 'Erreur inconnue').trim();
+    const cleanStack = sanitizeCrashText(errInfo.stack || cleanMsg).slice(
+        0,
+        CRASH_REPORTER_LIMITS.MAX_DESCRIPTION_LENGTH,
+    );
 
     const payload = {
         category: 'crash',
