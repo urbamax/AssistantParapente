@@ -110,6 +110,13 @@ const SCREENS = [
         ['js/services/feedback_service.js', ['MENU', 'ALL', 'auto']],
         ['js/views/feedback.js', []],
     ].map(([file, dataValues]) => ({ file, spec: '029', prefix: '', dataValues, minKeys: 1 })),
+    {
+        file: 'js/views/ice_viewer.js',
+        spec: '029',
+        prefix: 'ice.',
+        dataValues: ['Inconnu', '143,9875 MHz'],
+        minKeys: 20,
+    },
 ];
 
 const resolves = (key) => typeof key.split('.').reduce((node, part) => node?.[part], FR) === 'string';
