@@ -31,11 +31,7 @@ test.describe('E2E - GDPR Consent Flow', () => {
         const refuseAllBtn = modal.locator('[data-action="refuseAll"]');
         await refuseAllBtn.click();
 
-        // 5. La modale et la bannière doivent disparaître
-        await page.waitForTimeout(1000); // Wait for transition
-        const classList = await modal.evaluate((node) => node.className);
-        console.log('MODAL CLASS:', classList);
-
+        // 5. La modale et la bannière doivent disparaître (assertions Playwright auto-retriées)
         await expect(modal).not.toHaveClass(/active/);
         await expect(banner).not.toHaveClass(/active/);
 

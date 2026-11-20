@@ -88,10 +88,9 @@ test.describe('E2E - Logbook Offline Flow', () => {
         // Déclencher manuellement l'événement 'online'
         await page.evaluate(() => window.dispatchEvent(new Event('online')));
 
-        // 9. Vérifier que la synchro a fonctionné
-        await page.waitForTimeout(1000);
-
-        // Le vol est toujours là
+        // 9. Vérifier que le vol reste affiché et persisté localement après le retour en ligne
         await expect(flightEntry).toBeVisible();
+        const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('tp_logbook_data') || '[]'));
+        expect(saved.some((f) => f.site === 'Montagne Test Offline')).toBe(true);
     });
 });
