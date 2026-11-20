@@ -106,4 +106,26 @@ describe('SitesMapBase UI actions & URL hardening', () => {
         view.closeMoreMapsDropdown();
         expect(sheet.classList.contains('active')).toBe(false);
     });
+
+    it('openSpotairModal URL-encodes spotairId and launchGps("apple") uses HTTPS', () => {
+        document.body.innerHTML += `
+            <dialog id="spotair-modal">
+                <h3 id="spotair-modal-title"></h3>
+                <div id="spotair-modal-iframe"></div>
+            </dialog>
+            <div id="gps-bottom-sheet"></div>
+        `;
+        view.openSpotairModal('99" onload="alert(1)', 'unknown-site');
+        const iframe = /** @type {HTMLIFrameElement} */ (document.getElementById('spotair-modal-iframe'));
+        expect(iframe.src).toBe('https://www.spotair.mobi/page/wind/ffvl/99%22%20onload%3D%22alert(1)');
+
+        const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+        view.openGpsMenu(45.8, 6.2);
+        view.launchGps('apple');
+        expect(openSpy).toHaveBeenLastCalledWith(
+            'https://maps.apple.com/?daddr=45.8,6.2&dirflg=d',
+            '_blank',
+            'noopener,noreferrer',
+        );
+    });
 });

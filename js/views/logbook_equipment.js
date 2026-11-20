@@ -82,10 +82,13 @@ export class LogbookEquipmentBase extends BaseView {
         const windLimitsDiv = document.getElementById('eq-wind-limits');
 
         if (eqTypeSelect && windLimitsDiv) {
-            eqTypeSelect.addEventListener('change', function (e) {
-                windLimitsDiv.style.display =
-                    /** @type {HTMLInputElement} */ (e.target).value === 'voile' ? 'flex' : 'none';
-            });
+            if (eqTypeSelect.dataset.equipmentListenerBound !== 'true') {
+                eqTypeSelect.dataset.equipmentListenerBound = 'true';
+                eqTypeSelect.addEventListener('change', function (e) {
+                    windLimitsDiv.style.display =
+                        /** @type {HTMLInputElement} */ (e.target).value === 'voile' ? 'flex' : 'none';
+                });
+            }
             // Initiale state
             windLimitsDiv.style.display = eqTypeSelect.value === 'voile' ? 'flex' : 'none';
         }
@@ -94,7 +97,8 @@ export class LogbookEquipmentBase extends BaseView {
         const setupAutreListener = (selectId, autreId) => {
             const selectEl = /** @type {HTMLSelectElement} */ (document.getElementById(selectId));
             const autreEl = /** @type {HTMLInputElement} */ (document.getElementById(autreId));
-            if (selectEl && autreEl) {
+            if (selectEl && autreEl && selectEl.dataset.equipmentListenerBound !== 'true') {
+                selectEl.dataset.equipmentListenerBound = 'true';
                 selectEl.addEventListener('change', () => {
                     autreEl.style.display = selectEl.value === 'Autre' ? 'block' : 'none';
                     if (selectEl.value !== 'Autre') {

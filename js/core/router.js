@@ -148,11 +148,13 @@ class Router {
     async navigate(mode, params = {}) {
         if (!this.routes.has(mode)) {
             console.error(`Route not found: ${mode}`);
-            this.navigate('MENU');
+            if (mode !== 'MENU') await this.navigate('MENU');
             return;
         }
         if (!canOpenRoute(mode)) {
-            if (mode !== DENIED_ROUTE_FALLBACK) this.navigate(DENIED_ROUTE_FALLBACK, { ...params, pushState: false });
+            if (mode !== DENIED_ROUTE_FALLBACK) {
+                await this.navigate(DENIED_ROUTE_FALLBACK, { ...params, pushState: false });
+            }
             return;
         }
         const navId = ++this._navSeq;
@@ -225,6 +227,11 @@ class Router {
             // (ex. QuizView active qcm-setup-screen, puis le callback réactivait qcm-screen
             // → écran bloqué sur « Chargement… »).
             await transition.updateCallbackDone.catch(() => {});
+            if (navId !== this._navSeq) {
+                console.timeEnd('ROUTER_HIDE_SCREENS');
+                console.timeEnd('ROUTER_NAVIGATE_TOTAL_' + mode);
+                return;
+            }
         } else {
             updateDOM();
         }
@@ -263,6 +270,13 @@ class Router {
                 console.error(`Error mounting ${mode}:`, e);
                 renderCrashScreen(screenEl, mode, e);
             }
+        }
+        if (navId !== this._navSeq) {
+            if (view?.mount) {
+                console.timeEnd('ROUTER_MOUNT_' + mode);
+            }
+            console.timeEnd('ROUTER_NAVIGATE_TOTAL_' + mode);
+            return;
         }
 
         // Push/replace state for browser history

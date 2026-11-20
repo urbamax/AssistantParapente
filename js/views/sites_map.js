@@ -269,10 +269,10 @@ export class SitesMapBase extends BaseView {
                 <button class="action-btn-primary" data-action="openGpsMenu" data-args="'${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}'" style="flex: 1; padding: 6px 10px; font-size: 0.8rem; justify-content: center;">
                     <i class="ri-navigation-line"></i> ${tt('card.goThere')}
                 </button>
-                <button class="action-btn-secondary windy-btn" data-action="focusSiteWindy" data-args="'${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}', '${escapeHTML(site.nom)}'" style="padding: 6px 8px;" title="${tt('popup.windyTitle')}">
+                <button class="action-btn-secondary windy-btn" data-action="focusSiteWindy" data-args="'${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}', '${escapeHTML(String(site.nom || '').replace(/'/g, '’'))}'" style="padding: 6px 8px;" title="${tt('popup.windyTitle')}">
                     <i class="ri-windy-line"></i>
                 </button>
-                <button class="action-btn-secondary paraglidable-btn" data-action="focusSiteMap" data-args="'paraglidable', '${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}', '${escapeHTML(site.nom)}'" style="padding: 6px 8px;" title="${tt('popup.paraglidableTitle')}">
+                <button class="action-btn-secondary paraglidable-btn" data-action="focusSiteMap" data-args="'paraglidable', '${parseFloat(site.latitude || site.lat)}', '${parseFloat(site.longitude || site.lon)}', '${escapeHTML(String(site.nom || '').replace(/'/g, '’'))}'" style="padding: 6px 8px;" title="${tt('popup.paraglidableTitle')}">
                     <i class="ri-flight-takeoff-line"></i>
                 </button>
             </div>
@@ -304,7 +304,7 @@ export class SitesMapBase extends BaseView {
             titleEl.textContent = site
                 ? tl('maps.spotairTitleSite', { name: site.nom })
                 : tl('maps.spotairTitleGeneric');
-        iframe.src = `https://www.spotair.mobi/page/wind/ffvl/${spotairId}`;
+        iframe.src = `https://www.spotair.mobi/page/wind/ffvl/${encodeURIComponent(String(spotairId ?? ''))}`;
 
         if (typeof modal.showModal === 'function' && !modal.open) {
             modal.showModal();
@@ -349,7 +349,7 @@ export class SitesMapBase extends BaseView {
         } else if (app === 'gmaps') {
             url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
         } else if (app === 'apple') {
-            url = `http://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`;
+            url = `https://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`;
         }
         if (url) window.open(url, '_blank', 'noopener,noreferrer');
         this.closeGpsMenu();

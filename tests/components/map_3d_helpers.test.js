@@ -94,4 +94,23 @@ describe('Map3DComponent helpers & edge cases', () => {
         Map3DComponent.clearPlayback();
         expect(Map3DComponent.activeInterval).toBeNull();
     });
+
+    it('_playerHtml escapes sessionId attributes and destroy() releases activeMap and activeOverlay', () => {
+        const html = Map3DComponent._playerHtml('s1" onclick="alert(1)', 10);
+        expect(html).not.toContain('onclick="alert(1)"');
+        expect(html).toContain('id="play-btn-s1&quot; onclick=&quot;alert(1)"');
+
+        const removeSpy = vi.fn();
+        const finalizeSpy = vi.fn();
+        Map3DComponent.activeInterval = setInterval(() => {}, 10000);
+        Map3DComponent.activeMap = { remove: removeSpy };
+        Map3DComponent.activeOverlay = { finalize: finalizeSpy };
+
+        Map3DComponent.destroy();
+        expect(Map3DComponent.activeInterval).toBeNull();
+        expect(finalizeSpy).toHaveBeenCalledTimes(1);
+        expect(removeSpy).toHaveBeenCalledTimes(1);
+        expect(Map3DComponent.activeMap).toBeNull();
+        expect(Map3DComponent.activeOverlay).toBeNull();
+    });
 });

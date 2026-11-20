@@ -10,6 +10,7 @@ import { parseCoordinates } from '../utils/geo_utils.js';
 import GlobalState from '../core/app_state.js';
 import { tl } from './logbook_strings.js';
 import { LogbookFormBase } from './logbook_form.js';
+import { destroyLoadedMap3D } from './logbook_history.js';
 
 class LogbookViewClass extends LogbookFormBase {
     constructor() {
@@ -281,6 +282,7 @@ class LogbookViewClass extends LogbookFormBase {
         await super.unmount();
         console.log('Unmounting LogbookView');
         this.closeSessionModal();
+        destroyLoadedMap3D();
         // Le Carnet n'utilise aucune librairie de Chart externe (graphiques générés en HTML pur).
         // Les écouteurs d'événements sont attachés à des éléments du DOM
         // recréés par innerHTML, et sont donc automatiquement garbage collected.

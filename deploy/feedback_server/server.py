@@ -82,7 +82,20 @@ def sanitize_category(raw) -> str:
     if not isinstance(raw, str):
         return "other"
     cleaned = raw.strip().lower()
-    return cleaned if cleaned in COLORS else "other"
+    for allowed in COLORS:
+        if cleaned == allowed:
+            return allowed
+    return "other"
+
+
+def prune_old_logs(directory: Path, max_files: int = 200) -> None:
+    """Limite le nombre de fichiers JSON conservés sur disque pour éviter toute saturation de la carte SD."""
+    try:
+        files = sorted(directory.glob("*.json"), key=lambda p: p.stat().st_mtime)
+        for old_file in files[:-max_files]:
+            old_file.unlink(missing_ok=True)
+    except Exception:
+        pass
 
 
 def resolve_client_ip(headers, remote_addr: str) -> str:
@@ -262,6 +275,8 @@ class FeedbackHandler(http.server.BaseHTTPRequestHandler):
     def _send_json(self, status: int, data: dict):
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Cache-Control", "no-store")
         self._send_cors_headers()
         self.end_headers()
         self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))
@@ -330,19 +345,32 @@ class FeedbackHandler(http.server.BaseHTTPRequestHandler):
             # Sauvegarde locale JSON horodatée (sans IP brute pour conformité RGPD)
             timestamp_str = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
             target_dir = CRASHES_DIR if cat == "crash" else LOGS_DIR
-            log_file = target_dir / f"{timestamp_str}_{cat}_{secrets.token_hex(4)}.json"
+            base_dir = os.path.realpath(target_dir)
+            filename = f"{timestamp_str}_{cat}_{secrets.token_hex(4)}.json"
+            log_path = os.path.realpath(os.path.join(base_dir, filename))
             try:
-                with open(log_file, "w", encoding="utf-8") as f:
+                if not log_path.startswith(base_dir + os.sep):
+                    raise ValueError("Chemin de log hors du répertoire autorisé")
+                with open(log_path, "w", encoding="utf-8") as f:
                     json.dump(
                         {
                             "received_at": datetime.now(timezone.utc).isoformat(),
                             "category": cat,
-                            "payload": body,
+                            "payload": {
+                                "category": cat,
+                                "categoryLabel": label,
+                                "subject": subject,
+                                "description": description,
+                                "contact": contact,
+                                "location": location,
+                                "context": ctx,
+                            },
                         },
                         f,
                         ensure_ascii=False,
                         indent=2,
                     )
+                prune_old_logs(target_dir)
             except Exception as e:
                 print(f"[WARN] Erreur écriture log local: {e}", file=sys.stderr)
 
