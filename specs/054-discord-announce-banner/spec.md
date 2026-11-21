@@ -25,7 +25,9 @@ it or dismiss it, without it ever interrupting what I'm doing.
   - title « Assistant Parapente a son Discord »;
   - text « Pour regrouper vos retours, signaler un bug ou discuter vols et matos entre pilotes. Le
     lien reste aussi accessible en haut à droite de l'appli. »;
-  - link « Rejoindre » → `https://discord.gg/z6vc8ARNk`, `target="_blank"`,
+  - link « Rejoindre » → the permanent invite `FEEDBACK_CONFIG.discordInviteUrl`
+    (`https://discord.gg/mZsjqXmGn3`, same as header, footer and feedback modal; the dated
+    invite `z6vc8ARNk` first used here expires on 2026-12-21), `target="_blank"`,
     `rel="noopener noreferrer"`;
   - close button `×` with `aria-label` « Fermer l'annonce ».
 - Clicking « Rejoindre » or `×` removes the card and stores `ap_discord_banner_dismissed_v1` in

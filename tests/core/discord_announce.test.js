@@ -32,6 +32,7 @@ describe('Discord announcement', () => {
         const join = el.querySelector('a.discord-announce-join');
         expect(join.textContent).toBe('Rejoindre');
         expect(join.getAttribute('href')).toBe(DISCORD_ANNOUNCE_URL);
+        expect(DISCORD_ANNOUNCE_URL).toBe('https://discord.gg/mZsjqXmGn3'); // permanent invite, not a dated one
         expect(join.target).toBe('_blank');
         expect(join.rel).toBe('noopener noreferrer');
         expect(el.querySelector('button.discord-announce-close').getAttribute('aria-label')).toBe("Fermer l'annonce");
