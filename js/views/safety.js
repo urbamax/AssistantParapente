@@ -29,6 +29,7 @@ import {
     testIceView,
     enableIceCloud,
     disableIceCloud,
+    reconcileIceCloudIfNeeded,
 } from './safety_ice.js';
 
 // Textes de l'écran (spec 019), tous dans js/i18n/fr.js (section safety). esc() : texte pour du
@@ -440,6 +441,7 @@ class SafetyViewClass extends BaseView {
             document.getElementById('safety-root')?.appendChild(panel);
         }
         panel.innerHTML = renderIceTabHtml();
+        void reconcileIceCloudIfNeeded();
     }
 
     applyTab() {

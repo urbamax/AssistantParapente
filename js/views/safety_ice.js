@@ -378,6 +378,43 @@ function refreshIcePanel() {
     if (panel) panel.innerHTML = renderIceTabHtml();
 }
 
+let _reconcilePromise = null;
+
+/**
+ * Si le pilote est connecté mais que cet appareil n'a pas encore activé la synchro ICE,
+ * vérifie si une fiche existe déjà dans son profil en ligne (consentement déjà donné ailleurs).
+ * Si oui, réactive automatiquement la synchro et récupère la fiche (ou pousse la locale si plus récente).
+ */
+export async function reconcileIceCloudIfNeeded() {
+    const state = getIceCloudState();
+    if (state.enabled && state.consentAt) return;
+    const engine = typeof window !== 'undefined' ? window.FirebaseAuthEngine : null;
+    if (!engine?.enabled || !engine.currentUser || !engine.fetchIceFromCloud) return;
+    if (_reconcilePromise) return _reconcilePromise;
+
+    _reconcilePromise = (async () => {
+        try {
+            const remote = await engine.fetchIceFromCloud();
+            if (!remote?.success || !remote.data) return;
+
+            const local = IceService.getProfile();
+            const hasLocal = Boolean(local.nom || local.prenom || local.contact1Phone || local.contact2Phone);
+            const consentAt = remote.data.consentAt || new Date().toISOString();
+            setIceCloudState({ enabled: true, consentAt, lastSyncedAt: Date.now() });
+
+            if (!hasLocal || (remote.data.updatedAt || 0) >= state.updatedAt) {
+                IceService.saveProfile(remote.data, { updatedAt: remote.data.updatedAt || Date.now() });
+            } else if (engine.saveIceToCloud) {
+                await engine.saveIceToCloud();
+            }
+            refreshIcePanel();
+        } finally {
+            _reconcilePromise = null;
+        }
+    })();
+    return _reconcilePromise;
+}
+
 /** Envoie la fiche en ligne si le pilote a demandé la sauvegarde (sans bloquer l'écran). */
 function pushIceIfEnabled() {
     if (!getIceCloudState().enabled) return;
