@@ -2042,6 +2042,9 @@ export const FR = Object.freeze({
             'Fiche enregistrée dans votre profil en ligne{when}. Elle suit vos modifications et se retrouve sur vos autres appareils.',
         cloudDeleteBtn: 'Supprimer ma fiche en ligne',
         cloudEnableBtn: 'Enregistrer ma fiche dans mon profil en ligne',
+        cloudFoundOnlineHint:
+            'Une fiche est déjà enregistrée dans votre profil en ligne (depuis un autre appareil). Elle ne vient sur cet appareil que si vous le demandez.',
+        cloudUseOnlineBtn: 'Retrouver ma fiche en ligne sur cet appareil',
         cloudTitle: 'Sauvegarde en ligne (facultative)',
         cloudIntroPrefix: 'Votre fiche contient des données de santé : par défaut elle reste',
         cloudIntroLocalOnly: 'uniquement sur cet appareil',
