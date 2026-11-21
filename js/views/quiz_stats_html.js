@@ -703,47 +703,13 @@ export function buildQuestionsHtml(
                     ? `<span class="question-exam-badge" title="${tq(examCount > 1 ? 'stats.examBadgeTitleMany' : 'stats.examBadgeTitleOne', { count: examCount })}" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35); padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🎓 ${examCount > 1 ? tq('stats.examBadgeMany', { count: examCount }) : tq('stats.examBadgeOne')}</span>`
                     : '';
 
-            // Build answers HTML if available
-            let answersHtml = '';
-            if (qObj && qObj.choices) {
-                const perOption = optionExplanations(qObj);
-                const courseLinks =
-                    typeof view.getCourseLinks === 'function'
-                        ? view.getCourseLinks(code)
-                        : view.getCourseUrl && view.getCourseUrl(code)
-                          ? [{ url: view.getCourseUrl(code), title: '', page: '' }]
-                          : [];
-
-                answersHtml =
-                    '<div class="question-answers" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">';
-                answersHtml += '<div class="bank-item-choices" style="display:flex; flex-direction:column; gap:8px;">';
-                qObj.choices.forEach((ans, idx) => {
-                    const pts = parseInt(ans.pts || 0);
-                    const isCorrect = pts > 0;
-                    const text = perOption ? perOption[idx] : null;
-                    const links = isCorrect ? choiceSourceHtml(courseLinks, qObj, idx) : '';
-                    const explHtml = text ? optionExplanationHtml(text, 'ok', tq('question.explanation'), links) : '';
-                    const choiceHtml = `
-                            <div class="bank-choice ${pts > 0 ? 'correct' : pts < 0 ? 'incorrect' : ''}">
-                                ${escapeHTML(ans.text)} ${pts > 0 ? '(+' + pts + ')' : pts < 0 ? '(' + pts + ')' : ''}
-                            </div>
-                        `;
-                    answersHtml += explHtml
-                        ? `<div class="qcm-option-group">${choiceHtml}${explHtml}</div>`
-                        : choiceHtml;
-                });
-                answersHtml += '</div>';
-
-                if (!perOption && (qObj.explication || courseLinks.length > 0)) {
-                    answersHtml += `
-                                <div class="bank-item-explication" style="margin-top:12px;">
-                                    ${qObj.explication ? `<div>${explanationHtml(qObj.explication)}</div>` : ''}
-                                    ${courseLinksHtml(courseLinks)}
-                                </div>
-                            `;
-                }
-                answersHtml += '</div>';
-            }
+            // Réponses, explications et liens de cours : construits au premier dépliage de la question
+            // (buildQuestionAnswersHtml), pas ici. Les embarquer pour toutes les questions donnait
+            // ~2 Mo de HTML et ~13 000 éléments à chaque affichage de la page.
+            const answersHtml =
+                qObj && qObj.choices
+                    ? '<div class="question-answers" data-lazy="1" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);"></div>'
+                    : '';
 
             const qText = qObj ? qObj.question : tql('stats.unknownQuestion');
             const displayText = qText;
@@ -780,6 +746,50 @@ export function buildQuestionsHtml(
     }
 
     return allQuestionsHtml;
+}
+
+/**
+ * Contenu dépliable d'une question de la liste détaillée : réponses notées, explication de chaque
+ * option et liens de cours. Construit au premier dépliage (toggleQuestionDetails).
+ * @param {any} view
+ * @param {any} qObj
+ * @param {string} code
+ */
+export function buildQuestionAnswersHtml(view, qObj, code) {
+    if (!qObj || !qObj.choices) return '';
+    const perOption = optionExplanations(qObj);
+    const courseLinks =
+        typeof view.getCourseLinks === 'function'
+            ? view.getCourseLinks(code)
+            : view.getCourseUrl && view.getCourseUrl(code)
+              ? [{ url: view.getCourseUrl(code), title: '', page: '' }]
+              : [];
+
+    let answersHtml = '<div class="bank-item-choices" style="display:flex; flex-direction:column; gap:8px;">';
+    qObj.choices.forEach((ans, idx) => {
+        const pts = parseInt(ans.pts || 0);
+        const isCorrect = pts > 0;
+        const text = perOption ? perOption[idx] : null;
+        const links = isCorrect ? choiceSourceHtml(courseLinks, qObj, idx) : '';
+        const explHtml = text ? optionExplanationHtml(text, 'ok', tq('question.explanation'), links) : '';
+        const choiceHtml = `
+                            <div class="bank-choice ${pts > 0 ? 'correct' : pts < 0 ? 'incorrect' : ''}">
+                                ${escapeHTML(ans.text)} ${pts > 0 ? '(+' + pts + ')' : pts < 0 ? '(' + pts + ')' : ''}
+                            </div>
+                        `;
+        answersHtml += explHtml ? `<div class="qcm-option-group">${choiceHtml}${explHtml}</div>` : choiceHtml;
+    });
+    answersHtml += '</div>';
+
+    if (!perOption && (qObj.explication || courseLinks.length > 0)) {
+        answersHtml += `
+                                <div class="bank-item-explication" style="margin-top:12px;">
+                                    ${qObj.explication ? `<div>${explanationHtml(qObj.explication)}</div>` : ''}
+                                    ${courseLinksHtml(courseLinks)}
+                                </div>
+                            `;
+    }
+    return answersHtml;
 }
 
 /** Jauge circulaire du taux de réussite global. */

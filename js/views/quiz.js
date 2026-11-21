@@ -128,6 +128,9 @@ class QuizViewClass extends QuizVoiceBase {
 
         try {
             console.log('QuizView: Initializing QuizService in background...');
+            // Questions déjà en mémoire (retour depuis un autre écran du QCM) : l'écran affiché plus bas
+            // est déjà à jour, inutile de le reconstruire une seconde fois quand init() se résout.
+            const questionsAlreadyLoaded = QuizService.getQuestions().length > 0;
             // Non-blocking initialization
             QuizService.init()
                 .then(() => {
@@ -140,7 +143,7 @@ class QuizViewClass extends QuizVoiceBase {
                     this.refreshMasterySlider();
 
                     // Re-render the correct screen based on routing mode if needed
-                    const mode = GlobalState.get('mode');
+                    const mode = questionsAlreadyLoaded ? null : GlobalState.get('mode');
                     if (mode === 'STATS') {
                         this.renderStats();
                     } else if (mode === 'REVISION_AXES') {
@@ -187,11 +190,15 @@ class QuizViewClass extends QuizVoiceBase {
             if (bankSearch) bankSearch.addEventListener('input', this._handleChange);
 
             // Subscribe to level changes to re-render dynamic content (QCM Bank, Stats)
+            // subscribe() appelle aussi la fonction tout de suite : l'écran vient d'être affiché juste
+            // au-dessus, on ne le reconstruit qu'aux vrais changements de niveau.
+            let levelSubscribed = false;
             this._unsubscribeLevel = GlobalState.subscribe('level', () => {
                 this.syncOfficialTheoryForLevel();
                 this.updateThemeUI();
                 this.updateRevisionSummary();
                 this.refreshMasterySlider();
+                if (!levelSubscribed) return;
 
                 const bankScreen = document.getElementById('qcm-bank-screen');
                 if (bankScreen && bankScreen.classList.contains('active')) {
@@ -208,6 +215,7 @@ class QuizViewClass extends QuizVoiceBase {
                     this.renderRevisionAxes();
                 }
             });
+            levelSubscribed = true;
 
             this._onBrevetsUpdated = () => {
                 this.syncOfficialTheoryForLevel();
