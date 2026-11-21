@@ -187,7 +187,21 @@ export function reviewIntervalDays(streak) {
 }
 
 /**
+ * Dernière milliseconde du jour local contenant `now`.
+ * @param {number} now
+ * @returns {number}
+ */
+export function endOfLocalDay(now) {
+    const d = new Date(now);
+    d.setHours(24, 0, 0, 0);
+    return d.getTime() - 1;
+}
+
+/**
  * Priorité d'une question : >= 0 si elle est à réviser, d'autant plus grand qu'elle est en retard.
+ *
+ * L'échéance se compte en jours calendaires : une question dont l'échéance tombe aujourd'hui, même ce soir,
+ * est à réviser dès ce matin. Sinon le bilan annonçait « Rien à réviser : prochaine échéance le <aujourd'hui> ».
  * @param {QuestionStat|undefined} stat
  * @param {number} [now]
  * @returns {number} Infinity si la question n'a jamais été tentée
@@ -200,7 +214,7 @@ export function dueScore(stat, now = Date.now()) {
         // pour ne pas casser l'historique tant que la question n'a pas été retentée.
         return LEGACY_SUCCESS_THRESHOLD - ratio;
     }
-    const daysSinceSeen = (now - stat.lastSeen) / DAY_MS;
+    const daysSinceSeen = (endOfLocalDay(now) - stat.lastSeen) / DAY_MS;
     const intervalDays = getQuestionIntervalDays(stat);
     return daysSinceSeen - intervalDays - ratio;
 }
