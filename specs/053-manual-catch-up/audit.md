@@ -4,7 +4,7 @@ One row per manual text (catalogue key) after the change, compared with `origin/
 
 **Method.** Every manual tab was read for every role (none, `beta`, `owner`) and compared with the features merged since 2026-11-07 (PR descriptions, then the strings and code of the screens). Rows marked *kept* were read and found accurate; the evidence column of *added* and *corrected* rows names what they were checked against.
 
-**Totals.** 277 texts: 250 kept, 13 corrected, 14 added, 0 removed.
+**Totals.** 277 texts: 247 kept, 16 corrected, 14 added, 0 removed (three QCM rows corrected afterwards by spec 055).
 
 **Found outside the manual (not changed here).** The ICE screen intro (`js/i18n/fr.js`, `ice.introHint`) still ends with « Votre fiche reste sur cet appareil : elle n'est ni synchronisée ni exportée », which contradicts the optional online copy (PRs 180, 307). To fix in its own change.
 
@@ -252,12 +252,12 @@ One row per manual text (catalogue key) after the change, compared with `origin/
 | qcm | modeEntrainement | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | qcm | uneSimulationDeLExamen | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | qcm | modeExamen | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
-| qcm | revisionEspaceeUneQuestion | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
+| qcm | revisionEspaceeUneQuestion | all | corrected | Corrected in spec 055: SM-2 intervals (js/services/review_scheduler.js); marked kept by mistake in 053 |
 | qcm | modeRevision | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
-| qcm | choisissezUnNiveauGlobal | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
+| qcm | choisissezUnNiveauGlobal | all | corrected | Corrected in spec 055: « Palier objectif » slider from current mastery + 1 % to 100 % (QuizService.getMasteryTargetBounds); marked kept by mistake in 053 |
 | qcm | modePerfectionnement | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | qcm | n2ParametrageAvance | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
-| qcm | enModeEntrainementOu | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
+| qcm | enModeEntrainementOu | all | corrected | Corrected in spec 055: count slider 5 to 50, last position = all (#qcm-count-slider); marked kept by mistake in 053 |
 | qcm | n3LectureEtReponses | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | qcm | leBoutonLitLa | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | qcm | ditesLesLettresDes | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
