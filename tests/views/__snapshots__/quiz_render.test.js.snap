@@ -857,6 +857,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>0 / 1 tentées <span style="opacity:0.7;">(1 non tentée)</span></span>
@@ -881,6 +882,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>0 / 1 tentées <span style="opacity:0.7;">(1 non tentée)</span></span>
@@ -905,6 +907,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>0 / 1 tentées <span style="opacity:0.7;">(1 non tentée)</span></span>
@@ -929,6 +932,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>0 / 1 tentées <span style="opacity:0.7;">(1 non tentée)</span></span>
@@ -1079,6 +1083,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>0 / 1 tentées <span style="opacity:0.7;">(1 non tentée)</span></span>
@@ -1103,6 +1108,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -1127,6 +1133,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -1151,6 +1158,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -1504,7 +1512,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             
                     <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px;">
                         
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Facteurs humains']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Facteurs humains']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -1521,6 +1529,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>0 / 1 tentées <span style="opacity:0.7;">(1 non tentée)</span></span>
@@ -1528,7 +1537,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Mécavol']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Mécavol']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -1545,6 +1554,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -1552,7 +1562,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Météo']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Météo']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -1569,6 +1579,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -1576,7 +1587,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Réglementation']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Réglementation']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -1593,6 +1604,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -1831,7 +1843,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             
                     <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px;">
                         
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Facteurs humains']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Facteurs humains']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -1848,6 +1860,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>0 / 1 tentées <span style="opacity:0.7;">(1 non tentée)</span></span>
@@ -1855,7 +1868,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Mécavol']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Mécavol']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -1872,6 +1885,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -1879,7 +1893,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Météo']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Météo']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -1896,6 +1910,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -1920,6 +1935,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">1 dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -2195,7 +2211,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             
                     <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px;">
                         
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Facteurs humains']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Facteurs humains']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -2212,6 +2228,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>0 / 1 tentées <span style="opacity:0.7;">(1 non tentée)</span></span>
@@ -2219,7 +2236,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Mécavol']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Mécavol']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -2236,6 +2253,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -2243,7 +2261,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Météo']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Météo']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -2260,6 +2278,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -2267,7 +2286,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Réglementation']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Réglementation']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -2284,6 +2303,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -2539,6 +2559,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">1 dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>0 / 1 tentées <span style="opacity:0.7;">(1 non tentée)</span></span>
@@ -2546,7 +2567,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Mécavol']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Mécavol']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -2563,6 +2584,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -2570,7 +2592,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Météo']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Météo']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -2587,6 +2609,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -2594,7 +2617,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Réglementation']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Réglementation']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -2611,6 +2634,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -2891,7 +2915,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             
                     <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px;">
                         
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Facteurs humains']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Facteurs humains']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -2908,6 +2932,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>0 / 1 tentées <span style="opacity:0.7;">(1 non tentée)</span></span>
@@ -2915,7 +2940,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Mécavol']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Mécavol']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -2932,6 +2957,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -2939,7 +2965,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Météo']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Météo']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -2956,6 +2982,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -2963,7 +2990,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Réglementation']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Réglementation']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -2980,6 +3007,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -3218,7 +3246,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             
                     <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px;">
                         
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Facteurs humains']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Facteurs humains']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -3235,6 +3263,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>0 / 1 tentées <span style="opacity:0.7;">(1 non tentée)</span></span>
@@ -3259,6 +3288,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">1 dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -3283,6 +3313,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">1 dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -3290,7 +3321,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Réglementation']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Réglementation']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -3307,6 +3338,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -3626,7 +3658,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             
                     <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px;">
                         
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Facteurs humains']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Facteurs humains']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -3643,6 +3675,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>0 / 1 tentées <span style="opacity:0.7;">(1 non tentée)</span></span>
@@ -3650,7 +3683,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Mécavol']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Mécavol']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -3667,6 +3700,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -3674,7 +3708,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Météo']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Météo']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -3691,6 +3725,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -3698,7 +3733,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     </div>
                 </div>
             
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Réglementation']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['Réglementation']" style="cursor:pointer; padding:14px 14px; border-radius:16px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center; opacity:0.45;">
                     <!-- Subtle background glow for active -->
                     
 
@@ -3715,6 +3750,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    <div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Aucune dans la sélection</div>
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -3919,19 +3955,9 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 
                 <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
+                    <div style="font-size:2rem; font-weight:900; color:#fb923c;">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
-                </div>
-                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
-                    <div style="font-size:2rem; font-weight:900; color:#f87171;">1</div>
-                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Échecs</div>
-                    <div style="font-size:0.65rem; opacity:0.4;">(0%)</div>
-                </div>
-                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
-                    <div style="font-size:2rem; font-weight:900; color:var(--text-muted);">1</div>
-                    <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Non tentées</div>
-                    <div style="font-size:0.65rem; opacity:0.4;">(sur 4)</div>
                 </div>
             </div>
         
@@ -3970,6 +3996,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -3994,6 +4021,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:0%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>0 / 1 tentées <span style="opacity:0.7;">(1 non tentée)</span></span>
@@ -4018,6 +4046,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:10%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>
@@ -4042,6 +4071,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                         <div style="height:100%; width:20%; background:#f87171; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px #f87171;"></div>
                     </div>
 
+                    
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>1 / 1 tentées</span>

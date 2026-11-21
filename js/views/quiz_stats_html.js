@@ -119,7 +119,7 @@ export function buildOfficialTheoryBannerHtml(level, entry, attrName = 'data-qui
 }
 
 /** Thème d'une question ; à défaut, déduit de la lettre de son code. */
-function questionTheme(view, code) {
+export function questionTheme(view, code) {
     const qObj = view.getQuestionByCode(code);
     if (qObj && qObj.theme) return qObj.theme;
     if (qObj && qObj.code) {
@@ -149,11 +149,13 @@ function questionTheme(view, code) {
  * reprend telles quelles.
  * @param {any} view
  * @param {{ levelQs: any[], levelQuestionEntries: Array<[string, any]>, stats: any }} data
+ * @param {{ ignoreThemes?: boolean }} [options] ignoreThemes : seules les tuiles de maîtrise filtrent
+ *   (compteur « dans la sélection » des cartes de thème).
  * @returns {Array<[string, any]>}
  */
-export function filterStatsQuestionEntries(view, { levelQs, levelQuestionEntries, stats }) {
+export function filterStatsQuestionEntries(view, { levelQs, levelQuestionEntries, stats }, options = {}) {
     const masteryFilters = activeMasteryFilters(view.state);
-    const themeFilters = activeThemeFilters(view.state);
+    const themeFilters = options.ignoreThemes ? [] : activeThemeFilters(view.state);
     /** @type {Array<[string, any]>} */
     let visible;
     if (!masteryFilters.length) {
@@ -418,8 +420,24 @@ export function buildThemesHtml(view, levelThemes) {
         // Progress bar width
         const barWidth = totalQ > 0 ? pct : 0;
 
+        // Tuiles de maîtrise cochées : combien de questions du thème elles retiennent. Un thème sans
+        // aucune est grisé (le cocher viderait la liste).
+        const selectionCount = typeof data.selectionCount === 'number' ? data.selectionCount : null;
+        const selectionHtml =
+            selectionCount === null
+                ? ''
+                : `<div class="theme-card-selection" style="font-size:0.72rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">${tq(
+                      selectionCount === 0
+                          ? 'stats.themeSelectionNone'
+                          : selectionCount > 1
+                            ? 'stats.themeSelectionMany'
+                            : 'stats.themeSelectionOne',
+                      { count: selectionCount },
+                  )}</div>`;
+        const dimmed = selectionCount === 0 && !isActive ? ' opacity:0.45;' : '';
+
         themesHtml += `
-                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['${name}']" style="cursor:pointer; padding:14px 14px; border-radius:16px; ${cardBorder} ${cardBg} color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;">
+                <div role="button" tabindex="0" class="theme-card" data-action="QuizsetThemeFilter" data-args="['${name}']" style="cursor:pointer; padding:14px 14px; border-radius:16px; ${cardBorder} ${cardBg} color:var(--text-main); transition:all 0.25s ease; position:relative; overflow:hidden; text-align:center;${dimmed}">
                     <!-- Subtle background glow for active -->
                     ${isActive ? `<div style="position:absolute;inset:0;background:radial-gradient(ellipse at top left, rgba(${tColorRgb},0.08) 0%, transparent 70%);pointer-events:none;"></div>` : ''}
 
@@ -436,6 +454,7 @@ export function buildThemesHtml(view, levelThemes) {
                         <div style="height:100%; width:${barWidth}%; background:${tColor}; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 8px ${tColor};"></div>
                     </div>
 
+                    ${selectionHtml}
                     <!-- Footer: question count -->
                     <div style="font-size:0.68rem; opacity:0.55; display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;">
                         <span>${tq('stats.themeCount', { attempted: attemptedUnique, total: totalQ })}${notAttemptedQ > 0 ? ` <span style="opacity:0.7;">${tq(notAttemptedQ > 1 ? 'stats.themeNotAttemptedMany' : 'stats.themeNotAttemptedOne', { count: notAttemptedQ })}</span>` : ''}</span>
