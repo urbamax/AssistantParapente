@@ -1306,6 +1306,9 @@ export const FR = Object.freeze({
             themeCount: '{attempted} / {total} tentées',
             themeNotAttemptedOne: '({count} non tentée)',
             themeNotAttemptedMany: '({count} non tentées)',
+            themeSelectionNone: 'Aucune dans la sélection',
+            themeSelectionOne: '1 dans la sélection',
+            themeSelectionMany: '{count} dans la sélection',
             removeFilter: '✕ Retirer filtre',
             filters: Object.freeze({
                 ALL: 'Toutes les questions tentées',

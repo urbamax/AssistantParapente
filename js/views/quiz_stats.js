@@ -28,6 +28,7 @@ import {
     buildOfficialTheoryBannerHtml,
     activeMasteryFilters,
     activeThemeFilters,
+    questionTheme,
     buildFilteredTrainingButtonHtml,
     filterStatsQuestionEntries,
 } from './quiz_stats_html.js';
@@ -321,7 +322,19 @@ export class QuizStatsBase extends BaseView {
             );
             if (notAttempted < 0) notAttempted = 0;
 
-            levelQuestionEntries.forEach(([, data]) => {
+            // Thèmes cochés : la répartition par maîtrise ne porte que sur leurs questions (filtres à
+            // facettes : un groupe de filtres fait évoluer l'autre, jamais le sien).
+            const checkedThemes = new Set(activeThemeFilters(this.state));
+            const tileQuestionCodes = checkedThemes.size
+                ? new Set(levelQs.filter((q) => checkedThemes.has(questionTheme(this, q.code))).map((q) => q.code))
+                : levelQuestionCodes;
+            const tileEntries = checkedThemes.size
+                ? levelQuestionEntries.filter(([code]) => tileQuestionCodes.has(code))
+                : levelQuestionEntries;
+            const tileTotal = tileQuestionCodes.size;
+            if (checkedThemes.size) notAttempted = Math.max(0, tileTotal - tileEntries.length);
+
+            tileEntries.forEach(([, data]) => {
                 if (data.total === 0) return;
                 const pct = Math.round(masteryRatio(data) * 100);
 
@@ -400,8 +413,22 @@ export class QuizStatsBase extends BaseView {
                 poor,
                 failed,
                 notAttempted,
-                totalLevelQuestions,
+                totalLevelQuestions: tileTotal,
             });
+            // Tuiles cochées : chaque carte de thème indique combien de ses questions elles retiennent
+            // (le taux du thème, lui, reste celui de toutes ses questions).
+            if (activeMasteryFilters(this.state).length) {
+                for (const t of Object.values(levelThemes)) t.selectionCount = 0;
+                const selected = filterStatsQuestionEntries(
+                    this,
+                    { levelQs, levelQuestionEntries, stats },
+                    { ignoreThemes: true },
+                );
+                for (const [code] of selected) {
+                    const t = levelThemes[questionTheme(this, code)];
+                    if (t) t.selectionCount++;
+                }
+            }
             const { themesHtml, sortControlsHtml } = buildThemesHtml(this, levelThemes);
             const allExams = QuizService.getExamHistory();
             const levelExams = currentLevel !== 'ALL' ? allExams.filter((e) => e.level === currentLevel) : allExams;
