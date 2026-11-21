@@ -23,8 +23,8 @@ rules_version = '2';
 //       updatedAt?: number, per-string size bounds
 //   - users/{userId}/stats/{statId}
 //       statId in ['qcm_stats', 'exam_history']
-//       qcm_stats: total keys <= 2000, questions map (<= 2000), themes map (<= 100), appliedExamIds list (<= 1000)
-//       exam_history: total keys <= 20, exams list (<= 1000), deletedExamIds list (<= 200)
+//       qcm_stats: total keys <= 2000, questions map (<= 2000), themes map (<= 100), appliedExamIds list (<= 2500: id and date of up to 1000 exams, plus margin)
+//       exam_history: total keys <= 20, exams list (<= 1000), deletedExamIds list (<= 1000)
 //   - users/{userId}/preferences/{prefId}
 //       prefId == 'user_prefs', hasOnly(24 allowed preference fields), no iceProfile,
 //       favoriteSites?: list (<= 100), minimizedSites?: list (<= 200), savedLocations?: list (<= 50),
@@ -217,12 +217,12 @@ service cloud.firestore {
           && optNumber(data, 'totalCorrect')
           && (!('questions' in data) || (data.questions is map && data.questions.keys().size() <= 2000))
           && (!('themes' in data) || (data.themes is map && data.themes.keys().size() <= 100))
-          && (!('appliedExamIds' in data) || (data.appliedExamIds is list && data.appliedExamIds.size() <= 1000))
+          && (!('appliedExamIds' in data) || (data.appliedExamIds is list && data.appliedExamIds.size() <= 2500))
         ))
         && (statId != 'exam_history' || (
           data.keys().size() <= 20
           && (!('exams' in data) || (data.exams is list && data.exams.size() <= 1000))
-          && (!('deletedExamIds' in data) || (data.deletedExamIds is list && data.deletedExamIds.size() <= 200))
+          && (!('deletedExamIds' in data) || (data.deletedExamIds is list && data.deletedExamIds.size() <= 1000))
         ));
     }
 

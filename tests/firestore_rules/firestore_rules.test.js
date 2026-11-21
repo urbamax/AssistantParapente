@@ -566,6 +566,18 @@ describe('durcissement des bornes et types (anti-abus)', () => {
             await assertFails(setDoc(doc(asMe(), 'users', ME, 'stats', 'autre_stat'), { a: 1 }));
         });
 
+        it('accepte 1000 examens (id et date dans appliedExamIds) et 1000 examens supprimés, pas au-delà', async () => {
+            const ids = (n) => Array.from({ length: n }, (_, i) => `exam_${i}`);
+            await assertSucceeds(setDoc(doc(asMe(), 'users', ME, 'stats', 'qcm_stats'), { appliedExamIds: ids(2500) }));
+            await assertFails(setDoc(doc(asMe(), 'users', ME, 'stats', 'qcm_stats'), { appliedExamIds: ids(2501) }));
+            await assertSucceeds(
+                setDoc(doc(asMe(), 'users', ME, 'stats', 'exam_history'), { exams: [], deletedExamIds: ids(1000) }),
+            );
+            await assertFails(
+                setDoc(doc(asMe(), 'users', ME, 'stats', 'exam_history'), { exams: [], deletedExamIds: ids(1001) }),
+            );
+        });
+
         it('refuse les types invalides sur qcm_stats et exam_history', async () => {
             await assertFails(setDoc(doc(asMe(), 'users', ME, 'stats', 'qcm_stats'), { totalQuestions: 'beaucoup' }));
             await assertFails(setDoc(doc(asMe(), 'users', ME, 'stats', 'exam_history'), { exams: 'pas-une-liste' }));
