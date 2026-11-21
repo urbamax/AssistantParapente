@@ -527,7 +527,8 @@ body.dark-theme .feedback-discord-banner {
    Posée au-dessus de la barre de navigation du bas, jamais dessus. Pas de backdrop-filter :
    il fige le rendu WebKit sous Linux (CI e2e). */
 .discord-announce {
-    --discord-announce-nav-clearance: 104px;
+    /* Barre du bas : 20px du bord + ~77px de haut (css/header.css). */
+    --discord-announce-nav-clearance: 112px;
     position: fixed;
     right: 24px;
     bottom: var(--discord-announce-nav-clearance);
@@ -641,7 +642,7 @@ body.course-open .discord-announce {
 
 @media (max-width: 767px) {
     .discord-announce {
-        --discord-announce-nav-clearance: calc(max(12px, env(safe-area-inset-bottom)) + 84px);
+        --discord-announce-nav-clearance: calc(max(12px, env(safe-area-inset-bottom)) + 82px);
         left: 12px;
         right: 12px;
         width: auto;
