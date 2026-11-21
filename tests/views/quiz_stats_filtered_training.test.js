@@ -4,6 +4,7 @@ import QuizView from '../../js/views/quiz.js';
 import QuizService from '../../js/services/quiz_service.js';
 import GlobalState from '../../js/core/app_state.js';
 import GdprEngine from '../../js/gdpr_engine.js';
+import AppRouter from '../../js/core/router.js';
 import { filterStatsQuestionEntries, buildFilteredTrainingButtonHtml } from '../../js/views/quiz_stats_html.js';
 
 const INDEX = readFileSync('index.html', 'utf8');
@@ -221,6 +222,31 @@ describe('Statistiques — entraînement sur les questions filtrées', () => {
         expect(QuizView._statsTrainingActive).toBe(false);
         expect(document.getElementById('stats-screen').classList.contains('active')).toBe(true);
         expect(document.querySelector('[data-action="QuizstartFilteredTraining"]')).toBeNull();
+    });
+
+    it('reconstruit la page avant la navigation, pour que la transition montre déjà le bon contenu', () => {
+        QuizView.state.themeFilter = ['Météo'];
+        QuizView.renderStats();
+        expect(document.querySelector('[data-action="QuizstartFilteredTraining"]')).not.toBeNull();
+        expect(document.querySelector('[data-action="QuizclearAllFilters"]')).not.toBeNull();
+
+        const hadRoutes = AppRouter.routes;
+        AppRouter.routes = new Map([['STATS', {}]]);
+        let contentAtNavigate = null;
+        const navigate = vi.spyOn(AppRouter, 'navigate').mockImplementation(() => {
+            contentAtNavigate = document.getElementById('stats-content').innerHTML;
+            return Promise.resolve();
+        });
+        try {
+            QuizView.backToStatsAfterTraining();
+        } finally {
+            AppRouter.routes = hadRoutes;
+        }
+
+        expect(navigate).toHaveBeenCalledWith('STATS');
+        // Au moment de naviguer, la page cachée n'a déjà plus les filtres ni le bouton de la sélection.
+        expect(contentAtNavigate).not.toContain('QuizstartFilteredTraining');
+        expect(contentAtNavigate).not.toContain('QuizclearAllFilters');
     });
 
     it('garde le bouton Terminer pour une série lancée ailleurs', () => {
