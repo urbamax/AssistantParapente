@@ -25,6 +25,22 @@ const COURSE_CACHE_MAX_BYTES = 80 * 1024 * 1024; // ≈ 4 gros livrets ; le cour
 const TILE_CACHE_MAX = 1500; // ≈ 35 Mo à ≈ 23 Ko par morceau ; les plus anciens partent d'abord
 const TILE_HOSTNAME = 'server.arcgisonline.com';
 const RUNTIME_CACHES = [COURSE_CACHE, TILE_CACHE, VENDOR_CACHE];
+// Dossiers actuels de vendor/ (un par bibliothèque et par version : un fichier n'y change jamais, une
+// nouvelle version va dans un nouveau dossier). À l'activation, ce qui vient d'un autre dossier (ancienne
+// version) est retiré du cache des bibliothèques. tests/core/sw_precache.test.js compare à vendor/.
+const VENDOR_DIRS = ['firebase-12.19.0', 'inter', 'leaflet-1.9.4', 'pdfjs-6.4.299', 'remixicon-3.5.0'];
+
+/** Retire du cache des bibliothèques les fichiers d'anciennes versions (dossiers qui n'existent plus). */
+async function pruneOldVendorFiles() {
+    const cache = await caches.open(VENDOR_CACHE);
+    const requests = await cache.keys();
+    await Promise.all(
+        requests.map((request) => {
+            const match = new URL(request.url).pathname.match(/\/vendor\/([^/]+)\//);
+            return match && !VENDOR_DIRS.includes(match[1]) ? cache.delete(request) : null;
+        }),
+    );
+}
 
 // --- Firebase Cloud Messaging : réception des alertes météo en arrière-plan (app fermée) ---
 // importScripts (et non `import`) car ce SW est un script classique, pas un module worker.
@@ -269,6 +285,11 @@ self.addEventListener('activate', (event) => {
                     name !== CACHE_NAME && !RUNTIME_CACHES.includes(name) ? caches.delete(name) : null,
                 ),
             );
+            try {
+                await pruneOldVendorFiles();
+            } catch (e) {
+                console.warn('[SW] Nettoyage des anciennes bibliothèques ignoré :', e.message);
+            }
             await self.clients.claim();
         })(),
     );
