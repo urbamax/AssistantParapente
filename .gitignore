@@ -32,6 +32,13 @@ courses/
 .env.local
 *.env
 !.env.example
+
+# Outillage Discord du propriétaire : local uniquement, jamais versionné (structure du serveur,
+# salons d'administration). Seul le token dans .env permet d'agir sur le serveur.
+/.env.example
+/scripts/discord_bot.py
+/scripts/discord_guide.py
+/scripts/sync_discord_server.py
 deploy/feedback_server/logs/
 
 # Python
