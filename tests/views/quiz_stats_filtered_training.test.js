@@ -201,4 +201,37 @@ describe('Statistiques — entraînement sur les questions filtrées', () => {
         expect(QuizView._activeWorkshopAxisId).toBeNull();
         expect(document.getElementById('qcm-mode-label').textContent).toBe('MODE ENTRAÎNEMENT');
     });
+    it('termine par un retour aux statistiques, filtres effacés', () => {
+        QuizView.state.masteryFilter = ['GOOD'];
+        QuizView.state.themeFilter = ['Météo'];
+        QuizView._statsFilteredCodes = ['A80V', 'A81V'];
+        QuizView.startFilteredTraining();
+        QuizService.state.examResults = [
+            { isCorrect: true, question: QUESTIONS[0], selected: [QUESTIONS[0].choices[0]] },
+        ];
+        QuizView.renderExamResults();
+
+        const back = document.querySelector('#qcm-question-text [data-action="QuizbackToStatsAfterTraining"]');
+        expect(back?.textContent).toContain('Retour aux statistiques');
+        expect(document.querySelector('#qcm-question-text [data-action="finish-session"]')).toBeNull();
+
+        QuizView.handleClick({ target: back });
+        expect(QuizView.state.masteryFilter).toBe('ALL');
+        expect(QuizView.state.themeFilter).toBeNull();
+        expect(QuizView._statsTrainingActive).toBe(false);
+        expect(document.getElementById('stats-screen').classList.contains('active')).toBe(true);
+        expect(document.querySelector('[data-action="QuizstartFilteredTraining"]')).toBeNull();
+    });
+
+    it('garde le bouton Terminer pour une série lancée ailleurs', () => {
+        QuizView._statsFilteredCodes = ['A80V'];
+        QuizView.startFilteredTraining();
+        QuizView.launchWorkshop([QUESTIONS[0]], null);
+        QuizService.state.examResults = [
+            { isCorrect: true, question: QUESTIONS[0], selected: [QUESTIONS[0].choices[0]] },
+        ];
+        QuizView.renderExamResults();
+        expect(document.querySelector('#qcm-question-text [data-action="finish-session"]')).not.toBeNull();
+        expect(document.querySelector('#qcm-question-text [data-action="QuizbackToStatsAfterTraining"]')).toBeNull();
+    });
 });

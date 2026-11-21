@@ -1431,6 +1431,7 @@ export const FR = Object.freeze({
             correct: 'VRAI',
             yourAnswer: 'Votre réponse',
             finish: 'TERMINER',
+            backToStats: 'Retour aux statistiques',
             pointsScore: '{points}/{total}',
             pointsUnit: 'pts',
             questionsCount: '{correct}/{total} questions',

@@ -43,6 +43,8 @@ export class QuizStatsBase extends BaseView {
         this._axesStatusFilter = 'ALL';
         this._expandedAxisTakeaways = new Set();
         this._activeWorkshopAxisId = null;
+        /** Série en cours lancée par « S'entraîner sur ces N questions » (fin : retour aux statistiques). */
+        this._statsTrainingActive = false;
         /** @type {string[]} Questions retenues par les filtres de la liste détaillée des statistiques. */
         this._statsFilteredCodes = [];
         /** @type {ResizeObserver | null} */
