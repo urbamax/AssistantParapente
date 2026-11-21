@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import VoiceService, { formatSpeechText, splitSpeechChunks } from '../../js/services/voice_service.js';
+import VoiceService, {
+    LETTER_ECHO_MS,
+    formatSpeechText,
+    splitSpeechChunks,
+    spokenLetterPositions,
+} from '../../js/services/voice_service.js';
 
 // Spec 016 : enveloppe des API vocales du navigateur (lecture, écoute, préférences).
 
@@ -105,6 +110,45 @@ describe('VoiceService (spec 016)', () => {
             window.webkitSpeechRecognition = FakeRecognition;
             expect(VoiceService.canSpeak()).toBe(true);
             expect(VoiceService.canListen()).toBe(true);
+        });
+    });
+
+    describe('answer letters just spoken (echo for one second)', () => {
+        it('finds the answer letters of a text, not the letters of a spelled acronym', () => {
+            expect(spokenLetterPositions('Réponse A : oui.')).toEqual([{ letter: 'a', index: 8 }]);
+            expect(spokenLetterPositions('Sélection : A et C.').map((l) => l.letter)).toEqual(['a', 'c']);
+            expect(spokenLetterPositions('norme E.N.C. avant')).toEqual([]);
+        });
+
+        it('reports a letter as just spoken from the moment it is read, then forgets it', () => {
+            installSynthesis();
+            vi.useFakeTimers();
+            try {
+                vi.setSystemTime(10_000);
+                VoiceService.speak('Réponse B : vent de face.');
+                const at = 10_000 + 8 * 75; // estimated time of « B » (no onboundary event)
+                expect(VoiceService.getRecentlySpokenLetters(at - 10).has('b')).toBe(false);
+                expect(VoiceService.getRecentlySpokenLetters(at + 500).has('b')).toBe(true);
+                expect(VoiceService.getRecentlySpokenLetters(at + LETTER_ECHO_MS + 2_000).has('b')).toBe(false);
+            } finally {
+                vi.useRealTimers();
+                VoiceService.stopSpeaking();
+            }
+        });
+
+        it('uses the time the browser reports for the word when it can', () => {
+            const synth = installSynthesis();
+            vi.useFakeTimers();
+            try {
+                vi.setSystemTime(20_000);
+                VoiceService.speak('Réponse C : non.');
+                vi.setSystemTime(23_000);
+                synth.current.onboundary({ name: 'word', charIndex: 8 });
+                expect(VoiceService.getRecentlySpokenLetters(23_500).has('c')).toBe(true);
+            } finally {
+                vi.useRealTimers();
+                VoiceService.stopSpeaking();
+            }
         });
     });
 

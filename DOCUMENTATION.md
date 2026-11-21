@@ -376,7 +376,7 @@ The flight document in `users/{uid}/logbook/{id}` never carries the IGC text: `s
   1. Open official course PDFs directly at exact verified pages.
   2. Study concise key concepts synthesized from explanations (without spoiling question statements).
   3. Launch targeted mini-workshops (5–8 questions) or an anti-trap workshop specifically focusing on repeated errors.
-- **Hands-Free Voice Mode (`QuizVoiceBase` & `VoiceService`)**: Spoken questions, choice selection by letter, automatic chaining (`Enchaîner`) advancing after correction, screen kept on via Screen Wake Lock API during listening, and spoken summary scores.
+- **Hands-Free Voice Mode (`QuizVoiceBase` & `VoiceService`)**: Spoken questions, choice selection by letter, automatic chaining (`Enchaîner`) advancing after correction, screen kept on via Screen Wake Lock API during listening, and spoken summary scores. Listening goes on while the app speaks, so its own voice can come back through the speaker (in a car): an answer letter heard alone is ignored for one second after the app has pronounced it (`LETTER_ECHO_MS`, plus the recognition delay), then accepted as the pilot's answer. `VoiceService` timestamps each answer letter it reads, from the browser's word events (`onboundary`) when available, otherwise estimated from the speech rate; `looksLikeEcho()` receives them as `recentLetters`.
 - **Keyboard Shortcuts**: Complete desktop keyboard navigation (keys `A`–`D` or `1`–`4` to toggle choices, `Enter` to validate and advance, arrow keys to navigate).
 
 ### 2. In-App PDF Course Viewer (`js/views/course_viewer.js`)

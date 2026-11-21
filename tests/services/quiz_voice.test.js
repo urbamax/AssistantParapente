@@ -225,6 +225,20 @@ describe('looksLikeEcho (spec 022, FR-006)', () => {
     });
 });
 
+describe('a letter the app has just spoken is its own echo for one second', () => {
+    it('ignores a lone letter spoken less than a second ago, and accepts the others', () => {
+        const recent = new Set(['b']);
+        expect(looksLikeEcho('B', '', { speaking: true, recentLetters: recent })).toBe(true);
+        expect(looksLikeEcho('baie', '', { speaking: true, recentLetters: recent })).toBe(true);
+        expect(looksLikeEcho('C', '', { speaking: true, recentLetters: recent })).toBe(false);
+        expect(looksLikeEcho('B', '', { speaking: true, recentLetters: new Set() })).toBe(false);
+    });
+
+    it('only filters a letter heard alone', () => {
+        expect(looksLikeEcho('B et D', '', { speaking: true, recentLetters: new Set(['b']) })).toBe(false);
+    });
+});
+
 describe('spoken trap messages', () => {
     const fail = (trapFeedback) => ({
         isCorrect: false,
