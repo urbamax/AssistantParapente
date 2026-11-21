@@ -1,6 +1,8 @@
 import { escapeHTML } from '../core/security.js';
 import { splitOptionExplanations } from '../services/error_diagnostic.js';
 import { ACRONYMS_DATA } from '../data/acronyms_data.js';
+import { COURSES_DATA } from '../data/courses_data.js';
+import { tq } from './quiz_strings.js';
 
 // Trié par ordre décroissant de longueur pour faire correspondre les sigles composés en premier (ex: 'SUP AIP' avant 'AIP')
 const ACRONYM_KEYS = Object.keys(ACRONYMS_DATA).sort((a, b) => b.length - a.length);
@@ -10,16 +12,36 @@ const ACRONYM_REGEX = new RegExp(
 );
 
 /**
- * Enveloppe les acronymes et sigles aéronautiques connus dans des balises <abbr> avec leur définition.
+ * Page de la bibliothèque qui explique un sigle : adresse du PDF à la bonne page et libellé du bouton.
+ * @param {{ course: string, page: number } | undefined} source
+ * @returns {{ url: string, label: string } | null}
+ */
+export function acronymSource(source) {
+    const course = source && COURSES_DATA[source.course];
+    if (!course || !course.pdf) return null;
+    return {
+        url: `${course.pdf}#page=${source.page}`,
+        label: tq('acronymSource', { title: course.title, page: source.page }),
+    };
+}
+
+/**
+ * Enveloppe les sigles connus dans des balises <abbr> avec leur définition et leur source.
+ * À n'utiliser que sur les explications : jamais sur une question ni sur ses choix (ce serait souffler
+ * la réponse).
  * @param {string} escapedText texte déjà échappé par escapeHTML
  * @returns {string}
  */
 export function annotateAcronyms(escapedText) {
     if (!escapedText) return '';
     return String(escapedText).replace(ACRONYM_REGEX, (match) => {
-        const def = ACRONYMS_DATA[match];
-        if (!def) return match;
-        return `<abbr class="qcm-acronym" title="${escapeHTML(def)}" data-acronym="${escapeHTML(match)}" tabindex="0">${match}</abbr>`;
+        const entry = ACRONYMS_DATA[match];
+        if (!entry) return match;
+        const source = acronymSource(entry.source);
+        const sourceAttrs = source
+            ? ` data-source-url="${escapeHTML(source.url)}" data-source-label="${escapeHTML(source.label)}"`
+            : '';
+        return `<abbr class="qcm-acronym" title="${escapeHTML(entry.def)}" data-acronym="${escapeHTML(match)}"${sourceAttrs} tabindex="0">${match}</abbr>`;
     });
 }
 

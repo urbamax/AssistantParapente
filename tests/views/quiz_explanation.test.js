@@ -91,15 +91,22 @@ describe('annotateAcronyms', () => {
     it('wraps known paragliding acronyms in <abbr> tags with definition', () => {
         const annotated = annotateAcronyms('Calé au QNH et QFE, hors TMA ou CTR');
         expect(annotated).toContain('<abbr class="qcm-acronym" title="');
-        expect(annotated).toContain('data-acronym="QNH" tabindex="0">QNH</abbr>');
-        expect(annotated).toContain('data-acronym="QFE" tabindex="0">QFE</abbr>');
-        expect(annotated).toContain('data-acronym="TMA" tabindex="0">TMA</abbr>');
-        expect(annotated).toContain('data-acronym="CTR" tabindex="0">CTR</abbr>');
+        expect(annotated).toMatch(/data-acronym="QNH"[^>]*tabindex="0">QNH<\/abbr>/);
+        expect(annotated).toMatch(/data-acronym="QFE"[^>]*tabindex="0">QFE<\/abbr>/);
+        expect(annotated).toMatch(/data-acronym="TMA"[^>]*tabindex="0">TMA<\/abbr>/);
+        expect(annotated).toMatch(/data-acronym="CTR"[^>]*tabindex="0">CTR<\/abbr>/);
     });
 
     it('matches compound acronyms like SUP AIP before AIP', () => {
         const annotated = annotateAcronyms('Voir SUP AIP et AIP');
-        expect(annotated).toContain('data-acronym="SUP AIP" tabindex="0">SUP AIP</abbr>');
+        expect(annotated).toMatch(/data-acronym="SUP AIP"[^>]*tabindex="0">SUP AIP<\/abbr>/);
+    });
+
+    it('carries the definition and the library page that explains it', () => {
+        const annotated = annotateAcronyms('Une PTS');
+        expect(annotated).toContain('title="Prise de terrain en S');
+        expect(annotated).toMatch(/data-source-url="courses\/[0-9a-f]+\.pdf#page=17"/);
+        expect(annotated).toContain('data-source-label="Source : Livret Pédagogique - Initiation, p. 17"');
     });
 
     it('returns empty string when given falsy input', () => {
