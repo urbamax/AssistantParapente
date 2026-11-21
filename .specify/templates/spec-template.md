@@ -125,13 +125,13 @@
   the app. Read the sections related to this feature, then list what must be added,
   corrected or removed so the manual matches the app once the feature ships. Also note any
   outdated content you notice nearby. Write "No impact" only after checking, with a reason.
-  Public manual changes must also be mirrored in the Discord guide (scripts/discord_guide.py).
+  Public manual changes must also be mirrored in the Discord guide (#guide-utilisation).
 -->
 
 - **Sections checked**: [e.g., "Carnet de vol", "Météo"]
 - **Updates required**: [e.g., "Describe the new IGC batch import; remove the old single-file note"]
 - **Outdated content found nearby**: [e.g., "Quiz section still describes the old level filter" or "None"]
-- **Discord guide (`#guide-utilisation`, `scripts/discord_guide.py`)**: [Changes to mirror for the public part of the manual, or "No change: only role-gated sections touched"]
+- **Discord guide (`#guide-utilisation`)**: [Changes to mirror for the public part of the manual, or "No change: only role-gated sections touched"]
 
 ## Release Announcement *(mandatory)*
 
