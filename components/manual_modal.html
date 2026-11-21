@@ -238,10 +238,7 @@
                                     Elle tient votre <strong>carnet de vol</strong> (import de traces .igc, météo du
                                     jour enregistrée automatiquement) et suit l'<strong>usure de votre matériel</strong>.
                                 </li>
-                                <li data-i18n-html="manualModal.elleRassembleSurUn" style="margin-bottom: 6px">
-                                    Elle rassemble sur un écran <strong>Sécurité</strong> la conduite à tenir en cas
-                                    d'accident, votre position GPS et les check-lists avant le décollage.
-                                </li>
+                                <li data-i18n-html="manualModal.elleRassembleSurUn" style="margin-bottom: 6px">Elle rassemble sur un écran <strong>Sécurité</strong> la conduite à tenir en cas d'accident, votre position GPS, les check-lists avant le décollage et votre fiche d'urgence (ICE) avec son étiquette casque.</li>
                                 <li data-i18n-html="manualModal.elleSuitVotreEt" style="margin-bottom: 6px">
                                     Elle suit votre <strong>progression dans le temps</strong>, détecte vos <strong>pièges récurrents</strong> et vous guide chapitre par chapitre avec les <strong>Axes de révision</strong> pour orienter vos révisions efficacement.
                                 </li>
@@ -477,10 +474,18 @@
                                 </li>
                                 <li data-hidden-with-role="beta" data-i18n="manualModal.lesQcmLeCarnetSansMeteo" style="margin-bottom: 6px">les QCM, le carnet de vol et l'écran Sécurité fonctionnent hors ligne. Les cours déjà ouverts et les zones de carte déjà consultées restent disponibles sur l'appareil.</li>
                                 <li data-i18n="manualModal.lorsquUneMiseAJour" style="margin-bottom: 6px">
-                                    <strong data-i18n="manualModal.nouvelleVersion">Nouvelle version :</strong> lorsqu'une mise à jour de l'application est
-                                    disponible, un message vous le signale pour que vous puissiez recharger la page.
+                                    <strong data-i18n="manualModal.nouvelleVersion">Nouvelle version :</strong> lorsqu'une nouvelle version de l'application est disponible, un écran s'affiche par-dessus l'application avec un seul bouton, Mettre à jour : la mise à jour est obligatoire et recharge l'application avec ses nouveaux fichiers.
                                 </li>
                             </ul>
+
+                            <h5 data-i18n="manualModal.n5InstallerLApplication" style="margin-top: 16px; margin-bottom: 8px">5. Installer l'application</h5>
+                            <p data-i18n-html="manualModal.installerLApplicationTexte" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">Installée sur l'écran d'accueil, l'application s'ouvre en plein écran, comme une application classique, et reste disponible hors connexion. Sur Android et sur ordinateur (Chrome, Edge), le bouton <strong>Installer l'application</strong>, en haut à droite ou en bas de page, l'installe en un clic. Sur iPhone et iPad, ce bouton affiche les trois étapes à suivre dans Safari : toucher le bouton de partage, choisir <strong>« Sur l'écran d'accueil »</strong>, puis <strong>« Ajouter »</strong>. Le bouton disparaît une fois l'application installée.</p>
+
+                            <h5 data-i18n="manualModal.n6SignalerUnProbleme" style="margin-top: 16px; margin-bottom: 8px">6. Signaler un problème ou faire une suggestion</h5>
+                            <p data-i18n-html="manualModal.signalerUnProblemeTexte" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">Le lien <strong>Signaler un problème / Suggestion</strong>, en bas de page, ouvre un formulaire pour signaler un bug, une erreur dans un QCM ou un cours, ou proposer une amélioration. Aucune adresse e-mail n'est demandée : laissez un contact seulement si vous souhaitez une réponse. Vous pouvez joindre un contexte technique non personnel (écran affiché, version, navigateur), sans aucune donnée de vol ni position GPS. Rien n'est envoyé avant de cliquer sur <strong>Envoyer</strong> ; hors ligne, votre brouillon est gardé et le bouton <strong>Copier le message</strong> permet de le transmettre plus tard.</p>
+
+                            <h5 data-i18n="manualModal.n7LaCommunauteDiscord" style="margin-top: 16px; margin-bottom: 8px">7. La communauté Discord</h5>
+                            <p data-i18n-html="manualModal.laCommunauteDiscordTexte" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">Le bouton Discord de l'en-tête, le lien Discord en bas de page et le bouton <strong>Rejoindre le Discord</strong> du formulaire de retours mènent au serveur de la communauté Assistant Parapente : échanges entre pilotes, annonces des mises à jour et mode d'emploi en version courte.</p>
                         </div>
 
                         <div data-requires-role="owner" hidden id="manual-section-sites" class="manual-section" style="display: none">
@@ -600,9 +605,7 @@
                                 "
                             >
                                 <li data-i18n="manualModal.leCurseurHeureDe" style="margin-bottom: 8px">
-                                    <strong data-i18n="manualModal.heureDeVol">Heure de vol :</strong> Le curseur "Heure de vol" choisit l'heure
-                                    affichée pour tous les sites. La case "Masquer les sites sans créneau volable"
-                                    retire ceux qui n'ont aucune heure volable sur la durée des prévisions.
+                                    <strong data-i18n="manualModal.heureDeVol">Heure de vol :</strong> Le curseur "Heure de vol" choisit l'heure affichée pour tous les sites ; chaque site est lu à l'heure de son propre fuseau horaire (utile pour un site d'outre-mer). La case "Masquer les sites sans créneau volable" retire ceux qui n'ont aucune heure volable sur la durée des prévisions.
                                 </li>
                                 <li data-i18n="manualModal.chaqueAvisIndiqueLe" style="margin-bottom: 8px">
                                     <strong data-i18n="manualModal.contexteDeLaPrevision">Contexte de la prévision :</strong> Chaque avis indique le modèle utilisé,
@@ -819,7 +822,7 @@
                                 <li data-i18n-html="manualModal.importerTraceIgc" style="margin-bottom: 8px"><strong>Importer une trace GPS (.igc) :</strong> Glissez-déposez ou sélectionnez le fichier IGC de votre vario. L'application repère le vrai décollage et le vrai atterrissage (ni le parking, ni la marche du retour, même avec des virages serrés en approche), puis calcule la date, la durée, l'altitude max, le gain, la distance, le vario max et les vitesses. Un <strong>départ au treuil</strong> est reconnu tout seul (montée régulière en ligne droite dès le décollage) : le type de vol passe alors à <strong>Treuil</strong>. Si votre vario était mal calé (par exemple une altitude d'atterrissage négative), elle vous le signale et vous pouvez corriger les altitudes en saisissant l'altitude réelle du décollage ou de l'atterrissage. <strong>Plusieurs vols d'un coup :</strong> sélectionnez ou déposez plusieurs fichiers ensemble (avec leurs fichiers .sdf si vous en avez) : un tableau s'ouvre avec une ligne par vol, rangée par date. Chaque ligne part de la trace et de vos habitudes ; corrigez-la directement (date, site, durée, voile, sellette, type de vol, école et stage, pilotes), ou recopiez une colonne sur les autres lignes avec « Appliquer à toutes ». Un fichier illisible, un doublon ou un vol déjà dans le carnet est signalé et décoché. Rien n'est ajouté avant de cliquer sur « Importer ».</li>
                                 <li data-i18n-html="manualModal.importerFfvl" style="margin-bottom: 8px"><strong>Importer votre carnet FFVL (Excel) :</strong> Dans l'historique, « Importer un export FFVL » lit le fichier Excel du carnet de vols de l'Intranet FFVL (Passeport, Carnet de vols, Export Excel). Un tableau s'ouvre avec une ligne par vol ; rien n'est ajouté avant de cliquer sur « Importer ». L'export ne donne ni l'heure, ni la voile, ni le type de vol : ils restent vides et le vol s'affiche avec sa date seule ; complétez-les en modifiant le vol. Le dénivelé, l'analyse et le formateur sont recopiés dans le commentaire (le formateur devient moniteur si vous indiquez l'école). Un vol importé porte la mention « Importé FFVL ». Importer le même export une seconde fois ne crée aucun doublon (les vols déjà importés sont signalés et décochés), et « Annuler cet import », en haut de l'historique, retire tous les vols de cet import, et eux seuls.</li>
                                 <li data-i18n-html="manualModal.capteursSyride" style="margin-bottom: 8px"><strong>Capteurs Syride (.sdf) :</strong> Avec un vario Syride, ajoutez le fichier <strong>.sdf</strong> exporté avec le .igc (sélectionnez ou glissez les deux fichiers ensemble). Il apporte ce que l'IGC ne contient pas : le <strong>facteur de charge</strong> (G) mesuré par l'accéléromètre, y compris au largage du treuil. Vous pouvez aussi l'ajouter plus tard en modifiant le vol. L'application vérifie qu'il s'agit bien du même vol : sa trace doit suivre celle du .igc sur toute sa longueur, sinon il est refusé.</li>
-                                <li data-i18n-html="manualModal.uneProposeLesSites" style="margin-bottom: 8px"><strong>Site de vol :</strong> Une <strong>autocomplétion</strong> propose les sites de la base officielle FFVL, vos sites habituels en tête. À l'import d'une trace, l'application choisit le site connu le plus proche du décollage, dans un rayon de 120 m ; si plusieurs sites sont possibles, ils s'affichent en boutons sous le champ pour changer d'un clic. Pour un lieu absent de la base, le bouton <strong>"Placer sur la carte"</strong> permet de le pointer sur une carte (vue carte ou satellite) ou de coller des coordonnées, y compris un lien Google Maps. La position est ensuite reprise automatiquement lors de vos prochaines sessions à ce lieu.</li>
+                                <li data-i18n-html="manualModal.uneProposeLesSites" style="margin-bottom: 8px"><strong>Site de vol :</strong> Une <strong>autocomplétion</strong> propose les sites de la base officielle FFVL, vos sites habituels en tête. À l'import d'une trace, l'application choisit le site connu le plus proche du décollage, dans un rayon de 120 m ; si plusieurs sites sont possibles, ils s'affichent en boutons sous le champ pour changer d'un clic. Pour un lieu absent de la base, le bouton <strong>"Placer sur la carte"</strong> permet de le pointer sur une carte (vue carte ou satellite) ou de coller des coordonnées, y compris un lien Google Maps. La position est ensuite reprise automatiquement lors de vos prochaines sessions à ce lieu. Un vol rattaché à un site de la base FFVL suit son nom : si la FFVL renomme le site, le vol prend automatiquement le nouveau nom ; un lieu saisi librement reste tel que vous l'avez écrit.</li>
                                 <li data-i18n-html="manualModal.materielSession" style="margin-bottom: 8px"><strong>Matériel :</strong> Associez la voile et la sellette utilisées, choisies parmi vos équipements enregistrés ou saisies librement (les saisies précédentes sont proposées).</li>
                                 <li data-i18n-html="manualModal.indiquezLeTypeDe" style="margin-bottom: 8px"><strong>Type de vol, décollage et prise de terrain :</strong> Indiquez le type de vol (Plouf, Thermique, Soaring, Restit, Cross, Treuil) et la technique de décollage, obligatoire : <strong>"Face voile"</strong>, <strong>"Dos voile"</strong> ou une autre technique. Vous pouvez aussi renseigner la <strong>prise de terrain</strong> (Directe, En U, En S, En huit, ou une approche saisie librement et mémorisée) ainsi qu'un éventuel <strong>posé hors terrain (vache)</strong> ; à l'import d'une trace IGC, la prise de terrain est suggérée automatiquement d'après l'approche finale. Pour un vol au treuil, indiquez aussi le <strong>treuilleur</strong> : la liste propose d'abord ceux de la journée sur ce site.</li>
                                 <li data-i18n-html="manualModal.sessionEcoleExercices" style="margin-bottom: 8px"><strong>Session encadrée par une école :</strong> Cochez cette case et indiquez le <strong>brevet préparé</strong> (BI, BP, BPC, Treuil), le nom de l'école, des moniteurs (plusieurs possibles) et, s'il y en a, des accompagnateurs lorsque la séance a eu lieu en stage (ceux de votre dernière session avec cette école au même endroit sont proposés). Cochez « C'est un stage » pour donner son nom et sa spécialité (choisie dans la liste ou saisie librement via « Autre ») : en choisissant ensuite le nom d'un stage déjà saisi, ou pour une session à moins de 3 h d'une session de stage au même endroit, l'école, la spécialité, le brevet préparé, les moniteurs, les accompagnateurs et les pilotes de ce stage sont repris. Les stages et les brevets préparés sont aussi comptés dans les statistiques. Pour un vol, cochez aussi les <strong>exercices travaillés</strong> ; un exercice absent de la liste s'ajoute avec le bouton <strong>Ajouter</strong> et sera proposé aux sessions suivantes.</li>
@@ -980,16 +983,7 @@
                             <h5 data-i18n="manualModal.n2PeriodiciteCombineeTemps" style="margin-top: 16px; margin-bottom: 8px">
                                 2. Périodicité Combinée (Temps et Heures)
                             </h5>
-                            <p data-i18n-html="manualModal.selectionnezLIntervalleTemporelRecommand" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
-                                Sélectionnez l'intervalle temporel recommandé par le constructeur (<strong
-                                    >6 mois</strong
-                                >, <strong>12 mois</strong>, <strong>24 mois</strong>, ou aucun contrôle requis) ET la
-                                limite d'heures de vol (<strong>50h</strong>, <strong>100h</strong>,
-                                <strong>150h</strong>, <strong>200h</strong>, ou non applicable). L'application
-                                surveillera les deux compteurs en temps réel grâce au carnet de vol, et déclenchera une
-                                alerte au premier des deux termes échu. Un badge sur le bouton
-                                <strong>Carnet</strong> de la barre de navigation signale le matériel à réviser.
-                            </p>
+                            <p data-i18n-html="manualModal.selectionnezLIntervalleTemporelRecommand" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">Sélectionnez l'intervalle temporel recommandé par le constructeur (<strong>6 mois</strong>, <strong>12 mois</strong>, <strong>24 mois</strong>, ou aucun contrôle requis) ET la limite d'heures de vol (<strong>50h</strong>, <strong>100h</strong>, <strong>150h</strong>, <strong>200h</strong>, ou non applicable). L'application surveillera les deux compteurs en temps réel grâce au carnet de vol (les heures sont comptées depuis la dernière révision enregistrée), et déclenchera une alerte au premier des deux termes échu. Un badge sur le bouton <strong>Carnet</strong> de la barre de navigation signale le matériel à réviser.</p>
 
                             <h5 data-i18n="manualModal.n3CodeCouleur" style="margin-top: 16px; margin-bottom: 8px">
                                 3. Code Couleur &amp; Alertes Visuelles de Maintenance
@@ -1078,9 +1072,7 @@
                                 "
                             >
                                 <li data-i18n="manualModal.masqueLEquipementDesMenus" style="margin-bottom: 8px">
-                                    <strong data-i18n="manualModal.archiver">Archiver :</strong> Masque l'équipement des menus d'ajout (lors de la saisie
-                                    d'un nouveau vol), mais conserve tout son historique d'heures de vol et de gonflage
-                                    associés. Idéal pour garder des statistiques correctes de vos anciennes ailes.
+                                    <strong data-i18n="manualModal.archiver">Archiver :</strong> Masque l'équipement des menus d'ajout (lors de la saisie d'un nouveau vol) et de ses alertes de révision, mais conserve tout son historique d'heures de vol et de gonflage associés. Idéal pour garder des statistiques correctes de vos anciennes ailes.
                                 </li>
                                 <li data-i18n="manualModal.effaceCompletementLeMateriel" style="margin-bottom: 8px">
                                     <strong data-i18n="manualModal.supprimerDefinitivement">Supprimer définitivement :</strong> Efface complètement le matériel et rompt
@@ -1167,11 +1159,7 @@
                         <!-- SECURITE -->
                         <div id="manual-section-safety" class="manual-section" style="display: none">
                             <h4 data-i18n="manualModal.lEcranSecurite" style="margin-top: 0; color: var(--accent-orange)">L'Écran Sécurité</h4>
-                            <p data-i18n-html="manualModal.cetEcranReprendDes" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">
-                                Cet écran reprend des contenus officiels de la FFVL (source indiquée sur chaque
-                                rubrique). Le bouton <strong>Sécurité</strong> de la barre de navigation ouvre un
-                                sous-menu donnant accès à ses trois rubriques.
-                            </p>
+                            <p data-i18n-html="manualModal.cetEcranReprendDes" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">Les rubriques Urgence, Check-lists et Ma SIGR reprennent des contenus officiels de la FFVL (source indiquée sur chaque rubrique). Le bouton <strong>Sécurité</strong> de la barre de navigation ouvre un sous-menu donnant accès aux quatre rubriques.</p>
 
                             <h5 data-i18n="manualModal.n1Urgence" style="margin-top: 16px; margin-bottom: 8px">1. Urgence</h5>
                             <ul
@@ -1231,6 +1219,21 @@
                                 physique, rapport à la communauté, mental) comme solides ou à renforcer. L'application
                                 résume celles à travailler en priorité. Votre bilan reste sur cet appareil.
                             </p>
+
+                            <h5 data-i18n="manualModal.n4FicheIceEtEtiquette" style="margin-top: 16px; margin-bottom: 8px">4. Fiche ICE et étiquette casque</h5>
+                            <ul
+                                style="
+                                    color: var(--text-secondary);
+                                    line-height: 1.6;
+                                    font-size: 0.95rem;
+                                    padding-left: 20px;
+                                    margin-bottom: 16px;
+                                "
+                            >
+                                <li data-i18n-html="manualModal.ficheIceFormulaire" style="margin-bottom: 8px"><strong>Fiche d'urgence :</strong> ICE signifie <em>In Case of Emergency</em> (« en cas d'urgence »). Renseignez votre identité, un ou deux contacts d'urgence, vos données médicales vitales (groupe sanguin, allergies, traitements, anticoagulant, dernier rappel antitétanique), votre licence et votre assurance, puis <strong>Enregistrer dans mon profil</strong>.</li>
+                                <li data-i18n-html="manualModal.ficheIceEtiquette" style="margin-bottom: 8px"><strong>Étiquette casque :</strong> l'application en tire une étiquette avec un QR code, à imprimer avec <strong>Imprimer l'étiquette casque</strong> et à coller sur votre casque ou votre sellette. En cas d'accident, un témoin ou un secouriste la scanne avec l'appareil photo de n'importe quel smartphone, même sans réseau, pour joindre vos proches et lire vos informations médicales. <strong>Tester la vue Secours</strong> montre ce qu'il verra.</li>
+                                <li data-i18n-html="manualModal.ficheIceDonneesDeSante" style="margin-bottom: 8px"><strong>Vos données de santé :</strong> par défaut, la fiche reste <strong>uniquement sur cet appareil</strong>. Avec un compte connecté, la carte <strong>Sauvegarde en ligne (facultative)</strong> permet de l'enregistrer dans votre profil en ligne pour la retrouver sur vos autres appareils, après votre accord. Cet accord est demandé sur chaque appareil : une fiche déjà en ligne ne vient sur un nouvel appareil qu'avec le bouton <strong>Retrouver ma fiche en ligne sur cet appareil</strong>. <strong>Supprimer ma fiche en ligne</strong> efface la copie en ligne et garde celle de l'appareil.</li>
+                            </ul>
                         </div>
 
                         <div id="manual-section-qcm" class="manual-section" style="display: none">
@@ -1319,7 +1322,10 @@
                                     font-size: 0.95rem;
                                     margin-bottom: 8px;
                                 "
-                            >Accessible depuis le menu <strong>Théorie &gt; Axes de révision</strong>, cet écran découpe les questions en <strong>21 sous-chapitres</strong> classés par priorité selon vos résultats (<strong>Point bloquant</strong>, <strong>À rafraîchir</strong>, <strong>À découvrir</strong>, <strong>Maîtrisé</strong>) et signale vos <strong>pièges récurrents</strong>. Chaque axe propose un parcours en 3 étapes contre le bachotage : lire les pages exactes des manuels officiels, réviser les points clés du cours (rédigés sans dévoiler l'énoncé des questions), puis lancer un atelier ciblé de 5 à 8 questions (ou un <strong>atelier anti-pièges</strong> dédié à vos erreurs répétées).</p>
+                            >Accessible depuis le menu <strong>Théorie &gt; Axes de révision</strong>, cet écran découpe les questions en <strong>21 sous-chapitres</strong> classés en trois priorités selon vos résultats (<strong>Points à consolider</strong>, <strong>Acquis à rafraîchir</strong>, <strong>Chapitre à découvrir</strong>) et signale vos <strong>pièges récurrents</strong>. Les chapitres maîtrisés n'apparaissent plus, pas plus que les questions déjà maîtrisées dans les points clés, et un filtre qui ne contient aucun chapitre est masqué. Chaque axe propose un parcours en 3 étapes contre le bachotage : lire les pages exactes des manuels officiels, réviser les points clés du cours (rédigés sans dévoiler l'énoncé des questions), puis lancer un atelier ciblé de 5 à 8 questions (ou un <strong>atelier anti-pièges</strong> dédié à vos erreurs répétées).</p>
+
+                            <h5 data-i18n="manualModal.n6LesSiglesExpliques" style="margin-top: 16px; margin-bottom: 8px">6. Les sigles expliqués</h5>
+                            <p data-i18n-html="manualModal.lesSiglesExpliquesTexte" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">Dans les explications (correction, rapport d'examen, banque de questions, axes de révision), les sigles sont repérés : touchez-en un pour afficher sa signification et sa source, avec un bouton qui ouvre la page du document de la bibliothèque d'où elle vient. Les énoncés et les propositions ne sont jamais annotés, pour ne pas souffler la réponse.</p>
                         </div>
 
                         <div id="manual-section-library" class="manual-section" style="display: none">
@@ -1342,9 +1348,9 @@
                                     <strong data-i18n="manualModal.categorisation">Catégorisation :</strong> Les documents sont classés de manière logique (Mécanique de vol, Météorologie, Matériel, Réglementation...). Utilisez les boutons "Par catégorie", "Par niveau" ou "A-Z" pour les regrouper par thème, par niveau de brevet ou par ordre alphabétique. Seuls les cours de votre niveau (et les cours généraux) sont affichés.
                                 </li>
                                 <li data-i18n="manualModal.laBarreDeRecherche2" style="margin-bottom: 8px">
-                                    <strong data-i18n="manualModal.rechercheRapide">Recherche Rapide :</strong> La barre de recherche filtre instantanément les
-                                    documents selon leur titre ou leur catégorie.
+                                    <strong data-i18n="manualModal.rechercheRapide">Recherche Rapide :</strong> La barre de recherche filtre instantanément les documents selon leur titre, leur catégorie ou leurs mots-clés.
                                 </li>
+                                <li data-i18n-html="manualModal.textesOfficielsEtDocuments" style="margin-bottom: 8px"><strong>Textes officiels et documents publics :</strong> en plus des cours et des affiches, la bibliothèque réunit des textes officiels de la FFVL en libre accès (statuts, règlement intérieur, chartes des écoles et des clubs-écoles, textes du biplace, de l'accompagnateur fédéral et du treuilleur, déclaration d'accident), des documents publics sur la sécurité, le matériel et la météo (dont le guide aviation de Météo-France) et le guide <strong>Le parachute de secours en vol libre</strong> du Syndicat national des moniteurs de vol libre (SNMVL).</li>
                             </ul>
 
                             <h5 data-i18n="manualModal.n2LectureDesCours" style="margin-top: 16px; margin-bottom: 8px">2. Lecture des Cours</h5>
@@ -1360,7 +1366,7 @@
 
                         <div id="manual-section-stats" class="manual-section" style="display: none">
                             <h4 data-i18n="manualModal.suiviEtStatistiques" style="margin-top: 0; color: var(--accent-orange)">Suivi et Statistiques</h4>
-                            <p data-i18n="manualModal.ceTableauDeBord" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">Ce tableau de bord personnel agrège l'ensemble de vos résultats aux QCM (sessions d'entraînement, de révision et examens blancs terminés) du niveau sélectionné pour vous aider à cibler vos révisions. En haut, une jauge affiche votre taux de réussite global et permet d'enregistrer la validation de votre examen théorique officiel, à côté de la répartition de vos questions par degré de maîtrise (non tentées, maîtrisées à 100%, excellentes, très bonnes, satisfaisantes, fragiles, en difficulté, en échec) d'où vous pouvez filtrer la liste ou lancer directement une série de Perfectionnement.</p>
+                            <p data-i18n="manualModal.ceTableauDeBord" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">Ce tableau de bord personnel agrège l'ensemble de vos résultats aux QCM (sessions d'entraînement, de révision et examens blancs terminés) du niveau sélectionné pour vous aider à cibler vos révisions. En haut, une jauge affiche votre taux de réussite global et permet d'enregistrer la validation de votre examen théorique officiel. À côté, vos questions sont réparties par degré de maîtrise (Maîtrisées, Excellentes, Très Bonnes, Satisfaisantes, À travailler, Échecs, Non tentées) : touchez une ou plusieurs de ces tuiles pour filtrer la liste des questions.</p>
 
                             <h5 data-i18n="manualModal.n1AnalyseParTheme" style="margin-top: 16px; margin-bottom: 8px">1. Analyse par Thème</h5>
                             <p data-i18n="manualModal.lApplicationCalculeVotrePourcentage"
@@ -1370,7 +1376,8 @@
                                     font-size: 0.95rem;
                                     margin-bottom: 8px;
                                 "
-                            >L'application calcule votre pourcentage de réussite exact et le nombre de questions tentées pour chaque grande famille (Météo, Mécavol, Pilotage...), triables par ordre alphabétique ou par taux de réussite. Cliquez sur une carte de thème pour filtrer la liste détaillée des questions ci-dessous.</p>
+                            >L'application calcule votre pourcentage de réussite exact et le nombre de questions tentées pour chaque grande famille (Météo, Mécavol, Pilotage...), triables par ordre alphabétique ou par taux de réussite. Touchez une ou plusieurs cartes de thème pour filtrer la liste détaillée des questions ci-dessous. Tuiles et thèmes se combinent : les tuiles cochées s'additionnent, les thèmes cochés les restreignent, et chaque groupe montre ce que l'autre garde. Les tuiles ne comptent alors que les questions des thèmes cochés, et chaque thème indique combien de ses questions sont dans la sélection, sans changer son taux. Tout effacer retire les filtres.</p>
+                            <p data-i18n-html="manualModal.sEntrainerSurLaSelection" style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem">Dès qu'un filtre est actif, le bouton <strong>S'entraîner sur ces N questions</strong> lance une série d'entraînement sur exactement les questions de la liste. À la fin, <strong>Retour aux statistiques</strong> ramène sur cette page avec les filtres effacés, puisque vos réponses ont fait changer des questions de tuile. Le bouton <strong>Travailler mes axes prioritaires</strong> ouvre les axes de révision.</p>
 
                             <h5 data-i18n="manualModal.n2HistoriqueDesExamens" style="margin-top: 16px; margin-bottom: 8px">2. Historique des Examens</h5>
                             <p data-i18n="manualModal.vousRetrouverezLHistoriqueDe"
@@ -1382,7 +1389,7 @@
                                 "
                             >Vous retrouverez l'historique complet de vos examens blancs terminés pour le niveau sélectionné, avec la date, le score en points FFVL et le pourcentage exact : cliquez sur un examen pour ouvrir dans une fenêtre le détail de toutes ses questions et leurs explications. En dessous, la liste détaillée de toutes les questions du niveau (triable par taux de réussite, nombre de tentatives, date de dernière réponse ou code) permet de déplier chaque question pour consulter ses propositions, leurs explications, les liens vers les cours et l'historique daté de vos dernières tentatives.</p>
 
-                            <h5 data-i18n="manualModal.n3Reinitialisation" style="margin-top: 16px; margin-bottom: 8px">3. Réinitialisation</h5>
+                            <h5 data-i18n="manualModal.n3Reinitialisation" style="margin-top: 16px; margin-bottom: 8px">3. Sauvegarde et réinitialisation</h5>
                             <p data-i18n="manualModal.siVousSouhaitezRecommencer"
                                 style="
                                     color: var(--text-secondary);
@@ -1390,11 +1397,7 @@
                                     font-size: 0.95rem;
                                     margin-bottom: 8px;
                                 "
-                            >
-                                Si vous souhaitez recommencer à zéro (par exemple pour préparer le niveau supérieur
-                                l'année suivante), un bouton de réinitialisation vous permet d'effacer vos statistiques
-                                locales. Attention, cette action est irréversible !
-                            </p>
+                            >Les boutons Exporter et Importer enregistrent vos statistiques QCM et votre historique d'examens dans un fichier, puis les restaurent. Si vous souhaitez recommencer à zéro (par exemple pour préparer le niveau supérieur l'année suivante), le bouton Réinitialiser efface vos statistiques locales. Attention, cette action est irréversible !</p>
                         </div>
                     </div>
                 </div>
