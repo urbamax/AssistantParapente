@@ -11,6 +11,41 @@ import IDBStorage from './idb_storage.js';
 import { t } from '../utils/i18n.js';
 
 /**
+ * Instant (ms) d'une heure de prévision Open-Meteo. Avec `timezone=auto`, les heures sont données dans
+ * le fuseau du site (« 2026-11-21T14:00 ») et `utc_offset_seconds` donne son décalage : un site de
+ * La Réunion n'est pas à l'heure du téléphone. Sans décalage connu, l'heure est lue dans le fuseau du
+ * téléphone (ancien comportement).
+ * @param {string} time
+ * @param {number | undefined} utcOffsetSeconds
+ * @returns {number}
+ */
+export function forecastTimeMs(time, utcOffsetSeconds) {
+    if (Number.isFinite(utcOffsetSeconds) && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(String(time))) {
+        return Date.parse(`${time}:00Z`) - /** @type {number} */ (utcOffsetSeconds) * 1000;
+    }
+    return new Date(time).getTime();
+}
+
+/**
+ * Index de l'heure de prévision la plus proche de maintenant, pour un site.
+ * @param {string[]} times heures du site (hourly.time)
+ * @param {number | undefined} utcOffsetSeconds décalage du site (utc_offset_seconds)
+ * @param {number} now
+ */
+export function currentForecastIndex(times, utcOffsetSeconds, now) {
+    let best = 0;
+    let minDiff = Infinity;
+    (times || []).forEach((time, i) => {
+        const diff = Math.abs(forecastTimeMs(time, utcOffsetSeconds) - now);
+        if (diff < minDiff) {
+            minDiff = diff;
+            best = i;
+        }
+    });
+    return best;
+}
+
+/**
  * Charge le second modèle pour les mêmes sites que le modèle principal (sites du rayon +
  * favoris) et les mêmes heures, pour comparer l'heure affichée (spec 002, US3, FR-009/010).
  * Mêmes lots de 400 sites, même cache de 10 min et même pause après un refus d'Open-Meteo
@@ -117,8 +152,10 @@ export async function saveForecastSnapshot() {
     const entries = Object.entries(this.state.weatherForecasts || {})
         .filter(([siteId]) => this.state.forecastProvenance && this.state.forecastProvenance[siteId])
         .map(([siteId, forecasts]) => {
-            const { modelKey, fetchedAt } = this.state.forecastProvenance[siteId];
-            return { key: `forecast:${siteId}`, value: { siteId, modelKey, fetchedAt, forecasts } };
+            const { modelKey, fetchedAt, utcOffsetSeconds } = this.state.forecastProvenance[siteId];
+            const value = { siteId, modelKey, fetchedAt, forecasts };
+            if (Number.isFinite(utcOffsetSeconds)) value.utcOffsetSeconds = utcOffsetSeconds;
+            return { key: `forecast:${siteId}`, value };
         });
     if (entries.length === 0) return;
     try {
@@ -152,13 +189,24 @@ export async function restoreForecastSnapshot(now = Date.now()) {
     const expired = [];
     for (const record of records) {
         const value = record && record.value;
-        const future = (value?.forecasts || []).filter((hour) => String(hour.time) >= currentHour);
+        // Heures du site dans son fuseau : comparées en instant réel quand le décalage est connu.
+        const offset = value?.utcOffsetSeconds;
+        const startOfHour = Math.floor(now / 3_600_000) * 3_600_000;
+        const future = (value?.forecasts || []).filter((hour) =>
+            Number.isFinite(offset)
+                ? forecastTimeMs(String(hour.time), offset) >= startOfHour
+                : String(hour.time) >= currentHour,
+        );
         if (!value || future.length === 0) {
             expired.push(record.key);
             continue;
         }
         forecasts[value.siteId] = future;
-        provenance[value.siteId] = { modelKey: value.modelKey, fetchedAt: value.fetchedAt };
+        provenance[value.siteId] = {
+            modelKey: value.modelKey,
+            fetchedAt: value.fetchedAt,
+            ...(Number.isFinite(offset) ? { utcOffsetSeconds: offset } : {}),
+        };
     }
     if (expired.length > 0) {
         IDBStorage.deleteValues(expired).catch(() => {});
@@ -307,27 +355,17 @@ export async function fetchWeatherForSites({ force = false } = {}) {
         this.state.weatherForecasts = {};
         this.state.forecastProvenance = {};
 
-        // Find current time index in hourly forecast to align offset=0 with current hour
-        const now = new Date();
-        let currentHourIndex = 0;
-        if (results[0]?.hourly?.time) {
-            const times = results[0].hourly.time;
-            const currentTimestamp = now.getTime();
-            let minDiff = Infinity;
-            times.forEach((t, i) => {
-                const diff = Math.abs(new Date(t).getTime() - currentTimestamp);
-                if (diff < minDiff) {
-                    minDiff = diff;
-                    currentHourIndex = i;
-                }
-            });
-        }
+        // L'heure actuelle se cherche site par site : chacun a ses heures dans son fuseau (timezone=auto).
+        const nowMs = Date.now();
+        const currentHourIndex = currentForecastIndex(results[0]?.hourly?.time, results[0]?.utc_offset_seconds, nowMs);
 
         activeSites.forEach((site, index) => {
             try {
                 const hourly = results[index]?.hourly;
                 if (hourly) {
                     const forecasts = [];
+                    const utcOffsetSeconds = results[index]?.utc_offset_seconds;
+                    const siteHourIndex = currentForecastIndex(hourly.time, utcOffsetSeconds, nowMs);
                     const windSpeedKey =
                         Object.keys(hourly).find((k) => k.startsWith('wind_speed_10m')) || 'wind_speed_10m';
                     const windDirKey =
@@ -337,9 +375,9 @@ export async function fetchWeatherForSites({ force = false } = {}) {
                     const precipKey = Object.keys(hourly).find((k) => k.startsWith('precipitation')) || 'precipitation';
                     const capeKey = Object.keys(hourly).find((k) => k.startsWith('cape')) || 'cape';
 
-                    // Keep up to 168 hours (7 jours, cf. digest hebdo) starting from currentHourIndex
+                    // Keep up to 168 hours (7 jours, cf. digest hebdo) starting from the site's current hour
                     for (let i = 0; i <= 168; i++) {
-                        const idx = currentHourIndex + i;
+                        const idx = siteHourIndex + i;
                         if (idx < hourly.time.length) {
                             // Valeurs validées : une donnée absente (ex. au-delà de l'horizon
                             // AROME, ~108 h) reste null, jamais 0 (spec 001, FR-005).
@@ -418,6 +456,7 @@ export async function fetchWeatherForSites({ force = false } = {}) {
                     this.state.forecastProvenance[site.id] = {
                         modelKey: this.state.weatherModel,
                         fetchedAt: resultsFetchedAt[index],
+                        ...(Number.isFinite(utcOffsetSeconds) ? { utcOffsetSeconds } : {}),
                     };
                 }
             } catch (siteErr) {
