@@ -159,7 +159,7 @@ Examples of foundational tasks (adjust based on your project):
   Discord tooling (never committed)
 - [ ] TXXX If the feature is available to all users: finalise the Discord update notice
   from the spec's "Release Announcement" section; after deployment and the owner's approval,
-  post it to the announcements channel (`📢・annonces`) with the owner's local Discord tooling
+  post it to the update channel (`#mises-a-jour`) with the owner's local Discord tooling
 - [ ] TXXX [P] Documentation updates in docs/
 - [ ] TXXX Code cleanup and refactoring
 - [ ] TXXX Performance optimization across all stories

@@ -165,7 +165,7 @@ Pilots use the app on take-off and in the mountains, often without a network.
   tooling republishes the channel once the change is deployed, with the owner's approval.
 - Every specification MUST state whether the feature will be available to all users (not
   limited to the `beta` or `owner` roles). If it is, the work MUST include an update notice
-  for the community Discord server (announcements channel, posted with the owner's local
+  for the community Discord server (update channel `#mises-a-jour`, posted with the owner's local
   Discord tooling): a short French text, drafted with the change, that
   says what is new for pilots. It is posted only once the feature is deployed and live for
   everyone, and only after the owner approves the text. A feature still limited to `beta` or

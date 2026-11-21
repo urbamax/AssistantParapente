@@ -138,7 +138,7 @@
 <!--
   ACTION REQUIRED: State who gets the feature. If it is available to all users (not
   limited to the beta or owner roles), draft the update notice for the community Discord
-  server's announcements channel. It is posted only after the feature is deployed and live
+  server's update channel (#mises-a-jour). It is posted only after the feature is deployed and live
   for everyone, and only after the owner approves the text. If the feature is limited to
   beta/owner, write "Not yet: limited to <role>" and post the notice when it opens up.
 -->
