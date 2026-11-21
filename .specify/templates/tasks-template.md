@@ -154,12 +154,10 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX Check the user manual ("Mode d'emploi") against the shipped feature and update
   `components/manual_modal.html` and the `manualModal` strings in `js/i18n/fr_html.js`
   (per the spec's "User Manual Impact" section); fix any outdated content found nearby
-- [ ] TXXX Mirror public manual changes in the Discord guide (`#guide-utilisation`): after
-  deployment and the owner's approval, update and republish it with the owner's local
-  Discord tooling (never committed)
-- [ ] TXXX If the feature is available to all users: finalise the Discord update notice
-  from the spec's "Release Announcement" section; after deployment and the owner's approval,
-  post it to the update channel (`#mises-a-jour`) with the owner's local Discord tooling
+- [ ] TXXX In the pull request description, write `## Discord notice` (the French notice from
+  the spec's "Release Announcement", or `None: <reason>`) and `## Discord guide` (what to change
+  in `#guide-utilisation`, or `None: <reason>`); the CI check fails without them. Never post to
+  Discord yourself: a session posts them after deployment, with the owner's approval
 - [ ] TXXX [P] Documentation updates in docs/
 - [ ] TXXX Code cleanup and refactoring
 - [ ] TXXX Performance optimization across all stories

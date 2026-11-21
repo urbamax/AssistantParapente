@@ -1,0 +1,31 @@
+name: PR Discord sections
+
+# Spec 056 : chaque PR vers main dit ce qu'il faut annoncer dans #mises-a-jour (« ## Discord notice »)
+# et ce qu'il faut changer dans #guide-utilisation (« ## Discord guide »). Relancé quand la description
+# change (edited). Le corps de la PR est lu dans le fichier d'événement, jamais dans une commande.
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, edited, reopened, synchronize]
+
+concurrency:
+  group: pr-discord-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  discord-sections:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+
+      - run: node scripts/pr_discord_sections.mjs --check "$GITHUB_EVENT_PATH"

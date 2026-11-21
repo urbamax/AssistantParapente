@@ -46,7 +46,7 @@
   update in `components/manual_modal.html` / `manualModal` strings and, for public sections,
   in the Discord guide (`#guide-utilisation`) are identified.
 - [ ] Release announcement: the spec states the feature's availability; if it is for all
-  users, a Discord update notice is drafted (posted after deployment, with owner approval).
+  users, a Discord update notice is drafted for the pull request's `## Discord notice` section.
 
 ## Project Structure
 
