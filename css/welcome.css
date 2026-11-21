@@ -56,7 +56,7 @@
     color: var(--text-main);
     background: transparent;
     border: 1px solid var(--border-color);
-    border-left: 6px solid var(--level-color);
+    border-left: 6px solid var(--level-color, var(--accent-orange));
     border-radius: 16px;
     cursor: pointer;
     transition:
@@ -74,7 +74,7 @@
 }
 
 .welcome-level[aria-pressed='true'] {
-    box-shadow: 0 0 0 2px var(--level-color);
+    box-shadow: 0 0 0 2px var(--level-color, var(--accent-orange));
 }
 
 .welcome-cards {

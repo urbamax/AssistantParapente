@@ -1,6 +1,6 @@
 /* --- SITES DE VOL --- */
 .site-card {
-    background: var(--surface-light);
+    background: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 16px;
@@ -912,7 +912,7 @@ body.light-mode .leaflet-tile-pane {
     margin: 0 !important;
     padding: 0 !important;
     box-sizing: border-box !important;
-    background: var(--bg-main) !important;
+    background: var(--bg-app) !important;
     z-index: var(--z-fullscreen) !important;
     display: flex !important;
     flex-direction: column !important;

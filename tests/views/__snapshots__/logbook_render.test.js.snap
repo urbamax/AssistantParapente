@@ -62,7 +62,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
 
 exports[`logbook renders (spec 014: identical before and after moving the texts) > equipment 1`] = `
 "<h3 class="stats-section-title">Mon Inventaire</h3><div class="equip-list">
-                    <div class="equip-card status-danger" style=" border:1px solid #eee; padding:15px; border-radius:8px; margin-bottom:15px; background:var(--bg-card); display:flex; flex-direction:column; justify-content:space-between; min-height:160px;">
+                    <div class="equip-card status-danger">
                         <div class="equip-alert text-danger" style="color:#ef4444; font-weight:bold; margin-bottom:8px;"><i class="ri-tools-line"></i> ⚠️ ATTENTION : Révision requise - Date dépassée (10/01/2025) ET Heures dépassées (2h / 1h)</div>
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
@@ -99,7 +99,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                     </div>
                 
-                    <div class="equip-card status-warning" style=" border:1px solid #eee; padding:15px; border-radius:8px; margin-bottom:15px; background:var(--bg-card); display:flex; flex-direction:column; justify-content:space-between; min-height:160px;">
+                    <div class="equip-card status-warning">
                         <div class="equip-alert text-warning" style="color:#f59e0b; font-weight:bold; margin-bottom:8px;"><i class="ri-tools-line"></i> ⚠️ À réviser bientôt : Dans 15 jours OU Dans 2h</div>
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
@@ -136,7 +136,7 @@ exports[`logbook renders (spec 014: identical before and after moving the texts)
                         </div>
                     </div>
                 
-                    <div class="equip-card status-ok" style="opacity: 0.6; filter: grayscale(0.8); border:1px solid #eee; padding:15px; border-radius:8px; margin-bottom:15px; background:var(--bg-card); display:flex; flex-direction:column; justify-content:space-between; min-height:160px;">
+                    <div class="equip-card status-ok is-archived">
                         
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">

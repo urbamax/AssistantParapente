@@ -27,12 +27,15 @@
     /* Referenced by .nav-menu-btn.active (css/header.css) for the active nav item's text
        color; was never defined, so that color silently fell back to plain text. */
     --primary-color: var(--accent-orange);
+    --color-primary: var(--accent-orange);
 
     /* --- THEME VARIABLES (Default: Dark) --- */
     --bg-app: var(--p-dark-deep);
     --bg-surface: var(--p-dark-surface);
     --bg-overlay: rgba(2, 6, 23, 0.6);
     --bg-card: rgba(15, 23, 42, 0.6);
+    --bg-card-hover: rgba(30, 41, 59, 0.72);
+    --surface-hover: rgba(255, 255, 255, 0.05);
     --bg-input: rgba(0, 0, 0, 0.2);
 
     --text-main: #ffffff;
@@ -40,6 +43,7 @@
     --text-secondary: #cbd5e1;
 
     --border-color: var(--p-dark-border);
+    --border-light: rgba(255, 255, 255, 0.08);
     --border-glass: 1px solid var(--p-dark-border);
 
     --glass-bg: var(--p-dark-glass);
@@ -94,6 +98,8 @@ body.light-mode {
     --bg-surface: var(--p-light-surface);
     --bg-overlay: rgba(255, 255, 255, 0.8);
     --bg-card: rgba(255, 255, 255, 0.85);
+    --bg-card-hover: rgba(0, 0, 0, 0.04);
+    --surface-hover: rgba(0, 0, 0, 0.03);
     --bg-input: rgba(0, 0, 0, 0.05);
 
     --text-main: #0f172a;
@@ -101,6 +107,7 @@ body.light-mode {
     --text-secondary: #64748b;
 
     --border-color: var(--p-light-border);
+    --border-light: rgba(0, 0, 0, 0.06);
     --border-glass: 1px solid var(--p-light-border);
 
     --glass-bg: var(--p-light-glass);

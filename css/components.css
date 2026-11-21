@@ -525,7 +525,7 @@ body.dark-theme .feedback-discord-banner {
 
 /* Boutons et liens d'installation PWA */
 .pwa-install-btn {
-    color: var(--color-primary, #0ea5e9);
+    color: var(--color-primary, var(--accent-orange));
 }
 
 .pwa-install-btn:hover {
@@ -551,7 +551,7 @@ body.dark-theme .feedback-discord-banner {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    color: var(--color-primary, #0ea5e9);
+    color: var(--color-primary, var(--accent-orange));
     cursor: pointer;
     text-decoration: none;
     transition: opacity 0.2s ease;
@@ -626,7 +626,7 @@ body.dark-theme .feedback-discord-banner {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: var(--color-primary, #0ea5e9);
+    background: var(--color-primary, var(--accent-orange));
     color: #ffffff;
     font-weight: 700;
     font-size: 0.85rem;
@@ -658,7 +658,7 @@ body.dark-theme .feedback-discord-banner {
 
 .pwa-step-icon {
     font-size: 1rem;
-    color: var(--color-primary, #0ea5e9);
+    color: var(--color-primary, var(--accent-orange));
     vertical-align: middle;
     padding: 0 2px;
 }
