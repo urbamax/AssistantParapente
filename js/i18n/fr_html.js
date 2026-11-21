@@ -465,7 +465,7 @@ export const FR_HTML = Object.freeze({
         elleTientVotreImport:
             "Elle tient votre <strong>carnet de vol</strong> (import de traces .igc, météo du jour enregistrée automatiquement) et suit l'<strong>usure de votre matériel</strong>.",
         elleRassembleSurUn:
-            "Elle rassemble sur un écran <strong>Sécurité</strong> la conduite à tenir en cas d'accident, votre position GPS et les check-lists avant le décollage.",
+            "Elle rassemble sur un écran <strong>Sécurité</strong> la conduite à tenir en cas d'accident, votre position GPS, les check-lists avant le décollage et votre fiche d'urgence (ICE) avec son étiquette casque.",
         elleSuitVotreEt:
             'Elle suit votre <strong>progression dans le temps</strong>, détecte vos <strong>pièges récurrents</strong> et vous guide chapitre par chapitre avec les <strong>Axes de révision</strong> pour orienter vos révisions efficacement.',
         ceQueLApplicationNe: "Ce que l'application ne fait PAS",
@@ -527,8 +527,17 @@ export const FR_HTML = Object.freeze({
             "les QCM, le carnet de vol et l'écran Sécurité fonctionnent hors ligne. Les cours déjà ouverts et les zones de carte déjà consultées restent disponibles sur l'appareil.",
         sansReseau: 'Sans réseau :',
         lorsquUneMiseAJour:
-            "lorsqu'une mise à jour de l'application est disponible, un message vous le signale pour que vous puissiez recharger la page.",
+            "lorsqu'une nouvelle version de l'application est disponible, un écran s'affiche par-dessus l'application avec un seul bouton, Mettre à jour : la mise à jour est obligatoire et recharge l'application avec ses nouveaux fichiers.",
         nouvelleVersion: 'Nouvelle version :',
+        n5InstallerLApplication: "5. Installer l'application",
+        installerLApplicationTexte:
+            "Installée sur l'écran d'accueil, l'application s'ouvre en plein écran, comme une application classique, et reste disponible hors connexion. Sur Android et sur ordinateur (Chrome, Edge), le bouton <strong>Installer l'application</strong>, en haut à droite ou en bas de page, l'installe en un clic. Sur iPhone et iPad, ce bouton affiche les trois étapes à suivre dans Safari : toucher le bouton de partage, choisir <strong>« Sur l'écran d'accueil »</strong>, puis <strong>« Ajouter »</strong>. Le bouton disparaît une fois l'application installée.",
+        n6SignalerUnProbleme: '6. Signaler un problème ou faire une suggestion',
+        signalerUnProblemeTexte:
+            "Le lien <strong>Signaler un problème / Suggestion</strong>, en bas de page, ouvre un formulaire pour signaler un bug, une erreur dans un QCM ou un cours, ou proposer une amélioration. Aucune adresse e-mail n'est demandée : laissez un contact seulement si vous souhaitez une réponse. Vous pouvez joindre un contexte technique non personnel (écran affiché, version, navigateur), sans aucune donnée de vol ni position GPS. Rien n'est envoyé avant de cliquer sur <strong>Envoyer</strong> ; hors ligne, votre brouillon est gardé et le bouton <strong>Copier le message</strong> permet de le transmettre plus tard.",
+        n7LaCommunauteDiscord: '7. La communauté Discord',
+        laCommunauteDiscordTexte:
+            "Le bouton Discord de l'en-tête, le lien Discord en bas de page et le bouton <strong>Rejoindre le Discord</strong> du formulaire de retours mènent au serveur de la communauté Assistant Parapente : échanges entre pilotes, annonces des mises à jour et mode d'emploi en version courte.",
         preparationDesVolsSites: 'Préparation des Vols (Sites & Météo)',
         preparationDesVolsSitesSeuls: 'Sites de Vol',
         ceModuleCroiseLes:
@@ -574,7 +583,7 @@ export const FR_HTML = Object.freeze({
         volumeTotal: 'Volume total :',
         n4HeureDeVol: '4. Heure de Vol et Fiabilité des Prévisions',
         leCurseurHeureDe:
-            'Le curseur "Heure de vol" choisit l\'heure affichée pour tous les sites. La case "Masquer les sites sans créneau volable" retire ceux qui n\'ont aucune heure volable sur la durée des prévisions.',
+            'Le curseur "Heure de vol" choisit l\'heure affichée pour tous les sites ; chaque site est lu à l\'heure de son propre fuseau horaire (utile pour un site d\'outre-mer). La case "Masquer les sites sans créneau volable" retire ceux qui n\'ont aucune heure volable sur la durée des prévisions.',
         heureDeVol: 'Heure de vol :',
         chaqueAvisIndiqueLe:
             'Chaque avis indique le modèle utilisé, l\'heure à laquelle la prévision a été récupérée et l\'heure de calcul du modèle (run). Au-delà de 3 heures, la prévision est signalée comme ancienne, avec un bouton "Actualiser".',
@@ -658,7 +667,7 @@ export const FR_HTML = Object.freeze({
         capteursSyride:
             "<strong>Capteurs Syride (.sdf) :</strong> Avec un vario Syride, ajoutez le fichier <strong>.sdf</strong> exporté avec le .igc (sélectionnez ou glissez les deux fichiers ensemble). Il apporte ce que l'IGC ne contient pas : le <strong>facteur de charge</strong> (G) mesuré par l'accéléromètre, y compris au largage du treuil. Vous pouvez aussi l'ajouter plus tard en modifiant le vol. L'application vérifie qu'il s'agit bien du même vol : sa trace doit suivre celle du .igc sur toute sa longueur, sinon il est refusé.",
         uneProposeLesSites:
-            "<strong>Site de vol :</strong> Une <strong>autocomplétion</strong> propose les sites de la base officielle FFVL, vos sites habituels en tête. À l'import d'une trace, l'application choisit le site connu le plus proche du décollage, dans un rayon de 120 m ; si plusieurs sites sont possibles, ils s'affichent en boutons sous le champ pour changer d'un clic. Pour un lieu absent de la base, le bouton <strong>\"Placer sur la carte\"</strong> permet de le pointer sur une carte (vue carte ou satellite) ou de coller des coordonnées, y compris un lien Google Maps. La position est ensuite reprise automatiquement lors de vos prochaines sessions à ce lieu.",
+            "<strong>Site de vol :</strong> Une <strong>autocomplétion</strong> propose les sites de la base officielle FFVL, vos sites habituels en tête. À l'import d'une trace, l'application choisit le site connu le plus proche du décollage, dans un rayon de 120 m ; si plusieurs sites sont possibles, ils s'affichent en boutons sous le champ pour changer d'un clic. Pour un lieu absent de la base, le bouton <strong>\"Placer sur la carte\"</strong> permet de le pointer sur une carte (vue carte ou satellite) ou de coller des coordonnées, y compris un lien Google Maps. La position est ensuite reprise automatiquement lors de vos prochaines sessions à ce lieu. Un vol rattaché à un site de la base FFVL suit son nom : si la FFVL renomme le site, le vol prend automatiquement le nouveau nom ; un lieu saisi librement reste tel que vous l'avez écrit.",
         materielSession:
             '<strong>Matériel :</strong> Associez la voile et la sellette utilisées, choisies parmi vos équipements enregistrés ou saisies librement (les saisies précédentes sont proposées).',
         indiquezLeTypeDe:
@@ -708,7 +717,7 @@ export const FR_HTML = Object.freeze({
             "Pour chaque matériel (Carnet &gt; Matériel), vous pouvez définir : le type (Voile, Sellette, Parachute de Secours, Accessoire), la marque, le modèle, la taille et la couleur (choisis dans une liste ou saisis librement, le nom du matériel est composé automatiquement), la date d'achat, ainsi que la date de sa dernière révision en atelier certifié.",
         n2PeriodiciteCombineeTemps: '2. Périodicité Combinée (Temps et Heures)',
         selectionnezLIntervalleTemporelRecommand:
-            "Sélectionnez l'intervalle temporel recommandé par le constructeur (<strong >6 mois</strong >, <strong>12 mois</strong>, <strong>24 mois</strong>, ou aucun contrôle requis) ET la limite d'heures de vol (<strong>50h</strong>, <strong>100h</strong>, <strong>150h</strong>, <strong>200h</strong>, ou non applicable). L'application surveillera les deux compteurs en temps réel grâce au carnet de vol, et déclenchera une alerte au premier des deux termes échu. Un badge sur le bouton <strong>Carnet</strong> de la barre de navigation signale le matériel à réviser.",
+            "Sélectionnez l'intervalle temporel recommandé par le constructeur (<strong>6 mois</strong>, <strong>12 mois</strong>, <strong>24 mois</strong>, ou aucun contrôle requis) ET la limite d'heures de vol (<strong>50h</strong>, <strong>100h</strong>, <strong>150h</strong>, <strong>200h</strong>, ou non applicable). L'application surveillera les deux compteurs en temps réel grâce au carnet de vol (les heures sont comptées depuis la dernière révision enregistrée), et déclenchera une alerte au premier des deux termes échu. Un badge sur le bouton <strong>Carnet</strong> de la barre de navigation signale le matériel à réviser.",
         n3CodeCouleur: '3. Code Couleur & Alertes Visuelles de Maintenance',
         pourRepererRapidementLe:
             "Pour repérer rapidement le matériel nécessitant votre attention, l'application utilise des indicateurs visuels :",
@@ -723,7 +732,7 @@ export const FR_HTML = Object.freeze({
         n4ArchiverOuSupprimer: '4. Archiver ou Supprimer définitivement',
         lorsqueVousChangezDe: 'Lorsque vous changez de matériel, vous avez deux options :',
         masqueLEquipementDesMenus:
-            "Masque l'équipement des menus d'ajout (lors de la saisie d'un nouveau vol), mais conserve tout son historique d'heures de vol et de gonflage associés. Idéal pour garder des statistiques correctes de vos anciennes ailes.",
+            "Masque l'équipement des menus d'ajout (lors de la saisie d'un nouveau vol) et de ses alertes de révision, mais conserve tout son historique d'heures de vol et de gonflage associés. Idéal pour garder des statistiques correctes de vos anciennes ailes.",
         archiver: 'Archiver :',
         effaceCompletementLeMateriel: "Efface complètement le matériel et rompt l'association avec vos vols passés.",
         supprimerDefinitivement: 'Supprimer définitivement :',
@@ -737,7 +746,7 @@ export const FR_HTML = Object.freeze({
             "Dès que vous êtes connecté à votre compte, l'application synchronise instantanément en tâche de fond votre <strong>Carnet de Vol</strong>, votre <strong>Équipement</strong>, et l'intégralité de vos configurations : rayon GPS, tri des sites. Retrouvez votre espace de pilotage personnalisé sur n'importe quel ordinateur, tablette ou smartphone sans aucune perte de données.",
         lEcranSecurite: "L'Écran Sécurité",
         cetEcranReprendDes:
-            'Cet écran reprend des contenus officiels de la FFVL (source indiquée sur chaque rubrique). Le bouton <strong>Sécurité</strong> de la barre de navigation ouvre un sous-menu donnant accès à ses trois rubriques.',
+            'Les rubriques Urgence, Check-lists et Ma SIGR reprennent des contenus officiels de la FFVL (source indiquée sur chaque rubrique). Le bouton <strong>Sécurité</strong> de la barre de navigation ouvre un sous-menu donnant accès aux quatre rubriques.',
         n1Urgence: '1. Urgence',
         enUnGesteEt: 'en un geste, et la fréquence radio sécurité vol libre de la FFVL (143,9875 MHz).',
         appelerLe112: 'Appeler le 112',
@@ -757,6 +766,13 @@ export const FR_HTML = Object.freeze({
         n3MaSigr: '3. Ma SIGR',
         laStrategieIndividuelleDe:
             'La Stratégie Individuelle de Gestion des Risques vous fait évaluer honnêtement sept "plaques" de protection (pilotage, aérologie, accidentologie, matériel, condition physique, rapport à la communauté, mental) comme solides ou à renforcer. L\'application résume celles à travailler en priorité. Votre bilan reste sur cet appareil.',
+        n4FicheIceEtEtiquette: '4. Fiche ICE et étiquette casque',
+        ficheIceFormulaire:
+            "<strong>Fiche d'urgence :</strong> ICE signifie <em>In Case of Emergency</em> (« en cas d'urgence »). Renseignez votre identité, un ou deux contacts d'urgence, vos données médicales vitales (groupe sanguin, allergies, traitements, anticoagulant, dernier rappel antitétanique), votre licence et votre assurance, puis <strong>Enregistrer dans mon profil</strong>.",
+        ficheIceEtiquette:
+            "<strong>Étiquette casque :</strong> l'application en tire une étiquette avec un QR code, à imprimer avec <strong>Imprimer l'étiquette casque</strong> et à coller sur votre casque ou votre sellette. En cas d'accident, un témoin ou un secouriste la scanne avec l'appareil photo de n'importe quel smartphone, même sans réseau, pour joindre vos proches et lire vos informations médicales. <strong>Tester la vue Secours</strong> montre ce qu'il verra.",
+        ficheIceDonneesDeSante:
+            "<strong>Vos données de santé :</strong> par défaut, la fiche reste <strong>uniquement sur cet appareil</strong>. Avec un compte connecté, la carte <strong>Sauvegarde en ligne (facultative)</strong> permet de l'enregistrer dans votre profil en ligne pour la retrouver sur vos autres appareils, après votre accord. Cet accord est demandé sur chaque appareil : une fiche déjà en ligne ne vient sur un nouvel appareil qu'avec le bouton <strong>Retrouver ma fiche en ligne sur cet appareil</strong>. <strong>Supprimer ma fiche en ligne</strong> efface la copie en ligne et garde celle de l'appareil.",
         entrainementAuxQcmOfficiels: 'Entraînement aux QCM Officiels',
         ceModuleUtiliseLa:
             'Ce module utilise la base de données officielle des questions de la Fédération Française de Vol Libre (FFVL) pour préparer vos brevets théoriques.',
@@ -787,7 +803,10 @@ export const FR_HTML = Object.freeze({
             'Accessible depuis l\'écran d\'accueil du QCM, ce répertoire permet de consulter librement l\'intégralité des questions du niveau sélectionné. Une barre de recherche retrouve instantanément une question par mot-clé ou par code (ex: "Cumulonimbus", "Finesse"), et un menu filtre par thème. Cliquez sur n\'importe quelle proposition pour déplier son explication détaillée et ouvrir le manuel officiel à la page correspondante.',
         n5LesAxesDeRevision: '5. Les Axes de Révision',
         axesDeRevisionDescription:
-            "Accessible depuis le menu <strong>Théorie &gt; Axes de révision</strong>, cet écran découpe les questions en <strong>21 sous-chapitres</strong> classés par priorité selon vos résultats (<strong>Point bloquant</strong>, <strong>À rafraîchir</strong>, <strong>À découvrir</strong>, <strong>Maîtrisé</strong>) et signale vos <strong>pièges récurrents</strong>. Chaque axe propose un parcours en 3 étapes contre le bachotage : lire les pages exactes des manuels officiels, réviser les points clés du cours (rédigés sans dévoiler l'énoncé des questions), puis lancer un atelier ciblé de 5 à 8 questions (ou un <strong>atelier anti-pièges</strong> dédié à vos erreurs répétées).",
+            "Accessible depuis le menu <strong>Théorie &gt; Axes de révision</strong>, cet écran découpe les questions en <strong>21 sous-chapitres</strong> classés en trois priorités selon vos résultats (<strong>Points à consolider</strong>, <strong>Acquis à rafraîchir</strong>, <strong>Chapitre à découvrir</strong>) et signale vos <strong>pièges récurrents</strong>. Les chapitres maîtrisés n'apparaissent plus, pas plus que les questions déjà maîtrisées dans les points clés, et un filtre qui ne contient aucun chapitre est masqué. Chaque axe propose un parcours en 3 étapes contre le bachotage : lire les pages exactes des manuels officiels, réviser les points clés du cours (rédigés sans dévoiler l'énoncé des questions), puis lancer un atelier ciblé de 5 à 8 questions (ou un <strong>atelier anti-pièges</strong> dédié à vos erreurs répétées).",
+        n6LesSiglesExpliques: '6. Les sigles expliqués',
+        lesSiglesExpliquesTexte:
+            "Dans les explications (correction, rapport d'examen, banque de questions, axes de révision), les sigles sont repérés : touchez-en un pour afficher sa signification et sa source, avec un bouton qui ouvre la page du document de la bibliothèque d'où elle vient. Les énoncés et les propositions ne sont jamais annotés, pour ne pas souffler la réponse.",
         laBibliothequeDeCours: 'La Bibliothèque de Cours',
         unEspaceCentralisantDe:
             'Un espace centralisant de nombreux supports de cours, manuels de vol libre et affiches pédagogiques pour consolider la théorie.',
@@ -796,23 +815,27 @@ export const FR_HTML = Object.freeze({
             'Les documents sont classés de manière logique (Mécanique de vol, Météorologie, Matériel, Réglementation...). Utilisez les boutons "Par catégorie", "Par niveau" ou "A-Z" pour les regrouper par thème, par niveau de brevet ou par ordre alphabétique. Seuls les cours de votre niveau (et les cours généraux) sont affichés.',
         categorisation: 'Catégorisation :',
         laBarreDeRecherche2:
-            'La barre de recherche filtre instantanément les documents selon leur titre ou leur catégorie.',
+            'La barre de recherche filtre instantanément les documents selon leur titre, leur catégorie ou leurs mots-clés.',
         rechercheRapide: 'Recherche Rapide :',
+        textesOfficielsEtDocuments:
+            "<strong>Textes officiels et documents publics :</strong> en plus des cours et des affiches, la bibliothèque réunit des textes officiels de la FFVL en libre accès (statuts, règlement intérieur, chartes des écoles et des clubs-écoles, textes du biplace, de l'accompagnateur fédéral et du treuilleur, déclaration d'accident), des documents publics sur la sécurité, le matériel et la météo (dont le guide aviation de Météo-France) et le guide <strong>Le parachute de secours en vol libre</strong> du Syndicat national des moniteurs de vol libre (SNMVL).",
         n2LectureDesCours: '2. Lecture des Cours',
         enCliquantSurUn:
             "En cliquant sur un cours (ou sur un lien de cours depuis une explication du QCM ou un axe de révision), le document PDF s'ouvre à la page demandée. Sur l'application installée sur téléphone ou tablette, une visionneuse intégrée avec bouton Retour et zoom par pincement permet de lire le cours sans quitter votre session ; dans un navigateur classique, le PDF s'ouvre dans un nouvel onglet. Un cours déjà ouvert reste ensuite consultable hors ligne.",
         suiviEtStatistiques: 'Suivi et Statistiques',
         ceTableauDeBord:
-            "Ce tableau de bord personnel agrège l'ensemble de vos résultats aux QCM (sessions d'entraînement, de révision et examens blancs terminés) du niveau sélectionné pour vous aider à cibler vos révisions. En haut, une jauge affiche votre taux de réussite global et permet d'enregistrer la validation de votre examen théorique officiel, à côté de la répartition de vos questions par degré de maîtrise (non tentées, maîtrisées à 100%, excellentes, très bonnes, satisfaisantes, fragiles, en difficulté, en échec) d'où vous pouvez filtrer la liste ou lancer directement une série de Perfectionnement.",
+            "Ce tableau de bord personnel agrège l'ensemble de vos résultats aux QCM (sessions d'entraînement, de révision et examens blancs terminés) du niveau sélectionné pour vous aider à cibler vos révisions. En haut, une jauge affiche votre taux de réussite global et permet d'enregistrer la validation de votre examen théorique officiel. À côté, vos questions sont réparties par degré de maîtrise (Maîtrisées, Excellentes, Très Bonnes, Satisfaisantes, À travailler, Échecs, Non tentées) : touchez une ou plusieurs de ces tuiles pour filtrer la liste des questions.",
         n1AnalyseParTheme: '1. Analyse par Thème',
         lApplicationCalculeVotrePourcentage:
-            "L'application calcule votre pourcentage de réussite exact et le nombre de questions tentées pour chaque grande famille (Météo, Mécavol, Pilotage...), triables par ordre alphabétique ou par taux de réussite. Cliquez sur une carte de thème pour filtrer la liste détaillée des questions ci-dessous.",
+            "L'application calcule votre pourcentage de réussite exact et le nombre de questions tentées pour chaque grande famille (Météo, Mécavol, Pilotage...), triables par ordre alphabétique ou par taux de réussite. Touchez une ou plusieurs cartes de thème pour filtrer la liste détaillée des questions ci-dessous. Tuiles et thèmes se combinent : les tuiles cochées s'additionnent, les thèmes cochés les restreignent, et chaque groupe montre ce que l'autre garde. Les tuiles ne comptent alors que les questions des thèmes cochés, et chaque thème indique combien de ses questions sont dans la sélection, sans changer son taux. Tout effacer retire les filtres.",
+        sEntrainerSurLaSelection:
+            "Dès qu'un filtre est actif, le bouton <strong>S'entraîner sur ces N questions</strong> lance une série d'entraînement sur exactement les questions de la liste. À la fin, <strong>Retour aux statistiques</strong> ramène sur cette page avec les filtres effacés, puisque vos réponses ont fait changer des questions de tuile. Le bouton <strong>Travailler mes axes prioritaires</strong> ouvre les axes de révision.",
         n2HistoriqueDesExamens: '2. Historique des Examens',
         vousRetrouverezLHistoriqueDe:
             "Vous retrouverez l'historique complet de vos examens blancs terminés pour le niveau sélectionné, avec la date, le score en points FFVL et le pourcentage exact : cliquez sur un examen pour ouvrir dans une fenêtre le détail de toutes ses questions et leurs explications. En dessous, la liste détaillée de toutes les questions du niveau (triable par taux de réussite, nombre de tentatives, date de dernière réponse ou code) permet de déplier chaque question pour consulter ses propositions, leurs explications, les liens vers les cours et l'historique daté de vos dernières tentatives.",
-        n3Reinitialisation: '3. Réinitialisation',
+        n3Reinitialisation: '3. Sauvegarde et réinitialisation',
         siVousSouhaitezRecommencer:
-            "Si vous souhaitez recommencer à zéro (par exemple pour préparer le niveau supérieur l'année suivante), un bouton de réinitialisation vous permet d'effacer vos statistiques locales. Attention, cette action est irréversible !",
+            "Les boutons Exporter et Importer enregistrent vos statistiques QCM et votre historique d'examens dans un fichier, puis les restaurent. Si vous souhaitez recommencer à zéro (par exemple pour préparer le niveau supérieur l'année suivante), le bouton Réinitialiser efface vos statistiques locales. Attention, cette action est irréversible !",
     }),
     header: Object.freeze({
         altAssistantParapente: 'Assistant Parapente',

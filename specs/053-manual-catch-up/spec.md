@@ -176,7 +176,7 @@ check the notice text exists and was approved by the owner before posting.
 ## Release Announcement *(mandatory)*
 
 - **Availability**: All users (the public manual); the beta/owner parts change only for those roles.
-- **Discord notice (French, for pilots)**: « 📖 Le mode d'emploi a été mis à jour : fiche ICE, installation de l'application, formulaire de retours, filtres des statistiques et bien d'autres nouveautés y sont désormais expliqués. Retrouvez-le dans l'application (menu Mode d'emploi) ou dans #guide-utilisation. » (draft; posted only after deployment and the owner's approval)
+- **Discord notice (French, for pilots)**: « 📖 Le mode d'emploi est à jour ! On y trouve maintenant la fiche ICE et l'étiquette casque, l'installation de l'application en un clic, le formulaire « Signaler un problème / Suggestion », les filtres combinés des statistiques avec « S'entraîner sur ces N questions », les sigles expliqués dans le QCM et les nouveaux textes officiels de la bibliothèque. Retrouvez-le dans l'application (bouton Manuel) ou dans #guide-utilisation. » (final text; posted to #mises-a-jour only after deployment and the owner's approval)
 
 ## Assumptions
 
