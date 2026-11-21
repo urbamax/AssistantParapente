@@ -14,6 +14,7 @@ import {
     isDue,
     nextDueAt,
     summarizeReviews,
+    endOfLocalDay,
 } from '../../js/services/review_scheduler.js';
 
 const NOW = Date.UTC(2026, 9, 13, 12, 0, 0);
@@ -238,13 +239,13 @@ describe('dueScore and isDue', () => {
     it('is due once the interval (plus the success ratio, in days) has elapsed', () => {
         // streak 3 => 7 days, ratio 1 => due after 8 days
         expect(isDue(seen(3, daysAgo(8)), NOW)).toBe(true);
-        expect(isDue(seen(3, daysAgo(7.5)), NOW)).toBe(false);
+        expect(isDue(seen(3, daysAgo(6.5)), NOW)).toBe(false);
         expect(isDue(seen(3, daysAgo(30)), NOW)).toBe(true);
     });
 
     it('supports SM-2 interval in dueScore and isDue', () => {
         // interval 15 days, ratio 1 => due after 16 days
-        const sm2Stat = seen(3, daysAgo(15.5), { interval: 15, easeFactor: 2.5 });
+        const sm2Stat = seen(3, daysAgo(14.5), { interval: 15, easeFactor: 2.5 });
         expect(isDue(sm2Stat, NOW)).toBe(false);
         const sm2Due = seen(3, daysAgo(16.5), { interval: 15, easeFactor: 2.5 });
         expect(isDue(sm2Due, NOW)).toBe(true);
@@ -269,15 +270,33 @@ describe('nextDueAt', () => {
         const stat = seen(3, daysAgo(2));
         const due = nextDueAt(stat);
         expect(due).toBe(stat.lastSeen + 8 * DAY_MS);
-        expect(isDue(stat, due - 1)).toBe(false);
+        expect(isDue(stat, due - DAY_MS)).toBe(false);
         expect(isDue(stat, due)).toBe(true);
+    });
+
+    it('is due from the start of the day it falls on, not only once its hour has passed', () => {
+        const morning = new Date(2026, 10, 21, 8, 0, 0).getTime();
+        const evening = new Date(2026, 10, 21, 19, 30, 0).getTime();
+        const dayBefore = new Date(2026, 10, 20, 23, 59, 0).getTime();
+        // Réussie une fois (intervalle 1 j, ratio 1) : échéance 2 jours après, le 21 à 19 h 30.
+        const stat = seen(1, evening - 2 * DAY_MS, { total: 1, correct: 1, interval: 1 });
+        expect(nextDueAt(stat)).toBe(evening);
+        expect(isDue(stat, morning)).toBe(true);
+        expect(isDue(stat, dayBefore)).toBe(false);
+        const summary = summarizeReviews([{ code: 'A' }], { A: stat }, morning);
+        expect(summary).toMatchObject({ due: 1, notDue: 0, nextDueAt: null });
+    });
+
+    it('endOfLocalDay is the last millisecond of the local day', () => {
+        const noon = new Date(2026, 10, 21, 12, 0, 0).getTime();
+        expect(endOfLocalDay(noon)).toBe(new Date(2026, 10, 22, 0, 0, 0).getTime() - 1);
     });
 
     it('calculates nextDueAt with SM-2 interval', () => {
         const stat = seen(3, daysAgo(2), { interval: 15 });
         const due = nextDueAt(stat);
         expect(due).toBe(stat.lastSeen + 16 * DAY_MS); // 15 + 1
-        expect(isDue(stat, due - 1)).toBe(false);
+        expect(isDue(stat, due - DAY_MS)).toBe(false);
         expect(isDue(stat, due)).toBe(true);
     });
 
