@@ -117,6 +117,35 @@
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
 - **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
 
+## User Manual Impact *(mandatory)*
+
+<!--
+  ACTION REQUIRED: The in-app user manual ("Mode d'emploi",
+  components/manual_modal.html + manualModal strings in js/i18n/fr_html.js) lags behind
+  the app. Read the sections related to this feature, then list what must be added,
+  corrected or removed so the manual matches the app once the feature ships. Also note any
+  outdated content you notice nearby. Write "No impact" only after checking, with a reason.
+  Public manual changes must also be mirrored in the Discord guide (scripts/discord_guide.py).
+-->
+
+- **Sections checked**: [e.g., "Carnet de vol", "Météo"]
+- **Updates required**: [e.g., "Describe the new IGC batch import; remove the old single-file note"]
+- **Outdated content found nearby**: [e.g., "Quiz section still describes the old level filter" or "None"]
+- **Discord guide (`#guide-utilisation`, `scripts/discord_guide.py`)**: [Changes to mirror for the public part of the manual, or "No change: only role-gated sections touched"]
+
+## Release Announcement *(mandatory)*
+
+<!--
+  ACTION REQUIRED: State who gets the feature. If it is available to all users (not
+  limited to the beta or owner roles), draft the update notice for the community Discord
+  server's announcements channel. It is posted only after the feature is deployed and live
+  for everyone, and only after the owner approves the text. If the feature is limited to
+  beta/owner, write "Not yet: limited to <role>" and post the notice when it opens up.
+-->
+
+- **Availability**: [All users | Limited to beta | Limited to owner]
+- **Discord notice (French, for pilots)**: [e.g., "Nouveau : importez plusieurs fichiers IGC d'un coup dans le carnet de vol."]
+
 ## Assumptions
 
 <!--

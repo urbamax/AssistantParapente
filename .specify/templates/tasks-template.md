@@ -151,6 +151,15 @@ Examples of foundational tasks (adjust based on your project):
 
 **Purpose**: Improvements that affect multiple user stories
 
+- [ ] TXXX Check the user manual ("Mode d'emploi") against the shipped feature and update
+  `components/manual_modal.html` and the `manualModal` strings in `js/i18n/fr_html.js`
+  (per the spec's "User Manual Impact" section); fix any outdated content found nearby
+- [ ] TXXX Mirror public manual changes in the Discord guide (`scripts/discord_guide.py`);
+  after deployment and the owner's approval, republish `#guide-utilisation`
+  (`python3 scripts/discord_guide.py`)
+- [ ] TXXX If the feature is available to all users: finalise the Discord update notice
+  from the spec's "Release Announcement" section; after deployment and the owner's approval,
+  post it to the announcements channel (`scripts/discord_bot.py send --channel "📢・annonces"`)
 - [ ] TXXX [P] Documentation updates in docs/
 - [ ] TXXX Code cleanup and refactoring
 - [ ] TXXX Performance optimization across all stories
