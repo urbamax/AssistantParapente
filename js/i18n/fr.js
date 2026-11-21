@@ -1846,6 +1846,13 @@ export const FR = Object.freeze({
             "Stockage local saturé : certaines données n'ont pas pu être enregistrées. Exportez puis allégez votre carnet.",
         dismiss: "Fermer l'alerte",
     }),
+    // Annonce unique de l'ouverture du serveur Discord (js/core/discord_announce.js)
+    discordAnnounce: Object.freeze({
+        title: 'Assistant Parapente a son Discord',
+        text: "Pour regrouper vos retours, signaler un bug ou discuter vols et matos entre pilotes. Le lien reste aussi accessible en haut à droite de l'appli.",
+        join: 'Rejoindre',
+        close: "Fermer l'annonce",
+    }),
     privacy: Object.freeze({ gpsDisabled: 'Géolocalisation désactivée par vos choix de confidentialité.' }),
     map3d: Object.freeze({
         loading: 'Chargement du moteur 3D (MapLibre & deck.gl)...',
