@@ -118,14 +118,14 @@ describe('FirebaseAuthEngine : fiche d’urgence en ligne', () => {
             expect(firestore.docs.has(PATH)).toBe(false);
         });
 
-        it('réactive la synchro et récupère la fiche si une fiche existe déjà en ligne sur le compte', async () => {
+        it('sans accord sur cet appareil, ne touche pas à une fiche déjà enregistrée en ligne sur le compte', async () => {
             useFirestore({
                 [PATH]: { ...profile, nom: 'Cloud', updatedAt: 500, consentAt: '2026-11-10T12:10:00.000Z' },
             });
             await FirebaseAuthEngine._syncIceProfile(firestore.module, 'u1');
-            expect(getIceCloudState().enabled).toBe(true);
-            expect(getIceCloudState().consentAt).toBe('2026-11-10T12:10:00.000Z');
-            expect(IceService.getProfile().nom).toBe('Cloud');
+            expect(getIceCloudState().enabled).toBe(false);
+            expect(IceService.getProfile().nom).not.toBe('Cloud');
+            expect(firestore.docs.get(PATH).nom).toBe('Cloud');
         });
 
         it('première sauvegarde : envoie la fiche avec sa date et la date de l’accord', async () => {
@@ -465,7 +465,7 @@ describe('carte « Sauvegarde en ligne » et boutons', () => {
         expect(engine.saveIceToCloud).toHaveBeenCalledTimes(1);
     });
 
-    it('reconcileIceCloudIfNeeded récupère une fiche déjà enregistrée en ligne et active la synchro des modifs', async () => {
+    it('reconcileIceCloudIfNeeded signale une fiche déjà en ligne sans l’activer ni la récupérer sans accord', async () => {
         document.body.innerHTML = '<section id="safety-panel-ice"></section>';
         engine.fetchIceFromCloud.mockResolvedValue({
             success: true,
@@ -475,13 +475,13 @@ describe('carte « Sauvegarde en ligne » et boutons', () => {
 
         await reconcileIceCloudIfNeeded();
 
-        expect(getIceCloudState().enabled).toBe(true);
-        expect(IceService.getProfile().nom).toBe('EnLigne');
-        expect(document.getElementById('safety-panel-ice').textContent).toContain(
-            'Fiche enregistrée dans votre profil en ligne',
-        );
+        expect(getIceCloudState().enabled).toBe(false);
+        expect(IceService.getProfile().nom).not.toBe('EnLigne');
+        const panel = document.getElementById('safety-panel-ice').textContent;
+        expect(panel).toContain('Une fiche est déjà enregistrée dans votre profil en ligne');
+        expect(panel).toContain('Retrouver ma fiche en ligne sur cet appareil');
 
         saveIceProfile();
-        expect(engine.saveIceToCloud).toHaveBeenCalledTimes(1);
+        expect(engine.saveIceToCloud).not.toHaveBeenCalled();
     });
 });

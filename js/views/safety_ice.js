@@ -356,6 +356,12 @@ export function renderIceCloudCard() {
             <button type="button" class="safety-btn" data-action="SafetydisableIceCloud">
                 <i class="ri-delete-bin-line" aria-hidden="true"></i> ${th('cloudDeleteBtn')}
             </button>`;
+    } else if (_onlineSheetFound) {
+        body = `
+            <p class="safety-hint" role="status">${th('cloudFoundOnlineHint')}</p>
+            <button type="button" class="safety-btn safety-btn-primary" data-action="SafetyenableIceCloud">
+                <i class="ri-cloud-line" aria-hidden="true"></i> ${th('cloudUseOnlineBtn')}
+            </button>`;
     } else {
         body = `
             <button type="button" class="safety-btn safety-btn-primary" data-action="SafetyenableIceCloud">
@@ -378,12 +384,15 @@ function refreshIcePanel() {
     if (panel) panel.innerHTML = renderIceTabHtml();
 }
 
+// Une fiche existe dans le profil en ligne du pilote, mais la sauvegarde en ligne n'est pas activée sur
+// cet appareil : la carte le dit et propose de la retrouver (avec l'accord, comme sur le premier appareil).
+let _onlineSheetFound = false;
 let _reconcilePromise = null;
 
 /**
- * Si le pilote est connecté mais que cet appareil n'a pas encore activé la synchro ICE,
- * vérifie si une fiche existe déjà dans son profil en ligne (consentement déjà donné ailleurs).
- * Si oui, réactive automatiquement la synchro et récupère la fiche (ou pousse la locale si plus récente).
+ * Pilote connecté, sauvegarde en ligne non activée sur cet appareil : regarde si une fiche existe déjà
+ * dans son profil en ligne, pour le lui signaler. N'active rien et n'écrit rien : la fiche contient des
+ * données de santé, l'accord se donne sur chaque appareil (bouton de la carte, enableIceCloud).
  */
 export async function reconcileIceCloudIfNeeded() {
     const state = getIceCloudState();
@@ -395,19 +404,11 @@ export async function reconcileIceCloudIfNeeded() {
     _reconcilePromise = (async () => {
         try {
             const remote = await engine.fetchIceFromCloud();
-            if (!remote?.success || !remote.data) return;
-
-            const local = IceService.getProfile();
-            const hasLocal = Boolean(local.nom || local.prenom || local.contact1Phone || local.contact2Phone);
-            const consentAt = remote.data.consentAt || new Date().toISOString();
-            setIceCloudState({ enabled: true, consentAt, lastSyncedAt: Date.now() });
-
-            if (!hasLocal || (remote.data.updatedAt || 0) >= state.updatedAt) {
-                IceService.saveProfile(remote.data, { updatedAt: remote.data.updatedAt || Date.now() });
-            } else if (engine.saveIceToCloud) {
-                await engine.saveIceToCloud();
+            const found = Boolean(remote?.success && remote.data);
+            if (found !== _onlineSheetFound) {
+                _onlineSheetFound = found;
+                refreshIcePanel();
             }
-            refreshIcePanel();
         } finally {
             _reconcilePromise = null;
         }
@@ -460,6 +461,7 @@ export async function enableIceCloud() {
     }
 
     setIceCloudState({ enabled: true, consentAt: new Date().toISOString() });
+    _onlineSheetFound = false;
     if (useRemote) {
         IceService.saveProfile(remote.data, { updatedAt: remote.data.updatedAt || Date.now() });
         setIceCloudState({ lastSyncedAt: Date.now() });

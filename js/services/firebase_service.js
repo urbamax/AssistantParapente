@@ -1090,33 +1090,14 @@ export const FirebaseAuthEngine = {
      */
     _syncIceProfile: async function (firestoreModule, uid) {
         const state = getIceCloudState();
+        // Données de santé : sans l'accord donné sur cet appareil, la fiche en ligne n'est ni lue ni écrite,
+        // même si elle existe déjà (l'écran ICE propose alors de la retrouver, avec l'accord).
+        if (!state.enabled || !state.consentAt) return;
         const { doc, getDoc, setDoc } = firestoreModule;
         const ref = doc(db, 'users', uid, 'ice', 'profile');
         const snap = await getDoc(ref);
         const cloud = snap.exists() ? snap.data() : null;
         const { IceService } = await import('./ice_service.js');
-
-        if (!state.enabled || !state.consentAt) {
-            if (!cloud) return;
-            // Le pilote a déjà consenti et enregistré sa fiche en ligne depuis un autre appareil :
-            // on réactive la synchro sur cet appareil et on récupère la fiche (ou on envoie si local plus récent).
-            const local = IceService.getProfile();
-            const hasLocal = Boolean(local.nom || local.prenom || local.contact1Phone || local.contact2Phone);
-            const consentAt = cloud.consentAt || new Date().toISOString();
-            setIceCloudState({ enabled: true, consentAt, lastSyncedAt: Date.now() });
-            if (!hasLocal || (cloud.updatedAt || 0) >= state.updatedAt) {
-                IceService.saveProfile(cloud, { updatedAt: cloud.updatedAt || Date.now() });
-                return;
-            }
-            const body = {
-                ...local,
-                updatedAt: state.updatedAt || Date.now(),
-                consentAt,
-            };
-            await setDoc(ref, body);
-            setIceCloudState({ lastSyncedAt: Date.now() });
-            return;
-        }
 
         if (!cloud) {
             if (state.lastSyncedAt) {
