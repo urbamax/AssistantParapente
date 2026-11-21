@@ -26,6 +26,10 @@ import {
     buildQuestionsHtml,
     buildGaugeHtml,
     buildOfficialTheoryBannerHtml,
+    activeMasteryFilters,
+    activeThemeFilters,
+    buildFilteredTrainingButtonHtml,
+    filterStatsQuestionEntries,
 } from './quiz_stats_html.js';
 
 // Passer à true en cas de souci technique pour réactiver la suppression d'examen
@@ -39,6 +43,8 @@ export class QuizStatsBase extends BaseView {
         this._axesStatusFilter = 'ALL';
         this._expandedAxisTakeaways = new Set();
         this._activeWorkshopAxisId = null;
+        /** @type {string[]} Questions retenues par les filtres de la liste détaillée des statistiques. */
+        this._statsFilteredCodes = [];
         /** @type {ResizeObserver | null} */
         this._examHistoryResizeObserver = null;
         /** @type {ResizeObserver[]} */
@@ -425,13 +431,22 @@ export class QuizStatsBase extends BaseView {
                 </div>
             </div>`
                 : '';
+            // Questions retenues par les filtres de la liste détaillée : le bouton d'entraînement les sert
+            // telles qu'affichées au moment du clic (liste figée, même si leur maîtrise change en cours de série).
+            const hasActiveFilter =
+                activeMasteryFilters(this.state).length > 0 || activeThemeFilters(this.state).length > 0;
+            this._statsFilteredCodes = hasActiveFilter
+                ? filterStatsQuestionEntries(this, { levelQs, levelQuestionEntries, stats }).map(([code]) => code)
+                : [];
+            const filteredTrainingButtonHtml = buildFilteredTrainingButtonHtml(this._statsFilteredCodes.length);
             container.innerHTML = `
             ${successGaugeHtml}
             ${officialTheoryBannerHtml}
-            <div style="text-align:center; margin: 16px 0 8px;">
+            <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin: 16px 0 8px;">
                 <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
                     <i class="ri-compass-3-line" aria-hidden="true"></i> ${tq('axes.openFromStats')}
                 </button>
+                ${filteredTrainingButtonHtml}
             </div>
 
             <div style="margin-top:48px;">
@@ -1009,20 +1024,18 @@ export class QuizStatsBase extends BaseView {
     }
 
     setMasteryFilter(filter) {
-        if (this.state.masteryFilter === filter) {
-            this.state.masteryFilter = 'ALL'; // Toggle off
-        } else {
-            this.state.masteryFilter = filter;
-        }
+        // Plusieurs tuiles peuvent être cochées : un clic ajoute ou retire la tuile.
+        const checked = activeMasteryFilters(this.state);
+        const next = checked.includes(filter) ? checked.filter((f) => f !== filter) : [...checked, filter];
+        this.state.masteryFilter = next.length ? next : 'ALL';
         this.renderStats();
     }
 
     setThemeFilter(theme) {
-        if (this.state.themeFilter === theme) {
-            this.state.themeFilter = null; // Toggle off
-        } else {
-            this.state.themeFilter = theme;
-        }
+        // Plusieurs thèmes peuvent être cochés : un clic ajoute ou retire le thème.
+        const checked = activeThemeFilters(this.state);
+        const next = checked.includes(theme) ? checked.filter((t) => t !== theme) : [...checked, theme];
+        this.state.themeFilter = next.length ? next : null;
         this.renderStats();
     }
 

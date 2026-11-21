@@ -118,14 +118,123 @@ export function buildOfficialTheoryBannerHtml(level, entry, attrName = 'data-qui
         </div>`;
 }
 
+/** Thème d'une question ; à défaut, déduit de la lettre de son code. */
+function questionTheme(view, code) {
+    const qObj = view.getQuestionByCode(code);
+    if (qObj && qObj.theme) return qObj.theme;
+    if (qObj && qObj.code) {
+        const map = {
+            A: 'Météo',
+            E: 'Mécavol',
+            G: 'Mécavol',
+            H: 'Mécavol',
+            L: 'Matériel',
+            N: 'Matériel',
+            R: 'Matériel',
+            U: 'Pilotage',
+            W: 'Pilotage',
+            X: 'Pilotage',
+            S: 'Réglementation',
+            F: 'Facteurs humains',
+            P: 'Milieu naturel',
+        };
+        return map[qObj.code.charAt(0)] || 'Autre';
+    }
+    return 'Autre';
+}
+
+/**
+ * Questions de la liste détaillée retenues par les filtres actifs (tuile de maîtrise et thème), dans
+ * l'ordre des données : la liste les trie ensuite, et le bouton d'entraînement sur la sélection les
+ * reprend telles quelles.
+ * @param {any} view
+ * @param {{ levelQs: any[], levelQuestionEntries: Array<[string, any]>, stats: any }} data
+ * @returns {Array<[string, any]>}
+ */
+export function filterStatsQuestionEntries(view, { levelQs, levelQuestionEntries, stats }) {
+    const masteryFilters = activeMasteryFilters(view.state);
+    const themeFilters = activeThemeFilters(view.state);
+    /** @type {Array<[string, any]>} */
+    let visible;
+    if (!masteryFilters.length) {
+        visible = levelQuestionEntries;
+    } else {
+        // Plusieurs tuiles cochées : les questions de chacune s'additionnent.
+        const buckets = new Set(masteryFilters);
+        visible = levelQuestionEntries.filter(([, data]) => buckets.has(masteryBucket(data)));
+        if (buckets.has('NOT_ATTEMPTED')) {
+            const unattempted = levelQs
+                .filter((q) => !stats.questions[q.code] || stats.questions[q.code].total === 0)
+                .map((q) => /** @type {[string, any]} */ ([q.code, { total: 0, correct: 0 }]));
+            const seen = new Set(visible.map(([code]) => code));
+            visible = [...visible, ...unattempted.filter(([code]) => !seen.has(code))];
+        }
+    }
+    if (themeFilters.length) {
+        const themes = new Set(themeFilters);
+        visible = visible.filter(([code]) => themes.has(questionTheme(view, code)));
+    }
+    return visible;
+}
+
+/**
+ * Tuile de maîtrise d'une question tentée (même découpage que les cartes de répartition).
+ * @param {any} data
+ */
+function masteryBucket(data) {
+    if (!data || !data.total) return 'NOT_ATTEMPTED';
+    const pct = Math.round(masteryRatio(data) * 100);
+    if (pct === 100) return 'PERFECT';
+    if (pct >= 90) return 'EXCELLENT';
+    if (pct >= 75) return 'VERY_GOOD';
+    if (pct >= 50) return 'GOOD';
+    if (pct > 0) return 'POOR';
+    return 'FAILED';
+}
+
+/**
+ * Tuiles de maîtrise cochées. L'état accepte une liste ou l'ancienne valeur unique ('ALL' = aucune).
+ * @param {any} state
+ * @returns {string[]}
+ */
+export function activeMasteryFilters(state) {
+    const f = state?.masteryFilter;
+    if (Array.isArray(f)) return f.filter((x) => x && x !== 'ALL');
+    return f && f !== 'ALL' ? [f] : [];
+}
+
+/**
+ * Thèmes cochés. L'état accepte une liste ou l'ancienne valeur unique (null = aucun).
+ * @param {any} state
+ * @returns {string[]}
+ */
+export function activeThemeFilters(state) {
+    const t = state?.themeFilter;
+    if (Array.isArray(t)) return t.filter(Boolean);
+    return t ? [t] : [];
+}
+
+/**
+ * Bouton « S'entraîner sur ces N questions », affiché à côté des axes prioritaires quand un filtre
+ * de la liste détaillée est actif.
+ * @param {number} count
+ */
+export function buildFilteredTrainingButtonHtml(count) {
+    if (!count) return '';
+    const label = count > 1 ? tq('stats.trainFilteredMany', { count }) : tq('stats.trainFilteredOne');
+    return `<button type="button" data-action="QuizstartFilteredTraining" style="background:rgba(14,165,233,0.12); color:#0ea5e9; border:1px solid rgba(14,165,233,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-play-circle-line" aria-hidden="true"></i> ${label}
+                </button>`;
+}
+
 /** Cartes de répartition des questions par niveau de maîtrise (filtre au clic). */
 export function buildDistributionHtml(
     view,
     { perfect, excellent, veryGood, good, poor, failed, notAttempted, totalLevelQuestions },
 ) {
-    const currentFilter = view.state.masteryFilter || 'ALL';
+    const checkedFilters = activeMasteryFilters(view.state);
     const getCardStyle = (baseColor, filterType) => {
-        const isActive = currentFilter === filterType;
+        const isActive = checkedFilters.includes(filterType);
         const bgOpacity = isActive ? 0.15 : 0.03;
         const borderOpacity = isActive ? 0.6 : 0.1;
         // Remove scale, use shadow/border for "pop"
@@ -200,7 +309,7 @@ export function buildDistributionHtml(
     ];
 
     const visibleCards = cards.some((c) => c.count > 0)
-        ? cards.filter((c) => c.count > 0 || currentFilter === c.filter)
+        ? cards.filter((c) => c.count > 0 || checkedFilters.includes(c.filter))
         : cards;
 
     const distributionHtml = `
@@ -208,7 +317,7 @@ export function buildDistributionHtml(
                 ${visibleCards
                     .map(
                         (c) => `
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['${c.filter}']" style="${getCardStyle(c.rgb, c.filter)}">
+                <div role="button" tabindex="0" aria-pressed="${checkedFilters.includes(c.filter)}" data-action="QuizsetMasteryFilter" data-args="['${c.filter}']" style="${getCardStyle(c.rgb, c.filter)}">
                     <div style="font-size:2rem; font-weight:900; color:${c.color};">${c.count}</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">${c.label}</div>
                     <div style="font-size:0.65rem; opacity:0.4;">${c.sub}</div>
@@ -300,7 +409,7 @@ export function buildThemesHtml(view, levelThemes) {
                       : '248,113,113';
 
         // Active state
-        const isActive = view.state.themeFilter === name;
+        const isActive = activeThemeFilters(view.state).includes(name);
         const cardBorder = isActive
             ? `border:2px solid ${tColor}; box-shadow:0 0 20px -4px rgba(${tColorRgb},0.4);`
             : `border:1px solid var(--border-color);`;
@@ -425,72 +534,20 @@ export function buildQuestionsHtml(
     }
 
     if (levelQuestionEntries.length > 0) {
-        // --- FILTERING LOGIC ---
-        let visibleQuestions = [];
+        let visibleQuestions = filterStatsQuestionEntries(view, { levelQs, levelQuestionEntries, stats });
 
-        if (view.state.masteryFilter === 'ALL') {
-            visibleQuestions = levelQuestionEntries;
-        } else if (view.state.masteryFilter === 'NOT_ATTEMPTED') {
-            // Determine unattempted questions
-            // levelQs contains ALL valid questions for this level (excluding Delta)
-            // stats.questions contains history
-            levelQs.forEach((q) => {
-                if (!stats.questions[q.code] || stats.questions[q.code].total === 0) {
-                    // Create a mock "data" object for rendering
-                    visibleQuestions.push([q.code, { total: 0, correct: 0 }]);
-                }
-            });
-        } else {
-            visibleQuestions = levelQuestionEntries.filter(([, data]) => {
-                const pct = Math.round(masteryRatio(data) * 100);
-                if (view.state.masteryFilter === 'PERFECT') return pct === 100;
-                if (view.state.masteryFilter === 'EXCELLENT') return pct >= 90 && pct < 100;
-                if (view.state.masteryFilter === 'VERY_GOOD') return pct >= 75 && pct < 90;
-                if (view.state.masteryFilter === 'GOOD') return pct >= 50 && pct < 75;
-                if (view.state.masteryFilter === 'POOR') return pct > 0 && pct < 50;
-                if (view.state.masteryFilter === 'FAILED') return pct === 0;
-                return true;
-            });
-        }
-
-        const filterLabel = tq(`stats.filters.${view.state.masteryFilter}`);
-        const hasActiveFilter = view.state.masteryFilter !== 'ALL' || Boolean(view.state.themeFilter);
+        const masteryFilters = activeMasteryFilters(view.state);
+        const themeFilters = activeThemeFilters(view.state);
+        const hasActiveFilter = masteryFilters.length > 0 || themeFilters.length > 0;
 
         // Append theme filter label if active
-        let displayLabel = view.state.masteryFilter !== 'ALL' ? filterLabel : '';
-        if (view.state.themeFilter) {
-            const themeSuffix = tq('stats.themeSuffix', { theme: view.state.themeFilter }); // inserted as HTML: escaped (spec 025)
+        let displayLabel = masteryFilters.map((f) => tq(`stats.filters.${f}`)).join(' + ');
+        if (themeFilters.length) {
+            const themeSuffix =
+                themeFilters.length > 1
+                    ? tq('stats.themesSuffix', { themes: themeFilters.join(', ') })
+                    : tq('stats.themeSuffix', { theme: themeFilters[0] }); // inserted as HTML: escaped (spec 025)
             displayLabel = displayLabel ? displayLabel + themeSuffix : themeSuffix.replace(/^\s*•\s*/, '');
-            // Filter sortedQuestions again by theme
-            visibleQuestions = visibleQuestions.filter(([code]) => {
-                const qObj = view.getQuestionByCode(code);
-
-                let qTheme = qObj && qObj.theme ? qObj.theme : null;
-
-                // If theme is missing but we have a code, try to derive it
-                if (!qTheme && qObj && qObj.code) {
-                    const letter = qObj.code.charAt(0);
-                    const map = {
-                        A: 'Météo',
-                        E: 'Mécavol',
-                        G: 'Mécavol',
-                        H: 'Mécavol',
-                        L: 'Matériel',
-                        N: 'Matériel',
-                        R: 'Matériel',
-                        U: 'Pilotage',
-                        W: 'Pilotage',
-                        X: 'Pilotage',
-                        S: 'Réglementation',
-                        F: 'Facteurs humains',
-                        P: 'Milieu naturel',
-                    };
-                    qTheme = map[letter] || 'Autre';
-                }
-
-                if (!qTheme) qTheme = 'Autre';
-                return qTheme === view.state.themeFilter;
-            });
         }
 
         const sortKey = view.state.questionSort || 'rate';

@@ -656,10 +656,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-checkbox-circle-line"></i> Valider ma qualification
                 </button>
             </div>
-            <div style="text-align:center; margin: 16px 0 8px;">
+            <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin: 16px 0 8px;">
                 <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
                     <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
                 </button>
+                
             </div>
 
             <div style="margin-top:48px;">
@@ -667,37 +668,37 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="background:rgba(74, 222, 128, 0.03); border:1px solid rgba(74, 222, 128, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="background:rgba(74, 222, 128, 0.03); border:1px solid rgba(74, 222, 128, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#4ade80;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Maîtrisées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(100%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['EXCELLENT']" style="background:rgba(134, 239, 172, 0.03); border:1px solid rgba(134, 239, 172, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['EXCELLENT']" style="background:rgba(134, 239, 172, 0.03); border:1px solid rgba(134, 239, 172, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#86efac;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Excellentes</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(90-99%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['VERY_GOOD']" style="background:rgba(56, 189, 248, 0.03); border:1px solid rgba(56, 189, 248, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['VERY_GOOD']" style="background:rgba(56, 189, 248, 0.03); border:1px solid rgba(56, 189, 248, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#38bdf8;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Très Bonnes</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(75-89%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['GOOD']" style="background:rgba(250, 204, 21, 0.03); border:1px solid rgba(250, 204, 21, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['GOOD']" style="background:rgba(250, 204, 21, 0.03); border:1px solid rgba(250, 204, 21, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#facc15;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Satisfaisantes</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(50-74%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#fb923c;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#f87171;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Échecs</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(0%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:var(--text-muted);">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Non tentées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(sur 0)</div>
@@ -802,10 +803,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
             </div>
         
             
-            <div style="text-align:center; margin: 16px 0 8px;">
+            <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin: 16px 0 8px;">
                 <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
                     <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
                 </button>
+                
             </div>
 
             <div style="margin-top:48px;">
@@ -813,7 +815,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:var(--text-muted);">4</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Non tentées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(sur 4)</div>
@@ -1013,10 +1015,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
                 </button>
             </div>
-            <div style="text-align:center; margin: 16px 0 8px;">
+            <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin: 16px 0 8px;">
                 <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
                     <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
                 </button>
+                
             </div>
 
             <div style="margin-top:48px;">
@@ -1024,17 +1027,17 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#f87171;">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Échecs</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(0%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:var(--text-muted);">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Non tentées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(sur 4)</div>
@@ -1449,10 +1452,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
                 </button>
             </div>
-            <div style="text-align:center; margin: 16px 0 8px;">
+            <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin: 16px 0 8px;">
                 <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
                     <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
                 </button>
+                
             </div>
 
             <div style="margin-top:48px;">
@@ -1460,22 +1464,22 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['EXCELLENT']" style="background:rgba(134, 239, 172, 0.15); border:1px solid rgba(134, 239, 172, 0.6); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; box-shadow: 0 0 20px rgba(134, 239, 172, 0.2);">
+                <div role="button" tabindex="0" aria-pressed="true" data-action="QuizsetMasteryFilter" data-args="['EXCELLENT']" style="background:rgba(134, 239, 172, 0.15); border:1px solid rgba(134, 239, 172, 0.6); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; box-shadow: 0 0 20px rgba(134, 239, 172, 0.2);">
                     <div style="font-size:2rem; font-weight:900; color:#86efac;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Excellentes</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(90-99%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#f87171;">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Échecs</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(0%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:var(--text-muted);">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Non tentées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(sur 4)</div>
@@ -1778,9 +1782,12 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
                 </button>
             </div>
-            <div style="text-align:center; margin: 16px 0 8px;">
+            <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin: 16px 0 8px;">
                 <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
                     <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
+                </button>
+                <button type="button" data-action="QuizstartFilteredTraining" style="background:rgba(14,165,233,0.12); color:#0ea5e9; border:1px solid rgba(14,165,233,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-play-circle-line" aria-hidden="true"></i> S'entraîner sur cette question
                 </button>
             </div>
 
@@ -1789,17 +1796,17 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.15); border:1px solid rgba(248, 113, 113, 0.6); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; box-shadow: 0 0 20px rgba(248, 113, 113, 0.2);">
+                <div role="button" tabindex="0" aria-pressed="true" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.15); border:1px solid rgba(248, 113, 113, 0.6); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; box-shadow: 0 0 20px rgba(248, 113, 113, 0.2);">
                     <div style="font-size:2rem; font-weight:900; color:#f87171;">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Échecs</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(0%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:var(--text-muted);">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Non tentées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(sur 4)</div>
@@ -2136,10 +2143,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
                 </button>
             </div>
-            <div style="text-align:center; margin: 16px 0 8px;">
+            <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin: 16px 0 8px;">
                 <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
                     <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
                 </button>
+                
             </div>
 
             <div style="margin-top:48px;">
@@ -2147,22 +2155,22 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['GOOD']" style="background:rgba(250, 204, 21, 0.15); border:1px solid rgba(250, 204, 21, 0.6); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; box-shadow: 0 0 20px rgba(250, 204, 21, 0.2);">
+                <div role="button" tabindex="0" aria-pressed="true" data-action="QuizsetMasteryFilter" data-args="['GOOD']" style="background:rgba(250, 204, 21, 0.15); border:1px solid rgba(250, 204, 21, 0.6); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; box-shadow: 0 0 20px rgba(250, 204, 21, 0.2);">
                     <div style="font-size:2rem; font-weight:900; color:#facc15;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Satisfaisantes</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(50-74%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#f87171;">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Échecs</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(0%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:var(--text-muted);">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Non tentées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(sur 4)</div>
@@ -2465,9 +2473,12 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
                 </button>
             </div>
-            <div style="text-align:center; margin: 16px 0 8px;">
+            <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin: 16px 0 8px;">
                 <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
                     <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
+                </button>
+                <button type="button" data-action="QuizstartFilteredTraining" style="background:rgba(14,165,233,0.12); color:#0ea5e9; border:1px solid rgba(14,165,233,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-play-circle-line" aria-hidden="true"></i> S'entraîner sur cette question
                 </button>
             </div>
 
@@ -2476,17 +2487,17 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#f87171;">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Échecs</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(0%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.15); border:1px solid rgba(255, 255, 255, 0.6); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);">
+                <div role="button" tabindex="0" aria-pressed="true" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.15); border:1px solid rgba(255, 255, 255, 0.6); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);">
                     <div style="font-size:2rem; font-weight:900; color:var(--text-muted);">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Non tentées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(sur 4)</div>
@@ -2828,10 +2839,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
                 </button>
             </div>
-            <div style="text-align:center; margin: 16px 0 8px;">
+            <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin: 16px 0 8px;">
                 <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
                     <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
                 </button>
+                
             </div>
 
             <div style="margin-top:48px;">
@@ -2839,22 +2851,22 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="background:rgba(74, 222, 128, 0.15); border:1px solid rgba(74, 222, 128, 0.6); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; box-shadow: 0 0 20px rgba(74, 222, 128, 0.2);">
+                <div role="button" tabindex="0" aria-pressed="true" data-action="QuizsetMasteryFilter" data-args="['PERFECT']" style="background:rgba(74, 222, 128, 0.15); border:1px solid rgba(74, 222, 128, 0.6); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; box-shadow: 0 0 20px rgba(74, 222, 128, 0.2);">
                     <div style="font-size:2rem; font-weight:900; color:#4ade80;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Maîtrisées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(100%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#f87171;">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Échecs</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(0%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:var(--text-muted);">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Non tentées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(sur 4)</div>
@@ -3157,9 +3169,12 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
                 </button>
             </div>
-            <div style="text-align:center; margin: 16px 0 8px;">
+            <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin: 16px 0 8px;">
                 <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
                     <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
+                </button>
+                <button type="button" data-action="QuizstartFilteredTraining" style="background:rgba(14,165,233,0.12); color:#0ea5e9; border:1px solid rgba(14,165,233,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-play-circle-line" aria-hidden="true"></i> S'entraîner sur ces 2 questions
                 </button>
             </div>
 
@@ -3168,17 +3183,17 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.15); border:1px solid rgba(251, 146, 60, 0.6); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; box-shadow: 0 0 20px rgba(251, 146, 60, 0.2);">
+                <div role="button" tabindex="0" aria-pressed="true" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.15); border:1px solid rgba(251, 146, 60, 0.6); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; box-shadow: 0 0 20px rgba(251, 146, 60, 0.2);">
                     <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#f87171;">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Échecs</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(0%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:var(--text-muted);">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Non tentées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(sur 4)</div>
@@ -3559,10 +3574,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
                 </button>
             </div>
-            <div style="text-align:center; margin: 16px 0 8px;">
+            <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin: 16px 0 8px;">
                 <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
                     <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
                 </button>
+                
             </div>
 
             <div style="margin-top:48px;">
@@ -3570,22 +3586,22 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['VERY_GOOD']" style="background:rgba(56, 189, 248, 0.15); border:1px solid rgba(56, 189, 248, 0.6); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);">
+                <div role="button" tabindex="0" aria-pressed="true" data-action="QuizsetMasteryFilter" data-args="['VERY_GOOD']" style="background:rgba(56, 189, 248, 0.15); border:1px solid rgba(56, 189, 248, 0.6); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);">
                     <div style="font-size:2rem; font-weight:900; color:#38bdf8;">0</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Très Bonnes</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(75-89%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#f87171;">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Échecs</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(0%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:var(--text-muted);">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Non tentées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(sur 4)</div>
@@ -3888,9 +3904,12 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <i class="ri-checkbox-circle-line"></i> Valider mon examen théorique
                 </button>
             </div>
-            <div style="text-align:center; margin: 16px 0 8px;">
+            <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin: 16px 0 8px;">
                 <button type="button" data-action="QuizshowRevisionAxes" style="background:rgba(255,122,0,0.12); color:var(--accent-orange); border:1px solid rgba(255,122,0,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
                     <i class="ri-compass-3-line" aria-hidden="true"></i> Travailler mes axes prioritaires
+                </button>
+                <button type="button" data-action="QuizstartFilteredTraining" style="background:rgba(14,165,233,0.12); color:#0ea5e9; border:1px solid rgba(14,165,233,0.35); padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:700; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ri-play-circle-line" aria-hidden="true"></i> S'entraîner sur cette question
                 </button>
             </div>
 
@@ -3899,17 +3918,17 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px;">
                 
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['POOR']" style="background:rgba(251, 146, 60, 0.03); border:1px solid rgba(251, 146, 60, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#fb923c;">2</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">À travailler</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(1-49%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['FAILED']" style="background:rgba(248, 113, 113, 0.03); border:1px solid rgba(248, 113, 113, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:#f87171;">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Échecs</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(0%)</div>
                 </div>
-                <div role="button" tabindex="0" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
+                <div role="button" tabindex="0" aria-pressed="false" data-action="QuizsetMasteryFilter" data-args="['NOT_ATTEMPTED']" style="background:rgba(255, 255, 255, 0.03); border:1px solid rgba(255, 255, 255, 0.1); padding:20px 12px; border-radius:20px; text-align:center; cursor:pointer; transition:all 0.2s; flex:1 1 120px; ">
                     <div style="font-size:2rem; font-weight:900; color:var(--text-muted);">1</div>
                     <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; opacity:0.6; margin-top:8px;">Non tentées</div>
                     <div style="font-size:0.65rem; opacity:0.4;">(sur 4)</div>

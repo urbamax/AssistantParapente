@@ -441,6 +441,9 @@ class QuizViewClass extends QuizVoiceBase {
             case 'QuizstartAxisWorkshop':
                 this.startAxisWorkshop(args[0]);
                 break;
+            case 'QuizstartFilteredTraining':
+                this.startFilteredTraining();
+                break;
             case 'QuizstartTrapsWorkshop':
                 this.startTrapsWorkshop();
                 break;
@@ -939,6 +942,16 @@ class QuizViewClass extends QuizVoiceBase {
         if (!picked.length) return;
 
         this.launchWorkshop(picked, axisId);
+    }
+
+    // Série d'entraînement sur les questions affichées par les filtres de la page Statistiques
+    // (tuile de maîtrise, thème). Liste figée au clic, ordre mélangé ; une réponse par question.
+    startFilteredTraining() {
+        const picked = (this._statsFilteredCodes || [])
+            .map((code) => QuizService.getQuestionByCode(code))
+            .filter(Boolean);
+        if (!picked.length) return;
+        this.launchWorkshop(picked, null);
     }
 
     launchWorkshop(picked, workshopId) {
