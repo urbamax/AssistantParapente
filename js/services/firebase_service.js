@@ -100,6 +100,28 @@ function deletedFlightMarker(id) {
     return { id, deleted: true, deletedAt: now, updatedAt: now };
 }
 
+/**
+ * Écrit un document de vol ou de matériel. Si les règles Firestore le refusent (`permission-denied` :
+ * un champ inconnu ou trop long dans ce seul document), il est passé et signalé dans la console, et la
+ * synchro continue avec les autres : un seul vol refusé ne bloque plus tout le carnet. Toute autre
+ * erreur (réseau, connexion) interrompt la synchro comme avant.
+ * @param {() => Promise<unknown>} write
+ * @param {string} what description pour la console (« vol <id> »)
+ * @returns {Promise<boolean>} false si le document a été refusé
+ */
+export async function writeUnlessRejected(write, what) {
+    try {
+        await write();
+        return true;
+    } catch (error) {
+        if (error && /** @type {any} */ (error).code === 'permission-denied') {
+            console.warn(`[Sync] ${what} refusé par les règles Firestore, ignoré :`, error);
+            return false;
+        }
+        throw error;
+    }
+}
+
 // We will expose this engine to the window object so it can be called from non-module scripts
 const SYNC_DOT_TITLES = {
     syncing: t('account.syncDot.syncing'),
@@ -691,7 +713,10 @@ export const FirebaseAuthEngine = {
                 if (cloudExisting && (cloudExisting.updatedAt || 0) > (session.updatedAt || 0)) continue;
                 const sRef = doc(db, 'users', uid, 'logbook', session.id);
                 const stripped = stripTrace(session);
-                await setDoc(sRef, stripped);
+                if (!(await writeUnlessRejected(() => setDoc(sRef, stripped), `vol ${session.id}`))) {
+                    session.syncPending = true;
+                    continue;
+                }
                 if (!cloudExisting) cloudLogbook.push(stripped);
                 cloudLogbookById.set(session.id, stripped);
             }
@@ -746,7 +771,7 @@ export const FirebaseAuthEngine = {
                 const cloudSession = cloudLogbook.find((s) => s.id === session.id);
                 if (!cloudSession) {
                     const sRef = doc(db, 'users', uid, 'logbook', session.id);
-                    await setDoc(sRef, stripTrace(session));
+                    await writeUnlessRejected(() => setDoc(sRef, stripTrace(session)), `vol ${session.id}`);
                 }
             }
 
@@ -818,7 +843,10 @@ export const FirebaseAuthEngine = {
                 const cloudExisting = cloudEquipById.get(item.id);
                 if (cloudExisting && (cloudExisting.updatedAt || 0) > (item.updatedAt || 0)) continue;
                 const eRef = doc(db, 'users', uid, 'equipment', item.id);
-                await setDoc(eRef, item);
+                if (!(await writeUnlessRejected(() => setDoc(eRef, item), `matériel ${item.id}`))) {
+                    item.syncPending = true;
+                    continue;
+                }
                 if (!cloudExisting) cloudEquip.push(item);
                 cloudEquipById.set(item.id, item);
             }
@@ -862,7 +890,7 @@ export const FirebaseAuthEngine = {
                 const cloudItem = cloudEquip.find((e) => e.id === item.id);
                 if (!cloudItem) {
                     const eRef = doc(db, 'users', uid, 'equipment', item.id);
-                    await setDoc(eRef, item);
+                    await writeUnlessRejected(() => setDoc(eRef, item), `matériel ${item.id}`);
                 }
             }
 
@@ -1231,7 +1259,7 @@ export const FirebaseAuthEngine = {
                 if (deletedIds.has(session.id)) continue;
                 if ((cloudUpdatedAt.get(session.id) || 0) > (Number(session.updatedAt) || 0)) continue;
                 const docRef = doc(db, 'users', uid, 'logbook', session.id);
-                await setDoc(docRef, stripTrace(session));
+                await writeUnlessRejected(() => setDoc(docRef, stripTrace(session)), `vol ${session.id}`);
             }
 
             this.lastSyncTime = new Date().toLocaleTimeString();
@@ -1274,7 +1302,7 @@ export const FirebaseAuthEngine = {
             // Save all locally present to cloud
             for (const item of data) {
                 const docRef = doc(db, 'users', uid, 'equipment', item.id);
-                await setDoc(docRef, item);
+                await writeUnlessRejected(() => setDoc(docRef, item), `matériel ${item.id}`);
             }
 
             this.lastSyncTime = new Date().toLocaleTimeString();

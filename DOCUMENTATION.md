@@ -396,7 +396,7 @@ Calculates overall success percentage, subject mastery radar, active day streak,
 
 ### 1. Hybrid Storage Strategy (`js/services/firebase_service.js`)
 - **Offline Mode (Guest)**: Data is immediately written to `LocalStorage` using `StorageService`.
-- **Authenticated Mode**: Automatically merges local data with Cloud Firestore under `users/{uid}` subcollections (`logbook`, `equipment`, `stats`, `preferences`, `igcTraces`, `ice`, read-only `access`, and server-only `pushState`), enforced by `firestore.rules` (tested via `npm run test:rules`). Supports Google Auth and Email/Password sign-in.
+- **Authenticated Mode**: Automatically merges local data with Cloud Firestore under `users/{uid}` subcollections (`logbook`, `equipment`, `stats`, `preferences`, `igcTraces`, `ice`, read-only `access`, and server-only `pushState`), enforced by `firestore.rules` (tested via `npm run test:rules`). The rules accept only a fixed list of fields per document: a flight or equipment document they refuse (`permission-denied`) is skipped and logged by `writeUnlessRejected()`, and the sync goes on with the others; any other error still stops it. The exam lists are bounded to fit 1000 exams (`appliedExamIds` <= 2500, id and date per exam; `deletedExamIds` <= 1000; `exams` <= 1000). Supports Google Auth and Email/Password sign-in.
 
 ### 2. Local backup file, without an account (specs 041 and 042, `js/services/backup_service.js`, `js/core/backup_ui.js`)
 - **Where**: "Exporter" / "Importer" in the "Espace Synchro" dialog (always visible, even when the Firebase consent is refused) and in the privacy options. They never need an account or consent: the file stays on the device.
