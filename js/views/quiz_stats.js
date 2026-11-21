@@ -30,6 +30,7 @@ import {
     activeThemeFilters,
     questionTheme,
     buildFilteredTrainingButtonHtml,
+    buildQuestionAnswersHtml,
     filterStatsQuestionEntries,
 } from './quiz_stats_html.js';
 
@@ -1039,6 +1040,12 @@ export class QuizStatsBase extends BaseView {
         const arrow = document.getElementById('arrow-' + code);
 
         if (!answersDiv) return;
+
+        // Premier dépliage : le contenu n'est pas embarqué dans la liste, on le construit maintenant.
+        if (answersDiv.dataset.lazy) {
+            answersDiv.innerHTML = buildQuestionAnswersHtml(this, this.getQuestionByCode(code), code);
+            delete answersDiv.dataset.lazy;
+        }
 
         const isExpanded = answersDiv.style.display !== 'none';
 
