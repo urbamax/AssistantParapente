@@ -25,6 +25,47 @@ import {
 import { tt, th, tl } from './sites_strings.js';
 import { SitesMapBase } from './sites_map.js';
 
+const attrValue = (v) => String(v).replace(/["\\]/g, '\\$&');
+
+/**
+ * Repère l'élément qui a le focus clavier dans la liste (fiche du site, action, rang), pour le
+ * retrouver après un nouveau rendu : la liste est réécrite en entier (arrivée de la météo, favori,
+ * synchro…) et l'élément focalisé disparaît avec l'ancien HTML.
+ * @param {HTMLElement} container
+ * @returns {{ cardId: string | null, selector: string, index: number } | null}
+ */
+export function captureListFocus(container) {
+    const el = /** @type {HTMLElement | null} */ (document.activeElement);
+    if (!el || el === container || !container.contains(el)) return null;
+    let selector;
+    if (el.dataset.action) {
+        selector = `[data-action="${attrValue(el.dataset.action)}"]`;
+        if (el.dataset.args !== undefined) selector += `[data-args="${attrValue(el.dataset.args)}"]`;
+    } else if (el.id) {
+        selector = `[id="${attrValue(el.id)}"]`;
+    } else {
+        selector = el.tagName.toLowerCase();
+    }
+    const card = /** @type {HTMLElement | null} */ (el.closest('[id^="site-card-"]'));
+    const scope = card || container;
+    return { cardId: card ? card.id : null, selector, index: [...scope.querySelectorAll(selector)].indexOf(el) };
+}
+
+/**
+ * Rend le focus au même élément dans la liste réécrite, sans faire défiler l'écran.
+ * @param {HTMLElement} container
+ * @param {ReturnType<typeof captureListFocus>} anchor
+ */
+export function restoreListFocus(container, anchor) {
+    if (!anchor) return;
+    const scope = anchor.cardId ? document.getElementById(anchor.cardId) : container;
+    if (!scope || !container.contains(scope)) return;
+    const target = /** @type {HTMLElement | undefined} */ (
+        scope.querySelectorAll(anchor.selector)[Math.max(0, anchor.index)]
+    );
+    if (target && document.activeElement !== target) target.focus({ preventScroll: true });
+}
+
 export class SitesListBase extends SitesMapBase {
     // À fournir par SitesView (met à jour les pastilles des filtres après un rendu de la liste).
     updateBadges() {
@@ -216,6 +257,8 @@ export class SitesListBase extends SitesMapBase {
         // Position de lecture : tout re-rendu de la liste (« + » d'une fiche, favori, synchro…) doit la garder.
         const screen = document.getElementById('sites-screen');
         const keptScrollTop = screen ? screen.scrollTop : 0;
+        // Et le focus clavier : sinon il se perd à chaque rendu (navigation au clavier, spec 010).
+        const keptFocus = captureListFocus(listDiv);
 
         const activeSites = SitesService.getFilteredAndSortedSites(SitesService.getSites());
         this.renderLocationContext();
@@ -459,6 +502,7 @@ export class SitesListBase extends SitesMapBase {
         }
 
         this.updateBadges();
+        restoreListFocus(listDiv, keptFocus);
         if (screen && screen.scrollTop !== keptScrollTop) screen.scrollTop = keptScrollTop;
     }
 
