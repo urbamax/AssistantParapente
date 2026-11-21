@@ -426,6 +426,7 @@ class QuizViewClass extends QuizVoiceBase {
         switch (action) {
             case 'QuizshowRevisionAxes':
                 this._activeWorkshopAxisId = null;
+                this._statsTrainingActive = false;
                 if (AppRouter.routes && AppRouter.routes.has('REVISION_AXES')) {
                     AppRouter.navigate('REVISION_AXES');
                 } else {
@@ -443,6 +444,9 @@ class QuizViewClass extends QuizVoiceBase {
                 break;
             case 'QuizstartFilteredTraining':
                 this.startFilteredTraining();
+                break;
+            case 'QuizbackToStatsAfterTraining':
+                this.backToStatsAfterTraining();
                 break;
             case 'QuizstartTrapsWorkshop':
                 this.startTrapsWorkshop();
@@ -508,6 +512,7 @@ class QuizViewClass extends QuizVoiceBase {
                 break;
             case 'finish-session':
                 this._activeWorkshopAxisId = null;
+                this._statsTrainingActive = false;
                 AppRouter.navigate('QCM');
                 break;
             case 'quiz-voice-read':
@@ -918,6 +923,7 @@ class QuizViewClass extends QuizVoiceBase {
     startSession() {
         try {
             this._activeWorkshopAxisId = null;
+            this._statsTrainingActive = false;
             const level = typeof GlobalState !== 'undefined' ? GlobalState.get('level') : 'BI';
             const firstQuestion = QuizService.startSession(level);
 
@@ -952,11 +958,26 @@ class QuizViewClass extends QuizVoiceBase {
             .filter(Boolean);
         if (!picked.length) return;
         this.launchWorkshop(picked, null);
+        this._statsTrainingActive = true;
+    }
+
+    // Fin d'une série lancée depuis les statistiques : retour à la page, filtres effacés (la maîtrise
+    // des questions a changé, la sélection d'avant ne correspond plus aux tuiles).
+    backToStatsAfterTraining() {
+        this._statsTrainingActive = false;
+        this.state.masteryFilter = 'ALL';
+        this.state.themeFilter = null;
+        if (AppRouter.routes && AppRouter.routes.has('STATS')) {
+            AppRouter.navigate('STATS');
+        } else {
+            this.showStatsScreen();
+        }
     }
 
     launchWorkshop(picked, workshopId) {
         const sessionQuestions = QuizService.shuffle(picked).map((q) => QuizService.shuffleQuestionChoices(q));
         this._activeWorkshopAxisId = workshopId;
+        this._statsTrainingActive = false;
         QuizService._masteryPool = null;
         QuizService.state.qcmConfig.mode = 'TRAINING';
         QuizService.state.qcmIndex = 0;
@@ -1408,7 +1429,9 @@ class QuizViewClass extends QuizVoiceBase {
 
         const exitButtonHtml = this._activeWorkshopAxisId
             ? `<button class="next-btn" data-action="QuizshowRevisionAxes" style="width:100%;"><i class="ri-compass-3-line"></i> ${tq('axes.backToAxesBtn')}</button>`
-            : `<button class="next-btn" data-action="finish-session" style="width:100%;">${tq('results.finish')}</button>`;
+            : this._statsTrainingActive
+              ? `<button class="next-btn" data-action="QuizbackToStatsAfterTraining" style="width:100%;"><i class="ri-bar-chart-box-line"></i> ${tq('results.backToStats')}</button>`
+              : `<button class="next-btn" data-action="finish-session" style="width:100%;">${tq('results.finish')}</button>`;
 
         const summaryHtml = isInvalidated
             ? ''
