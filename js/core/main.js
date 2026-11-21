@@ -13,6 +13,7 @@ import { exportBackupAction, importBackupAction } from './backup_ui.js';
 import SitesService from '../services/sites_service.js';
 import AccessService, { ACCESS_EVENTS, applyRoleVisibility } from '../services/access_service.js';
 import { initAppUpdateNotifier } from './app_update.js';
+import { initDiscordAnnounce } from './discord_announce.js';
 import { receiveMigration, redirectFromLegacyOrigin } from './domain_migration.js';
 import { initCrashReporter } from '../services/crash_reporter.js';
 import { initPwaInstaller, promptInstall, closeInstallModal } from '../services/pwa_installer.js';
@@ -439,6 +440,9 @@ export async function bootApplication() {
 
     // 6. Connect to Firebase SDKs
     // Handled in Polyfills section
+
+    // Annonce unique du serveur Discord, une fois l'écran de départ affiché.
+    initDiscordAnnounce();
 
     console.timeEnd('BOOT_TOTAL');
     console.log('✅ Application Booted Successfully.');

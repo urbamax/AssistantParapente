@@ -22,6 +22,7 @@ const StorageService = {
         PENDING_QUIZ: 'pending_quiz',
         ACCESS: 'parapente_access',
         FEEDBACK_DRAFT: 'parapente_feedback_draft',
+        DISCORD_ANNOUNCE_DISMISSED: 'ap_discord_banner_dismissed_v1',
     },
 
     /**
