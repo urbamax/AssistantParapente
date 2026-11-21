@@ -154,6 +154,24 @@ Pilots use the app on take-off and in the mountains, often without a network.
   Principle IV pass.
 - Commit messages follow Conventional Commits (`feat(sites): …`).
 - Any architecture change MUST update `DOCUMENTATION.md` in the same pull request.
+- The in-app user manual ("Mode d'emploi": `components/manual_modal.html`, with its strings
+  under `manualModal` in `js/i18n/fr_html.js`) is known to lag behind the app. Every
+  specification MUST state its impact on the manual, and every change MUST check the
+  manual sections it touches and update them in the same pull request when they are missing,
+  outdated or wrong. "No impact" is allowed only after that check, with a one-line reason.
+  The Discord copy of the manual (channel `#guide-utilisation`, built by
+  `scripts/discord_guide.py` from the public part of the manual, without role-gated blocks)
+  MUST be kept in step: when a public part of the manual changes, the same change updates
+  `scripts/discord_guide.py`, and the channel is republished
+  (`python3 scripts/discord_guide.py`) once the change is deployed, with the owner's
+  approval.
+- Every specification MUST state whether the feature will be available to all users (not
+  limited to the `beta` or `owner` roles). If it is, the work MUST include an update notice
+  for the community Discord server (announcements channel, posted with the project's Discord
+  bot tooling, `scripts/discord_bot.py`): a short French text, drafted with the change, that
+  says what is new for pilots. It is posted only once the feature is deployed and live for
+  everyone, and only after the owner approves the text. A feature still limited to `beta` or
+  `owner` gets its notice when it opens to everyone.
 - Deployment is never automatic: it happens only when the owner explicitly asks for it. An
   agent may prepare and run it, after confirming that `main` is green, building `dist/` and
   checking the built app, and only after the owner's final confirmation.
@@ -171,4 +189,4 @@ Pilots use the app on take-off and in the mountains, often without a network.
   - PATCH: clarification, wording, typo.
 - Compliance is checked at every `/speckit-plan` and during review of every pull request.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-29 | **Last Amended**: 2026-09-29
+**Version**: 1.1.0 | **Ratified**: 2026-09-29 | **Last Amended**: 2026-11-21

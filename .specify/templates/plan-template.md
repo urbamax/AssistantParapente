@@ -42,6 +42,12 @@
 
 [Gates determined based on constitution file]
 
+- [ ] User manual: the spec's "User Manual Impact" section is filled in, and the sections to
+  update in `components/manual_modal.html` / `manualModal` strings and, for public sections,
+  in the Discord guide (`scripts/discord_guide.py`) are identified.
+- [ ] Release announcement: the spec states the feature's availability; if it is for all
+  users, a Discord update notice is drafted (posted after deployment, with owner approval).
+
 ## Project Structure
 
 ### Documentation (this feature)
