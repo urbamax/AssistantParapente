@@ -8,8 +8,10 @@
 import { t } from '../utils/i18n.js';
 import StorageService from '../services/storage.js';
 import { isUserBusy } from './app_update.js';
+import { FEEDBACK_CONFIG } from '../feedback_config.js';
 
-export const DISCORD_ANNOUNCE_URL = 'https://discord.gg/z6vc8ARNk';
+// Permanent invite shared with the header, footer and feedback modal (a dated invite would expire).
+export const DISCORD_ANNOUNCE_URL = FEEDBACK_CONFIG.discordInviteUrl;
 export const DISCORD_ANNOUNCE_ID = 'discord-announce';
 
 const FIRST_SHOW_DELAY_MS = 4000;
