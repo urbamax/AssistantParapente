@@ -15,13 +15,7 @@ import GdprEngine from '../gdpr_engine.js';
 import { buildResultsTrapsHtml } from './quiz_traps_html.js';
 import { tq, tql } from './quiz_strings.js';
 import { choiceSourceHtml, courseLinksHtml } from './quiz_course_links.js';
-import {
-    annotateAcronyms,
-    explanationHtml,
-    optionExplanationHtml,
-    optionExplanations,
-    optionOutcome,
-} from './quiz_explanation.js';
+import { explanationHtml, optionExplanationHtml, optionExplanations, optionOutcome } from './quiz_explanation.js';
 import { buildTrapFeedback } from '../services/error_diagnostic.js';
 import { choiceIndex } from '../services/answer_log.js';
 import { floorPercent1, formatPercent } from '../utils/text_utils.js';
@@ -344,6 +338,11 @@ class QuizViewClass extends QuizVoiceBase {
                 <button type="button" class="qcm-acronym-close" aria-label="${tq('acronymClose')}"><i class="ri-close-line"></i></button>
             </div>
             <div class="qcm-acronym-popover-body">${escapeHTML(title)}</div>
+            ${
+                el.dataset.sourceUrl
+                    ? `<button type="button" class="qcm-acronym-source" data-action="openUrl" data-url="${escapeHTML(el.dataset.sourceUrl)}"><i class="ri-book-open-line" aria-hidden="true"></i> ${escapeHTML(el.dataset.sourceLabel || '')}</button>`
+                    : ''
+            }
         `;
         popover.classList.add('visible');
 
@@ -1086,7 +1085,7 @@ class QuizViewClass extends QuizVoiceBase {
                     <div class="quiz-progress" style="margin-left: auto;">${tq('question.progress', { index: qIdx, total })}</div>
                 </div>
             </div>
-            <div class="quiz-question-text">${annotateAcronyms(escapeHTML(q.question))}</div>
+            <div class="quiz-question-text">${escapeHTML(q.question)}</div>
         `;
 
         // Render choices (spec 016 : lettres affichées dès que le mode vocal est disponible)

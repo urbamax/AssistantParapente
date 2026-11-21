@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import QuizView from '../../js/views/quiz.js';
+import { explanationHtml } from '../../js/views/quiz_explanation.js';
 import QuizService from '../../js/services/quiz_service.js';
 import GlobalState from '../../js/core/app_state.js';
 import GdprEngine from '../../js/gdpr_engine.js';
@@ -221,6 +222,27 @@ describe('quiz renders (spec 024: identical before and after moving the texts)',
         QuizView.renderQuestion(QUESTIONS[0]);
         out.revisionSeen = html('qcm-question-text');
         expect(out).toMatchSnapshot();
+    });
+
+    it('no acronym tooltip in the question nor in the choices, only in the explanations', () => {
+        const q = Q(
+            'QA1',
+            'Réglementation',
+            'Que signifie un calage au QNH près d’une TMA ?',
+            'Le QNH donne l’altitude.',
+            {
+                choices: [
+                    { text: 'Une altitude au-dessus de la mer (QNH)', pts: 6 },
+                    { text: 'Une hauteur au-dessus de la TMA', pts: -6 },
+                ],
+            },
+        );
+        QuizService.state.qcmConfig.mode = 'TRAINING';
+        QuizView.renderQuestion(q);
+        const screen = document.getElementById('qcm-screen');
+        expect(screen.querySelectorAll('.qcm-acronym')).toHaveLength(0);
+        expect(screen.textContent).toContain('QNH');
+        expect(explanationHtml('Le QNH donne l’altitude.')).toContain('class="qcm-acronym"');
     });
 
     it('answer feedback with course link', () => {

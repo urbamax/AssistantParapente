@@ -1050,6 +1050,7 @@ export const FR = Object.freeze({
         // Spec 024 : textes de l'écran du quiz (js/views/quiz.js). Noms de thèmes et codes de niveau : données.
         explanation: 'Explication',
         acronymClose: 'Fermer',
+        acronymSource: 'Source : {title}, p. {page}',
         officialTheory: Object.freeze({
             validatedBadge: 'Examen théorique {level} validé',
             validatedWithDate: 'Examen théorique {level} validé le {date}',
