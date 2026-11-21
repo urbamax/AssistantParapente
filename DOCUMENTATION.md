@@ -261,6 +261,8 @@ Sites service fetches open-access meteorological data from **Open-Meteo API**:
 - Models offered (`WEATHER_MODEL_INFO` in `js/data/weather_config.js`): `meteofrance` (AROME), `iconeu`, `icon`, `ecmwf`, `gfs`, and `best_match` = Open-Meteo's automatic multi-model selection (`forecast` endpoint; formerly mislabelled « Meteoblue »).
 
 #### Which sites are requested (spec 002)
+Forecast hours come with `timezone=auto`, so each site has them in its own time zone (La Réunion is UTC+4, mainland France UTC+1/+2). The current hour is found site by site from Open-Meteo's `utc_offset_seconds` (`currentForecastIndex()`, `forecastTimeMs()` in `js/services/sites_forecast_fetch.js`); the offset is kept with the saved offline forecast so its past hours are dropped in the right time zone. Hours are displayed in the site's local time.
+
 Weather is requested only for the sites within the search radius of the reference position, plus favourite sites — never for the whole database (one Open-Meteo call per location; free tier ≈ 5 000/hour).
 - Radius 10–200 km, default **50 km**; « Illimité » was removed (it requested ~2 000 sites per load). The map zoom sync is clamped to the same range.
 - Reference position (`SitesService.getEffectiveLocation()`): GPS or geocoded address, otherwise **Boulogne-sur-Mer** (`DEFAULT_LOCATION`), with a notice inviting to enable GPS or enter an address.
