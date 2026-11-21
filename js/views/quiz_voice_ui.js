@@ -393,11 +393,15 @@ export class QuizVoiceBase extends QuizStatsBase {
         const speaking = VoiceService.isSpeaking();
         const spokenContext =
             typeof VoiceService.getSpokenContext === 'function' ? VoiceService.getSpokenContext() : '';
+        const recentLetters =
+            typeof VoiceService.getRecentlySpokenLetters === 'function'
+                ? VoiceService.getRecentlySpokenLetters()
+                : new Set();
 
         let heard = alternatives[0] || '';
         let command = /** @type {import('../services/quiz_voice.js').VoiceCommand} */ ({ type: 'unknown' });
         for (const alt of alternatives) {
-            if (echoWindow && looksLikeEcho(alt, spokenContext, { speaking })) continue;
+            if (echoWindow && looksLikeEcho(alt, spokenContext, { speaking, recentLetters })) continue;
             const parsed = parseVoiceCommand(alt, q.choices.length);
             if (parsed.type !== 'unknown') {
                 heard = alt;

@@ -13,6 +13,31 @@ const SILENT_ERRORS = new Set(['no-speech', 'aborted']);
 // Délai après la fin d'une lecture pendant lequel une phrase entendue peut encore en être l'écho
 // (la reconnaissance rend son résultat un peu après la fin du son).
 const ECHO_DELAY_MS = 1500;
+// Une lettre de réponse (« Réponse B ») que l'application vient de prononcer est ignorée si elle est
+// entendue seule dans la seconde qui suit : c'est sa propre voix captée par le micro (haut-parleur en
+// voiture). Après, la même lettre est une vraie réponse du pilote.
+export const LETTER_ECHO_MS = 1000;
+// La reconnaissance rend son résultat après un court silence : on en tient compte en plus de la seconde.
+const RECOGNITION_LATENCY_MS = 1000;
+// Débit estimé de la synthèse (rate 0,95), quand le navigateur ne signale pas les mots lus (onboundary).
+const SPEECH_MS_PER_CHAR = 75;
+
+/**
+ * Lettres de réponse (A à F, seules) d'un texte lu, avec leur position dans ce texte.
+ * @param {string} text
+ * @returns {Array<{ letter: string, index: number }>}
+ */
+export function spokenLetterPositions(text) {
+    const found = [];
+    // Pas une lettre d'un sigle épelé (« E.N.C. ») : ni précédée d'un point, ni suivie de « .X ».
+    const re = /(^|[^A-Za-zÀ-ÖØ-öø-ÿ.])([A-F])(?![A-Za-zÀ-ÖØ-öø-ÿ]|\.[A-Za-z])/g;
+    let m;
+    while ((m = re.exec(String(text || '')))) {
+        found.push({ letter: m[2].toLowerCase(), index: m.index + m[1].length });
+    }
+    return found;
+}
+
 // Longueur max par énoncé : évite la coupure des phrases longues par les moteurs TTS mobiles/Chrome.
 const MAX_SPEECH_CHUNK_LEN = 160;
 const INITIAL_RETRY_MS = 120;
@@ -191,6 +216,8 @@ const VoiceService = {
     _speaking: false,
     _spokenText: '',
     _lastSpeechEnd: -Infinity,
+    /** @type {Array<{ letter: string, at: number }>} lettres de réponse lues et l'heure (ms) où elles l'ont été */
+    _spokenLetters: [],
     /** @type {SpeechSynthesisUtterance | null} Référence forte pour éviter le GC prématuré sur Chrome/Safari. */
     _utterance: null,
     /** @type {ReturnType<typeof setTimeout> | null} */
@@ -317,6 +344,21 @@ const VoiceService = {
         return this.isEchoWindow(now) ? this._spokenText : '';
     },
 
+    /**
+     * Lettres de réponse (« a » à « f ») prononcées par l'application depuis moins de LETTER_ECHO_MS
+     * (plus le délai de la reconnaissance) : entendues seules, ce sont des échos de sa voix.
+     * @param {number} [now]
+     * @returns {Set<string>}
+     */
+    getRecentlySpokenLetters(now = Date.now()) {
+        const recent = new Set();
+        for (const { letter, at } of this._spokenLetters) {
+            const age = now - at;
+            if (age >= 0 && age <= LETTER_ECHO_MS + RECOGNITION_LATENCY_MS) recent.add(letter);
+        }
+        return recent;
+    },
+
     isListening() {
         return this._wantListen;
     },
@@ -340,6 +382,7 @@ const VoiceService = {
         const id = ++this._speechId;
         this._speaking = true;
         this._spokenText = formatted;
+        this._spokenLetters = [];
         this._clearSpeechWatchdog();
         if (wasActive) synth.cancel();
         this._setAudioSession(this._wantListen ? 'play-and-record' : 'playback');
@@ -372,6 +415,24 @@ const VoiceService = {
                     this._scheduleResume(80);
                 }
             };
+
+            // Heure de chaque lettre de réponse : donnée par le navigateur quand il signale les mots lus,
+            // sinon estimée d'après le débit de la synthèse.
+            const letters = spokenLetterPositions(chunk);
+            const startedAt = Date.now();
+            const pending = letters.map(({ letter, index }) => {
+                const entry = { letter, at: startedAt + index * SPEECH_MS_PER_CHAR };
+                this._spokenLetters.push(entry);
+                return { entry, index };
+            });
+            if (pending.length) {
+                utterance.onboundary = (event) => {
+                    if (id !== this._speechId) return;
+                    for (const p of pending) {
+                        if (p.index === event.charIndex) p.entry.at = Date.now();
+                    }
+                };
+            }
 
             utterance.onend = finish;
             utterance.onerror = finish;

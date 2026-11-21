@@ -322,13 +322,21 @@ const FILLERS = new Set(['reponse', 'reponses', 'et', 'la', 'le', 'les', 'lettre
  * pendant une lecture (et juste après), c'est sans doute l'écho de sa propre voix.
  * @param {string} transcript
  * @param {string} [spokenContext]
- * @param {{ speaking?: boolean }} [options]
+ * @param {{ speaking?: boolean, recentLetters?: Set<string> }} [options] recentLetters : lettres de réponse
+ *   prononcées par l'application il y a moins d'une seconde (VoiceService.getRecentlySpokenLetters)
  */
-export function looksLikeEcho(transcript, spokenContext = '', { speaking = false } = {}) {
+export function looksLikeEcho(transcript, spokenContext = '', { speaking = false, recentLetters = new Set() } = {}) {
     const raw = normalizeRaw(transcript);
     if (!raw) return false;
     const rawWords = raw.split(' ');
     if (rawWords.some((w) => ECHO_WORDS.has(w))) return true;
+
+    // Une lettre de réponse entendue seule dans la seconde où l'application l'a prononcée : son écho.
+    if (rawWords.length === 1 && recentLetters.size) {
+        const w = rawWords[0];
+        const index = w in STRONG_LETTERS ? STRONG_LETTERS[w] : WEAK_LETTERS[w];
+        if (index !== undefined && recentLetters.has('abcdef'[index])) return true;
+    }
 
     const spokenRaw = normalizeRaw(spokenContext);
     if (!spokenRaw) return false;
