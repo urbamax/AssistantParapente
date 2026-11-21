@@ -3,6 +3,17 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
     test: {
         environment: 'happy-dom',
+        // Le simulateur de navigateur n'ouvre jamais d'autre page ni de cadre : sans cela, un test qui clique
+        // un lien target="_blank" ou insère une <iframe src> lui fait charger l'adresse sur un serveur
+        // localhost:3000 inexistant, et des erreurs ECONNREFUSED s'affichent dans la sortie des tests.
+        environmentOptions: {
+            happyDOM: {
+                settings: {
+                    disableIframePageLoading: true,
+                    navigation: { disableChildPageNavigation: true, disableChildFrameNavigation: true },
+                },
+            },
+        },
         setupFiles: ['./tests/setupTests.js'],
         globals: true,
         // Le délai par défaut (5 s) est trop juste quand la suite complète tourne sur une machine chargée
