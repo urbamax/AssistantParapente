@@ -496,9 +496,15 @@ html.dark-theme .bar-track {
     border-radius: var(--radius-card);
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    min-height: 160px;
     gap: 12px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
     transition: transform 0.2s, box-shadow 0.2s;
+}
+.equip-card.is-archived {
+    opacity: 0.6;
+    filter: grayscale(0.8);
 }
 .equip-card:hover {
     transform: translateY(-2px);
@@ -782,7 +788,7 @@ html.dark-theme .bar-track {
 }
 .record-label {
     font-size: 0.85rem;
-    color: var(--text-color);
+    color: var(--text-main);
     font-weight: 500;
 }
 .record-when {
@@ -801,7 +807,7 @@ html.dark-theme .bar-track {
 .record-value {
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--text-color);
+    color: var(--text-main);
 }
 .record-chevron {
     color: var(--text-secondary);

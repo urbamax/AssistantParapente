@@ -900,7 +900,7 @@ body.light-mode #stats-content div:has(> [data-exam-id])::-webkit-scrollbar-thum
     }
 
     #stats-screen #stats-content > div:has([data-action="QuizsetThemeSort"]) > div:last-child {
-        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+        grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)) !important;
         gap: 8px !important;
     }
 

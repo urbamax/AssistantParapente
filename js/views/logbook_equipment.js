@@ -399,10 +399,10 @@ export class LogbookEquipmentBase extends BaseView {
                     };
 
                     const isArchive = equip.statut === 'archive';
-                    const cardStyle = isArchive ? 'opacity: 0.6; filter: grayscale(0.8);' : '';
+                    const archiveClass = isArchive ? ' is-archived' : '';
 
                     html += `
-                    <div class="equip-card ${statusClass}" style="${cardStyle} border:1px solid #eee; padding:15px; border-radius:8px; margin-bottom:15px; background:var(--bg-card); display:flex; flex-direction:column; justify-content:space-between; min-height:160px;">
+                    <div class="equip-card ${statusClass}${archiveClass}">
                         ${alertHtml}
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
