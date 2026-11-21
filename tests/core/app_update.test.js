@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { initAppUpdateNotifier, watchSiteVersion } from '../../js/core/app_update.js';
+import {
+    _resetUpdateBannerForTesting,
+    initAppUpdateNotifier,
+    isUserBusy,
+    watchSiteVersion,
+} from '../../js/core/app_update.js';
 
 function stubServiceWorker(controller) {
     const listeners = {};
@@ -16,6 +21,7 @@ function stubServiceWorker(controller) {
 describe('initAppUpdateNotifier', () => {
     beforeEach(() => {
         document.body.innerHTML = '';
+        _resetUpdateBannerForTesting();
     });
 
     afterEach(() => {
@@ -43,6 +49,51 @@ describe('initAppUpdateNotifier', () => {
         expect(overlay.textContent).not.toContain('Nouvelle version disponible');
         expect(overlay.querySelector('.app-update-dismiss')).toBeNull();
         expect(document.activeElement).toBe(overlay.querySelector('.app-update-reload'));
+    });
+});
+
+describe('the update screen waits until the pilot is done', () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+        document.body.innerHTML = '';
+        _resetUpdateBannerForTesting();
+    });
+
+    afterEach(() => {
+        _resetUpdateBannerForTesting();
+        vi.useRealTimers();
+        delete navigator.serviceWorker;
+    });
+
+    it('is busy while a series of questions is shown, not on the setup screen', () => {
+        document.body.innerHTML = '<div id="qcm-screen" class="mode-screen"></div>';
+        expect(isUserBusy()).toBe(false);
+        document.getElementById('qcm-screen').classList.add('active');
+        expect(isUserBusy()).toBe(true);
+    });
+
+    it('is busy while the logbook form is shown', () => {
+        document.body.innerHTML = '<input id="lb-site">';
+        const input = document.getElementById('lb-site');
+        input.getClientRects = () => /** @type {any} */ ([{}]);
+        expect(isUserBusy()).toBe(true);
+        input.getClientRects = () => /** @type {any} */ ([]);
+        expect(isUserBusy()).toBe(false);
+    });
+
+    it('shows the screen only once the exam or series is over', () => {
+        document.body.innerHTML = '<div id="qcm-screen" class="mode-screen active"></div>';
+        const listeners = stubServiceWorker({});
+        initAppUpdateNotifier(Promise.resolve(null));
+        listeners.controllerchange();
+        expect(document.getElementById('app-update-banner')).toBeNull();
+
+        vi.advanceTimersByTime(15000);
+        expect(document.getElementById('app-update-banner')).toBeNull();
+
+        document.getElementById('qcm-screen').classList.remove('active');
+        vi.advanceTimersByTime(15000);
+        expect(document.getElementById('app-update-banner')).not.toBeNull();
     });
 });
 
