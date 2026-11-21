@@ -10,6 +10,7 @@ import {
     disableIceCloud as disableIceCloudView,
     clearIceProfile,
     saveIceProfile,
+    reconcileIceCloudIfNeeded,
 } from '../../js/views/safety_ice.js';
 import { createFakeFirestore } from '../fixtures/fake_firestore.js';
 
@@ -115,6 +116,16 @@ describe('FirebaseAuthEngine : fiche d’urgence en ligne', () => {
             await FirebaseAuthEngine._syncIceProfile(firestore.module, 'u1');
             expect(firestore.module.setDoc).not.toHaveBeenCalled();
             expect(firestore.docs.has(PATH)).toBe(false);
+        });
+
+        it('réactive la synchro et récupère la fiche si une fiche existe déjà en ligne sur le compte', async () => {
+            useFirestore({
+                [PATH]: { ...profile, nom: 'Cloud', updatedAt: 500, consentAt: '2026-11-10T12:10:00.000Z' },
+            });
+            await FirebaseAuthEngine._syncIceProfile(firestore.module, 'u1');
+            expect(getIceCloudState().enabled).toBe(true);
+            expect(getIceCloudState().consentAt).toBe('2026-11-10T12:10:00.000Z');
+            expect(IceService.getProfile().nom).toBe('Cloud');
         });
 
         it('première sauvegarde : envoie la fiche avec sa date et la date de l’accord', async () => {
@@ -450,6 +461,26 @@ describe('carte « Sauvegarde en ligne » et boutons', () => {
         saveIceProfile();
         expect(engine.saveIceToCloud).not.toHaveBeenCalled();
         setIceCloudState({ enabled: true, consentAt: 'x' });
+        saveIceProfile();
+        expect(engine.saveIceToCloud).toHaveBeenCalledTimes(1);
+    });
+
+    it('reconcileIceCloudIfNeeded récupère une fiche déjà enregistrée en ligne et active la synchro des modifs', async () => {
+        document.body.innerHTML = '<section id="safety-panel-ice"></section>';
+        engine.fetchIceFromCloud.mockResolvedValue({
+            success: true,
+            data: { ...profile, nom: 'EnLigne', updatedAt: 900, consentAt: '2026-11-10T12:10:00.000Z' },
+            error: null,
+        });
+
+        await reconcileIceCloudIfNeeded();
+
+        expect(getIceCloudState().enabled).toBe(true);
+        expect(IceService.getProfile().nom).toBe('EnLigne');
+        expect(document.getElementById('safety-panel-ice').textContent).toContain(
+            'Fiche enregistrée dans votre profil en ligne',
+        );
+
         saveIceProfile();
         expect(engine.saveIceToCloud).toHaveBeenCalledTimes(1);
     });
