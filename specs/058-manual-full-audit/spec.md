@@ -16,7 +16,7 @@
 | Général | Public synced prefs include « vos réglages de recherche de sites (rayon GPS) » | Without a role, only level and theme are synced as preferences | `firebase_service.js` preferences merge (`pilotLevel`, `themeMode`) |
 | Général | Cloud data can be deleted « depuis l'Espace Synchro » | No button deletes the account or its cloud data; only the ICE online copy can be deleted | `firebase_service.js`, `fr.js` `account.*` |
 | Matériel | Public sync covers « rayon GPS, tri des sites » | Same as above | idem |
-| QCM | Exam only for BI, BP, BPC | Also for « Tous les niveaux » (30 questions from the whole base, BI quotas); only Treuil has none | `isExamModeAvailable`, `getExamQuotas` |
+| QCM | Exam only for BI, BP, BPC | The app also offered it for « Tous les niveaux » (30 questions, BI quotas). Owner decision (2026-11-22): remove it, there is no official all-levels exam. The exam is now hidden for « Tous les niveaux » as for Treuil, and the manual says so | `isExamModeAvailable` |
 | QCM | Keyboard « A à D (ou 1 à 4) » | A to F (or 1 to 6) | `quiz.js` `handleKeydown` |
 | QCM | Voice answers by letters only | With the microphone on, the app reads the question then each answer and waits for « oui » or « non », then asks to confirm; letters and commands still work; the feature is marked experimental | `quiz_voice_ui.js`, `quiz.voice.*` |
 | QCM | Axis workshop « de 5 à 8 questions » | 6 questions per axis workshop (fewer if the chapter has fewer); anti-trap workshop up to 8, completed to 5 | `startAxisWorkshop`, `startTrapsWorkshop` |
@@ -43,6 +43,7 @@ Everything else was checked and still matches (About, level and theme, install, 
 - **FR-001**: Each « Manual says » statement above MUST be replaced by the « Code shows » fact, in the HTML and the catalogue (identical text).
 - **FR-002**: Public text MUST NOT mention owner-only sites, favourites, GPS radius or site sorting.
 - **FR-003**: The Discord guide (public parts) MUST be corrected the same way.
+- **FR-004**: The exam mode MUST NOT be offered for « Tous les niveaux » (as for Treuil): the mode switches back to Training and the button is hidden. As the app starts in « Tous les niveaux » until a level is chosen, a new user sees the exam once they pick BI, BP or BPC.
 
 ## Success Criteria *(mandatory)*
 
@@ -59,7 +60,7 @@ Everything else was checked and still matches (About, level and theme, install, 
 ## Release Announcement *(mandatory)*
 
 - **Availability**: All users.
-- **Discord notice**: None: corrections of the manual, no new feature.
+- **Discord notice**: « Le mode Examen n'est plus proposé en « Tous les niveaux » : un examen blanc se passe au niveau d'un brevet (BI, BP ou BPC), comme l'examen officiel. Choisissez votre niveau en haut de l'écran pour le retrouver. »
 
 ## Assumptions
 

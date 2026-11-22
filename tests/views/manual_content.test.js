@@ -211,10 +211,10 @@ describe('spec 058 : chaque affirmation vérifiée dans le code', () => {
         });
     }
 
-    it('QCM : examen aussi en « Tous les niveaux », clavier A à F, réponses par « oui » ou « non »', () => {
+    it('QCM : pas d’examen en « Tous les niveaux », clavier A à F, réponses par « oui » ou « non »', () => {
         mount();
         const text = visibleText('qcm');
-        expect(text).toMatch(/Tous les niveaux/);
+        expect(text).toMatch(/ni en Tous les niveaux/);
         expect(text).toMatch(/A à F \(ou 1 à 6\)/);
         expect(text).toMatch(/« oui » ou « non »/);
         expect(text).toMatch(/6 questions/);
