@@ -723,7 +723,6 @@ export function buildQuestionsHtml(
                                     <span class="bank-item-code">#${code}</span>
                                     <span class="quiz-theme-tag">${theme}</span>
                                     ${examBadgeHtml}
-                                    ${streak >= 3 ? `<span class="quiz-theme-tag" style="background:#4ade80; color:#000;">🔥 ${streak}</span>` : ''}
                                     ${hasAnswers ? '<i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-' + code + '"></i>' : ''}
                                 </div>
                                 <div style="font-size:0.9rem; line-height:1.4;">${escapeHTML(displayText)}</div>
