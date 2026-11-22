@@ -158,6 +158,53 @@ describe('CrashReporter Service (spec 050)', () => {
             expect(capturedBody.subject).toContain('RangeError in map.js:88');
         });
 
+        it('ajoute le message en tête quand la pile WebKit ne le contient pas', async () => {
+            let capturedBody = null;
+            const mockFetch = vi.fn(async (_url, init) => {
+                capturedBody = JSON.parse(init.body);
+                return { ok: true };
+            });
+
+            await sendCrashReport(
+                {
+                    name: 'TypeError',
+                    message: "undefined is not an object (evaluating 'a.b')",
+                    filename: 'https://assistantparapente.fr/js/views/webkit_case.js',
+                    lineno: 7,
+                    colno: 3,
+                    stack: 'render@https://assistantparapente.fr/js/views/webkit_case.js:7:3',
+                },
+                { endpoint: '/api/feedback', sendBeaconImpl: null, fetchImpl: mockFetch },
+            );
+
+            expect(capturedBody.description).toBe(
+                "TypeError: undefined is not an object (evaluating 'a.b')\n" +
+                    'render@https://assistantparapente.fr/js/views/webkit_case.js:7:3',
+            );
+        });
+
+        it('ne duplique pas le message quand la pile V8 le contient déjà', async () => {
+            let capturedBody = null;
+            const mockFetch = vi.fn(async (_url, init) => {
+                capturedBody = JSON.parse(init.body);
+                return { ok: true };
+            });
+
+            await sendCrashReport(
+                {
+                    name: 'TypeError',
+                    message: 'Kaboom',
+                    filename: 'https://assistantparapente.fr/js/views/v8_case.js',
+                    lineno: 9,
+                    colno: 1,
+                    stack: 'TypeError: Kaboom\n    at v8_case.js:9:1',
+                },
+                { endpoint: '/api/feedback', sendBeaconImpl: null, fetchImpl: mockFetch },
+            );
+
+            expect(capturedBody.description).toBe('TypeError: Kaboom\n    at v8_case.js:9:1');
+        });
+
         it('supprime les paramètres et fragments URL sensibles (ICE, migration) avant envoi', async () => {
             let capturedBody = null;
             const mockFetch = vi.fn().mockImplementation(async (_url, opts) => {

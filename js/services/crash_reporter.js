@@ -134,11 +134,16 @@ export async function sendCrashReport(errInfo, options = {}) {
     const file = (errInfo.filename || 'app').split('#')[0].split('?')[0].split('/').pop() || 'app';
     const locationStr = `${file}:${errInfo.lineno || '?'}:${errInfo.colno || '?'}`;
     const errorName = errInfo.name || 'Error';
-    const cleanMsg = sanitizeCrashText(errInfo.message || 'Erreur inconnue').trim();
-    const cleanStack = sanitizeCrashText(errInfo.stack || cleanMsg).slice(
-        0,
-        CRASH_REPORTER_LIMITS.MAX_DESCRIPTION_LENGTH,
-    );
+    // Les piles WebKit (Safari, WebView iOS) ne contiennent pas le message, contrairement à V8 :
+    // on le place en tête pour que l'alerte dise ce qui s'est passé.
+    const rawStack = errInfo.stack || '';
+    const rawMsg = errInfo.message || '';
+    const fullTrace = !rawStack
+        ? `${errorName}: ${rawMsg || 'Erreur inconnue'}`
+        : rawMsg && !rawStack.includes(rawMsg)
+          ? `${errorName}: ${rawMsg}\n${rawStack}`
+          : rawStack;
+    const cleanStack = sanitizeCrashText(fullTrace).slice(0, CRASH_REPORTER_LIMITS.MAX_DESCRIPTION_LENGTH);
 
     const payload = {
         category: 'crash',
