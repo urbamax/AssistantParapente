@@ -1173,7 +1173,7 @@ export const FR = Object.freeze({
             workshopOmissionsMany: '{count} oublis',
             workshopPartsJoin: ' et ',
             trapsWorkshopText:
-                'Un atelier de 8 questions au plus reprend, tous chapitres confondus, celles où vous êtes tombé dans un piège ou avez oublié une bonne réponse : les erreurs à corriger d’abord, puis celles en consolidation.',
+                'Jusqu’à 8 questions, tous chapitres confondus, où vous êtes tombé dans un piège ou avez oublié une bonne réponse : les erreurs à corriger d’abord, puis celles en consolidation.',
             trapsWorkshopBtn: 'Atelier pièges & oublis',
             workshopTrapsHint: 'Les questions où vous êtes tombé dans un piège passent en premier.',
             step1Heading: 'Étape 1 — Lire le cours officiel aux pages exactes',
