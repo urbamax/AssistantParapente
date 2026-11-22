@@ -207,6 +207,8 @@ describe('spec 059 : la politique de confidentialité indique comment supprimer 
     const LEGAL = readFileSync('components/legal_modals.html', 'utf8');
     it('§4 renvoie au bouton « Supprimer mon compte » et non plus à une demande à l’éditeur', () => {
         expect(LEGAL).toMatch(/Supprimer mon compte/);
-        expect(LEGAL).not.toMatch(/demander la suppression définitive de votre compte et de ses données à tout moment en\s+nous contactant/);
+        expect(LEGAL).not.toMatch(
+            /demander la suppression définitive de votre compte et de ses données à tout moment en\s+nous contactant/,
+        );
     });
 });
