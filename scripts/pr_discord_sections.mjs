@@ -39,7 +39,36 @@ export function readSection(body, name) {
     // Fin de la section : titre suivant, ligne horizontale, ou la mention « 🤖 Generated with … ».
     const end = rest.findIndex((line) => /^#{1,2}\s/.test(line) || /^\s*(-{3,}|🤖)/u.test(line));
     const content = (end === -1 ? rest : rest.slice(0, end)).join('\n');
-    return content.replace(/<!--[\s\S]*?-->/g, '').trim();
+    return stripHtmlComments(content).trim();
+}
+
+/**
+ * Retire les commentaires HTML, y compris un commentaire jamais fermé (jusqu'à la fin). Répété jusqu'à
+ * ce que le texte ne change plus : un retrait peut recoller un nouveau « <!-- » (ex. « <<!-- a -->!-- »).
+ * @param {string} text
+ * @returns {string}
+ */
+function stripHtmlComments(text) {
+    let previous;
+    let out = text;
+    do {
+        previous = out;
+        let result = '';
+        let i = 0;
+        for (;;) {
+            const start = out.indexOf('<!--', i);
+            if (start === -1) {
+                result += out.slice(i);
+                break;
+            }
+            result += out.slice(i, start);
+            const end = out.indexOf('-->', start + 4);
+            if (end === -1) break;
+            i = end + 3;
+        }
+        out = result;
+    } while (out !== previous);
+    return out;
 }
 
 /** « None: raison » / « Aucune : raison » ; renvoie la raison, '' sans raison, null sinon. */

@@ -39,6 +39,12 @@ describe('readSection', () => {
         expect(readSection('## Discord notice\nTexte.\n---\nPied', 'Discord notice')).toBe('Texte.');
     });
 
+    it('leaves no comment opener behind, even with nested or unclosed comments', () => {
+        expect(readSection('## Discord notice\nA<!-<!-- x -->- y -->B', 'Discord notice')).not.toContain('<!--');
+        expect(readSection('## Discord notice\nTexte <!-- jamais fermé', 'Discord notice')).toBe('Texte');
+        expect(readSection('## Discord notice\n<<!-- a -->!-- b -->C', 'Discord notice')).not.toContain('<!--');
+    });
+
     it('accepts CRLF line endings and a heading in any case', () => {
         expect(readSection('## discord NOTICE\r\nTexte.\r\n## Next\r\n', 'Discord notice')).toBe('Texte.');
     });
