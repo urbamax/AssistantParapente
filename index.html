@@ -182,6 +182,15 @@
                                 <!-- Injected by JS -->
                             </select>
                         </div>
+
+                        <!-- Spec 063 : série « Questions à piège » (mode Entraînement seulement) -->
+                        <div class="setup-group setup-group-margin qcm-traps-group" id="qcm-traps-group">
+                            <label class="qcm-traps-toggle" for="qcm-traps-only">
+                                <input type="checkbox" id="qcm-traps-only" autocomplete="off" aria-describedby="qcm-traps-hint" />
+                                <span data-i18n="qcmSetupScreen.questionsAPiege">Questions à piège</span>
+                            </label>
+                            <p data-i18n="qcmSetupScreen.questionsAPiegeAide" class="qcm-traps-hint" id="qcm-traps-hint">Seulement les questions qui contiennent un piège, en commençant par celles où vous vous êtes déjà trompé.</p>
+                        </div>
                     </div>
 
                     <!-- MASTERY (PERFECTIONNEMENT) OPTIONS (Only shown in Mastery Mode) -->

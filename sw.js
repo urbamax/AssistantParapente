@@ -153,6 +153,7 @@ const CRITICAL_ASSETS = [
     './js/services/pilot_habits.js',
     './js/services/answer_log.js',
     './js/services/error_diagnostic.js',
+    './js/services/trap_series.js',
     './js/services/mastery.js',
     './js/services/review_scheduler.js',
     './js/services/revision_axes.js',

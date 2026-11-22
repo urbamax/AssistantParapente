@@ -464,3 +464,66 @@ describe('read-closely box in the corrections (spec 061)', () => {
         expect(box(detail)).toBeNull();
     });
 });
+
+// Spec 063 : option « Questions à piège » de l'écran de lancement.
+describe('trap series option in the quiz setup (spec 063)', () => {
+    const group = () => document.getElementById('qcm-traps-group');
+    const box = () => /** @type {HTMLInputElement} */ (document.getElementById('qcm-traps-only'));
+    afterEach(() => QuizService.setTrapsOnly(false));
+
+    it('is shown in training mode only', () => {
+        vi.spyOn(QuizService, 'hasQuestionTraps').mockReturnValue(true);
+        const shown = {};
+        for (const mode of ['EXAM', 'REVISION', 'MASTERY', 'TRAINING']) {
+            QuizView.updateModeUI(mode);
+            shown[mode] = group().style.display !== 'none';
+        }
+        expect(shown).toEqual({ EXAM: false, REVISION: false, MASTERY: false, TRAINING: true });
+        expect(box().disabled).toBe(false);
+    });
+
+    it('is disabled when the trap sentences are not loaded', () => {
+        vi.spyOn(QuizService, 'hasQuestionTraps').mockReturnValue(false);
+        QuizView.updateModeUI('TRAINING');
+        expect(box().disabled).toBe(true);
+        expect(box().checked).toBe(false);
+    });
+
+    it('sets the option when ticked and labels the series', () => {
+        vi.spyOn(QuizService, 'hasQuestionTraps').mockReturnValue(true);
+        QuizView.updateModeUI('TRAINING');
+        box().checked = true;
+        QuizView.handleChange({ target: box() });
+        expect(QuizService.state.qcmConfig.trapsOnly).toBe(true);
+        QuizService.state.qcmConfig.mode = 'TRAINING';
+        vi.spyOn(QuizService, 'startSession').mockReturnValue(QUESTIONS[0]);
+        QuizView.startSession();
+        expect(text('qcm-mode-label')).toBe('MODE ENTRAÎNEMENT · QUESTIONS À PIÈGE');
+        // Une série lancée depuis les statistiques n'en est pas une.
+        QuizView.launchWorkshop([QUESTIONS[0]], null);
+        expect(text('qcm-mode-label')).not.toContain('PIÈGE');
+        box().checked = false;
+        QuizView.handleChange({ target: box() });
+        expect(QuizService.state.qcmConfig.trapsOnly).toBe(false);
+    });
+});
+
+// Régression (spec 061, trouvée par spec 063) : l'encart de la question précédente ne doit pas rester
+// caché dans la page quand la question suivante s'affiche.
+describe('read-closely box does not linger on the next question', () => {
+    it('clears the previous correction when the next question renders', () => {
+        vi.spyOn(QuizService, 'getQuestionTraps').mockImplementation((c) =>
+            Object.freeze(c === 'A1V' ? ['Le mot « sépare » décide.'] : []),
+        );
+        QuizService.state.qcmConfig.mode = 'TRAINING';
+        QuizView.renderQuestion(QUESTIONS[0]);
+        QuizView.showAnswerFeedback(
+            { selected: [QUESTIONS[0].choices[0]], isCorrect: true, question: QUESTIONS[0] },
+            true,
+        );
+        expect(document.querySelector('.quiz-read-closely')).not.toBeNull();
+        QuizView.renderQuestion(QUESTIONS[1]);
+        expect(document.querySelector('.quiz-read-closely')).toBeNull();
+        expect(document.getElementById('qcm-feedback').textContent).not.toContain('« sépare »');
+    });
+});

@@ -1954,3 +1954,30 @@ abbr.qcm-acronym:focus-visible {
 .quiz-read-closely-text + .quiz-read-closely-text {
     margin-top: 4px;
 }
+
+/* Spec 063 : option « Questions à piège » de l'écran de lancement. */
+.qcm-traps-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: var(--text-main);
+    cursor: pointer;
+}
+
+.qcm-traps-toggle input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent-gold);
+}
+
+.qcm-traps-toggle input:disabled + span {
+    opacity: 0.5;
+}
+
+.qcm-traps-hint {
+    margin: 4px 0 0 28px;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: var(--text-secondary);
+}
