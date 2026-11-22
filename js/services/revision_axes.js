@@ -572,7 +572,8 @@ export function buildRevisionAxes(questions, stats = {}, coursesData = [], optio
         // Un piège ou oubli actif bloque l'axe même avec un bon taux de réussite : la faille persiste.
         if (strugglingCount > 0 || hesitantCount > 0 || traps.active > 0 || omissions.active > 0) {
             status = 'BLOCKER';
-        } else if (dueCount > 0) {
+        } else if (dueCount > 0 || traps.consolidating > 0 || omissions.consolidating > 0) {
+            // Une erreur en consolidation reste à revoir : le chapitre n'est pas encore maîtrisé.
             status = 'REFRESH';
         } else if (unattemptedCount > 0) {
             status = 'EXPLORE';

@@ -81,6 +81,16 @@ describe('axes de révision : pièges', () => {
         expect(html).toContain('Atelier pièges &amp; oublis');
     });
 
+    it('keeps a chapter with a consolidating error out of the mastered ones, so the box matches the pills', () => {
+        const { report, html } = render(
+            statsWith({ U1V: { ...good, answers: log([3, 0b011], [2, 0b001], [1, 0b001]) } }),
+        );
+        expect(report.axes.find((a) => a.id === 'pilotage-plan-vol-vent').status).toBe('REFRESH');
+        expect(html).toContain('data-axis-id="pilotage-plan-vol-vent"');
+        expect(html).toContain('1 piège en consolidation');
+        expect(html).toContain('À revoir : 1 piège');
+    });
+
     it('offers the workshop for omissions alone, and counts both kinds', () => {
         const omissionOnly = render(statsWith({ U2V: { ...good, answers: log([0, 0b000]) } })).html;
         expect(omissionOnly).toContain('revision-axes-traps-cta');
