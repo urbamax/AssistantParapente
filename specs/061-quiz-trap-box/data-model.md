@@ -11,7 +11,7 @@ An object keyed by question code.
 
 Sentence rules (enforced by `tests/data/quiz_question_traps.test.js`):
 
-- non-empty, trimmed, ends with « . », fewer than 140 characters;
+- non-empty, trimmed, ends with « . », fewer than 240 characters (140 before the 2026-11-22 amendment);
 - no verdict word: juste(s), faux, fausse(s), vrai(e)(s), correct(e), exact(e), inexact(e), « bonne réponse », « à tort », « piège »;
 - no address to the learner: tu, toi, ton, ta, tes, vous, votre, vos, imperative forms such as « repérez », « regarde »;
 - no semicolon, no straight double quote (French guillemets « » allowed).
