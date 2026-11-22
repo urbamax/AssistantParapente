@@ -265,7 +265,20 @@ describe('spec 060 : l’atelier pièges & oublis, tous chapitres confondus', ()
         expect(text).toMatch(/avez oublié une bonne réponse/);
         expect(text).toMatch(/les erreurs à corriger d'abord, puis celles en consolidation/);
         expect(text).not.toMatch(/anti-pièges/);
-        expect(text).toMatch(/en consolidation n'est pas encore maîtrisé/);
-        expect(text).toMatch(/le filtre En consolidation regroupe ces chapitres/);
+        expect(text).toMatch(/un piège ou un oubli encore en consolidation/);
+        expect(text).toMatch(/À corriger.{0,3}En consolidation/);
+    });
+});
+
+describe('spec 062 : la page Axes de révision telle qu’elle s’affiche', () => {
+    it('QCM décrit les priorités renommées, les cartes repliées, les deux lignes de filtres et l’aide', () => {
+        mount();
+        const text = visibleText('qcm');
+        expect(text).toMatch(/Priorité 1 · À retravailler/);
+        expect(text).toMatch(/Priorité 2 · À entretenir/);
+        expect(text).toMatch(/Priorité 3 · À découvrir/);
+        expect(text).toMatch(/ligne repliée qui dit pourquoi/);
+        expect(text).toMatch(/Comment lire cette page/);
+        expect(text).not.toMatch(/Points à consolider|Acquis à rafraîchir|Chapitre à découvrir/);
     });
 });

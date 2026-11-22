@@ -5,10 +5,13 @@
  * Chaque carte d'axe structure l'étude en 3 étapes :
  *   1. Lire le cours officiel aux pages exactes (uniquement pages vérifiées #page=N)
  *   2. Points clés à retenir (explications conceptuelles dépliables sans choix QCM A/B/C/D)
- *   3. Vérifier ma compréhension (lancement d'un atelier ciblé de 5 à 8 questions)
+ *   3. Vérifier ma compréhension (lancement d'un atelier ciblé de 6 questions)
+ *
+ * Spec 062 : cartes repliées par défaut, étape 2 « Comprendre » regroupant pièges, oublis et points
+ * clés, numérotation sans trou, filtres en deux lignes et aide « Comment lire cette page ».
  */
 import { escapeHTML } from '../core/security.js';
-import { tq } from './quiz_strings.js';
+import { tq, tqh } from './quiz_strings.js';
 import { explanationHtml } from './quiz_explanation.js';
 
 /** @type {Record<string, { border: string, bg: string, color: string, icon: string }>} */
@@ -150,6 +153,21 @@ function buildAxisBreakdownPillsHtml(axis) {
     return pills.join('');
 }
 
+/**
+ * Libellé du bouton « Voir tous » : il annonce les erreurs surmontées qu'il ajoute, pour que son
+ * total ne contredise pas les pastilles (qui ne comptent que les erreurs à corriger et en consolidation).
+ *
+ * @param {'traps' | 'omissions'} kind
+ * @param {Array<{ status: string }>} items
+ */
+function showAllLabel(kind, items) {
+    const overcome = items.filter((i) => i.status === 'overcome').length;
+    if (overcome === 0) return tq(`axes.${kind}ShowAll`, { count: items.length });
+    return overcome === 1
+        ? tq(`axes.${kind}ShowAllOvercomeOne`, { count: items.length })
+        : tq(`axes.${kind}ShowAllOvercome`, { count: items.length, overcome });
+}
+
 /** Nombre de pièges visibles sans déplier le bloc. */
 const TRAPS_VISIBLE = 3;
 
@@ -205,7 +223,7 @@ function buildTrapsBlockHtml(axis, expandedIds) {
         .join('');
 
     const toggle = hasMore
-        ? `<button type="button" data-action="QuiztoggleAxisTakeaways" data-args="traps:${escapeHTML(axis.id)}" aria-expanded="${expanded ? 'true' : 'false'}" style="align-self:flex-start; background:rgba(248,113,113,0.1); color:#ef4444; border:1px solid rgba(248,113,113,0.35); padding:6px 12px; border-radius:10px; font-size:0.8rem; font-weight:700; cursor:pointer;">${expanded ? tq('axes.trapsHideAll') : tq('axes.trapsShowAll', { count: items.length })}</button>`
+        ? `<button type="button" data-action="QuiztoggleAxisTakeaways" data-args="traps:${escapeHTML(axis.id)}" aria-expanded="${expanded ? 'true' : 'false'}" style="align-self:flex-start; background:rgba(248,113,113,0.1); color:#ef4444; border:1px solid rgba(248,113,113,0.35); padding:6px 12px; border-radius:10px; font-size:0.8rem; font-weight:700; cursor:pointer;">${expanded ? tq('axes.trapsHideAll') : showAllLabel('traps', items)}</button>`
         : '';
 
     return `
@@ -268,7 +286,7 @@ function buildOmissionsBlockHtml(axis, expandedIds) {
         .join('');
 
     const toggle = hasMore
-        ? `<button type="button" data-action="QuiztoggleAxisTakeaways" data-args="omissions:${escapeHTML(axis.id)}" aria-expanded="${expanded ? 'true' : 'false'}" style="align-self:flex-start; background:rgba(251,146,60,0.1); color:#ea580c; border:1px solid rgba(251,146,60,0.35); padding:6px 12px; border-radius:10px; font-size:0.8rem; font-weight:700; cursor:pointer;">${expanded ? tq('axes.omissionsHideAll') : tq('axes.omissionsShowAll', { count: items.length })}</button>`
+        ? `<button type="button" data-action="QuiztoggleAxisTakeaways" data-args="omissions:${escapeHTML(axis.id)}" aria-expanded="${expanded ? 'true' : 'false'}" style="align-self:flex-start; background:rgba(251,146,60,0.1); color:#ea580c; border:1px solid rgba(251,146,60,0.35); padding:6px 12px; border-radius:10px; font-size:0.8rem; font-weight:700; cursor:pointer;">${expanded ? tq('axes.omissionsHideAll') : showAllLabel('omissions', items)}</button>`
         : '';
 
     return `
@@ -304,7 +322,7 @@ function buildStep1CoursesHtml(axis) {
     }
 
     const coursesHtml = axis.courseReadings
-        .map((reading) => {
+        .map((reading, index) => {
             const pageButtons = reading.pageLinks
                 .map(
                     (link) => `
@@ -316,7 +334,8 @@ function buildStep1CoursesHtml(axis) {
                 .join('');
 
             const focusBadge =
-                reading.focusHitCount > 0
+                // Les cours sont triés par nombre d'erreurs couvertes : seul le premier est mis en avant.
+                index === 0 && reading.focusHitCount > 0
                     ? `<span style="background:rgba(248,113,113,0.15); color:#ef4444; border:1px solid rgba(248,113,113,0.35); padding:2px 8px; border-radius:999px; font-size:0.72rem; font-weight:700;">${tq('axes.courseFocusBadge')}</span>`
                     : '';
 
@@ -439,7 +458,7 @@ function buildStep2TakeawaysHtml(axis, isExpanded) {
  * @param {any} axis
  * @returns {string}
  */
-function buildStep3WorkshopHtml(axis) {
+function buildStep3WorkshopHtml(axis, stepNumber) {
     const btnLabel =
         axis.workshopSize === 1 ? tq('axes.workshopBtnOne') : tq('axes.workshopBtnMany', { count: axis.workshopSize });
 
@@ -448,7 +467,7 @@ function buildStep3WorkshopHtml(axis) {
             <div style="flex:1 1 240px;">
                 <div style="display:flex; align-items:center; gap:8px; font-weight:700; font-size:0.88rem; color:var(--text-main); margin-bottom:2px;">
                     <i class="ri-focus-2-line" style="color:var(--accent-orange);"></i>
-                    <span>${tq('axes.step3Heading')}</span>
+                    <span>${tq('axes.step3Heading', { n: stepNumber })}</span>
                 </div>
                 <div style="font-size:0.8rem; color:var(--text-secondary); line-height:1.4;">
                     ${tq('axes.step3Hint')}${axis.traps?.active > 0 || axis.omissions?.active > 0 ? ` ${tq('axes.workshopTrapsHint')}` : ''}
@@ -473,6 +492,7 @@ function buildStep3WorkshopHtml(axis) {
 export function buildRevisionAxisCardHtml(axis, expandedIds) {
     const theme = STATUS_THEME[axis.status] || STATUS_THEME.EXPLORE;
     const isExpanded = expandedIds instanceof Set && expandedIds.has(axis.id);
+    const isOpen = expandedIds instanceof Set && expandedIds.has(`card:${axis.id}`);
     const statusLabel = tq(`axes.statusLabels.${axis.status}`);
     const barColor =
         axis.masteryPct >= 85
@@ -483,8 +503,25 @@ export function buildRevisionAxisCardHtml(axis, expandedIds) {
                 ? '#ef4444'
                 : '#38bdf8';
 
+    const reasonText = buildReasonText(axis);
+    const understandHtml = [
+        buildTrapsBlockHtml(axis, expandedIds),
+        buildOmissionsBlockHtml(axis, expandedIds),
+        buildStep2TakeawaysHtml(axis, isExpanded),
+    ].join('');
+    const hasUnderstandStep = understandHtml.trim() !== '';
+    const understandStepHtml = hasUnderstandStep
+        ? `<section class="revision-axis-understand" style="display:flex; flex-direction:column; gap:10px;">
+                <div style="display:flex; align-items:center; gap:8px; font-weight:800; font-size:0.92rem; color:var(--text-main);">
+                    <i class="ri-lightbulb-line" style="color:#f59e0b;"></i>
+                    <span>${tq('axes.stepUnderstandHeading')}</span>
+                </div>
+                ${understandHtml}
+            </section>`
+        : '';
+
     return `
-        <article class="revision-axis-card" data-axis-id="${escapeHTML(axis.id)}" data-axis-status="${escapeHTML(axis.status)}" style="background:var(--bg-card); border:1px solid var(--border-color); border-left:4px solid ${theme.color}; border-radius:var(--radius-md); padding:20px; display:flex; flex-direction:column; gap:14px; box-shadow:0 4px 12px rgba(0,0,0,0.04);">
+        <article class="revision-axis-card" data-axis-id="${escapeHTML(axis.id)}" data-axis-status="${escapeHTML(axis.status)}" data-open="${isOpen ? 'true' : 'false'}" style="background:var(--bg-card); border:1px solid var(--border-color); border-left:4px solid ${theme.color}; border-radius:var(--radius-md); padding:16px 20px; display:flex; flex-direction:column; gap:14px; box-shadow:0 4px 12px rgba(0,0,0,0.04);">
             <header style="display:flex; flex-direction:column; gap:10px;">
                 <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px;">
                     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
@@ -501,13 +538,19 @@ export function buildRevisionAxisCardHtml(axis, expandedIds) {
                     </span>
                 </div>
 
-                <div>
-                    <h3 style="margin:0 0 4px 0; font-size:1.12rem; font-weight:800; color:var(--text-main);">
-                        ${escapeHTML(axis.title)}
-                    </h3>
-                    <p style="margin:0; font-size:0.85rem; color:var(--text-secondary); line-height:1.45;">
-                        ${escapeHTML(axis.subtitle)}
-                    </p>
+                <div style="display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:10px;">
+                    <div style="flex:1 1 280px;">
+                        <h3 style="margin:0 0 4px 0; font-size:1.08rem; font-weight:800; color:var(--text-main);">
+                            ${escapeHTML(axis.title)}
+                        </h3>
+                        <p style="margin:0; font-size:0.85rem; color:var(--text-secondary); line-height:1.45;">
+                            ${escapeHTML(axis.subtitle)}
+                        </p>
+                    </div>
+                    <button type="button" class="revision-axis-card-toggle" data-action="QuiztoggleAxisTakeaways" data-args="card:${escapeHTML(axis.id)}" aria-expanded="${isOpen ? 'true' : 'false'}" style="background:var(--accent-orange); color:#fff; border:none; padding:8px 14px; border-radius:10px; font-size:0.84rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; white-space:nowrap;">
+                        <span>${isOpen ? tq('axes.cardClose') : tq('axes.cardOpen')}</span>
+                        <i class="${isOpen ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'}"></i>
+                    </button>
                 </div>
 
                 <div style="display:flex; flex-direction:column; gap:8px;">
@@ -517,16 +560,64 @@ export function buildRevisionAxisCardHtml(axis, expandedIds) {
                     <div style="display:flex; flex-wrap:wrap; gap:6px;">
                         ${buildAxisBreakdownPillsHtml(axis)}
                     </div>
+                    ${reasonText ? `<div class="revision-axis-reason" style="font-size:0.82rem; color:var(--text-secondary); line-height:1.4;">${reasonText}</div>` : ''}
                 </div>
             </header>
 
-            ${buildTrapsBlockHtml(axis, expandedIds)}
-            ${buildOmissionsBlockHtml(axis, expandedIds)}
-            ${buildStep1CoursesHtml(axis)}
-            ${buildStep2TakeawaysHtml(axis, isExpanded)}
-            ${buildStep3WorkshopHtml(axis)}
+            <div class="revision-axis-card-body" ${isOpen ? '' : 'hidden'} style="display:${isOpen ? 'flex' : 'none'}; flex-direction:column; gap:14px;">
+                ${buildStep1CoursesHtml(axis)}
+                ${understandStepHtml}
+                ${buildStep3WorkshopHtml(axis, hasUnderstandStep ? 3 : 2)}
+            </div>
         </article>
     `;
+}
+
+/**
+ * Phrase « Pourquoi Priorité N : … » : les compteurs qui ont placé le chapitre dans sa priorité.
+ * Elle suit les règles de `buildRevisionAxes` (services/revision_axes.js).
+ *
+ * @param {any} axis
+ * @returns {string}
+ */
+function buildReasonText(axis) {
+    const plural = (count, one, many) => (count === 1 ? tq(one) : tq(many, { count }));
+    /** @type {string[]} */
+    const reasons = [];
+    const traps = axis.traps || {};
+    const omissions = axis.omissions || {};
+    let priorityKey = '';
+    if (axis.status === 'BLOCKER') {
+        priorityKey = 'axes.reasonPriority1';
+        if (axis.strugglingCount > 0)
+            reasons.push(plural(axis.strugglingCount, 'axes.pillStrugglingOne', 'axes.pillStrugglingMany'));
+        if (axis.hesitantCount > 0)
+            reasons.push(plural(axis.hesitantCount, 'axes.pillHesitantOne', 'axes.pillHesitantMany'));
+        if (traps.active > 0) reasons.push(plural(traps.active, 'axes.pillTrapsActiveOne', 'axes.pillTrapsActiveMany'));
+        if (omissions.active > 0)
+            reasons.push(plural(omissions.active, 'axes.pillOmissionsActiveOne', 'axes.pillOmissionsActiveMany'));
+    } else if (axis.status === 'REFRESH') {
+        priorityKey = 'axes.reasonPriority2';
+        if (axis.dueCount > 0) reasons.push(plural(axis.dueCount, 'axes.pillDueOne', 'axes.pillDueMany'));
+        if (traps.consolidating > 0)
+            reasons.push(
+                plural(traps.consolidating, 'axes.pillTrapsConsolidatingOne', 'axes.pillTrapsConsolidatingMany'),
+            );
+        if (omissions.consolidating > 0)
+            reasons.push(
+                plural(
+                    omissions.consolidating,
+                    'axes.pillOmissionsConsolidatingOne',
+                    'axes.pillOmissionsConsolidatingMany',
+                ),
+            );
+    } else if (axis.status === 'EXPLORE') {
+        priorityKey = 'axes.reasonPriority3';
+        if (axis.unattemptedCount > 0)
+            reasons.push(plural(axis.unattemptedCount, 'axes.pillUnattemptedOne', 'axes.pillUnattemptedMany'));
+    }
+    if (!priorityKey || reasons.length === 0) return '';
+    return tqh('axes.reasonPrefix', { priority: tq(priorityKey), reasons: reasons.join(tq('axes.reasonJoin')) });
 }
 
 /**
@@ -543,49 +634,118 @@ export function buildRevisionAxesDashboardHtml(report, uiState = {}) {
     // Les chapitres déjà maîtrisés n'ont plus besoin d'apparaître dans les axes de révision.
     const revisionAxes = report.axes.filter((axis) => axis.status !== 'MASTERED');
 
-    // Chapitres où un piège ou un oubli est encore en consolidation : ce sont eux que l'encadré
-    // « À revoir » compte en plus des erreurs actives.
+    // Deux familles de filtres, qui comptent toutes deux des chapitres : les priorités se partagent les
+    // chapitres, les filtres d'erreurs les recoupent. Un filtre vide ou qui retient tous les chapitres
+    // n'apporte rien : il est masqué, sauf s'il est sélectionné.
+    const hasActiveError = (axis) => (axis.traps?.active || 0) + (axis.omissions?.active || 0) > 0;
     const hasConsolidating = (axis) => (axis.traps?.consolidating || 0) + (axis.omissions?.consolidating || 0) > 0;
-    const candidateFilters = [
-        { key: 'TRAPS', count: report.trapTotals?.axes || 0, labelKey: 'axes.filterTraps' },
+    const isUseful = (f) =>
+        activeFilter === f.key || (f.count > 0 && (f.group === 'chapters' || f.count < revisionAxes.length));
+    const filterGroups = [
         {
-            key: 'CONSOLIDATING',
-            count: revisionAxes.filter(hasConsolidating).length,
-            labelKey: 'axes.filterConsolidating',
+            labelKey: 'axes.filterGroupChapters',
+            filters: [
+                { key: 'ALL', count: revisionAxes.length, labelKey: 'axes.filterAll', group: 'all' },
+                {
+                    key: 'BLOCKER',
+                    count: report.counts.BLOCKER || 0,
+                    labelKey: 'axes.filterBlocker',
+                    group: 'chapters',
+                },
+                {
+                    key: 'REFRESH',
+                    count: report.counts.REFRESH || 0,
+                    labelKey: 'axes.filterRefresh',
+                    group: 'chapters',
+                },
+                {
+                    key: 'EXPLORE',
+                    count: report.counts.EXPLORE || 0,
+                    labelKey: 'axes.filterExplore',
+                    group: 'chapters',
+                },
+            ].filter((f) => f.key === 'ALL' || isUseful(f)),
         },
-        { key: 'BLOCKER', count: report.counts.BLOCKER || 0, labelKey: 'axes.filterBlocker' },
-        { key: 'REFRESH', count: report.counts.REFRESH || 0, labelKey: 'axes.filterRefresh' },
-        { key: 'EXPLORE', count: report.counts.EXPLORE || 0, labelKey: 'axes.filterExplore' },
-    ];
-    const filterDefs = [
-        { key: 'ALL', label: tq('axes.filterAll', { count: revisionAxes.length }) },
-        ...candidateFilters
-            .filter((f) => f.count > 0 || activeFilter === f.key)
-            .map((f) => ({ key: f.key, label: tq(f.labelKey, { count: f.count }) })),
-    ];
+        {
+            labelKey: 'axes.filterGroupErrors',
+            filters: [
+                {
+                    key: 'TRAPS',
+                    count: revisionAxes.filter(hasActiveError).length,
+                    labelKey: 'axes.filterTraps',
+                    group: 'errors',
+                },
+                {
+                    key: 'CONSOLIDATING',
+                    count: revisionAxes.filter(hasConsolidating).length,
+                    labelKey: 'axes.filterConsolidating',
+                    group: 'errors',
+                },
+            ].filter(isUseful),
+        },
+    ].filter((g) => g.filters.length > 0);
 
-    const filtersHtml = filterDefs
-        .map((f) => {
-            const isActive = f.key === activeFilter;
-            const style = isActive
-                ? 'background:var(--accent-orange); color:#fff; border:1px solid var(--accent-orange);'
-                : 'background:var(--bg-card); color:var(--text-secondary); border:1px solid var(--border-color);';
-            return `
+    const filterButton = (f) => {
+        const isActive = f.key === activeFilter;
+        const style = isActive
+            ? 'background:var(--accent-orange); color:#fff; border:1px solid var(--accent-orange);'
+            : 'background:var(--bg-card); color:var(--text-secondary); border:1px solid var(--border-color);';
+        return `
                 <button type="button" data-action="QuizsetAxesFilter" data-args="${f.key}" aria-pressed="${isActive ? 'true' : 'false'}" style="${style} padding:8px 14px; border-radius:999px; font-size:0.82rem; font-weight:700; cursor:pointer; transition:all 0.2s;">
-                    ${f.label}
+                    ${tq(f.labelKey, { count: f.count })}
                 </button>
             `;
-        })
+    };
+    const filtersHtml = filterGroups
+        .map(
+            (g) => `
+            <div class="revision-axes-filter-group" role="group" aria-label="${tq(g.labelKey)}" style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+                <span style="font-size:0.78rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.04em; min-width:170px;">${tq(g.labelKey)}</span>
+                ${g.filters.map(filterButton).join('')}
+            </div>`,
+        )
         .join('');
 
     const visibleAxes =
         activeFilter === 'ALL'
             ? revisionAxes
             : activeFilter === 'TRAPS'
-              ? revisionAxes.filter((axis) => axis.traps?.active > 0)
+              ? revisionAxes.filter(hasActiveError)
               : activeFilter === 'CONSOLIDATING'
                 ? revisionAxes.filter(hasConsolidating)
                 : revisionAxes.filter((axis) => axis.status === activeFilter);
+
+    // Chapitres maîtrisés : masqués, mais signalés pour que leur absence ne surprenne pas.
+    const masteredAxes = report.axes.filter((axis) => axis.status === 'MASTERED');
+    const masteredHtml =
+        masteredAxes.length > 0
+            ? `<div class="revision-axes-mastered-hidden" style="font-size:0.82rem; color:var(--text-secondary); display:flex; align-items:center; gap:6px;"><i class="ri-checkbox-circle-line" style="color:#22c55e;"></i> ${
+                  masteredAxes.length === 1
+                      ? tq('axes.masteredHiddenOne', { titles: masteredAxes[0].title })
+                      : tq('axes.masteredHiddenMany', {
+                            count: masteredAxes.length,
+                            titles: masteredAxes.map((a) => a.title).join(', '),
+                        })
+              }</div>`
+            : '';
+
+    const guideOpen = expandedIds.has('guide');
+    const guideHtml = `
+        <div class="revision-axes-guide" style="display:flex; flex-direction:column; gap:8px;">
+            <button type="button" data-action="QuiztoggleAxisTakeaways" data-args="guide" aria-expanded="${guideOpen ? 'true' : 'false'}" style="align-self:flex-start; background:none; border:none; padding:0; color:var(--accent-orange); font-size:0.84rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                <i class="ri-question-line"></i> ${guideOpen ? tq('axes.guideHideBtn') : tq('axes.guideBtn')}
+            </button>
+            ${
+                guideOpen
+                    ? `<ul class="revision-axes-guide-list" style="margin:0; padding-left:18px; display:flex; flex-direction:column; gap:6px; font-size:0.82rem; color:var(--text-secondary); line-height:1.45;">
+                    <li>${tq('axes.guidePriorities')}</li>
+                    <li>${tq('axes.guideQuestions')}</li>
+                    <li>${tq('axes.guideErrors')}</li>
+                    <li>${tq('axes.guideCounts')}</li>
+                </ul>`
+                    : ''
+            }
+        </div>`;
 
     // Atelier transversal : proposé tant qu'il reste un piège ou un oubli à corriger ou en consolidation.
     const openTraps = (report.trapTotals?.active || 0) + (report.trapTotals?.consolidating || 0);
@@ -600,11 +760,23 @@ export function buildRevisionAxesDashboardHtml(report, uiState = {}) {
               })
             : '',
     ].filter(Boolean);
+    const errorChapters = revisionAxes.filter((axis) => hasActiveError(axis) || hasConsolidating(axis)).length;
+    const workshopItems = workshopParts.join(tq('axes.workshopPartsJoin'));
+    const workshopTitle =
+        errorChapters > 0
+            ? tq('axes.trapsWorkshopTitleChapters', {
+                  items: workshopItems,
+                  chapters:
+                      errorChapters === 1
+                          ? tq('axes.workshopChaptersOne')
+                          : tq('axes.workshopChaptersMany', { count: errorChapters }),
+              })
+            : tq('axes.trapsWorkshopTitle', { items: workshopItems });
     const trapsCtaHtml =
         workshopParts.length > 0
             ? `<div class="revision-axes-traps-cta" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; padding:16px 20px; border-radius:var(--radius-md); background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.35);">
                     <div style="flex:1 1 260px;">
-                        <div style="font-weight:800; font-size:0.95rem; color:var(--text-main); margin-bottom:2px; display:flex; align-items:center; gap:8px;"><i class="ri-alert-line" style="color:#ef4444;"></i> ${tq('axes.trapsWorkshopTitle', { items: workshopParts.join(tq('axes.workshopPartsJoin')) })}</div>
+                        <div style="font-weight:800; font-size:0.95rem; color:var(--text-main); margin-bottom:2px; display:flex; align-items:center; gap:8px;"><i class="ri-alert-line" style="color:#ef4444;"></i> ${workshopTitle}</div>
                         <div style="font-size:0.82rem; color:var(--text-secondary); line-height:1.4;">${tq('axes.trapsWorkshopText')}</div>
                     </div>
                     <button type="button" data-action="QuizstartTrapsWorkshop" style="background:#ef4444; color:#fff; border:none; padding:10px 18px; border-radius:10px; font-weight:700; font-size:0.86rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; white-space:nowrap;"><i class="ri-focus-2-line"></i> ${tq('axes.trapsWorkshopBtn')} <i class="ri-arrow-right-line"></i></button>
@@ -647,17 +819,20 @@ export function buildRevisionAxesDashboardHtml(report, uiState = {}) {
                         <div style="font-size:0.78rem; color:var(--text-secondary); line-height:1.4;">${tq('axes.methodStep3Text')}</div>
                     </div>
                 </div>
+                <div style="margin-top:14px;">${guideHtml}</div>
             </div>
 
             ${trapsCtaHtml}
 
-            <div class="revision-axes-filters" style="display:flex; flex-wrap:wrap; gap:8px;">
+            <div class="revision-axes-filters" style="display:flex; flex-direction:column; gap:10px;">
                 ${filtersHtml}
             </div>
 
             <div class="revision-axes-list" style="display:flex; flex-direction:column; gap:16px;">
                 ${cardsHtml}
             </div>
+
+            ${masteredHtml}
         </div>
     `;
 }

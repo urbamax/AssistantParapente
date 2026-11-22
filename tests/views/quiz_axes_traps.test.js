@@ -59,11 +59,12 @@ describe('axes de révision : pièges', () => {
 
     it('shows the trap pill, the block and the workshop shortcut on the card, never the QCM texts', () => {
         const { html } = render(statsWith({ U1V: { ...good, answers: log([0, 0b010]) } }));
-        expect(html).toContain('1 piège actif');
+        expect(html).toContain('1 piège à corriger');
         expect(html).toContain('revision-axis-traps');
         expect(html).toContain('Pourquoi ce piège est faux.');
         expect(html).toContain('data-action="QuizstartTrapsWorkshop"');
-        expect(html).toContain('Avec pièges actifs (1)');
+        // Un seul chapitre : le filtre « À corriger » retiendrait tout, il est masqué.
+        expect(html).not.toContain('data-args="TRAPS"');
         expect(html).not.toMatch(/PIEGE-SECRET|ENONCE-SECRET|BONNE-SECRET/);
     });
 
@@ -71,7 +72,7 @@ describe('axes de révision : pièges', () => {
         const { html } = render(statsWith({}));
         expect(html).not.toContain('revision-axis-traps');
         expect(html).not.toContain('QuizstartTrapsWorkshop');
-        expect(html).not.toContain('Avec pièges actifs');
+        expect(html).not.toContain('data-args="TRAPS"');
     });
 
     it('offers the traps and omissions workshop while a trap is only consolidating', () => {
@@ -93,7 +94,8 @@ describe('axes de révision : pièges', () => {
 
     it('filters the chapters with a trap or omission in consolidation', () => {
         const stats = statsWith({ U1V: { ...good, answers: log([3, 0b011], [2, 0b001], [1, 0b001]) } });
-        expect(render(stats).html).toContain('En consolidation (1)');
+        // Un seul chapitre ici : le filtre retiendrait tous les chapitres, il n'est donc proposé que sélectionné.
+        expect(render(stats).html).not.toContain('data-args="CONSOLIDATING"');
         const { html } = render(stats, { statusFilter: 'CONSOLIDATING' });
         expect(html).toContain('data-args="CONSOLIDATING" aria-pressed="true"');
         expect(html).toContain('data-axis-id="pilotage-plan-vol-vent"');
@@ -137,7 +139,7 @@ describe('axes de révision : pièges', () => {
         });
         const folded = render(stats).html;
         expect((folded.match(/revision-axis-trap-item"/g) || []).length).toBe(3);
-        expect(folded).toContain('Voir tous mes pièges (4)');
+        expect(folded).toContain('Voir tous mes pièges (4, dont 1 surmonté)');
         const unfolded = render(stats, { expandedIds: new Set(['traps:pilotage-plan-vol-vent']) }).html;
         expect((unfolded.match(/revision-axis-trap-item"/g) || []).length).toBe(4);
         expect(unfolded).toContain('data-trap-status="overcome"');
@@ -186,7 +188,7 @@ describe('axes de révision : oublis orange récurrents', () => {
                 },
             }),
         );
-        expect(html).toContain('1 oubli actif');
+        expect(html).toContain('1 oubli à corriger');
         expect(html).toContain('revision-axis-omissions');
         expect(html).toContain('Oublié 2 fois');
         expect(html).toContain('Pourquoi la bonne.');
@@ -212,7 +214,7 @@ describe('axes de révision : oublis orange récurrents', () => {
         });
         const folded = render(stats).html;
         expect((folded.match(/revision-axis-omission-item"/g) || []).length).toBe(3);
-        expect(folded).toContain('Voir tous mes oublis (4)');
+        expect(folded).toContain('Voir tous mes oublis (4, dont 1 surmonté)');
         const unfolded = render(stats, { expandedIds: new Set(['omissions:pilotage-plan-vol-vent']) }).html;
         expect((unfolded.match(/revision-axis-omission-item"/g) || []).length).toBe(4);
         expect(unfolded).toContain('data-omission-status="overcome"');
