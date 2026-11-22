@@ -48,12 +48,20 @@ test('Spec 043 : parcours complet Axes de révision (cours PDF #page=N, points c
     await expect(firstCard).toHaveAttribute('data-axis-id', 'meteo-brises-aerologie');
     await expect(firstCard).toHaveAttribute('data-axis-status', 'BLOCKER');
 
+    // Spec 062 : les cartes sont repliées, avec la raison de leur priorité ; on ouvre la première.
+    await expect(firstCard.locator('.revision-axis-reason')).toContainText('Pourquoi Priorité 1');
+    await expect(firstCard.locator('.revision-axis-card-body')).toBeHidden();
+    await firstCard.locator('.revision-axis-card-toggle').click();
+    await expect(firstCard.locator('.revision-axis-card-body')).toBeVisible();
+
     // Étape 1 : présence de liens PDF vérifiés avec #page=
     const pageLinks = firstCard.locator('a[href*="#page="]');
     expect(await pageLinks.count()).toBeGreaterThan(0);
 
     // Étape 2 : déplier les points clés à retenir
-    const toggleTakeawaysBtn = firstCard.locator('[data-action="QuiztoggleAxisTakeaways"]');
+    const toggleTakeawaysBtn = firstCard.locator(
+        '[data-action="QuiztoggleAxisTakeaways"][data-args="meteo-brises-aerologie"]',
+    );
     await toggleTakeawaysBtn.click();
     await expect(firstCard.locator('.revision-axis-takeaways-list')).toBeVisible();
 
