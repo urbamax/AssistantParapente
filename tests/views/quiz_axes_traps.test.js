@@ -74,6 +74,35 @@ describe('axes de révision : pièges', () => {
         expect(html).not.toContain('Avec pièges actifs');
     });
 
+    it('offers the traps and omissions workshop while a trap is only consolidating', () => {
+        const { html } = render(statsWith({ U1V: { ...good, answers: log([3, 0b010], [2, 0b001], [1, 0b001]) } }));
+        expect(html).toContain('revision-axes-traps-cta');
+        expect(html).toContain('À revoir : 1 piège');
+        expect(html).toContain('Atelier pièges &amp; oublis');
+    });
+
+    it('offers the workshop for omissions alone, and counts both kinds', () => {
+        const omissionOnly = render(statsWith({ U2V: { ...good, answers: log([0, 0b000]) } })).html;
+        expect(omissionOnly).toContain('revision-axes-traps-cta');
+        expect(omissionOnly).toContain('À revoir : 1 oubli');
+        const both = render(
+            statsWith({
+                // Piège coché avec la bonne réponse : un piège, pas d'oubli.
+                U1V: { ...good, answers: log([0, 0b011]) },
+                U2V: { ...good, answers: log([0, 0b000]) },
+                // Piège coché sans la bonne réponse : un piège et un oubli.
+                U3V: { ...good, answers: log([0, 0b100]) },
+            }),
+        ).html;
+        expect(both).toContain('À revoir : 2 pièges et 2 oublis');
+    });
+
+    it('hides the workshop box once every error is overcome', () => {
+        const overcome = log([30, 0b010], [29, 0b001], [25, 0b001], [20, 0b001]);
+        const { html } = render(statsWith({ U1V: { ...good, answers: overcome } }));
+        expect(html).not.toContain('revision-axes-traps-cta');
+    });
+
     it('lists only urgent traps by default, and the overcome ones once unfolded', () => {
         const stats = statsWith({
             U1V: {

@@ -532,7 +532,7 @@ export function buildRevisionAxisCardHtml(axis, expandedIds) {
 /**
  * Construit le tableau de bord complet de l'écran « Axes de révision ».
  *
- * @param {{ level: string, axes: any[], counts: Record<string, number>, trapTotals?: { active: number, consolidating: number, overcome: number, axes: number } }} report
+ * @param {{ level: string, axes: any[], counts: Record<string, number>, trapTotals?: { active: number, consolidating: number, overcome: number, axes: number }, omissionTotals?: { active: number, consolidating: number, overcome: number, axes: number } }} report
  * @param {{ statusFilter?: string, expandedIds?: Set<string> }} [uiState]
  * @returns {string}
  */
@@ -577,12 +577,24 @@ export function buildRevisionAxesDashboardHtml(report, uiState = {}) {
               ? revisionAxes.filter((axis) => axis.traps?.active > 0)
               : revisionAxes.filter((axis) => axis.status === activeFilter);
 
-    const activeTraps = report.trapTotals?.active || 0;
+    // Atelier transversal : proposé tant qu'il reste un piège ou un oubli à corriger ou en consolidation.
+    const openTraps = (report.trapTotals?.active || 0) + (report.trapTotals?.consolidating || 0);
+    const openOmissions = (report.omissionTotals?.active || 0) + (report.omissionTotals?.consolidating || 0);
+    const workshopParts = [
+        openTraps > 0
+            ? tq(openTraps === 1 ? 'axes.workshopTrapsOne' : 'axes.workshopTrapsMany', { count: openTraps })
+            : '',
+        openOmissions > 0
+            ? tq(openOmissions === 1 ? 'axes.workshopOmissionsOne' : 'axes.workshopOmissionsMany', {
+                  count: openOmissions,
+              })
+            : '',
+    ].filter(Boolean);
     const trapsCtaHtml =
-        activeTraps > 0
+        workshopParts.length > 0
             ? `<div class="revision-axes-traps-cta" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; padding:16px 20px; border-radius:var(--radius-md); background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.35);">
                     <div style="flex:1 1 260px;">
-                        <div style="font-weight:800; font-size:0.95rem; color:var(--text-main); margin-bottom:2px; display:flex; align-items:center; gap:8px;"><i class="ri-alert-line" style="color:#ef4444;"></i> ${tq('axes.trapsWorkshopTitle', { count: activeTraps })}</div>
+                        <div style="font-weight:800; font-size:0.95rem; color:var(--text-main); margin-bottom:2px; display:flex; align-items:center; gap:8px;"><i class="ri-alert-line" style="color:#ef4444;"></i> ${tq('axes.trapsWorkshopTitle', { items: workshopParts.join(tq('axes.workshopPartsJoin')) })}</div>
                         <div style="font-size:0.82rem; color:var(--text-secondary); line-height:1.4;">${tq('axes.trapsWorkshopText')}</div>
                     </div>
                     <button type="button" data-action="QuizstartTrapsWorkshop" style="background:#ef4444; color:#fff; border:none; padding:10px 18px; border-radius:10px; font-weight:700; font-size:0.86rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; white-space:nowrap;"><i class="ri-focus-2-line"></i> ${tq('axes.trapsWorkshopBtn')} <i class="ri-arrow-right-line"></i></button>

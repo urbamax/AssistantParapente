@@ -256,3 +256,14 @@ describe('spec 059 : la politique de confidentialité indique comment supprimer 
         );
     });
 });
+
+describe('spec 060 : l’atelier pièges & oublis, tous chapitres confondus', () => {
+    it('QCM décrit l’atelier qui reprend pièges et oublis, à corriger puis en consolidation', () => {
+        mount();
+        const text = visibleText('qcm');
+        expect(text).toMatch(/atelier pièges & oublis/);
+        expect(text).toMatch(/avez oublié une bonne réponse/);
+        expect(text).toMatch(/les erreurs à corriger d'abord, puis celles en consolidation/);
+        expect(text).not.toMatch(/anti-pièges/);
+    });
+});

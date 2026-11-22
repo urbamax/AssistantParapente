@@ -1005,7 +1005,7 @@ class QuizViewClass extends QuizVoiceBase {
         this.renderQuestion(sessionQuestions[0]);
     }
 
-    // Atelier anti-pièges : les questions où un piège est actif (puis en consolidation), tous chapitres
+    // Atelier pièges & oublis : les questions où un piège ou un oubli est actif (puis en consolidation), tous chapitres
     // confondus. Il se comporte comme un atelier d'axe, d'où l'identifiant réservé.
     startTrapsWorkshop() {
         const level = (typeof GlobalState !== 'undefined' && GlobalState.get('level')) || 'BI';
