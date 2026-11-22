@@ -46,6 +46,8 @@ Owner: « À revoir : 43 pièges et 43 oublis » did not match the pills below. 
 
 - **FR-006**: A chapter with a trap or omission « En consolidation » MUST NOT be « maîtrisé »: it is « Acquis à rafraîchir » (Priority 2, unless it is a blocker), so it stays on screen and the box total equals the sum of the visible pills.
 
+- **FR-007**: Owner, after checking the totals (52 traps = 5 active + 47 consolidating): the screen only offered « Avec pièges actifs », which « fait bizarre » next to a total made mostly of consolidating errors. A filter « En consolidation (N) » MUST list the chapters with a trap or omission in consolidation (hidden when N = 0).
+
 ## Success Criteria *(mandatory)*
 
 - **SC-001**: Tests cover scenarios 1 to 5 (box rendering and picker).

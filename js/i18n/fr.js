@@ -1117,6 +1117,7 @@ export const FR = Object.freeze({
             filterExplore: 'Priorité 3 · À découvrir ({count})',
             filterMastered: 'Maîtrisés ({count})',
             filterTraps: 'Avec pièges actifs ({count})',
+            filterConsolidating: 'En consolidation ({count})',
             emptyFilter: 'Aucun chapitre dans cette catégorie pour le niveau sélectionné.',
             statusLabels: Object.freeze({
                 BLOCKER: 'Priorité 1 · Points à consolider',

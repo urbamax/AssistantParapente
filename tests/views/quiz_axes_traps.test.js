@@ -91,6 +91,17 @@ describe('axes de révision : pièges', () => {
         expect(html).toContain('À revoir : 1 piège');
     });
 
+    it('filters the chapters with a trap or omission in consolidation', () => {
+        const stats = statsWith({ U1V: { ...good, answers: log([3, 0b011], [2, 0b001], [1, 0b001]) } });
+        expect(render(stats).html).toContain('En consolidation (1)');
+        const { html } = render(stats, { statusFilter: 'CONSOLIDATING' });
+        expect(html).toContain('data-args="CONSOLIDATING" aria-pressed="true"');
+        expect(html).toContain('data-axis-id="pilotage-plan-vol-vent"');
+        expect(render(statsWith({ U1V: { ...good, answers: log([0, 0b010]) } })).html).not.toContain(
+            'En consolidation (',
+        );
+    });
+
     it('offers the workshop for omissions alone, and counts both kinds', () => {
         const omissionOnly = render(statsWith({ U2V: { ...good, answers: log([0, 0b000]) } })).html;
         expect(omissionOnly).toContain('revision-axes-traps-cta');

@@ -7,3 +7,4 @@
 - [X] T005 Run `npm run verify`, open the PR with its Discord sections
 - [ ] T006 After deployment, when the owner asks, update `#guide-utilisation` if needed
 - [X] T007 [US1] FR-006: consolidating error keeps the chapter in « Acquis à rafraîchir » (`js/services/revision_axes.js`), test and manual
+- [X] T008 [US1] FR-007: « En consolidation » filter (`js/views/quiz_axes_html.js`), test and manual
