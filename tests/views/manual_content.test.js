@@ -151,3 +151,33 @@ describe('spec 053 – US3 : chaque rôle voit son mode d’emploi', () => {
         expect(visibleText('sites')).toMatch(/Point de Référence et Rayon de Recherche/);
     });
 });
+
+describe('spec 055 : les modes du QCM décrits comme dans l’application', () => {
+    for (const roles of [[], ['beta'], ['owner']]) {
+        it(`ne garde aucune ancienne description des modes (rôles : ${roles.join(', ') || 'aucun'})`, () => {
+            mount(roles);
+            const text = allVisibleText();
+            expect(text).not.toMatch(/50 ?%, 75 ?% ou 100 ?%/);
+            expect(text).not.toMatch(/1, 3, 7, 14 puis 30/);
+            expect(text).not.toMatch(/10, 20, 30, 40 ou TOUTES/);
+        });
+    }
+
+    it('Perfectionnement : palier réglable au curseur, maîtrise sur les 10 dernières réponses', () => {
+        mount();
+        const text = visibleText('qcm');
+        expect(text).toMatch(/Palier objectif/);
+        expect(text).toMatch(/Maîtrise actuelle/);
+        expect(text).toMatch(/10 dernières réponses/);
+    });
+
+    it('Révision : 1 jour, puis 6 jours, puis des intervalles qui s’allongent', () => {
+        mount();
+        expect(visibleText('qcm')).toMatch(/1 jour, puis 6 jours/);
+    });
+
+    it('Nombre de questions : curseur de 5 à 50, dernière position = toutes', () => {
+        mount();
+        expect(visibleText('qcm')).toMatch(/de 5 à 50/);
+    });
+});
