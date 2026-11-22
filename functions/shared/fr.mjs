@@ -1762,6 +1762,27 @@ export const FR = Object.freeze({
             enabled: 'Alertes météo activées sur cet appareil !',
             failed: "Échec de l'activation des alertes{detail}.",
         }),
+        // Suppression du compte et des données en ligne (spec 059).
+        delete: Object.freeze({
+            confirm: 'Supprimer définitivement',
+            retry: 'Réessayer la suppression',
+            inProgress: 'Suppression en cours…',
+            done: 'Votre compte et toutes vos données en ligne ont été supprimés. Les données de cet appareil sont toujours là.',
+            errors: Object.freeze({
+                'not-signed-in': 'Connectez-vous d’abord pour supprimer votre compte.',
+                offline: 'Pas de connexion internet : la suppression a besoin du réseau. Réessayez une fois connecté.',
+                'password-required': 'Saisissez votre mot de passe pour confirmer la suppression.',
+                'wrong-password': 'Mot de passe incorrect : rien n’a été supprimé. Réessayez.',
+                'too-many-requests': 'Trop de tentatives : rien n’a été supprimé. Réessayez dans quelques minutes.',
+                network: 'Erreur réseau : rien n’a été supprimé. Vérifiez votre connexion et réessayez.',
+                incomplete:
+                    'La suppression n’est pas allée au bout (erreur réseau ?) : une partie de vos données en ligne peut rester. Réessayez ; la synchronisation reste en pause d’ici là.',
+                'requires-recent-login':
+                    'Vos données en ligne sont supprimées, mais Firebase demande une connexion récente pour supprimer le compte. Saisissez à nouveau votre mot de passe et réessayez.',
+                'account-not-deleted':
+                    'Vos données en ligne sont supprimées, mais le compte n’a pas pu l’être. Réessayez.',
+            }),
+        }),
     }),
     // Sauvegarde locale (js/core/backup_ui.js) : export / import d'un fichier, sans compte ni cloud.
     backup: Object.freeze({

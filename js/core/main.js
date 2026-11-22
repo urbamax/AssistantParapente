@@ -359,6 +359,9 @@ export async function bootApplication() {
         'closeAuthModal',
         'openAuthModal',
         'enablePushNotifications',
+        'openDeleteAccount',
+        'cancelDeleteAccount',
+        'confirmDeleteAccount',
     ].forEach((action) => {
         AppEvents.register('FirebaseAuth' + action, (args, e, t) =>
             window.FirebaseAuthEngine && window.FirebaseAuthEngine[action]

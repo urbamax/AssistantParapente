@@ -18,6 +18,7 @@ import {
     stripTrace,
     uploadFlightTrace,
 } from './flight_trace_sync.js';
+import { TRACE_MAX_PARTS, traceDocId } from '../utils/trace_codec.js';
 import { t } from '../utils/i18n.js';
 import AccessService from './access_service.js';
 import { getIceCloudState, setIceCloudState, disableIceCloud } from './ice_cloud_state.js';
@@ -136,6 +137,12 @@ export const FirebaseAuthEngine = {
     // Chargeur du SDK Firestore utilisé par la synchro complète ; remplaçable en test, où
     // l'import dynamique de l'URL du SDK hébergé n'est pas résoluble.
     _loadFirestore: loadFirestoreModule,
+    // Chargeur du SDK Auth utilisé par la suppression du compte ; remplaçable en test.
+    _loadAuth: loadAuthModule,
+
+    // Suppression du compte en cours ou interrompue (spec 059) : toute synchro est suspendue pour ne pas
+    // renvoyer dans le cloud ce qui vient d'en être effacé, jusqu'à la réussite ou l'annulation.
+    _accountDeletion: false,
 
     // --- État du voyant de synchronisation (point dans le header) ---
     // _changeSeq augmente à chaque modification locale à envoyer ; _syncedSeq retient la
@@ -261,13 +268,7 @@ export const FirebaseAuthEngine = {
                         await this.syncDataWithCloud();
 
                         // 1. Synchro automatique silencieuse toutes les 30 secondes
-                        if (!this._syncInterval) {
-                            this._syncInterval = setInterval(() => {
-                                if (navigator.onLine && this.currentUser) {
-                                    this.syncDataWithCloud(true); // silent sync
-                                }
-                            }, 30 * 1000); // 30 secondes (réduit depuis 2 min)
-                        }
+                        this._startAutoSync();
 
                         // 2. Synchro instantanée dès le retour de la connexion internet
                         if (!this._onlineListenerAttached) {
@@ -282,6 +283,7 @@ export const FirebaseAuthEngine = {
                     } else {
                         console.log('User logged out');
                         this.currentUser = null;
+                        this._accountDeletion = false;
                         AccessService.clear();
                         this._updateSyncStatus(); // déconnecté : plus de voyant
                         // On réinitialise lastSyncTime à la déconnexion pour ne pas afficher
@@ -306,6 +308,16 @@ export const FirebaseAuthEngine = {
         });
 
         return this._initPromise;
+    },
+
+    /** Synchro automatique silencieuse toutes les 30 secondes (réduit depuis 2 min). */
+    _startAutoSync: function () {
+        if (this._syncInterval) return;
+        this._syncInterval = setInterval(() => {
+            if (navigator.onLine && this.currentUser) {
+                this.syncDataWithCloud(true); // silent sync
+            }
+        }, 30 * 1000);
     },
 
     // UI Helpers
@@ -351,6 +363,8 @@ export const FirebaseAuthEngine = {
     },
 
     closeAuthModal: function () {
+        // Fermer l'Espace Synchro pendant une suppression interrompue vaut annulation : la synchro reprend.
+        if (this._accountDeletion || this._deleteAccountPanelOpen()) this.cancelDeleteAccount();
         const overlay = /** @type {HTMLDialogElement & { _cancelBound?: boolean }} */ (
             document.getElementById('auth-modal-overlay')
         );
@@ -608,10 +622,204 @@ export const FirebaseAuthEngine = {
     },
 
     // -----------------------------------------------------------------------
+    // SUPPRESSION DU COMPTE ET DES DONNÉES EN LIGNE (spec 059, droit à l'effacement)
+    // -----------------------------------------------------------------------
+    /**
+     * Supprime le compte et tout ce qu'il a en ligne : chaque document de chaque sous-collection de
+     * users/{uid}, puis users/{uid}, puis le compte Firebase Auth. Le mot de passe est redemandé d'abord
+     * (reauthenticateWithCredential) : un mot de passe faux ne supprime rien, et deleteUser ne tombe pas
+     * sur auth/requires-recent-login. La synchro reste suspendue jusqu'à la réussite (déconnexion) ou
+     * l'annulation, pour ne pas renvoyer ce qui vient d'être effacé. Les données de l'appareil restent.
+     * @param {string} password
+     * @returns {Promise<{ success: boolean, data: { documents: number } | null, error: string | null }>}
+     *   error : 'not-signed-in', 'offline', 'password-required', 'wrong-password', 'too-many-requests',
+     *   'network', 'incomplete', 'requires-recent-login' ou 'account-not-deleted'
+     */
+    deleteAccount: async function (password) {
+        const user = this.currentUser;
+        const fail = (error) => ({ success: false, data: null, error });
+        if (!user || !this.enabled) return fail('not-signed-in');
+        if (typeof navigator !== 'undefined' && navigator.onLine === false) return fail('offline');
+        if (!password) return fail('password-required');
+
+        this._accountDeletion = true;
+        if (this._syncInterval) {
+            clearInterval(this._syncInterval);
+            this._syncInterval = null;
+        }
+        if (this._debounceSyncTimer) {
+            clearTimeout(this._debounceSyncTimer);
+            this._debounceSyncTimer = null;
+        }
+
+        let authModule;
+        try {
+            authModule = await this._loadAuth();
+            const credential = authModule.EmailAuthProvider.credential(user.email, password);
+            await authModule.reauthenticateWithCredential(user, credential);
+        } catch (error) {
+            const code = error?.code || '';
+            if (code === 'auth/wrong-password' || code === 'auth/invalid-credential') return fail('wrong-password');
+            if (code === 'auth/too-many-requests') return fail('too-many-requests');
+            return fail('network');
+        }
+
+        // Une synchro déjà partie finit avant les suppressions (sinon elle pourrait réécrire derrière).
+        if (this._activeSyncPromise) await this._activeSyncPromise.catch(() => {});
+
+        let documents;
+        try {
+            documents = await this._deleteAllCloudDocuments(await this._loadFirestore(), user.uid);
+        } catch (error) {
+            console.error('[Compte] Suppression des données en ligne incomplète :', error);
+            return fail('incomplete');
+        }
+
+        // La copie en ligne de la fiche d'urgence n'existe plus : l'appareil ne la croit plus sauvegardée.
+        disableIceCloud();
+        this.lastSyncTime = null;
+
+        try {
+            await authModule.deleteUser(user);
+        } catch (error) {
+            console.error('[Compte] Suppression du compte impossible :', error);
+            return fail(error?.code === 'auth/requires-recent-login' ? 'requires-recent-login' : 'account-not-deleted');
+        }
+        return { success: true, data: { documents }, error: null };
+    },
+
+    /**
+     * Efface tous les documents de users/{uid}. Les morceaux de trace ont des identifiants fixes
+     * ({vol}_0 à {vol}_11) : ils sont supprimés par identifiant pour chaque vol du carnet, sans
+     * télécharger les traces (jusqu'à 700 ko par morceau) ; un dernier listage retire les restes.
+     * Supprimer un document absent est sans effet, ce qui rend un nouvel essai sans risque.
+     * @returns {Promise<number>} nombre de documents dont la suppression a été demandée
+     */
+    _deleteAllCloudDocuments: async function (firestore, uid) {
+        const { collection, getDocs, doc, deleteDoc } = firestore;
+        let count = 0;
+        const deleteAll = async (refs) => {
+            for (let i = 0; i < refs.length; i += 25) {
+                await Promise.all(refs.slice(i, i + 25).map((ref) => deleteDoc(ref)));
+            }
+            count += refs.length;
+        };
+        const list = async (col) => (await getDocs(col)).docs;
+
+        const flights = await list(collection(db, 'users', uid, 'logbook'));
+        const traceParts = flights.flatMap((flight) =>
+            Array.from({ length: TRACE_MAX_PARTS }, (_v, index) =>
+                doc(db, 'users', uid, 'igcTraces', traceDocId(flight.id, index)),
+            ),
+        );
+        await deleteAll(traceParts);
+        await deleteAll((await list(collection(db, 'users', uid, 'igcTraces'))).map((d) => d.ref));
+        await deleteAll(flights.map((d) => d.ref));
+        // Chemins écrits en toutes lettres : tests/core/firestore_rules_paths.test.js les compare aux règles.
+        const others = [
+            collection(db, 'users', uid, 'equipment'),
+            collection(db, 'users', uid, 'stats'),
+            collection(db, 'users', uid, 'preferences'),
+            collection(db, 'users', uid, 'ice'),
+            collection(db, 'users', uid, 'access'),
+            collection(db, 'users', uid, 'pushState'),
+        ];
+        for (const col of others) {
+            await deleteAll((await list(col)).map((d) => d.ref));
+        }
+        await deleteAll([doc(db, 'users', uid)]);
+        return count;
+    },
+
+    _deleteAccountPanelOpen: function () {
+        const panel = document.getElementById('auth-delete-account-panel');
+        return Boolean(panel && !panel.hidden);
+    },
+
+    /** « Supprimer mon compte » : ouvre le panneau de confirmation (rien n'est supprimé à ce stade). */
+    openDeleteAccount: function () {
+        const panel = document.getElementById('auth-delete-account-panel');
+        const opener = document.getElementById('auth-delete-account-open');
+        if (!panel) return;
+        this.clearAlerts();
+        this._setDeleteAccountError('');
+        const input = /** @type {HTMLInputElement | null} */ (document.getElementById('delete-account-password'));
+        if (input) input.value = '';
+        this._setDeleteAccountBusy(false, false);
+        panel.hidden = false;
+        if (opener) opener.hidden = true;
+        input?.focus();
+    },
+
+    /** Annuler (ou fermer l'Espace Synchro) : rien de plus n'est supprimé et la synchro reprend. */
+    cancelDeleteAccount: function () {
+        const panel = document.getElementById('auth-delete-account-panel');
+        const opener = document.getElementById('auth-delete-account-open');
+        if (panel) panel.hidden = true;
+        if (opener) opener.hidden = false;
+        const input = /** @type {HTMLInputElement | null} */ (document.getElementById('delete-account-password'));
+        if (input) input.value = '';
+        const wasPaused = this._accountDeletion;
+        this._accountDeletion = false;
+        if (wasPaused && this.currentUser) {
+            this._startAutoSync();
+            this.syncDataWithCloud(true);
+        }
+    },
+
+    /** « Supprimer définitivement » / « Réessayer » dans le panneau de confirmation. */
+    confirmDeleteAccount: async function () {
+        const input = /** @type {HTMLInputElement | null} */ (document.getElementById('delete-account-password'));
+        const password = input ? input.value : '';
+        this._setDeleteAccountError('');
+        this._setDeleteAccountBusy(true, false);
+        const result = await this.deleteAccount(password);
+        if (result.success) {
+            if (input) input.value = '';
+            const panel = document.getElementById('auth-delete-account-panel');
+            const opener = document.getElementById('auth-delete-account-open');
+            if (panel) panel.hidden = true;
+            if (opener) opener.hidden = false;
+            this._setDeleteAccountBusy(false, false);
+            // deleteUser déconnecte : onAuthStateChanged affiche la vue « non connecté ».
+            this.updateModalUI();
+            this.showAlert(t('account.delete.done'), 'success');
+            return result;
+        }
+        this._setDeleteAccountBusy(false, true);
+        this._setDeleteAccountError(t(`account.delete.errors.${result.error}`));
+        if (result.error === 'password-required' || result.error === 'wrong-password') input?.focus();
+        return result;
+    },
+
+    _setDeleteAccountBusy: function (busy, retry) {
+        const button = /** @type {HTMLButtonElement | null} */ (document.getElementById('delete-account-confirm'));
+        if (!button) return;
+        button.disabled = busy;
+        const label = button.querySelector('.delete-account-confirm-label');
+        if (label) {
+            label.textContent = busy
+                ? t('account.delete.inProgress')
+                : retry
+                  ? t('account.delete.retry')
+                  : t('account.delete.confirm');
+        }
+    },
+
+    _setDeleteAccountError: function (message) {
+        const el = document.getElementById('delete-account-error');
+        if (!el) return;
+        el.textContent = message;
+        el.hidden = !message;
+    },
+
+    // -----------------------------------------------------------------------
     // MÉTHODE CENTRALE : Synchro Cloud complète (toutes les données)
     // -----------------------------------------------------------------------
     syncDataWithCloud: function (silent = false) {
         if (!this.currentUser) return Promise.resolve({ success: false, data: null, error: 'Not logged in' });
+        // Suppression du compte en cours : aucune synchro (code d'erreur technique, pas un texte affiché).
+        if (this._accountDeletion) return Promise.resolve({ success: false, data: null, error: 'account-deletion' });
         if (this._activeSyncPromise) {
             if (!silent && this._activeSyncSilent) {
                 this._activeSyncSilent = false;
@@ -1026,7 +1234,7 @@ export const FirebaseAuthEngine = {
      * (vol, équipement, préférences, niveau, thème…).
      */
     triggerDebouncedSync: function () {
-        if (!this.currentUser || !this.enabled) return;
+        if (!this.currentUser || !this.enabled || this._accountDeletion) return;
 
         // Annule la synchro en attente si elle existe
         if (this._debounceSyncTimer) {
@@ -1070,7 +1278,7 @@ export const FirebaseAuthEngine = {
 
     /** Envoie la fiche de cet appareil, si le pilote a demandé la sauvegarde en ligne. */
     saveIceToCloud: async function () {
-        if (!this.currentUser || !this.enabled)
+        if (!this.currentUser || !this.enabled || this._accountDeletion)
             return { success: false, data: null, error: 'Not enabled or logged in' };
         const state = getIceCloudState();
         if (!state.enabled || !state.consentAt) return { success: false, data: null, error: 'ice-cloud-disabled' };
@@ -1154,7 +1362,7 @@ export const FirebaseAuthEngine = {
 
     // Write-through updates to Cloud when user makes progress
     saveStatsToCloud: async function () {
-        if (!this.currentUser || !this.enabled)
+        if (!this.currentUser || !this.enabled || this._accountDeletion)
             return { success: false, data: null, error: 'Not enabled or logged in' };
         // Les statistiques et l'historique QCM relèvent du consentement « statistiques », en plus de la synchro.
         if (!isStatsConsentGranted()) return { success: false, data: null, error: 'stats-consent-missing' };
@@ -1185,7 +1393,7 @@ export const FirebaseAuthEngine = {
     },
 
     saveHistoryToCloud: async function () {
-        if (!this.currentUser || !this.enabled)
+        if (!this.currentUser || !this.enabled || this._accountDeletion)
             return { success: false, data: null, error: 'Not enabled or logged in' };
         // Les statistiques et l'historique QCM relèvent du consentement « statistiques », en plus de la synchro.
         if (!isStatsConsentGranted()) return { success: false, data: null, error: 'stats-consent-missing' };
@@ -1216,7 +1424,7 @@ export const FirebaseAuthEngine = {
     },
 
     savePreferencesToCloud: async function () {
-        if (!this.currentUser || !this.enabled || this.syncingData)
+        if (!this.currentUser || !this.enabled || this.syncingData || this._accountDeletion)
             return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
@@ -1238,7 +1446,7 @@ export const FirebaseAuthEngine = {
     },
 
     syncLogbookData: async function (data) {
-        if (!this.currentUser || !this.enabled || this.syncingData || this._activeSyncPromise)
+        if (!this.currentUser || !this.enabled || this.syncingData || this._activeSyncPromise || this._accountDeletion)
             return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
@@ -1273,7 +1481,7 @@ export const FirebaseAuthEngine = {
     },
 
     deleteLogbookEntry: async function (id) {
-        if (!this.currentUser || !this.enabled)
+        if (!this.currentUser || !this.enabled || this._accountDeletion)
             return { success: false, data: null, error: 'Not enabled or logged in' };
 
         try {
@@ -1292,7 +1500,7 @@ export const FirebaseAuthEngine = {
     },
 
     syncEquipmentData: async function (data) {
-        if (!this.currentUser || !this.enabled || this.syncingData || this._activeSyncPromise)
+        if (!this.currentUser || !this.enabled || this.syncingData || this._activeSyncPromise || this._accountDeletion)
             return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
@@ -1316,7 +1524,7 @@ export const FirebaseAuthEngine = {
     },
 
     deleteEquipmentEntry: async function (id) {
-        if (!this.currentUser || !this.enabled)
+        if (!this.currentUser || !this.enabled || this._accountDeletion)
             return { success: false, data: null, error: 'Not enabled or logged in' };
 
         try {
@@ -1334,7 +1542,7 @@ export const FirebaseAuthEngine = {
     },
 
     syncEquipmentEntry: async function (item) {
-        if (!this.currentUser || !this.enabled || this.syncingData || this._activeSyncPromise)
+        if (!this.currentUser || !this.enabled || this.syncingData || this._activeSyncPromise || this._accountDeletion)
             return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {
@@ -1355,7 +1563,7 @@ export const FirebaseAuthEngine = {
     },
 
     syncLogbookEntry: async function (session) {
-        if (!this.currentUser || !this.enabled || this.syncingData || this._activeSyncPromise)
+        if (!this.currentUser || !this.enabled || this.syncingData || this._activeSyncPromise || this._accountDeletion)
             return { success: false, data: null, error: 'Not enabled, syncing or not logged in' };
 
         try {

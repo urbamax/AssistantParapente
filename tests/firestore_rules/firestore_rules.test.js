@@ -323,11 +323,18 @@ describe('rôles du pilote (access)', () => {
         await assertSucceeds(getDoc(profile(asMe(), ME)));
     });
 
-    it('ne peut ni se donner un rôle, ni modifier ou supprimer les siens', async () => {
+    it('ne peut ni se donner un rôle, ni modifier les siens', async () => {
         await assertFails(setDoc(profile(asMe(), ME), { roles: ['beta', 'admin'] }));
         await assertFails(setDoc(doc(asMe(), 'users', ME, 'access', 'autre'), { roles: ['beta'] }));
         await assertFails(setDoc(profile(asMe(), ME), { roles: [] }, { merge: true }));
-        await assertFails(deleteDoc(profile(asMe(), ME)));
+    });
+
+    // Suppression du compte (spec 059) : le pilote efface tout ce qui porte son uid, rôles compris.
+    it('peut supprimer ses propres rôles, pas ceux d’un autre', async () => {
+        await assertSucceeds(getDocs(collection(asMe(), 'users', ME, 'access')));
+        await assertSucceeds(deleteDoc(profile(asMe(), ME)));
+        await assertFails(deleteDoc(profile(asMe(), OTHER)));
+        await assertFails(deleteDoc(profile(anonymous(), OTHER)));
     });
 
     it("ne lit pas les rôles d'un autre pilote", async () => {
@@ -340,12 +347,57 @@ describe('rôles du pilote (access)', () => {
     });
 });
 
+describe('suppression du compte (spec 059) : le pilote efface tous ses documents', () => {
+    it('supprime chaque document de chaque sous-collection, puis le document du compte', async () => {
+        await env.withSecurityRulesDisabled(async (context) => {
+            const db = context.firestore();
+            await setDoc(doc(db, 'users', ME, 'access', 'profile'), { roles: ['beta'] });
+            await setDoc(doc(db, 'users', ME, 'igcTraces', 'f1_0'), part({ flightId: 'f1' }));
+            await setDoc(doc(db, 'users', ME, 'ice', 'profile'), { updatedAt: 1, consentAt: 'x' });
+            await setDoc(doc(db, 'users', ME, 'stats', 'exam_history'), { exams: [] });
+        });
+        const db = asMe();
+        for (const sub of ['logbook', 'igcTraces', 'equipment', 'stats', 'preferences', 'ice', 'access', 'pushState']) {
+            const snap = await assertSucceeds(getDocs(collection(db, 'users', ME, sub)));
+            for (const d of snap.docs) await assertSucceeds(deleteDoc(d.ref));
+        }
+        await assertSucceeds(deleteDoc(doc(db, 'users', ME)));
+        await env.withSecurityRulesDisabled(async (context) => {
+            const admin = context.firestore();
+            for (const sub of [
+                'logbook',
+                'igcTraces',
+                'equipment',
+                'stats',
+                'preferences',
+                'ice',
+                'access',
+                'pushState',
+            ]) {
+                expect((await getDocs(collection(admin, 'users', ME, sub))).size).toBe(0);
+                expect((await getDocs(collection(admin, 'users', OTHER, sub))).size).toBeGreaterThanOrEqual(0);
+            }
+            expect((await getDoc(doc(admin, 'users', ME))).exists()).toBe(false);
+            expect((await getDoc(doc(admin, 'users', OTHER, 'logbook', 'f1'))).exists()).toBe(true);
+        });
+    });
+});
+
 describe("tout ce que l'application n'utilise pas est refusé", () => {
-    it('pushState est réservé à la Cloud Function (même pour son propriétaire)', async () => {
+    it('pushState est écrit par la Cloud Function seule ; son propriétaire peut seulement le lire et le supprimer (spec 059)', async () => {
         const ref = doc(asMe(), 'users', ME, 'pushState', 'favoriteSitesFlyable');
-        await assertFails(getDoc(ref));
         await assertFails(setDoc(ref, { favoris: 'faux' }));
+        await assertFails(setDoc(doc(asMe(), 'users', ME, 'pushState', 'nouveau'), { a: 1 }));
+        await assertSucceeds(getDocs(collection(asMe(), 'users', ME, 'pushState')));
+        await assertSucceeds(deleteDoc(ref));
+    });
+
+    it("pushState d'un autre pilote reste illisible et intouchable", async () => {
+        const ref = doc(asMe(), 'users', OTHER, 'pushState', 'favoriteSitesFlyable');
+        await assertFails(getDoc(ref));
+        await assertFails(getDocs(collection(asMe(), 'users', OTHER, 'pushState')));
         await assertFails(deleteDoc(ref));
+        await assertFails(deleteDoc(doc(anonymous(), 'users', ME, 'pushState', 'favoriteSitesFlyable')));
     });
 
     it('une sous-collection inconnue est refusée, même sous son propre uid', async () => {

@@ -291,6 +291,15 @@ export const FR_HTML = Object.freeze({
         deconnexion: 'Déconnexion',
         activerLesAlertesMeteo: 'Activer les alertes météo',
         titleRecevoirUneNotification: 'Recevoir une notification quand un site favori devient volable, même app fermée',
+        supprimerMonCompte: 'Supprimer mon compte',
+        supprimerMonCompteTitre: 'Supprimer mon compte et mes données en ligne',
+        supprimerMonCompteTexte:
+            "Votre compte et <strong>toutes vos données en ligne</strong> seront supprimés : carnet de vol et traces GPS, matériel, statistiques du QCM, préférences, fiche d'urgence en ligne et alertes météo. <strong>C'est définitif</strong> : rien ne pourra être récupéré.",
+        supprimerMonCompteLocal:
+            "Les données de <strong>cet appareil</strong> restent ici. Pour les garder ailleurs, utilisez d'abord <strong>Exporter</strong> ci-dessous ; pour les retirer aussi, effacez les données de ce site dans les réglages de votre navigateur.",
+        motDePasseConfirmation: 'Confirmez avec votre mot de passe',
+        annuler: 'Annuler',
+        supprimerDefinitivement: 'Supprimer définitivement',
     }),
     localBackup: Object.freeze({
         titre: 'Sauvegarde sur cet appareil',
@@ -382,7 +391,7 @@ export const FR_HTML = Object.freeze({
         lesDonneesStockeesLocalement:
             "Les données stockées localement (LocalStorage) restent stockées sur votre navigateur jusqu'à ce que vous effaciez les données de votre site ou révoquiez votre consentement (la révocation du consentement « Statistiques » efface les scores QCM, mais conserve votre carnet de vol, matériel et fiche ICE locaux).",
         lesComptesUtilisateursInactifs:
-            'Les données synchronisées sur Firebase sont conservées tant que votre compte existe. Vous pouvez demander la suppression définitive de votre compte et de ses données à tout moment en nous contactant.',
+            "Les données synchronisées sur Firebase sont conservées tant que votre compte existe. Vous pouvez supprimer vous-même, à tout moment, votre compte et toutes ses données en ligne : Espace Synchro, puis Supprimer mon compte (c'est définitif). Les données stockées sur votre appareil ne sont pas touchées.",
         n5VosDroitsRgpd: '5. Vos Droits (RGPD)',
         conformementAuReglementGeneral:
             "Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez de droits d'accès, de rectification, de portabilité et de suppression de vos données, ainsi que du droit de retirer votre consentement à tout moment. Vous pouvez également introduire une réclamation auprès de la CNIL (cnil.fr).",
@@ -516,7 +525,7 @@ export const FR_HTML = Object.freeze({
         pourCreerVotreCompte:
             "Pour créer votre compte (ce qui est <strong>100% gratuit</strong>), cliquez sur l'icône <strong>👤</strong> en haut à droite de l'application (Espace Synchro). La création prend moins d'une minute : une adresse e-mail et un mot de passe suffisent. Aucune information personnelle supplémentaire n'est requise.",
         ellesSontHebergeesSur:
-            "elles sont hébergées sur l'infrastructure Firebase (Google Ireland, serveurs européens) et ne sont jamais partagées ni vendues. Pour faire supprimer votre compte et vos données en ligne, contactez l'éditeur avec le formulaire Signaler un problème / Suggestion (l'application n'a pas encore de bouton pour le faire vous-même).",
+            "elles sont hébergées sur l'infrastructure Firebase (Google Ireland, serveurs européens) et ne sont jamais partagées ni vendues. Pour supprimer votre compte et toutes vos données en ligne, ouvrez l'Espace Synchro, puis Supprimer mon compte : votre mot de passe est redemandé et c'est définitif. Les données de cet appareil restent : exportez-les avant si vous voulez les garder ailleurs.",
         vosDonneesRestentLes: 'Vos données restent les vôtres :',
         uneFoisConnecteUn:
             "Une fois connecté, un petit point dans l'en-tête indique qu'une synchronisation est en cours ou que des modifications n'ont pas encore pu être envoyées (hors ligne) : l'application réessaie automatiquement. Les boutons <strong>Exporter</strong> et <strong>Importer</strong> de l'Espace Synchro, disponibles aussi sans compte, permettent de garder une copie complète de vos données (y compris vos traces GPS .igc) dans un fichier et de les restaurer plus tard.",
