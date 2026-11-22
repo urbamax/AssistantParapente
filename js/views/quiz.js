@@ -1088,9 +1088,9 @@ class QuizViewClass extends QuizVoiceBase {
             const stats = QuizService.getPersistentStats();
             const s = stats.questions[q.code];
             if (!s || s.total === 0) {
-                badgeHtml = `<div class="quiz-theme-tag" style="background:var(--accent-orange, #3b82f6); color:#fff; border-color:var(--accent-orange, #3b82f6); margin-left: 8px;"><i class="ri-sparkling-line"></i> ${tq('question.new')}</div>`;
+                badgeHtml = `<div class="quiz-theme-tag" style="background:var(--accent-orange, #3b82f6); color:#fff; border-color:var(--accent-orange, #3b82f6);"><i class="ri-sparkling-line"></i> ${tq('question.new')}</div>`;
             } else {
-                badgeHtml = `<div class="quiz-theme-tag" style="background:#f87171; color:#fff; border-color:#f87171; margin-left: 8px;"><i class="ri-refresh-line"></i> ${tq('question.toReview')}</div>`;
+                badgeHtml = `<div class="quiz-theme-tag" style="background:#f87171; color:#fff; border-color:#f87171;"><i class="ri-refresh-line"></i> ${tq('question.toReview')}</div>`;
             }
         }
 
@@ -1125,7 +1125,7 @@ class QuizViewClass extends QuizVoiceBase {
         container.innerHTML = `
             <div class="quiz-header-row">
                 <div class="quiz-meta" style="display:flex; align-items:center;">
-                    <span class="bank-item-code" style="margin-right: 8px; ${colorStyle}">${escapeHTML(q.code)}</span>
+                    <span class="bank-item-code" style="${colorStyle}">${escapeHTML(q.code)}</span>
                     <div class="quiz-theme-tag">${escapeHTML(q.theme)}</div>
                     ${badgeHtml}
                     <div class="quiz-progress" style="margin-left: auto;">${tq('question.progress', { index: qIdx, total })}</div>
@@ -1469,8 +1469,8 @@ class QuizViewClass extends QuizVoiceBase {
                                   return `
                     <div class="bank-item" style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; background: var(--bg-card); box-shadow:0 2px 4px rgba(0,0,0,0.02);">
                         <div class="bank-item-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items:center;">
-                            <span class="bank-item-code" style="font-family:monospace; font-size:0.85rem; color:var(--text-secondary); background:rgba(0,0,0,0.05); padding:4px 8px; border-radius:4px;">#${escapeHTML(r.question.code)}</span>
-                            <span class="badge" style="${badge.style} padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">${tq(badge.labelKey)}</span>
+                            <span class="bank-item-code">#${escapeHTML(r.question.code)}</span>
+                            <span class="badge quiz-result-badge" style="${badge.style}">${tq(badge.labelKey)}</span>
                         </div>
                         <div class="bank-item-question" style="font-weight: 600; font-size:1.1rem; margin-bottom: 16px; color:var(--text-main); line-height:1.4;">${escapeHTML(r.question.question)}</div>
                         <div class="bank-item-choices" style="display: flex; flex-direction: column; gap: 10px;">
