@@ -1919,3 +1919,38 @@ abbr.qcm-acronym:focus-visible {
         transform: translateY(0);
     }
 }
+
+/* Spec 061 : encart « À lire de près » de la correction (ce qui rend la question délicate).
+   Or doré, pour le distinguer du bandeau orange des pièges récurrents de l'élève. */
+.quiz-read-closely {
+    margin: 0 0 12px;
+    padding: 10px 14px;
+    border-left: 4px solid var(--accent-gold);
+    border-radius: 0 8px 8px 0;
+    background: rgba(234, 179, 8, 0.1);
+    color: var(--text-main);
+    overflow-wrap: anywhere;
+}
+
+.quiz-read-closely-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--accent-gold);
+    color: light-dark(#a16207, var(--accent-gold));
+}
+
+.quiz-read-closely-text {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.quiz-read-closely-text + .quiz-read-closely-text {
+    margin-top: 4px;
+}

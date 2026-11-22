@@ -59,6 +59,7 @@ const SCREENS = [
         ['js/views/quiz_stats_html.js', 30],
         ['js/views/quiz_voice_ui.js', 6],
         ['js/views/quiz_course_links.js', 4],
+        ['js/views/quiz_read_closely.js', 2],
         ['js/views/quiz_explanation.js', 0],
         ['js/views/quiz_strings.js', 0],
         ['js/views/quiz_traps_html.js', 7],

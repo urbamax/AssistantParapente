@@ -1,0 +1,1830 @@
+{
+  "A100B": [
+    "La question vise le pic de température de l'air, pas l'instant où le soleil est au plus haut."
+  ],
+  "A101M": [
+    "« La base des cumulus » peut marquer la fin de la montée ou seulement le début de la condensation."
+  ],
+  "A102B": [
+    "Deux choix parlent du vent : c'est sa force, « très fort » ou « moyenne », qui change son effet."
+  ],
+  "A105B": [
+    "La brise de pente et le thermique qui s'en détache ne vont pas au même endroit, d'où le poids de « loin du relief »."
+  ],
+  "A106B": [
+    "« Toujours » tombe dès qu'un seul cas contraire existe."
+  ],
+  "A107B": [
+    "L'énoncé dit « peut », et un choix tourné à la négative décrit peut-être un cas qui existe."
+  ],
+  "A108B": [
+    "« Ne … que » tombe dès qu'un seul cas contraire existe."
+  ],
+  "A109B": [
+    "Les trois choix parlent du « soir » : c'est le sens du mouvement de l'air qui les sépare."
+  ],
+  "A110B": [
+    "Ces choix mêlent un lieu et un moment, et c'est surtout le moment de la journée qui compte."
+  ],
+  "A11V": [
+    "Trois choix finissent par « seulement », qui enferme chaque nuage dans un seul étage."
+  ],
+  "A12B": [
+    "Deux choix ne diffèrent que d'un mot : ascendance « thermique » ou « dynamique »."
+  ],
+  "A13B": [
+    "Deux choix ne diffèrent que d'un mot : « stables » ou « instables ».",
+    "Deux choix ne diffèrent que d'un mot : « horizontalement » ou « verticalement »."
+  ],
+  "A14B": [
+    "Deux choix ne diffèrent que d'un mot : « stables » ou « instables ».",
+    "Deux choix ne diffèrent que d'un mot : « verticalement » ou « horizontalement »."
+  ],
+  "A15B": [
+    "Deux affirmations ne diffèrent que par le nom du nuage, et l'étage de chacun décide de sa composition.",
+    "Le mot « grêlons » porte sur la forme des précipitations du nimbostratus, pas sur leur existence."
+  ],
+  "A16M": [
+    "Le nom contient « instabilité », mais « conditionnelle » renvoie à l'état de l'air au départ."
+  ],
+  "A17B": [
+    "Les phénomènes cités existent tous, seule change leur attribution à l'un ou l'autre nuage."
+  ],
+  "A20B": [
+    "« Hors problème de visibilité » écarte ce critère : seul compte le danger propre à chaque nuage."
+  ],
+  "A21V": [
+    "La formule « avec prudence » rassure sans rien changer au danger propre à un cumulonimbus."
+  ],
+  "A24B": [
+    "Le mot « généralement » écarte les cas rares : seul compte ce que produit le nuage d'ordinaire."
+  ],
+  "A25B": [
+    "Front « chaud » ne veut pas dire thermiques plus forts : tout dépend de l'effet du voile nuageux sur le soleil qui chauffe le sol."
+  ],
+  "A27B": [
+    "L'énoncé précise front « chaud » : un nuage de perturbation n'appartient pas forcément à ce front-là."
+  ],
+  "A28B": [
+    "Le nom « de rayonnement » désigne la cause de ce brouillard, qui fixe les conditions de sa formation."
+  ],
+  "A29B": [
+    "Le nom « d'advection » désigne un air qui se déplace, et ce type de brouillard en dépend."
+  ],
+  "A30B": [
+    "« Plutôt stable » freine la convection, mais « impossible » ne laisse aucune exception, même avec un sol très chauffé."
+  ],
+  "A31B": [
+    "La précision « en atmosphère humide » renvoie à ce que devient l'air humide qui monte et se refroidit."
+  ],
+  "A34B": [
+    "« Uniquement » tombe dès qu'un seul cas contraire existe.",
+    "La parenthèse parle de « gouttelettes », un mot qui désigne de l'eau liquide.",
+    "« Partout » tombe dès qu'un seul cas contraire existe, ici un seul endroit de la troposphère sans vapeur d'eau."
+  ],
+  "A35B": [
+    "Buée et rosée naissent de la vapeur, et « sous forme de » porte sur l'état de l'eau qu'on voit."
+  ],
+  "A36M": [
+    "Deux choix citent les mêmes états dans l'ordre inverse : seul le sens du passage les distingue."
+  ],
+  "A38M": [
+    "Deux choix ne diffèrent que d'un mot : isobares « espacés » ou « resserrés ».",
+    "Deux choix ne diffèrent que d'un mot : vents « plutôt faibles » ou « plutôt forts »."
+  ],
+  "A39M": [
+    "Une réserve bien tournée comme « hors cas ponctuel de l'orage » ne rend pas un choix plus sûr."
+  ],
+  "A3V": [
+    "Le mot « gazeuse » oppose la vapeur d'eau, invisible, à ce que l'œil voit d'un nuage."
+  ],
+  "A43B": [
+    "L'énoncé compare « l'air froid » à l'air chaud, et non l'inverse."
+  ],
+  "A44B": [
+    "Deux choix donnent la même valeur de 1° par 100 m : seul le verbe change, « diminue » ou « augmente »."
+  ],
+  "A45B": [
+    "L'énoncé dit air « nuageux » : la condensation de son eau agit sur la vitesse à laquelle sa température baisse."
+  ],
+  "A46B": [
+    "Les relevés « 15 °C au sol et 12 °C 500 m au-dessus » donnent une baisse par 100 m à comparer au refroidissement d'une particule qui monte."
+  ],
+  "A47M": [
+    "Deux relevés ont les mêmes chiffres, seule change l'altitude associée à chaque température."
+  ],
+  "A49B": [
+    "Le mot « principalement » vise le mode de chauffage dominant, pas tout ce qui chauffe un peu l'air."
+  ],
+  "A4B": [
+    "« Réchauffement » et refroidissement s'opposent : tout tient à ce que devient la température de l'air qui monte."
+  ],
+  "A51B": [
+    "« On appelle » demande une définition, et un trait fréquent n'est pas forcément ce qui définit la chose."
+  ],
+  "A52B": [
+    "Deux choix ne diffèrent que d'un mot : « faibles » ou « forts »."
+  ],
+  "A53B": [
+    "Deux choix ne diffèrent que d'un verbe : « se renforce » ou « s'affaiblit »."
+  ],
+  "A54B": [
+    "Un air qui descend une pente n'est pas toujours une brise, et « un vent météo » renvoie à l'origine de cet air."
+  ],
+  "A55V": [
+    "« Est due à » demande la cause, distincte de ce que la turbulence produit sur l'aile."
+  ],
+  "A57B": [
+    "L'unité compte : un nœud ne vaut pas un km/h, et la conversion précède le choix."
+  ],
+  "A59B": [
+    "Les petits mots « provenant du » et « soufflant vers » désignent deux côtés opposés."
+  ],
+  "A60B": [
+    "Chaque choix associe un côté et un hémisphère, et les deux mots comptent."
+  ],
+  "A61B": [
+    "Deux détails changent d'un choix à l'autre : le sens de rotation et l'hémisphère."
+  ],
+  "A62B": [
+    "« Face au vent » inverse la règle apprise dos au vent."
+  ],
+  "A63B": [
+    "Les mêmes mots reviennent dans un ordre inversé : tout tient à la couche placée au-dessus.",
+    "« On appelle » demande une définition, et un effet possible n'est pas ce qui définit la chose."
+  ],
+  "A64B": [
+    "« Ne peut pas » tombe dès qu'un seul cas contraire existe.",
+    "Deux choix ne diffèrent que d'un mot : « rapidement » ou « doucement »."
+  ],
+  "A65B": [
+    "Deux choix ne diffèrent que par le nom du nuage : « cumulus » ou « stratus »."
+  ],
+  "A66M": [
+    "Les « Açores » sont dans la bonne zone sans être forcément le lieu d'où viennent les perturbations."
+  ],
+  "A67M": [
+    "Un seul mot change la masse d'air chaude : « tropicale » ou « équatoriale »."
+  ],
+  "A68B": [
+    "Deux choix ne diffèrent que d'un mot : « au-dessus » ou « au-dessous »."
+  ],
+  "A6B": [
+    "Le verbe « semblent » sépare l'immobilité apparente du nuage du mouvement réel de l'air."
+  ],
+  "A70B": [
+    "Le verbe change de sens d'un choix à l'autre : l'air chaud « est soulevé » ou « soulève » l'air froid.",
+    "Un choix prudent qui offre deux possibilités demande que les deux soient réelles."
+  ],
+  "A72B": [
+    "La justification « air froid = air stable » semble logique, mais une parenthèse ne prouve rien."
+  ],
+  "A73B": [
+    "Le mot « isolés » suffit à changer le sens du choix."
+  ],
+  "A75B": [
+    "La zone se situe dans le temps : ce qui arrive avec le front n'est pas ce qui vient après lui."
+  ],
+  "A76M": [
+    "« Toujours » tombe dès qu'un seul cas contraire existe."
+  ],
+  "A77B": [
+    "Le mot « isolés » compte : la question ne porte pas seulement sur l'endroit où naissent des orages."
+  ],
+  "A78V": [
+    "« Résulte » demande la cause : un phénomène qui accompagne la montée de l'air n'en est pas forcément l'origine."
+  ],
+  "A81T": [
+    "« Seule » et « peu importe » écartent tout le reste, et un seul autre facteur suffit à les faire tomber."
+  ],
+  "A81V": [
+    "Deux choix ne diffèrent que d'un mot : côté « au » vent ou côté « sous » le vent."
+  ],
+  "A83V": [
+    "Ce que le phénomène fait à l'aile se distingue de ce que le pilote doit faire pour y répondre."
+  ],
+  "A86V": [
+    "L'heure compte : « en début d'après-midi » ne désigne ni la fin de journée ni le soir."
+  ],
+  "A87V": [
+    "Deux choix ne diffèrent que d'un mot : continent « plus chaud » ou « plus froid » que la mer."
+  ],
+  "A88V": [
+    "Le nom de la brise, « de terre » ou « de mer », décide du seul mot qui change entre deux choix."
+  ],
+  "A89V": [
+    "« Le matin » fixe la position du soleil, donc le versant qu'il éclaire à cette heure."
+  ],
+  "A91V": [
+    "« À tout moment » tombe dès qu'un seul cas contraire existe, et une justification savante n'y change rien.",
+    "L'énoncé dit « descendantes », puis deux choix ne diffèrent que par « jour » ou « nuit »."
+  ],
+  "A92V": [
+    "« Jamais » tombe dès qu'un seul cas contraire existe."
+  ],
+  "A93V": [
+    "La saison indiquée, « l'hiver », compte pour une brise née du soleil qui chauffe le sol."
+  ],
+  "A94B": [
+    "Ce qui arrive « au vent » du relief n'arrive pas « sous le vent »."
+  ],
+  "A96B": [
+    "Deux choix ne diffèrent que d'un mot : « au vent » ou « sous le vent » du relief.",
+    "« N'importe où » exclut tout lieu particulier, alors que la question porte sur la place propre au phénomène."
+  ],
+  "A98B": [
+    "Un seul préfixe sépare deux choix : « stable » ou « instable »."
+  ],
+  "A99B": [
+    "Pour la stabilité, l'endroit où arrive la chaleur compte : près du sol ou « en altitude »."
+  ],
+  "E10B": [
+    "Deux choix ont les mêmes mots dans un ordre inversé : tout tient à l'endroit de la dépression."
+  ],
+  "E11B": [
+    "L'énoncé parle de « la portance » seule, pas de la force aérodynamique totale.",
+    "« Quelle que soit » tombe dès qu'un seul cas contraire existe."
+  ],
+  "E12B": [
+    "Deux choix commencent par « augmente », et tout se joue sur ce qui se passe peu avant le décrochage."
+  ],
+  "E13B": [
+    "Le mot « transitoirement » vise l'effet immédiat, avant que l'aile retrouve son équilibre."
+  ],
+  "E17B": [
+    "Deux choix ne diffèrent que d'un mot : « carré » ou « cube » de la vitesse."
+  ],
+  "E17T": [
+    "« Incassables » tombe dès qu'un seul cas contraire existe, ici une seule rupture."
+  ],
+  "E20M": [
+    "Deux choix ne diffèrent que d'un mot : « à piquer » ou « à cabrer », et tout tient à ce que la traînée retient vers l'arrière."
+  ],
+  "E26B": [
+    "Au sol, deux choix ne diffèrent que d'un mot : vent « instantané » ou vent « moyen ».",
+    "En vol, deux vents s'opposent dans les choix : le vent « météo » et le vent relatif de l'aile."
+  ],
+  "E27B": [
+    "Deux choix ne diffèrent que d'un mot : « à droite » ou « à gauche », selon la demi-aile qui avance le plus vite."
+  ],
+  "E32M": [
+    "Une incidence « supérieure » à celle du taux de chute mini oriente l'aile vers une limite de vol."
+  ],
+  "E33V": [
+    "Tout tient à la référence du déplacement : la vitesse par rapport au « sol » ou à l'air."
+  ],
+  "E34V": [
+    "« Toujours » tombe dès qu'un seul cas contraire existe."
+  ],
+  "E36V": [
+    "« Jamais » tombe dès qu'un seul cas contraire existe.",
+    "Deux choix ne diffèrent que d'un mot : trajectoire-« air » ou trajectoire-« sol »."
+  ],
+  "E37B": [
+    "L'énoncé est à la négative : il cherche ce sur quoi le vent « n'a aucune influence ».",
+    "Le vent est dit « régulier en force et direction », ce qui exclut l'effet d'une rafale."
+  ],
+  "E38B": [
+    "Un « fort vent arrière » établi n'est pas une rafale : l'aile vole dans une masse d'air qui se déplace tout entière."
+  ],
+  "E39B": [
+    "Le sens du vent, « vent arrière », par rapport à la trajectoire décide du calcul."
+  ],
+  "E41M": [
+    "Le mot « transitoirement » vise l'effet immédiat de la rafale, avant que l'aile retrouve son équilibre.",
+    "Deux choix sur l'incidence ne diffèrent que d'un mot : « diminution » ou « augmentation »."
+  ],
+  "E42M": [
+    "Le mot « transitoirement » vise l'effet immédiat de la rafale, avant que l'aile retrouve son équilibre.",
+    "Deux choix sur l'incidence ne diffèrent que d'un mot : « augmentation » ou « diminution »."
+  ],
+  "E43M": [
+    "Le mot « transitoirement » vise l'entrée dans l'ascendance, pas l'aile une fois stabilisée."
+  ],
+  "E44M": [
+    "Le mot « transitoirement » vise l'entrée dans la descendance, pas l'aile une fois stabilisée."
+  ],
+  "E45M": [
+    "Le mot « transitoirement » vise l'instant où l'aile entre dans l'ascendance, avant tout retour à l'équilibre.",
+    "Deux choix sur l'incidence ne diffèrent que d'un mot : « diminue » ou « augmente »."
+  ],
+  "E46M": [
+    "Le mot « transitoirement » vise l'instant où l'aile entre dans la descendance, avant tout retour à l'équilibre.",
+    "Deux choix sur l'incidence ne diffèrent que d'un mot : « augmente » ou « diminue »."
+  ],
+  "E47B": [
+    "« Par rapport à l'air ascendant » prend la masse d'air pour référence, pas le sol."
+  ],
+  "E48M": [
+    "« Régulière » décrit le vol installé dans l'ascendance, pas l'instant où l'aile y entre."
+  ],
+  "E49B": [
+    "La question porte sur « la finesse-sol », mesurée par rapport au terrain, pas sur la finesse de l'aile dans l'air."
+  ],
+  "E50V": [
+    "Deux mots différents, comme vent relatif et « la trajectoire », peuvent désigner la même droite."
+  ],
+  "E53B": [
+    "« Brider » une aile a un sens précis, qui désigne une action particulière sur l'aile."
+  ],
+  "E55B": [
+    "Le verbe « s'incline » vise le mouvement qui incline l'aile, pas le virage entier."
+  ],
+  "E56B": [
+    "La question porte sur le « poids apparent », celui que l'aile doit porter en virage, pas sur le poids total."
+  ],
+  "E57B": [
+    "Dans un rapport, l'ordre compte : la grandeur placée en premier change tout.",
+    "Le suffixe « sol » fixe la référence : les vitesses sont relevées par rapport au terrain."
+  ],
+  "E58B": [
+    "Dans un rapport, l'ordre compte : la force placée en premier change tout.",
+    "Un rapport de distances se relève au sol, et la masse d'air dans laquelle il est mesuré compte."
+  ],
+  "E5V": [
+    "« Légèrement » rend plausible un écart de forces dans un vol pourtant dit stabilisé."
+  ],
+  "E60M": [
+    "« Toujours » tombe dès qu'un seul cas contraire existe.",
+    "Une précision comme « en air calme » peut changer la valeur d'un choix."
+  ],
+  "E61B": [
+    "La question porte sur « la finesse-air », celle de l'aile dans l'air, pas sur la finesse-sol."
+  ],
+  "E62M": [
+    "Deux choix sur l'angle de plané ne diffèrent que d'un mot : « grand » ou « petit »."
+  ],
+  "E63B": [
+    "« Jamais » tombe dès qu'un seul cas contraire existe.",
+    "« Toujours » tombe dès qu'un seul cas contraire existe."
+  ],
+  "E64B": [
+    "Les choix ne diffèrent que par deux détails : le sens de variation et le sens du vent, « arrière » ou de face."
+  ],
+  "E66B": [
+    "Dans un rapport, l'ordre compte : la grandeur placée en premier change tout.",
+    "Le numérateur compte : le « poids du pilote » seul n'est pas le poids de tout l'ensemble."
+  ],
+  "E67M": [
+    "L'aile est prise à « un pilote plus léger » : c'est sous un poids plus lourd qu'elle va voler."
+  ],
+  "E68B": [
+    "Les choix vont par paires qui ne diffèrent que d'un mot : « plus vite » ou « moins vite »."
+  ],
+  "E69B": [
+    "L'énoncé parle d'un « fort » accroissement, ce qui renvoie à ce qu'une grosse surcharge fait subir à la structure."
+  ],
+  "E6V": [
+    "« Exactement » est un mot fort, qui ne tient que si la situation exige une égalité stricte."
+  ],
+  "E71M": [
+    "Deux choix emploient les mêmes mots, « vitesse » et « incidence », mais pas à la même place."
+  ],
+  "E72M": [
+    "L'altitude atteinte au bout du compte se distingue de la rapidité avec laquelle chaque aile y parvient.",
+    "Deux choix ne diffèrent que d'un mot : l'aile « la plus » ou « la moins » chargée."
+  ],
+  "E73M": [
+    "Dans un rapport, l'ordre compte : le poids placé en premier change tout."
+  ],
+  "E76M": [
+    "« Toujours » tombe dès qu'un seul cas contraire existe, et le mot revient ici dans trois choix."
+  ],
+  "E77B": [
+    "Deux choix sur l'incidence ne diffèrent que d'un mot : « trop faible » ou « trop forte »."
+  ],
+  "E78M": [
+    "La question porte sur l'origine de l'abattée « consécutive à un décrochage », pas sur la cause du décrochage lui-même."
+  ],
+  "E78T": [
+    "Un fait connu du vol libre, « comme en vol stabilisé non tracté », est appliqué à la treuillée et à la traction du câble."
+  ],
+  "E79M": [
+    "Les choix vont par paires qui ne diffèrent que d'un mot : « cabreur » ou « piqueur », « à cabrer » ou « à piquer »."
+  ],
+  "E79T": [
+    "Chaque choix parle soit de la « treuillée stabilisée », soit d'un effet transitoire."
+  ],
+  "E7V": [
+    "L'énoncé parle de la force aérodynamique entière, distincte de l'une de ses composantes."
+  ],
+  "E80B": [
+    "Les choix vont par paires sur la portance et la traînée, et seul le sens de variation change."
+  ],
+  "E81B": [
+    "Les trois choix ne diffèrent que par un mot de comparaison avec la vitesse du taux de chute mini."
+  ],
+  "E83M": [
+    "Les choix vont par paires qui ne diffèrent que d'un mot : « diminue » ou « augmente »."
+  ],
+  "E84M": [
+    "Chaque choix affirme deux choses, la vitesse et l'incidence, et les deux doivent tenir."
+  ],
+  "E85M": [
+    "Le mot « suivi » fixe un ordre entre ce qui vient avant et ce qui vient après le décrochage.",
+    "Deux choix sur l'incidence ne diffèrent que d'un mot : « augmentation » ou « diminution »."
+  ],
+  "E87M": [
+    "Deux choix posent la même égalité, mais pas avec les mêmes forces de l'autre côté."
+  ],
+  "E8M": [
+    "La force ne suit pas forcément la vitesse au même rythme : tout dépend de la loi qui les relie."
+  ],
+  "E9B": [
+    "Deux choix ne diffèrent que d'un mot : vitesse par rapport à « l'air » ou au « sol »."
+  ],
+  "F10B": [
+    "« Conditions aérologiques » désigne l'air du jour, distinct des autres aspects de la prise en main de l'aile."
+  ],
+  "F13BM": [
+    "L'énoncé restreint la question aux causes « liées à l'erreur humaine » : une cause d'accident ne suffit pas."
+  ],
+  "F17BM": [
+    "« Toutes » tombe dès qu'un seul cas contraire existe."
+  ],
+  "F1BM": [
+    "Deux choix disent « je vais sur site », et c'est ce qui accompagne cette décision qui les sépare."
+  ],
+  "F20VBM": [
+    "L'énoncé cherche l'attitude « la plus dangereuse », et un défaut n'expose pas forcément au danger."
+  ],
+  "F21VBM": [
+    "Le mot « absolu » renforce une qualité sans la changer en défaut."
+  ],
+  "F24BM": [
+    "Une compétence reconnue peut être déformée par un complément comme « sans GPS »."
+  ],
+  "F25VBM": [
+    "Le moment précisé dans chaque choix compte : « avant le vol » ou « pendant le vol »."
+  ],
+  "F29V": [
+    "« Uniquement » tombe dès qu'un seul cas contraire existe."
+  ],
+  "F2B": [
+    "Chaque choix vise un moment : le niveau d'aujourd'hui ou celui « quand j'aurai progressé »."
+  ],
+  "F30V": [
+    "L'énoncé précise ce que le pilote n'a pas fait avant d'arriver : « sans avoir approfondi le bulletin météo »."
+  ],
+  "F33B": [
+    "L'énoncé oppose l'habitude au jour même : « aujourd'hui je suis particulièrement bas ».",
+    "« Quoi qu'il arrive » fige une décision et ne laisse rien au pilote si elle échoue."
+  ],
+  "F34M": [
+    "Avoir « mes instruments de vol avec ma carte » ne dit rien de ce que les règles permettent au parapente dans un nuage."
+  ],
+  "F36M": [
+    "L'énoncé précise « sans vache possible », ce qui pèse sur chaque choix à travers le terrain sous la transition."
+  ],
+  "F37M": [
+    "Un choix en deux phrases peut changer de sens à la seconde, ici « les kilomètres parcourus sont la priorité »."
+  ],
+  "F38BM": [
+    "Les conditions du jour attirent l'œil, mais « j'ai conduit jusque tard dans la nuit » décrit l'état du pilote."
+  ],
+  "F3B": [
+    "Une intention louable en début de choix n'engage pas la fin, où le regard « fixe ce point le plus possible »."
+  ],
+  "F6B": [
+    "L'énoncé porte sur les compétences « non techniques », et la négation change le tri."
+  ],
+  "F8VBM": [
+    "Un simple préfixe peut changer une qualité en défaut, comme dans « sur-confiance »."
+  ],
+  "G10V": [
+    "Les choix vont par paires où un seul mot change : « augmente » ou « diminue »."
+  ],
+  "G11M": [
+    "Deux choix ne diffèrent que d'un mot : « augmentation » ou « diminution » de la portance."
+  ],
+  "G12V": [
+    "L'énoncé parle de « l'axe de lacet », la rotation autour de la verticale, pas de l'inclinaison de l'aile.",
+    "Deux choix sur la traînée ne diffèrent que d'un mot : « augmente » ou « diminue »."
+  ],
+  "G13B": [
+    "L'aile est prise à un pilote « plus léger », donc elle porte une autre charge que d'habitude.",
+    "Deux choix ne diffèrent que d'un mot : « plus » ou « moins » sensible à la fermeture."
+  ],
+  "G14B": [
+    "L'aile est prise à un pilote « plus lourd », donc elle porte une autre charge que d'habitude."
+  ],
+  "G15M": [
+    "Deux choix ne diffèrent que par le type de profil : « creux » ou « biconvexes ».",
+    "Le qualificatif accolé au profil reflex, « stable » ou « instable », change tout."
+  ],
+  "G16B": [
+    "Le nom de l'axe cité compte : « lacet », tangage ou roulis."
+  ],
+  "G17M": [
+    "L'énoncé part d'une fermeture, et la vitesse à laquelle une aile ferme n'est pas celle à laquelle elle décroche."
+  ],
+  "G18M": [
+    "Deux choix s'opposent sur le sens de variation de l'incidence : « augmentation » ou diminution."
+  ],
+  "G19V": [
+    "Assiette et incidence se distinguent : l'une se mesure par rapport à l'horizon, l'autre par rapport au vent relatif."
+  ],
+  "G1M": [
+    "Chaque choix porte une condition : « en vol équilibré » ou « transitoirement »."
+  ],
+  "G20M": [
+    "Deux choix ne diffèrent que d'un mot : aile « extérieure » ou « intérieure » à la rotation.",
+    "Tout tient à ce qui tourne et autour de quoi : « le pilote » ou la voile."
+  ],
+  "G21B": [
+    "Tous les réglages de l'aile ne touchent pas le calage, qui est l'angle de l'aile par rapport au pilote."
+  ],
+  "G22B": [
+    "Deux choix ne diffèrent que par l'unité, qui dit si le centrage mesure un angle ou une position."
+  ],
+  "G23B": [
+    "Une aile exigeante à piloter n'est pas pour autant une aile « instable »."
+  ],
+  "G24B": [
+    "« Aucun risque » tombe dès qu'un seul cas contraire existe."
+  ],
+  "G25B": [
+    "La question porte sur l'effet de l'accélérateur ajouté aux oreilles, pas sur l'effet des oreilles seules."
+  ],
+  "G26B": [
+    "Une trajectoire plus plongeante ne veut pas dire que l'aile pique, car l'incidence se mesure par rapport au vent relatif."
+  ],
+  "G27B": [
+    "« Jamais » tombe dès qu'un seul cas contraire existe."
+  ],
+  "G28M": [
+    "Une formule qui garantit une « manœuvre sans souci » tombe dès qu'une seule situation à risque existe.",
+    "« Toutes » et « identique » tombent dès qu'une seule aile réagit autrement."
+  ],
+  "G29M": [
+    "L'énoncé demande le minimum exigé par la norme, pas une valeur qui la respecte."
+  ],
+  "G2B": [
+    "Au « point d'arrêt », c'est l'air qui s'arrête ou les pressions, et tout tient à cette différence."
+  ],
+  "G30M": [
+    "« Il ne faut pas dépasser » vise une limite qui garde une marge de sécurité, ni une charge courante ni la résistance de rupture."
+  ],
+  "G31V": [
+    "Deux choix inversent la division, et tout tient à ce qui est au numérateur, le PTV ou la surface."
+  ],
+  "G32M": [
+    "Une valeur chiffrée présentée comme un plafond, « difficilement dépasser 2 », dépend de l'inclinaison."
+  ],
+  "G33M": [
+    "La négation « n'entraîne pas » renverse le sens de tout le choix."
+  ],
+  "G34B": [
+    "Deux choix ne diffèrent que d'un mot : le bruit du vent « s'affaiblit » ou « augmente »."
+  ],
+  "G35M": [
+    "La question porte sur l'autorotation, et tout incident dangereux n'en est pas une cause.",
+    "« Même une petite » cravate : la taille de l'incident ne dit pas à elle seule s'il est sans conséquence."
+  ],
+  "G3M": [
+    "Le sens du déplacement du point d'arrêt, « vers le haut », dit si l'incidence monte ou baisse."
+  ],
+  "G5B": [
+    "Un seul préfixe change entre deux choix : « brider » ou « débrider »."
+  ],
+  "G6B": [
+    "Un « vent arrière fort » établi n'est pas une rafale : l'aile vole dans une masse d'air qui se déplace tout entière."
+  ],
+  "G7B": [
+    "L'énoncé vise un instant précis, peu avant le sommet, ni le creux de la ressource ni l'après-sommet."
+  ],
+  "G8B": [
+    "Deux choix comparent des incidences, et le sens de la comparaison, « plus petit » ou « plus grand », décide.",
+    "« En permanence sans risque » tombe dès qu'un seul cas contraire existe."
+  ],
+  "G9B": [
+    "« En finale » situe le moment du vol, mais la question porte sur l'effet de la posture du pilote."
+  ],
+  "L10M": [
+    "QNH, QFE et niveau de vol se ressemblent, mais chacun cale l'altimètre sur une référence différente."
+  ],
+  "L11M": [
+    "L'énoncé décrit un geste précis : un zéro posé sur le terrain d'atterrissage."
+  ],
+  "L12M": [
+    "Le moment, avant le décollage, compte moins que le calage imposé par l'énoncé : « au QNH »."
+  ],
+  "L13M": [
+    "Deux choix parlent de hauteur, l'une par rapport au lieu du calage, l'autre « au-dessus du sol qu'elle survole »."
+  ],
+  "L14B": [
+    "Le variomètre mesure une vitesse verticale, et tout tient à son objet : le pilote ou « la masse d'air » qui l'entoure."
+  ],
+  "L15B": [
+    "Chaque choix combine un objet et une référence : l'aile ou « la masse d'air », et par rapport à quoi.",
+    "Une vitesse verticale se mesure entre deux instants successifs, et la référence « niveau de la mer » relève d'une autre grandeur."
+  ],
+  "L16B": [
+    "Variomètre et altimètre exploitent tous deux la pression, mais l'un donne une vitesse et l'autre une « hauteur »."
+  ],
+  "L18V": [
+    "Une vérification utile n'est pas forcément un point que la visite prévol « ne doit pas oublier »."
+  ],
+  "L19B": [
+    "Les gestes cités existent, et toute la différence tient à la fréquence annoncée, « au moins une fois tous les 2 ans »."
+  ],
+  "L1B": [
+    "Ce que fait le parachute une fois lancé se distingue de ce que le pilote doit faire pour le lancer, d'où le poids de « automatique »."
+  ],
+  "L2B": [
+    "Replier le secours et le remonter dans sa sellette sont deux gestes distincts, qui ne reviennent pas forcément au pilote.",
+    "Un mot absolu comme « en permanence » peut aussi décrire une exigence réelle."
+  ],
+  "L4B": [
+    "La négation « n'exige pas » renverse le sens de tout le choix."
+  ],
+  "L58T": [
+    "Deux mots proches, mixte et « combinés », ne sont pas tous deux le nom en usage pour un type de treuil."
+  ],
+  "L60T": [
+    "« Automatiquement » fait d'une simple déclaration une garantie, pour un treuil dont la technique sort du dossier Tracté.",
+    "Deux choix parlent d'encouragement : l'un vise ce treuil précis, l'autre l'innovation en général."
+  ],
+  "L64T": [
+    "« Pratique mais pas obligatoire » range le parachute de ligne parmi les commodités plutôt que parmi les éléments de sécurité."
+  ],
+  "L65T": [
+    "Ce choix relie deux idées par « et », et une seule qui ne tient pas suffit à faire tomber l'ensemble."
+  ],
+  "L67T": [
+    "« Obligatoirement homologué » parle d'homologation, là où le dossier Tracté peut exiger des qualités à garantir."
+  ],
+  "L6B": [
+    "Un anémomètre au sol et un anémomètre « à bord » ne mesurent pas le même vent."
+  ],
+  "L7B": [
+    "Altimètre et variomètre exploitent tous deux la pression, mais l'un affiche une altitude et l'autre une vitesse.",
+    "La négation « ne subit pas » affirme qu'il n'y a aucune influence.",
+    "« Même en parfait état » : un écart d'affichage ne vient pas forcément d'une panne."
+  ],
+  "L85T": [
+    "L'adverbe « fortement » porte sur la part de résistance qu'une épissure soignée fait perdre à la ligne."
+  ],
+  "L86T": [
+    "Deux choix commencent pareil, et seule change la pièce au bout de la ligne : « une boucle de la même matière » ou un anneau."
+  ],
+  "L8B": [
+    "Ce que l'instrument exploite pour fonctionner se distingue de l'information qu'il donne au pilote."
+  ],
+  "L9B": [
+    "« Définitivement » tombe dès qu'un seul cas contraire existe, ici un seul recalage possible.",
+    "Un mot absolu comme « doit toujours » peut aussi décrire une exigence réelle."
+  ],
+  "N11M": [
+    "Le mot « cabrée » fixe le sens du réglage, dont découle chaque effet."
+  ],
+  "N12M": [
+    "Le mot « piquée » fixe le sens du réglage, dont découle chaque effet."
+  ],
+  "N13B": [
+    "Deux choix ne diffèrent que d'un mot : la partie « avant » ou « arrière » du profil."
+  ],
+  "N14V": [
+    "« Systématiquement » et un chiffre précis appliquent un même raccourcissement à toutes les ailes."
+  ],
+  "N17M": [
+    "« Sans inconvénient » tombe dès qu'un seul cas contraire existe."
+  ],
+  "N19V": [
+    "« Mini » ou « max » place l'aile du côté lent ou du côté rapide de la polaire."
+  ],
+  "N24M": [
+    "« Rallonger » les élévateurs arrière fixe le sens du réglage, plus piqué ou plus cabré, dont découlent tous les effets."
+  ],
+  "N28B": [
+    "« N'ont rien à voir » tombe dès qu'un seul cas contraire existe."
+  ],
+  "N29M": [
+    "Trois valeurs à un facteur dix l'une de l'autre, « 10 daN » ou « 1000 daN », se jugent mieux une fois converties en kilos."
+  ],
+  "N31M": [
+    "« Élasticité » veut dire capacité à s'étirer, à comparer au faible allongement de la fibre."
+  ],
+  "N34M": [
+    "Deux choix ne diffèrent que d'un numéro des secours : « le 112 » ou « le 118 »."
+  ],
+  "N35B": [
+    "Quatre niveaux existent, et tout tient au sens des lettres, de A vers D, dans « le plus accessible est noté D »."
+  ],
+  "N36B": [
+    "La négation va jusqu'au bout du choix : « n'est pas obligatoire sur tous les exemplaires »."
+  ],
+  "N37B": [
+    "« Sans risque » et « n'importe quel pilote » sont deux absolus qu'une norme d'essais devrait garantir à la fois.",
+    "« Quel que soit le harnais » ignore l'effet de la sellette et de ses réglages sur le comportement de l'aile."
+  ],
+  "N38V": [
+    "Convenir aux débutants n'est pas leur être « réservée », un mot qui exclut les autres pilotes."
+  ],
+  "N39M": [
+    "Vendre une aile et lui annoncer un classement sont deux choses, et une seule exige d'avoir passé les tests."
+  ],
+  "N40B": [
+    "Le début du choix parle de coût, et la fin dit d'où vient ce prix plus bas : « l'absence de contrôle technique »."
+  ],
+  "N41B": [
+    "« Veut atteindre » vise le niveau espéré, distinct du niveau actuel du pilote."
+  ],
+  "N43B": [
+    "« Obligatoire » est plus fort que « conseillé », et tout tient au cadre qui impose le secours."
+  ],
+  "N44B": [
+    "« Ne peut pas » tombe dès qu'un seul cas contraire existe."
+  ],
+  "N45B": [
+    "« Chaque » est absolu, mais un mot absolu ne fait basculer un choix que s'il existe un cas contraire."
+  ],
+  "N46M": [
+    "La négation « n'a pas été » change tout le sens du choix, jusqu'à son dernier mot."
+  ],
+  "N47M": [
+    "La valeur chiffrée « 3 mm » s'applique à une liaison qui encaisse l'ouverture du secours."
+  ],
+  "N48B": [
+    "Deux choix décrivent la même routine annuelle avant le repliage, et seul le geste d'entretien change, dont le « lavage »."
+  ],
+  "N49B": [
+    "La fréquence est celle de l'aération, mais le lieu change : « en vol » ou au sol."
+  ],
+  "N49M": [
+    "Le choix décrit un essai d'homologation réel, et tout tient à la valeur chiffrée de la vitesse, « 50 m/s »."
+  ],
+  "N4B": [
+    "Une surface se calcule avec deux longueurs, et « l'épaisseur du profil » se mesure de bas en haut, pas d'avant en arrière."
+  ],
+  "N50B": [
+    "Étudier le secours est une chose, le but annoncé ensuite, « un engagement plus important », en est une autre."
+  ],
+  "N51V": [
+    "« Ne … que » restreint, et une restriction peut aussi décrire la prudence demandée.",
+    "L'aérologie change chaque jour et sert à décider de voler, pas forcément à « choisir sa voile »."
+  ],
+  "N52B": [
+    "« Ne … que » restreint, et une restriction peut aussi décrire la prudence demandée.",
+    "« En air calme » sonne prudent sans changer la nature du matériel essayé.",
+    "L'aérologie change chaque jour et sert à décider de voler, pas forcément à « choisir sa voile »."
+  ],
+  "N53M": [
+    "Des essais définis à l'avance ne couvrent pas forcément « les limites extrêmes » de l'aile dans toutes les turbulences réelles."
+  ],
+  "N54B": [
+    "Les conditions citées, « fortes » ou modérées, renvoient à celles pour lesquelles la classe A est pensée."
+  ],
+  "N57V": [
+    "Le choix cite un critère réel, et tout tient à l'importance que lui donne le mot « secondaire »."
+  ],
+  "N58V": [
+    "« Garantissent » et « en toute sécurité » sont absolus, et une protection ne supprime pas tout risque.",
+    "« Dans tous les cas » est ici précédé d'une négation, qui renverse ce que le choix affirme."
+  ],
+  "N59B": [
+    "« Parfois » et « certains modèles » limitent ce que le choix affirme, sans viser toutes les protections."
+  ],
+  "N62V": [
+    "« Rapidement » sonne comme une qualité, mais la question porte sur le maintien du casque lors d'un choc."
+  ],
+  "N6B": [
+    "Les trois formules se ressemblent : tout tient à la grandeur mise « au carré » et à celle qui divise l'autre."
+  ],
+  "N7V": [
+    "« Jamais » tombe dès qu'un seul cas contraire existe, ici une suspente qui change de longueur avec l'âge."
+  ],
+  "N9V": [
+    "Une justification savante, « puisqu'il est compensé », peut cacher une affirmation risquée."
+  ],
+  "P10BM": [
+    "« Jamais » tombe dès qu'un seul cas contraire existe, ici un seul arrêté qui touche le vol libre."
+  ],
+  "P11V": [
+    "Deux choix ne diffèrent que d'un mot : hauteur comptée depuis la « mer » ou depuis le « sol »."
+  ],
+  "P12BM": [
+    "Deux choix ne diffèrent que d'un mot : « Mineure » ou « Majeure »."
+  ],
+  "P13V": [
+    "Le choix commence par « carnivores », puis l'ajout « ou fructivores » change tout."
+  ],
+  "P14BM": [
+    "« Jamais » tombe dès qu'un seul cas contraire existe, ici un seul cas où le vol devient une infraction."
+  ],
+  "P15V": [
+    "« Tous » tombe dès qu'un seul cas contraire existe, ici une seule espèce de rapace qui migre."
+  ],
+  "P16BM": [
+    "« Quiétude » fait penser au calme des habitants, alors que la tranquillité visée peut être une autre."
+  ],
+  "P18BM": [
+    "L'énoncé demande une distance « moyenne » mesurée, pas un seuil d'interdiction propre à certaines zones."
+  ],
+  "P19V": [
+    "« Exclusivement » tombe dès qu'un seul cas contraire existe, ici un autre lieu de nidification sur le littoral."
+  ],
+  "P1V": [
+    "Deux choix ne diffèrent que d'un mot : « menacée » ou « protégée », deux notions distinctes.",
+    "Évaluer le degré de menace et décider de protéger ne relèvent pas forcément du même acteur, d'où le poids de « l'État »."
+  ],
+  "P20BM": [
+    "L'énoncé dit « en vol », et tous les repères ne restent pas visibles sur un oiseau qui vole à distance."
+  ],
+  "P21V": [
+    "« Toujours » tombe dès qu'un seul cas contraire existe, et un animal peut voir une aile approcher sans l'entendre."
+  ],
+  "P22BM": [
+    "L'énoncé dit « vol battu », celui d'un oiseau qui bat des ailes faute de trouver de quoi monter sans effort."
+  ],
+  "P24BM": [
+    "Deux choix ne diffèrent que d'un mot : vol « en festons » ou vol « en vagues »."
+  ],
+  "P26BM": [
+    "« Uniquement » tombe dès qu'un seul cas contraire existe, ici une période sensible plus large que « l'accouplement »."
+  ],
+  "P27V": [
+    "« Toute l'année » rend permanente une zone de protection des nids, qui peut dépendre de la saison.",
+    "Un choix reprend la consigne puis ajoute « sauf… », et l'exception compte autant que le reste."
+  ],
+  "P28BM": [
+    "« Maximum » fixe une limite pour toutes les espèces, qui tombe dès qu'une seule la dépasse.",
+    "« Peut » ne demande pas que ce soit le cas de toutes les espèces, une seule suffit."
+  ],
+  "P2BM": [
+    "« Dans son périmètre » vise le parc entier, et non une partie seulement."
+  ],
+  "P30V": [
+    "Quelques jours ou « plusieurs années » : c'est l'ordre de grandeur du délai qui départage deux choix."
+  ],
+  "P3V": [
+    "Deux choix ne diffèrent que d'une négation, et « toutes » tombe dès qu'un seul cas contraire existe."
+  ],
+  "P4BM": [
+    "« Une seule zone » et « toute la surface » donnent le même statut à tout le parc."
+  ],
+  "P5V": [
+    "Deux choix ne diffèrent que d'un mot : parcs « régionaux » ou « nationaux »."
+  ],
+  "P8BM": [
+    "« Jamais » et « toujours » tombent dès qu'un seul cas contraire existe, ici une réserve dont la règle diffère."
+  ],
+  "S100B": [
+    "« Aucune » tombe dès qu'un seul cas contraire existe, ici un cas où l'accompagnateur fédéral enseigne."
+  ],
+  "S101B": [
+    "« Uniquement » tombe dès qu'un seul cas contraire existe, ici un autre public encadré."
+  ],
+  "S102B": [
+    "« Uniquement » tombe dès qu'un seul cas contraire existe, ici un autre moment d'usage de la radio."
+  ],
+  "S104V": [
+    "Un début plausible peut être suivi d'une suite qui change tout, comme « ne doit plus retourner en école »."
+  ],
+  "S105B": [
+    "« Dans un club de plaine » situe le club, sans dire si cela change ce que la qualification permet."
+  ],
+  "S106V": [
+    "« Internationale » : une règle valable partout ne s'appuie pas sur un usage propre à une région."
+  ],
+  "S108V": [
+    "« En plaine » fixe le cadre : le plafond n'est pas le même partout en France."
+  ],
+  "S111V": [
+    "« Uniquement » tombe dès qu'un seul cas contraire existe, ici un autre lieu possible."
+  ],
+  "S115V": [
+    "La question porte sur « l'activité » du réseau, pas sur l'endroit où il se trouve."
+  ],
+  "S116B": [
+    "L'énoncé suppose une obligation de dépôt, « sont tenus de déposer », dont l'existence même est en jeu."
+  ],
+  "S117B": [
+    "« Temporairement » porte sur la durée d'usage du moteur, qui ne décide pas forcément de la catégorie de l'aile."
+  ],
+  "S118B": [
+    "« Ne concerne que » tombe dès qu'un seul cas contraire existe.",
+    "Deux choix commencent par « Oui », puis l'un parle de tolérance et l'autre d'interdiction."
+  ],
+  "S11M": [
+    "Défraiement pour des déplacements ou « indemnité pour le temps » : tout tient à ce que l'argent couvre."
+  ],
+  "S11T": [
+    "« Aucune » tombe dès qu'un seul cas contraire existe, ici une portée réelle du document fédéral."
+  ],
+  "S120B": [
+    "« Donc » tire une conséquence qui ne découle pas forcément de ce qui précède.",
+    "« N'évolue qu'en » tombe dès qu'un seul cas contraire existe."
+  ],
+  "S121B": [
+    "« Il me suffit » fait d'une seule démarche une condition complète."
+  ],
+  "S122B": [
+    "Ce qui est survolé fixe la hauteur minimale, ici « un grand rassemblement de personnes ».",
+    "« Pas de minimum » suppose qu'une aile sans moteur échappe aux hauteurs de survol."
+  ],
+  "S123B": [
+    "« Uniquement » tombe dès qu'un seul cas contraire existe.",
+    "« Toujours » tombe dès qu'un seul cas contraire existe."
+  ],
+  "S124B": [
+    "« Jamais » étend un cas particulier à toutes les zones d'entraînement militaires."
+  ],
+  "S125B": [
+    "« Seulement si » pose une condition qui ne tient que si elle existe dans la règle.",
+    "« Uniquement » tombe dès qu'un seul cas contraire existe."
+  ],
+  "S126B": [
+    "« Tout l'espace aérien » suppose qu'une carte à petite échelle montre toutes les couches.",
+    "La question demande la carte « la plus adaptée », pas une carte qui « suffit amplement »."
+  ],
+  "S127B": [
+    "Deux choix parlent du dos des cartes, et l'échelle de chacune, « 1/500 000 » ou 1/250 000, les sépare."
+  ],
+  "S128B": [
+    "« Il suffit » fait d'une source d'information la seule à consulter, sans dire si elle est officielle."
+  ],
+  "S129B": [
+    "La question demande des « contraintes », et un message qui informe ne limite pas forcément le vol.",
+    "« Simplement » réduit la contrainte à un seul geste."
+  ],
+  "S12M": [
+    "Moniteur « breveté d'État » et non moniteur fédéral : le diplôme change ce qu'il peut faire.",
+    "Être payé ou encaisser « directement à son nom » le prix des cours : ce n'est pas la même chose."
+  ],
+  "S131B": [
+    "« Il suffit » promet qu'une démarche simple ouvre la zone, quelle que soit la nature d'une ZIT.",
+    "Le rythme semaine et week-end vaut pour certaines zones militaires, pas forcément pour une zone interdite."
+  ],
+  "S132B": [
+    "« Toutes » met dans le même lot des références fixes et des lectures liées à la pression.",
+    "L'unité annoncée, « en mètres », n'est pas forcément celle des cartes aéronautiques."
+  ],
+  "S134B": [
+    "« Il suffit » fait d'une hauteur de vol une garantie, comme si tous les espaces commençaient au-dessus."
+  ],
+  "S136B": [
+    "Les listes se ressemblent, et un seul élément ajouté ou oublié suffit à changer le sens du choix.",
+    "« Hauteurs sol » suppose que les limites d'un espace sont toujours comptées depuis le sol."
+  ],
+  "S14B": [
+    "« Nécessaire pour enseigner » lie le droit d'enseigner au label de la structure, et non au moniteur."
+  ],
+  "S15B": [
+    "« Atteste la partie pratique » ou « délivre le brevet » : deux verbes, deux étapes distinctes.",
+    "« Toutes » n'est pas toujours un excès, car certaines fonctions couvrent bien l'ensemble d'une structure."
+  ],
+  "S15T": [
+    "« Au moins 250 m » ou « à moins de 250 m » : deux tournures voisines au sens opposé."
+  ],
+  "S16B": [
+    "« Non reconnue par la FFVL » peut retirer le droit d'enseigner ou seulement celui d'attester les brevets fédéraux."
+  ],
+  "S17B": [
+    "« Financièrement » précise sur quel plan joue l'indépendance : l'argent, pas forcément le reste."
+  ],
+  "S18B": [
+    "« Club-École » et non École Française de Vol Libre : le mot « Club » change le statut de la structure."
+  ],
+  "S18T": [
+    "« Uniquement » tombe dès qu'un seul cas contraire existe."
+  ],
+  "S19V": [
+    "Avoir une licence fédérale ne dit pas qui sont les membres de la fédération au sens de ses statuts, d'où le poids de « individus ».",
+    "Faire partie de l'organisation fédérale, comme les « ligues régionales », n'est pas forcément en être membre."
+  ],
+  "S1B": [
+    "« Obtenir l'autorisation » n'est pas la même chose que se renseigner auprès de quelqu'un."
+  ],
+  "S20T": [
+    "« Coopté » ou « nommé », et par quelle instance : les deux détails comptent.",
+    "Treuilleur ou formateur de treuilleurs : les « qualifications de treuilleur » se situent à un niveau précis de la chaîne de formation."
+  ],
+  "S21M": [
+    "« Uniquement » tombe dès qu'un seul cas contraire existe."
+  ],
+  "S21T": [
+    "Former des treuilleurs et « enseigner le parapente » ne relèvent pas de la même qualification."
+  ],
+  "S22M": [
+    "« Toutes » tombe dès qu'un seul cas contraire existe, ici une décision politique prise par une autre instance."
+  ],
+  "S22T": [
+    "« En l'absence de moniteur », c'est le niveau du pilote treuillé qui décide de ce que le treuilleur peut faire."
+  ],
+  "S24M": [
+    "« Uniquement » tombe dès qu'un seul cas contraire existe."
+  ],
+  "S24T": [
+    "Le titre de responsable « régional » renvoie à l'instance qui le désigne, nationale ou de ligue."
+  ],
+  "S25T": [
+    "Recevoir et utiliser un rapport n'est pas la même chose que l'avoir « élaboré »."
+  ],
+  "S26B": [
+    "Tous les ans ou « tous les 2 ans » : un seul chiffre sépare deux choix."
+  ],
+  "S27M": [
+    "« Pour certains » limite l'affirmation à une partie des conseillers techniques, pas à tous."
+  ],
+  "S28T": [
+    "La condition « s'il n'est pas diplômé d'État » porte sur le droit d'être rémunéré.",
+    "Rembourser des frais engagés et rémunérer une prestation sont deux choses différentes."
+  ],
+  "S29B": [
+    "« Hors compétition » fixe le cadre de la licence, et la formalité médicale demandée se lit dans ce cadre."
+  ],
+  "S29T": [
+    "« Seul » rend souvent un choix suspect, mais il ne tombe que s'il existe un autre responsable."
+  ],
+  "S30T": [
+    "Une fonction confiée par un formateur et une « qualification fédérale » ne sont pas la même chose."
+  ],
+  "S31M": [
+    "« Directement » affirme un lien d'accès entre deux qualifications, dont l'origine est en jeu.",
+    "« Distinctement » porte sur le fait que l'une des deux qualifications soit ou non un passage obligé vers l'autre."
+  ],
+  "S32T": [
+    "La négation « n'ayant pas validé » se lit avec la condition « hors présence moniteur » qui la précède."
+  ],
+  "S33T": [
+    "« Formateur national » et formateur de treuilleurs sont deux rôles distincts, et « exclusivement » ne laisse place à aucun autre."
+  ],
+  "S34T": [
+    "Deux choix se ressemblent : « briefing de début » et « débriefing de fin » de séance."
+  ],
+  "S35B": [
+    "Deux éléments changent d'un choix à l'autre : le délai en jours et le destinataire de la déclaration."
+  ],
+  "S35T": [
+    "« Ne … que » tombe dès qu'un seul cas contraire existe, ici un seul autre devoir du treuilleur."
+  ],
+  "S36B": [
+    "« Dans tous les cas » tombe dès qu'un seul cas contraire existe, ici une autre personne habilitée à déclarer."
+  ],
+  "S37T": [
+    "« Se borne à » tombe dès qu'un seul cas contraire existe, ici un autre rôle du treuilleur.",
+    "« Le cas échéant » réserve l'action aux situations où elle s'impose, pas à toutes les séances."
+  ],
+  "S38B": [
+    "Celui qui cause le dommage et celui qui rembourse ne sont pas forcément la même personne.",
+    "Une responsabilité civile est citée dans plusieurs choix, et tout tient à qui elle appartient, ici « le propriétaire de la voiture »."
+  ],
+  "S38T": [
+    "« Aucun rôle » tombe dès qu'un seul cas contraire existe, ici une tâche de sécurité envers les personnes au sol."
+  ],
+  "S39B": [
+    "Avoir causé un dommage ne dit pas encore qui doit l'évaluer ni qui doit le régler sur place."
+  ],
+  "S39T": [
+    "Deux choix ne diffèrent que par un chiffre : la durée du stage compacté, « 4 jours » ou six."
+  ],
+  "S3B": [
+    "« Certifiés » vise la dernière étape, pas celle où l'école valide la théorie et la pratique."
+  ],
+  "S40M": [
+    "« Proposer » une assurance n'est pas la même obligation que la « prendre »."
+  ],
+  "S41T": [
+    "Un avis et une autorisation sont deux démarches différentes, et la négation « n'est pas nécessaire » porte sur l'avis.",
+    "« Le cas échéant » réserve la démarche aux sites où d'autres usagers partagent la plateforme."
+  ],
+  "S42T": [
+    "L'assurance de l'activité elle-même se distingue de celle d'un matériel qui sert à la pratiquer, d'où le poids de « spécifique »."
+  ],
+  "S43M": [
+    "« Uniquement » tombe dès qu'un seul cas contraire existe, ici un port obligatoire sous le seuil de 5 m."
+  ],
+  "S43T": [
+    "Deux choix ne diffèrent que d'un mot : licencié « pratiquant » ou « non pratiquant »."
+  ],
+  "S44M": [
+    "Une obligation peut dépendre du type de vol, « en vol thermique », ou du cadre dans lequel on vole."
+  ],
+  "S44T": [
+    "« Une assurance classique de véhicule » ne vise pas forcément une activité de treuillage."
+  ],
+  "S45T": [
+    "Ici, « le vol » ne désigne pas l'activité aérienne, comme le montre « dégâts matériels » qui le précède."
+  ],
+  "S46T": [
+    "« En aucun cas » tombe dès qu'un seul cas contraire existe, ici une condition qui ouvre le treuillage."
+  ],
+  "S47B": [
+    "Le sens de la phrase compte : « les ballons doivent la priorité », c'est-à-dire qui cède à qui."
+  ],
+  "S47T": [
+    "« Strictement prohibée » tombe dès qu'un seul cas contraire existe, ici une condition qui ouvre cette pratique."
+  ],
+  "S48B": [
+    "Deux choix inversent la même phrase, ce qui suppose une priorité liée au type d'aile."
+  ],
+  "S48T": [
+    "Une seule dimension est citée, « un chemin de longueur suffisante », pour définir une piste de treuil."
+  ],
+  "S49B": [
+    "Deux choix ne diffèrent que d'un mot : « gauche » ou « droite »."
+  ],
+  "S4B": [
+    "L'énoncé vise « la partie pratique » du brevet, pas l'enregistrement final du brevet entier."
+  ],
+  "S50B": [
+    "L'autre aile arrive par la droite, et la priorité à droite désigne l'une des deux ailes."
+  ],
+  "S50T": [
+    "« Aucune démarche » tombe dès qu'un seul cas contraire existe, ici une seule formalité obligatoire."
+  ],
+  "S51B": [
+    "« Loin du relief » change les règles du dépassement : la pente ne contraint plus le côté choisi."
+  ],
+  "S51T": [
+    "« Éventuellement » adoucit une pratique sans dire si elle est permise, même de temps en temps."
+  ],
+  "S53B": [
+    "Deux choix ne diffèrent que d'un mot : la pente à « droite » ou à « gauche »."
+  ],
+  "S54B": [
+    "Le relief est à la gauche du pilote qui lit l'énoncé, et son côté change pour l'aile qui arrive en face."
+  ],
+  "S54T": [
+    "« Hors présence moniteur » : la condition ajoutée au début du choix pèse autant que la suite."
+  ],
+  "S55B": [
+    "L'énoncé place le relief « à leur droite », ce qui fixe le côté resté libre pour dépasser."
+  ],
+  "S56B": [
+    "Être le premier dans l'ascendance donne le choix du sens de rotation, distinct de la question de savoir qui « est prioritaire »."
+  ],
+  "S56T": [
+    "Le début du choix décrit une mission réelle, et la fin ajoute « sans se soucier du pilote »."
+  ],
+  "S57B": [
+    "L'autre aile est « 50 m en dessous », et tout tient à qui était là le premier et au poids de la hauteur.",
+    "Une bonne intention, « pour pouvoir la surveiller », ne suffit pas à justifier une manœuvre."
+  ],
+  "S57T": [
+    "La qualification « treuil fixe delta » précise un treuil et un aéronef, et les deux comptent dans chaque choix."
+  ],
+  "S58M": [
+    "Le choix parle du régime d'un pilote de vol libre, qui ne change pas avec la visibilité.",
+    "« Tous les aéronefs » : un mot absolu peut tenir quand c'est l'espace lui-même qui fixe la règle."
+  ],
+  "S59M": [
+    "Deux choix ne diffèrent que d'une lettre : VFR ou IFR."
+  ],
+  "S60M": [
+    "« Contrôlé » ne veut pas dire fermé à tous, car le contrôle vise certains trafics et certains régimes de vol."
+  ],
+  "S61M": [
+    "Non contrôlé et « non classé » sont deux idées distinctes : un espace libre peut porter une classe."
+  ],
+  "S62M": [
+    "« Tous » tombe dès qu'un seul cas contraire existe, ici un espace contrôlé fermé au vol libre.",
+    "« Peut être autorisée localement » décrit une possibilité, pas une règle générale."
+  ],
+  "S64M": [
+    "« Jamais » est suivi de « sauf dérogation », et le choix se lit jusqu'au bout."
+  ],
+  "S65M": [
+    "La classe E est contrôlée pour un certain trafic, et la radio « obligatoire » vise une aile de vol libre."
+  ],
+  "S67M": [
+    "Une zone qui change de classe suit la règle de la classe en vigueur à ce moment-là, d'où le poids de « peut être classé E ».",
+    "« Jamais » tombe dès qu'un seul cas contraire existe."
+  ],
+  "S68M": [
+    "Tous ces espaces sont contrôlés, et la question porte sur ceux qui descendent « jusqu'à la surface de la terre »."
+  ],
+  "S69M": [
+    "Deux choix sur la zone D ne diffèrent que d'un mot : « tout aéronef » ou « uniquement » les PUL."
+  ],
+  "S6M": [
+    "Avec passager, « gratuitement » ou contre paiement : un seul mot sépare deux cadres très différents."
+  ],
+  "S70M": [
+    "Dangereuse ne veut pas dire interdite, et la lettre D impose ses propres conditions d'entrée."
+  ],
+  "S72M": [
+    "La question se place au-dessus du seuil de 900 m mer ou 300 m sol, et les minima changent de part et d'autre.",
+    "Un chiffre familier comme « 300 m » peut désigner une autre grandeur : distance aux nuages ou visibilité."
+  ],
+  "S73B": [
+    "La question porte sur le vol « à l'intérieur des nuages », pas sur les minima de visibilité liés à l'altitude."
+  ],
+  "S74B": [
+    "L'énoncé est négatif : chaque choix se lit comme une chose interdite au pilote.",
+    "Le jour aéronautique fixe une heure limite, et un décollage « 30 min après le coucher du soleil » se situe par rapport à elle."
+  ],
+  "S75B": [
+    "L'énoncé se place en classe E ou au-dessus du seuil en classe G, et les distances aux nuages y changent."
+  ],
+  "S76B": [
+    "Le seuil se calcule avec le relief, le plus haut entre 900 m mer et 300 m au-dessus du sol."
+  ],
+  "S76T": [
+    "« Ne … que » transforme une condition nécessaire en condition unique, et tombe s'il en manque une."
+  ],
+  "S77B": [
+    "L'énoncé se place sous le seuil de 900 m mer ou 300 m sol, où les minima ne sont pas ceux du dessus."
+  ],
+  "S77T": [
+    "Une règle générale du vol libre, « l'emport d'une radio n'est pas obligatoire », peut changer pendant une séance de treuil."
+  ],
+  "S78M": [
+    "« Tous » tombe dès qu'un seul cas contraire existe, ici un aérodrome qui accepte les PUL."
+  ],
+  "S79M": [
+    "L'énoncé précise que le terrain est « non contrôlé », et ce statut décide de ce qui est permis."
+  ],
+  "S7M": [
+    "« Ne … qu'après » pose une condition obligatoire, et tout tient à ce que le BPC en soit une."
+  ],
+  "S80M": [
+    "Chaque valeur a sa référence : au-dessus de la mer ou « m/sol », au-dessus du sol.",
+    "« Dans la plupart des cas » laisse place aux exceptions, et une règle qui en a peut rester générale."
+  ],
+  "S81M": [
+    "« Ne … qu'après un an » ajoute une condition de durée, qui ne tient que si elle existe dans le règlement."
+  ],
+  "S82M": [
+    "L'énoncé porte sur la classe E, où les règles propres à la classe G ne s'appliquent pas."
+  ],
+  "S82T": [
+    "Un mot absolu comme « exclusivement » peut décrire une règle réelle de partage des tâches."
+  ],
+  "S83B": [
+    "L'énoncé demande où l'aile homologuée est « obligatoire », pas où elle est conseillée."
+  ],
+  "S83T": [
+    "« Se limite à » tombe dès qu'un seul cas contraire existe, ici une autre tâche du chauffeur."
+  ],
+  "S84B": [
+    "Un chiffre familier comme « 300 m » peut désigner une autre grandeur : distance aux nuages ou visibilité.",
+    "L'énoncé se place sous le seuil de 900 m mer et 300 m sol, où les minima ne sont pas ceux du dessus."
+  ],
+  "S85B": [
+    "La question se place au-dessus du seuil de 900 m mer ou 300 m sol, et les minima changent de part et d'autre."
+  ],
+  "S86M": [
+    "Un mot absolu comme « partout » peut tenir, et chaque cas de survol compte pour le savoir."
+  ],
+  "S88B": [
+    "« Obligent » vise ce qui est imposé, pas ce qui est simplement permis."
+  ],
+  "S89M": [
+    "La « nuit aéronautique » ne commence pas forcément au moment où le soleil se couche."
+  ],
+  "S8M": [
+    "Les choix ne diffèrent que par le brevet exigé, jusqu'au dernier mot, « confirmé » compris."
+  ],
+  "S90M": [
+    "La question porte sur « la circulation dans l'espace aérien », pas sur l'usage des terrains ou des sites de vol."
+  ],
+  "S91V": [
+    "Deux choix ne diffèrent que d'un mot : responsabilité civile « terrestre » ou couvrant le risque « aérien ».",
+    "« La loi impose » : une assurance conseillée n'est pas pour autant une obligation légale."
+  ],
+  "S92V": [
+    "L'énoncé écarte tout arrêté préfectoral, et seules les obligations prévues par la loi peuvent alors être contrôlées."
+  ],
+  "S93V": [
+    "Une démarche qui sonne officielle, « déclaré en préfecture », ne vaut pas forcément autorisation d'utiliser un terrain."
+  ],
+  "S95V": [
+    "La mairie a un rôle, et tout tient à sa forme : avis ou « déclaration en mairie avec dépôt d'un plan de vol »."
+  ],
+  "S9M": [
+    "« Dès » le BPC fait suivre le monitorat directement ce brevet, sans étape intercalée."
+  ],
+  "U11B": [
+    "Deux mots proches s'opposent : une pente « concave » est creusée, une pente « convexe » est bombée."
+  ],
+  "U12B": [
+    "Le sens de la comparaison compte : « inférieure ou égale » et « supérieure » s'opposent, et l'égalité aussi."
+  ],
+  "U13B": [
+    "« Vent météo nul » ne veut pas dire absence de vent, car le soleil crée des brises à 15 h.",
+    "Un mot absolu se juge sur ce qu'il porte, et ici « dans tous les cas » s'applique à une précaution."
+  ],
+  "U16M": [
+    "« À finesse maximum » : atteignable sur le papier, mais sans aucune réserve de hauteur.",
+    "« Sûrement » fait d'une possibilité une certitude, ici celle de trouver des ascendances."
+  ],
+  "U17B": [
+    "Une valeur qui semble faible, « 40 m c'est peu », ne change pas forcément la règle."
+  ],
+  "U19M": [
+    "« Plein travers » : ici, c'est la direction du vent qui compte autant que sa force.",
+    "« Sûrement » promet une réussite, comme si une bonne course suffisait contre un vent de côté."
+  ],
+  "U20M": [
+    "Assiette et incidence sont deux angles différents : l'un peut rester fixe pendant que l'autre varie."
+  ],
+  "U21M": [
+    "Le « sol » et « l'horizontale » ne se confondent que sur un terrain plat."
+  ],
+  "U24V": [
+    "« Certainement » affirme une vitesse que le pilote, à peine envolé, ne peut pas encore juger."
+  ],
+  "U25M": [
+    "« Le seul moyen » tombe dès qu'un seul cas contraire existe, ici une autre façon d'obtenir le même résultat."
+  ],
+  "U26B": [
+    "Un air moins dense, « la densité de l'air diminuant », freine moins mais porte moins, et un seul de ces effets décide du décollage."
+  ],
+  "U27V": [
+    "La durée annoncée, « plusieurs minutes après son passage », porte sur le temps que dure le danger du sillage."
+  ],
+  "U28V": [
+    "« Trajectoire/air » désigne le chemin suivi dans la masse d'air, qui se déplace avec le vent, et non le tracé au sol."
+  ],
+  "U29B": [
+    "Une performance de l'aile ne suffit pas à dessiner ce qu'elle atteint au sol, d'où le poids de « ne dépend pas du vent »."
+  ],
+  "U30B": [
+    "Des mots absolus peuvent définir une exigence, et « à tout moment » décrit ici ce que demande le vol en local.",
+    "« Garantir » suppose qu'une distance fixée d'avance tient compte du vent rencontré."
+  ],
+  "U31B": [
+    "« Coûte que coûte » refuse toute adaptation quand le vent change."
+  ],
+  "U32B": [
+    "« Elle avance par rapport au sol » : ce simple fait renseigne déjà sur la force du vent."
+  ],
+  "U33B": [
+    "« Vent arrière » fixe le sens dans lequel la vitesse du vent se combine avec celle de l'aile."
+  ],
+  "U34B": [
+    "« Jamais » tombe dès qu'un seul cas contraire existe, et la question porte sur la vitesse par rapport au sol."
+  ],
+  "U36M": [
+    "« Finesse/sol » parle de distance parcourue, pas de durée de vol."
+  ],
+  "U37M": [
+    "L'énoncé demande quand voler « plus vite », et chaque paire de choix oppose un cas où l'on accélère et un cas où l'on ralentit."
+  ],
+  "U39V": [
+    "Le côté du relief désigne l'aile prioritaire, et « elle a le relief à droite » parle de l'autre aile.",
+    "« Derrière » ne dit pas à quelle distance : passer derrière est une chose, passer tout près en est une autre."
+  ],
+  "U3M": [
+    "En altitude, le froid et le manque d'oxygène arrivent ensemble, et un seul des deux cause l'hypoxie.",
+    "« Parfois » change tout : un signe possible n'a pas besoin d'être constant."
+  ],
+  "U40M": [
+    "La « trajectoire/sol » et l'axe de l'aile ne se confondent pas quand le vent vient de côté."
+  ],
+  "U41B": [
+    "Deux choix s'opposent : l'axe de l'aile « fait un angle » avec la trajectoire/sol ou « reste parallèle » à elle.",
+    "L'effet girouette aligne l'aile sur le vent relatif, pas forcément sur le vent météo, d'où le poids de « se met face au vent »."
+  ],
+  "U42M": [
+    "« Définissent » vise les droites entre lesquelles l'angle se mesure, pas ce qui le provoque."
+  ],
+  "U43B": [
+    "« Dynamique » ou « thermique » : un seul mot change la nature de l'ascendance."
+  ],
+  "U44B": [
+    "L'énoncé demande ce qu'il « vaut mieux » faire, et un « jamais » peut alors être un conseil de prudence."
+  ],
+  "U45B": [
+    "L'énoncé demande ce qu'il « vaut mieux » faire, et un « jamais » peut alors être un conseil de prudence.",
+    "« Trop basses » et « trop élevées » : le mot « trop » désigne les deux extrêmes de vitesse."
+  ],
+  "U46B": [
+    "« Le plus … possible » pousse vers un extrême, et un fait réel peut mener à une conduite excessive."
+  ],
+  "U47M": [
+    "Deux choix ne diffèrent que d'un mot : cumulus « au vent » ou « sous le vent » de la route."
+  ],
+  "U49V": [
+    "« Dos à la pente » ou « face à la pente » : tout tient au côté vers lequel l'aile tourne."
+  ],
+  "U4M": [
+    "La valeur de 2000 m porte sur les « premiers symptômes » qui « peuvent » apparaître, pas sur l'hypoxie grave."
+  ],
+  "U50M": [
+    "« Vitesse mini » et « taux de chute mini » : le même mot « mini » désigne deux régimes différents."
+  ],
+  "U52V": [
+    "Virer « face à la pente », c'est tourner vers le relief, avec un vent qui vient alors d'un côté précis.",
+    "Le rayon est mesuré « par rapport au sol », et la vitesse sol grandit quand l'aile a le vent dans le dos."
+  ],
+  "U53B": [
+    "« Parfaite » sonne excessif, alors qu'une pente toute proche laisse peu de marge d'erreur."
+  ],
+  "U54B": [
+    "En air turbulent, « le plus vite possible » ne garde pas forcément l'aile la mieux tenue au-dessus du pilote."
+  ],
+  "U55B": [
+    "Trois choix se ressemblent, et tout tient au geste associé à chaque variation, « augmente » ou « diminue »."
+  ],
+  "U57B": [
+    "Le variomètre retombe mais reste « faiblement positif », ce qui renseigne sur l'air qui porte l'aile."
+  ],
+  "U58B": [
+    "« À l'intérieur de la bulle » décrit le mouvement par rapport à l'air qui porte l'aile, pas au sol."
+  ],
+  "U59B": [
+    "Un variomètre ramené « à 0 » dit que l'aile ne monte plus, pas que l'air a cessé de monter.",
+    "La condition « en gardant toujours une direction totalement dégagée » encadre l'usage des bords du nuage."
+  ],
+  "U60M": [
+    "La dérive est donnée en minutes, « 3 km en 10 mn », et se convertit en heures avant toute comparaison aux km/h.",
+    "« Au cours d'une spirale », l'aile tourne sur place dans l'air, et son déplacement au sol vient d'ailleurs."
+  ],
+  "U61B": [
+    "« Opposée » porte sur la place occupée sur le cercle, distincte du sens de rotation."
+  ],
+  "U62B": [
+    "« Jamais » tombe dès qu'un seul cas contraire existe.",
+    "Un nuage change de type en se développant, et son aspect du moment ne suffit pas forcément à juger le risque."
+  ],
+  "U63B": [
+    "Ce choix associe deux abris, « du soleil et du vent », et un seul décide de la naissance d'un thermique."
+  ],
+  "U64B": [
+    "Un jour d'orage annoncé, des ascendances qui « commencent à s'élargir » peuvent être une aubaine ou un signal.",
+    "Observer est prudent, mais ce choix dit « attends », ce qui fixe le moment où le pilote quitte l'air."
+  ],
+  "U65V": [
+    "« Toujours » tombe dès qu'un seul cas contraire existe."
+  ],
+  "U66B": [
+    "« De toute façon » vise les effets du nuage au sol, même pour un pilote qui se pose tout de suite."
+  ],
+  "U67B": [
+    "« Toujours » tombe dès qu'un seul cas contraire existe.",
+    "« Toute » est un mot fort, qui suppose qu'une rotation rapide efface tous les repères."
+  ],
+  "U68M": [
+    "Deux choix ne diffèrent que d'un mot : « avant » ou « pendant » l'approche."
+  ],
+  "U69B": [
+    "Face à un « vent de face de 15 km/h », rester longtemps en l'air ne suffit pas forcément à atteindre le terrain.",
+    "Accélérer face au vent est une chose, « aussi rapidement que possible » en est une autre."
+  ],
+  "U72B": [
+    "L'autre aile est placée en dessous, et en approche la priorité dépend de cette position."
+  ],
+  "U74V": [
+    "Deux choix ne diffèrent que d'un mot : la finale commence en « entrée » ou en « bout » de terrain.",
+    "« Tout dépend des conditions » sonne prudent, comme si la finale face au vent variait."
+  ],
+  "U75B": [
+    "Le 360° est fait « en prise de terrain », avec peu de hauteur restante et des ailes autour.",
+    "« Tout à fait » est une formule forte, à peser face au peu de marge qui reste si près du sol."
+  ],
+  "U77B": [
+    "Sous le plan de descente prévu, ce qui manque peut être du temps ou de la hauteur, et tout tient à cette différence."
+  ],
+  "U78B": [
+    "« Ne dépend que » tombe dès qu'un seul cas contraire existe."
+  ],
+  "U79B": [
+    "« Légèrement » rend la manœuvre rassurante, alors que près du sol la marge avant le décrochage est faible."
+  ],
+  "U7B": [
+    "« Jamais » tombe dès qu'un seul cas contraire existe."
+  ],
+  "U80B": [
+    "La cible « descend » dans le champ de vision, ce qui situe la trajectoire au-dessus ou avant elle."
+  ],
+  "U80T": [
+    "Deux choix se ressemblent : la tension se relâche « progressivement » ou « brutalement »."
+  ],
+  "U81V": [
+    "La ressource existe, et tout tient à ce qu'elle rende ou non la prise de vitesse « dangereuse »."
+  ],
+  "U82V": [
+    "« Tous » est un mot fort, qui porte sur ce que perd une aile lente face à n'importe quelle perturbation."
+  ],
+  "U83B": [
+    "Incidence et vitesse/air ne varient pas forcément dans le même sens, chaque grandeur se juge à part."
+  ],
+  "U84B": [
+    "« Parfois » et « en cas de pilotage inadapté » limitent le danger annoncé."
+  ],
+  "U85B": [
+    "Le freinage se fait « par vent fort », où le réflexe du posé en air calme ne s'applique pas forcément."
+  ],
+  "U86V": [
+    "La question demande les causes « principales » des collisions, pas tout ce qui nuit au vol."
+  ],
+  "U87M": [
+    "« Un peu fatigué » sonne anodin, alors que le vol prévu est inhabituel."
+  ],
+  "U89B": [
+    "« Quel que soit mon niveau » fait dépendre le plaisir sous une aile de ses seuls résultats."
+  ],
+  "U8M": [
+    "« Très tôt » porte sur le moment où les thermiques apparaissent, pas sur leur existence."
+  ],
+  "U90V": [
+    "Le côté du relief, « sur ma droite », fixe la priorité le long d'une pente.",
+    "Deux choix ne diffèrent que par leur fin, dont « j'impose ma priorité »."
+  ],
+  "U91B": [
+    "« N'arrivent pas qu'aux autres » porte une négation qui dit le contraire de « qu'aux autres ».",
+    "« Raisonnablement » change le sens d'« accroître les risques », appliqué à une nouveauté à la fois."
+  ],
+  "U92B": [
+    "« Un peu dedans » sonne anodin, alors que la visibilité disparaît dès l'entrée dans le nuage.",
+    "Une boussole ou un GPS indiquent où l'on est, sans montrer ce qui est autour."
+  ],
+  "U93M": [
+    "La condition « si je suis sûr » paraît rassurante, alors qu'une ascendance tout le long ne se garantit pas forcément.",
+    "« Toujours » n'est pas un défaut ici, car il porte sur la possibilité de rejoindre un terrain de fortune."
+  ],
+  "U9M": [
+    "Deux choix parlent de la fin des ascendances, et seul le rythme change, « immédiat » ou « progressif ».",
+    "L'énoncé précise le type de front qui arrive, « front chaud », et c'est lui qui décide de l'évolution des cumulus."
+  ],
+  "W10B": [
+    "Le seuil « supérieur à 30 km/h » porte sur ce qu'une technique de gonflage rend volable.",
+    "Le mot « faibles » peut surprendre, car le face-voile ne sert pas forcément que par vent fort."
+  ],
+  "W11B": [
+    "Deux choix échangent l'ordre : gonfler « face au vent » puis courir vers la pente, ou l'inverse."
+  ],
+  "W12B": [
+    "« Expérimenté » et « site adapté » rassurent sans changer ni la force du vent ni le fait d'être seul."
+  ],
+  "W14V": [
+    "L'installation en sellette existe, et le choix ajoute ce qu'il fait des commandes : « en lâchant les commandes »."
+  ],
+  "W15V": [
+    "« D'autant plus facile » s'applique aux deux extrêmes de vent, qui se jugent chacun à part.",
+    "« Franc » paraît brutal, mais le choix dit « parfois », comme pour une voile qui monte très fort."
+  ],
+  "W16V": [
+    "Deux choix ne diffèrent que d'un mot : se pencher « en avant » ou « en arrière »."
+  ],
+  "W17B": [
+    "Tirer les freins peut servir, et tout tient à ce que fait le corps du pilote au même moment."
+  ],
+  "W18V": [
+    "« Aucun affermissement » des A renseigne sur le fait que l'aile soit prête ou non à porter le pilote."
+  ],
+  "W19V": [
+    "L'aile part à droite, et le côté de la course comme celui du « frein droit » en découlent."
+  ],
+  "W1V": [
+    "Ce choix a deux moitiés, et la seconde porte sur « un apprentissage beaucoup plus léger en paralpinisme »."
+  ],
+  "W20V": [
+    "Deux choix freinent pour ramener l'aile, mais le corps du pilote n'y fait pas la même chose."
+  ],
+  "W21V": [
+    "Ventrale et accélération figurent dans plusieurs choix, et la position des mains, « mains hautes », les sépare."
+  ],
+  "W22V": [
+    "Le contrôle visuel de la voile a sa place, et tout tient au moment visé, aussitôt après le décollage."
+  ],
+  "W23B": [
+    "« Un peu abaissé », mais bras hauts : l'effet sur l'aile dure alors tout le vol."
+  ],
+  "W24V": [
+    "L'assise se « soulève » à droite, ce qui fixe le côté vers lequel le pilote bascule.",
+    "Deux choix ne diffèrent que par le côté du freinage : « du même côté » ou « du côté gauche »."
+  ],
+  "W25V": [
+    "« Très légèrement » adoucit l'affirmation, alors qu'un bord de fuite bien réglé pourrait ne pas être bridé du tout.",
+    "La parenthèse « sans accélérateur » précise de quelle vitesse maximale il s'agit."
+  ],
+  "W26V": [
+    "Élévateur entier ou suspentes extérieures : les oreilles ne concernent que les bouts d'aile, d'où le poids de « élévateurs avant ».",
+    "« Extérieures » et « extrémités (stabilo) » se ressemblent sans désigner les mêmes suspentes."
+  ],
+  "W28B": [
+    "Ce choix parle de finesse « sol » et de vent de face, qui agit sur la distance parcourue au sol."
+  ],
+  "W29B": [
+    "« En turbulences » appelle la prudence, et la question porte sur ce que les oreilles apportent alors.",
+    "« Ne … plus » paraît excessif, mais la question porte sur ce qui dirige l'aile pendant les oreilles."
+  ],
+  "W30B": [
+    "Au « taux de chute mini », les mains sont déjà basses et l'aile vole lentement."
+  ],
+  "W31V": [
+    "« Sans danger » et « à proximité immédiate d'un relief » incluent le passage vent dans le dos."
+  ],
+  "W32M": [
+    "« Sans rapport » tombe dès qu'un seul cas contraire existe, ici un lien entre vitesse et inclinaison."
+  ],
+  "W33B": [
+    "« Quitte à » annonce un prix à payer, en échange d'un gain pour l'aile.",
+    "Le but annoncé, « pour réduire le taux de chute », paraît sensé, mais le geste agit aussi sur la vitesse de l'aile."
+  ],
+  "W34B": [
+    "Deux choix ne diffèrent que d'un mot : « abaisser » ou « lever » les mains."
+  ],
+  "W35B": [
+    "« Se préparer à » un geste n'est pas encore le faire.",
+    "Au « taux de chute minimum », l'aile vole déjà lentement, et l'entrée dans l'ascendance agit sur elle."
+  ],
+  "W36B": [
+    "Deux choix ne diffèrent que d'un mot : virer face au « vent » ou face à la « pente »."
+  ],
+  "W38M": [
+    "L'énoncé parle de « fermetures », pas de décrochage : ce qui protège de l'un peut exposer à l'autre."
+  ],
+  "W39B": [
+    "Le geste proposé peut servir, et tout tient à son rang dans l'ordre des actions, « immédiatement »."
+  ],
+  "W3V": [
+    "Deux choix ne diffèrent que par la durée : « environ une semaine » ou plusieurs.",
+    "La question porte sur le brevet « initial », un niveau précis face aux sites et aérologies variés."
+  ],
+  "W40B": [
+    "S'éloigner de la pente se conçoit, et tout tient au moment où le choix engage le virage, « immédiatement ».",
+    "Le but annoncé, « ralentir la vitesse de rapprochement du sol », rassure, mais le freinage agit sur une aile proche du décrochage."
+  ],
+  "W41B": [
+    "S'éloigner du relief se conçoit, et l'adverbe « énergiquement » pèse lourd avec une seule demi-aile qui porte."
+  ],
+  "W42B": [
+    "La condition « classé A » rassure sans dispenser forcément de corriger le cap."
+  ],
+  "W43B": [
+    "Agir sur les freins peut servir, et tout tient à la durée pendant laquelle l'action est maintenue.",
+    "La turbulence semble seule en cause, alors que « erreur de pilotage » renvoie à ce que le pilote pouvait faire avant."
+  ],
+  "W44B": [
+    "Deux choix tirent le frein gauche, mais pas au même moment ni avec la même durée d'action."
+  ],
+  "W45M": [
+    "« Sans rien tenter » choque, mais la condition « près du sol » pèse sur ce que demande une sortie de parachutale."
+  ],
+  "W46M": [
+    "Toute rotation n'est pas une vrille, qui naît d'une cause précise, distincte d'une « fermeture massive »."
+  ],
+  "W47M": [
+    "Le verbe « éviter » qui ouvre le choix ne va pas forcément dans le sens de la suite de la phrase."
+  ],
+  "W48M": [
+    "Deux choix ne diffèrent que d'un mot : élévateur « avant » ou « arrière »."
+  ],
+  "W49M": [
+    "« Impossible » tombe dès qu'un seul cas contraire existe, ici un autre moyen de diriger l'aile."
+  ],
+  "W4B": [
+    "« Légèrement » rend anodin un réglage qui freine l'aile bras hauts."
+  ],
+  "W50M": [
+    "Deux choix se posent face au vent, mais pas avec la même pente annoncée, « forte » ou « très faible »."
+  ],
+  "W51B": [
+    "Freiner progressivement se conçoit, et tout tient au point où le choix pousse ce freinage, « jusqu'au point de parachutage ».",
+    "« En finale », la hauteur qui reste limite ce qu'on peut encore enchaîner, comme des 360°."
+  ],
+  "W52V": [
+    "La ressource est un phénomène réel, sans suffire forcément à rendre la prise de vitesse « dangereuse »."
+  ],
+  "W53V": [
+    "Les gestes proposés ont leur place, mais la hauteur « 2 m/sol » leur laisse peu de temps."
+  ],
+  "W54B": [
+    "Se poser face au vent est la règle, mais « à 4 m/sol » un virage engage peu de hauteur."
+  ],
+  "W55V": [
+    "Freiner au posé est normal, et les mots « à fond » pèsent lourd par 20 km/h de vent."
+  ],
+  "W56B": [
+    "Les chiffres « 5 m/sol et sur 180° » fixent la hauteur et l'amplitude du dernier virage.",
+    "Ralentir fait partie du posé, et tout tient au moment, que change « très tôt »."
+  ],
+  "W58M": [
+    "« Toutes » tombe dès qu'un seul cas contraire existe, ici une phase où quelque chose ramène le pilote sous son aile.",
+    "Le verbe compte : « relever » le frein n'est pas le tirer."
+  ],
+  "W59B": [
+    "Une fermeture vient d'une perte de pression dans l'aile, ce qui donne une sensation précise dans « la commande ».",
+    "La sensation, « tomber vers l'avant » ou « tomber sur le dos », décrit le mouvement en cours, et non celui qui suit."
+  ],
+  "W5B": [
+    "Deux choix ne diffèrent que d'un mot : « convexe », bombé, ou « concave », creusé."
+  ],
+  "W60M": [
+    "Contrer l'abattée se fait aux freins, et tout tient au moment, « pendant la ressource » ou pendant l'abattée."
+  ],
+  "W61V": [
+    "Deux choix ne diffèrent que d'un mot, « gauche » ou « droite », selon le côté resté en retard.",
+    "Deux choix ne diffèrent que par la direction de la course, qui dépend du côté où se trouve l'aile."
+  ],
+  "W62B": [
+    "« Vent de travers droit » désigne le côté de l'aile que le vent atteint en premier."
+  ],
+  "W63V": [
+    "Deux choix ne diffèrent que d'un mot : le côté où courir pour retourner sous l'aile.",
+    "La course et le frein ne vont pas forcément du même côté, « frein droit » ou « frein gauche »."
+  ],
+  "W64B": [
+    "« Mes oreilles » peut désigner celles de l'aile ou celles du pilote.",
+    "« En permanence » garde les yeux du pilote sur l'aile, et donc loin du reste."
+  ],
+  "W66B": [
+    "« Dans toutes les situations » tombe dès qu'un seul cas contraire existe, ici une aérologie où descendre plus vite ne suffit pas.",
+    "« Plus d'autre choix » sonne excessif, alors que la question porte sur le moyen de diriger qui reste sûr."
+  ],
+  "W67B": [
+    "Deux gestes au frein se ressemblent, mais pas par leur amplitude ni par leur rythme."
+  ],
+  "W69V": [
+    "Deux choix ne diffèrent que d'un mot : « absence » ou « minimum » de vent.",
+    "« Sans risque » fait de l'expérience du pilote une protection contre tout risque."
+  ],
+  "W6M": [
+    "Un air « moins dense » résiste moins, mais porte aussi moins l'aile.",
+    "« Aucune » tombe dès qu'un seul cas contraire existe, ici une compétence en montagne utile au décollage."
+  ],
+  "W70V": [
+    "« Pendant » ou aussitôt après la temporisation : un seul mot place la décision dans le temps."
+  ],
+  "W71V": [
+    "« Réservée » tombe dès qu'un seul cas contraire existe, ici un usage du face-voile par vent modéré."
+  ],
+  "W72V": [
+    "Deux choix ne diffèrent que d'un mot : passer « sous » ou « au-dessus » du faisceau supérieur.",
+    "« Sans vent » ne dit pas ce qui ferait monter l'aile sur place avant le décollage."
+  ],
+  "W73B": [
+    "La question vise le « vent soutenu », et une précaution générale ne lui est pas forcément propre.",
+    "La négation « ne s'impose pas » renverse le sens de tout le choix."
+  ],
+  "W74M": [
+    "La négation « ne tient pas compte » écarte l'effet de l'accélérateur sur le réglage des freins."
+  ],
+  "W75B": [
+    "Deux choix ne diffèrent que d'un mot : la dureté « s'accroît » ou « faiblit » quand la vitesse augmente."
+  ],
+  "W76M": [
+    "Deux choix ne diffèrent que d'un mot : bras hauts, l'aile est « débridée » ou « bridée »."
+  ],
+  "W78M": [
+    "« Parfois » ne demande pas que cela arrive à chaque virage, un seul cas suffit."
+  ],
+  "W79B": [
+    "« Doucement » rend le geste prudent en apparence, mais un freinage même léger agit sur une aile qui perd déjà de la vitesse."
+  ],
+  "W7V": [
+    "Par « vent nul », toute la vitesse de l'aile par rapport à l'air vient d'une seule source."
+  ],
+  "W81B": [
+    "« Immédiatement » fixe un ordre dans les priorités quand l'aile ferme."
+  ],
+  "W82B": [
+    "Ici « incidence » veut dire influence, pas angle d'attaque, et la phrase est à la forme négative."
+  ],
+  "W83M": [
+    "« Protégé » promet l'absence de tout incident, ce qu'une homologation ne garantit pas forcément en vol réel.",
+    "Le mot « initiale » précise de quelle aile on parle, neuve ou usée."
+  ],
+  "W84M": [
+    "« Immédiatement » fixe un ordre, alors que d'autres actions peuvent précéder le secours.",
+    "Le côté du geste compte, mais aussi son dosage : « violemment et au maximum du débattement »."
+  ],
+  "W85B": [
+    "« Un frein » ou les deux « symétriquement » : les deux gestes n'agissent pas de la même façon sur la voile."
+  ],
+  "W86M": [
+    "« Uniquement » tombe dès qu'un seul cas contraire existe, ici une autre aile concernée.",
+    "« Synonyme » exige que deux notions soient les mêmes, ici la course d'une commande et un écart de vitesses."
+  ],
+  "W87M": [
+    "Deux choix ne diffèrent que d'un mot : la baisse d'incidence « rapproche » ou « éloigne » de la frontale.",
+    "« Jamais » tombe dès qu'un seul cas contraire existe, ici un cas où le pilote doit agir."
+  ],
+  "W88M": [
+    "Le verbe compte : on « desserre » la ventrale, et chaque effet en découle."
+  ],
+  "W89M": [
+    "Le verbe compte : on « serre » la ventrale, et chaque effet en découle."
+  ],
+  "W8B": [
+    "Les 35 km/h sont la vitesse « maximale » de l'aile, et l'écart avec le vent dit la marge qui reste."
+  ],
+  "W90M": [
+    "Chaque choix associe un comportement et un nom, comme « neutre spirale », qui doivent aller ensemble."
+  ],
+  "W91M": [
+    "Chaque choix associe un comportement et un nom, comme « stable spirale », qui doivent aller ensemble."
+  ],
+  "W92M": [
+    "Chaque choix associe un comportement et un nom, « stable » ou « instable » spirale, qui doivent aller ensemble."
+  ],
+  "W93M": [
+    "« Continue à accélérer » décrit plus qu'une aile qui garde la même inclinaison."
+  ],
+  "W94M": [
+    "« Tout le temps » se mesure à la vitesse à laquelle une autorotation consomme une hauteur de 200 m.",
+    "« Immédiatement » fixe un ordre, alors que d'autres actions peuvent précéder le lancer du secours."
+  ],
+  "W95B": [
+    "L'énoncé glisse la présence d'un « parachute de secours », comme si elle changeait les limites qu'un pilote se fixe."
+  ],
+  "W9B": [
+    "Reculer dos à l'aile peut se concevoir, et tout tient au mot « fortement » qui qualifie la résistance.",
+    "La prise des élévateurs est banale, et le choix ajoute ce qu'il en fait face au vent : « tractionner »."
+  ]
+}

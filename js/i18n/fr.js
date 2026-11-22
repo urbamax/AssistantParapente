@@ -1411,6 +1411,8 @@ export const FR = Object.freeze({
             seeCourseAt: 'VOIR : {title} (p. {page})',
             seeCourseShort: 'COURS · p. {page}',
             noSource: 'Aucune source trouvée pour le moment.',
+            readCloselyTitle: 'À lire de près',
+            readCloselyAria: 'À lire de près : ce qui rend cette question délicate',
         }),
         traps: Object.freeze({
             resultsTitleOne: '1 piège rencontré dans cette série',

@@ -5,7 +5,7 @@
  */
 import { escapeHTML } from '../core/security.js';
 import { BREVET_CODES, OFFICIAL_THEORY_TOTAL_POINTS, PROGRESSION_CHAIN } from '../services/brevet_service.js';
-import { isExamModeAvailable } from '../services/quiz_service.js';
+import QuizService, { isExamModeAvailable } from '../services/quiz_service.js';
 import { masteryRatio } from '../services/mastery.js';
 import { readAnswerLog } from '../services/answer_log.js';
 import { toSorted } from '../utils/array_utils.js';
@@ -13,6 +13,7 @@ import { formatDateOnly, parseDateToMs } from '../utils/date_utils.js';
 import { tq, tqh, tql } from './quiz_strings.js';
 import { choiceSourceHtml, courseLinksHtml } from './quiz_course_links.js';
 import { explanationHtml, optionExplanationHtml, optionExplanations } from './quiz_explanation.js';
+import { readCloselyHtml } from './quiz_read_closely.js';
 
 /**
  * Encart du statut officiel (examen théorique pour BI/BP/BPC, ou qualification Treuil sans examen).
@@ -764,7 +765,8 @@ export function buildQuestionAnswersHtml(view, qObj, code) {
               ? [{ url: view.getCourseUrl(code), title: '', page: '' }]
               : [];
 
-    let answersHtml = '<div class="bank-item-choices" style="display:flex; flex-direction:column; gap:8px;">';
+    // Spec 061 : encart « À lire de près » en tête de la correction dépliée.
+    let answersHtml = `${readCloselyHtml(QuizService.getQuestionTraps(code))}<div class="bank-item-choices" style="display:flex; flex-direction:column; gap:8px;">`;
     qObj.choices.forEach((ans, idx) => {
         const pts = parseInt(ans.pts || 0);
         const isCorrect = pts > 0;

@@ -16,6 +16,7 @@ import BaseView from '../core/base_view.js';
 import { tq, tql } from './quiz_strings.js';
 import { choiceSourceHtml, courseLinksHtml } from './quiz_course_links.js';
 import { explanationHtml, optionExplanationHtml, optionExplanations, optionOutcome } from './quiz_explanation.js';
+import { readCloselyHtml } from './quiz_read_closely.js';
 import { choiceIndex } from '../services/answer_log.js';
 import { buildRevisionAxes } from '../services/revision_axes.js';
 import { floorPercent1, formatPercent } from '../utils/text_utils.js';
@@ -642,7 +643,7 @@ export class QuizStatsBase extends BaseView {
                         <summary>
                             <div style="font-size:0.75rem; opacity:0.6; margin-bottom:6px;">${tq('history.questionNumber', { n: idx + 1 })}${qCode ? ` • <span style="font-family:monospace;">#${escapeHTML(qCode)}</span>` : ''}</div>
                             <div style="font-weight:600;">${escapeHTML(q.question)}</div>
-                        </summary>
+                        </summary>${qCode ? readCloselyHtml(QuizService.getQuestionTraps(qCode)) : ''}
                         <div class="bank-item-choices" style="display:flex; flex-direction:column; gap:6px; margin-top:12px;">
                             ${optionsHtml}
                         </div>
@@ -755,7 +756,7 @@ export class QuizStatsBase extends BaseView {
                         <div class="card error-card" style="border-left: 3px solid #ef4444; padding: 15px; border-radius: 8px; background: var(--bg-card, #fff); box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                             <div style="margin-bottom: 10px;">
                                 <strong style="color: var(--text-main, #333);">${escapeHTML(q.code)} - ${escapeHTML(q.theme || err.theme || QuizService.getThemeForCode(q.code))}</strong><br>
-                                <p style="margin: 8px 0; color: var(--text-main, #333);">${escapeHTML(q.question)}</p>
+                                <p style="margin: 8px 0; color: var(--text-main, #333);">${escapeHTML(q.question)}</p>${readCloselyHtml(QuizService.getQuestionTraps(q.code))}
                             </div>
                             <div style="font-size: 0.9em; background: var(--bg-secondary, #f9f9f9); padding: 10px; border-radius: 6px;">
                                 ${q.choices

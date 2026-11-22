@@ -16,6 +16,7 @@ import { buildResultsTrapsHtml } from './quiz_traps_html.js';
 import { tq, tql } from './quiz_strings.js';
 import { choiceSourceHtml, courseLinksHtml } from './quiz_course_links.js';
 import { explanationHtml, optionExplanationHtml, optionExplanations, optionOutcome } from './quiz_explanation.js';
+import { readCloselyHtml } from './quiz_read_closely.js';
 import { buildTrapFeedback } from '../services/error_diagnostic.js';
 import { choiceIndex } from '../services/answer_log.js';
 import { floorPercent1, formatPercent } from '../utils/text_utils.js';
@@ -658,7 +659,7 @@ class QuizViewClass extends QuizVoiceBase {
                         <span class="bank-item-code" style="${colorStyle}">${escapeHTML(q.code)}</span>
                         <span class="bank-item-theme">${escapeHTML(q.theme)}</span>
                     </div>
-                    <div class="bank-item-question">${escapeHTML(q.question)}</div>
+                    <div class="bank-item-question">${escapeHTML(q.question)}</div>${readCloselyHtml(QuizService.getQuestionTraps(q.code))}
                     <div class="bank-item-choices">
                         ${q.choices
                             .map((c, idx) => {
@@ -1330,7 +1331,9 @@ class QuizViewClass extends QuizVoiceBase {
             });
         }
 
-        const alertsHtml = this.trapAlertsHtml(result.trapFeedback);
+        // Spec 061 : ce qui rend la question délicate, une fois la réponse donnée (jamais avant).
+        const alertsHtml =
+            readCloselyHtml(QuizService.getQuestionTraps(original.code)) + this.trapAlertsHtml(result.trapFeedback);
         const feedbackDiv = document.getElementById('qcm-feedback');
         // Sans découpage par choix : l'explication entière, comme avant (gabarit inchangé, spec 024).
         const feedbackHtml = perOption
@@ -1472,7 +1475,7 @@ class QuizViewClass extends QuizVoiceBase {
                             <span class="bank-item-code">#${escapeHTML(r.question.code)}</span>
                             <span class="badge quiz-result-badge" style="${badge.style}">${tq(badge.labelKey)}</span>
                         </div>
-                        <div class="bank-item-question" style="font-weight: 600; font-size:1.1rem; margin-bottom: 16px; color:var(--text-main); line-height:1.4;">${escapeHTML(r.question.question)}</div>
+                        <div class="bank-item-question" style="font-weight: 600; font-size:1.1rem; margin-bottom: 16px; color:var(--text-main); line-height:1.4;">${escapeHTML(r.question.question)}</div>${readCloselyHtml(QuizService.getQuestionTraps(r.question.code))}
                         <div class="bank-item-choices" style="display: flex; flex-direction: column; gap: 10px;">
                             ${r.question.choices
                                 .map((c) => {

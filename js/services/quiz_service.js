@@ -598,10 +598,12 @@ class QuizService {
         try {
             // URLs stables (sans paramètre horodaté) : le service worker les met en cache et les
             // ressert hors ligne ; une URL unique à chaque appel ne trouvait jamais de copie.
-            const [questionsRes, explicationsRes, courseMappingRes] = await Promise.all([
+            const [questionsRes, explicationsRes, courseMappingRes, trapsRes] = await Promise.all([
                 fetch(`${this.basePath}/js/data/qcm_ffvl.csv`),
                 fetch(`${this.basePath}/js/data/qcm_ffvl_explanations.csv`),
                 fetch(`${this.basePath}/js/data/question_course_mapping.json`),
+                // Spec 061 : phrases « À lire de près », facultatives (leur absence n'empêche rien).
+                fetch(`${this.basePath}/js/data/qcm_question_traps.json`).catch(() => null),
             ]);
 
             if (!questionsRes.ok || !explicationsRes.ok) throw new Error('Failed to load QCM CSV data');
@@ -611,6 +613,7 @@ class QuizService {
             // Le mapping question -> cours est un pré-requis mou (best-effort) : son absence ne
             // doit jamais empêcher le chargement des questions elles-mêmes.
             const courseMapping = courseMappingRes.ok ? await courseMappingRes.json() : {};
+            this._questionTraps = trapsRes && trapsRes.ok ? await trapsRes.json().catch(() => ({})) : {};
 
             const explications = this.parseExplicationsCSV(explicationsCSV);
             const questions = this.parseQuestionsCSV(questionsCSV, explications, courseMapping);
@@ -628,6 +631,17 @@ class QuizService {
 
     getQuestions() {
         return this.questions || [];
+    }
+
+    /**
+     * Spec 061 : phrases de l'encart « À lire de près » d'une question (ce qui la rend délicate),
+     * dans l'ordre d'affichage ; tableau vide quand elle n'en a pas ou que le fichier manque.
+     * @param {string} code
+     * @returns {readonly string[]}
+     */
+    getQuestionTraps(code) {
+        const list = code && this._questionTraps ? this._questionTraps[code] : null;
+        return Object.freeze(Array.isArray(list) ? list.filter((s) => typeof s === 'string' && s) : []);
     }
 
     setQuestions(questions) {

@@ -22,6 +22,7 @@ const STATIC_PATHS = [
     'js/data/qcm_ffvl.csv',
     'js/data/qcm_ffvl_explanations.csv',
     'js/data/question_course_mapping.json',
+    'js/data/qcm_question_traps.json',
 ];
 
 // Ne sont pas mis en pré-cache par le service worker (trop lourds / ouverts à la demande).
