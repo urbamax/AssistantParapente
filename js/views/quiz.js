@@ -975,6 +975,10 @@ class QuizViewClass extends QuizVoiceBase {
         this._statsTrainingActive = false;
         this.state.masteryFilter = 'ALL';
         this.state.themeFilter = null;
+        // La page est reconstruite, encore cachée, avant la navigation : l'animation de transition
+        // montre sinon l'ancien contenu (filtres cochés, anciens taux), puis la page saute à la fin
+        // quand le montage la recalcule.
+        this.renderStats();
         if (AppRouter.routes && AppRouter.routes.has('STATS')) {
             AppRouter.navigate('STATS');
         } else {
