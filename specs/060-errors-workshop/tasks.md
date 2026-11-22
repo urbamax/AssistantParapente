@@ -6,3 +6,4 @@
 - [X] T004 [US1] Manual text in `components/manual_modal.html` and `js/i18n/fr_html.js`, content test
 - [X] T005 Run `npm run verify`, open the PR with its Discord sections
 - [ ] T006 After deployment, when the owner asks, update `#guide-utilisation` if needed
+- [X] T007 [US1] FR-006: consolidating error keeps the chapter in « Acquis à rafraîchir » (`js/services/revision_axes.js`), test and manual

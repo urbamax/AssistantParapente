@@ -40,6 +40,12 @@ A pilot has traps and omissions « À corriger » or « En consolidation » spre
 - **FR-004**: The workshop is renamed « Atelier pièges & oublis » (button, header label « ATELIER PIÈGES & OUBLIS »), including the button of the end-of-series traps card.
 - **FR-005**: The screen MUST still never show a question or choice text.
 
+### Follow-up after deployment (2026-11-22)
+
+Owner: « À revoir : 43 pièges et 43 oublis » did not match the pills below. The total counted errors still « En consolidation » in chapters classed « maîtrisés », which the screen hides. Owner: « s'ils sont maîtrisés, c'est qu'il n'y a plus rien à revoir chez eux ».
+
+- **FR-006**: A chapter with a trap or omission « En consolidation » MUST NOT be « maîtrisé »: it is « Acquis à rafraîchir » (Priority 2, unless it is a blocker), so it stays on screen and the box total equals the sum of the visible pills.
+
 ## Success Criteria *(mandatory)*
 
 - **SC-001**: Tests cover scenarios 1 to 5 (box rendering and picker).
@@ -48,7 +54,7 @@ A pilot has traps and omissions « À corriger » or « En consolidation » spre
 ## User Manual Impact *(mandatory)*
 
 - **Sections checked**: QCM tab, « Axes de révision » paragraph (HTML and `manualModal` catalogue).
-- **Updates required**: the workshop sentence: name, traps and omissions, « À corriger » then « En consolidation », shown as soon as one remains.
+- **Updates required**: a chapter with a consolidating error is not mastered (FR-006); the workshop sentence: name, traps and omissions, « À corriger » then « En consolidation », shown as soon as one remains.
 - **Discord guide (`#guide-utilisation`)**: card « 5. QCM & théorie » if it names the anti-trap workshop.
 
 ## Release Announcement *(mandatory)*

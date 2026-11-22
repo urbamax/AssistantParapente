@@ -265,5 +265,6 @@ describe('spec 060 : l’atelier pièges & oublis, tous chapitres confondus', ()
         expect(text).toMatch(/avez oublié une bonne réponse/);
         expect(text).toMatch(/les erreurs à corriger d'abord, puis celles en consolidation/);
         expect(text).not.toMatch(/anti-pièges/);
+        expect(text).toMatch(/en consolidation n'est pas encore maîtrisé/);
     });
 });
