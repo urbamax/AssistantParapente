@@ -1300,7 +1300,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                                     <span class="bank-item-code">#S3V</span>
                                     <span class="quiz-theme-tag">Réglementation</span>
                                     
-                                    
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-S3V"></i>
                                 </div>
                                 <div style="font-size:0.9rem; line-height:1.4;">La zone R est :</div>
@@ -1322,7 +1321,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                                     <span class="bank-item-code">#E2VB</span>
                                     <span class="quiz-theme-tag">Mécavol</span>
                                     <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35);">🎓 Examen</span>
-                                    
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-E2VB"></i>
                                 </div>
                                 <div style="font-size:0.9rem; line-height:1.4;">La finesse dépend de :</div>
@@ -1344,7 +1342,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                                     <span class="bank-item-code">#A1V</span>
                                     <span class="quiz-theme-tag">Météo</span>
                                     <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35);">🎓 Examen</span>
-                                    <span class="quiz-theme-tag" style="background:#4ade80; color:#000;">🔥 3</span>
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-A1V"></i>
                                 </div>
                                 <div style="font-size:0.9rem; line-height:1.4;">Qu’est-ce qu’un front ?</div>
@@ -2030,7 +2027,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                                 <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;">
                                     <span class="bank-item-code">#S3V</span>
                                     <span class="quiz-theme-tag">Réglementation</span>
-                                    
                                     
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-S3V"></i>
                                 </div>
@@ -2718,7 +2714,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                                     <span class="bank-item-code">#F4V</span>
                                     <span class="quiz-theme-tag">Facteurs humains</span>
                                     
-                                    
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-F4V"></i>
                                 </div>
                                 <div style="font-size:0.9rem; line-height:1.4;">Le stress :</div>
@@ -3405,7 +3400,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                                     <span class="bank-item-code">#E2VB</span>
                                     <span class="quiz-theme-tag">Mécavol</span>
                                     <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35);">🎓 Examen</span>
-                                    
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-E2VB"></i>
                                 </div>
                                 <div style="font-size:0.9rem; line-height:1.4;">La finesse dépend de :</div>
@@ -3427,7 +3421,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                                     <span class="bank-item-code">#A1V</span>
                                     <span class="quiz-theme-tag">Météo</span>
                                     <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35);">🎓 Examen</span>
-                                    <span class="quiz-theme-tag" style="background:#4ade80; color:#000;">🔥 3</span>
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-A1V"></i>
                                 </div>
                                 <div style="font-size:0.9rem; line-height:1.4;">Qu’est-ce qu’un front ?</div>
@@ -4104,7 +4097,6 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                                     <span class="bank-item-code">#A1V</span>
                                     <span class="quiz-theme-tag">Météo</span>
                                     <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35);">🎓 Examen</span>
-                                    <span class="quiz-theme-tag" style="background:#4ade80; color:#000;">🔥 3</span>
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-A1V"></i>
                                 </div>
                                 <div style="font-size:0.9rem; line-height:1.4;">Qu’est-ce qu’un front ?</div>
