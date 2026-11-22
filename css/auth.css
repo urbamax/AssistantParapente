@@ -284,6 +284,86 @@ body.light-mode .auth-alert.success {
     color: #15803d;
 }
 
+/* Suppression du compte (spec 059) */
+.auth-delete-account {
+    border-top: 1px solid var(--border-color);
+    padding-top: 12px;
+}
+
+.auth-delete-account-open {
+    background: none;
+    border: none;
+    padding: 4px 0;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.auth-delete-account-open:hover,
+.auth-delete-account-open:focus-visible {
+    color: var(--accent-red);
+}
+
+.auth-delete-account-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid rgba(226, 0, 26, 0.35);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    background: rgba(226, 0, 26, 0.05);
+}
+
+.auth-delete-account-panel[hidden],
+.auth-delete-account-open[hidden],
+.auth-delete-account-error[hidden] {
+    display: none;
+}
+
+.auth-delete-account-title {
+    font-weight: 800;
+    color: var(--accent-red);
+    font-size: 0.95rem;
+}
+
+.auth-delete-account-text {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+/* Champ sans icône : pas de retrait à gauche. */
+.auth-delete-account-panel .auth-input {
+    padding-left: 14px;
+}
+
+.auth-delete-account-error {
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    font-size: 0.82rem;
+    line-height: 1.4;
+    background: rgba(226, 0, 26, 0.1);
+    border: 1px solid rgba(226, 0, 26, 0.25);
+    color: #f87171;
+}
+
+body.light-mode .auth-delete-account-error {
+    color: #b91c1c;
+}
+
+.action-btn.auth-delete-account-confirm {
+    background: var(--accent-red);
+    border-color: var(--accent-red);
+    color: #fff;
+}
+
+.action-btn.auth-delete-account-confirm:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
 /* Connected User View */
 .auth-user-view {
     display: flex;

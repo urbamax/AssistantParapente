@@ -2166,6 +2166,46 @@
                             <i class="ri-notification-3-line"></i> Activer les alertes météo
                         </button>
                     </div>
+
+                    <!-- Suppression du compte et de toutes les données en ligne (spec 059, droit à l'effacement) -->
+                    <section class="auth-delete-account" aria-labelledby="auth-delete-account-title">
+                        <button type="button" id="auth-delete-account-open" data-i18n="authLoggedInView.supprimerMonCompte"
+                            class="auth-delete-account-open"
+                            data-action="FirebaseAuthopenDeleteAccount"
+                            aria-controls="auth-delete-account-panel"
+                        >
+                            <i class="ri-delete-bin-line" aria-hidden="true"></i> Supprimer mon compte
+                        </button>
+                        <div id="auth-delete-account-panel" class="auth-delete-account-panel" hidden>
+                            <div id="auth-delete-account-title" data-i18n="authLoggedInView.supprimerMonCompteTitre" class="auth-delete-account-title">
+                                Supprimer mon compte et mes données en ligne
+                            </div>
+                            <p data-i18n-html="authLoggedInView.supprimerMonCompteTexte" class="auth-delete-account-text">
+                                Votre compte et <strong>toutes vos données en ligne</strong> seront supprimés : carnet de vol
+                                et traces GPS, matériel, statistiques du QCM, préférences, fiche d'urgence en ligne et alertes
+                                météo. <strong>C'est définitif</strong> : rien ne pourra être récupéré.
+                            </p>
+                            <p data-i18n-html="authLoggedInView.supprimerMonCompteLocal" class="auth-delete-account-text">
+                                Les données de <strong>cet appareil</strong> restent ici. Pour les garder ailleurs, utilisez
+                                d'abord <strong>Exporter</strong> ci-dessous ; pour les retirer aussi, effacez les données de ce
+                                site dans les réglages de votre navigateur.
+                            </p>
+                            <div class="auth-field">
+                                <label data-i18n="authLoggedInView.motDePasseConfirmation" for="delete-account-password">Confirmez avec votre mot de passe</label>
+                                <input type="password" id="delete-account-password" class="auth-input" autocomplete="current-password" />
+                            </div>
+                            <div id="delete-account-error" class="auth-delete-account-error" role="alert" hidden></div>
+                            <div class="auth-action-row">
+                                <button type="button" data-i18n="authLoggedInView.annuler" class="action-btn secondary" data-action="FirebaseAuthcancelDeleteAccount">
+                                    Annuler
+                                </button>
+                                <button type="button" id="delete-account-confirm" class="action-btn auth-delete-account-confirm" data-action="FirebaseAuthconfirmDeleteAccount">
+                                    <i class="ri-delete-bin-line" aria-hidden="true"></i>
+                                    <span data-i18n="authLoggedInView.supprimerDefinitivement" class="delete-account-confirm-label">Supprimer définitivement</span>
+                                </button>
+                            </div>
+                        </div>
+                    </section>
                 </div>
 
                 <!-- Sauvegarde locale : accessible sans compte ni consentement Firebase -->

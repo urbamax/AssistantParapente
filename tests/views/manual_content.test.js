@@ -191,3 +191,22 @@ describe('spec 057 : pas d’icône décorative dans l’encadré « À propos �
         expect(card.textContent).toMatch(/100% Gratuit/i);
     });
 });
+
+describe('spec 059 : la suppression du compte est décrite comme dans l’application', () => {
+    it('Général explique « Supprimer mon compte » dans l’Espace Synchro, son caractère définitif et les données de l’appareil', () => {
+        mount();
+        const text = allVisibleText();
+        expect(text).toMatch(/Espace Synchro, puis Supprimer mon compte/);
+        expect(text).toMatch(/définitif/);
+        expect(text).toMatch(/données de cet appareil restent/);
+        expect(text).not.toMatch(/supprimer à tout moment depuis l'Espace Synchro ou en contactant/);
+    });
+});
+
+describe('spec 059 : la politique de confidentialité indique comment supprimer son compte', () => {
+    const LEGAL = readFileSync('components/legal_modals.html', 'utf8');
+    it('§4 renvoie au bouton « Supprimer mon compte » et non plus à une demande à l’éditeur', () => {
+        expect(LEGAL).toMatch(/Supprimer mon compte/);
+        expect(LEGAL).not.toMatch(/demander la suppression définitive de votre compte et de ses données à tout moment en\s+nous contactant/);
+    });
+});

@@ -21,7 +21,12 @@ export function createFakeFirestore(initialDocs = {}) {
                 const matches = [...docs.entries()].filter(
                     ([path]) => path.startsWith(prefix) && !path.slice(prefix.length).includes('/'),
                 );
-                return { forEach: (cb) => matches.forEach(([, data]) => cb({ data: () => data })) };
+                const snaps = matches.map(([path, data]) => ({
+                    id: path.slice(prefix.length),
+                    ref: { path },
+                    data: () => data,
+                }));
+                return { docs: snaps, size: snaps.length, forEach: (cb) => snaps.forEach(cb) };
             },
         },
     };

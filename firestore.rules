@@ -8,8 +8,8 @@ rules_version = '2';
 // (ou à coller dans la console Firebase > Firestore > Règles). Testées en local : npm run test:rules.
 //
 // Principe : chaque pilote n'accède qu'à ses propres données, sous users/{son uid}. Tout le reste
-// est refusé (refus par défaut), y compris users/{uid}/pushState, réservé à la Cloud Function
-// (le SDK admin ignore ces règles).
+// est refusé (refus par défaut). users/{uid}/pushState est écrit par la Cloud Function seule (le SDK
+// admin ignore ces règles) ; son propriétaire peut le lire et le supprimer (suppression du compte).
 //
 // Collections :
 //   - users/{userId}
@@ -30,7 +30,9 @@ rules_version = '2';
 //       favoriteSites?: list (<= 100), minimizedSites?: list (<= 200), savedLocations?: list (<= 50),
 //       limitWindMin?: number, limitWindMax?: number, limitGustDelta?: number, per-string size bounds
 //   - users/{userId}/access/{docId}
-//       read-only for owner (managed manually / Admin SDK)
+//       read and delete for owner (managed manually / Admin SDK; deleted with the account, spec 059)
+//   - users/{userId}/pushState/{docId}
+//       written by the Cloud Function only; read and delete for owner (account deletion, spec 059)
 //   - users/{userId}/igcTraces/{partId}
 //       flightId, index (0..11), total (1..12, index < total), encoding, data (1..700000), updatedAt?
 //       partId == flightId + '_' + string(index)
@@ -334,9 +336,18 @@ service cloud.firestore {
       // Rôles du pilote (ex. { roles: ['beta'] } dans le document « profile ») : donnés à la main
       // dans la console Firebase ou par le SDK admin, jamais par l'application. Le pilote peut les
       // lire pour savoir quoi afficher, mais ne peut ni les créer, ni les modifier, ni les supprimer.
+      // Le pilote peut aussi les supprimer, avec tout son compte (spec 059, droit à l'effacement).
       match /access/{docId} {
-        allow read: if isOwner(userId);
-        allow write: if false;
+        allow read, delete: if isOwner(userId);
+        allow create, update: if false;
+      }
+
+      // État des alertes météo (sites favoris devenus volables) : écrit par la Cloud Function seule
+      // (le SDK admin ignore ces règles). Le pilote peut le lire et le supprimer pour effacer son compte
+      // (spec 059), jamais l'écrire.
+      match /pushState/{docId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if false;
       }
 
       // Traces de vol (fichiers IGC compressés, voir specs/037-sync-flight-traces) : un document par
