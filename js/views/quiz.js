@@ -563,6 +563,8 @@ class QuizViewClass extends QuizVoiceBase {
         if (e.target.id === 'sort-questions-select' || e.target.getAttribute('data-action') === 'QuizsortQuestions') {
             this.sortQuestions(e.target.value);
             AppEvents.markHandled(e);
+        } else if (e.target.id === 'qcm-traps-only') {
+            QuizService.setTrapsOnly(e.target.checked);
         } else if (e.target.id === 'qcm-theme-select') {
             QuizService.setTheme(e.target.value);
             this.updateThemeUI(e.target.value);
@@ -756,6 +758,7 @@ class QuizViewClass extends QuizVoiceBase {
 
         const masteryOptions = document.getElementById('mastery-options');
         if (masteryOptions) masteryOptions.style.display = mode === 'MASTERY' ? '' : 'none';
+        this.updateTrapSeriesUI(mode);
         this.updateThemeUI();
         this.updateCountUI(QuizService.state.qcmConfig.count);
         this.refreshMasterySlider();
@@ -847,6 +850,19 @@ class QuizViewClass extends QuizVoiceBase {
         }
     }
 
+    // Spec 063 : l'option « Questions à piège » n'existe qu'en Entraînement, et seulement quand les
+    // phrases « À lire de près » sont chargées.
+    updateTrapSeriesUI(mode = QuizService.state.qcmConfig.mode) {
+        const group = document.getElementById('qcm-traps-group');
+        const box = /** @type {HTMLInputElement | null} */ (document.getElementById('qcm-traps-only'));
+        if (!group || !box) return;
+        group.style.display = mode === 'TRAINING' ? '' : 'none';
+        const available = QuizService.hasQuestionTraps();
+        if (!available) QuizService.setTrapsOnly(false);
+        box.disabled = !available;
+        box.checked = available && QuizService.state.qcmConfig.trapsOnly === true;
+    }
+
     updateThemeUI(theme = QuizService.state.qcmConfig.theme) {
         const select = /** @type {HTMLSelectElement | null} */ (document.getElementById('qcm-theme-select'));
         if (!select) return;
@@ -935,6 +951,9 @@ class QuizViewClass extends QuizVoiceBase {
             this._statsTrainingActive = false;
             const level = typeof GlobalState !== 'undefined' ? GlobalState.get('level') : 'BI';
             const firstQuestion = QuizService.startSession(level);
+            // Spec 063 : l'intitulé de la série dit qu'elle ne contient que des questions à piège.
+            this._trapSeriesActive =
+                QuizService.state.qcmConfig.mode === 'TRAINING' && QuizService.state.qcmConfig.trapsOnly === true;
 
             document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
             document.getElementById('qcm-screen').classList.add('active');
@@ -988,6 +1007,7 @@ class QuizViewClass extends QuizVoiceBase {
     }
 
     launchWorkshop(picked, workshopId) {
+        this._trapSeriesActive = false;
         const sessionQuestions = QuizService.shuffle(picked).map((q) => QuizService.shuffleQuestionChoices(q));
         this._activeWorkshopAxisId = workshopId;
         this._statsTrainingActive = false;
@@ -1047,6 +1067,9 @@ class QuizViewClass extends QuizVoiceBase {
 
         const feedbackDiv = document.getElementById('qcm-feedback');
         feedbackDiv.style.display = 'none';
+        // La correction précédente (dont l'encart « À lire de près », spec 061) ne reste pas cachée dans
+        // la page : avant la réponse, rien de la question suivante ni de la précédente n'y figure.
+        feedbackDiv.innerHTML = '';
 
         const container = document.getElementById('qcm-question-text');
         const choicesDiv = document.getElementById('qcm-choices');
@@ -1076,8 +1099,9 @@ class QuizViewClass extends QuizVoiceBase {
                 modeLabelEl.innerText = this.workshopTitle(this._activeWorkshopAxisId);
             } else {
                 const mode = QuizService.state.qcmConfig.mode;
+                const trainingKey = this._trapSeriesActive ? 'TRAINING_TRAPS' : 'TRAINING';
                 modeLabelEl.innerText = tql(
-                    `modes.labels.${['EXAM', 'REVISION', 'MASTERY'].includes(mode) ? mode : 'TRAINING'}`,
+                    `modes.labels.${['EXAM', 'REVISION', 'MASTERY'].includes(mode) ? mode : trainingKey}`,
                 );
             }
         }

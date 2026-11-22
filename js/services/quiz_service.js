@@ -16,6 +16,7 @@ import {
     textChoiceIndex,
 } from './answer_log.js';
 import { QCM_DATA_REVISION, QCM_POINT_CORRECTIONS } from '../data/qcm_point_corrections.js';
+import { orderTrapSeries } from './trap_series.js';
 import { diagnoseQuestionErrors } from './error_diagnostic.js';
 
 // Tolérance sur la somme des maîtrises (flottants) pour décider que l'objectif est atteint.
@@ -562,6 +563,8 @@ class QuizService {
                 count: 10,
                 theme: 'ALL',
                 masteryTarget: 75,
+                // Spec 063 : série « Questions à piège » (mode Entraînement seulement).
+                trapsOnly: false,
             },
             qcmSessionData: [],
             currentQcmSelection: new Set(),
@@ -639,6 +642,11 @@ class QuizService {
      * @param {string} code
      * @returns {readonly string[]}
      */
+    /** Spec 063 : vrai quand les phrases « À lire de près » sont chargées. */
+    hasQuestionTraps() {
+        return Boolean(this._questionTraps && Object.keys(this._questionTraps).length > 0);
+    }
+
     getQuestionTraps(code) {
         const list = code && this._questionTraps ? this._questionTraps[code] : null;
         return Object.freeze(Array.isArray(list) ? list.filter((s) => typeof s === 'string' && s) : []);
@@ -861,6 +869,9 @@ class QuizService {
     }
     setMasteryTarget(target) {
         this.state.qcmConfig.masteryTarget = target;
+    }
+    setTrapsOnly(on) {
+        this.state.qcmConfig.trapsOnly = Boolean(on);
     }
 
     // Maîtrise d'une question (0 à 1) : part de bonnes réponses sur ses dernières tentatives
@@ -1110,7 +1121,15 @@ class QuizService {
             questions = this.buildExamSelection(level, sourceData);
         } else {
             if (selectedTheme !== 'ALL') sourceData = sourceData.filter((q) => q.theme === selectedTheme);
-            questions = this.shuffle(sourceData).slice(0, count);
+            if (this.state.qcmConfig.trapsOnly) {
+                // Spec 063 : seulement les questions à piège, les erreurs d'abord.
+                const traps = sourceData.filter((q) => this.getQuestionTraps(q.code).length > 0);
+                if (traps.length === 0) throw new Error(t('quiz.dialogs.noTrapQuestion'));
+                const stats = this.getPersistentStats();
+                questions = orderTrapSeries(traps, stats && stats.questions, (a) => this.shuffle(a)).slice(0, count);
+            } else {
+                questions = this.shuffle(sourceData).slice(0, count);
+            }
         }
 
         if (questions.length === 0) throw new Error('Aucune question trouvée');

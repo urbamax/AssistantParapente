@@ -24,6 +24,9 @@ export const FR_HTML = Object.freeze({
             'Mode Entraînement : choisissez votre thème et volume. Correction immédiate après chaque question.',
         nombreDeQuestions: 'NOMBRE DE QUESTIONS',
         themeSpecifiqueOptionnel: 'THÈME SPÉCIFIQUE',
+        questionsAPiege: 'Questions à piège',
+        questionsAPiegeAide:
+            'Seulement les questions qui contiennent un piège, en commençant par celles où vous vous êtes déjà trompé.',
         tousLesThemes: 'Tous les thèmes',
         palierObjectif: 'PALIER OBJECTIF',
         commencer: 'COMMENCER',
@@ -800,7 +803,7 @@ export const FR_HTML = Object.freeze({
         modePerfectionnement: 'Mode Perfectionnement :',
         n2ParametrageAvance: '2. Paramétrage Avancé',
         enModeEntrainementOu:
-            "En mode Entraînement ou Révision, le curseur Nombre de questions va de 5 à 50 par pas de 5 (sa dernière position prend toutes les questions), et vous pouvez filtrer sur un thème précis (ex: uniquement la Météo, ou uniquement la Réglementation). En mode Perfectionnement, ce nombre est calculé automatiquement selon le périmètre et le palier choisis. Dans tous les modes, l'ordre des réponses est mélangé à chaque session pour retenir la théorie plutôt que la position de la bonne réponse. Sur ordinateur, vous pouvez aussi répondre entièrement au clavier : touches A à F (ou 1 à 6) pour cocher les choix, Entrée pour valider puis passer à la suite, et flèches gauche/droite pour naviguer.",
+            "En mode Entraînement ou Révision, le curseur Nombre de questions va de 5 à 50 par pas de 5 (sa dernière position prend toutes les questions), et vous pouvez filtrer sur un thème précis (ex: uniquement la Météo, ou uniquement la Réglementation). En mode Entraînement, l'option « Questions à piège » ne garde que les questions qui contiennent un piège (un « jamais », deux propositions qui ne diffèrent que d'un mot…), en commençant par celles où vous vous êtes déjà trompé, et l'encart « À lire de près » explique le piège après chaque réponse. En mode Perfectionnement, ce nombre est calculé automatiquement selon le périmètre et le palier choisis. Dans tous les modes, l'ordre des réponses est mélangé à chaque session pour retenir la théorie plutôt que la position de la bonne réponse. Sur ordinateur, vous pouvez aussi répondre entièrement au clavier : touches A à F (ou 1 à 6) pour cocher les choix, Entrée pour valider puis passer à la suite, et flèches gauche/droite pour naviguer.",
         n3LectureEtReponses: '3. Lecture et Réponses à la Voix',
         leBoutonLitLa:
             "<strong>Lecture à voix haute :</strong> Le bouton <strong>Lecture auto</strong> lit chaque question et ses réponses. Le bouton <strong>Enchaîner</strong> active la lecture automatique, maintient l'écran allumé et passe tout seul à la question suivante après la lecture de la correction, jusqu'à l'annonce vocale du score final. Après validation, seul le verdict est lu pour une bonne réponse ; en cas d'erreur ou d'oubli, seules les explications des propositions manquées (ainsi que l'alerte de piège récurrent) sont lues.",
