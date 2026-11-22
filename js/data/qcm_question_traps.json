@@ -475,99 +475,96 @@
     "L'énoncé précise « sans vache possible », ce qui pèse sur chaque choix à travers le terrain sous la transition."
   ],
   "F37M": [
-    "Un choix en deux phrases peut changer de sens à la seconde, ici « les kilomètres parcourus sont la priorité »."
+    "Un choix en deux phrases peut changer de sens à la seconde : partir du potentiel du jour est raisonnable, mais « les kilomètres sont la priorité » place l'objectif avant l'état et les limites du pilote."
   ],
   "F38BM": [
-    "Les conditions du jour attirent l'œil, mais « j'ai conduit jusque tard dans la nuit » décrit l'état du pilote."
+    "Les conditions « fumantes » attirent l'œil, mais « j'ai conduit jusque tard dans la nuit » décrit le pilote : la fatigue s'ajoute à un air fort, et c'est elle qui doit fixer l'ambition du vol."
   ],
   "F3B": [
-    "Une intention louable en début de choix n'engage pas la fin, où le regard « fixe ce point le plus possible »."
+    "Un début louable n'engage pas la fin : rester concentré est utile, mais « fixer ce point le plus possible » bloque le regard, qui doit balayer toute la trajectoire et les obstacles."
   ],
   "F6B": [
-    "L'énoncé porte sur les compétences « non techniques », et la négation change le tri."
+    "L'énoncé cherche les compétences « non techniques » : la négation inverse le tri. Le SIV, maîtrise des incidents de vol, est du pilotage, donc une compétence technique."
   ],
   "F8VBM": [
-    "Un simple préfixe peut changer une qualité en défaut, comme dans « sur-confiance »."
+    "Un préfixe change une qualité en défaut : la confiance aide à voler, mais la « sur-confiance » pousse à agir au-delà de ses limites, ce qui l'écarte des compétences à développer."
   ],
   "G10V": [
-    "Les choix vont par paires où un seul mot change : « augmente » ou « diminue »."
+    "Les choix vont par paires, « augmente » ou « diminue » : abaisser une commande freine et fait porter davantage ce côté, et ce surplus de portance l'incline. Le surplus de traînée, lui, fait pivoter l'aile."
   ],
   "G11M": [
-    "Deux choix ne diffèrent que d'un mot : « augmentation » ou « diminution » de la portance."
+    "Deux choix ne diffèrent que d'un mot, « augmentation » ou « diminution » de la portance : tirer une commande fait d'abord porter plus ce côté, qui se soulève, d'où l'inclinaison à l'opposé du virage voulu."
   ],
   "G12V": [
-    "L'énoncé parle de « l'axe de lacet », la rotation autour de la verticale, pas de l'inclinaison de l'aile.",
-    "Deux choix sur la traînée ne diffèrent que d'un mot : « augmente » ou « diminue »."
+    "L'énoncé vise « l'axe de lacet », la rotation autour de la verticale, pas l'inclinaison : ce qui fait pivoter l'aile, c'est le côté freiné qui avance moins vite que l'autre.",
+    "Deux choix sur la traînée ne diffèrent que d'un mot : abaisser une commande freine ce côté, donc sa traînée augmente."
   ],
   "G13B": [
-    "L'aile est prise à un pilote « plus léger », donc elle porte une autre charge que d'habitude.",
-    "Deux choix ne diffèrent que d'un mot : « plus » ou « moins » sensible à la fermeture."
+    "L'aile est prise à un pilote « plus léger » : elle volera plus chargée, donc plus tendue. Pour trancher entre « plus » et « moins » sensible à la fermeture, une voile tendue ferme moins, mais plus vivement."
   ],
   "G14B": [
-    "L'aile est prise à un pilote « plus lourd », donc elle porte une autre charge que d'habitude."
+    "L'aile est prise à un pilote « plus lourd » : elle volera moins chargée, donc plus molle, plus lente, avec des commandes moins efficaces et plus de risque de fermeture. Rien ne la rend plus maniable."
   ],
   "G15M": [
-    "Deux choix ne diffèrent que par le type de profil : « creux » ou « biconvexes ».",
-    "Le qualificatif accolé au profil reflex, « stable » ou « instable », change tout."
+    "Deux choix ne diffèrent que par le profil, « creux » ou « biconvexes », et un autre dit le reflex « instable » : tout tient à savoir si le profil corrige un écart d'incidence. Le creux l'aggrave, le reflex le corrige."
   ],
   "G16B": [
-    "Le nom de l'axe cité compte : « lacet », tangage ou roulis."
+    "Le nom de l'axe compte, « lacet », tangage ou roulis : le pendule fait balancer le pilote d'avant en arrière et de côté, ce qui donne du tangage et du roulis, pas une rotation autour de la verticale."
   ],
   "G17M": [
-    "L'énoncé part d'une fermeture, et la vitesse à laquelle une aile ferme n'est pas celle à laquelle elle décroche."
+    "L'énoncé part d'une fermeture, qui arrive à faible incidence, donc à vitesse élevée : il ne faut pas raisonner comme pour un décrochage, qui arrive lentement. Une aile allongée ferme plus violemment."
   ],
   "G18M": [
-    "Deux choix s'opposent sur le sens de variation de l'incidence : « augmentation » ou diminution."
+    "Deux choix s'opposent sur le sens de l'incidence : une aile ferme quand l'air arrive trop à plat et appuie sur le dessus. Une brusque augmentation mène au décrochage, pas à la fermeture."
   ],
   "G19V": [
-    "Assiette et incidence se distinguent : l'une se mesure par rapport à l'horizon, l'autre par rapport au vent relatif."
+    "Assiette et incidence se distinguent par leur référence : l'assiette se mesure par rapport à l'horizon, donc une forte ascendance qui cabre l'aile la fait varier franchement en vol thermique."
   ],
   "G1M": [
-    "Chaque choix porte une condition : « en vol équilibré » ou « transitoirement »."
+    "Chaque choix porte une condition, « en vol équilibré » ou « transitoirement » : le centre de poussée ne bouge que quand l'incidence change, donc il reste fixe à l'équilibre et bouge pendant les rafales."
   ],
   "G20M": [
-    "Deux choix ne diffèrent que d'un mot : aile « extérieure » ou « intérieure » à la rotation.",
-    "Tout tient à ce qui tourne et autour de quoi : « le pilote » ou la voile."
+    "Deux choix ne diffèrent que d'un mot, aile « extérieure » ou « intérieure » : la vrille vient d'une commande trop tirée, et c'est le côté tiré, intérieur au virage, qui décroche.",
+    "Tout tient à ce qui tourne : dans la vrille, c'est la voile qui pivote autour de la verticale, pas le pilote qui tourne autour d'elle."
   ],
   "G21B": [
-    "Tous les réglages de l'aile ne touchent pas le calage, qui est l'angle de l'aile par rapport au pilote."
+    "Tous les réglages ne touchent pas le calage, qui est l'angle de l'aile par rapport au pilote : les trims, l'accélérateur et les suspentes le changent, les freins ne servent qu'au pilotage."
   ],
   "G22B": [
-    "Deux choix ne diffèrent que par l'unité, qui dit si le centrage mesure un angle ou une position."
+    "Deux choix ne diffèrent que par l'unité : le centrage situe un point le long de la corde, donc une position en pourcentage. Les degrés mesurent un angle, comme l'incidence."
   ],
   "G23B": [
-    "Une aile exigeante à piloter n'est pas pour autant une aile « instable »."
+    "Une aile exigeante n'est pas pour autant « instable » : un grand allongement la rend plus sensible et plus fine à piloter, mais on l'ajoute pour gagner en finesse, donc en performance."
   ],
   "G24B": [
-    "« Aucun risque » tombe dès qu'un seul cas contraire existe."
+    "« Aucun risque » n'admet aucune exception : un gradient ou une turbulence aux oreilles suffit à faire passer l'aile en parachutale, ce qui écarte ce choix."
   ],
   "G25B": [
-    "La question porte sur l'effet de l'accélérateur ajouté aux oreilles, pas sur l'effet des oreilles seules."
+    "La question porte sur ce que l'accélérateur ajoute aux oreilles, pas sur les oreilles seules : il fait baisser l'incidence, ce qui éloigne l'aile de la parachutale et la fait descendre encore plus vite."
   ],
   "G26B": [
-    "Une trajectoire plus plongeante ne veut pas dire que l'aile pique, car l'incidence se mesure par rapport au vent relatif."
+    "Une trajectoire plus plongeante ne veut pas dire une incidence plus faible : l'incidence se mesure par rapport à l'air qui arrive sur l'aile, et aux oreilles la traînée la fait augmenter."
   ],
   "G27B": [
-    "« Jamais » tombe dès qu'un seul cas contraire existe."
+    "« Jamais » n'admet aucune exception, et les oreilles sont elles-mêmes deux fermetures volontaires : la voile peut donc fermer, ce qui écarte ce choix."
   ],
   "G28M": [
-    "Une formule qui garantit une « manœuvre sans souci » tombe dès qu'une seule situation à risque existe.",
-    "« Toutes » et « identique » tombent dès qu'une seule aile réagit autrement."
+    "« Sans souci », « toutes » et « identique » n'admettent aucune exception : un seul 360 qui part en spirale ou une seule aile qui réagit autrement suffit à les écarter. D'où le manuel de chaque aile."
   ],
   "G29M": [
-    "L'énoncé demande le minimum exigé par la norme, pas une valeur qui la respecte."
+    "L'énoncé demande le minimum exigé par la norme : 10 g la respecte aussi, puisqu'il dépasse 8 g, mais le minimum à supporter sans rupture est 8 g."
   ],
   "G2B": [
-    "Au « point d'arrêt », c'est l'air qui s'arrête ou les pressions, et tout tient à cette différence."
+    "Au « point d'arrêt », c'est l'air qui s'arrête, pas les pressions : il est freiné jusqu'à une vitesse nulle sur le bord d'attaque, et c'est justement là que la pression est la plus forte."
   ],
   "G30M": [
-    "« Il ne faut pas dépasser » vise une limite qui garde une marge de sécurité, ni une charge courante ni la résistance de rupture."
+    "« Il ne faut pas dépasser » demande une limite qui garde une marge : l'aile neuve résiste à 8 g, et rester sous 4 g n'en utilise que la moitié. 2 g est une charge courante, pas une limite."
   ],
   "G31V": [
-    "Deux choix inversent la division, et tout tient à ce qui est au numérateur, le PTV ou la surface."
+    "Deux choix inversent la division : la charge alaire se lit en kg par m², donc le poids total se place au-dessus de la surface. Ce poids comprend aussi l'aile, la sellette et le matériel."
   ],
   "G32M": [
-    "Une valeur chiffrée présentée comme un plafond, « difficilement dépasser 2 », dépend de l'inclinaison."
+    "« Difficilement dépasser 2 » présente un chiffre comme un plafond, mais le facteur de charge grandit avec l'inclinaison : il dépasse 2 dès que l'aile est inclinée au-delà de 60°."
   ],
   "G33M": [
     "La négation « n'entraîne pas » renverse le sens de tout le choix."
