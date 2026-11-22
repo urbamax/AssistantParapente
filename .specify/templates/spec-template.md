@@ -125,7 +125,8 @@
   the app. Read the sections related to this feature, then list what must be added,
   corrected or removed so the manual matches the app once the feature ships. Also note any
   outdated content you notice nearby. Write "No impact" only after checking, with a reason.
-  Public manual changes must also be mirrored in the Discord guide (#guide-utilisation).
+  Public manual changes must also be mirrored in the Discord guide (#guide-utilisation):
+  describe them in the pull request under "## Discord guide".
 -->
 
 - **Sections checked**: [e.g., "Carnet de vol", "Météo"]
@@ -138,9 +139,10 @@
 <!--
   ACTION REQUIRED: State who gets the feature. If it is available to all users (not
   limited to the beta or owner roles), draft the update notice for the community Discord
-  server's update channel (#mises-a-jour). It is posted only after the feature is deployed and live
-  for everyone, and only after the owner approves the text. If the feature is limited to
-  beta/owner, write "Not yet: limited to <role>" and post the notice when it opens up.
+  server's update channel (#mises-a-jour). Copy it into the pull request description under
+  "## Discord notice" (and the guide change under "## Discord guide"); a session posts them
+  after deployment, with the owner's approval. If the feature is limited to beta/owner, write
+  "None: limited to <role>" there and give the notice when it opens up.
 -->
 
 - **Availability**: [All users | Limited to beta | Limited to owner]

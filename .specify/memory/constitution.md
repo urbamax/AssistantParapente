@@ -161,15 +161,25 @@ Pilots use the app on take-off and in the mountains, often without a network.
   outdated or wrong. "No impact" is allowed only after that check, with a one-line reason.
   The Discord copy of the manual (channel `#guide-utilisation`, which holds only the public
   part of the manual, without role-gated blocks) MUST be kept in step: when a public part of
-  the manual changes, the spec lists what to change there, and the owner's local Discord
-  tooling republishes the channel once the change is deployed, with the owner's approval.
+  the manual changes, the pull request says what to change there (see below).
 - Every specification MUST state whether the feature will be available to all users (not
   limited to the `beta` or `owner` roles). If it is, the work MUST include an update notice
-  for the community Discord server (update channel `#mises-a-jour`, posted with the owner's local
-  Discord tooling): a short French text, drafted with the change, that
-  says what is new for pilots. It is posted only once the feature is deployed and live for
-  everyone, and only after the owner approves the text. A feature still limited to `beta` or
-  `owner` gets its notice when it opens to everyone.
+  for the community Discord server (update channel `#mises-a-jour`): a short French text that
+  says what is new for pilots. A feature still limited to `beta` or `owner` gets its notice
+  when it opens to everyone.
+- The notice and the Discord guide change travel in the pull request, because the agent's
+  session ends before deployment and only the owner's machine holds the Discord tooling. Every
+  pull request to `main` (except bot pull requests) MUST have a `## Discord notice` section
+  (the French notice, at most 2,000 characters) and a `## Discord guide` section (what to
+  change in `#guide-utilisation`), each holding French text or `None: <reason>`. A CI check
+  (`scripts/pr_discord_sections.mjs`) enforces it.
+- Nothing is posted to Discord by the agent that wrote the change. After a deployment, when the
+  owner asks (« publie les annonces »), a session working in the owner's main checkout runs the
+  local tool (`scripts/discord_notices.py`, git-ignored): it lists the notices and guide changes
+  of the pull requests merged since the last batch, shows them to the owner, and only after the
+  owner's approval posts the notices to `#mises-a-jour`, applies the guide changes and
+  republishes `#guide-utilisation`, then records those pull requests as done in its local
+  ledger so nothing is posted twice.
 - The Discord tooling (bot scripts, server layout, bot token) stays on the owner's machine and
   MUST NOT be committed: it is listed in `.gitignore`, and nothing in the repository may hold
   a Discord token, webhook URL or the server's private layout.
@@ -190,4 +200,4 @@ Pilots use the app on take-off and in the mountains, often without a network.
   - PATCH: clarification, wording, typo.
 - Compliance is checked at every `/speckit-plan` and during review of every pull request.
 
-**Version**: 1.1.0 | **Ratified**: 2026-09-29 | **Last Amended**: 2026-11-21
+**Version**: 1.2.0 | **Ratified**: 2026-09-29 | **Last Amended**: 2026-11-22

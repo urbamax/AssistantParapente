@@ -39,6 +39,8 @@ courses/
 /scripts/discord_bot.py
 /scripts/discord_guide.py
 /scripts/sync_discord_server.py
+/scripts/discord_notices.py
+/scripts/.discord_notices_ledger.json
 deploy/feedback_server/logs/
 
 # Python
