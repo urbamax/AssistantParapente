@@ -181,3 +181,13 @@ describe('spec 055 : les modes du QCM décrits comme dans l’application', () =
         expect(visibleText('qcm')).toMatch(/de 5 à 50/);
     });
 });
+
+describe('spec 057 : pas d’icône décorative dans l’encadré « À propos »', () => {
+    it('l’encadré du haut garde son titre et son texte, sans icône', () => {
+        mount();
+        const card = root.querySelector('#manual-section-about > div');
+        expect(card.querySelector('i')).toBeNull();
+        expect(card.textContent).toMatch(/Assistant Parapente/);
+        expect(card.textContent).toMatch(/100% Gratuit/i);
+    });
+});
