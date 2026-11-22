@@ -306,8 +306,9 @@ export function getTopTraps(questions, stats, options = {}) {
 }
 
 /**
- * Questions à rejouer pour dépasser leurs pièges : pièges actifs d'abord (rechutes et plus
- * fréquents en tête), puis pièges en consolidation.
+ * Questions à rejouer pour dépasser leurs pièges et oublis : chaque question est classée selon son
+ * erreur non surmontée la plus urgente (piège coché ou bonne réponse oubliée). Erreurs actives
+ * d'abord (rechutes et plus fréquentes en tête), puis erreurs en consolidation.
  *
  * @param {any[]} questions
  * @param {Record<string, any>} stats
@@ -319,7 +320,8 @@ export function pickAntiTrapQuestions(questions, stats, options = {}) {
     const scored = [];
     for (const q of Array.isArray(questions) ? questions : []) {
         if (options.axisId && options.axisOf && options.axisOf(q) !== options.axisId) continue;
-        const [top] = diagnoseQuestionErrors(q, map[q.code]).traps.filter((t) => t.status !== 'overcome');
+        const { traps, omissions } = diagnoseQuestionErrors(q, map[q.code]);
+        const [top] = [...traps, ...omissions].filter((t) => t.status !== 'overcome').sort(compareTraps);
         if (top) scored.push({ q, top });
     }
     scored.sort((a, b) => compareTraps(a.top, b.top));

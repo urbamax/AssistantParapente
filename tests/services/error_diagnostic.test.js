@@ -315,6 +315,27 @@ describe('getTopTraps and pickAntiTrapQuestions', () => {
         expect(pickAntiTrapQuestions(questions, stats).map((x) => x.code)).toEqual(['U1V', 'U2V']);
         expect(pickAntiTrapQuestions(questions, stats, { maxQuestions: 1 })).toHaveLength(1);
     });
+
+    it('also picks questions with an unresolved omission, active errors before consolidating ones', () => {
+        const withOmissions = {
+            questions: {
+                ...stats.questions,
+                // Bonne réponse oubliée hier, jamais rattrapée : oubli actif.
+                U4V: stat([[100, 0]], [0, 0, 0, 0]),
+                // Oubli puis deux réponses justes : oubli en consolidation.
+                U5V: stat(
+                    [
+                        [100, 0],
+                        [101, GOOD],
+                        [102, GOOD],
+                    ],
+                    [0, 0, 0, 0],
+                ),
+            },
+        };
+        const all = [...questions, q('U5V')];
+        expect(pickAntiTrapQuestions(all, withOmissions).map((x) => x.code)).toEqual(['U1V', 'U2V', 'U4V', 'U5V']);
+    });
 });
 
 describe('revision axes integration', () => {
