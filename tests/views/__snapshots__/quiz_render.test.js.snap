@@ -245,7 +245,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
     "question": "
             <div class="quiz-header-row">
                 <div class="quiz-meta" style="display:flex; align-items:center;">
-                    <span class="bank-item-code" style="margin-right: 8px; background: rgba(34, 197, 94, 0.2); color: var(--level-text-V, #4ade80); border: 1px solid rgba(34, 197, 94, 0.4);">A1V</span>
+                    <span class="bank-item-code" style="background: rgba(34, 197, 94, 0.2); color: var(--level-text-V, #4ade80); border: 1px solid rgba(34, 197, 94, 0.4);">A1V</span>
                     <div class="quiz-theme-tag">Météo</div>
                     
                     <div class="quiz-progress" style="margin-left: auto;">Question 1 / 2</div>
@@ -264,7 +264,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
     "question": "
             <div class="quiz-header-row">
                 <div class="quiz-meta" style="display:flex; align-items:center;">
-                    <span class="bank-item-code" style="margin-right: 8px; background: rgba(34, 197, 94, 0.2); color: var(--level-text-V, #4ade80); border: 1px solid rgba(34, 197, 94, 0.4);">A1V</span>
+                    <span class="bank-item-code" style="background: rgba(34, 197, 94, 0.2); color: var(--level-text-V, #4ade80); border: 1px solid rgba(34, 197, 94, 0.4);">A1V</span>
                     <div class="quiz-theme-tag">Météo</div>
                     
                     <div class="quiz-progress" style="margin-left: auto;">Question 1 / 2</div>
@@ -283,7 +283,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
     "question": "
             <div class="quiz-header-row">
                 <div class="quiz-meta" style="display:flex; align-items:center;">
-                    <span class="bank-item-code" style="margin-right: 8px; background: rgba(34, 197, 94, 0.2); color: var(--level-text-V, #4ade80); border: 1px solid rgba(34, 197, 94, 0.4);">A1V</span>
+                    <span class="bank-item-code" style="background: rgba(34, 197, 94, 0.2); color: var(--level-text-V, #4ade80); border: 1px solid rgba(34, 197, 94, 0.4);">A1V</span>
                     <div class="quiz-theme-tag">Météo</div>
                     
                     <div class="quiz-progress" style="margin-left: auto;">Question 1 / 2</div>
@@ -302,9 +302,9 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
     "question": "
             <div class="quiz-header-row">
                 <div class="quiz-meta" style="display:flex; align-items:center;">
-                    <span class="bank-item-code" style="margin-right: 8px; background: rgba(34, 197, 94, 0.2); color: var(--level-text-V, #4ade80); border: 1px solid rgba(34, 197, 94, 0.4);">F4V</span>
+                    <span class="bank-item-code" style="background: rgba(34, 197, 94, 0.2); color: var(--level-text-V, #4ade80); border: 1px solid rgba(34, 197, 94, 0.4);">F4V</span>
                     <div class="quiz-theme-tag">Facteurs humains</div>
-                    <div class="quiz-theme-tag" style="background:var(--accent-orange, #3b82f6); color:#fff; border-color:var(--accent-orange, #3b82f6); margin-left: 8px;"><i class="ri-sparkling-line"></i> Nouveau</div>
+                    <div class="quiz-theme-tag" style="background:var(--accent-orange, #3b82f6); color:#fff; border-color:var(--accent-orange, #3b82f6);"><i class="ri-sparkling-line"></i> Nouveau</div>
                     <div class="quiz-progress" style="margin-left: auto;">Question 1 / 2</div>
                 </div>
             </div>
@@ -321,7 +321,7 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
     "question": "
             <div class="quiz-header-row">
                 <div class="quiz-meta" style="display:flex; align-items:center;">
-                    <span class="bank-item-code" style="margin-right: 8px; background: rgba(34, 197, 94, 0.2); color: var(--level-text-V, #4ade80); border: 1px solid rgba(34, 197, 94, 0.4);">A1V</span>
+                    <span class="bank-item-code" style="background: rgba(34, 197, 94, 0.2); color: var(--level-text-V, #4ade80); border: 1px solid rgba(34, 197, 94, 0.4);">A1V</span>
                     <div class="quiz-theme-tag">Météo</div>
                     
                     <div class="quiz-progress" style="margin-left: auto;">Question 1 / 2</div>
@@ -333,9 +333,9 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
   "revisionSeen": "
             <div class="quiz-header-row">
                 <div class="quiz-meta" style="display:flex; align-items:center;">
-                    <span class="bank-item-code" style="margin-right: 8px; background: rgba(34, 197, 94, 0.2); color: var(--level-text-V, #4ade80); border: 1px solid rgba(34, 197, 94, 0.4);">A1V</span>
+                    <span class="bank-item-code" style="background: rgba(34, 197, 94, 0.2); color: var(--level-text-V, #4ade80); border: 1px solid rgba(34, 197, 94, 0.4);">A1V</span>
                     <div class="quiz-theme-tag">Météo</div>
-                    <div class="quiz-theme-tag" style="background:#f87171; color:#fff; border-color:#f87171; margin-left: 8px;"><i class="ri-refresh-line"></i> À revoir</div>
+                    <div class="quiz-theme-tag" style="background:#f87171; color:#fff; border-color:#f87171;"><i class="ri-refresh-line"></i> À revoir</div>
                     <div class="quiz-progress" style="margin-left: auto;">Question 2 / 2</div>
                 </div>
             </div>
@@ -375,8 +375,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                     <div class="bank-item" style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; background: var(--bg-card); box-shadow:0 2px 4px rgba(0,0,0,0.02);">
                         <div class="bank-item-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items:center;">
-                            <span class="bank-item-code" style="font-family:monospace; font-size:0.85rem; color:var(--text-secondary); background:rgba(0,0,0,0.05); padding:4px 8px; border-radius:4px;">#A1V</span>
-                            <span class="badge" style="background:rgba(248,113,113,0.1); color:#dc2626; border:1px solid #f87171; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">FAUX</span>
+                            <span class="bank-item-code">#A1V</span>
+                            <span class="badge quiz-result-badge" style="background:rgba(248,113,113,0.1); color:#dc2626; border:1px solid #f87171;">FAUX</span>
                         </div>
                         <div class="bank-item-question" style="font-weight: 600; font-size:1.1rem; margin-bottom: 16px; color:var(--text-main); line-height:1.4;">Qu’est-ce qu’un front ?</div>
                         <div class="bank-item-choices" style="display: flex; flex-direction: column; gap: 10px;">
@@ -485,8 +485,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                     <div class="bank-item" style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; background: var(--bg-card); box-shadow:0 2px 4px rgba(0,0,0,0.02);">
                         <div class="bank-item-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items:center;">
-                            <span class="bank-item-code" style="font-family:monospace; font-size:0.85rem; color:var(--text-secondary); background:rgba(0,0,0,0.05); padding:4px 8px; border-radius:4px;">#A1V</span>
-                            <span class="badge" style="background:rgba(248,113,113,0.1); color:#dc2626; border:1px solid #f87171; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">FAUX</span>
+                            <span class="bank-item-code">#A1V</span>
+                            <span class="badge quiz-result-badge" style="background:rgba(248,113,113,0.1); color:#dc2626; border:1px solid #f87171;">FAUX</span>
                         </div>
                         <div class="bank-item-question" style="font-weight: 600; font-size:1.1rem; margin-bottom: 16px; color:var(--text-main); line-height:1.4;">Qu’est-ce qu’un front ?</div>
                         <div class="bank-item-choices" style="display: flex; flex-direction: column; gap: 10px;">
@@ -538,8 +538,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                     <div class="bank-item" style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; background: var(--bg-card); box-shadow:0 2px 4px rgba(0,0,0,0.02);">
                         <div class="bank-item-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items:center;">
-                            <span class="bank-item-code" style="font-family:monospace; font-size:0.85rem; color:var(--text-secondary); background:rgba(0,0,0,0.05); padding:4px 8px; border-radius:4px;">#A1V</span>
-                            <span class="badge" style="background:rgba(248,113,113,0.1); color:#dc2626; border:1px solid #f87171; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">FAUX</span>
+                            <span class="bank-item-code">#A1V</span>
+                            <span class="badge quiz-result-badge" style="background:rgba(248,113,113,0.1); color:#dc2626; border:1px solid #f87171;">FAUX</span>
                         </div>
                         <div class="bank-item-question" style="font-weight: 600; font-size:1.1rem; margin-bottom: 16px; color:var(--text-main); line-height:1.4;">Qu’est-ce qu’un front ?</div>
                         <div class="bank-item-choices" style="display: flex; flex-direction: column; gap: 10px;">
@@ -591,8 +591,8 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                 
                     <div class="bank-item" style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; background: var(--bg-card); box-shadow:0 2px 4px rgba(0,0,0,0.02);">
                         <div class="bank-item-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items:center;">
-                            <span class="bank-item-code" style="font-family:monospace; font-size:0.85rem; color:var(--text-secondary); background:rgba(0,0,0,0.05); padding:4px 8px; border-radius:4px;">#A1V</span>
-                            <span class="badge" style="background:rgba(248,113,113,0.1); color:#dc2626; border:1px solid #f87171; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">FAUX</span>
+                            <span class="bank-item-code">#A1V</span>
+                            <span class="badge quiz-result-badge" style="background:rgba(248,113,113,0.1); color:#dc2626; border:1px solid #f87171;">FAUX</span>
                         </div>
                         <div class="bank-item-question" style="font-weight: 600; font-size:1.1rem; margin-bottom: 16px; color:var(--text-main); line-height:1.4;">Qu’est-ce qu’un front ?</div>
                         <div class="bank-item-choices" style="display: flex; flex-direction: column; gap: 10px;">
@@ -1296,9 +1296,9 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div role="button" tabindex="0" class="question-stat-item" data-code="S3V" data-pct="0" data-total="1" data-streak="0" data-date="0" data-exams="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['S3V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
-                                <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-                                    <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#S3V</span>
-                                    <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Réglementation</span>
+                                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;">
+                                    <span class="bank-item-code">#S3V</span>
+                                    <span class="quiz-theme-tag">Réglementation</span>
                                     
                                     
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-S3V"></i>
@@ -1318,10 +1318,10 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="10" data-total="4" data-streak="0" data-date="1790587800000" data-exams="1" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
-                                <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-                                    <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#E2VB</span>
-                                    <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Mécavol</span>
-                                    <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35); padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🎓 Examen</span>
+                                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;">
+                                    <span class="bank-item-code">#E2VB</span>
+                                    <span class="quiz-theme-tag">Mécavol</span>
+                                    <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35);">🎓 Examen</span>
                                     
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-E2VB"></i>
                                 </div>
@@ -1340,11 +1340,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790587800000" data-exams="1" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
-                                <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-                                    <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#A1V</span>
-                                    <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Météo</span>
-                                    <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35); padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🎓 Examen</span>
-                                    <span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 3</span>
+                                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;">
+                                    <span class="bank-item-code">#A1V</span>
+                                    <span class="quiz-theme-tag">Météo</span>
+                                    <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35);">🎓 Examen</span>
+                                    <span class="quiz-theme-tag" style="background:#4ade80; color:#000;">🔥 3</span>
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-A1V"></i>
                                 </div>
                                 <div style="font-size:0.9rem; line-height:1.4;">Qu’est-ce qu’un front ?</div>
@@ -2027,9 +2027,9 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div role="button" tabindex="0" class="question-stat-item" data-code="S3V" data-pct="0" data-total="1" data-streak="0" data-date="0" data-exams="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['S3V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
-                                <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-                                    <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#S3V</span>
-                                    <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Réglementation</span>
+                                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;">
+                                    <span class="bank-item-code">#S3V</span>
+                                    <span class="quiz-theme-tag">Réglementation</span>
                                     
                                     
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-S3V"></i>
@@ -2714,9 +2714,9 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div role="button" tabindex="0" class="question-stat-item" data-code="F4V" data-pct="0" data-total="0" data-streak="0" data-date="0" data-exams="0" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['F4V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
-                                <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-                                    <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#F4V</span>
-                                    <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Facteurs humains</span>
+                                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;">
+                                    <span class="bank-item-code">#F4V</span>
+                                    <span class="quiz-theme-tag">Facteurs humains</span>
                                     
                                     
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-F4V"></i>
@@ -3401,10 +3401,10 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div role="button" tabindex="0" class="question-stat-item" data-code="E2VB" data-pct="10" data-total="4" data-streak="0" data-date="1790587800000" data-exams="1" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['E2VB']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
-                                <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-                                    <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#E2VB</span>
-                                    <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Mécavol</span>
-                                    <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35); padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🎓 Examen</span>
+                                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;">
+                                    <span class="bank-item-code">#E2VB</span>
+                                    <span class="quiz-theme-tag">Mécavol</span>
+                                    <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35);">🎓 Examen</span>
                                     
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-E2VB"></i>
                                 </div>
@@ -3423,11 +3423,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790587800000" data-exams="1" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
-                                <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-                                    <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#A1V</span>
-                                    <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Météo</span>
-                                    <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35); padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🎓 Examen</span>
-                                    <span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 3</span>
+                                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;">
+                                    <span class="bank-item-code">#A1V</span>
+                                    <span class="quiz-theme-tag">Météo</span>
+                                    <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35);">🎓 Examen</span>
+                                    <span class="quiz-theme-tag" style="background:#4ade80; color:#000;">🔥 3</span>
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-A1V"></i>
                                 </div>
                                 <div style="font-size:0.9rem; line-height:1.4;">Qu’est-ce qu’un front ?</div>
@@ -4100,11 +4100,11 @@ exports[`quiz renders (spec 024: identical before and after moving the texts) > 
                     <div role="button" tabindex="0" class="question-stat-item" data-code="A1V" data-pct="20" data-total="2" data-streak="3" data-date="1790587800000" data-exams="1" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:pointer;" data-action="QuiztoggleQuestionDetails" data-args="['A1V']">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
-                                <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-                                    <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#A1V</span>
-                                    <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">Météo</span>
-                                    <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35); padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🎓 Examen</span>
-                                    <span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 3</span>
+                                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;">
+                                    <span class="bank-item-code">#A1V</span>
+                                    <span class="quiz-theme-tag">Météo</span>
+                                    <span class="question-exam-badge" title="Posée 1 fois en examen" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35);">🎓 Examen</span>
+                                    <span class="quiz-theme-tag" style="background:#4ade80; color:#000;">🔥 3</span>
                                     <i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-A1V"></i>
                                 </div>
                                 <div style="font-size:0.9rem; line-height:1.4;">Qu’est-ce qu’un front ?</div>

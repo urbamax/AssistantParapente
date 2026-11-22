@@ -700,7 +700,7 @@ export function buildQuestionsHtml(
             const examCount = examCountByCode.get(code) ?? (allowGlobalExamCount ? Number(data?.examCount) || 0 : 0);
             const examBadgeHtml =
                 examCount > 0
-                    ? `<span class="question-exam-badge" title="${tq(examCount > 1 ? 'stats.examBadgeTitleMany' : 'stats.examBadgeTitleOne', { count: examCount })}" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35); padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🎓 ${examCount > 1 ? tq('stats.examBadgeMany', { count: examCount }) : tq('stats.examBadgeOne')}</span>`
+                    ? `<span class="question-exam-badge" title="${tq(examCount > 1 ? 'stats.examBadgeTitleMany' : 'stats.examBadgeTitleOne', { count: examCount })}" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35);">🎓 ${examCount > 1 ? tq('stats.examBadgeMany', { count: examCount }) : tq('stats.examBadgeOne')}</span>`
                     : '';
 
             // Réponses, explications et liens de cours : construits au premier dépliage de la question
@@ -719,11 +719,11 @@ export function buildQuestionsHtml(
                     <div role="button" tabindex="0" class="question-stat-item" data-code="${code}" data-pct="${pct}" data-total="${data.total}" data-streak="${streak}" data-date="${lastSeen}" data-exams="${examCount}" style="background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-color); cursor:${hasAnswers ? 'pointer' : 'default'};" ${hasAnswers ? `data-action="QuiztoggleQuestionDetails" data-args="['${code}']"` : ''}>
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
                             <div style="flex:1;">
-                                <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-                                    <span style="font-family:monospace; font-size:0.75rem; opacity:0.5;">#${code}</span>
-                                    <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:0.7rem;">${theme}</span>
+                                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;">
+                                    <span class="bank-item-code">#${code}</span>
+                                    <span class="quiz-theme-tag">${theme}</span>
                                     ${examBadgeHtml}
-                                    ${streak >= 3 ? `<span style="background:#4ade80; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:700;">🔥 ${streak}</span>` : ''}
+                                    ${streak >= 3 ? `<span class="quiz-theme-tag" style="background:#4ade80; color:#000;">🔥 ${streak}</span>` : ''}
                                     ${hasAnswers ? '<i class="ri-arrow-down-s-line" style="opacity:0.5; transition:transform 0.2s;" id="arrow-' + code + '"></i>' : ''}
                                 </div>
                                 <div style="font-size:0.9rem; line-height:1.4;">${escapeHTML(displayText)}</div>
