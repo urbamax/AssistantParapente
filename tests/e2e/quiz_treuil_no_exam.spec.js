@@ -14,6 +14,8 @@ test.beforeEach(async ({ page }) => {
                 date: new Date().toISOString(),
             }),
         );
+        // Sans niveau choisi, l'application démarre en « Tous les niveaux », qui n'a pas d'examen (spec 058).
+        if (!localStorage.getItem('userLevel')) localStorage.setItem('userLevel', JSON.stringify('BI'));
     });
     await page.route('https://api.open-meteo.com/**', (route) => route.fulfill({ json: [] }));
 });
@@ -56,4 +58,10 @@ test('le mode Examen est absent pour le niveau Treuil, la Qualification Treuil r
     // Rebasculer sur BI : le bouton Examen réapparaît
     await levelSelect.selectOption('BI');
     await expect(examBtn).toBeVisible();
+
+    // « Tous les niveaux » : pas d'examen officiel tous niveaux confondus (spec 058)
+    await examBtn.click();
+    await levelSelect.selectOption('ALL');
+    await expect(examBtn).toBeHidden();
+    await expect(trainingBtn).toHaveClass(/active/);
 });

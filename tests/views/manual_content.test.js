@@ -192,6 +192,49 @@ describe('spec 057 : pas d’icône décorative dans l’encadré « À propos �
     });
 });
 
+describe('spec 058 : chaque affirmation vérifiée dans le code', () => {
+    it('sans rôle, ni favoris, ni rayon GPS, ni tri des sites', () => {
+        mount();
+        const text = [visibleText('dashboard'), visibleText('equipment')].join(' ');
+        expect(text).not.toMatch(/sites favoris/);
+        expect(text).not.toMatch(/rayon GPS/);
+        expect(text).not.toMatch(/tri des sites/);
+    });
+
+    for (const roles of [[], ['beta'], ['owner']]) {
+        it(`ne promet pas de bouton de suppression inexistant (rôles : ${roles.join(', ') || 'aucun'})`, () => {
+            mount(roles);
+            expect(allVisibleText()).not.toMatch(/supprimer à tout moment depuis l'Espace Synchro/);
+            expect(allVisibleText()).not.toMatch(/A à D \(ou 1 à 4\)/);
+            expect(allVisibleText()).not.toMatch(/"Par niveau"/);
+            expect(allVisibleText()).not.toMatch(/de 5 à 8 questions/);
+        });
+    }
+
+    it('QCM : pas d’examen en « Tous les niveaux », clavier A à F, réponses par « oui » ou « non »', () => {
+        mount();
+        const text = visibleText('qcm');
+        expect(text).toMatch(/ni en Tous les niveaux/);
+        expect(text).toMatch(/A à F \(ou 1 à 6\)/);
+        expect(text).toMatch(/« oui » ou « non »/);
+        expect(text).toMatch(/6 questions/);
+    });
+
+    it('Bibliothèque : visionneuse intégrée partout, deux boutons de tri', () => {
+        mount();
+        const text = visibleText('library');
+        expect(text).not.toMatch(/nouvel onglet/);
+        expect(text).toMatch(/Par catégorie/);
+    });
+
+    it('Statistiques : tri aussi par série et par examens', () => {
+        mount();
+        const text = visibleText('stats');
+        expect(text).toMatch(/par série de bonnes réponses/);
+        expect(text).toMatch(/par nombre d'examens/);
+    });
+});
+
 describe('spec 059 : la suppression du compte est décrite comme dans l’application', () => {
     it('Général explique « Supprimer mon compte » dans l’Espace Synchro, son caractère définitif et les données de l’appareil', () => {
         mount();
@@ -200,6 +243,7 @@ describe('spec 059 : la suppression du compte est décrite comme dans l’applic
         expect(text).toMatch(/définitif/);
         expect(text).toMatch(/données de cet appareil restent/);
         expect(text).not.toMatch(/supprimer à tout moment depuis l'Espace Synchro ou en contactant/);
+        expect(text).not.toMatch(/pas encore de bouton/);
     });
 });
 

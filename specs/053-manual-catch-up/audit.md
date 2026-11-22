@@ -4,7 +4,7 @@ One row per manual text (catalogue key) after the change, compared with `origin/
 
 **Method.** Every manual tab was read for every role (none, `beta`, `owner`) and compared with the features merged since 2026-11-07 (PR descriptions, then the strings and code of the screens). Rows marked *kept* were read and found accurate; the evidence column of *added* and *corrected* rows names what they were checked against.
 
-**Totals.** 277 texts: 247 kept, 16 corrected, 14 added, 0 removed (three QCM rows corrected afterwards by spec 055).
+**Totals.** 277 texts: 238 kept, 25 corrected, 14 added, 0 removed (three QCM rows corrected afterwards by spec 055, 9 more by spec 058 after a claim-by-claim check against the code).
 
 **Found outside the manual (not changed here).** The ICE screen intro (`js/i18n/fr.js`, `ice.introHint`) still ends with « Votre fiche reste sur cet appareil : elle n'est ni synchronisée ni exportée », which contradicts the optional online copy (PRs 180, 307). To fix in its own change.
 
@@ -53,7 +53,7 @@ One row per manual text (catalogue key) after the change, compared with `origin/
 | dashboard | lApplicationDisposeDUnBouton | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | dashboard | n3CreerSonCompte | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | dashboard | sansCompteVousPerdez | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
-| dashboard | vosScoresVotreHistorique | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
+| dashboard | vosScoresVotreHistorique | all | corrected | Corrected in spec 058: favourites are owner-only |
 | dashboard | concretementVoiciCeQuUn | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | dashboard | commencezVotreRevisionQcm | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | dashboard | continuiteParfaite | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
@@ -63,11 +63,11 @@ One row per manual text (catalogue key) after the change, compared with `origin/
 | dashboard | carnetDeVol2 | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | dashboard | votreNiveauDeBrevet | beta | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | dashboard | sauvegardeDeVosPreferences | beta | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
-| dashboard | votreNiveauDeBrevetSansMeteo | not-beta | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
+| dashboard | votreNiveauDeBrevetSansMeteo | not-beta | corrected | Corrected in spec 058: without a role only level and theme are synced (firebase_service.js preferences) |
 | dashboard | unEffacementAccidentelDu | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | dashboard | protectionContreLaPerte | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | dashboard | pourCreerVotreCompte | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
-| dashboard | ellesSontHebergeesSur | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
+| dashboard | ellesSontHebergeesSur | all | corrected | Corrected in spec 058: no in-app button deletes the account or cloud data |
 | dashboard | vosDonneesRestentLes | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | dashboard | uneFoisConnecteUn | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | dashboard | n4HorsLigneEt | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
@@ -224,7 +224,7 @@ One row per manual text (catalogue key) after the change, compared with `origin/
 | equipment | leSystemeCroiseAutomatiquement | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | equipment | synchronisationCloudFirebase | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | equipment | desQueVousEtes | beta | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
-| equipment | desQueVousEtesSansMeteo | not-beta | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
+| equipment | desQueVousEtesSansMeteo | not-beta | corrected | Corrected in spec 058: no GPS radius or site sorting without the owner role |
 | safety | lEcranSecurite | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | safety | cetEcranReprendDes | all | corrected | Safety tabs urgence, prevol, sigr, ice (js/views/safety.js TABS); ICE is not FFVL content |
 | safety | n1Urgence | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
@@ -250,40 +250,40 @@ One row per manual text (catalogue key) after the change, compared with `origin/
 | qcm | n1LesQuatreModes | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | qcm | cEstLeModePar | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | qcm | modeEntrainement | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
-| qcm | uneSimulationDeLExamen | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
+| qcm | uneSimulationDeLExamen | all | corrected | Corrected in spec 058: exam also for « Tous les niveaux » (isExamModeAvailable, getExamQuotas) |
 | qcm | modeExamen | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | qcm | revisionEspaceeUneQuestion | all | corrected | Corrected in spec 055: SM-2 intervals (js/services/review_scheduler.js); marked kept by mistake in 053 |
 | qcm | modeRevision | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | qcm | choisissezUnNiveauGlobal | all | corrected | Corrected in spec 055: « Palier objectif » slider from current mastery + 1 % to 100 % (QuizService.getMasteryTargetBounds); marked kept by mistake in 053 |
 | qcm | modePerfectionnement | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | qcm | n2ParametrageAvance | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
-| qcm | enModeEntrainementOu | all | corrected | Corrected in spec 055: count slider 5 to 50, last position = all (#qcm-count-slider); marked kept by mistake in 053 |
+| qcm | enModeEntrainementOu | all | corrected | Corrected in specs 055 and 058: count slider; keys A to F / 1 to 6 (quiz.js handleKeydown) |
 | qcm | n3LectureEtReponses | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | qcm | leBoutonLitLa | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
-| qcm | ditesLesLettresDes | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
+| qcm | ditesLesLettresDes | all | corrected | Corrected in spec 058: oui/non reading flow and confirmation (quiz_voice_ui.js) |
 | qcm | repondreALaVoix | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | qcm | n4LaBanqueDe | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | qcm | accessibleDepuisLeMenu | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | qcm | n5LesAxesDeRevision | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
-| qcm | axesDeRevisionDescription | all | corrected | Priority labels (fr.js axes.status); mastered chapters/questions and empty filters hidden (PR 289); 21 axes (REVISION_AXES_CATALOG) |
+| qcm | axesDeRevisionDescription | all | corrected | Corrected in spec 058: axis workshop 6 questions, anti-trap up to 8 completed to 5 (quiz.js) |
 | qcm | n6LesSiglesExpliques | all | added | Acronym popover in explanations only, with library source (PRs 251, 252, 309) |
 | qcm | lesSiglesExpliquesTexte | all | added | Same as above |
 | library | laBibliothequeDeCours | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | library | unEspaceCentralisantDe | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | library | n1NavigationEtTri | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
-| library | lesDocumentsSontClasses | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
+| library | lesDocumentsSontClasses | all | corrected | Corrected in spec 058: two sort buttons, A-Z and Par catégorie (index.html) |
 | library | categorisation | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | library | laBarreDeRecherche2 | all | corrected | Library search also matches course keywords (cfcf23a, js/views/manual.js) |
 | library | rechercheRapide | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | library | textesOfficielsEtDocuments | all | added | New library entries (PRs 253, 260, 262; js/data/courses_data.js) |
 | library | n2LectureDesCours | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
-| library | enCliquantSurUn | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
+| library | enCliquantSurUn | all | corrected | Corrected in spec 058: built-in viewer in every case (js/core/course_link.js) |
 | stats | suiviEtStatistiques | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | stats | ceTableauDeBord | all | corrected | Mastery tile labels (fr.js stats.mastery); no Perfectionnement launch from stats any more (data-actions in js/views/quiz_stats*.js); tiles multi-select (PR 316) |
 | stats | n1AnalyseParTheme | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
 | stats | lApplicationCalculeVotrePourcentage | all | corrected | Faceted filters, « N dans la sélection », « Tout effacer » (PRs 316, 319) |
 | stats | sEntrainerSurLaSelection | all | added | « S'entraîner sur ces N questions », « Retour aux statistiques », « Travailler mes axes prioritaires » (PRs 316, 317) |
 | stats | n2HistoriqueDesExamens | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
-| stats | vousRetrouverezLHistoriqueDe | all | kept | Read against the PRs merged since 2026-11-07 and the screen strings; still accurate |
+| stats | vousRetrouverezLHistoriqueDe | all | corrected | Corrected in spec 058: sort by streak and exams too (quiz_stats_html.js) |
 | stats | n3Reinitialisation | all | corrected | Heading now covers Exporter / Importer / Réinitialiser |
 | stats | siVousSouhaitezRecommencer | all | corrected | Stats buttons Exporter, Importer, Réinitialiser (quiz_stats.js exportData/importData) |

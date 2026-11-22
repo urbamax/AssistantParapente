@@ -66,12 +66,13 @@ describe('Qualification Treuil — pas de mode examen, suivi de qualification', 
         document.body.innerHTML = '';
     });
 
-    it('isExamModeAvailable renvoie false pour TREUIL et true pour les autres niveaux', () => {
+    it('isExamModeAvailable renvoie false pour TREUIL et Tous les niveaux, true pour BI, BP et BPC', () => {
         expect(isExamModeAvailable('TREUIL')).toBe(false);
         expect(isExamModeAvailable('BI')).toBe(true);
         expect(isExamModeAvailable('BP')).toBe(true);
         expect(isExamModeAvailable('BPC')).toBe(true);
-        expect(isExamModeAvailable('ALL')).toBe(true);
+        // Pas d'examen officiel tous niveaux confondus (spec 058).
+        expect(isExamModeAvailable('ALL')).toBe(false);
         expect(OFFICIAL_THEORY_TOTAL_POINTS).not.toHaveProperty('TREUIL');
     });
 

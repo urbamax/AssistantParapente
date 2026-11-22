@@ -96,7 +96,9 @@ export function getExamQuotas(level = 'BI') {
  * @returns {boolean}
  */
 export function isExamModeAvailable(level = 'BI') {
-    return level !== 'TREUIL';
+    // Pas d'examen pour la qualification Treuil, ni pour « Tous les niveaux » : il n'existe pas
+    // d'examen officiel tous niveaux confondus (spec 058).
+    return level !== 'TREUIL' && level !== 'ALL';
 }
 
 // Compte, pour une question, combien de fois chaque choix a été coché (index = position dans les
