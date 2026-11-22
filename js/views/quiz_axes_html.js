@@ -543,8 +543,16 @@ export function buildRevisionAxesDashboardHtml(report, uiState = {}) {
     // Les chapitres déjà maîtrisés n'ont plus besoin d'apparaître dans les axes de révision.
     const revisionAxes = report.axes.filter((axis) => axis.status !== 'MASTERED');
 
+    // Chapitres où un piège ou un oubli est encore en consolidation : ce sont eux que l'encadré
+    // « À revoir » compte en plus des erreurs actives.
+    const hasConsolidating = (axis) => (axis.traps?.consolidating || 0) + (axis.omissions?.consolidating || 0) > 0;
     const candidateFilters = [
         { key: 'TRAPS', count: report.trapTotals?.axes || 0, labelKey: 'axes.filterTraps' },
+        {
+            key: 'CONSOLIDATING',
+            count: revisionAxes.filter(hasConsolidating).length,
+            labelKey: 'axes.filterConsolidating',
+        },
         { key: 'BLOCKER', count: report.counts.BLOCKER || 0, labelKey: 'axes.filterBlocker' },
         { key: 'REFRESH', count: report.counts.REFRESH || 0, labelKey: 'axes.filterRefresh' },
         { key: 'EXPLORE', count: report.counts.EXPLORE || 0, labelKey: 'axes.filterExplore' },
@@ -575,7 +583,9 @@ export function buildRevisionAxesDashboardHtml(report, uiState = {}) {
             ? revisionAxes
             : activeFilter === 'TRAPS'
               ? revisionAxes.filter((axis) => axis.traps?.active > 0)
-              : revisionAxes.filter((axis) => axis.status === activeFilter);
+              : activeFilter === 'CONSOLIDATING'
+                ? revisionAxes.filter(hasConsolidating)
+                : revisionAxes.filter((axis) => axis.status === activeFilter);
 
     // Atelier transversal : proposé tant qu'il reste un piège ou un oubli à corriger ou en consolidation.
     const openTraps = (report.trapTotals?.active || 0) + (report.trapTotals?.consolidating || 0);
