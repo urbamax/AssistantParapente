@@ -856,103 +856,101 @@
     "Quelques jours ou « plusieurs années » : c'est l'ordre de grandeur du délai qui départage deux choix."
   ],
   "P3V": [
-    "Deux choix ne diffèrent que d'une négation, et « toutes » tombe dès qu'un seul cas contraire existe."
+    "Deux choix ne diffèrent que d'une négation, et « toutes » n'admet aucune exception : il suffit d'une espèce menacée encore chassable pour l'écarter. Être menacée et être protégée sont deux choses distinctes."
   ],
   "P4BM": [
-    "« Une seule zone » et « toute la surface » donnent le même statut à tout le parc."
+    "« Une seule zone » et « toute la surface » donnent le même statut à tout le parc : il suffit que le parc ait une zone cœur et une aire d'adhésion aux règles différentes pour écarter ce choix."
   ],
   "P5V": [
-    "Deux choix ne diffèrent que d'un mot : parcs « régionaux » ou « nationaux »."
+    "Deux choix ne diffèrent que d'un mot, parcs « régionaux » ou « nationaux » : le parc national impose des règles, le parc régional repose sur une charte signée, donc une protection par contrat."
   ],
   "P8BM": [
-    "« Jamais » et « toujours » tombent dès qu'un seul cas contraire existe, ici une réserve dont la règle diffère."
+    "« Jamais » et « toujours » n'admettent aucune exception : les règles varient d'une réserve à l'autre, et des dérogations négociées suffisent à écarter les deux. Il reste « parfois, à certains endroits »."
   ],
   "S100B": [
-    "« Aucune » tombe dès qu'un seul cas contraire existe, ici un cas où l'accompagnateur fédéral enseigne."
+    "« Aucune prérogative pour l'enseignement » est absolu, mais ici rien ne le contredit : l'accompagnateur est un bénévole qui conseille en club sans enseigner. Il ne concurrence donc pas les écoles et n'allège pas le DEJEPS."
   ],
   "S101B": [
-    "« Uniquement » tombe dès qu'un seul cas contraire existe, ici un autre public encadré."
+    "« Uniquement » n'admet aucune exception : l'accompagnateur encadre des pilotes en sortie, pas seulement ses pairs. Et ces pilotes sont licenciés, au moins niveau vert, puisque c'est un dispositif de la fédération."
   ],
   "S102B": [
-    "« Uniquement » tombe dès qu'un seul cas contraire existe, ici un autre moment d'usage de la radio."
+    "« Uniquement » limite la radio à un seul moment, alors qu'un danger peut survenir à tout moment du vol : chaque pilote reste maître de son aile, et l'accompagnateur se sert de sa radio comme n'importe quel pilote."
   ],
   "S104V": [
-    "Un début plausible peut être suivi d'une suite qui change tout, comme « ne doit plus retourner en école »."
+    "Un début plausible peut être suivi d'une suite qui change tout : prendre une licence va de soi, mais « ne doit plus retourner en école » contredit la suite de la formation, qui continue en école."
   ],
   "S105B": [
-    "« Dans un club de plaine » situe le club, sans dire si cela change ce que la qualification permet."
+    "« Dans un club de plaine » situe le club sans changer la qualification : les prérogatives sont les mêmes partout, et c'est l'accompagnateur qui choisit le site de chaque sortie, montagne comprise."
   ],
   "S106V": [
-    "« Internationale » : une règle valable partout ne s'appuie pas sur un usage propre à une région."
+    "« Internationale » décide : une règle valable partout ne s'appuie pas sur un usage régional, ni le français, ni l'heure européenne. Elle utilise l'anglais et le temps universel."
   ],
   "S108V": [
-    "« En plaine » fixe le cadre : le plafond n'est pas le même partout en France."
+    "« En plaine » fixe le cadre : le plafond n'est pas le même partout en France. Hors Alpes et Pyrénées, le vol à vue s'arrête au niveau de vol 115, environ 3 500 m."
   ],
   "S111V": [
-    "« Uniquement » tombe dès qu'un seul cas contraire existe, ici un autre lieu possible."
+    "« Uniquement » n'admet aucune exception : une ZRT peut protéger un aérodrome, une usine sensible ou un grand événement, donc il suffit d'un autre lieu pour écarter ces choix."
   ],
   "S115V": [
-    "La question porte sur « l'activité » du réseau, pas sur l'endroit où il se trouve."
+    "La question porte sur « l'activité » du réseau, pas sur sa place : la carte montre où il se trouve, mais l'activation change chaque jour, et seul le message AZBA du SIA la donne."
   ],
   "S116B": [
-    "L'énoncé suppose une obligation de dépôt, « sont tenus de déposer », dont l'existence même est en jeu."
+    "L'énoncé suppose une obligation, « sont tenus de déposer », qui n'existe pas : sauf cas très particulier, le vol libre ne dépose pas de plan de vol. Les choix qui en décrivent le contenu tombent avec cette obligation."
   ],
   "S117B": [
-    "« Temporairement » porte sur la durée d'usage du moteur, qui ne décide pas forcément de la catégorie de l'aile."
+    "« Temporairement » porte sur la durée d'usage du moteur, mais c'est sa présence qui décide : avec un moteur, l'aile n'est plus un planeur ultra léger et relève des ULM."
   ],
   "S118B": [
-    "« Ne concerne que » tombe dès qu'un seul cas contraire existe.",
-    "Deux choix commencent par « Oui », puis l'un parle de tolérance et l'autre d'interdiction."
+    "« Ne concerne que » la route n'admet aucune exception : les règles de l'air traitent elles aussi de l'alcool et des drogues, ce qui suffit à l'écarter.",
+    "Deux choix commencent par « Oui », puis l'un parle de tolérance et l'autre d'interdiction : pour un pilote, ces règles interdisent de voler sous leur influence, sans seuil toléré."
   ],
   "S11M": [
-    "Défraiement pour des déplacements ou « indemnité pour le temps » : tout tient à ce que l'argent couvre."
+    "Défraiement pour des déplacements ou « indemnité pour le temps » : tout tient à ce que l'argent couvre. Le moniteur fédéral est bénévole, il peut être remboursé de ses frais, mais pas payé pour enseigner."
   ],
   "S11T": [
-    "« Aucune » tombe dès qu'un seul cas contraire existe, ici une portée réelle du document fédéral."
+    "« Aucune valeur légale » n'admet aucune exception : il suffit d'une portée concrète du dossier pour l'écarter, et le respecter conditionne l'assurance fédérale des treuils."
   ],
   "S120B": [
-    "« Donc » tire une conséquence qui ne découle pas forcément de ce qui précède.",
-    "« N'évolue qu'en » tombe dès qu'un seul cas contraire existe."
+    "« Donc » tire une conséquence qui ne suit pas : croiser un trafic IFR en classe E ne le rend pas prioritaire, chacun devant voir et éviter.",
+    "« N'évolue qu'en » n'admet aucune exception : il suffit d'un avion IFR qui traverse la classe E pour l'écarter."
   ],
   "S121B": [
-    "« Il me suffit » fait d'une seule démarche une condition complète."
+    "« Il me suffit » fait d'une seule démarche une condition complète : un aérodrome contrôlé est hors des espaces G et E ouverts au vol libre, il faut donc une autorisation particulière, une radio ou un circuit ne suffisent pas."
   ],
   "S122B": [
-    "Ce qui est survolé fixe la hauteur minimale, ici « un grand rassemblement de personnes ».",
-    "« Pas de minimum » suppose qu'une aile sans moteur échappe aux hauteurs de survol."
+    "Ce qui est survolé fixe la hauteur minimale : au-dessus d'un grand rassemblement, comme d'une ville, c'est 300 m au-dessus de l'obstacle le plus haut, pas 150 m.",
+    "« Pas de minimum » suppose qu'une aile sans moteur échappe à ces hauteurs, alors qu'elles s'appliquent aussi au vol libre."
   ],
   "S123B": [
-    "« Uniquement » tombe dès qu'un seul cas contraire existe.",
-    "« Toujours » tombe dès qu'un seul cas contraire existe."
+    "« Uniquement » et « toujours » n'admettent aucune exception : il suffit d'une seule limite notée autrement, en hauteur sol, en altitude ou en niveau de vol, pour les écarter. Les cartes emploient les trois."
   ],
   "S124B": [
-    "« Jamais » étend un cas particulier à toutes les zones d'entraînement militaires."
+    "« Jamais » étend un cas particulier à toutes les zones d'entraînement : seul le RTBA activé fait voler les avions très bas et très vite en suivi de terrain, au point que leur pilote ne peut pas éviter les autres."
   ],
   "S125B": [
-    "« Seulement si » pose une condition qui ne tient que si elle existe dans la règle.",
-    "« Uniquement » tombe dès qu'un seul cas contraire existe."
+    "« Seulement si » et « uniquement » posent des limites que la règle ne prévoit pas : les avions militaires peuvent voler en classes G et E à tout moment, ce qui suffit à écarter les deux."
   ],
   "S126B": [
-    "« Tout l'espace aérien » suppose qu'une carte à petite échelle montre toutes les couches.",
-    "La question demande la carte « la plus adaptée », pas une carte qui « suffit amplement »."
+    "« Tout l'espace aérien » suppose qu'une carte à petite échelle montre toutes les couches, alors que le 1/1 000 000 ne montre que l'espace inférieur.",
+    "La question demande la carte « la plus adaptée », pas une carte qui « suffit » : là où il existe, le 1/250 000 est plus détaillé que le 1/500 000."
   ],
   "S127B": [
-    "Deux choix parlent du dos des cartes, et l'échelle de chacune, « 1/500 000 » ou 1/250 000, les sépare."
+    "Deux choix parlent du dos des cartes, et l'échelle les sépare : c'est au dos du 1/250 000, et dans le complément aux cartes, que figurent les horaires des zones R, pas au dos du 1/500 000."
   ],
   "S128B": [
-    "« Il suffit » fait d'une source d'information la seule à consulter, sans dire si elle est officielle."
+    "« Il suffit » fait d'une source la seule à consulter : l'activité militaire change chaque jour, et seul l'organe officiel, le SIA avec ses SUP AIP et NOTAM, la donne à jour."
   ],
   "S129B": [
-    "La question demande des « contraintes », et un message qui informe ne limite pas forcément le vol.",
-    "« Simplement » réduit la contrainte à un seul geste."
+    "La question demande des « contraintes » : un NOTAM d'information ne fait qu'informer, alors que la contrainte est la zone temporaire qui limite le vol.",
+    "« Simplement » réduit la contrainte à un seul geste, ne pas survoler le lieu, alors qu'elle porte sur un volume d'air et une durée."
   ],
   "S12M": [
-    "Moniteur « breveté d'État » et non moniteur fédéral : le diplôme change ce qu'il peut faire.",
-    "Être payé ou encaisser « directement à son nom » le prix des cours : ce n'est pas la même chose."
+    "Moniteur « breveté d'État », pas fédéral : son diplôme lui permet d'être salarié ou bénévole.",
+    "Être payé et encaisser « directement à son nom » le prix des cours sont deux choses : l'argent des cours revient à l'association, qui paie ensuite son salarié."
   ],
   "S131B": [
-    "« Il suffit » promet qu'une démarche simple ouvre la zone, quelle que soit la nature d'une ZIT.",
-    "Le rythme semaine et week-end vaut pour certaines zones militaires, pas forcément pour une zone interdite."
+    "« Il suffit » promet qu'un coup de fil ouvre la zone, alors qu'une ZIT est interdite : le répondeur renseigne sur d'autres zones militaires.",
+    "Le rythme semaine et week-end vaut pour certaines zones militaires, pas pour une zone interdite qui protège un site sensible."
   ],
   "S132B": [
     "« Toutes » met dans le même lot des références fixes et des lectures liées à la pression.",
