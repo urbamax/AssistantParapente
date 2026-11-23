@@ -411,6 +411,50 @@ export function applyPointCorrections(exam, questionLookup) {
     return next;
 }
 
+function trailingOnes(recent) {
+    if (!Array.isArray(recent)) return 0;
+    let s = 0;
+    for (let i = recent.length - 1; i >= 0; i--) {
+        if (recent[i] === 1) s++;
+        else break;
+    }
+    return s;
+}
+
+/**
+ * Calcule la nouvelle série de bonnes réponses consécutives d'une question sans la plafonner à
+ * `MASTERY_WINDOW` (la fenêtre glissante `recent` est bornée à 10 entrées, pas `streak`).
+ * @param {any} qStat
+ * @param {boolean} isCorrect
+ * @param {any} [previous]
+ * @returns {number}
+ */
+function nextQuestionStreak(qStat, isCorrect, previous = null) {
+    if (!isCorrect) return 0;
+    let base = typeof qStat?.streak === 'number' ? qStat.streak : trailingOnes(qStat?.recent);
+    if (previous?.isCorrect) {
+        base = Math.max(0, base - 1);
+    }
+    return base + 1;
+}
+
+function healCappedStreaks(stats) {
+    if (!stats || typeof stats !== 'object' || !stats.questions || typeof stats.questions !== 'object') {
+        return false;
+    }
+    let changed = false;
+    for (const q of Object.values(stats.questions)) {
+        if (!q || typeof q !== 'object') continue;
+        const total = Number(q.total) || 0;
+        const correct = Number(q.correct) || 0;
+        if (total > 10 && correct === total && q.streak === 10) {
+            q.streak = total;
+            changed = true;
+        }
+    }
+    return changed;
+}
+
 export function recalculateGlobalCounters(stats) {
     if (!stats || typeof stats !== 'object') return stats;
     let questionsTotal = 0;
@@ -510,14 +554,7 @@ export function replayExamToStats(exam, stats, questionLookup) {
             qStat.correct = (qStat.correct || 0) + 1;
         }
 
-        let s = 0;
-        if (Array.isArray(qStat.recent)) {
-            for (let i = qStat.recent.length - 1; i >= 0; i--) {
-                if (qStat.recent[i] === 1) s++;
-                else break;
-            }
-        }
-        qStat.streak = s;
+        qStat.streak = nextQuestionStreak(qStat, isCorrect);
         const sm2 = applySm2Review(
             { ...qStat, repetitions: prevReps },
             {
@@ -1309,13 +1346,20 @@ class QuizService {
         const prevCorrect = s.totalCorrect;
         recalculateGlobalCounters(s);
         const flattened = flattenAnswerLogs(s);
+        const healedStreak = healCappedStreaks(s);
         let cleanedLegacyKeys = false;
         if ('appliedCorrections' in s || 'corrections' in s) {
             delete s.appliedCorrections;
             delete s.corrections;
             cleanedLegacyKeys = true;
         }
-        if (flattened || cleanedLegacyKeys || s.totalQuestions !== prevTotal || s.totalCorrect !== prevCorrect) {
+        if (
+            flattened ||
+            healedStreak ||
+            cleanedLegacyKeys ||
+            s.totalQuestions !== prevTotal ||
+            s.totalCorrect !== prevCorrect
+        ) {
             StorageService.set(StorageService.KEYS.QCM_STATS, s);
             if (typeof window !== 'undefined' && window.FirebaseAuthEngine && window.FirebaseAuthEngine.enabled) {
                 window.FirebaseAuthEngine.saveStatsToCloud();
@@ -1386,14 +1430,7 @@ class QuizService {
             qStat.correct = (qStat.correct || 0) + 1;
         }
 
-        let s = 0;
-        if (Array.isArray(qStat.recent)) {
-            for (let i = qStat.recent.length - 1; i >= 0; i--) {
-                if (qStat.recent[i] === 1) s++;
-                else break;
-            }
-        }
-        qStat.streak = s;
+        qStat.streak = nextQuestionStreak(qStat, isCorrect, previous);
         qStat.lastSeen = timestamp;
 
         const sm2 = applySm2Review(
