@@ -1337,102 +1337,102 @@
     "« Trajectoire/air » désigne le chemin suivi dans la masse d'air, qui se déplace avec le vent, et non le tracé au sol."
   ],
   "U29B": [
-    "Une performance de l'aile ne suffit pas à dessiner ce qu'elle atteint au sol, d'où le poids de « ne dépend pas du vent »."
+    "Une performance de l'aile ne suffit pas à dessiner ce qu'elle atteint au sol : le vent allonge la portée dans son sens et la raccourcit face à lui, donc le cône penche, ce qui écarte « ne dépend pas du vent »."
   ],
   "U30B": [
-    "Des mots absolus peuvent définir une exigence, et « à tout moment » décrit ici ce que demande le vol en local.",
-    "« Garantir » suppose qu'une distance fixée d'avance tient compte du vent rencontré."
+    "Des mots absolus peuvent définir une exigence : « à tout moment, quelles que soient les conditions » décrit ce que demande le vol en local, et le rend recevable.",
+    "« Garantir » suppose qu'une distance fixée d'avance tient compte du vent, alors qu'un vent de face réduit la distance parcourue : 20 de finesse ne garantit rien."
   ],
   "U31B": [
-    "« Coûte que coûte » refuse toute adaptation quand le vent change."
+    "« Coûte que coûte » refuse toute adaptation : quand le vent change, le cap direct n'est plus forcément celui qui ramène au terrain, il faut revoir son plan et repérer des terrains de secours."
   ],
   "U32B": [
-    "« Elle avance par rapport au sol » : ce simple fait renseigne déjà sur la force du vent."
+    "« Elle avance par rapport au sol » suffit pour trancher : face au vent, l'aile recule si le vent est plus rapide qu'elle, donc si elle avance, le vent est moins fort que sa vitesse dans l'air."
   ],
   "U33B": [
-    "« Vent arrière » fixe le sens dans lequel la vitesse du vent se combine avec celle de l'aile."
+    "« Vent arrière » fixe le sens du calcul : la vitesse du vent s'ajoute à celle de l'aile, et comme elles sont égales, la vitesse au sol double."
   ],
   "U34B": [
-    "« Jamais » tombe dès qu'un seul cas contraire existe, et la question porte sur la vitesse par rapport au sol."
+    "« Jamais » n'admet aucune exception, et la question porte sur la vitesse par rapport au sol : le vent la change, il l'augmente quand il souffle dans le dos et la réduit de face."
   ],
   "U36M": [
-    "« Finesse/sol » parle de distance parcourue, pas de durée de vol."
+    "« Finesse/sol » parle de distance parcourue au sol, pas de durée de vol : face au vent, il faut passer moins de temps dans cet air qui recule, donc voler plus vite."
   ],
   "U37M": [
-    "L'énoncé demande quand voler « plus vite », et chaque paire de choix oppose un cas où l'on accélère et un cas où l'on ralentit."
+    "L'énoncé demande quand voler « plus vite » : dans chaque paire, un cas pousse à accélérer, l'autre à ralentir. On accélère pour sortir vite d'un air défavorable, descendance ou vent de face."
   ],
   "U39V": [
-    "Le côté du relief désigne l'aile prioritaire, et « elle a le relief à droite » parle de l'autre aile.",
-    "« Derrière » ne dit pas à quelle distance : passer derrière est une chose, passer tout près en est une autre."
+    "Le côté du relief désigne l'aile prioritaire, et « elle a le relief à droite » parle de l'autre aile : c'est elle qui passe, l'autre s'écarte vers la vallée.",
+    "« Derrière » ne dit pas à quelle distance : passer tout près derrière un biplace, à la même hauteur, laisse trop peu de marge s'il change de trajectoire."
   ],
   "U3M": [
-    "En altitude, le froid et le manque d'oxygène arrivent ensemble, et un seul des deux cause l'hypoxie.",
-    "« Parfois » change tout : un signe possible n'a pas besoin d'être constant."
+    "En altitude, le froid et le manque d'oxygène arrivent ensemble, et seul le second cause l'hypoxie : l'air y contient moins d'oxygène, ce que le froid n'explique pas.",
+    "« Parfois » change tout : un signe possible, comme les maux de tête, n'a pas besoin d'apparaître à chaque fois."
   ],
   "U40M": [
-    "La « trajectoire/sol » et l'axe de l'aile ne se confondent pas quand le vent vient de côté."
+    "La « trajectoire/sol » et l'axe de l'aile ne se confondent pas quand le vent vient de côté : l'aile avance de biais, en crabe, pour compenser la dérive."
   ],
   "U41B": [
-    "Deux choix s'opposent : l'axe de l'aile « fait un angle » avec la trajectoire/sol ou « reste parallèle » à elle.",
-    "L'effet girouette aligne l'aile sur le vent relatif, pas forcément sur le vent météo, d'où le poids de « se met face au vent »."
+    "Deux choix s'opposent, l'axe de l'aile « fait un angle » avec la trajectoire/sol ou « reste parallèle » : par vent de travers, l'aile avance en crabe, donc les deux font un angle.",
+    "L'effet girouette aligne l'aile sur le vent relatif, pas sur le vent météo : en vol, elle ne se met pas face au vent du jour."
   ],
   "U42M": [
-    "« Définissent » vise les droites entre lesquelles l'angle se mesure, pas ce qui le provoque."
+    "« Définissent » demande entre quelles droites l'angle se mesure, pas ce qui le provoque : le vent cause la dérive, mais l'angle se lit entre l'axe de l'aile et sa trajectoire au sol."
   ],
   "U43B": [
-    "« Dynamique » ou « thermique » : un seul mot change la nature de l'ascendance."
+    "« Dynamique » ou « thermique » : un seul mot change la nature de l'ascendance. L'ascendance dynamique est un air que le vent pousse régulièrement le long d'une pente, sans fortes turbulences par elle-même."
   ],
   "U44B": [
-    "L'énoncé demande ce qu'il « vaut mieux » faire, et un « jamais » peut alors être un conseil de prudence."
+    "L'énoncé demande ce qu'il « vaut mieux » faire, et un « jamais » peut alors être un conseil de prudence : en turbulence, éviter les virages serrés et rester loin des limites de vol, donc pas au taux de chute mini."
   ],
   "U45B": [
-    "L'énoncé demande ce qu'il « vaut mieux » faire, et un « jamais » peut alors être un conseil de prudence.",
-    "« Trop basses » et « trop élevées » : le mot « trop » désigne les deux extrêmes de vitesse."
+    "L'énoncé demande ce qu'il « vaut mieux » faire, et « ne jamais » peut alors être un conseil de prudence, recevable ici.",
+    "« Trop basses » et « trop élevées » désignent les deux extrêmes de vitesse : en turbulence, chacune rapproche d'une limite, décrochage ou fermeture, donc on les évite toutes deux."
   ],
   "U46B": [
-    "« Le plus … possible » pousse vers un extrême, et un fait réel peut mener à une conduite excessive."
+    "« Le plus … possible » pousse vers un extrême : les efforts sur l'aile croissent bien avec la vitesse, mais voler au plus lent mène au décrochage, et au plus vite à la fermeture."
   ],
   "U47M": [
-    "Deux choix ne diffèrent que d'un mot : cumulus « au vent » ou « sous le vent » de la route."
+    "Deux choix ne diffèrent que d'un mot, cumulus « au vent » ou « sous le vent » de la route : en montant, le pilote dérive avec le vent, donc partir du côté au vent le ramène vers sa route."
   ],
   "U49V": [
-    "« Dos à la pente » ou « face à la pente » : tout tient au côté vers lequel l'aile tourne."
+    "« Dos à la pente » ou « face à la pente » : tout tient au côté vers lequel l'aile tourne. Virer dos à la pente, vers la vallée, éloigne l'aile du relief, alors que l'autre sens l'y ramène."
   ],
   "U4M": [
-    "La valeur de 2000 m porte sur les « premiers symptômes » qui « peuvent » apparaître, pas sur l'hypoxie grave."
+    "La valeur de 2000 m porte sur les « premiers symptômes » qui « peuvent » apparaître : selon la sensibilité de chacun, ils arrivent tôt, ce qui rend ce choix recevable. Le vol libre monte assez haut pour être concerné."
   ],
   "U50M": [
-    "« Vitesse mini » et « taux de chute mini » : le même mot « mini » désigne deux régimes différents."
+    "« Vitesse mini » et « taux de chute mini » : le même mot « mini » désigne deux régimes. Pour monter, il faut descendre le moins vite possible, donc voler au taux de chute mini, pas au bord du décrochage."
   ],
   "U52V": [
-    "Virer « face à la pente », c'est tourner vers le relief, avec un vent qui vient alors d'un côté précis.",
-    "Le rayon est mesuré « par rapport au sol », et la vitesse sol grandit quand l'aile a le vent dans le dos."
+    "Virer « face à la pente », c'est tourner vers le relief avec le vent dans le dos : le sol défile vite et l'aile est poussée vers la pente, d'où un virage à éviter.",
+    "Le rayon est mesuré « par rapport au sol » : avec plus de vitesse au sol, il faut s'incliner davantage pour tracer le même cercle."
   ],
   "U53B": [
-    "« Parfaite » sonne excessif, alors qu'une pente toute proche laisse peu de marge d'erreur."
+    "« Parfaite » sonne excessif, mais la pente toute proche laisse très peu de marge d'erreur : la trajectoire doit y être maîtrisée en permanence, ce qui rend ce choix recevable."
   ],
   "U54B": [
-    "En air turbulent, « le plus vite possible » ne garde pas forcément l'aile la mieux tenue au-dessus du pilote."
+    "En air turbulent, « le plus vite possible » pousse l'aile vers la fermeture : mieux vaut prendre de la marge par rapport au relief, voler plus lentement et rester attentif au pilotage."
   ],
   "U55B": [
-    "Trois choix se ressemblent, et tout tient au geste associé à chaque variation, « augmente » ou « diminue »."
+    "Trois choix se ressemblent : tout tient au geste associé à chaque variation. L'ascendance est la plus forte au cœur, donc on resserre quand elle faiblit et on élargit quand elle augmente."
   ],
   "U57B": [
-    "Le variomètre retombe mais reste « faiblement positif », ce qui renseigne sur l'air qui porte l'aile."
+    "Le variomètre retombe mais reste « faiblement positif » : l'aile reste dans l'air qui monte, simplement décentrée. Il suffit de décaler le cercle vers le maximum, sans changer de sens ni quitter l'ascendance."
   ],
   "U58B": [
-    "« À l'intérieur de la bulle » décrit le mouvement par rapport à l'air qui porte l'aile, pas au sol."
+    "« À l'intérieur de la bulle » décrit le mouvement par rapport à l'air qui porte l'aile : l'aile y descend sans cesse, et elle ne monte au sol que parce que la bulle monte plus vite."
   ],
   "U59B": [
-    "Un variomètre ramené « à 0 » dit que l'aile ne monte plus, pas que l'air a cessé de monter.",
-    "La condition « en gardant toujours une direction totalement dégagée » encadre l'usage des bords du nuage."
+    "Un variomètre ramené « à 0 » dit que l'aile ne monte plus, pas que l'air a cessé de monter : sous un gros cumulus qui aspire, accélérer ne fait pas sortir du danger, il faut s'éloigner vers le clair.",
+    "La condition « en gardant toujours une direction totalement dégagée » encadre l'usage des bords du nuage, ce qui rend ce choix acceptable."
   ],
   "U60M": [
-    "La dérive est donnée en minutes, « 3 km en 10 mn », et se convertit en heures avant toute comparaison aux km/h.",
-    "« Au cours d'une spirale », l'aile tourne sur place dans l'air, et son déplacement au sol vient d'ailleurs."
+    "La dérive est donnée en minutes, « 3 km en 10 mn », et se convertit en heures : 10 minutes font un sixième d'heure, donc 18 km/h.",
+    "« Au cours d'une spirale », l'aile tourne sur place dans l'air : son déplacement au sol vient donc du vent seul, ce qui permet de le mesurer."
   ],
   "U61B": [
-    "« Opposée » porte sur la place occupée sur le cercle, distincte du sens de rotation."
+    "« Opposée » porte sur la place occupée sur le cercle, pas sur le sens de rotation : on tourne dans le même sens que l'autre aile, à l'opposé sur le cercle, là où elles sont le plus loin l'une de l'autre."
   ],
   "U62B": [
     "« Jamais » tombe dès qu'un seul cas contraire existe.",
