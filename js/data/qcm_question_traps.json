@@ -1730,92 +1730,92 @@
     "« Aucune » n'admet aucune exception : il faut au moins savoir évoluer en montagne pour rejoindre le décollage et s'y installer."
   ],
   "W70V": [
-    "« Pendant » ou aussitôt après la temporisation : un seul mot place la décision dans le temps."
+    "« Pendant » ou aussitôt après la temporisation : un seul mot place la décision dans le temps. Pendant, l'aile se stabilise encore, la décision se prend ensuite, sur le contact dans les mains et la ventrale."
   ],
   "W71V": [
-    "« Réservée » tombe dès qu'un seul cas contraire existe, ici un usage du face-voile par vent modéré."
+    "« Réservée » n'admet aucune exception : il suffit qu'on gonfle face à l'aile par vent modéré pour l'écarter, ce qui se pratique couramment."
   ],
   "W72V": [
-    "Deux choix ne diffèrent que d'un mot : passer « sous » ou « au-dessus » du faisceau supérieur.",
-    "« Sans vent » ne dit pas ce qui ferait monter l'aile sur place avant le décollage."
+    "Deux choix ne diffèrent que d'un mot, passer « sous » ou « au-dessus » du faisceau supérieur : passer dessous défait le croisement des élévateurs, passer dessus le vrille davantage.",
+    "« Sans vent » ne dit pas ce qui ferait monter l'aile sur place : un pré-gonflage demande un vent qui la nourrisse."
   ],
   "W73B": [
-    "La question vise le « vent soutenu », et une précaution générale ne lui est pas forcément propre.",
-    "La négation « ne s'impose pas » renverse le sens de tout le choix."
+    "La question vise le « vent soutenu » : trier ses suspentes est une bonne habitude, mais vaut par tout temps, sans être propre au vent fort, d'où aucun point.",
+    "La négation « ne s'impose pas » renverse tout le choix : par vent soutenu, le pré-gonflage permet de vérifier l'aile avant de la monter pour de bon."
   ],
   "W74M": [
-    "La négation « ne tient pas compte » écarte l'effet de l'accélérateur sur le réglage des freins."
+    "La négation « ne tient pas compte » écarte l'effet de l'accélérateur, alors qu'il penche l'aile vers l'avant et peut tendre les freins : le réglage doit en tenir compte."
   ],
   "W75B": [
-    "Deux choix ne diffèrent que d'un mot : la dureté « s'accroît » ou « faiblit » quand la vitesse augmente."
+    "Deux choix ne diffèrent que d'un mot, la dureté « s'accroît » ou « faiblit » : plus l'air passe vite sur l'aile, plus les commandes sont dures, elles s'allègent quand l'aile ralentit."
   ],
   "W76M": [
-    "Deux choix ne diffèrent que d'un mot : bras hauts, l'aile est « débridée » ou « bridée »."
+    "Deux choix ne diffèrent que d'un mot, aile « débridée » ou « bridée » bras hauts : mains hautes, l'aile doit voler libre, donc tout réglage qui la freine déjà est écarté."
   ],
   "W78M": [
-    "« Parfois » ne demande pas que cela arrive à chaque virage, un seul cas suffit."
+    "« Parfois » ne demande qu'un seul cas : il suffit qu'un virage commence ainsi, par un ralentissement, un roulis inverse ou un déséquilibre du pilote, pour que chaque choix tienne."
   ],
   "W79B": [
-    "« Doucement » rend le geste prudent en apparence, mais un freinage même léger agit sur une aile qui perd déjà de la vitesse."
+    "« Doucement » rend le geste prudent en apparence, mais l'aile qui cabre perd déjà de la vitesse : même un léger freinage aggrave ce cabré. Il faut relever brièvement les mains."
   ],
   "W7V": [
-    "Par « vent nul », toute la vitesse de l'aile par rapport à l'air vient d'une seule source."
+    "Par « vent nul », toute la vitesse de l'aile dans l'air vient de la course du pilote : il faut courir au moins à sa vitesse minimum de vol, et freiner la ralentirait encore."
   ],
   "W81B": [
-    "« Immédiatement » fixe un ordre dans les priorités quand l'aile ferme."
+    "« Immédiatement » fixe un ordre : quand l'aile ferme, la première action est de garder le cap, poids et frein du côté ouvert. Un coup ample côté fermé ne vient qu'ensuite, si besoin."
   ],
   "W82B": [
-    "Ici « incidence » veut dire influence, pas angle d'attaque, et la phrase est à la forme négative."
+    "Ici, « incidence » veut dire influence, pas angle d'attaque, et la phrase est négative : elle prétend que les forces n'influent pas sur la vitesse, alors qu'elles en dépendent au carré."
   ],
   "W83M": [
-    "« Protégé » promet l'absence de tout incident, ce qu'une homologation ne garantit pas forcément en vol réel.",
-    "Le mot « initiale » précise de quelle aile on parle, neuve ou usée."
+    "« Protégé » promet l'absence d'incident, ce qu'une homologation ne garantit pas : la classe B décrit le comportement de l'aile lors d'essais, pas l'impossibilité d'un twist ou d'une cravate.",
+    "Le mot « initiale » précise qu'il s'agit de l'aile neuve : la résistance de 8 g est celle du départ, que l'usure réduit ensuite."
   ],
   "W84M": [
-    "« Immédiatement » fixe un ordre, alors que d'autres actions peuvent précéder le secours.",
-    "Le côté du geste compte, mais aussi son dosage : « violemment et au maximum du débattement »."
+    "« Immédiatement » fixe un ordre : avant le secours, on tente de garder le cap à la sellette et au frein.",
+    "Le côté du geste compte, mais aussi son dosage : freiner « violemment et au maximum » le côté ouvert le ferait décrocher, il faut doser."
   ],
   "W85B": [
-    "« Un frein » ou les deux « symétriquement » : les deux gestes n'agissent pas de la même façon sur la voile."
+    "« Un frein » ou les deux « symétriquement » : tirer un seul frein fait tourner la voile, alors que des tours de frein égaux des deux côtés la mettent en panne sans la déséquilibrer."
   ],
   "W86M": [
-    "« Uniquement » tombe dès qu'un seul cas contraire existe, ici une autre aile concernée.",
-    "« Synonyme » exige que deux notions soient les mêmes, ici la course d'une commande et un écart de vitesses."
+    "« Uniquement » n'admet aucune exception : un grand débattement profite à tout pilote, pas seulement aux débutants.",
+    "« Synonyme » exige deux notions identiques : la course d'une commande et l'écart de vitesses de l'aile ne mesurent pas la même chose."
   ],
   "W87M": [
-    "Deux choix ne diffèrent que d'un mot : la baisse d'incidence « rapproche » ou « éloigne » de la frontale.",
-    "« Jamais » tombe dès qu'un seul cas contraire existe, ici un cas où le pilote doit agir."
+    "Deux choix ne diffèrent que d'un mot, la baisse d'incidence « rapproche » ou « éloigne » de la frontale : une aile ferme quand l'incidence est trop faible, donc une chute brutale l'en rapproche.",
+    "« Jamais » n'admet aucune exception : il suffit qu'une seule situation demande d'agir, comme stopper une abattée, pour l'écarter."
   ],
   "W88M": [
-    "Le verbe compte : on « desserre » la ventrale, et chaque effet en découle."
+    "Le verbe compte, on « desserre » la ventrale : le pilote sent mieux l'air et pilote plus à la sellette, mais réagit plus fort à une fermeture, d'où un risque d'autorotation accru. Le twist va avec une ventrale serrée."
   ],
   "W89M": [
-    "Le verbe compte : on « serre » la ventrale, et chaque effet en découle."
+    "Le verbe compte, on « serre » la ventrale : le pilote est plus stable mais sent moins l'air, et une fermeture risque alors de vriller les élévateurs, le twist. L'autorotation va avec une ventrale desserrée."
   ],
   "W8B": [
-    "Les 35 km/h sont la vitesse « maximale » de l'aile, et l'écart avec le vent dit la marge qui reste."
+    "Les 35 km/h sont la vitesse « maximale » de l'aile : face à 30 km/h de vent, il ne reste que 5 km/h de marge, et une rafale suffit à la faire reculer. On s'abstient."
   ],
   "W90M": [
-    "Chaque choix associe un comportement et un nom, comme « neutre spirale », qui doivent aller ensemble."
+    "Chaque choix associe un comportement et un nom, qui doivent aller ensemble : l'aile qui reste en virage est neutre, celle qui revient à plat est stable, celle qui engage est instable."
   ],
   "W91M": [
-    "Chaque choix associe un comportement et un nom, comme « stable spirale », qui doivent aller ensemble."
+    "Chaque choix associe un comportement et un nom, qui doivent aller ensemble : rester en virage, c'est neutre, revenir à plat, c'est stable, engager, c'est instable."
   ],
   "W92M": [
-    "Chaque choix associe un comportement et un nom, « stable » ou « instable » spirale, qui doivent aller ensemble."
+    "Chaque choix associe un comportement et un nom, « stable » ou « instable » spirale : rester en virage, c'est neutre, revenir à plat, c'est stable, et engager, c'est instable."
   ],
   "W93M": [
-    "« Continue à accélérer » décrit plus qu'une aile qui garde la même inclinaison."
+    "« Continue à accélérer » décrit plus qu'une aile qui garde la même inclinaison : elle s'engage de plus en plus, ce qui est l'instabilité spirale, pas la neutralité."
   ],
   "W94M": [
-    "« Tout le temps » se mesure à la vitesse à laquelle une autorotation consomme une hauteur de 200 m.",
-    "« Immédiatement » fixe un ordre, alors que d'autres actions peuvent précéder le lancer du secours."
+    "« Tout le temps » se mesure à la vitesse de l'autorotation, qui avale 200 m en quelques secondes : si le contre échoue, le secours se lance aussitôt.",
+    "« Immédiatement » fixe un ordre : on tente d'abord de contrer la rotation, et le secours suit si cela ne suffit pas."
   ],
   "W95B": [
-    "L'énoncé glisse la présence d'un « parachute de secours », comme si elle changeait les limites qu'un pilote se fixe."
+    "L'énoncé glisse la présence d'un « parachute de secours », comme si cela repoussait les limites du pilote : avoir un secours ne doit jamais pousser à chercher la parachutale ou les 360° engagés."
   ],
   "W9B": [
-    "Reculer dos à l'aile peut se concevoir, et tout tient au mot « fortement » qui qualifie la résistance.",
-    "La prise des élévateurs est banale, et le choix ajoute ce qu'il en fait face au vent : « tractionner »."
+    "Reculer dos à l'aile peut se concevoir, mais « fortement » change tout : résister fort bloque l'aile, qui monte alors trop vite et peut dépasser le pilote.",
+    "La prise des élévateurs est banale, le choix ajoute ce qu'il en fait : « tractionner » les A face au vent accélère la montée au lieu de la freiner."
   ]
 }
