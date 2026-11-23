@@ -65,4 +65,19 @@ describe('QuizService - question traps (spec 061)', () => {
         expect(res.success).toBe(true);
         expect(QuizService.getQuestionTraps('A92V')).toEqual([]);
     });
+
+    it('lastAnswerWasWrong: true only when the last recorded answer was wrong or incomplete', () => {
+        const questions = {
+            A1V: { total: 3, correct: 2, streak: 0 },
+            A2V: { total: 3, correct: 2, streak: 2 },
+            A3V: { total: 0, correct: 0, streak: 0 },
+        };
+        vi.spyOn(QuizService, 'getPersistentStats').mockReturnValue({ questions });
+        expect(QuizService.lastAnswerWasWrong('A1V')).toBe(true);
+        expect(QuizService.lastAnswerWasWrong('A2V')).toBe(false);
+        expect(QuizService.lastAnswerWasWrong('A3V')).toBe(false);
+        expect(QuizService.lastAnswerWasWrong('Z9V')).toBe(false);
+        expect(QuizService.lastAnswerWasWrong(undefined)).toBe(false);
+        vi.restoreAllMocks();
+    });
 });

@@ -658,7 +658,7 @@ export class QuizStatsBase extends BaseView {
                         <summary>
                             <div style="font-size:0.75rem; opacity:0.6; margin-bottom:6px;">${tq('history.questionNumber', { n: idx + 1 })}${qCode ? ` • <span style="font-family:monospace;">#${escapeHTML(qCode)}</span>` : ''}</div>
                             <div style="font-weight:600;">${escapeHTML(q.question)}</div>
-                        </summary>${qCode ? readCloselyHtml(QuizService.getQuestionTraps(qCode)) : ''}
+                        </summary>${qCode && !r.isCorrect ? readCloselyHtml(QuizService.getQuestionTraps(qCode)) : ''}
                         <div class="bank-item-choices" style="display:flex; flex-direction:column; gap:6px; margin-top:12px;">
                             ${optionsHtml}
                         </div>

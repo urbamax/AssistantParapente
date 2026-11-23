@@ -673,6 +673,18 @@ class QuizService {
         return Object.freeze(Array.isArray(list) ? list.filter((s) => typeof s === 'string' && s) : []);
     }
 
+    /**
+     * Spec 061 (2026-11-23) : l'encart « À lire de près » ne se montre qu'après une erreur. Hors
+     * correction immédiate (banque, liste détaillée), « erreur » veut dire : la dernière réponse
+     * enregistrée pour cette question était fausse ou incomplète.
+     * @param {string} code
+     * @returns {boolean}
+     */
+    lastAnswerWasWrong(code) {
+        const q = code ? this.getPersistentStats()?.questions?.[code] : null;
+        return Boolean(q) && (Number(q.total) || 0) > 0 && (Number(q.streak) || 0) === 0;
+    }
+
     setQuestions(questions) {
         this.questions = Array.isArray(questions) ? questions : [];
         this._questionMap = null;
