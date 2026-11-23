@@ -218,6 +218,31 @@ export function activeThemeFilters(state) {
 }
 
 /**
+ * Spec 064 : section « Vos pièges ». Une ligne par type de piège rencontré (déjà trié), avec la
+ * description du type, « Tombé N fois sur M », une barre et le bouton d'entraînement sur ce type.
+ * @param {Array<{ type: string, falls: number, encounters: number }>} rows
+ */
+export function buildTrapStatsHtml(rows) {
+    if (!rows || !rows.length) return `<p class="stats-traps-empty">${tq('stats.trapsEmpty')}</p>`;
+    const items = rows
+        .map((r) => {
+            const pct = r.encounters ? Math.round((r.falls / r.encounters) * 100) : 0;
+            const type = escapeHTML(r.type);
+            return `<li class="stats-traps-row" data-trap-type="${type}">
+                <div class="stats-traps-head">
+                    <span class="stats-traps-name">${tq(`trapTypes.${r.type}.name`)}</span>
+                    <span class="stats-traps-count">${tq('stats.trapsCount', { falls: r.falls, encounters: r.encounters })}</span>
+                </div>
+                <div class="stats-traps-bar" aria-hidden="true"><span style="width:${pct}%"></span></div>
+                <p class="stats-traps-desc">${tq(`trapTypes.${r.type}.desc`)}</p>
+                <button type="button" class="stats-traps-train" data-action="QuizstartTrapTypeTraining" data-args="${type}"><i class="ri-play-circle-line" aria-hidden="true"></i> ${tq('stats.trapsTrain')}</button>
+            </li>`;
+        })
+        .join('');
+    return `<p class="stats-traps-intro">${tq('stats.trapsIntro')}</p><ul class="stats-traps-list">${items}</ul>`;
+}
+
+/**
  * Bouton « S'entraîner sur ces N questions », affiché à côté des axes prioritaires quand un filtre
  * de la liste détaillée est actif.
  * @param {number} count
@@ -765,8 +790,9 @@ export function buildQuestionAnswersHtml(view, qObj, code) {
               ? [{ url: view.getCourseUrl(code), title: '', page: '' }]
               : [];
 
-    // Spec 061 : encart « À lire de près » en tête de la correction dépliée.
-    let answersHtml = `${readCloselyHtml(QuizService.getQuestionTraps(code))}<div class="bank-item-choices" style="display:flex; flex-direction:column; gap:8px;">`;
+    // Spec 061 : encart « À lire de près » en tête de la correction dépliée, si la dernière réponse était fausse.
+    const readClosely = QuizService.lastAnswerWasWrong(code) ? readCloselyHtml(QuizService.getQuestionTraps(code)) : '';
+    let answersHtml = `${readClosely}<div class="bank-item-choices" style="display:flex; flex-direction:column; gap:8px;">`;
     qObj.choices.forEach((ans, idx) => {
         const pts = parseInt(ans.pts || 0);
         const isCorrect = pts > 0;

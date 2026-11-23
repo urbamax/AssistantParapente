@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { answer } from './answer_helpers.js';
 
 // Spec 063 : série « Questions à piège ». Les vraies phrases de spec 061 sont servies : chaque question
-// de la série doit afficher l'encart « À lire de près » après la réponse.
+// de la série doit afficher l'encart « À lire de près » après une réponse fausse (FR-001a).
 test.use({ serviceWorkers: 'block' });
 
 test.beforeEach(async ({ page }) => {
@@ -34,8 +35,7 @@ test('with the option on, every question of the training series has a trap box',
     for (let i = 0; i < 5; i++) {
         await expect(page.locator('#qcm-choices .qcm-option').first()).toBeVisible();
         await expect(page.locator('.quiz-read-closely')).toHaveCount(0);
-        await page.locator('#qcm-choices .qcm-option').first().click();
-        await page.locator('[data-action="validate-question"]').click();
+        await answer(page, false);
         await expect(page.locator('.quiz-read-closely')).toBeVisible();
         await page.locator('[data-action="next-question"]').click();
     }

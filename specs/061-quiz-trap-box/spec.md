@@ -19,6 +19,7 @@
 ### Session 2026-11-22 (after release)
 
 - Owner: « la partie À lire de près n'est jamais très claire et n'explique pas comment éviter le piège d'énoncé ». The sentences only named the trap (« « Toujours » tombe dès qu'un seul cas contraire existe », « Deux choix ne diffèrent que d'un mot : … »), which the learner had just seen. → A: rewrite all sentences so each names the trap **and** shows how to settle it on this question (owner chose the full rewrite over a generic reflex line). FR-006 amended accordingly; the rewrite plan is in `rewrite-plan.md`.
+- Owner (2026-11-23): « on doit afficher les pièges d'énoncé que quand on s'est trompé sur la question ». → A: the box shows only after a wrong or incomplete answer. FR-001 amended.
 
 ## Context
 
@@ -72,6 +73,7 @@ The same box appears wherever the app shows the correction of an answered questi
 ### Functional Requirements
 
 - **FR-001**: After an answer is submitted (and only then), the correction of a question MUST show one box listing the trap sentence(s) of that question, above the choice explanations, in every view that shows an answered question's correction: training, revision and perfecting modes, the review of a finished mock exam, the question bank, and the statistics' error review and detailed question list. The errors workshop and revision axes, which show one choice's line per item, are out of scope.
+- **FR-001a** (amended 2026-11-23): The box MUST be shown only when the learner got the question wrong (wrong or incomplete answer). In the immediate correction, the end-of-series review and the exam reviews, that is the answer being corrected. In the question bank and the statistics' detailed list, which show no answer, the box MUST be shown only when the last recorded answer to the question was wrong (its streak of right answers is 0 after at least one attempt).
 - **FR-002**: The box MUST be titled « À lire de près », distinct from the existing « Piège récurrent » banner and the « pièges » of the errors workshop (owner had no preference; recommended title kept).
 - **FR-003**: The box MUST NOT be shown, nor its text be present in the page, before the answer or at any time during a mock exam in progress.
 - **FR-004**: Questions without a trap MUST show no box.

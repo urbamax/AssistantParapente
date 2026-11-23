@@ -565,6 +565,9 @@ class QuizService {
                 masteryTarget: 75,
                 // Spec 063 : série « Questions à piège » (mode Entraînement seulement).
                 trapsOnly: false,
+                // Spec 064 : type de piège ciblé depuis les statistiques (null = tous).
+                /** @type {string | null} */
+                trapType: null,
             },
             qcmSessionData: [],
             currentQcmSelection: new Set(),
@@ -601,12 +604,14 @@ class QuizService {
         try {
             // URLs stables (sans paramètre horodaté) : le service worker les met en cache et les
             // ressert hors ligne ; une URL unique à chaque appel ne trouvait jamais de copie.
-            const [questionsRes, explicationsRes, courseMappingRes, trapsRes] = await Promise.all([
+            const [questionsRes, explicationsRes, courseMappingRes, trapsRes, trapTypesRes] = await Promise.all([
                 fetch(`${this.basePath}/js/data/qcm_ffvl.csv`),
                 fetch(`${this.basePath}/js/data/qcm_ffvl_explanations.csv`),
                 fetch(`${this.basePath}/js/data/question_course_mapping.json`),
                 // Spec 061 : phrases « À lire de près », facultatives (leur absence n'empêche rien).
                 fetch(`${this.basePath}/js/data/qcm_question_traps.json`).catch(() => null),
+                // Spec 064 : type de chaque piège et choix qu'il touche (section « Vos pièges »).
+                fetch(`${this.basePath}/js/data/qcm_trap_types.json`).catch(() => null),
             ]);
 
             if (!questionsRes.ok || !explicationsRes.ok) throw new Error('Failed to load QCM CSV data');
@@ -617,6 +622,7 @@ class QuizService {
             // doit jamais empêcher le chargement des questions elles-mêmes.
             const courseMapping = courseMappingRes.ok ? await courseMappingRes.json() : {};
             this._questionTraps = trapsRes && trapsRes.ok ? await trapsRes.json().catch(() => ({})) : {};
+            this._trapTypes = trapTypesRes && trapTypesRes.ok ? await trapTypesRes.json().catch(() => ({})) : {};
 
             const explications = this.parseExplicationsCSV(explicationsCSV);
             const questions = this.parseQuestionsCSV(questionsCSV, explications, courseMapping);
@@ -642,6 +648,21 @@ class QuizService {
      * @param {string} code
      * @returns {readonly string[]}
      */
+    /**
+     * Spec 064 : pièges d'une question, avec leur type et les choix qu'ils touchent (positions du CSV).
+     * @param {string} code
+     * @returns {ReadonlyArray<{ type: string, choices: number[] }>}
+     */
+    getTrapTypes(code) {
+        const list = code && this._trapTypes ? this._trapTypes[code] : null;
+        return Object.freeze(Array.isArray(list) ? list : []);
+    }
+
+    /** Spec 064 : vrai quand les types de pièges sont chargés. */
+    hasTrapTypes() {
+        return Boolean(this._trapTypes && Object.keys(this._trapTypes).length > 0);
+    }
+
     /** Spec 063 : vrai quand les phrases « À lire de près » sont chargées. */
     hasQuestionTraps() {
         return Boolean(this._questionTraps && Object.keys(this._questionTraps).length > 0);
@@ -650,6 +671,18 @@ class QuizService {
     getQuestionTraps(code) {
         const list = code && this._questionTraps ? this._questionTraps[code] : null;
         return Object.freeze(Array.isArray(list) ? list.filter((s) => typeof s === 'string' && s) : []);
+    }
+
+    /**
+     * Spec 061 (2026-11-23) : l'encart « À lire de près » ne se montre qu'après une erreur. Hors
+     * correction immédiate (banque, liste détaillée), « erreur » veut dire : la dernière réponse
+     * enregistrée pour cette question était fausse ou incomplète.
+     * @param {string} code
+     * @returns {boolean}
+     */
+    lastAnswerWasWrong(code) {
+        const q = code ? this.getPersistentStats()?.questions?.[code] : null;
+        return Boolean(q) && (Number(q.total) || 0) > 0 && (Number(q.streak) || 0) === 0;
     }
 
     setQuestions(questions) {
@@ -872,6 +905,9 @@ class QuizService {
     }
     setTrapsOnly(on) {
         this.state.qcmConfig.trapsOnly = Boolean(on);
+    }
+    setTrapType(type) {
+        this.state.qcmConfig.trapType = type || null;
     }
 
     // Maîtrise d'une question (0 à 1) : part de bonnes réponses sur ses dernières tentatives
@@ -1123,7 +1159,12 @@ class QuizService {
             if (selectedTheme !== 'ALL') sourceData = sourceData.filter((q) => q.theme === selectedTheme);
             if (this.state.qcmConfig.trapsOnly) {
                 // Spec 063 : seulement les questions à piège, les erreurs d'abord.
-                const traps = sourceData.filter((q) => this.getQuestionTraps(q.code).length > 0);
+                const trapType = this.state.qcmConfig.trapType;
+                const traps = sourceData.filter(
+                    (q) =>
+                        this.getQuestionTraps(q.code).length > 0 &&
+                        (!trapType || this.getTrapTypes(q.code).some((tr) => tr.type === trapType)),
+                );
                 if (traps.length === 0) throw new Error(t('quiz.dialogs.noTrapQuestion'));
                 const stats = this.getPersistentStats();
                 questions = orderTrapSeries(traps, stats && stats.questions, (a) => this.shuffle(a)).slice(0, count);

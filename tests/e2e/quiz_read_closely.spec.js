@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
+import { answer } from './answer_helpers.js';
 
 // Spec 061 : encart « À lire de près ». Le fichier des phrases est remplacé par une version de test :
 // une phrase reconnaissable pour chaque question (ou aucune), pour ne pas dépendre du tirage.
@@ -37,7 +38,7 @@ async function answerFirstChoice(page) {
     await page.locator('[data-action="validate-question"]').click();
 }
 
-test('training: the box appears only after the answer', async ({ page }) => {
+test('training: the box appears only after a wrong answer', async ({ page }) => {
     await setup(page, ALL);
     await page.goto('/?mode=QCM');
     await page.locator('#mode-training').click();
@@ -47,7 +48,13 @@ test('training: the box appears only after the answer', async ({ page }) => {
     await expect(box(page)).toHaveCount(0);
     await expect(page.locator('#qcm-screen')).not.toContainText(SENTENCE);
 
-    await answerFirstChoice(page);
+    await answer(page, true);
+    await expect(page.locator('[data-action="next-question"]')).toBeVisible();
+    await expect(box(page)).toHaveCount(0);
+
+    await page.locator('[data-action="next-question"]').click();
+    await expect(page.locator('#qcm-choices .qcm-option').first()).toBeVisible();
+    await answer(page, false);
     await expect(box(page)).toBeVisible();
     await expect(box(page)).toContainText('À lire de près');
     await expect(box(page)).toContainText(SENTENCE);
@@ -58,7 +65,8 @@ test('training: no box for a question without traps', async ({ page }) => {
     await page.goto('/?mode=QCM');
     await page.locator('#mode-training').click();
     await page.locator('#qcm-start-btn').click();
-    await answerFirstChoice(page);
+    await expect(page.locator('#qcm-choices .qcm-option').first()).toBeVisible();
+    await answer(page, false);
     await expect(page.locator('[data-action="next-question"]')).toBeVisible();
     await expect(box(page)).toHaveCount(0);
 });

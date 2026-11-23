@@ -1096,6 +1096,7 @@ export const FR = Object.freeze({
                 MASTERY: 'MODE PERFECTIONNEMENT',
                 TRAINING: 'MODE ENTRAÎNEMENT',
                 TRAINING_TRAPS: 'MODE ENTRAÎNEMENT · QUESTIONS À PIÈGE',
+                TRAINING_TRAP_TYPE: 'QUESTIONS À PIÈGE · {type}',
                 AXIS_WORKSHOP: 'ATELIER CIBLÉ — {title}',
                 TRAPS_WORKSHOP: 'ATELIER PIÈGES & OUBLIS',
             }),
@@ -1404,6 +1405,13 @@ export const FR = Object.freeze({
             noData: 'Aucune donnée.',
             historyTitle: 'HISTORIQUE DES EXAMENS',
             questionsTitle: 'LISTE DÉTAILLÉE DES QUESTIONS',
+            trapsTitle: 'VOS PIÈGES',
+            trapsIntro:
+                'Les sortes de pièges rencontrées dans vos réponses, de celle où vous tombez le plus souvent à celle où vous tombez le moins.',
+            trapsEmpty:
+                'Aucun piège rencontré pour l’instant. Lancez une série « Questions à piège » en mode Entraînement pour les découvrir.',
+            trapsCount: 'Tombé {falls} fois sur {encounters}',
+            trapsTrain: 'S’entraîner',
             export: 'Exporter',
             import: 'Importer',
             reset: 'Réinitialiser',
@@ -1445,6 +1453,33 @@ export const FR = Object.freeze({
             noSource: 'Aucune source trouvée pour le moment.',
             readCloselyTitle: 'À lire de près',
             readCloselyAria: 'À lire de près : ce qui rend cette question délicate',
+        }),
+        // Spec 064 : types de pièges montrés dans « Vos pièges » (statistiques).
+        trapTypes: Object.freeze({
+            absolu: Object.freeze({
+                name: 'Mots absolus',
+                desc: '« jamais », « toujours », « uniquement » : un seul cas contraire suffit à écarter la proposition.',
+            }),
+            un_mot: Object.freeze({
+                name: 'Choix à un mot près',
+                desc: 'Deux propositions identiques sauf un mot, et c’est ce mot qui décide.',
+            }),
+            cadre: Object.freeze({
+                name: 'Cadre de l’énoncé',
+                desc: 'Un mot de la question fixe le moment, le lieu ou la portée : « transitoirement », « à 15 h », « en plaine ».',
+            }),
+            inversion: Object.freeze({
+                name: 'Relations inversées',
+                desc: 'Cause et conséquence, rapport ou rôles retournés : « traînée sur portance », « plus léger que vous ».',
+            }),
+            vrai_hors_sujet: Object.freeze({
+                name: 'Vrai mais hors sujet',
+                desc: 'Une proposition vraie, ou à moitié vraie, qui ne répond pas à ce que demande la question.',
+            }),
+            valeur: Object.freeze({
+                name: 'Valeurs et unités',
+                desc: 'Un chiffre, une unité ou un seuil à connaître précisément.',
+            }),
         }),
         traps: Object.freeze({
             resultsTitleOne: '1 piège rencontré dans cette série',

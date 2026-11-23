@@ -27,6 +27,7 @@ describe('QuizService - trap series (spec 063)', () => {
     });
     afterEach(() => {
         QuizService.setTrapsOnly(false);
+        if (typeof QuizService.setTrapType === 'function') QuizService.setTrapType(null);
         vi.restoreAllMocks();
     });
 
@@ -64,6 +65,32 @@ describe('QuizService - trap series (spec 063)', () => {
         QuizService.setMode('REVISION');
         QuizService.startSession('BI');
         expect(codes()).toContain('A2B');
+    });
+
+    it('keeps only questions with a trap of the chosen type (spec 064)', () => {
+        vi.spyOn(QuizService, 'getTrapTypes').mockImplementation((c) =>
+            Object.freeze(
+                {
+                    A1B: [{ type: 'absolu', choices: [1] }],
+                    A3B: [{ type: 'un_mot', choices: [0] }],
+                    E1B: [{ type: 'absolu', choices: [1] }],
+                }[c] || [],
+            ),
+        );
+        QuizService.setTrapsOnly(true);
+        QuizService.setTrapType('absolu');
+        QuizService.startSession('BI');
+        expect(codes().sort()).toEqual(['A1B', 'E1B']);
+        QuizService.setTrapType(null);
+        QuizService.startSession('BI');
+        expect(codes().sort()).toEqual(['A1B', 'A3B', 'E1B']);
+    });
+
+    it('returns the trap types of a question, empty when unknown', () => {
+        QuizService._trapTypes = { A1B: [{ type: 'absolu', choices: [1] }] };
+        expect(QuizService.getTrapTypes('A1B')).toEqual([{ type: 'absolu', choices: [1] }]);
+        expect(QuizService.getTrapTypes('ZZZ')).toEqual([]);
+        expect(Object.isFrozen(QuizService.getTrapTypes('ZZZ'))).toBe(true);
     });
 
     it('tells whether trap data is loaded', () => {

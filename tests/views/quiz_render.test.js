@@ -13,7 +13,7 @@ const INDEX = readFileSync('index.html', 'utf8');
 const SCREENS = (() => {
     const tpl = document.createElement('template');
     tpl.innerHTML = INDEX.slice(INDEX.indexOf('<div id="qcm-setup-screen"'));
-    return ['qcm-setup-screen', 'qcm-screen', 'stats-screen', 'qcm-bank-screen']
+    return ['qcm-setup-screen', 'qcm-screen', 'stats-screen', 'revision-axes-screen', 'qcm-bank-screen']
         .map((id) => tpl.content.getElementById(id).outerHTML)
         .join('')
         .replace(/\s(src|href)="https?:[^"]*"/g, '');
@@ -406,15 +406,18 @@ describe('results screen escapes quiz texts (spec 027)', () => {
     });
 });
 
-// Spec 061 : encart « À lire de près » dans chaque correction d'une question répondue, jamais avant.
+// Spec 061 : encart « À lire de près » dans la correction, seulement après une erreur (2026-11-23).
 describe('read-closely box in the corrections (spec 061)', () => {
     const TRAPS = { A1V: ['Le mot « sépare » décide.'], E2VB: ['Deux choix ne diffèrent que d’un mot.'] };
     const box = (root) => root.querySelector('.quiz-read-closely');
+    let wrong;
     beforeEach(() => {
+        wrong = new Set();
         vi.spyOn(QuizService, 'getQuestionTraps').mockImplementation((c) => Object.freeze(TRAPS[c] || []));
+        vi.spyOn(QuizService, 'lastAnswerWasWrong').mockImplementation((c) => wrong.has(c));
     });
 
-    it('training: absent before the answer, shown after it, absent for a question without traps', () => {
+    it('training: absent before the answer and after a right answer, shown after a wrong one', () => {
         QuizService.state.qcmConfig.mode = 'TRAINING';
         QuizView.renderQuestion(QUESTIONS[0]);
         expect(box(document.getElementById('qcm-screen'))).toBeNull();
@@ -424,13 +427,20 @@ describe('read-closely box in the corrections (spec 061)', () => {
             { selected: [QUESTIONS[0].choices[0]], isCorrect: true, question: QUESTIONS[0] },
             true,
         );
+        expect(box(document.getElementById('qcm-feedback'))).toBeNull();
+
+        QuizView.renderQuestion(QUESTIONS[0]);
+        QuizView.showAnswerFeedback(
+            { selected: [QUESTIONS[0].choices[1]], isCorrect: false, question: QUESTIONS[0] },
+            true,
+        );
         const feedback = document.getElementById('qcm-feedback');
         expect(box(feedback).textContent).toContain('Le mot « sépare » décide.');
         expect(feedback.style.display).toBe('block');
 
         QuizView.renderQuestion(QUESTIONS[3]);
         QuizView.showAnswerFeedback(
-            { selected: [QUESTIONS[3].choices[0]], isCorrect: true, question: QUESTIONS[3] },
+            { selected: [QUESTIONS[3].choices[1]], isCorrect: false, question: QUESTIONS[3] },
             true,
         );
         expect(box(document.getElementById('qcm-feedback'))).toBeNull();
@@ -445,21 +455,25 @@ describe('read-closely box in the corrections (spec 061)', () => {
         expect(box(document.getElementById('qcm-question-text')).textContent).toContain('ne diffèrent que');
     });
 
-    it('question bank shows the box in the item of a question with traps only', () => {
+    it('question bank shows the box only when the last answer to the question was wrong', () => {
         QuizView.renderBankContent('ALL');
-        const items = [...document.querySelectorAll('.bank-item')];
-        const withTrap = items.find((i) => i.textContent.includes('A1V'));
-        const without = items.find((i) => i.textContent.includes('F4V'));
-        expect(box(withTrap)).not.toBeNull();
-        expect(box(without)).toBeNull();
+        const item = () => [...document.querySelectorAll('.bank-item')].find((i) => i.textContent.includes('A1V'));
+        expect(box(item())).toBeNull();
+        wrong.add('A1V');
+        QuizView.renderBankContent('ALL');
+        expect(box(item())).not.toBeNull();
     });
 
-    it('statistics: exam review and detailed list show the box', () => {
+    it('statistics: exam review shows the box for errors, the detailed list after a wrong last answer', () => {
         QuizView.reviewExam('x1');
         expect(box(document.getElementById('stats-content'))).not.toBeNull();
         const detail = document.createElement('div');
         detail.innerHTML = buildQuestionAnswersHtml(QuizView, QUESTIONS[0], 'A1V');
+        expect(box(detail)).toBeNull();
+        wrong.add('A1V');
+        detail.innerHTML = buildQuestionAnswersHtml(QuizView, QUESTIONS[0], 'A1V');
         expect(box(detail).textContent).toContain('« sépare »');
+        wrong.add('F4V');
         detail.innerHTML = buildQuestionAnswersHtml(QuizView, QUESTIONS[3], 'F4V');
         expect(box(detail)).toBeNull();
     });
@@ -518,12 +532,79 @@ describe('read-closely box does not linger on the next question', () => {
         QuizService.state.qcmConfig.mode = 'TRAINING';
         QuizView.renderQuestion(QUESTIONS[0]);
         QuizView.showAnswerFeedback(
-            { selected: [QUESTIONS[0].choices[0]], isCorrect: true, question: QUESTIONS[0] },
+            { selected: [QUESTIONS[0].choices[1]], isCorrect: false, question: QUESTIONS[0] },
             true,
         );
         expect(document.querySelector('.quiz-read-closely')).not.toBeNull();
         QuizView.renderQuestion(QUESTIONS[1]);
         expect(document.querySelector('.quiz-read-closely')).toBeNull();
         expect(document.getElementById('qcm-feedback').textContent).not.toContain('« sépare »');
+    });
+});
+
+// Spec 064 : section « Vos pièges », en tête des axes de révision, et entraînement par type.
+describe('« Vos pièges » in the revision axes (spec 064)', () => {
+    const TYPES = {
+        A1V: [{ type: 'absolu', choices: [1] }],
+        E2VB: [{ type: 'un_mot', choices: [0] }],
+    };
+    const section = () => document.getElementById('stats-traps');
+    beforeEach(() => {
+        vi.spyOn(QuizService, 'hasTrapTypes').mockReturnValue(true);
+        vi.spyOn(QuizService, 'getTrapTypes').mockImplementation((c) => Object.freeze(TYPES[c] || []));
+    });
+    afterEach(() => {
+        QuizService.setTrapsOnly(false);
+        QuizService.setTrapType(null);
+    });
+    const withAnswers = (answers) => {
+        const s = structuredClone(STATS);
+        for (const [code, masks] of Object.entries(answers)) {
+            s.questions[code] = { ...(s.questions[code] || {}), answers: masks.map((m, i) => (20000 + i) * 1024 + m) };
+        }
+        QuizService.getPersistentStats.mockImplementation(() => structuredClone(s));
+    };
+
+    it('lists the types met, most falls first, with « N sur M »', () => {
+        // A1V : le choix piégé (index 1, négatif) coché deux fois sur deux ; E2VB : bonne réponse oubliée une fois sur deux.
+        withAnswers({ A1V: [0b011, 0b010], E2VB: [0b001, 0b000] });
+        QuizView.renderRevisionAxes();
+        const rows = [...section().querySelectorAll('[data-trap-type]')];
+        expect(rows.map((r) => r.getAttribute('data-trap-type'))).toEqual(['absolu', 'un_mot']);
+        expect(rows[0].textContent).toContain('Mots absolus');
+        expect(rows[0].textContent).toContain('2 fois sur 2');
+        expect(rows[1].textContent).toContain('1 fois sur 2');
+        expect(rows[0].querySelector('[data-action="QuizstartTrapTypeTraining"]').getAttribute('data-args')).toBe(
+            'absolu',
+        );
+    });
+
+    it('is on the revision axes page, not in the statistics', () => {
+        withAnswers({ A1V: [0b011] });
+        QuizView.renderStats();
+        expect(section()).toBeNull();
+        QuizView.renderRevisionAxes();
+        expect(document.getElementById('revision-axes-content').firstElementChild.id).toBe('stats-traps');
+    });
+
+    it('invites to train when no trap was met, and is absent without type data', () => {
+        QuizView.renderRevisionAxes();
+        expect(section().textContent).toContain('Questions à piège');
+        expect(section().querySelectorAll('[data-trap-type]')).toHaveLength(0);
+        QuizService.hasTrapTypes.mockReturnValue(false);
+        QuizView.renderRevisionAxes();
+        expect(section()).toBeNull();
+    });
+
+    it('« S’entraîner » starts a series of that type, labelled with it, and leaves the setup as it was', () => {
+        vi.spyOn(QuizService, 'startSession').mockImplementation(() => {
+            expect(QuizService.state.qcmConfig.trapsOnly).toBe(true);
+            expect(QuizService.state.qcmConfig.trapType).toBe('absolu');
+            return QUESTIONS[0];
+        });
+        QuizView.startTrapTypeTraining('absolu');
+        expect(text('qcm-mode-label')).toBe('QUESTIONS À PIÈGE · MOTS ABSOLUS');
+        expect(QuizService.state.qcmConfig.trapType).toBe(null);
+        expect(QuizService.state.qcmConfig.trapsOnly).toBe(false);
     });
 });

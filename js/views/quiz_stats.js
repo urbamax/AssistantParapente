@@ -19,6 +19,7 @@ import { explanationHtml, optionExplanationHtml, optionExplanations, optionOutco
 import { readCloselyHtml } from './quiz_read_closely.js';
 import { choiceIndex } from '../services/answer_log.js';
 import { buildRevisionAxes } from '../services/revision_axes.js';
+import { countTrapFalls } from '../services/trap_stats.js';
 import { floorPercent1, formatPercent } from '../utils/text_utils.js';
 import { buildRevisionAxesDashboardHtml } from './quiz_axes_html.js';
 import {
@@ -31,11 +32,31 @@ import {
     activeThemeFilters,
     questionTheme,
     buildFilteredTrainingButtonHtml,
+    buildTrapStatsHtml,
     buildQuestionAnswersHtml,
     filterStatsQuestionEntries,
 } from './quiz_stats_html.js';
 
 // Passer à true en cas de souci technique pour réactiver la suppression d'examen
+/**
+ * Questions de parapente du niveau choisi, sans les codes de delta (H, R, X). Partagé par les
+ * statistiques et les axes de révision (« Vos pièges », spec 064).
+ * @param {any[]} questions
+ * @param {string} level
+ * @returns {any[]}
+ */
+export function levelQuestions(questions, level) {
+    const para = questions.filter((q) => q.parapente === true);
+    const suffix = { BI: 'V', BP: 'B', BPC: 'M', TREUIL: 'T' }[level];
+    const kept =
+        level === 'ALL'
+            ? para
+            : suffix
+              ? para.filter((q) => q.code && q.code.includes(suffix))
+              : para.filter((q) => q.class && q.class.includes(level));
+    return kept.filter((q) => !['H', 'R', 'X'].includes(q.code.charAt(0)));
+}
+
 const SHOW_EXAM_DELETE = false;
 
 export class QuizStatsBase extends BaseView {
@@ -170,10 +191,26 @@ export class QuizStatsBase extends BaseView {
 
         const stats = QuizService.getPersistentStats();
         const report = buildRevisionAxes(questions, stats, COURSES_DATA, { level: currentLevel });
-        container.innerHTML = buildRevisionAxesDashboardHtml(report, {
-            statusFilter: this._axesStatusFilter || 'ALL',
-            expandedIds: this._expandedAxisTakeaways,
-        });
+        // Spec 064 : « Vos pièges », sur les questions du niveau affiché, en tête des axes de révision.
+        const levelQs = levelQuestions(questions, currentLevel);
+        const trapStatsSectionHtml = QuizService.hasTrapTypes()
+            ? `<div id="stats-traps" style="margin-bottom:32px;">
+            <h3 class="library-section-header" style="border:none; margin-bottom:16px;">${tq('stats.trapsTitle')}</h3>
+            ${buildTrapStatsHtml(
+                countTrapFalls(
+                    levelQs,
+                    stats.questions,
+                    Object.fromEntries(levelQs.map((q) => [q.code, QuizService.getTrapTypes(q.code)])),
+                ),
+            )}
+        </div>`
+            : '';
+        container.innerHTML =
+            trapStatsSectionHtml +
+            buildRevisionAxesDashboardHtml(report, {
+                statusFilter: this._axesStatusFilter || 'ALL',
+                expandedIds: this._expandedAxisTakeaways,
+            });
     }
 
     renderStats() {
@@ -247,40 +284,7 @@ export class QuizStatsBase extends BaseView {
             const levelQuestionCodes = new Set();
             let totalLevelQuestions = 0;
 
-            let levelQs = [];
-            console.log('DEBUG RENDER STATS: Normalized Level =', currentLevel);
-
-            // Mapping levels to the questions' 'niveau' property
-            // 0: Vert (Intro)? 1: Bleu (BI)? 2: Marron (BP)? 3: Rouge/Confirme (BPC)?
-
-            if (currentLevel === 'ALL') {
-                // For global view, use all PARAPENTE questions
-                levelQs = questions.filter((q) => q.parapente === true);
-                console.log('DEBUG ALL FILTER: Total parapente questions:', levelQs.length);
-            } else if (currentLevel === 'BI') {
-                // BI = Contains suffix V AND parapente
-                levelQs = questions.filter((q) => q.parapente === true && q.code && q.code.includes('V'));
-                console.log(`DEBUG BI FILTER: Found ${levelQs.length} questions (Suffix contains V).`);
-            } else if (currentLevel === 'BP') {
-                // BP = Contains suffix B AND parapente
-                levelQs = questions.filter((q) => q.parapente === true && q.code && q.code.includes('B'));
-                console.log(`DEBUG BP FILTER: Found ${levelQs.length} questions (Suffix contains B).`);
-            } else if (currentLevel === 'BPC') {
-                // BPC = Contains suffix M AND parapente
-                levelQs = questions.filter((q) => q.parapente === true && q.code && q.code.includes('M'));
-                console.log(`DEBUG BPC FILTER: Found ${levelQs.length} questions (Suffix contains M).`);
-            } else if (currentLevel === 'TREUIL') {
-                // TREUIL = Contains suffix T AND parapente
-                levelQs = questions.filter((q) => q.parapente === true && q.code && q.code.includes('T'));
-                console.log(`DEBUG TREUIL FILTER: Found ${levelQs.length} questions (Suffix contains T).`);
-            } else {
-                // Fallback
-                levelQs = questions.filter((q) => q.parapente === true && q.class && q.class.includes(currentLevel));
-            }
-
-            // Deduplicate and Filter levelQs (Fix for erroneous 198 count vs 174)
-            const excludedPrefixes = ['H', 'R', 'X']; // Delta specifics
-            levelQs = levelQs.filter((q) => !excludedPrefixes.includes(q.code.charAt(0)));
+            const levelQs = levelQuestions(questions, currentLevel);
 
             if (levelQs.length > 0) {
                 totalLevelQuestions = levelQs.length;
@@ -643,7 +647,7 @@ export class QuizStatsBase extends BaseView {
                         <summary>
                             <div style="font-size:0.75rem; opacity:0.6; margin-bottom:6px;">${tq('history.questionNumber', { n: idx + 1 })}${qCode ? ` • <span style="font-family:monospace;">#${escapeHTML(qCode)}</span>` : ''}</div>
                             <div style="font-weight:600;">${escapeHTML(q.question)}</div>
-                        </summary>${qCode ? readCloselyHtml(QuizService.getQuestionTraps(qCode)) : ''}
+                        </summary>${qCode && !r.isCorrect ? readCloselyHtml(QuizService.getQuestionTraps(qCode)) : ''}
                         <div class="bank-item-choices" style="display:flex; flex-direction:column; gap:6px; margin-top:12px;">
                             ${optionsHtml}
                         </div>
