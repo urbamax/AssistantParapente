@@ -948,101 +948,101 @@
     "Le rythme semaine et week-end vaut pour certaines zones militaires, pas pour une zone interdite qui protège un site sensible."
   ],
   "S132B": [
-    "« Toutes » met dans le même lot des références fixes et des lectures liées à la pression.",
-    "L'unité annoncée, « en mètres », n'est pas forcément celle des cartes aéronautiques."
+    "« Toutes » met dans le même lot des références fixes et des lectures liées à la pression : une hauteur au-dessus du sol ou de la mer ne change pas avec la météo, seule la lecture de l'altimètre en dépend.",
+    "L'unité annoncée, « en mètres », ne tient pas : les cartes aéronautiques sont internationales et donnent hauteurs et altitudes en pieds."
   ],
   "S134B": [
-    "« Il suffit » fait d'une hauteur de vol une garantie, comme si tous les espaces commençaient au-dessus."
+    "« Il suffit » fait d'une hauteur de vol une garantie, comme si tous les espaces commençaient au-dessus de 150 m : il suffit d'une zone qui part du sol, comme une CTR ou le RTBA, pour l'écarter. Seule une carte à jour renseigne."
   ],
   "S136B": [
-    "Les listes se ressemblent, et un seul élément ajouté ou oublié suffit à changer le sens du choix.",
-    "« Hauteurs sol » suppose que les limites d'un espace sont toujours comptées depuis le sol."
+    "Les listes se ressemblent : un élément en trop ou en moins suffit à écarter un choix. Le cartouche donne type, nom, plancher, plafond et fréquence radio, ni horaires ni téléphone.",
+    "« Hauteurs sol » suppose que les limites partent toujours du sol, alors qu'elles se donnent aussi en altitude ou en niveau de vol."
   ],
   "S14B": [
-    "« Nécessaire pour enseigner » lie le droit d'enseigner au label de la structure, et non au moniteur."
+    "« Nécessaire pour enseigner » lie le droit d'enseigner au label de la structure, alors qu'il vient du diplôme du moniteur : le label garantit seulement que l'école suit le cadre fédéral."
   ],
   "S15B": [
-    "« Atteste la partie pratique » ou « délivre le brevet » : deux verbes, deux étapes distinctes.",
-    "« Toutes » n'est pas toujours un excès, car certaines fonctions couvrent bien l'ensemble d'une structure."
+    "« Atteste » ou « délivre » : deux verbes, deux étapes. Le directeur technique valide la partie pratique, mais c'est le responsable régional de la formation qui enregistre le brevet.",
+    "« Toutes » n'est pas toujours un excès : il ne fait tomber un choix que s'il existe un cas contraire, et le directeur technique répond bien de tout l'enseignement de son école."
   ],
   "S15T": [
-    "« Au moins 250 m » ou « à moins de 250 m » : deux tournures voisines au sens opposé."
+    "« Au moins 250 m » et « à moins de 250 m » se ressemblent mais disent l'inverse : la poulie doit être assez loin pour que le pilote puisse toujours se poser avant elle, donc au moins 250 m."
   ],
   "S16B": [
-    "« Non reconnue par la FFVL » peut retirer le droit d'enseigner ou seulement celui d'attester les brevets fédéraux."
+    "« Non reconnue par la FFVL » retire le droit d'attester les brevets fédéraux, pas celui d'enseigner : la loi lie l'enseignement au diplôme du moniteur, pas à la fédération."
   ],
   "S17B": [
-    "« Financièrement » précise sur quel plan joue l'indépendance : l'argent, pas forcément le reste."
+    "« Financièrement » précise sur quel plan joue l'indépendance : une école privée vit de ses élèves, pas d'argent fédéral, tout en signant la charte et en étant suivie par la fédération."
   ],
   "S18B": [
-    "« Club-École » et non École Française de Vol Libre : le mot « Club » change le statut de la structure."
+    "« Club-École » et non École Française de Vol Libre : le mot « Club » désigne une association loi 1901 affiliée et gérée par ses adhérents, pas une entreprise privée."
   ],
   "S18T": [
-    "« Uniquement » tombe dès qu'un seul cas contraire existe."
+    "« Uniquement » n'admet aucune exception : les facteurs non techniques, attitude, choix, émotions, causent la plupart des accidents, ce qui suffit à écarter ce choix."
   ],
   "S19V": [
-    "Avoir une licence fédérale ne dit pas qui sont les membres de la fédération au sens de ses statuts, d'où le poids de « individus ».",
-    "Faire partie de l'organisation fédérale, comme les « ligues régionales », n'est pas forcément en être membre."
+    "Avoir une licence ne fait pas d'un pilote un membre de la fédération au sens de ses statuts : ses membres sont des structures, clubs et écoles, pas des « individus ».",
+    "Faire partie de l'organisation fédérale, comme les « ligues régionales », n'est pas en être membre : les ligues relaient la fédération sans figurer parmi ses membres."
   ],
   "S1B": [
-    "« Obtenir l'autorisation » n'est pas la même chose que se renseigner auprès de quelqu'un."
+    "« Obtenir l'autorisation » n'est pas se renseigner : sur un site déclaré FFVL, aucune autorisation du club ou de l'école n'est exigée, mais il faut s'informer des espaces aériens et lire les panneaux."
   ],
   "S20T": [
-    "« Coopté » ou « nommé », et par quelle instance : les deux détails comptent.",
-    "Treuilleur ou formateur de treuilleurs : les « qualifications de treuilleur » se situent à un niveau précis de la chaîne de formation."
+    "« Coopté » ou « nommé », et par quelle instance : le formateur national est choisi par la commission Tracté elle-même, pas nommé par le comité directeur.",
+    "Treuilleur ou formateur de treuilleurs : le formateur national forme les formateurs, qui eux délivrent les qualifications de treuilleur, d'où un choix seulement en partie recevable."
   ],
   "S21M": [
-    "« Uniquement » tombe dès qu'un seul cas contraire existe."
+    "« Uniquement » n'admet aucune exception : il suffit que des membres réunissant un tiers des voix puissent aussi la convoquer pour écarter ce choix."
   ],
   "S21T": [
-    "Former des treuilleurs et « enseigner le parapente » ne relèvent pas de la même qualification."
+    "Former des treuilleurs et « enseigner le parapente » ne relèvent pas de la même qualification : enseigner le vol demande un moniteur diplômé, ce que la qualification de formateur treuil ne donne pas."
   ],
   "S22M": [
-    "« Toutes » tombe dès qu'un seul cas contraire existe, ici une décision politique prise par une autre instance."
+    "« Toutes » n'admet aucune exception : les orientations politiques sont fixées par l'assemblée générale, le bureau ne faisant que les appliquer au jour le jour."
   ],
   "S22T": [
-    "« En l'absence de moniteur », c'est le niveau du pilote treuillé qui décide de ce que le treuilleur peut faire."
+    "« En l'absence de moniteur », c'est le niveau du pilote treuillé qui décide : seul un pilote ayant au moins le brevet initial peut être treuillé, et encadrer des débutants demande un moniteur."
   ],
   "S24M": [
-    "« Uniquement » tombe dès qu'un seul cas contraire existe."
+    "« Uniquement » n'admet aucune exception : le comité départemental regroupe tous les clubs et organismes affiliés du département, pas les seules écoles."
   ],
   "S24T": [
-    "Le titre de responsable « régional » renvoie à l'instance qui le désigne, nationale ou de ligue."
+    "Responsable « régional » renvoie à l'instance qui le désigne : il est désigné au sein de sa ligue, élu par elle, pas par la commission nationale."
   ],
   "S25T": [
-    "Recevoir et utiliser un rapport n'est pas la même chose que l'avoir « élaboré »."
+    "Recevoir et utiliser un rapport n'est pas l'avoir « élaboré » : le rapport est généré automatiquement depuis l'intranet, le responsable régional tracté en est le destinataire."
   ],
   "S26B": [
-    "Tous les ans ou « tous les 2 ans » : un seul chiffre sépare deux choix."
+    "Tous les ans ou « tous les 2 ans » : un seul chiffre sépare deux choix. Une association présente son activité et ses comptes pour chaque année écoulée, donc son assemblée générale est annuelle."
   ],
   "S27M": [
-    "« Pour certains » limite l'affirmation à une partie des conseillers techniques, pas à tous."
+    "« Pour certains » limite l'affirmation à une partie des conseillers, ce qui la rend recevable : la plupart sont des agents de l'État, mais la fédération peut en salarier quelques-uns."
   ],
   "S28T": [
-    "La condition « s'il n'est pas diplômé d'État » porte sur le droit d'être rémunéré.",
-    "Rembourser des frais engagés et rémunérer une prestation sont deux choses différentes."
+    "La condition « s'il n'est pas diplômé d'État » porte sur le droit d'être payé : sans ce diplôme, le formateur agit en bénévole.",
+    "Rembourser des frais engagés et payer une prestation sont deux choses : le bénévole peut se faire rembourser un déplacement, pas facturer sa formation."
   ],
   "S29B": [
-    "« Hors compétition » fixe le cadre de la licence, et la formalité médicale demandée se lit dans ce cadre."
+    "« Hors compétition » fixe le cadre : pour une licence de pratique, aucun certificat médical n'est demandé, il suffit de lire l'information sur les contre-indications."
   ],
   "S29T": [
-    "« Seul » rend souvent un choix suspect, mais il ne tombe que s'il existe un autre responsable."
+    "« Seul » rend un choix suspect, mais il ne l'écarte que s'il existe un autre responsable : ici aucun, le formateur attribue la qualification sous sa propre responsabilité, sans autorisation du RRT ni du RRF."
   ],
   "S30T": [
-    "Une fonction confiée par un formateur et une « qualification fédérale » ne sont pas la même chose."
+    "Une fonction confiée par un formateur n'est pas une « qualification fédérale » : le tuteur est choisi pour une formation donnée et agit sous la responsabilité du formateur, pas à son niveau."
   ],
   "S31M": [
-    "« Directement » affirme un lien d'accès entre deux qualifications, dont l'origine est en jeu.",
-    "« Distinctement » porte sur le fait que l'une des deux qualifications soit ou non un passage obligé vers l'autre."
+    "« Directement » affirme un lien d'accès entre deux qualifications : c'est le brevet de pilote confirmé qui ouvre la voie au moniteur fédéral, pas l'animateur.",
+    "« Distinctement » demande si l'une est un passage obligé vers l'autre : animateur et accompagnateur s'obtiennent chacun à partir du brevet confirmé, sans dépendre l'un de l'autre."
   ],
   "S32T": [
-    "La négation « n'ayant pas validé » se lit avec la condition « hors présence moniteur » qui la précède."
+    "La négation « n'ayant pas validé » se lit avec « hors présence moniteur » : sans moniteur, le treuilleur ne peut treuiller que des pilotes ayant au moins le niveau vert, l'inverse de ce choix."
   ],
   "S33T": [
-    "« Formateur national » et formateur de treuilleurs sont deux rôles distincts, et « exclusivement » ne laisse place à aucun autre."
+    "« Formateur national » et formateur de treuilleurs sont deux rôles distincts, et « exclusivement » n'en laisse place à aucun autre : l'élève est évalué par son formateur, et son tuteur peut y contribuer."
   ],
   "S34T": [
-    "Deux choix se ressemblent : « briefing de début » et « débriefing de fin » de séance."
+    "Deux choix se ressemblent, « briefing de début » et « débriefing de fin » : le treuilleur fait le briefing pour fixer les procédures, alors que le débriefing ne figure pas dans son rôle, d'où aucun point."
   ],
   "S35B": [
     "Deux éléments changent d'un choix à l'autre : le délai en jours et le destinataire de la déclaration."
