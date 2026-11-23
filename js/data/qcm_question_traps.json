@@ -566,101 +566,100 @@
     "« Difficilement dépasser 2 » présente un chiffre comme un plafond, mais le facteur de charge grandit avec l'inclinaison : il dépasse 2 dès que l'aile est inclinée au-delà de 60°."
   ],
   "G33M": [
-    "La négation « n'entraîne pas » renverse le sens de tout le choix."
+    "La négation « n'entraîne pas » renverse tout le choix : cadencer, c'est freiner le côté extérieur au milieu d'un virage serré, ce qui écrase davantage le pilote dans sa sellette, donc augmente le facteur de charge."
   ],
   "G34B": [
-    "Deux choix ne diffèrent que d'un mot : le bruit du vent « s'affaiblit » ou « augmente »."
+    "Deux choix ne diffèrent que d'un mot, le bruit du vent « s'affaiblit » ou « augmente » : la vrille suit une aile trop ralentie, et moins de vitesse veut dire moins de bruit d'air."
   ],
   "G35M": [
-    "La question porte sur l'autorotation, et tout incident dangereux n'en est pas une cause.",
-    "« Même une petite » cravate : la taille de l'incident ne dit pas à elle seule s'il est sans conséquence."
+    "La question porte sur l'autorotation, qui part d'une aile devenue dissymétrique : un enfoncement au passage d'un gradient est dangereux, mais il mène au décrochage, pas à la rotation.",
+    "« Même une petite » cravate rappelle que la taille ne rend pas l'incident anodin : une petite cravate suffit à freiner un côté et à lancer la rotation."
   ],
   "G3M": [
-    "Le sens du déplacement du point d'arrêt, « vers le haut », dit si l'incidence monte ou baisse."
+    "Le sens du déplacement décide : un point d'arrêt qui monte vers le dessus du bord d'attaque veut dire un air qui arrive plus à plat, donc une incidence en baisse, ce qui mène à la fermeture, pas au décrochage."
   ],
   "G5B": [
-    "Un seul préfixe change entre deux choix : « brider » ou « débrider »."
+    "Un seul préfixe sépare deux choix, « brider » ou « débrider » : une aile ferme quand l'incidence baisse trop, et freiner un peu la garde à distance de ce seuil, alors que relâcher l'en rapproche."
   ],
   "G6B": [
-    "Un « vent arrière fort » établi n'est pas une rafale : l'aile vole dans une masse d'air qui se déplace tout entière."
+    "« Vent arrière fort » décrit un vent établi, pas une rafale : l'aile vole dans un air qui se déplace tout entier, donc portance, solidité et souffle sur le visage ne changent pas. Seule la vitesse-sol augmente."
   ],
   "G7B": [
-    "L'énoncé vise un instant précis, peu avant le sommet, ni le creux de la ressource ni l'après-sommet."
+    "L'énoncé vise un instant précis, peu avant le sommet : l'aile a perdu sa vitesse en montant et le pilote se sent allégé, et l'abattée n'a pas encore commencé, donc l'assiette n'est pas encore à piquer."
   ],
   "G8B": [
-    "Deux choix comparent des incidences, et le sens de la comparaison, « plus petit » ou « plus grand », décide.",
-    "« En permanence sans risque » tombe dès qu'un seul cas contraire existe."
+    "Deux choix comparent des incidences, « plus petit » ou « plus grand » : le taux de chute mini se vole lentement, et voler plus lentement demande plus d'incidence qu'à la finesse max.",
+    "« En permanence sans risque » n'admet aucune exception : près du sol ou en sortie d'ascendance, ce régime proche du décrochage devient dangereux, ce qui suffit à l'écarter."
   ],
   "G9B": [
-    "« En finale » situe le moment du vol, mais la question porte sur l'effet de la posture du pilote."
+    "« En finale » situe le moment, mais la question porte sur la posture : se relever présente à l'air une silhouette plus haute, ce qui augmente la traînée liée à la forme, rien d'autre."
   ],
   "L10M": [
-    "QNH, QFE et niveau de vol se ressemblent, mais chacun cale l'altimètre sur une référence différente."
+    "QNH, QFE et niveau de vol se ressemblent, mais chacun cale l'altimètre sur une référence différente : le QNH part du niveau de la mer, donc donne l'altitude, le QFE part du terrain, le niveau de vol de 1013 hPa."
   ],
   "L11M": [
-    "L'énoncé décrit un geste précis : un zéro posé sur le terrain d'atterrissage."
+    "L'énoncé décrit un geste précis, mettre l'altimètre à zéro sur le terrain : c'est le QFE, calé sur la pression du terrain. Le QNH afficherait l'altitude du terrain, pas zéro."
   ],
   "L12M": [
-    "Le moment, avant le décollage, compte moins que le calage imposé par l'énoncé : « au QNH »."
+    "Le calage imposé par l'énoncé, « au QNH », décide, pas le moment : le QNH fait lire l'altitude au-dessus de la mer, donc au décollage l'altitude du terrain, pas zéro."
   ],
   "L13M": [
-    "Deux choix parlent de hauteur, l'une par rapport au lieu du calage, l'autre « au-dessus du sol qu'elle survole »."
+    "Deux choix parlent de hauteur, mais pas par rapport au même sol : le QFE met l'altimètre à zéro là où il a été calé, et ce zéro ne suit pas le relief survolé ensuite."
   ],
   "L14B": [
-    "Le variomètre mesure une vitesse verticale, et tout tient à son objet : le pilote ou « la masse d'air » qui l'entoure."
+    "Le variomètre mesure une vitesse verticale, et tout tient à son objet : il compare la pression à deux instants pour savoir si l'aile monte ou descend, pas si « la masse d'air » qui l'entoure monte."
   ],
   "L15B": [
-    "Chaque choix combine un objet et une référence : l'aile ou « la masse d'air », et par rapport à quoi.",
-    "Une vitesse verticale se mesure entre deux instants successifs, et la référence « niveau de la mer » relève d'une autre grandeur."
+    "Chaque choix combine un objet et une référence, l'aile ou la masse d'air, et par rapport à quoi : le vario suit l'altitude de l'aile, donc sa vitesse verticale par rapport au sol.",
+    "Une vitesse se mesure entre deux instants, et la référence « niveau de la mer » relève de l'altitude, pas de la vitesse verticale."
   ],
   "L16B": [
-    "Variomètre et altimètre exploitent tous deux la pression, mais l'un donne une vitesse et l'autre une « hauteur »."
+    "Variomètre et altimètre exploitent tous deux la pression, mais l'un donne une vitesse de montée ou de descente et l'autre une « hauteur » : le vario répond « de combien je monte par seconde »."
   ],
   "L18V": [
-    "Une vérification utile n'est pas forcément un point que la visite prévol « ne doit pas oublier »."
+    "« Ne doit pas oublier » demande ce qui est vital, pas tout ce qui est utile : les points qui retiennent le pilote ou son secours, cuissardes et container, passent avant les lacets ou les instruments."
   ],
   "L19B": [
-    "Les gestes cités existent, et toute la différence tient à la fréquence annoncée, « au moins une fois tous les 2 ans »."
+    "Les gestes cités existent, et tout se joue sur la fréquence annoncée : un secours se replie au moins chaque année, donc « au moins une fois tous les 2 ans » laisse passer un intervalle trop long."
   ],
   "L1B": [
-    "Ce que fait le parachute une fois lancé se distingue de ce que le pilote doit faire pour le lancer, d'où le poids de « automatique »."
+    "« Automatique » est le mot à vérifier : une fois lancé, le parachute s'ouvre, mais c'est le pilote qui doit tirer la poignée et lancer le secours. Rien ne se fait sans lui."
   ],
   "L2B": [
-    "Replier le secours et le remonter dans sa sellette sont deux gestes distincts, qui ne reviennent pas forcément au pilote.",
-    "Un mot absolu comme « en permanence » peut aussi décrire une exigence réelle."
+    "Replier le secours et le remonter dans sa sellette sont deux gestes distincts : le pilote doit savoir le remonter, mais le pliage se confie à une personne compétente.",
+    "Un mot absolu peut décrire une exigence réelle : se préparer « en permanence » au secours tient, car un incident peut arriver à chaque vol."
   ],
   "L4B": [
-    "La négation « n'exige pas » renverse le sens de tout le choix."
+    "La négation « n'exige pas » renverse tout le choix : le geste d'extraction se travaille et se répète jusqu'à devenir un réflexe, ce qui exige bien de l'étudier."
   ],
   "L58T": [
-    "Deux mots proches, mixte et « combinés », ne sont pas tous deux le nom en usage pour un type de treuil."
+    "Deux mots proches, mixte et « combinés », ne sont pas tous deux des noms en usage : la machine qui combine fixe et dévidoir s'appelle déjà treuil mixte, et « combinés » ne désigne aucun type."
   ],
   "L60T": [
-    "« Automatiquement » fait d'une simple déclaration une garantie, pour un treuil dont la technique sort du dossier Tracté.",
-    "Deux choix parlent d'encouragement : l'un vise ce treuil précis, l'autre l'innovation en général."
+    "« Automatiquement » transforme une simple déclaration en garantie : l'assurance couvre l'usage prévu par le dossier Tracté, et ce treuil en sort, donc il passe d'abord par la commission.",
+    "Deux choix parlent d'encouragement : l'innovation en général est encouragée, mais l'issue pour ce treuil précis dépend de son examen."
   ],
   "L64T": [
-    "« Pratique mais pas obligatoire » range le parachute de ligne parmi les commodités plutôt que parmi les éléments de sécurité."
+    "« Pratique mais pas obligatoire » range le parachute de ligne parmi les commodités : il freine le câble qui retombe et le garde tendu au rembobinage, ce qui en fait un élément de sécurité."
   ],
   "L65T": [
-    "Ce choix relie deux idées par « et », et une seule qui ne tient pas suffit à faire tomber l'ensemble."
+    "Ce choix relie deux idées par « et » : il suffit qu'une ne tienne pas pour écarter l'ensemble. La drisse protège le pilote du parachute de ligne et amortit les à-coups, ce n'est pas un gadget."
   ],
   "L67T": [
-    "« Obligatoirement homologué » parle d'homologation, là où le dossier Tracté peut exiger des qualités à garantir."
+    "« Obligatoirement homologué » parle d'une homologation que rien n'impose : le dossier Tracté demande au largueur des qualités, simplicité, résistance, fiabilité, sans exiger de label."
   ],
   "L6B": [
-    "Un anémomètre au sol et un anémomètre « à bord » ne mesurent pas le même vent."
+    "Un anémomètre mesure une vitesse, pas une direction, et l'endroit compte : posé au sol, il mesure le vent, porté « à bord », il mesure l'air qui défile du fait de l'avancée, le vent relatif."
   ],
   "L7B": [
     "Altimètre et variomètre exploitent tous deux la pression, mais l'un affiche une altitude et l'autre une vitesse.",
-    "La négation « ne subit pas » affirme qu'il n'y a aucune influence.",
-    "« Même en parfait état » : un écart d'affichage ne vient pas forcément d'une panne."
+    "« Ne subit pas » et « même en parfait état » se testent ensemble : l'altimètre convertit une pression en altitude d'après une atmosphère moyenne, donc la température et la pression du jour le décalent sans qu'il soit en panne."
   ],
   "L85T": [
-    "L'adverbe « fortement » porte sur la part de résistance qu'une épissure soignée fait perdre à la ligne."
+    "L'adverbe « fortement » décide : une épissure soignée répartit l'effort sur toute la longueur engagée et garde l'essentiel de la résistance, alors qu'un nœud plie la fibre et l'affaiblit."
   ],
   "L86T": [
-    "Deux choix commencent pareil, et seule change la pièce au bout de la ligne : « une boucle de la même matière » ou un anneau."
+    "Deux choix commencent pareil, et seule change la pièce au bout de la ligne : la ligne se termine par un anneau, pièce distincte qui se loge dans le largueur, pas par une boucle du même câble."
   ],
   "L8B": [
     "Ce que l'instrument exploite pour fonctionner se distingue de l'information qu'il donne au pilote."
