@@ -1045,97 +1045,97 @@
     "Deux choix se ressemblent, « briefing de début » et « débriefing de fin » : le treuilleur fait le briefing pour fixer les procédures, alors que le débriefing ne figure pas dans son rôle, d'où aucun point."
   ],
   "S35B": [
-    "Deux éléments changent d'un choix à l'autre : le délai en jours et le destinataire de la déclaration."
+    "Deux éléments changent d'un choix à l'autre, le délai et le destinataire, et il faut les deux : la déclaration part vers la FFVL sous 5 jours, et c'est elle qui transmet à l'assureur."
   ],
   "S35T": [
-    "« Ne … que » tombe dès qu'un seul cas contraire existe, ici un seul autre devoir du treuilleur."
+    "« Ne … que » n'admet aucune exception : il suffit d'un autre devoir du treuilleur, choisir le lieu ou coordonner les personnes présentes, pour écarter ce choix."
   ],
   "S36B": [
-    "« Dans tous les cas » tombe dès qu'un seul cas contraire existe, ici une autre personne habilitée à déclarer."
+    "« Dans tous les cas » n'admet aucune exception : il suffit qu'une autre personne puisse déclarer, le pilote lui-même ou le moniteur pour son élève, pour écarter ce choix."
   ],
   "S37T": [
-    "« Se borne à » tombe dès qu'un seul cas contraire existe, ici un autre rôle du treuilleur.",
-    "« Le cas échéant » réserve l'action aux situations où elle s'impose, pas à toutes les séances."
+    "« Se borne à » n'admet aucune exception : il suffit d'un autre rôle, prévenir les autres usagers ou vérifier les zones actives, pour l'écarter.",
+    "« Le cas échéant » réserve le NOTAM aux séances qui l'exigent, ce qui rend ce choix recevable."
   ],
   "S38B": [
-    "Celui qui cause le dommage et celui qui rembourse ne sont pas forcément la même personne.",
-    "Une responsabilité civile est citée dans plusieurs choix, et tout tient à qui elle appartient, ici « le propriétaire de la voiture »."
+    "Celui qui cause le dommage n'est pas forcément celui qui paie : le pilote a causé le dégât, mais c'est sa responsabilité civile, son assurance, qui rembourse.",
+    "Une responsabilité civile apparaît dans plusieurs choix : tout tient à qui elle appartient, et celle du « propriétaire de la voiture » ne couvre que les dommages qu'il cause, pas ceux qu'il subit."
   ],
   "S38T": [
-    "« Aucun rôle » tombe dès qu'un seul cas contraire existe, ici une tâche de sécurité envers les personnes au sol."
+    "« Aucun rôle » n'admet aucune exception : il suffit d'une tâche de sécurité envers les personnes au sol, comme le périmètre autour du treuil, pour écarter ce choix."
   ],
   "S39B": [
-    "Avoir causé un dommage ne dit pas encore qui doit l'évaluer ni qui doit le régler sur place."
+    "Avoir causé un dommage ne dit pas qui l'évalue ni qui le paie : c'est le cultivateur qui estime ses pertes, et l'assurance de la FFVL qui règle, pas le pilote sur place."
   ],
   "S39T": [
-    "Deux choix ne diffèrent que par un chiffre : la durée du stage compacté, « 4 jours » ou six."
+    "Deux choix ne diffèrent que par un chiffre, « 4 jours » ou six : 10 h de théorie et 30 h de pratique ne tiennent pas en quatre jours, la formation compactée en dure six."
   ],
   "S3B": [
-    "« Certifiés » vise la dernière étape, pas celle où l'école valide la théorie et la pratique."
+    "« Certifiés » vise la dernière étape, l'enregistrement : l'école valide théorie et pratique, puis c'est le responsable régional de la formation qui certifie le brevet."
   ],
   "S40M": [
-    "« Proposer » une assurance n'est pas la même obligation que la « prendre »."
+    "« Proposer » une assurance n'est pas la même obligation que la « prendre » : pour le biplace, le pilote doit proposer à son passager une assurance individuelle accident, sans être obligé d'en souscrire une pour lui-même."
   ],
   "S41T": [
-    "Un avis et une autorisation sont deux démarches différentes, et la négation « n'est pas nécessaire » porte sur l'avis.",
-    "« Le cas échéant » réserve la démarche aux sites où d'autres usagers partagent la plateforme."
+    "Un avis et une autorisation sont deux démarches différentes, et la négation « n'est pas nécessaire » porte sur l'avis du maire, qui est bien exigé.",
+    "« Le cas échéant » réserve la démarche aux plateformes partagées avec d'autres usagers, ce qui rend ce choix recevable."
   ],
   "S42T": [
-    "L'assurance de l'activité elle-même se distingue de celle d'un matériel qui sert à la pratiquer, d'où le poids de « spécifique »."
+    "L'assurance de l'activité se distingue de celle d'un matériel : le contrat fédéral couvre déjà le Tracté, et seul le véhicule tracteur demande une couverture à part, pas l'activité, d'où le poids de « spécifique »."
   ],
   "S43M": [
-    "« Uniquement » tombe dès qu'un seul cas contraire existe, ici un port obligatoire sous le seuil de 5 m."
+    "« Uniquement » n'admet aucune exception : il suffit que le casque soit obligatoire même au sol, en école, pour écarter ce seuil de 5 m."
   ],
   "S43T": [
-    "Deux choix ne diffèrent que d'un mot : licencié « pratiquant » ou « non pratiquant »."
+    "Deux choix ne diffèrent que d'un mot, licencié « pratiquant » ou « non pratiquant » : c'est la licence pratiquant qui couvre l'encadrant, même s'il ne vole pas lui-même."
   ],
   "S44M": [
-    "Une obligation peut dépendre du type de vol, « en vol thermique », ou du cadre dans lequel on vole."
+    "Une obligation peut dépendre du type de vol ou du cadre : la FFVL impose le secours selon le cadre, école ou compétition, pas selon le type de vol comme « en vol thermique »."
   ],
   "S44T": [
-    "« Une assurance classique de véhicule » ne vise pas forcément une activité de treuillage."
+    "« Une assurance classique de véhicule » ne couvre pas forcément le treuillage : sans contrat adapté à cette activité, l'assureur peut refuser de garantir après un accident."
   ],
   "S45T": [
-    "Ici, « le vol » ne désigne pas l'activité aérienne, comme le montre « dégâts matériels » qui le précède."
+    "Ici, « le vol » veut dire le vol du matériel, comme le montre « dégâts matériels » qui le précède : une responsabilité civile couvre les dommages causés aux autres, pas la perte ou le vol de son propre treuil."
   ],
   "S46T": [
-    "« En aucun cas » tombe dès qu'un seul cas contraire existe, ici une condition qui ouvre le treuillage."
+    "« En aucun cas » n'admet aucune exception : il suffit d'une condition qui ouvre le treuillage, une assurance adaptée et un niveau équivalent au brevet initial, pour écarter ce choix."
   ],
   "S47B": [
-    "Le sens de la phrase compte : « les ballons doivent la priorité », c'est-à-dire qui cède à qui."
+    "Le sens de la phrase compte, « les ballons doivent la priorité » : un ballon dérive sans se diriger, il manœuvre moins bien qu'une aile, donc c'est l'aile qui lui cède le passage."
   ],
   "S47T": [
-    "« Strictement prohibée » tombe dès qu'un seul cas contraire existe, ici une condition qui ouvre cette pratique."
+    "« Strictement prohibée » n'admet aucune exception : la FFVL prévoit le cas du treuilleur étranger et ce qu'il doit prouver, ce qui suffit à écarter ce choix."
   ],
   "S48B": [
-    "Deux choix inversent la même phrase, ce qui suppose une priorité liée au type d'aile."
+    "Deux choix inversent la même phrase, comme si la priorité dépendait du type d'aile : entre deux planeurs ultra légers, ce sont les règles de croisement qui décident, les mêmes pour delta et parapente."
   ],
   "S48T": [
-    "Une seule dimension est citée, « un chemin de longueur suffisante », pour définir une piste de treuil."
+    "Une seule dimension, « un chemin de longueur suffisante », ne définit pas une piste de treuil : elle doit aussi être large, sans obstacle, et permettre de se poser si le câble casse."
   ],
   "S49B": [
-    "Deux choix ne diffèrent que d'un mot : « gauche » ou « droite »."
+    "Deux choix ne diffèrent que d'un mot, « gauche » ou « droite » : face à face, les deux ailes s'évitent par la droite, comme les voitures."
   ],
   "S4B": [
-    "L'énoncé vise « la partie pratique » du brevet, pas l'enregistrement final du brevet entier."
+    "L'énoncé vise « la partie pratique » du brevet, pas son enregistrement : c'est le directeur technique d'une école qui la valide, le responsable régional n'intervenant qu'ensuite."
   ],
   "S50B": [
-    "L'autre aile arrive par la droite, et la priorité à droite désigne l'une des deux ailes."
+    "L'autre aile arrive par la droite : la priorité à droite lui revient, donc c'est au pilote qui la voit arriver de céder. La taille des ailes ne compte pas."
   ],
   "S50T": [
-    "« Aucune démarche » tombe dès qu'un seul cas contraire existe, ici une seule formalité obligatoire."
+    "« Aucune démarche » n'admet aucune exception : il suffit d'une formalité obligatoire, l'accord du propriétaire ou la déclaration du site, pour écarter ce choix."
   ],
   "S51B": [
-    "« Loin du relief » change les règles du dépassement : la pente ne contraint plus le côté choisi."
+    "« Loin du relief » change les règles : sans pente pour bloquer un côté, l'aile peut doubler par la droite comme par la gauche, jamais par-dessus ou par-dessous."
   ],
   "S51T": [
-    "« Éventuellement » adoucit une pratique sans dire si elle est permise, même de temps en temps."
+    "« Éventuellement » adoucit une pratique sans la rendre permise : un treuil doit avoir un treuilleur dédié, qui ne fait rien d'autre, donc jamais le conducteur du véhicule."
   ],
   "S53B": [
-    "Deux choix ne diffèrent que d'un mot : la pente à « droite » ou à « gauche »."
+    "Deux choix ne diffèrent que d'un mot, pente à « droite » ou à « gauche » : on s'évite par la droite, et l'aile qui a la pente à sa droite ne peut pas s'écarter, donc elle passe en priorité."
   ],
   "S54B": [
-    "Le relief est à la gauche du pilote qui lit l'énoncé, et son côté change pour l'aile qui arrive en face."
+    "Le relief est à la gauche du pilote de l'énoncé, donc à la droite de l'aile qui arrive en face : c'est elle qui a la pente à sa droite et la priorité, l'autre s'écarte par la droite."
   ],
   "S54T": [
     "« Hors présence moniteur » : la condition ajoutée au début du choix pèse autant que la suite."
