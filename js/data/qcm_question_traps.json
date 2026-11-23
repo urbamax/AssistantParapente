@@ -382,96 +382,96 @@
     "Deux choix ne diffèrent que d'un mot, « la plus » ou « la moins » chargée : la charge augmente le taux de chute, donc l'aile la plus chargée monte moins vite."
   ],
   "E73M": [
-    "Dans un rapport, l'ordre compte : le poids placé en premier change tout."
+    "Dans un rapport, l'ordre compte : un facteur de charge de 2 en virage serré veut dire que le pilote se sent deux fois plus lourd, donc le poids apparent se place au-dessus du poids total."
   ],
   "E76M": [
-    "« Toujours » tombe dès qu'un seul cas contraire existe, et le mot revient ici dans trois choix."
+    "« Toujours » revient dans trois choix, et un seul cas contraire suffit à en écarter un : la vitesse de décrochage change avec la charge, une rafale fait décrocher sans toucher aux freins. Seule l'incidence de décrochage reste fixe."
   ],
   "E77B": [
-    "Deux choix sur l'incidence ne diffèrent que d'un mot : « trop faible » ou « trop forte »."
+    "Deux choix sur l'incidence ne diffèrent que d'un mot, « trop faible » ou « trop forte » : trop faible, l'aile ferme. Elle décroche quand l'air arrive trop cabré et ne suit plus le dessus de l'aile."
   ],
   "E78M": [
-    "La question porte sur l'origine de l'abattée « consécutive à un décrochage », pas sur la cause du décrochage lui-même."
+    "La question porte sur l'abattée « consécutive à un décrochage », pas sur ce qui a causé le décrochage : une erreur peut le provoquer, mais l'abattée vient ensuite de l'aile qui reprend sa vitesse."
   ],
   "E78T": [
-    "Un fait connu du vol libre, « comme en vol stabilisé non tracté », est appliqué à la treuillée et à la traction du câble."
+    "« Comme en vol stabilisé non tracté » plaque sur la treuillée une valeur du vol libre : le câble ajoute sa traction au poids, donc l'aile porte plus que son poids, et le facteur de charge dépasse 1."
   ],
   "E79M": [
-    "Les choix vont par paires qui ne diffèrent que d'un mot : « cabreur » ou « piqueur », « à cabrer » ou « à piquer »."
+    "Les choix vont par paires opposées, « cabreur » ou « piqueur », « à cabrer » ou « à piquer » : après un décrochage, l'aile a perdu sa vitesse et plonge vers l'avant pour la retrouver."
   ],
   "E79T": [
-    "Chaque choix parle soit de la « treuillée stabilisée », soit d'un effet transitoire."
+    "Chaque choix parle soit de la treuillée stabilisée, soit d'un moment passager : il faut savoir lequel. L'incidence ne monte que sur le coup, quand la traction augmente au décollage, puis revient au régime habituel."
   ],
   "E7V": [
-    "L'énoncé parle de la force aérodynamique entière, distincte de l'une de ses composantes."
+    "L'énoncé parle de la force aérodynamique entière, pas de la portance seule, qui est perpendiculaire au vent relatif : en vol stabilisé, cette force totale fait face au poids, à la verticale."
   ],
   "E80B": [
-    "Les choix vont par paires sur la portance et la traînée, et seul le sens de variation change."
+    "Les choix vont par paires, portance et traînée, et seul le sens change : au décrochage, l'air se décolle du dessus de l'aile en tourbillons, donc la portance chute et la traînée grimpe."
   ],
   "E81B": [
-    "Les trois choix ne diffèrent que par un mot de comparaison avec la vitesse du taux de chute mini."
+    "Les trois choix ne diffèrent que d'un mot de comparaison : le taux de chute mini se vole déjà lentement, près du décrochage, et ralentir encore mène au décrochage, à une vitesse plus basse."
   ],
   "E83M": [
-    "Les choix vont par paires qui ne diffèrent que d'un mot : « diminue » ou « augmente »."
+    "Les choix vont par paires, « diminue » ou « augmente » : un pilote plus lourd ou un virage serré chargent davantage l'aile, et une aile plus chargée vole plus vite en tout, décrochage compris."
   ],
   "E84M": [
-    "Chaque choix affirme deux choses, la vitesse et l'incidence, et les deux doivent tenir."
+    "Chaque choix affirme deux choses, la vitesse et l'incidence, et les deux doivent tenir : le décrochage arrive à une incidence propre à l'aile, et le virage, qui la charge plus, en relève la vitesse."
   ],
   "E85M": [
-    "Le mot « suivi » fixe un ordre entre ce qui vient avant et ce qui vient après le décrochage.",
-    "Deux choix sur l'incidence ne diffèrent que d'un mot : « augmentation » ou « diminution »."
+    "Le mot « suivi » fixe un ordre : la ressource vient avant ce décrochage, qui se produit pendant la remontée de l'aile, et c'est une abattée qui le suit.",
+    "Deux choix sur l'incidence ne diffèrent que d'un mot : décrocher, c'est dépasser une incidence limite, donc par une brusque augmentation. Une brusque diminution mène à la fermeture."
   ],
   "E87M": [
-    "Deux choix posent la même égalité, mais pas avec les mêmes forces de l'autre côté."
+    "Deux choix posent la même égalité, mais pas avec les mêmes forces : en vol tracté, la force aérodynamique équilibre le poids et la traction ensemble, pas la traction seule."
   ],
   "E8M": [
-    "La force ne suit pas forcément la vitesse au même rythme : tout dépend de la loi qui les relie."
+    "La force ne suit pas la vitesse au même rythme : elle varie avec son carré, donc tripler la vitesse multiplie la force par 3 × 3, pas par 3 ni par 3 × 3 × 3."
   ],
   "E9B": [
-    "Deux choix ne diffèrent que d'un mot : vitesse par rapport à « l'air » ou au « sol »."
+    "Deux choix ne diffèrent que d'un mot, vitesse par rapport à « l'air » ou au « sol » : les forces naissent de l'air qui passe sur l'aile, et le vent change la vitesse-sol sans rien changer à cet écoulement."
   ],
   "F10B": [
-    "« Conditions aérologiques » désigne l'air du jour, distinct des autres aspects de la prise en main de l'aile."
+    "« Conditions aérologiques » vise l'air du jour, mais chaque choix se juge sur la même idée : ne pas ajouter de nouveauté ou de difficulté à la découverte de l'aile. Les thermiques en ajoutent une."
   ],
   "F13BM": [
-    "L'énoncé restreint la question aux causes « liées à l'erreur humaine » : une cause d'accident ne suffit pas."
+    "L'énoncé limite la question aux causes « liées à l'erreur humaine » : un problème de matériel cause aussi des accidents, mais ce n'est pas une décision du pilote."
   ],
   "F17BM": [
-    "« Toutes » tombe dès qu'un seul cas contraire existe."
+    "« Toutes » n'admet aucune exception : une seule erreur d'un pilote expérimenté suffit à écarter ce choix, et elles arrivent, face à une situation nouvelle par exemple."
   ],
   "F1BM": [
-    "Deux choix disent « je vais sur site », et c'est ce qui accompagne cette décision qui les sépare."
+    "Deux choix disent « je vais sur site », et c'est ce qui accompagne la décision qui les sépare : y aller parce qu'un congé est posé, c'est le biais du coût déjà engagé. Y aller avec un plan B garde le choix de renoncer."
   ],
   "F20VBM": [
-    "L'énoncé cherche l'attitude « la plus dangereuse », et un défaut n'expose pas forcément au danger."
+    "L'énoncé cherche l'attitude « la plus dangereuse » : une prudence excessive peut faire renoncer à un bon vol, mais elle éloigne du danger. Le déni, lui, empêche de voir un risque, donc d'y répondre."
   ],
   "F21VBM": [
-    "Le mot « absolu » renforce une qualité sans la changer en défaut."
+    "Le mot « absolu » renforce le calme sans en faire un défaut : il ne faut pas le confondre avec l'indifférence, qui laisse la situation se dégrader sans réagir."
   ],
   "F24BM": [
-    "Une compétence reconnue peut être déformée par un complément comme « sans GPS »."
+    "Un complément peut déformer une compétence reconnue : naviguer est utile, mais « sans GPS » n'en fait pas une exigence, le GPS étant au contraire un outil de navigation du pilote."
   ],
   "F25VBM": [
-    "Le moment précisé dans chaque choix compte : « avant le vol » ou « pendant le vol »."
+    "Le moment précisé dans chaque choix compte, « avant le vol » ou « pendant le vol » : il faut se demander si l'aide calme vraiment, comme la respiration, ou si elle énerve ou distrait, comme le café ou la musique en vol."
   ],
   "F29V": [
-    "« Uniquement » tombe dès qu'un seul cas contraire existe."
+    "« Uniquement » n'admet aucune exception : il suffit d'une seule information utile en plus de l'intuition, comme la météo du jour demandée à l'école, pour écarter ce choix."
   ],
   "F2B": [
-    "Chaque choix vise un moment : le niveau d'aujourd'hui ou celui « quand j'aurai progressé »."
+    "Chaque choix vise un moment, le niveau d'aujourd'hui ou celui « quand j'aurai progressé » : l'aile se choisit pour le niveau qu'on a, pas pour celui qu'on espère avoir."
   ],
   "F30V": [
-    "L'énoncé précise ce que le pilote n'a pas fait avant d'arriver : « sans avoir approfondi le bulletin météo »."
+    "L'énoncé précise que le bulletin n'a pas été approfondi : il faut donc compenser sur place, en observant le ciel et en échangeant avec d'autres pilotes, au lieu de partir sur un léger vent de face constaté à un instant."
   ],
   "F33B": [
-    "L'énoncé oppose l'habitude au jour même : « aujourd'hui je suis particulièrement bas ».",
-    "« Quoi qu'il arrive » fige une décision et ne laisse rien au pilote si elle échoue."
+    "L'énoncé oppose l'habitude au jour même, « aujourd'hui je suis particulièrement bas » : la transition habituelle ne passe plus, il faut un terrain sûr à portée, déjà connu.",
+    "« Quoi qu'il arrive » fige une décision : si le retour au décollage échoue en étant déjà bas, il ne reste plus de solution."
   ],
   "F34M": [
-    "Avoir « mes instruments de vol avec ma carte » ne dit rien de ce que les règles permettent au parapente dans un nuage."
+    "Avoir « mes instruments de vol avec ma carte » ne change rien aux règles : le parapente vole à vue, et entrer dans un nuage lui est interdit, quel que soit l'équipement."
   ],
   "F36M": [
-    "L'énoncé précise « sans vache possible », ce qui pèse sur chaque choix à travers le terrain sous la transition."
+    "« Sans vache possible » décide : sous la transition, aucun champ pour se poser, donc partir bas pour suivre le groupe ne laisse aucune marge. Faire le plafond d'abord garde cette marge."
   ],
   "F37M": [
     "Un choix en deux phrases peut changer de sens à la seconde, ici « les kilomètres parcourus sont la priorité »."
