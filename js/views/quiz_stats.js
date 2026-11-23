@@ -19,6 +19,7 @@ import { explanationHtml, optionExplanationHtml, optionExplanations, optionOutco
 import { readCloselyHtml } from './quiz_read_closely.js';
 import { choiceIndex } from '../services/answer_log.js';
 import { buildRevisionAxes } from '../services/revision_axes.js';
+import { countTrapFalls } from '../services/trap_stats.js';
 import { floorPercent1, formatPercent } from '../utils/text_utils.js';
 import { buildRevisionAxesDashboardHtml } from './quiz_axes_html.js';
 import {
@@ -31,6 +32,7 @@ import {
     activeThemeFilters,
     questionTheme,
     buildFilteredTrainingButtonHtml,
+    buildTrapStatsHtml,
     buildQuestionAnswersHtml,
     filterStatsQuestionEntries,
 } from './quiz_stats_html.js';
@@ -470,6 +472,19 @@ export class QuizStatsBase extends BaseView {
                 ? filterStatsQuestionEntries(this, { levelQs, levelQuestionEntries, stats }).map(([code]) => code)
                 : [];
             const filteredTrainingButtonHtml = buildFilteredTrainingButtonHtml(this._statsFilteredCodes.length);
+            // Spec 064 : « Vos pièges », sur les questions du niveau affiché.
+            const trapStatsSectionHtml = QuizService.hasTrapTypes()
+                ? `<div id="stats-traps" style="margin-top:48px;">
+                <h3 class="library-section-header" style="border:none; margin-bottom:16px;">${tq('stats.trapsTitle')}</h3>
+                ${buildTrapStatsHtml(
+                    countTrapFalls(
+                        levelQs,
+                        stats.questions,
+                        Object.fromEntries(levelQs.map((q) => [q.code, QuizService.getTrapTypes(q.code)])),
+                    ),
+                )}
+            </div>`
+                : '';
             container.innerHTML = `
             ${successGaugeHtml}
             ${officialTheoryBannerHtml}
@@ -480,7 +495,7 @@ export class QuizStatsBase extends BaseView {
                 ${filteredTrainingButtonHtml}
             </div>
 
-            <div style="margin-top:48px;">
+            ${trapStatsSectionHtml}<div style="margin-top:48px;">
                 <h3 class="library-section-header" style="border:none; margin-bottom:24px;">${tq('stats.distributionTitle')}</h3>
                 ${distributionHtml}
             </div>

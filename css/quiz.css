@@ -1981,3 +1981,86 @@ abbr.qcm-acronym:focus-visible {
     line-height: 1.4;
     color: var(--text-secondary);
 }
+
+/* Spec 064 : section « Vos pièges » des statistiques. */
+.stats-traps-intro,
+.stats-traps-empty {
+    margin: 0 0 16px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.stats-traps-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+}
+
+.stats-traps-row {
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--accent-gold);
+    background: var(--bg-card);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stats-traps-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.stats-traps-name {
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.stats-traps-count {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+}
+
+.stats-traps-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border-color);
+    overflow: hidden;
+}
+
+.stats-traps-bar > span {
+    display: block;
+    height: 100%;
+    background: var(--accent-gold);
+}
+
+.stats-traps-desc {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+}
+
+.stats-traps-train {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(234, 179, 8, 0.45);
+    background: rgba(234, 179, 8, 0.12);
+    color: var(--accent-gold);
+    color: light-dark(#a16207, var(--accent-gold));
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+}

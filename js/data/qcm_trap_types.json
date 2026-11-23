@@ -1,0 +1,5502 @@
+{
+  "A100B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "A101M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "A102B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "A105B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "A106B": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "A107B": [
+    {
+      "type": "cadre",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "A108B": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "A109B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "A110B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "A11V": [
+    {
+      "type": "absolu",
+      "choices": [
+        0,
+        1,
+        2
+      ]
+    }
+  ],
+  "A12B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2,
+        3
+      ]
+    }
+  ],
+  "A13B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        3
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "A14B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        3
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "A15B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A16M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A17B": [
+    {
+      "type": "inversion",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "A20B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "A21V": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A24B": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A25B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A27B": [
+    {
+      "type": "cadre",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "A28B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "A29B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "A30B": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "A31B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "A34B": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    },
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A35B": [
+    {
+      "type": "inversion",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "A36M": [
+    {
+      "type": "inversion",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "A38M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        2
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        3
+      ]
+    }
+  ],
+  "A39M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "A3V": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "A43B": [
+    {
+      "type": "inversion",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "A44B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "A45B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "A46B": [
+    {
+      "type": "valeur",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "A47M": [
+    {
+      "type": "inversion",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "A49B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "A4B": [
+    {
+      "type": "inversion",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A51B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A52B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A53B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "A54B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "A55V": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "A57B": [
+    {
+      "type": "valeur",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "A59B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        2,
+        3
+      ]
+    }
+  ],
+  "A60B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "A61B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "A62B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "A63B": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A64B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A65B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "A66M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A67M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "A68B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A6B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "A70B": [
+    {
+      "type": "inversion",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A72B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "A73B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "A75B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A76M": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "A77B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "A78V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "A81T": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "A81V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "A83V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A86V": [
+    {
+      "type": "cadre",
+      "choices": [
+        1,
+        3
+      ]
+    }
+  ],
+  "A87V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "A88V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "A89V": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "A91V": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "A92V": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A93V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "A94B": [
+    {
+      "type": "inversion",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "A96B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "A98B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "A99B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "E10B": [
+    {
+      "type": "inversion",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "E11B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "E12B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "E13B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "E17B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2,
+        3
+      ]
+    }
+  ],
+  "E17T": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "E20M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "E26B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2,
+        3
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "E27B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2,
+        3
+      ]
+    }
+  ],
+  "E32M": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "E33V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "E34V": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "E36V": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "E37B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        2
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "E38B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "E39B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "E41M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        3
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        3
+      ]
+    }
+  ],
+  "E42M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        3
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        3
+      ]
+    }
+  ],
+  "E43M": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "E44M": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "E45M": [
+    {
+      "type": "cadre",
+      "choices": [
+        1,
+        2
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "E46M": [
+    {
+      "type": "cadre",
+      "choices": [
+        1,
+        2
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "E47B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "E48M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        3
+      ]
+    }
+  ],
+  "E49B": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "E50V": [
+    {
+      "type": "autre",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "E53B": [
+    {
+      "type": "autre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "E55B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "E56B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "E57B": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        2,
+        3
+      ]
+    }
+  ],
+  "E58B": [
+    {
+      "type": "inversion",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "E5V": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "E60M": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "E61B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "E62M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "E63B": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "E64B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "E66B": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "E67M": [
+    {
+      "type": "inversion",
+      "choices": [
+        0,
+        1,
+        2
+      ]
+    }
+  ],
+  "E68B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "E69B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "E6V": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "E71M": [
+    {
+      "type": "inversion",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "E72M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "E73M": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "E76M": [
+    {
+      "type": "absolu",
+      "choices": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "E77B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "E78M": [
+    {
+      "type": "cadre",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "E78T": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "E79M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        3
+      ]
+    }
+  ],
+  "E79T": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1,
+        2
+      ]
+    }
+  ],
+  "E7V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "E80B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "E81B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "E83M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "E84M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "E85M": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        2,
+        3
+      ]
+    }
+  ],
+  "E87M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "E8M": [
+    {
+      "type": "valeur",
+      "choices": [
+        0,
+        3
+      ]
+    }
+  ],
+  "E9B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "F10B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1,
+        3
+      ]
+    }
+  ],
+  "F13BM": [
+    {
+      "type": "cadre",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "F17BM": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "F1BM": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        3
+      ]
+    }
+  ],
+  "F20VBM": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "F21VBM": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "F24BM": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "F25VBM": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "F29V": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "F2B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "F30V": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "F33B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "F34M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "F36M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "F37M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "F38BM": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        3
+      ]
+    }
+  ],
+  "F3B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "F6B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "F8VBM": [
+    {
+      "type": "un_mot",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "G10V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        3
+      ]
+    }
+  ],
+  "G11M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "G12V": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "G13B": [
+    {
+      "type": "inversion",
+      "choices": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "G14B": [
+    {
+      "type": "inversion",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "G15M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "G16B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "G17M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "G18M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "G19V": [
+    {
+      "type": "inversion",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "G1M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "G20M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "inversion",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "G21B": [
+    {
+      "type": "inversion",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "G22B": [
+    {
+      "type": "valeur",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "G23B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "G24B": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "G25B": [
+    {
+      "type": "inversion",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "G26B": [
+    {
+      "type": "inversion",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "G27B": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "G28M": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "G29M": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "G2B": [
+    {
+      "type": "inversion",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "G30M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        3
+      ]
+    }
+  ],
+  "G31V": [
+    {
+      "type": "inversion",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "G32M": [
+    {
+      "type": "valeur",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "G33M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "G34B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "G35M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "G3M": [
+    {
+      "type": "inversion",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "G5B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2,
+        3
+      ]
+    }
+  ],
+  "G6B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "G7B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "G8B": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "G9B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "L10M": [
+    {
+      "type": "inversion",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "L11M": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "L12M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "L13M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "L14B": [
+    {
+      "type": "inversion",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "L15B": [
+    {
+      "type": "inversion",
+      "choices": [
+        0,
+        1
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "L16B": [
+    {
+      "type": "inversion",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "L18V": [
+    {
+      "type": "cadre",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "L19B": [
+    {
+      "type": "valeur",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "L1B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "L2B": [
+    {
+      "type": "inversion",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "L4B": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "L58T": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "L60T": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        2,
+        3
+      ]
+    }
+  ],
+  "L64T": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "L65T": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "L67T": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "L6B": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "L7B": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "L85T": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "L86T": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "L8B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "L9B": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "N11M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "N12M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "N13B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "N14V": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "N17M": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "N19V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "N24M": [
+    {
+      "type": "inversion",
+      "choices": [
+        0,
+        1,
+        2
+      ]
+    }
+  ],
+  "N28B": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "N29M": [
+    {
+      "type": "valeur",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "N31M": [
+    {
+      "type": "inversion",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "N34M": [
+    {
+      "type": "valeur",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "N35B": [
+    {
+      "type": "inversion",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "N36B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "N37B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "N38V": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "N39M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "N40B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "N41B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "N43B": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "N44B": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "N45B": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "N46M": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "N47M": [
+    {
+      "type": "valeur",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "N48B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "N49B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "N49M": [
+    {
+      "type": "valeur",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "N4B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "N50B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "N51V": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "N52B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "N53M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "N54B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "N57V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "N58V": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "N59B": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "N62V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "N6B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "N7V": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "N9V": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "P10BM": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "P11V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "P12BM": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2,
+        3
+      ]
+    }
+  ],
+  "P13V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "P14BM": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "P15V": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "P16BM": [
+    {
+      "type": "autre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "P18BM": [
+    {
+      "type": "valeur",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "P19V": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "P1V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "inversion",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "P20BM": [
+    {
+      "type": "cadre",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "P21V": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "P22BM": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "P24BM": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "P26BM": [
+    {
+      "type": "absolu",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "P27V": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "P28BM": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    },
+    {
+      "type": "valeur",
+      "choices": [
+        4
+      ]
+    }
+  ],
+  "P2BM": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "P30V": [
+    {
+      "type": "valeur",
+      "choices": [
+        2,
+        3
+      ]
+    }
+  ],
+  "P3V": [
+    {
+      "type": "absolu",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "P4BM": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "P5V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "P8BM": [
+    {
+      "type": "absolu",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "S100B": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "S101B": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "S102B": [
+    {
+      "type": "absolu",
+      "choices": [
+        2,
+        3
+      ]
+    }
+  ],
+  "S104V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S105B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "S106V": [
+    {
+      "type": "cadre",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "S108V": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S111V": [
+    {
+      "type": "absolu",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "S115V": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S116B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "S117B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S118B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S11M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        3
+      ]
+    }
+  ],
+  "S11T": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "S120B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S121B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S122B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S123B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S124B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S125B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S126B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S127B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S128B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S129B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S12M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S131B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S132B": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "valeur",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S134B": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S136B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S14B": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S15B": [
+    {
+      "type": "inversion",
+      "choices": [
+        0,
+        1
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S15T": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "S16B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1,
+        2
+      ]
+    }
+  ],
+  "S17B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "S18B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S18T": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S19V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "S1B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "S20T": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        3
+      ]
+    }
+  ],
+  "S21M": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S21T": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "S22M": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S22T": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "S24M": [
+    {
+      "type": "absolu",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "S24T": [
+    {
+      "type": "inversion",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S25T": [
+    {
+      "type": "inversion",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S26B": [
+    {
+      "type": "valeur",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "S27M": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S28T": [
+    {
+      "type": "inversion",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S29B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S29T": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S30T": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S31M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S32T": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S33T": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "S34T": [
+    {
+      "type": "un_mot",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "S35B": [
+    {
+      "type": "valeur",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "S35T": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "S36B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S37T": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S38B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "inversion",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S38T": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S39B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "S39T": [
+    {
+      "type": "valeur",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "S3B": [
+    {
+      "type": "inversion",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "S40M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "S41T": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S42T": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "S43M": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S43T": [
+    {
+      "type": "un_mot",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "S44M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S44T": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S45T": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S46T": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S47B": [
+    {
+      "type": "inversion",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S47T": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S48B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "S48T": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S49B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S4B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "S50B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S50T": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S51B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "S51T": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S53B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "S54B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "S54T": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S55B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "S56B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S56T": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S57B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S57T": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1,
+        3
+      ]
+    }
+  ],
+  "S58M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S59M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "S60M": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S61M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S62M": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S64M": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S65M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S67M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S68M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "S69M": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S6M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "S70M": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S72M": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "valeur",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S73B": [
+    {
+      "type": "valeur",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "S74B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S75B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S76B": [
+    {
+      "type": "valeur",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S76T": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S77B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S77T": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "S78M": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S79M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "S7M": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S80M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S81M": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S82M": [
+    {
+      "type": "cadre",
+      "choices": [
+        1,
+        3
+      ]
+    }
+  ],
+  "S82T": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S83B": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S83T": [
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "S84B": [
+    {
+      "type": "valeur",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S85B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S86M": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "S88B": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S89M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S8M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "S90M": [
+    {
+      "type": "cadre",
+      "choices": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "S91V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S92V": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "S93V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "S95V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "S9M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "U11B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "U12B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "U13B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U16M": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U17B": [
+    {
+      "type": "valeur",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "U19M": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "U20M": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "U21M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U24V": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "U25M": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "U26B": [
+    {
+      "type": "inversion",
+      "choices": [
+        1,
+        3
+      ]
+    }
+  ],
+  "U27V": [
+    {
+      "type": "valeur",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "U28V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1,
+        3
+      ]
+    }
+  ],
+  "U29B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U30B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U31B": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "U32B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "U33B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "U34B": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U36M": [
+    {
+      "type": "cadre",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "U37M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        3
+      ]
+    }
+  ],
+  "U39V": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "U3M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U40M": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "U41B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        3
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "U42M": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "U43B": [
+    {
+      "type": "inversion",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "U44B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "U45B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U46B": [
+    {
+      "type": "absolu",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "U47M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "U49V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "U4M": [
+    {
+      "type": "valeur",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "U50M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "U52V": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "U53B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "U54B": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U55B": [
+    {
+      "type": "inversion",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "U57B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "U58B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "U59B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "U60M": [
+    {
+      "type": "valeur",
+      "choices": [
+        1,
+        2
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "U61B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U62B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U63B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U64B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U65V": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U66B": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U67B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U68M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "U69B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "U72B": [
+    {
+      "type": "inversion",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "U74V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U75B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "U77B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "U78B": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U79B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "U7B": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "U80B": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "U80T": [
+    {
+      "type": "un_mot",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "U81V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U82V": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U83B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "U84B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "U85B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "U86V": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        3
+      ]
+    }
+  ],
+  "U87M": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "U89B": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U8M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "U90V": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U91B": [
+    {
+      "type": "cadre",
+      "choices": [
+        3
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "U92B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "U93M": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "U9M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "W10B": [
+    {
+      "type": "valeur",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W11B": [
+    {
+      "type": "inversion",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "W12B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W14V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "W15V": [
+    {
+      "type": "inversion",
+      "choices": [
+        3
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W16V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "W17B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W18V": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        3
+      ]
+    }
+  ],
+  "W19V": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "W1V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "W20V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "W21V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "W22V": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "W23B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W24V": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        2,
+        3
+      ]
+    }
+  ],
+  "W25V": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W26V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "W28B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W29B": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W30B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "W31V": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W32M": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "W33B": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "W34B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "W35B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "W36B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2,
+        3
+      ]
+    }
+  ],
+  "W38M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "W39B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "W3V": [
+    {
+      "type": "valeur",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "W40B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "W41B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "W42B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "W43B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    },
+    {
+      "type": "autre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "W44B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        3
+      ]
+    }
+  ],
+  "W45M": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "W46M": [
+    {
+      "type": "inversion",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "W47M": [
+    {
+      "type": "inversion",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "W48M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "W49M": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "W4B": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "W50M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "W51B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W52V": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "W53V": [
+    {
+      "type": "valeur",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "W54B": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W55V": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "W56B": [
+    {
+      "type": "valeur",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W58M": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "W59B": [
+    {
+      "type": "inversion",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "inversion",
+      "choices": [
+        2,
+        3
+      ]
+    }
+  ],
+  "W5B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "W60M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "W61V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        2,
+        3
+      ]
+    }
+  ],
+  "W62B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "W63V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    },
+    {
+      "type": "un_mot",
+      "choices": [
+        2,
+        3
+      ]
+    }
+  ],
+  "W64B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W66B": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "W67B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2,
+        3
+      ]
+    }
+  ],
+  "W69V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        2
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "W6M": [
+    {
+      "type": "inversion",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "W70V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "W71V": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "W72V": [
+    {
+      "type": "un_mot",
+      "choices": [
+        1,
+        2
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "W73B": [
+    {
+      "type": "cadre",
+      "choices": [
+        2
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W74M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "W75B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "W76M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "W78M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1,
+        2
+      ]
+    }
+  ],
+  "W79B": [
+    {
+      "type": "cadre",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "W7V": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W81B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    }
+  ],
+  "W82B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "W83M": [
+    {
+      "type": "absolu",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W84M": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W85B": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "W86M": [
+    {
+      "type": "absolu",
+      "choices": [
+        1
+      ]
+    },
+    {
+      "type": "inversion",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "W87M": [
+    {
+      "type": "un_mot",
+      "choices": [
+        0,
+        1
+      ]
+    },
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    }
+  ],
+  "W88M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1,
+        2
+      ]
+    }
+  ],
+  "W89M": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        1,
+        2
+      ]
+    }
+  ],
+  "W8B": [
+    {
+      "type": "valeur",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "W90M": [
+    {
+      "type": "inversion",
+      "choices": [
+        0,
+        1,
+        2
+      ]
+    }
+  ],
+  "W91M": [
+    {
+      "type": "inversion",
+      "choices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "W92M": [
+    {
+      "type": "inversion",
+      "choices": [
+        1,
+        2
+      ]
+    }
+  ],
+  "W93M": [
+    {
+      "type": "cadre",
+      "choices": [
+        1
+      ]
+    }
+  ],
+  "W94M": [
+    {
+      "type": "absolu",
+      "choices": [
+        2
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        0
+      ]
+    }
+  ],
+  "W95B": [
+    {
+      "type": "cadre",
+      "choices": [
+        0,
+        2
+      ]
+    }
+  ],
+  "W9B": [
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        2
+      ]
+    },
+    {
+      "type": "vrai_hors_sujet",
+      "choices": [
+        3
+      ]
+    }
+  ]
+}
