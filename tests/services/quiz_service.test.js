@@ -557,3 +557,47 @@ describe('QuizService - Choix cochés (choicePicks)', () => {
         expect(QuizService.state.currentQcmSelection.has(q2.choices[1])).toBe(true);
     });
 });
+
+describe('QuizService - Série en cours (streak)', () => {
+    beforeEach(() => {
+        StorageService.set(StorageService.KEYS.QCM_STATS, { themes: {}, questions: {} });
+        StorageService.set(StorageService.KEYS.EXAM_HISTORY, { exams: [] });
+        QuizService.state.qcmSessionData = [];
+        QuizService.state.examResults = [];
+    });
+
+    it('updateStats incrémente streak au-delà de 10 (sans plafonner à MASTERY_WINDOW)', () => {
+        const q = { code: 'F20VBM', theme: 'Facteurs humains', choices: [{ text: 'ok', pts: 6 }] };
+        for (let i = 0; i < 15; i++) {
+            QuizService.updateStats(q, true, q.choices);
+        }
+        const qStat = QuizService.getPersistentStats().questions.F20VBM;
+        expect(qStat.total).toBe(15);
+        expect(qStat.correct).toBe(15);
+        expect(qStat.recent).toHaveLength(10);
+        expect(qStat.streak).toBe(15);
+
+        // Ré-évaluation d'une réponse déjà juste (previous.isCorrect = true) ne double-compte pas
+        QuizService.updateStats(q, true, q.choices, { isCorrect: true, selected: q.choices });
+        expect(QuizService.getPersistentStats().questions.F20VBM.streak).toBe(15);
+
+        // Une erreur remet la série à 0
+        QuizService.updateStats(q, false, []);
+        expect(QuizService.getPersistentStats().questions.F20VBM.streak).toBe(0);
+    });
+
+    it('getPersistentStats répare une série bloquée à 10 quand toutes les tentatives sont justes', () => {
+        StorageService.set(StorageService.KEYS.QCM_STATS, {
+            totalQuestions: 15,
+            totalCorrect: 15,
+            themes: { 'Facteurs humains': { total: 15, correct: 15 } },
+            questions: {
+                F20VBM: { total: 15, correct: 15, streak: 10, recent: Array(10).fill(1) },
+            },
+        });
+
+        const healed = QuizService.getPersistentStats();
+        expect(healed.questions.F20VBM.streak).toBe(15);
+        expect(StorageService.get(StorageService.KEYS.QCM_STATS).questions.F20VBM.streak).toBe(15);
+    });
+});
