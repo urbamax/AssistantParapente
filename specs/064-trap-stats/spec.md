@@ -12,6 +12,10 @@
 
 Audit 6 found 694 traps in 567 questions and, for each, the choices it touches (the ones a learner who misses the trap gets wrong). Spec 061 shows one sentence per trap after an answer; spec 063 lets the learner train on trap questions. The answer log already keeps, per question, which choices were ticked at each attempt. Nothing yet tells the learner which *kind* of trap catches them: absolute words, two choices one word apart, the frame set by the statement…
 
+## Amendment 2026-11-23
+
+Owner: « Dans Axes de révision, pas dans stats !! ». The « Vos pièges » section moves from the statistics page to the top of the revision axes page (same content, same « S'entraîner » buttons, same level filter). Where this spec says « statistics page », read « revision axes page ».
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - See which kinds of traps catch me (Priority: P1)

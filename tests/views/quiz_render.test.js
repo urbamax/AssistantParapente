@@ -13,7 +13,7 @@ const INDEX = readFileSync('index.html', 'utf8');
 const SCREENS = (() => {
     const tpl = document.createElement('template');
     tpl.innerHTML = INDEX.slice(INDEX.indexOf('<div id="qcm-setup-screen"'));
-    return ['qcm-setup-screen', 'qcm-screen', 'stats-screen', 'qcm-bank-screen']
+    return ['qcm-setup-screen', 'qcm-screen', 'stats-screen', 'revision-axes-screen', 'qcm-bank-screen']
         .map((id) => tpl.content.getElementById(id).outerHTML)
         .join('')
         .replace(/\s(src|href)="https?:[^"]*"/g, '');
@@ -542,8 +542,8 @@ describe('read-closely box does not linger on the next question', () => {
     });
 });
 
-// Spec 064 : section « Vos pièges » des statistiques et entraînement par type.
-describe('« Vos pièges » in the statistics (spec 064)', () => {
+// Spec 064 : section « Vos pièges », en tête des axes de révision, et entraînement par type.
+describe('« Vos pièges » in the revision axes (spec 064)', () => {
     const TYPES = {
         A1V: [{ type: 'absolu', choices: [1] }],
         E2VB: [{ type: 'un_mot', choices: [0] }],
@@ -568,7 +568,7 @@ describe('« Vos pièges » in the statistics (spec 064)', () => {
     it('lists the types met, most falls first, with « N sur M »', () => {
         // A1V : le choix piégé (index 1, négatif) coché deux fois sur deux ; E2VB : bonne réponse oubliée une fois sur deux.
         withAnswers({ A1V: [0b011, 0b010], E2VB: [0b001, 0b000] });
-        QuizView.renderStats();
+        QuizView.renderRevisionAxes();
         const rows = [...section().querySelectorAll('[data-trap-type]')];
         expect(rows.map((r) => r.getAttribute('data-trap-type'))).toEqual(['absolu', 'un_mot']);
         expect(rows[0].textContent).toContain('Mots absolus');
@@ -579,12 +579,20 @@ describe('« Vos pièges » in the statistics (spec 064)', () => {
         );
     });
 
-    it('invites to train when no trap was met, and is absent without type data', () => {
+    it('is on the revision axes page, not in the statistics', () => {
+        withAnswers({ A1V: [0b011] });
         QuizView.renderStats();
+        expect(section()).toBeNull();
+        QuizView.renderRevisionAxes();
+        expect(document.getElementById('revision-axes-content').firstElementChild.id).toBe('stats-traps');
+    });
+
+    it('invites to train when no trap was met, and is absent without type data', () => {
+        QuizView.renderRevisionAxes();
         expect(section().textContent).toContain('Questions à piège');
         expect(section().querySelectorAll('[data-trap-type]')).toHaveLength(0);
         QuizService.hasTrapTypes.mockReturnValue(false);
-        QuizView.renderStats();
+        QuizView.renderRevisionAxes();
         expect(section()).toBeNull();
     });
 
