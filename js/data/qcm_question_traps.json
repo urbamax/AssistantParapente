@@ -1145,101 +1145,101 @@
     "Le relief est à la gauche du pilote qui lit l'énoncé, et son côté change pour l'aile qui arrive en face."
   ],
   "S54T": [
-    "« Hors présence moniteur » : la condition ajoutée au début du choix pèse autant que la suite."
+    "La condition placée en tête, « hors présence moniteur », pèse autant que la suite : sans moniteur, un treuilleur ne treuille que des pilotes ayant au moins le brevet initial, jamais des débutants."
   ],
   "S55B": [
-    "L'énoncé place le relief « à leur droite », ce qui fixe le côté resté libre pour dépasser."
+    "L'énoncé place le relief « à leur droite » : il ne reste que la gauche pour dépasser, et passer à droite coincerait l'aile de devant contre la pente."
   ],
   "S56B": [
-    "Être le premier dans l'ascendance donne le choix du sens de rotation, distinct de la question de savoir qui « est prioritaire »."
+    "Être le premier donne le choix du sens de rotation, pas la priorité : une aile qui monte par-dessous a la priorité, et personne ne peut s'approprier une ascendance."
   ],
   "S56T": [
-    "Le début du choix décrit une mission réelle, et la fin ajoute « sans se soucier du pilote »."
+    "Le début décrit une mission réelle, transmettre ce qu'il voit, et la fin ajoute « sans se soucier du pilote » : tout le rôle du starter est justement centré sur le pilote, ce qui écarte ce choix."
   ],
   "S57B": [
-    "L'autre aile est « 50 m en dessous », et tout tient à qui était là le premier et au poids de la hauteur.",
-    "Une bonne intention, « pour pouvoir la surveiller », ne suffit pas à justifier une manœuvre."
+    "L'autre aile est « 50 m en dessous », mais elle était là la première : c'est elle qui fixe le sens de rotation, quelle que soit sa hauteur.",
+    "Une bonne intention, « pour pouvoir la surveiller », ne justifie pas de tourner à contre-sens : les deux ailes se croiseraient de face."
   ],
   "S57T": [
-    "La qualification « treuil fixe delta » précise un treuil et un aéronef, et les deux comptent dans chaque choix."
+    "La qualification « treuil fixe delta » précise un treuil et un aéronef, et il faut les deux : seul un delta sur treuil fixe est couvert, changer l'un ou l'autre en sort."
   ],
   "S58M": [
-    "Le choix parle du régime d'un pilote de vol libre, qui ne change pas avec la visibilité.",
-    "« Tous les aéronefs » : un mot absolu peut tenir quand c'est l'espace lui-même qui fixe la règle."
+    "Le choix sur la mauvaise visibilité parle d'un pilote de vol libre, dont le régime ne change pas : il vole à vue, et entrer dans un nuage lui est interdit, pas permis en IFR.",
+    "« Tous les aéronefs » est absolu, mais tient ici : c'est l'espace lui-même, au-dessus du niveau 195, qui impose le vol aux instruments."
   ],
   "S59M": [
-    "Deux choix ne diffèrent que d'une lettre : VFR ou IFR."
+    "Deux choix ne diffèrent que d'une lettre, VFR ou IFR : un planeur ultra léger vole toujours à vue, en voyant et en étant vu, sans les instruments qu'exige le vol IFR."
   ],
   "S60M": [
-    "« Contrôlé » ne veut pas dire fermé à tous, car le contrôle vise certains trafics et certains régimes de vol."
+    "« Contrôlé » ne veut pas dire fermé à tous : le contrôle vise certains trafics, et la classe E, contrôlée pour le seul vol aux instruments, reste ouverte au vol libre, contrairement à C et D."
   ],
   "S61M": [
-    "Non contrôlé et « non classé » sont deux idées distinctes : un espace libre peut porter une classe."
+    "Non contrôlé et « non classé » sont deux idées distinctes : l'espace libre porte une classe, la G."
   ],
   "S62M": [
-    "« Tous » tombe dès qu'un seul cas contraire existe, ici un espace contrôlé fermé au vol libre.",
-    "« Peut être autorisée localement » décrit une possibilité, pas une règle générale."
+    "« Tous » n'admet aucune exception : un seul espace contrôlé fermé au vol libre, comme une classe D, suffit à écarter ce choix.",
+    "« Peut être autorisée localement » décrit une possibilité, pas une règle générale, ce qui rend ce choix recevable."
   ],
   "S64M": [
-    "« Jamais » est suivi de « sauf dérogation », et le choix se lit jusqu'au bout."
+    "« Jamais » est suivi de « sauf dérogation » : le choix se lit jusqu'au bout. La classe D est fermée au vol libre, et ni la radio ni le vol à vue n'y ouvrent l'accès."
   ],
   "S65M": [
-    "La classe E est contrôlée pour un certain trafic, et la radio « obligatoire » vise une aile de vol libre."
+    "La classe E est contrôlée pour le vol aux instruments seulement : pour une aile de vol libre, aucune radio n'est exigée, il suffit de respecter les règles du vol à vue."
   ],
   "S67M": [
-    "Une zone qui change de classe suit la règle de la classe en vigueur à ce moment-là, d'où le poids de « peut être classé E ».",
-    "« Jamais » tombe dès qu'un seul cas contraire existe."
+    "Une zone qui change de classe suit la règle de la classe en vigueur : certaines zones D passent en E à certaines périodes, d'où le poids de « peut être classé E ».",
+    "« Jamais » n'admet aucune exception : une seule zone D déclassable en E suffit à l'écarter."
   ],
   "S68M": [
-    "Tous ces espaces sont contrôlés, et la question porte sur ceux qui descendent « jusqu'à la surface de la terre »."
+    "Tous ces espaces sont contrôlés, la question porte sur ceux qui descendent « jusqu'à la surface » : la CTR, autour de l'aérodrome, part du sol, alors que TMA et voies aériennes commencent plus haut."
   ],
   "S69M": [
-    "Deux choix sur la zone D ne diffèrent que d'un mot : « tout aéronef » ou « uniquement » les PUL."
+    "Deux choix sur la zone D ne diffèrent que d'un mot, « tout aéronef » ou « uniquement » les PUL : une zone dangereuse l'est pour tous, pas pour une seule catégorie."
   ],
   "S6M": [
-    "Avec passager, « gratuitement » ou contre paiement : un seul mot sépare deux cadres très différents."
+    "Avec passager, « gratuitement » ou contre paiement : un seul mot sépare deux cadres. La qualification fédérale permet le biplace bénévole, un baptême payant demande un diplôme professionnel."
   ],
   "S70M": [
-    "Dangereuse ne veut pas dire interdite, et la lettre D impose ses propres conditions d'entrée."
+    "Dangereuse ne veut pas dire interdite : la lettre D désigne une zone dangereuse, où l'on peut entrer sans autorisation. Les zones interdites sont les P, les réglementées les R."
   ],
   "S72M": [
-    "La question se place au-dessus du seuil de 900 m mer ou 300 m sol, et les minima changent de part et d'autre.",
-    "Un chiffre familier comme « 300 m » peut désigner une autre grandeur : distance aux nuages ou visibilité."
+    "La question se place au-dessus du seuil de 900 m mer ou 300 m sol, où les minima changent : il faut 5 km de visibilité, 8 km au-dessus du niveau 100.",
+    "Un chiffre familier comme « 300 m » désigne une autre grandeur : c'est la distance verticale aux nuages, pas une visibilité."
   ],
   "S73B": [
-    "La question porte sur le vol « à l'intérieur des nuages », pas sur les minima de visibilité liés à l'altitude."
+    "La question porte sur le vol « à l'intérieur des nuages », pas sur les minima liés à l'altitude : aucune hauteur ne l'autorise, puisque le vol libre se fait toujours à vue."
   ],
   "S74B": [
-    "L'énoncé est négatif : chaque choix se lit comme une chose interdite au pilote.",
-    "Le jour aéronautique fixe une heure limite, et un décollage « 30 min après le coucher du soleil » se situe par rapport à elle."
+    "L'énoncé est négatif : chaque choix se lit comme une interdiction. Sans assurance de responsabilité civile aérienne, on ne décolle pas.",
+    "Le jour aéronautique s'arrête 30 min après le coucher du soleil : décoller à cette heure-là ou rester en vol au-delà, c'est voler de nuit, ce qui est interdit."
   ],
   "S75B": [
-    "L'énoncé se place en classe E ou au-dessus du seuil en classe G, et les distances aux nuages y changent."
+    "L'énoncé se place en classe E ou au-dessus du seuil en classe G : il faut alors rester à 1 500 m des nuages à l'horizontale et 300 m à la verticale, les petites distances valant pour la zone basse."
   ],
   "S76B": [
-    "Le seuil se calcule avec le relief, le plus haut entre 900 m mer et 300 m au-dessus du sol."
+    "Le seuil se calcule avec le relief, le plus haut entre 900 m mer et 300 m au-dessus du sol : ici 1 000 + 300 = 1 300 m. En dessous il suffit de rester hors des nuages, donc on peut monter jusqu'à leur base, 1 200 m."
   ],
   "S76T": [
-    "« Ne … que » transforme une condition nécessaire en condition unique, et tombe s'il en manque une."
+    "« Ne … que » transforme une condition nécessaire en condition unique : il suffit d'une autre démarche exigée, l'avis des services de l'aviation civile pour ce câble qui gêne la navigation, pour l'écarter."
   ],
   "S77B": [
-    "L'énoncé se place sous le seuil de 900 m mer ou 300 m sol, où les minima ne sont pas ceux du dessus."
+    "L'énoncé se place sous le seuil de 900 m mer ou 300 m sol : là, il suffit de 1 500 m de visibilité et de rester hors des nuages. Les 8 km et les grandes distances aux nuages valent au-dessus."
   ],
   "S77T": [
-    "Une règle générale du vol libre, « l'emport d'une radio n'est pas obligatoire », peut changer pendant une séance de treuil."
+    "Une règle générale peut changer dans un cadre précis : la radio n'est pas obligatoire en vol libre, mais en séance de treuil tous les intervenants en ont une, et le treuilleur vérifie la liaison."
   ],
   "S78M": [
-    "« Tous » tombe dès qu'un seul cas contraire existe, ici un aérodrome qui accepte les PUL."
+    "« Tous » n'admet aucune exception : un seul aérodrome qui accepte les planeurs ultra légers, civil et non contrôlé par exemple, suffit à écarter ce choix."
   ],
   "S79M": [
-    "L'énoncé précise que le terrain est « non contrôlé », et ce statut décide de ce qui est permis."
+    "L'énoncé précise que le terrain est « non contrôlé » : rien n'y interdit de se poser, il faut seulement s'intégrer au circuit des planeurs qui y volent."
   ],
   "S7M": [
-    "« Ne … qu'après » pose une condition obligatoire, et tout tient à ce que le BPC en soit une."
+    "« Ne … qu'après » pose une condition obligatoire, et elle tient : la formation biplace exige le brevet de pilote confirmé. À l'inverse, « réservée aux moniteurs » ajoute une limite qui n'existe pas."
   ],
   "S80M": [
-    "Chaque valeur a sa référence : au-dessus de la mer ou « m/sol », au-dessus du sol.",
-    "« Dans la plupart des cas » laisse place aux exceptions, et une règle qui en a peut rester générale."
+    "Chaque valeur a sa référence : un niveau de vol se compte au-dessus de la mer, et FL 115, soit 11 500 pieds, fait environ 3 500 m, pas une hauteur au-dessus du sol.",
+    "« Dans la plupart des cas » laisse place aux exceptions, Alpes et Pyrénées, ce qui rend ce choix recevable."
   ],
   "S81M": [
     "« Ne … qu'après un an » ajoute une condition de durée, qui ne tient que si elle existe dans le règlement."
