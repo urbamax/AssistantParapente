@@ -50,4 +50,14 @@ describe('question traps data (spec 061)', () => {
     it('no semicolon and no straight double quote', () => {
         expect(sentences.filter(([, s]) => s.includes(';') || s.includes('"'))).toEqual([]);
     });
+
+    // Réécriture du 2026-11-22 (rewrite-plan.md) : une phrase qui ne fait que nommer le piège, sans dire
+    // comment le trancher sur la question, est refusée.
+    it('no sentence is only a hollow formula naming the trap', () => {
+        const HOLLOW = [
+            /^« [^»]+ » tombe dès qu'un seul cas contraire existe(, [^:]*)?\.$/,
+            /^Deux choix ne diffèrent que d'un mot : [^:]*« [^»]+ » ou « [^»]+ »[^:]*\.$/,
+        ];
+        expect(sentences.filter(([, s]) => HOLLOW.some((re) => re.test(s)))).toEqual([]);
+    });
 });
