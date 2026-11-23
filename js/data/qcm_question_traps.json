@@ -1435,104 +1435,104 @@
     "« Opposée » porte sur la place occupée sur le cercle, distincte du sens de rotation."
   ],
   "U62B": [
-    "« Jamais » tombe dès qu'un seul cas contraire existe.",
-    "Un nuage change de type en se développant, et son aspect du moment ne suffit pas forcément à juger le risque."
+    "« Jamais » n'admet aucune exception : il suffit d'un cumulus dont l'ascendance se renforce pour écarter ce choix.",
+    "Un nuage change de type en grossissant : un cumulus peut devenir congestus, donc son aspect du moment ne suffit pas à juger le risque d'aspiration."
   ],
   "U63B": [
-    "Ce choix associe deux abris, « du soleil et du vent », et un seul décide de la naissance d'un thermique."
+    "Ce choix associe deux abris, « du soleil et du vent », et c'est le soleil qui décide : un thermique naît d'un sol chauffé, donc un versant à l'ombre n'en donne pas, abrité du vent ou non."
   ],
   "U64B": [
-    "Un jour d'orage annoncé, des ascendances qui « commencent à s'élargir » peuvent être une aubaine ou un signal.",
-    "Observer est prudent, mais ce choix dit « attends », ce qui fixe le moment où le pilote quitte l'air."
+    "Un jour d'orage annoncé, des ascendances qui « commencent à s'élargir » sont un signal, pas une aubaine : c'est le moment de se poser, avant que l'orage n'arrive.",
+    "Observer est prudent, mais ce choix dit « attends » des signes de vent : les rafales d'orage peuvent arriver d'un coup, il faut se poser avant."
   ],
   "U65V": [
-    "« Toujours » tombe dès qu'un seul cas contraire existe."
+    "« Toujours » n'admet aucune exception : il suffit d'un gros cumulus qui grossit en nuage d'orage, ou qui cache un autre appareil, pour l'écarter."
   ],
   "U66B": [
-    "« De toute façon » vise les effets du nuage au sol, même pour un pilote qui se pose tout de suite."
+    "« De toute façon » vise les effets du nuage au sol : même en se posant aussitôt, les rafales et la grêle d'un cumulonimbus peuvent rendre l'atterrissage difficile."
   ],
   "U67B": [
-    "« Toujours » tombe dès qu'un seul cas contraire existe.",
-    "« Toute » est un mot fort, qui suppose qu'une rotation rapide efface tous les repères."
+    "« Toujours sans danger » n'admet aucune exception : un seul risque suffit à l'écarter, et des 360° serrés en ont plusieurs, forte charge, perte de repères, voile noir.",
+    "« Toute » est un mot fort, mais la rotation rapide fait vraiment défiler le paysage au point de faire perdre ses repères, ce qui rend ce choix recevable."
   ],
   "U68M": [
-    "Deux choix ne diffèrent que d'un mot : « avant » ou « pendant » l'approche."
+    "Deux choix ne diffèrent que d'un mot, « avant » ou « pendant » l'approche : l'approche demande toute l'attention du pilote, donc l'échauffement des jambes se fait avant."
   ],
   "U69B": [
-    "Face à un « vent de face de 15 km/h », rester longtemps en l'air ne suffit pas forcément à atteindre le terrain.",
-    "Accélérer face au vent est une chose, « aussi rapidement que possible » en est une autre."
+    "Face à un vent de 15 km/h, rester plus longtemps en l'air ne fait pas avancer : le vent reprend chaque minute gagnée.",
+    "Accélérer face au vent est une chose, « aussi rapidement que possible » en est une autre : la bonne vitesse se cherche avec des repères au sol, ni trop lente ni à fond."
   ],
   "U72B": [
-    "L'autre aile est placée en dessous, et en approche la priorité dépend de cette position."
+    "L'autre aile est placée en dessous, et en approche la plus basse a la priorité : c'est à l'aile du dessus de lui céder le passage et de la surveiller."
   ],
   "U74V": [
-    "Deux choix ne diffèrent que d'un mot : la finale commence en « entrée » ou en « bout » de terrain.",
-    "« Tout dépend des conditions » sonne prudent, comme si la finale face au vent variait."
+    "Deux choix ne diffèrent que d'un mot, finale en « entrée » ou en « bout » de terrain : commencer en entrée laisse toute la longueur du terrain pour se poser.",
+    "« Tout dépend des conditions » sonne prudent, mais la finale se fait toujours face au vent : seule la place des virages s'adapte."
   ],
   "U75B": [
-    "Le 360° est fait « en prise de terrain », avec peu de hauteur restante et des ailes autour.",
-    "« Tout à fait » est une formule forte, à peser face au peu de marge qui reste si près du sol."
+    "Le 360° est fait « en prise de terrain », près du sol et au milieu d'autres ailes : on y perd ses repères et on gêne les autres, sans hauteur pour rattraper une erreur.",
+    "« Tout à fait » est une formule forte, justifiée ici par le peu de marge qui reste si près du sol."
   ],
   "U77B": [
-    "Sous le plan de descente prévu, ce qui manque peut être du temps ou de la hauteur, et tout tient à cette différence."
+    "Sous le plan de descente prévu, ce qui manque est de la hauteur, pas du temps : il faut raccourcir le chemin, S plus courts ou ligne droite. Accélérer ferait perdre de la hauteur encore plus vite."
   ],
   "U78B": [
-    "« Ne dépend que » tombe dès qu'un seul cas contraire existe."
+    "« Ne dépend que » n'admet aucune exception : il suffit que le vent ou l'incidence change la pente de finale pour l'écarter, et les deux la changent."
   ],
   "U79B": [
-    "« Légèrement » rend la manœuvre rassurante, alors que près du sol la marge avant le décrochage est faible."
+    "« Légèrement » rend la manœuvre rassurante, mais parachuter, c'est freiner l'aile jusqu'au bord du décrochage : près du sol, aucune hauteur pour rattraper. Mieux vaut allonger le trajet ou se relever."
   ],
   "U7B": [
-    "« Jamais » tombe dès qu'un seul cas contraire existe."
+    "« Jamais » n'admet aucune exception : il suffit d'un seul accident par vent fort pour l'écarter, et ce vol captif peut verrouiller l'aile et plaquer le pilote au sol."
   ],
   "U80B": [
-    "La cible « descend » dans le champ de vision, ce qui situe la trajectoire au-dessus ou avant elle."
+    "La cible « descend » dans le champ de vision : la trajectoire passe donc au-dessus d'elle, et l'aile se posera au-delà. Être court se verrait à l'inverse, cible qui monte."
   ],
   "U80T": [
-    "Deux choix se ressemblent : la tension se relâche « progressivement » ou « brutalement »."
+    "Deux choix se ressemblent, tension relâchée « progressivement » ou « brutalement » : relâcher peu à peu aide le pilote à se recentrer, alors qu'un relâchement brutal provoque une abattée."
   ],
   "U81V": [
-    "La ressource existe, et tout tient à ce qu'elle rende ou non la prise de vitesse « dangereuse »."
+    "La ressource existe, mais ne rend pas la prise de vitesse « dangereuse » : elle sert à l'arrondi, et cette vitesse garde une réserve face au gradient près du sol."
   ],
   "U82V": [
-    "« Tous » est un mot fort, qui porte sur ce que perd une aile lente face à n'importe quelle perturbation."
+    "« Tous » est un mot fort, mais il dit ce que perd une aile lente : sans réserve de vitesse, la moindre perturbation près du sol la trouve sans marge, ce qui rend ce choix recevable."
   ],
   "U83B": [
-    "Incidence et vitesse/air ne varient pas forcément dans le même sens, chaque grandeur se juge à part."
+    "Incidence et vitesse/air ne varient pas dans le même sens : le gradient fait baisser le vent relatif, donc la vitesse/air diminue pendant que l'incidence augmente."
   ],
   "U84B": [
-    "« Parfois » et « en cas de pilotage inadapté » limitent le danger annoncé."
+    "« Parfois » et « en cas de pilotage inadapté » limitent le danger annoncé, ce qui rend ce choix recevable. À l'inverse, « n'a pas d'effet » ignore que le gradient fait chuter la vitesse/air."
   ],
   "U85B": [
-    "Le freinage se fait « par vent fort », où le réflexe du posé en air calme ne s'applique pas forcément."
+    "Le freinage se fait « par vent fort », où le réflexe du posé en air calme ne vaut pas : la finale se fait bras hauts, sans grand freinage, puis on recule vers l'aile pour la vider."
   ],
   "U86V": [
-    "La question demande les causes « principales » des collisions, pas tout ce qui nuit au vol."
+    "La question demande les causes « principales » des collisions, pas tout ce qui nuit au vol : alcool ou téléphone dégradent l'attention, mais les collisions viennent surtout du regard mal porté et des ailes trop serrées."
   ],
   "U87M": [
-    "« Un peu fatigué » sonne anodin, alors que le vol prévu est inhabituel."
+    "« Un peu fatigué » sonne anodin, mais le vol prévu est déjà inhabituel : la fatigue ajoute une difficulté de plus, alors qu'il ne faut en ajouter qu'une seule à la fois."
   ],
   "U89B": [
-    "« Quel que soit mon niveau » fait dépendre le plaisir sous une aile de ses seuls résultats."
+    "« Quel que soit mon niveau » fait dépendre le plaisir des résultats de l'aile en compétition : le plaisir vient d'une aile que l'on maîtrise, adaptée à son niveau."
   ],
   "U8M": [
-    "« Très tôt » porte sur le moment où les thermiques apparaissent, pas sur leur existence."
+    "« Très tôt » porte sur l'heure d'apparition des thermiques : une inversion nette les retarde le matin, ce qui donne des vols calmes, pas agités ni propices à la performance."
   ],
   "U90V": [
-    "Le côté du relief, « sur ma droite », fixe la priorité le long d'une pente.",
-    "Deux choix ne diffèrent que par leur fin, dont « j'impose ma priorité »."
+    "Le relief « sur ma droite » fixe la priorité : le pilote qui a la pente à sa droite passe en premier, quel que soit son niveau.",
+    "Deux choix ne diffèrent que par leur fin : une priorité se donne mais ne s'impose pas, donc face à un pilote qui continue, mieux vaut faire demi-tour."
   ],
   "U91B": [
-    "« N'arrivent pas qu'aux autres » porte une négation qui dit le contraire de « qu'aux autres ».",
-    "« Raisonnablement » change le sens d'« accroître les risques », appliqué à une nouveauté à la fois."
+    "« N'arrivent pas qu'aux autres » porte une négation qui dit le contraire de « qu'aux autres » : admettre que l'erreur peut m'arriver rend prudent, donc n'accroît pas le risque.",
+    "« Raisonnablement » change le sens d'« accroître les risques » : une seule nouveauté à la fois en ajoute un peu, ce qui reste raisonnable."
   ],
   "U92B": [
-    "« Un peu dedans » sonne anodin, alors que la visibilité disparaît dès l'entrée dans le nuage.",
-    "Une boussole ou un GPS indiquent où l'on est, sans montrer ce qui est autour."
+    "« Un peu dedans » sonne anodin, mais la visibilité disparaît dès l'entrée dans le nuage, et le vol dans les nuages est interdit.",
+    "Une boussole ou un GPS disent où l'on est, sans montrer ce qui est autour : ils ne remplacent pas la vue."
   ],
   "U93M": [
-    "La condition « si je suis sûr » paraît rassurante, alors qu'une ascendance tout le long ne se garantit pas forcément.",
-    "« Toujours » n'est pas un défaut ici, car il porte sur la possibilité de rejoindre un terrain de fortune."
+    "La condition « si je suis sûr » paraît rassurante, mais aucune ascendance ne se garantit tout le long d'une crête : sans terrain où se poser, une seule faiblesse suffit à mettre en danger.",
+    "« Toujours » ne pose pas problème ici : il porte sur une précaution, garder un terrain de fortune à portée, qui doit justement valoir tout le vol."
   ],
   "U9M": [
     "Deux choix parlent de la fin des ascendances, et seul le rythme change, « immédiat » ou « progressif ».",
