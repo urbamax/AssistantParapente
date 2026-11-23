@@ -283,104 +283,103 @@
     "« Régulier en force et direction » écarte les rafales : la question porte sur un vent constant, sans à-coups."
   ],
   "E38B": [
-    "Un « fort vent arrière » établi n'est pas une rafale : l'aile vole dans une masse d'air qui se déplace tout entière."
+    "« Fort vent arrière » décrit un vent établi, pas une rafale : il emporte d'un bloc l'aile et l'air qui l'entoure, donc rien ne change dans l'air, ni force ni incidence. Seul le trajet au-dessus du sol change."
   ],
   "E39B": [
-    "Le sens du vent, « vent arrière », par rapport à la trajectoire décide du calcul."
+    "Le sens du vent décide du calcul : un vent « arrière » pousse l'aile dans son sens de marche, donc il s'ajoute à la vitesse-air, 35 + 10 km/h. Le retrancher serait le calcul d'un vent de face."
   ],
   "E41M": [
-    "Le mot « transitoirement » vise l'effet immédiat de la rafale, avant que l'aile retrouve son équilibre.",
-    "Deux choix sur l'incidence ne diffèrent que d'un mot : « diminution » ou « augmentation »."
+    "« Transitoirement » demande l'effet immédiat de la rafale, avant le nouvel équilibre : l'air arrive moins vite sur l'aile, donc les forces baissent sur le coup.",
+    "Deux choix sur l'incidence ne diffèrent que d'un mot : la rafale arrière retire de la vitesse horizontale au vent relatif, qui arrive alors plus incliné sur l'aile. L'incidence augmente."
   ],
   "E42M": [
-    "Le mot « transitoirement » vise l'effet immédiat de la rafale, avant que l'aile retrouve son équilibre.",
-    "Deux choix sur l'incidence ne diffèrent que d'un mot : « augmentation » ou « diminution »."
+    "« Transitoirement » demande l'effet immédiat de la rafale, avant le nouvel équilibre : l'air arrive plus vite sur l'aile, donc les forces augmentent sur le coup.",
+    "Deux choix sur l'incidence ne diffèrent que d'un mot : la rafale de face ajoute de la vitesse horizontale au vent relatif, qui arrive alors plus à plat sur l'aile. L'incidence diminue."
   ],
   "E43M": [
-    "Le mot « transitoirement » vise l'entrée dans l'ascendance, pas l'aile une fois stabilisée."
+    "« Transitoirement » vise l'entrée dans l'ascendance : l'air qui monte frappe l'aile par en dessous et incline le vent relatif, donc l'incidence augmente sur le coup, avant de revenir une fois l'aile stabilisée."
   ],
   "E44M": [
-    "Le mot « transitoirement » vise l'entrée dans la descendance, pas l'aile une fois stabilisée."
+    "« Transitoirement » vise l'entrée dans la descendance : l'air qui descend accompagne l'aile dans sa chute et rend le vent relatif plus rasant, donc l'incidence baisse sur le coup, avant de revenir."
   ],
   "E45M": [
-    "Le mot « transitoirement » vise l'instant où l'aile entre dans l'ascendance, avant tout retour à l'équilibre.",
-    "Deux choix sur l'incidence ne diffèrent que d'un mot : « diminue » ou « augmente »."
+    "« Transitoirement » vise l'instant de l'entrée, avant tout retour à l'équilibre : la rafale montante augmente les forces sur l'aile, qui est poussée vers le haut.",
+    "Deux choix sur l'incidence ne diffèrent que d'un mot : l'air qui monte frappe l'aile par en dessous, ce qui incline le vent relatif et fait croître l'incidence."
   ],
   "E46M": [
-    "Le mot « transitoirement » vise l'instant où l'aile entre dans la descendance, avant tout retour à l'équilibre.",
-    "Deux choix sur l'incidence ne diffèrent que d'un mot : « augmente » ou « diminue »."
+    "« Transitoirement » vise l'instant de l'entrée, avant tout retour à l'équilibre : la rafale descendante diminue les forces sur l'aile, qui abat vers le bas.",
+    "Deux choix sur l'incidence ne diffèrent que d'un mot : l'air qui descend rend le vent relatif plus rasant, ce qui fait baisser l'incidence."
   ],
   "E47B": [
-    "« Par rapport à l'air ascendant » prend la masse d'air pour référence, pas le sol."
+    "« Par rapport à l'air ascendant » prend la masse d'air pour référence, pas le sol : sans moteur, l'aile descend toujours dans l'air qui l'entoure. Elle ne monte, vue du sol, que si l'air monte plus vite."
   ],
   "E48M": [
-    "« Régulière » décrit le vol installé dans l'ascendance, pas l'instant où l'aile y entre."
+    "« Régulière » décrit le vol installé dans l'ascendance, pas l'entrée : l'air monte d'un bloc avec l'aile, donc à commandes égales l'aile vole dans cet air comme en air calme, même vitesse, même incidence."
   ],
   "E49B": [
-    "La question porte sur « la finesse-sol », mesurée par rapport au terrain, pas sur la finesse de l'aile dans l'air."
+    "La question porte sur « la finesse-sol », mesurée par rapport au terrain : l'air qui descend fait perdre plus de hauteur pour la même distance au sol, ce qui la dégrade."
   ],
   "E50V": [
-    "Deux mots différents, comme vent relatif et « la trajectoire », peuvent désigner la même droite."
+    "Deux mots différents désignent ici la même droite : le vent relatif suit la trajectoire, en sens contraire, donc les deux donnent le même angle avec l'aile."
   ],
   "E53B": [
-    "« Brider » une aile a un sens précis, qui désigne une action particulière sur l'aile."
+    "« Brider » a un sens précis : c'est freiner l'aile, qui ralentit, donc son incidence augmente. Pour l'accélérateur, c'est l'inverse : il la fait baisser."
   ],
   "E55B": [
-    "Le verbe « s'incline » vise le mouvement qui incline l'aile, pas le virage entier."
+    "« S'incline » vise le seul mouvement qui penche l'aile sur le côté, pas le virage entier : c'est le roulis. Le lacet la fait pivoter, le tangage la bascule d'avant en arrière."
   ],
   "E56B": [
-    "La question porte sur le « poids apparent », celui que l'aile doit porter en virage, pas sur le poids total."
+    "La question porte sur le « poids apparent », celui que l'aile porte en virage : l'effet centrifuge s'ajoute au poids, comme dans un manège, donc il dépasse le poids total."
   ],
   "E57B": [
-    "Dans un rapport, l'ordre compte : la grandeur placée en premier change tout.",
-    "Le suffixe « sol » fixe la référence : les vitesses sont relevées par rapport au terrain."
+    "Dans un rapport, l'ordre compte : une finesse donne la distance par mètre perdu, donc l'horizontal se place en premier.",
+    "Le suffixe « sol » fixe la référence : les vitesses sont relevées par rapport au terrain, alors que la vitesse de vol, le taux de chute et le rapport portance sur traînée se mesurent dans l'air."
   ],
   "E58B": [
-    "Dans un rapport, l'ordre compte : la force placée en premier change tout.",
-    "Un rapport de distances se relève au sol, et la masse d'air dans laquelle il est mesuré compte."
+    "Dans un rapport, l'ordre compte : une finesse est un nombre plus grand que 1, ce qui place la portance au-dessus de la traînée.",
+    "Un rapport de distances seul ne dit pas dans quel air il est mesuré : la finesse-air suppose un air sans mouvement, condition que ce choix ne précise pas."
   ],
   "E5V": [
-    "« Légèrement » rend plausible un écart de forces dans un vol pourtant dit stabilisé."
+    "« Légèrement » rend plausible un petit écart, mais le vol est dit « stabilisé » : vitesse et trajectoire constantes demandent des forces qui s'équilibrent exactement."
   ],
   "E60M": [
-    "« Toujours » tombe dès qu'un seul cas contraire existe.",
-    "Une précision comme « en air calme » peut changer la valeur d'un choix."
+    "« Toujours » n'admet aucune exception : il suffit d'un peu de vent pour que la finesse-sol s'écarte de la finesse-air, ce qui écarte ce choix.",
+    "La précision « en air calme » rend un choix recevable : sans vent, la distance au sol sur la hauteur perdue donne bien la finesse-air."
   ],
   "E61B": [
-    "La question porte sur « la finesse-air », celle de l'aile dans l'air, pas sur la finesse-sol."
+    "La question porte sur « la finesse-air », celle de l'aile dans l'air : ni le vent ni la charge ne changent sa valeur maximale, qui demande de voler plus vite qu'au taux de chute mini."
   ],
   "E62M": [
-    "Deux choix sur l'angle de plané ne diffèrent que d'un mot : « grand » ou « petit »."
+    "Deux choix ne diffèrent que d'un mot, angle de plané « grand » ou « petit » : une trajectoire peu inclinée parcourt plus de distance pour la même hauteur, donc la finesse est élevée."
   ],
   "E63B": [
-    "« Jamais » tombe dès qu'un seul cas contraire existe.",
-    "« Toujours » tombe dès qu'un seul cas contraire existe."
+    "« Jamais » et « toujours » n'admettent aucune exception : un vent arrière suffit à faire varier la finesse-sol et à la rendre supérieure à la finesse-air, ce qui écarte les deux."
   ],
   "E64B": [
-    "Les choix ne diffèrent que par deux détails : le sens de variation et le sens du vent, « arrière » ou de face."
+    "Les choix changent deux détails, le sens de variation et le sens du vent : il faut les lire ensemble. Un vent qui pousse dans le sens de marche allonge la distance au sol, donc la finesse-sol augmente."
   ],
   "E66B": [
-    "Dans un rapport, l'ordre compte : la grandeur placée en premier change tout.",
-    "Le numérateur compte : le « poids du pilote » seul n'est pas le poids de tout l'ensemble."
+    "Dans un rapport, l'ordre compte : la charge alaire se lit en kg par m², donc le poids est au-dessus de la surface.",
+    "Le numérateur compte : le « poids du pilote » seul oublie l'aile, la sellette et le matériel, alors que la charge alaire porte sur le poids total volant."
   ],
   "E67M": [
-    "L'aile est prise à « un pilote plus léger » : c'est sous un poids plus lourd qu'elle va voler."
+    "L'aile est prise à « un pilote plus léger » : elle volera donc plus chargée, et une charge plus forte augmente toutes ses vitesses, celle du décrochage comprise."
   ],
   "E68B": [
-    "Les choix vont par paires qui ne diffèrent que d'un mot : « plus vite » ou « moins vite »."
+    "Les choix vont par paires opposées, « plus vite » ou « moins vite » : une aile plus chargée voit toutes ses vitesses augmenter, à l'horizontale comme à la verticale."
   ],
   "E69B": [
-    "L'énoncé parle d'un « fort » accroissement, ce qui renvoie à ce qu'une grosse surcharge fait subir à la structure."
+    "« Fort » accroissement est le mot qui décide pour la structure : plus de poids par m² tend davantage suspentes et tissu, ce qui déforme l'aile en plus d'augmenter ses vitesses."
   ],
   "E6V": [
-    "« Exactement » est un mot fort, qui ne tient que si la situation exige une égalité stricte."
+    "« Exactement » est un mot fort, mais la situation l'exige : à vitesse et trajectoire constantes, aucune force ne reste non compensée. Un écart, même petit, ferait accélérer ou dévier l'aile."
   ],
   "E71M": [
-    "Deux choix emploient les mêmes mots, « vitesse » et « incidence », mais pas à la même place."
+    "Deux choix emploient les mêmes mots, « vitesse » et « incidence », à des places échangées : le décrochage arrive à une incidence propre à l'aile, et c'est la vitesse qui change avec la charge."
   ],
   "E72M": [
-    "L'altitude atteinte au bout du compte se distingue de la rapidité avec laquelle chaque aile y parvient.",
-    "Deux choix ne diffèrent que d'un mot : l'aile « la plus » ou « la moins » chargée."
+    "L'altitude finale se distingue de la rapidité pour y arriver : la même masse d'air porte les deux ailes jusqu'au même plafond, seul le temps de montée change.",
+    "Deux choix ne diffèrent que d'un mot, « la plus » ou « la moins » chargée : la charge augmente le taux de chute, donc l'aile la plus chargée monte moins vite."
   ],
   "E73M": [
     "Dans un rapport, l'ordre compte : le poids placé en premier change tout."
