@@ -1,99 +1,97 @@
 {
   "A100B": [
-    "La question vise le pic de température de l'air, pas l'instant où le soleil est au plus haut."
+    "Midi solaire est l'heure du soleil au plus haut, pas celle de l'air le plus chaud : l'air continue de se réchauffer tant qu'il reçoit plus qu'il ne perd, d'où un pic décalé dans l'après-midi."
   ],
   "A101M": [
-    "« La base des cumulus » peut marquer la fin de la montée ou seulement le début de la condensation."
+    "Une limite visible n'est pas forcément un arrêt : à la base des cumulus, la vapeur commence à condenser, mais l'air continue de monter dans le nuage."
   ],
   "A102B": [
-    "Deux choix parlent du vent : c'est sa force, « très fort » ou « moyenne », qui change son effet."
+    "Le vent revient dans deux choix avec une force différente : pour chacun, se demander si l'air chauffé au sol garde le temps de chauffer avant de se détacher. Trop fort, le vent le disperse."
   ],
   "A105B": [
-    "La brise de pente et le thermique qui s'en détache ne vont pas au même endroit, d'où le poids de « loin du relief »."
+    "« Loin du relief » est le détail qui décide : la brise de pente colle à la pente qui la crée, seul le thermique qui s'en détache s'éloigne du relief."
   ],
   "A106B": [
-    "« Toujours » tombe dès qu'un seul cas contraire existe."
+    "« Toujours » n'admet aucune exception, donc un seul cas contraire suffit à l'écarter : ici, le vent incline les thermiques, qui ne montent pas tous à la verticale."
   ],
   "A107B": [
-    "L'énoncé dit « peut », et un choix tourné à la négative décrit peut-être un cas qui existe."
+    "L'énoncé dit « peut » : chaque choix se teste comme une possibilité, pas comme une règle. Un thermique sans aucun nuage, par air sec, existe bien : c'est le thermique bleu."
   ],
   "A108B": [
-    "« Ne … que » tombe dès qu'un seul cas contraire existe."
+    "« Ne … que » enferme le thermique bleu dans l'air stable : un seul cas en air instable suffit à écarter ce choix, et c'est justement l'air instable qui fait les thermiques."
   ],
   "A109B": [
-    "Les trois choix parlent du « soir » : c'est le sens du mouvement de l'air qui les sépare."
+    "Les trois choix se passent « le soir », donc le moment ne départage rien : c'est le sens de l'air qui tranche, descendant pour les brises qui s'inversent, montant pour la restitution."
   ],
   "A110B": [
-    "Ces choix mêlent un lieu et un moment, et c'est surtout le moment de la journée qui compte."
+    "Les choix mêlent un lieu et un moment, mais la restitution dépend de l'heure : le sol rend le soir la chaleur stockée dans la journée, où qu'il soit dans la vallée."
   ],
   "A11V": [
-    "Trois choix finissent par « seulement », qui enferme chaque nuage dans un seul étage."
+    "« Seulement » enferme chaque nuage dans un étage : il suffit que l'un des deux déborde de son étage pour écarter ces trois choix, et les deux s'étendent sur plusieurs étages."
   ],
   "A12B": [
-    "Deux choix ne diffèrent que d'un mot : ascendance « thermique » ou « dynamique »."
+    "« Thermique » et « dynamique » nomment deux causes d'ascendance : « orographique » renvoie au relief, donc à l'air que le vent force à monter le long de la pente, l'ascendance dynamique."
   ],
   "A13B": [
-    "Deux choix ne diffèrent que d'un mot : « stables » ou « instables ».",
-    "Deux choix ne diffèrent que d'un mot : « horizontalement » ou « verticalement »."
+    "Deux paires de choix s'opposent mot pour mot, « stables » ou « instables », « horizontalement » ou « verticalement » : dans chaque paire, un seul peut convenir.",
+    "Pour trancher, partir du nom : « stratus » veut dire étalé, un nuage en couche, typique d'un air stable qui freine la montée."
   ],
   "A14B": [
-    "Deux choix ne diffèrent que d'un mot : « stables » ou « instables ».",
-    "Deux choix ne diffèrent que d'un mot : « verticalement » ou « horizontalement »."
+    "Deux paires de choix s'opposent mot pour mot, « stables » ou « instables », « verticalement » ou « horizontalement » : dans chaque paire, un seul peut convenir.",
+    "Pour trancher, partir du nom : « cumulus » veut dire amas, un nuage qui bourgeonne en hauteur parce que l'air instable laisse monter les bulles chaudes."
   ],
   "A15B": [
-    "Deux affirmations ne diffèrent que par le nom du nuage, et l'étage de chacun décide de sa composition.",
-    "Le mot « grêlons » porte sur la forme des précipitations du nimbostratus, pas sur leur existence."
+    "Les affirmations ne changent que de nom de nuage : il suffit de placer chacun à son étage, eau liquide en bas, glace en haut, et le cumulonimbus sur les trois.",
+    "« Grêlons » est le mot à vérifier : le nimbostratus donne bien des précipitations, mais une pluie fine et continue, pas de la grêle."
   ],
   "A16M": [
-    "Le nom contient « instabilité », mais « conditionnelle » renvoie à l'état de l'air au départ."
+    "Le nom contient « instabilité », mais c'est « conditionnelle » qui décide : l'air est plutôt stable au départ, et l'ascendance n'y naît que si un chauffage ou un soulèvement la déclenche."
   ],
   "A17B": [
-    "Les phénomènes cités existent tous, seule change leur attribution à l'un ou l'autre nuage."
+    "Tous les phénomènes cités existent, seule leur attribution change : pour trancher, rattacher chaque mot à son nuage, l'orage et les averses au cumulonimbus, la pluie continue au nimbostratus."
   ],
   "A20B": [
-    "« Hors problème de visibilité » écarte ce critère : seul compte le danger propre à chaque nuage."
+    "« Hors problème de visibilité » écarte la gêne pour la vue : il ne reste que l'agitation de l'air propre à chaque nuage, et un strato-cumulus étalé en couche n'a pas le développement vertical d'un nuage d'orage."
   ],
   "A21V": [
-    "La formule « avec prudence » rassure sans rien changer au danger propre à un cumulonimbus."
+    "« Avec prudence » rassure sans rien changer au danger : un cumulonimbus perturbe l'air sur des kilomètres autour de lui, et aucune précaution ne rend son approche sûre, par-dessous ou ailleurs."
   ],
   "A24B": [
-    "Le mot « généralement » écarte les cas rares : seul compte ce que produit le nuage d'ordinaire."
+    "« Généralement » demande ce que fait le nuage d'ordinaire, pas ce qu'il peut faire une fois : le cumulus de beau temps ne précipite que s'il grossit en congestus."
   ],
   "A25B": [
-    "Front « chaud » ne veut pas dire thermiques plus forts : tout dépend de l'effet du voile nuageux sur le soleil qui chauffe le sol."
+    "Front « chaud » n'annonce pas des thermiques plus forts : le voile de cirrostratus coupe une partie du soleil qui chauffe le sol, et c'est ce chauffage qui fait la convection."
   ],
   "A27B": [
-    "L'énoncé précise front « chaud » : un nuage de perturbation n'appartient pas forcément à ce front-là."
+    "L'énoncé précise front « chaud » : il faut séparer les nuages qui le précèdent, des cirrus jusqu'au nimbostratus, de ceux du front froid et de sa traîne, cumulonimbus et cumulus."
   ],
   "A28B": [
-    "Le nom « de rayonnement » désigne la cause de ce brouillard, qui fixe les conditions de sa formation."
+    "Le nom donne la cause : « de rayonnement », c'est le sol qui perd sa chaleur vers le ciel, donc par nuit claire et air calme. L'air chaud arrivant sur un sol froid relève de l'advection."
   ],
   "A29B": [
-    "Le nom « d'advection » désigne un air qui se déplace, et ce type de brouillard en dépend."
+    "Le nom donne la cause : « advection » veut dire air amené par le vent, donc un brouillard qui demande du vent. Le sol qui se refroidit par nuit claire relève du rayonnement."
   ],
   "A30B": [
-    "« Plutôt stable » freine la convection, mais « impossible » ne laisse aucune exception, même avec un sol très chauffé."
+    "« Plutôt stable » freine la convection, mais « impossible » n'admet aucune exception : un sol assez chauffé, sur une pente bien exposée, suffit à écarter ce mot."
   ],
   "A31B": [
-    "La précision « en atmosphère humide » renvoie à ce que devient l'air humide qui monte et se refroidit."
+    "« En atmosphère humide » demande ce que devient cet air en montant : il atteint vite son point de condensation et forme un nuage, et l'humidité ne dit rien de la stabilité."
   ],
   "A34B": [
-    "« Uniquement » tombe dès qu'un seul cas contraire existe.",
-    "La parenthèse parle de « gouttelettes », un mot qui désigne de l'eau liquide.",
-    "« Partout » tombe dès qu'un seul cas contraire existe, ici un seul endroit de la troposphère sans vapeur d'eau."
+    "La parenthèse « fines gouttelettes d'eau » décrit de l'eau liquide, déjà condensée : ce n'est plus de la vapeur, qui est un gaz invisible.",
+    "« Uniquement » et « partout » sont deux mots absolus à tester : l'air continental contient lui aussi de la vapeur, ce qui écarte le premier, et le second tient car l'air n'est jamais tout à fait sec."
   ],
   "A35B": [
-    "Buée et rosée naissent de la vapeur, et « sous forme de » porte sur l'état de l'eau qu'on voit."
+    "Buée et rosée se voient, donc ce ne sont plus de la vapeur : « sous forme de » désigne de l'eau déjà condensée en gouttelettes, alors que la vapeur reste un gaz invisible."
   ],
   "A36M": [
-    "Deux choix citent les mêmes états dans l'ordre inverse : seul le sens du passage les distingue."
+    "Deux choix citent les mêmes états dans l'ordre inverse, donc seul le sens compte : quand l'eau passe du gaz au liquide ou au solide, elle rend la chaleur reçue lors de l'évaporation."
   ],
   "A38M": [
-    "Deux choix ne diffèrent que d'un mot : isobares « espacés » ou « resserrés ».",
-    "Deux choix ne diffèrent que d'un mot : vents « plutôt faibles » ou « plutôt forts »."
+    "Deux paires s'opposent mot pour mot, isobares « espacés » ou « resserrés », vents « faibles » ou « forts » : un marais est une pression presque uniforme, donc des lignes éloignées et peu de vent."
   ],
   "A39M": [
-    "Une réserve bien tournée comme « hors cas ponctuel de l'orage » ne rend pas un choix plus sûr."
+    "La réserve « hors cas ponctuel de l'orage » rend le choix prudent, pas plus sûr : sans écart de pression, rien ne crée de vent fort, et l'orage reste justement le risque à retenir."
   ],
   "A3V": [
     "Le mot « gazeuse » oppose la vapeur d'eau, invisible, à ce que l'œil voit d'un nuage."

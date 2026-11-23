@@ -26,7 +26,7 @@ export function sentenceProblem(s) {
     if (typeof s !== 'string' || !s.trim()) return 'vide';
     if (s !== s.trim()) return 'espaces en bord';
     if (!s.endsWith('.')) return 'pas de point final';
-    if (s.length >= 140) return 'trop longue';
+    if (s.length >= 240) return 'trop longue';
     if (VERDICT.test(s)) return 'mot de verdict';
     if (ADDRESS.test(s)) return "adresse à l'élève";
     if (s.includes(';')) return 'point-virgule';

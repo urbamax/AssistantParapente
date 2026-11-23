@@ -4,7 +4,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import QuizService from '../../js/services/quiz_service.js';
 
 // Spec 061 : les phrases de l'encart « À lire de près » (audit 6). Une à trois phrases par question,
-// neutres (aucune adresse à l'élève), sans verdict, qui ne donnent pas la réponse.
+// neutres (aucune adresse à l'élève), sans verdict. Depuis l'amendement du 2026-11-22, chacune nomme le
+// piège et dit comment le trancher sur cette question (specs/061-quiz-trap-box/rewrite-plan.md).
 const FILE = 'js/data/qcm_question_traps.json';
 const traps = existsSync(FILE) ? JSON.parse(readFileSync(FILE, 'utf8')) : null;
 const codes = new Set(
@@ -33,8 +34,8 @@ describe('question traps data (spec 061)', () => {
         expect(bad.map(([c]) => c)).toEqual([]);
     });
 
-    it('every sentence is trimmed, ends with a period and is shorter than 140 characters', () => {
-        const bad = sentences.filter(([, s]) => s !== s.trim() || !s.endsWith('.') || s.length >= 140);
+    it('every sentence is trimmed, ends with a period and is shorter than 240 characters', () => {
+        const bad = sentences.filter(([, s]) => s !== s.trim() || !s.endsWith('.') || s.length >= 240);
         expect(bad).toEqual([]);
     });
 

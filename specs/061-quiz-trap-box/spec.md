@@ -16,6 +16,10 @@
 - Q: Register of the sentences? → A: Neutral, no address to the learner (owner).
 - Q: Title of the box? → A: « À lire de près » (owner had no preference; recommended option).
 
+### Session 2026-11-22 (after release)
+
+- Owner: « la partie À lire de près n'est jamais très claire et n'explique pas comment éviter le piège d'énoncé ». The sentences only named the trap (« « Toujours » tombe dès qu'un seul cas contraire existe », « Deux choix ne diffèrent que d'un mot : … »), which the learner had just seen. → A: rewrite all sentences so each names the trap **and** shows how to settle it on this question (owner chose the full rewrite over a generic reflex line). FR-006 amended accordingly; the rewrite plan is in `rewrite-plan.md`.
+
 ## Context
 
 Audit 6 read the 775 quiz questions (FFVL QCM, hang-gliding codes H, R, X excluded) and found, for 567 of them, 694 traps: the word of the statement or of a choice that decides the points and that a hurried learner misreads (an absolute word such as « jamais », two choices that differ by one word, « transitoirement », a time of day, a reversed ratio, a true fact that does not answer the question…). Phase 1 (PRs 333–350) made the option lines name these traps. For each trap the audit also wrote one short sentence meant for the learner. This feature shows those sentences in the correction.
@@ -72,7 +76,7 @@ The same box appears wherever the app shows the correction of an answered questi
 - **FR-003**: The box MUST NOT be shown, nor its text be present in the page, before the answer or at any time during a mock exam in progress.
 - **FR-004**: Questions without a trap MUST show no box.
 - **FR-005**: The trap sentences MUST be stored in a quiz data file keyed by question code, separate from the explanations file and from the official question file (which stays untouched), with 1 to 3 sentences per question.
-- **FR-006**: Every sentence MUST be neutral (no « tu », no « vous », no imperative), contain no verdict word (juste, faux, fausse, vrai, correct, exact, inexact, bonne réponse, à tort), not give the answer, end with a period and stay under 140 characters; a data test MUST enforce these rules and that every key is an existing question code.
+- **FR-006** (amended 2026-11-22): Every sentence MUST name what makes the question tricky **and** how to settle it on this very question (the reading reflex applied to it: the counter-example that defeats an absolute word, the clue that separates two choices differing by one word, what the statement actually asks…). Since the box is shown only after the answer, a sentence MAY state the decisive fact, but MUST NOT copy the choice explanations. Every sentence MUST be neutral (no « tu », no « vous », no imperative; infinitives such as « pour trancher, … » are allowed), contain no verdict word (juste, faux, fausse, vrai, correct, exact, inexact, bonne réponse, à tort, piège), end with a period and stay under 240 characters; a data test MUST enforce these rules and that every key is an existing question code.
 - **FR-007**: The box MUST be readable in light and dark themes and on phones, and MUST be announced to screen readers as a note attached to the correction.
 - **FR-008**: The box MUST be available to all users (no role).
 
