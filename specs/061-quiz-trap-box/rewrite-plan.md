@@ -41,4 +41,4 @@ Codes sorted alphabetically, 30 per lot. One PR per lot, each from a fresh branc
 
 ## After the last lot
 
-Add a data test that rejects the old hollow formulas on their own (a sentence that is only « … tombe dès qu'un seul cas contraire existe. » or only « Deux choix ne diffèrent que d'un mot : … »).
+Done 2026-11-23: all 19 lots merged (PRs 358 to 379). Added a data test that rejects the old hollow formulas on their own (a sentence that is only « … tombe dès qu'un seul cas contraire existe. » or only « Deux choix ne diffèrent que d'un mot : … »).
