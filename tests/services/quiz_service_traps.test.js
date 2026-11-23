@@ -13,6 +13,8 @@ function mockFetch({ trapsOk = true, trapsThrows = false } = {}) {
         if (url.endsWith('qcm_ffvl.csv')) return { ok: true, text: async () => QUESTIONS_CSV };
         if (url.endsWith('qcm_ffvl_explanations.csv')) return { ok: true, text: async () => EXPLANATIONS_CSV };
         if (url.endsWith('question_course_mapping.json')) return { ok: true, json: async () => ({}) };
+        if (url.endsWith('qcm_trap_types.json'))
+            return { ok: true, json: async () => ({ A92V: [{ type: 'absolu', choices: [2] }] }) };
         if (url.endsWith('qcm_question_traps.json')) {
             if (trapsThrows) throw new Error('offline');
             return trapsOk ? { ok: true, json: async () => TRAPS } : { ok: false };
@@ -36,6 +38,11 @@ describe('QuizService - question traps (spec 061)', () => {
         const res = await load();
         expect(res.success).toBe(true);
         expect(QuizService.getQuestionTraps('A92V')).toEqual(['Première phrase.', 'Deuxième phrase.']);
+    });
+
+    it('loads the trap types file with the quiz data (spec 064)', async () => {
+        await load();
+        expect(QuizService.getTrapTypes('A92V')).toEqual([{ type: 'absolu', choices: [2] }]);
     });
 
     it('returns an empty frozen array for a question without traps', async () => {

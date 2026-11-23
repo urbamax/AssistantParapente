@@ -454,6 +454,9 @@ class QuizViewClass extends QuizVoiceBase {
             case 'QuizstartFilteredTraining':
                 this.startFilteredTraining();
                 break;
+            case 'QuizstartTrapTypeTraining':
+                this.startTrapTypeTraining(args[0]);
+                break;
             case 'QuizbackToStatsAfterTraining':
                 this.backToStatsAfterTraining();
                 break;
@@ -954,6 +957,8 @@ class QuizViewClass extends QuizVoiceBase {
             // Spec 063 : l'intitulé de la série dit qu'elle ne contient que des questions à piège.
             this._trapSeriesActive =
                 QuizService.state.qcmConfig.mode === 'TRAINING' && QuizService.state.qcmConfig.trapsOnly === true;
+            // Spec 064 : type de piège ciblé depuis les statistiques (intitulé de la série).
+            this._trapSeriesType = this._trapSeriesActive ? QuizService.state.qcmConfig.trapType : null;
 
             document.querySelectorAll('.mode-screen').forEach((s) => s.classList.remove('active'));
             document.getElementById('qcm-screen').classList.add('active');
@@ -976,6 +981,23 @@ class QuizViewClass extends QuizVoiceBase {
         if (!picked.length) return;
 
         this.launchWorkshop(picked, axisId);
+    }
+
+    // Spec 064 : série « Questions à piège » d'un seul type, lancée depuis « Vos pièges ». Les réglages de
+    // l'écran de lancement (option cochée ou non) sont rendus tels quels une fois la série tirée.
+    startTrapTypeTraining(type) {
+        if (!type) return;
+        const previousTrapsOnly = QuizService.state.qcmConfig.trapsOnly;
+        QuizService.setMode('TRAINING');
+        QuizService.setTrapsOnly(true);
+        QuizService.setTrapType(type);
+        try {
+            this.startSession();
+            this._statsTrainingActive = true;
+        } finally {
+            QuizService.setTrapType(null);
+            QuizService.setTrapsOnly(previousTrapsOnly);
+        }
     }
 
     // Série d'entraînement sur les questions affichées par les filtres de la page Statistiques
@@ -1008,6 +1030,7 @@ class QuizViewClass extends QuizVoiceBase {
 
     launchWorkshop(picked, workshopId) {
         this._trapSeriesActive = false;
+        this._trapSeriesType = null;
         const sessionQuestions = QuizService.shuffle(picked).map((q) => QuizService.shuffleQuestionChoices(q));
         this._activeWorkshopAxisId = workshopId;
         this._statsTrainingActive = false;
@@ -1100,9 +1123,12 @@ class QuizViewClass extends QuizVoiceBase {
             } else {
                 const mode = QuizService.state.qcmConfig.mode;
                 const trainingKey = this._trapSeriesActive ? 'TRAINING_TRAPS' : 'TRAINING';
-                modeLabelEl.innerText = tql(
-                    `modes.labels.${['EXAM', 'REVISION', 'MASTERY'].includes(mode) ? mode : trainingKey}`,
-                );
+                modeLabelEl.innerText =
+                    this._trapSeriesActive && this._trapSeriesType && mode === 'TRAINING'
+                        ? tql('modes.labels.TRAINING_TRAP_TYPE', {
+                              type: tql(`trapTypes.${this._trapSeriesType}.name`).toUpperCase(),
+                          })
+                        : tql(`modes.labels.${['EXAM', 'REVISION', 'MASTERY'].includes(mode) ? mode : trainingKey}`);
             }
         }
 

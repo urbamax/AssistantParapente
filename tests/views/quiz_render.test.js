@@ -527,3 +527,62 @@ describe('read-closely box does not linger on the next question', () => {
         expect(document.getElementById('qcm-feedback').textContent).not.toContain('« sépare »');
     });
 });
+
+// Spec 064 : section « Vos pièges » des statistiques et entraînement par type.
+describe('« Vos pièges » in the statistics (spec 064)', () => {
+    const TYPES = {
+        A1V: [{ type: 'absolu', choices: [1] }],
+        E2VB: [{ type: 'un_mot', choices: [0] }],
+    };
+    const section = () => document.getElementById('stats-traps');
+    beforeEach(() => {
+        vi.spyOn(QuizService, 'hasTrapTypes').mockReturnValue(true);
+        vi.spyOn(QuizService, 'getTrapTypes').mockImplementation((c) => Object.freeze(TYPES[c] || []));
+    });
+    afterEach(() => {
+        QuizService.setTrapsOnly(false);
+        QuizService.setTrapType(null);
+    });
+    const withAnswers = (answers) => {
+        const s = structuredClone(STATS);
+        for (const [code, masks] of Object.entries(answers)) {
+            s.questions[code] = { ...(s.questions[code] || {}), answers: masks.map((m, i) => (20000 + i) * 1024 + m) };
+        }
+        QuizService.getPersistentStats.mockImplementation(() => structuredClone(s));
+    };
+
+    it('lists the types met, most falls first, with « N sur M »', () => {
+        // A1V : le choix piégé (index 1, négatif) coché deux fois sur deux ; E2VB : bonne réponse oubliée une fois sur deux.
+        withAnswers({ A1V: [0b011, 0b010], E2VB: [0b001, 0b000] });
+        QuizView.renderStats();
+        const rows = [...section().querySelectorAll('[data-trap-type]')];
+        expect(rows.map((r) => r.getAttribute('data-trap-type'))).toEqual(['absolu', 'un_mot']);
+        expect(rows[0].textContent).toContain('Mots absolus');
+        expect(rows[0].textContent).toContain('2 fois sur 2');
+        expect(rows[1].textContent).toContain('1 fois sur 2');
+        expect(rows[0].querySelector('[data-action="QuizstartTrapTypeTraining"]').getAttribute('data-args')).toBe(
+            'absolu',
+        );
+    });
+
+    it('invites to train when no trap was met, and is absent without type data', () => {
+        QuizView.renderStats();
+        expect(section().textContent).toContain('Questions à piège');
+        expect(section().querySelectorAll('[data-trap-type]')).toHaveLength(0);
+        QuizService.hasTrapTypes.mockReturnValue(false);
+        QuizView.renderStats();
+        expect(section()).toBeNull();
+    });
+
+    it('« S’entraîner » starts a series of that type, labelled with it, and leaves the setup as it was', () => {
+        vi.spyOn(QuizService, 'startSession').mockImplementation(() => {
+            expect(QuizService.state.qcmConfig.trapsOnly).toBe(true);
+            expect(QuizService.state.qcmConfig.trapType).toBe('absolu');
+            return QUESTIONS[0];
+        });
+        QuizView.startTrapTypeTraining('absolu');
+        expect(text('qcm-mode-label')).toBe('QUESTIONS À PIÈGE · MOTS ABSOLUS');
+        expect(QuizService.state.qcmConfig.trapType).toBe(null);
+        expect(QuizService.state.qcmConfig.trapsOnly).toBe(false);
+    });
+});
