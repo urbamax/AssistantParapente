@@ -532,7 +532,7 @@ describe('read-closely box does not linger on the next question', () => {
         QuizService.state.qcmConfig.mode = 'TRAINING';
         QuizView.renderQuestion(QUESTIONS[0]);
         QuizView.showAnswerFeedback(
-            { selected: [QUESTIONS[0].choices[0]], isCorrect: true, question: QUESTIONS[0] },
+            { selected: [QUESTIONS[0].choices[1]], isCorrect: false, question: QUESTIONS[0] },
             true,
         );
         expect(document.querySelector('.quiz-read-closely')).not.toBeNull();
