@@ -94,97 +94,97 @@
     "La réserve « hors cas ponctuel de l'orage » rend le choix prudent, pas plus sûr : sans écart de pression, rien ne crée de vent fort, et l'orage reste justement le risque à retenir."
   ],
   "A3V": [
-    "Le mot « gazeuse » oppose la vapeur d'eau, invisible, à ce que l'œil voit d'un nuage."
+    "« Gazeuse » est le mot qui décide : la vapeur est un gaz invisible, alors qu'un nuage se voit parce que cette vapeur s'est déjà condensée en gouttelettes ou en cristaux."
   ],
   "A43B": [
-    "L'énoncé compare « l'air froid » à l'air chaud, et non l'inverse."
+    "L'énoncé compare « l'air froid » à l'air chaud, pas l'inverse : l'air chaud monte parce qu'il est le plus léger des deux, donc l'air froid est le plus lourd."
   ],
   "A44B": [
-    "Deux choix donnent la même valeur de 1° par 100 m : seul le verbe change, « diminue » ou « augmente »."
+    "Deux choix gardent la même valeur, 1° par 100 m, et ne changent que de verbe : c'est le sens qui compte. L'air qui monte se détend sous une pression plus faible, et une détente refroidit."
   ],
   "A45B": [
-    "L'énoncé dit air « nuageux » : la condensation de son eau agit sur la vitesse à laquelle sa température baisse."
+    "Le mot « nuageux » change tout : dans cet air, la vapeur condense en montant et libère de la chaleur, ce qui freine le refroidissement par rapport à l'air clair."
   ],
   "A46B": [
-    "Les relevés « 15 °C au sol et 12 °C 500 m au-dessus » donnent une baisse par 100 m à comparer au refroidissement d'une particule qui monte."
+    "Les deux relevés donnent une baisse par 100 m, à calculer avant de choisir : 3° sur 500 m font 0,6° par 100 m, moins que le 1° perdu par une particule qui monte, qui devient donc plus froide que l'air."
   ],
   "A47M": [
-    "Deux relevés ont les mêmes chiffres, seule change l'altitude associée à chaque température."
+    "Deux relevés reprennent les mêmes chiffres, 18 °C et 22 °C, à des altitudes échangées : pour trancher, vérifier dans quel sens va la température en montant. Une inversion est un air plus chaud en haut."
   ],
   "A49B": [
-    "Le mot « principalement » vise le mode de chauffage dominant, pas tout ce qui chauffe un peu l'air."
+    "« Principalement » demande le mode de chauffage dominant : l'air laisse passer presque tout le rayonnement du soleil, c'est le sol chauffé qui réchauffe ensuite l'air à son contact."
   ],
   "A4B": [
-    "« Réchauffement » et refroidissement s'opposent : tout tient à ce que devient la température de l'air qui monte."
+    "« Réchauffement » contredit ce qui arrive à l'air qui monte : il se détend et se refroidit, et c'est ce refroidissement jusqu'au point de condensation qui fait le nuage."
   ],
   "A51B": [
-    "« On appelle » demande une définition, et un trait fréquent n'est pas forcément ce qui définit la chose."
+    "« On appelle » demande une définition : des vents faibles accompagnent souvent un anticyclone, mais existent ailleurs, alors que la haute pression est ce qui le définit."
   ],
   "A52B": [
-    "Deux choix ne diffèrent que d'un mot : « faibles » ou « forts »."
+    "Deux paires s'opposent, vents « faibles » ou « forts », air « ascendant » ou qui « s'affaisse » : dans un anticyclone, l'air descend du haut et s'étale, ce qui donne un temps calme et peu de vent."
   ],
   "A53B": [
-    "Deux choix ne diffèrent que d'un verbe : « se renforce » ou « s'affaiblit »."
+    "Deux choix ne changent que de verbe, « se renforce » ou « s'affaiblit » : des isobares resserrés signifient un gros écart de pression sur une courte distance, donc un air poussé plus fort."
   ],
   "A54B": [
-    "Un air qui descend une pente n'est pas toujours une brise, et « un vent météo » renvoie à l'origine de cet air."
+    "Un air qui descend une pente n'est pas forcément une brise : « vent météo » renvoie au vent général. La brise descendante est un air local, refroidi par le sol, qui coule par son propre poids."
   ],
   "A55V": [
-    "« Est due à » demande la cause, distincte de ce que la turbulence produit sur l'aile."
+    "« Est due à » demande la cause, pas l'effet : les variations de vitesse de vol sont ce que la turbulence fait subir à l'aile, pas ce qui la produit, l'air agité de remous."
   ],
   "A57B": [
-    "L'unité compte : un nœud ne vaut pas un km/h, et la conversion précède le choix."
+    "L'unité décide : un nœud vaut presque 2 km/h, donc convertir avant de choisir. 20 nœuds font environ 36 km/h, et 20 km/h reviendrait à confondre les deux unités."
   ],
   "A59B": [
-    "Les petits mots « provenant du » et « soufflant vers » désignent deux côtés opposés."
+    "« Provenant du » et « soufflant vers » désignent deux côtés opposés : un vent est nommé par sa provenance, donc un vent du 225° vient du sud-ouest et souffle vers le nord-est."
   ],
   "A60B": [
-    "Chaque choix associe un côté et un hémisphère, et les deux mots comptent."
+    "Chaque choix associe un côté et un hémisphère, et il faut les deux : la déviation se fait vers la droite au nord et vers la gauche au sud, donc un seul couple tient."
   ],
   "A61B": [
-    "Deux détails changent d'un choix à l'autre : le sens de rotation et l'hémisphère."
+    "Deux détails changent d'un choix à l'autre, le sens de rotation et l'hémisphère : il faut les vérifier tous les deux. Au nord, l'air tourne dans le sens horaire autour des hautes pressions, et le sud fait l'inverse."
   ],
   "A62B": [
-    "« Face au vent » inverse la règle apprise dos au vent."
+    "« Face au vent » est le détail qui décide : la règle apprise dos au vent place les basses pressions à gauche, et se retourner face au vent les met à droite."
   ],
   "A63B": [
-    "Les mêmes mots reviennent dans un ordre inversé : tout tient à la couche placée au-dessus.",
-    "« On appelle » demande une définition, et un effet possible n'est pas ce qui définit la chose."
+    "Les deux premiers choix reprennent les mêmes mots dans l'ordre inverse : seule compte la couche placée au-dessus. Normalement l'air refroidit en montant, l'inversion est l'air chaud au-dessus.",
+    "« On appelle » demande une définition : bloquer les ascendances est un effet possible d'une inversion, pas ce qui la définit."
   ],
   "A64B": [
-    "« Ne peut pas » tombe dès qu'un seul cas contraire existe.",
-    "Deux choix ne diffèrent que d'un mot : « rapidement » ou « doucement »."
+    "« Ne peut pas » n'admet aucune exception, donc un seul cas suffit à l'écarter : une atmosphère stable freine les thermiques sans tous les empêcher.",
+    "« Rapidement » et « doucement » s'opposent, un seul des deux peut convenir : « stable » veut dire que la température baisse lentement en montant, ce qui arrête vite la particule chaude."
   ],
   "A65B": [
-    "Deux choix ne diffèrent que par le nom du nuage : « cumulus » ou « stratus »."
+    "Deux choix ne changent que de nom de nuage, « cumulus » ou « stratus » : en air instable l'air monte, donc les nuages bourgeonnent en hauteur, alors que le stratus s'étale en couche dans l'air stable."
   ],
   "A66M": [
-    "Les « Açores » sont dans la bonne zone sans être forcément le lieu d'où viennent les perturbations."
+    "Les « Açores » sont dans l'Atlantique, mais désignent un anticyclone, zone de beau temps : les perturbations du front polaire naissent dans les dépressions et arrivent de l'ouest, portées par les vents d'ouest."
   ],
   "A67M": [
-    "Un seul mot change la masse d'air chaude : « tropicale » ou « équatoriale »."
+    "Un seul mot change la masse d'air chaude, « tropicale » ou « équatoriale » : le front polaire sépare l'air polaire de l'air tropical, pas de l'air équatorial, plus lointain."
   ],
   "A68B": [
-    "Deux choix ne diffèrent que d'un mot : « au-dessus » ou « au-dessous »."
+    "Deux choix ne diffèrent que d'un mot, « au-dessus » ou « au-dessous » : l'air chaud est le plus léger, il ne peut donc que passer au-dessus de l'air froid."
   ],
   "A6B": [
-    "Le verbe « semblent » sépare l'immobilité apparente du nuage du mouvement réel de l'air."
+    "« Semblent » est le mot qui décide : le nuage paraît immobile alors que l'air le traverse avec un vent fort. Il se reforme sans cesse du côté au vent et disparaît du côté sous le vent."
   ],
   "A70B": [
-    "Le verbe change de sens d'un choix à l'autre : l'air chaud « est soulevé » ou « soulève » l'air froid.",
-    "Un choix prudent qui offre deux possibilités demande que les deux soient réelles."
+    "Le verbe change de sens, l'air chaud « est soulevé » ou « soulève » : c'est le plus léger, donc il passe toujours au-dessus, en glissant sur l'air froid ou repoussé par lui.",
+    "Le choix prudent « refoulé vers le bas ou soulevé » demande que les deux arrivent : un air chaud refoulé sous l'air froid n'existe pas."
   ],
   "A72B": [
-    "La justification « air froid = air stable » semble logique, mais une parenthèse ne prouve rien."
+    "La parenthèse « air froid = air stable » a l'air d'une preuve sans en être une : un front froid soulève brutalement l'air chaud et fait naître des cumulonimbus, avec pluie, turbulences et rafales."
   ],
   "A73B": [
-    "Le mot « isolés » suffit à changer le sens du choix."
+    "Le mot « isolés » suffit à écarter un choix pourtant cumuliforme : au front froid, les nuages bourgeonnants sont groupés en ligne et très développés, pas éparpillés comme des cumulus de beau temps."
   ],
   "A75B": [
-    "La zone se situe dans le temps : ce qui arrive avec le front n'est pas ce qui vient après lui."
+    "La traîne se place dans le temps : c'est ce qui vient après le front froid, côté air froid, pas ce qui arrive avec lui ni l'air chaud placé entre les deux fronts."
   ],
   "A76M": [
-    "« Toujours » tombe dès qu'un seul cas contraire existe."
+    "« Toujours, dès le premier jour » n'admet aucune exception : il suffit d'un premier jour de traîne au vent de nord-ouest trop fort pour l'écarter, ce qui arrive souvent."
   ],
   "A77B": [
     "Le mot « isolés » compte : la question ne porte pas seulement sur l'endroit où naissent des orages."
