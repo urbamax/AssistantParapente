@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-// Spec 064 : « Vos pièges » dans les statistiques. Un historique où l'élève a coché deux fois le choix
+// Spec 064 : « Vos pièges », en tête des axes de révision. Un historique où l'élève a coché deux fois le choix
 // « n'est jamais turbulente » de A92V (piège de type « mots absolus ») doit apparaître dans la section,
 // et le bouton « S'entraîner » lance une série de questions de ce type.
 test.use({ serviceWorkers: 'block' });
@@ -32,8 +32,8 @@ test.beforeEach(async ({ page }) => {
     await page.route('https://api.open-meteo.com/**', (route) => route.fulfill({ json: [] }));
 });
 
-test('the statistics list the absolute-word traps and train on them', async ({ page }) => {
-    await page.goto('/?mode=STATS');
+test('the revision axes list the absolute-word traps and train on them', async ({ page }) => {
+    await page.goto('/?mode=REVISION_AXES');
     const row = page.locator('#stats-traps [data-trap-type="absolu"]');
     await expect(row).toBeVisible();
     await expect(row).toContainText('Mots absolus');
@@ -42,7 +42,8 @@ test('the statistics list the absolute-word traps and train on them', async ({ p
     await row.locator('[data-action="QuizstartTrapTypeTraining"]').click();
     await expect(page.locator('#qcm-mode-label')).toHaveText('QUESTIONS À PIÈGE · MOTS ABSOLUS');
     await expect(page.locator('.quiz-read-closely')).toHaveCount(0);
-    await page.locator('#qcm-choices .qcm-option').first().click();
+    // A92V, déjà manquée, ouvre la série : on retombe dans le piège pour voir l'encart (spec 061, FR-001a).
+    await page.locator('#qcm-choices .qcm-option', { hasText: 'jamais turbulente' }).click();
     await page.locator('[data-action="validate-question"]').click();
     await expect(page.locator('.quiz-read-closely')).toBeVisible();
 });
