@@ -661,7 +661,7 @@ class QuizViewClass extends QuizVoiceBase {
                         <span class="bank-item-code" style="${colorStyle}">${escapeHTML(q.code)}</span>
                         <span class="bank-item-theme">${escapeHTML(q.theme)}</span>
                     </div>
-                    <div class="bank-item-question">${escapeHTML(q.question)}</div>${readCloselyHtml(QuizService.getQuestionTraps(q.code))}
+                    <div class="bank-item-question">${escapeHTML(q.question)}</div>${QuizService.lastAnswerWasWrong(q.code) ? readCloselyHtml(QuizService.getQuestionTraps(q.code)) : ''}
                     <div class="bank-item-choices">
                         ${q.choices
                             .map((c, idx) => {
@@ -1355,9 +1355,10 @@ class QuizViewClass extends QuizVoiceBase {
             });
         }
 
-        // Spec 061 : ce qui rend la question délicate, une fois la réponse donnée (jamais avant).
+        // Spec 061 : ce qui rend la question délicate, seulement après une réponse fausse ou incomplète.
         const alertsHtml =
-            readCloselyHtml(QuizService.getQuestionTraps(original.code)) + this.trapAlertsHtml(result.trapFeedback);
+            (result.isCorrect ? '' : readCloselyHtml(QuizService.getQuestionTraps(original.code))) +
+            this.trapAlertsHtml(result.trapFeedback);
         const feedbackDiv = document.getElementById('qcm-feedback');
         // Sans découpage par choix : l'explication entière, comme avant (gabarit inchangé, spec 024).
         const feedbackHtml = perOption

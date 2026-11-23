@@ -765,8 +765,9 @@ export function buildQuestionAnswersHtml(view, qObj, code) {
               ? [{ url: view.getCourseUrl(code), title: '', page: '' }]
               : [];
 
-    // Spec 061 : encart « À lire de près » en tête de la correction dépliée.
-    let answersHtml = `${readCloselyHtml(QuizService.getQuestionTraps(code))}<div class="bank-item-choices" style="display:flex; flex-direction:column; gap:8px;">`;
+    // Spec 061 : encart « À lire de près » en tête de la correction dépliée, si la dernière réponse était fausse.
+    const readClosely = QuizService.lastAnswerWasWrong(code) ? readCloselyHtml(QuizService.getQuestionTraps(code)) : '';
+    let answersHtml = `${readClosely}<div class="bank-item-choices" style="display:flex; flex-direction:column; gap:8px;">`;
     qObj.choices.forEach((ans, idx) => {
         const pts = parseInt(ans.pts || 0);
         const isCorrect = pts > 0;

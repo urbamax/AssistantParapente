@@ -406,15 +406,18 @@ describe('results screen escapes quiz texts (spec 027)', () => {
     });
 });
 
-// Spec 061 : encart « À lire de près » dans chaque correction d'une question répondue, jamais avant.
+// Spec 061 : encart « À lire de près » dans la correction, seulement après une erreur (2026-11-23).
 describe('read-closely box in the corrections (spec 061)', () => {
     const TRAPS = { A1V: ['Le mot « sépare » décide.'], E2VB: ['Deux choix ne diffèrent que d’un mot.'] };
     const box = (root) => root.querySelector('.quiz-read-closely');
+    let wrong;
     beforeEach(() => {
+        wrong = new Set();
         vi.spyOn(QuizService, 'getQuestionTraps').mockImplementation((c) => Object.freeze(TRAPS[c] || []));
+        vi.spyOn(QuizService, 'lastAnswerWasWrong').mockImplementation((c) => wrong.has(c));
     });
 
-    it('training: absent before the answer, shown after it, absent for a question without traps', () => {
+    it('training: absent before the answer and after a right answer, shown after a wrong one', () => {
         QuizService.state.qcmConfig.mode = 'TRAINING';
         QuizView.renderQuestion(QUESTIONS[0]);
         expect(box(document.getElementById('qcm-screen'))).toBeNull();
@@ -424,13 +427,20 @@ describe('read-closely box in the corrections (spec 061)', () => {
             { selected: [QUESTIONS[0].choices[0]], isCorrect: true, question: QUESTIONS[0] },
             true,
         );
+        expect(box(document.getElementById('qcm-feedback'))).toBeNull();
+
+        QuizView.renderQuestion(QUESTIONS[0]);
+        QuizView.showAnswerFeedback(
+            { selected: [QUESTIONS[0].choices[1]], isCorrect: false, question: QUESTIONS[0] },
+            true,
+        );
         const feedback = document.getElementById('qcm-feedback');
         expect(box(feedback).textContent).toContain('Le mot « sépare » décide.');
         expect(feedback.style.display).toBe('block');
 
         QuizView.renderQuestion(QUESTIONS[3]);
         QuizView.showAnswerFeedback(
-            { selected: [QUESTIONS[3].choices[0]], isCorrect: true, question: QUESTIONS[3] },
+            { selected: [QUESTIONS[3].choices[1]], isCorrect: false, question: QUESTIONS[3] },
             true,
         );
         expect(box(document.getElementById('qcm-feedback'))).toBeNull();
@@ -445,21 +455,25 @@ describe('read-closely box in the corrections (spec 061)', () => {
         expect(box(document.getElementById('qcm-question-text')).textContent).toContain('ne diffèrent que');
     });
 
-    it('question bank shows the box in the item of a question with traps only', () => {
+    it('question bank shows the box only when the last answer to the question was wrong', () => {
         QuizView.renderBankContent('ALL');
-        const items = [...document.querySelectorAll('.bank-item')];
-        const withTrap = items.find((i) => i.textContent.includes('A1V'));
-        const without = items.find((i) => i.textContent.includes('F4V'));
-        expect(box(withTrap)).not.toBeNull();
-        expect(box(without)).toBeNull();
+        const item = () => [...document.querySelectorAll('.bank-item')].find((i) => i.textContent.includes('A1V'));
+        expect(box(item())).toBeNull();
+        wrong.add('A1V');
+        QuizView.renderBankContent('ALL');
+        expect(box(item())).not.toBeNull();
     });
 
-    it('statistics: exam review and detailed list show the box', () => {
+    it('statistics: exam review shows the box for errors, the detailed list after a wrong last answer', () => {
         QuizView.reviewExam('x1');
         expect(box(document.getElementById('stats-content'))).not.toBeNull();
         const detail = document.createElement('div');
         detail.innerHTML = buildQuestionAnswersHtml(QuizView, QUESTIONS[0], 'A1V');
+        expect(box(detail)).toBeNull();
+        wrong.add('A1V');
+        detail.innerHTML = buildQuestionAnswersHtml(QuizView, QUESTIONS[0], 'A1V');
         expect(box(detail).textContent).toContain('« sépare »');
+        wrong.add('F4V');
         detail.innerHTML = buildQuestionAnswersHtml(QuizView, QUESTIONS[3], 'F4V');
         expect(box(detail)).toBeNull();
     });
