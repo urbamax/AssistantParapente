@@ -662,96 +662,96 @@
     "Deux choix commencent pareil, et seule change la pièce au bout de la ligne : la ligne se termine par un anneau, pièce distincte qui se loge dans le largueur, pas par une boucle du même câble."
   ],
   "L8B": [
-    "Ce que l'instrument exploite pour fonctionner se distingue de l'information qu'il donne au pilote."
+    "Ce que l'instrument exploite se distingue de ce qu'il affiche : l'altimètre se sert de la baisse de pression avec la hauteur, mais il donne au pilote une altitude, pas une valeur de pression."
   ],
   "L9B": [
-    "« Définitivement » tombe dès qu'un seul cas contraire existe, ici un seul recalage possible.",
-    "Un mot absolu comme « doit toujours » peut aussi décrire une exigence réelle."
+    "« Définitivement » n'admet aucune exception : un seul recalage suffit à l'écarter, et l'altimètre se recale à chaque vol parce que la pression change d'un jour à l'autre.",
+    "Un mot absolu peut décrire une exigence réelle : « doit toujours » être comparé tient, puisqu'une altitude non recoupée peut être décalée à n'importe quel vol."
   ],
   "N11M": [
-    "Le mot « cabrée » fixe le sens du réglage, dont découle chaque effet."
+    "« Cabrée » fixe le sens du réglage : une aile cabrée vole à plus forte incidence, donc plus près de la parachutale et plus lente à monter au gonflage. Fermeture et nervosité vont avec l'aile calée piquée."
   ],
   "N12M": [
-    "Le mot « piquée » fixe le sens du réglage, dont découle chaque effet."
+    "« Piquée » fixe le sens du réglage : une aile piquée vole à plus faible incidence, donc plus près de la fermeture et plus vive au gonflage. Parachutale et paresse vont avec l'aile calée cabrée."
   ],
   "N13B": [
-    "Deux choix ne diffèrent que d'un mot : la partie « avant » ou « arrière » du profil."
+    "Deux choix ne diffèrent que d'un mot, partie « avant » ou « arrière » du profil : la portance s'exerce surtout vers l'avant, là où se trouve le centre de poussée, donc sur les suspentes A et B."
   ],
   "N14V": [
-    "« Systématiquement » et un chiffre précis appliquent un même raccourcissement à toutes les ailes."
+    "« Systématiquement » et un chiffre précis appliquent le même raccourcissement à toutes les ailes : 15 cm mangeraient presque toute la garde, et le réglage se fait selon l'aile, pour qu'elle ne soit jamais freinée mains hautes."
   ],
   "N17M": [
-    "« Sans inconvénient » tombe dès qu'un seul cas contraire existe."
+    "« Sans inconvénient » n'admet aucune exception : régler un trim oblige à lâcher les commandes quelques secondes, ce qui suffit à écarter ce choix."
   ],
   "N19V": [
-    "« Mini » ou « max » place l'aile du côté lent ou du côté rapide de la polaire."
+    "« Mini » ou « max » place l'aile du côté lent ou rapide de la polaire : mains hautes, l'aile n'est pas freinée, donc elle vole à sa vitesse max sans accélérateur, proche de sa finesse max."
   ],
   "N24M": [
-    "« Rallonger » les élévateurs arrière fixe le sens du réglage, plus piqué ou plus cabré, dont découlent tous les effets."
+    "« Rallonger » les élévateurs arrière fixe le sens du réglage : c'est rendre l'aile plus piquée, donc plus rapide, plus sensible aux fermetures et plus vive au gonflage, pas paresseuse."
   ],
   "N28B": [
-    "« N'ont rien à voir » tombe dès qu'un seul cas contraire existe."
+    "« N'ont rien à voir » n'admet aucune exception : des commandes trop tendues freinent l'aile en permanence et la rapprochent du décrochage, un premier incident pouvant alors en entraîner d'autres."
   ],
   "N29M": [
-    "Trois valeurs à un facteur dix l'une de l'autre, « 10 daN » ou « 1000 daN », se jugent mieux une fois converties en kilos."
+    "Trois valeurs à un facteur dix l'une de l'autre se jugent mieux en kilos : 10 daN, c'est une dizaine de kilos, 1000 daN une tonne. Une fine suspente doit tenir à peu près le poids d'un pilote, cent kilos."
   ],
   "N31M": [
-    "« Élasticité » veut dire capacité à s'étirer, à comparer au faible allongement de la fibre."
+    "« Élasticité » veut dire capacité à s'étirer puis à revenir : une fibre qui s'allonge très peu, comme l'aramide, ne peut donc pas avoir une bonne élasticité."
   ],
   "N34M": [
-    "Deux choix ne diffèrent que d'un numéro des secours : « le 112 » ou « le 118 »."
+    "Deux choix ne diffèrent que d'un numéro, « le 112 » ou « le 118 » : le 112 est le numéro d'urgence européen, le 118 n'est pas un numéro de secours."
   ],
   "N35B": [
-    "Quatre niveaux existent, et tout tient au sens des lettres, de A vers D, dans « le plus accessible est noté D »."
+    "Quatre niveaux existent, et tout tient au sens des lettres : A désigne les ailes les plus tolérantes, D les plus exigeantes, donc le niveau le plus accessible est noté A, pas D."
   ],
   "N36B": [
-    "La négation va jusqu'au bout du choix : « n'est pas obligatoire sur tous les exemplaires »."
+    "La négation porte sur tout le choix, « n'est pas obligatoire sur tous les exemplaires » : le sticker donne au pilote les informations de son aile, donc chaque exemplaire du modèle homologué doit le porter."
   ],
   "N37B": [
-    "« Sans risque » et « n'importe quel pilote » sont deux absolus qu'une norme d'essais devrait garantir à la fois.",
-    "« Quel que soit le harnais » ignore l'effet de la sellette et de ses réglages sur le comportement de l'aile."
+    "« Sans risque » et « n'importe quel pilote » sont deux absolus qu'aucune norme d'essais ne garantit : même une aile classée A demande un pilote formé.",
+    "« Quel que soit le harnais » ignore la sellette : les essais se font avec un réglage de référence, et une autre sellette change le comportement de l'aile."
   ],
   "N38V": [
-    "Convenir aux débutants n'est pas leur être « réservée », un mot qui exclut les autres pilotes."
+    "Convenir aux débutants n'est pas leur être « réservée » : la classe décrit un comportement en vol, et rien n'interdit à un pilote confirmé de voler sous une aile A."
   ],
   "N39M": [
-    "Vendre une aile et lui annoncer un classement sont deux choses, et une seule exige d'avoir passé les tests."
+    "Vendre une aile et lui annoncer un classement sont deux choses : la norme n'est pas obligatoire pour vendre, mais un classement n'existe qu'après avoir passé ses tests."
   ],
   "N40B": [
-    "Le début du choix parle de coût, et la fin dit d'où vient ce prix plus bas : « l'absence de contrôle technique »."
+    "Le début du choix parle de coût, la fin dit d'où vient ce prix bas, « l'absence de contrôle technique » : une vérification en moins ne renseigne en rien sur l'aile, ce qui l'écarte des critères."
   ],
   "N41B": [
-    "« Veut atteindre » vise le niveau espéré, distinct du niveau actuel du pilote."
+    "« Veut atteindre » vise le niveau espéré, pas le niveau actuel : l'aile se pilote avec le niveau d'aujourd'hui, et c'est lui qui guide le choix."
   ],
   "N43B": [
-    "« Obligatoire » est plus fort que « conseillé », et tout tient au cadre qui impose le secours."
+    "« Obligatoire » est plus fort que « conseillé » : il faut savoir quel cadre impose le secours. La compétition FFVL l'impose, une sortie club ne l'impose pas, même si tout pilote devrait l'avoir."
   ],
   "N44B": [
-    "« Ne peut pas » tombe dès qu'un seul cas contraire existe."
+    "« Ne peut pas » n'admet aucune exception : il suffit que des pilotes accrochent le secours aux mêmes mousquetons que l'aile, ce qui se pratique, pour écarter ce choix."
   ],
   "N45B": [
-    "« Chaque » est absolu, mais un mot absolu ne fait basculer un choix que s'il existe un cas contraire."
+    "« Chaque » est absolu, mais un mot absolu n'écarte un choix que si un cas contraire existe : ici aucun, puisque la fermeture du container fait partie de la prévol à chaque vol."
   ],
   "N46M": [
-    "La négation « n'a pas été » change tout le sens du choix, jusqu'à son dernier mot."
+    "La négation « n'a pas été » renverse tout le choix : l'emplacement du secours détermine le geste pour le sortir, donc c'est un critère à prendre en compte pour choisir sa sellette."
   ],
   "N47M": [
-    "La valeur chiffrée « 3 mm » s'applique à une liaison qui encaisse l'ouverture du secours."
+    "La valeur « 3 mm » s'applique à une liaison qui encaisse le choc de l'ouverture du secours : un maillon aussi fin ne convient pas, la liaison se fait avec un maillon bien plus épais."
   ],
   "N48B": [
-    "Deux choix décrivent la même routine annuelle avant le repliage, et seul le geste d'entretien change, dont le « lavage »."
+    "Deux choix décrivent la même routine annuelle avant le repliage, et seul le geste change : aérer défait le tassement du tissu, alors que le « lavage » en machine malmène tissu et suspentes."
   ],
   "N49B": [
-    "La fréquence est celle de l'aération, mais le lieu change : « en vol » ou au sol."
+    "La fréquence ressemble à celle de l'aération, mais le lieu change : le pliage s'éprouve au sol, sous portique, alors que lancer son secours « en vol » sur son site n'est pas un entretien."
   ],
   "N49M": [
-    "Le choix décrit un essai d'homologation réel, et tout tient à la valeur chiffrée de la vitesse, « 50 m/s »."
+    "Le choix décrit un essai d'homologation qui existe, et tout tient au chiffre : le secours chargé est largué et s'ouvre à 40 m/s lors de l'essai, pas à 50 m/s."
   ],
   "N4B": [
-    "Une surface se calcule avec deux longueurs, et « l'épaisseur du profil » se mesure de bas en haut, pas d'avant en arrière."
+    "Une surface se calcule avec deux longueurs dans le même plan : « l'épaisseur du profil » se mesure de bas en haut, pas d'avant en arrière, donc multipliée par l'envergure elle ne donne pas une surface d'aile."
   ],
   "N50B": [
-    "Étudier le secours est une chose, le but annoncé ensuite, « un engagement plus important », en est une autre."
+    "Étudier le secours est une chose, le but annoncé ensuite, « un engagement plus important », en est une autre : avoir un secours ne doit jamais repousser les limites que le pilote se fixe."
   ],
   "N51V": [
     "« Ne … que » restreint, et une restriction peut aussi décrire la prudence demandée.",
