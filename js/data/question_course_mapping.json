@@ -2538,7 +2538,13 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 13,
-    "verifiedAt": "2026-11-03"
+    "verifiedAt": "2026-11-28",
+    "others": [
+      {
+        "course_id": "general/materiel/supair-birdy2-notice",
+        "verifiedPage": 5
+      }
+    ]
   },
   "N15V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -2735,9 +2741,10 @@
     "verifiedAt": "2026-11-07"
   },
   "N38V": {
-    "course_id": "general/passeport-telechargement-web/2012-passeportspeed12-hd/2012-passeportspeed12-hd",
-    "score": 0.1527,
-    "title": "2012 passeportspeed12 hd"
+    "course_id": "general/materiel/supair-birdy2-notice",
+    "title": "Notice d’utilisation d’un parapente : Supair Birdy 2 (EN A)",
+    "verifiedPage": 2,
+    "verifiedAt": "2026-11-28"
   },
   "N39M": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -2917,7 +2924,13 @@
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 14,
-    "verifiedAt": "2026-10-10"
+    "verifiedAt": "2026-11-28",
+    "others": [
+      {
+        "course_id": "general/materiel/supair-birdy2-notice",
+        "verifiedPage": 2
+      }
+    ]
   },
   "N55B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -2939,7 +2952,13 @@
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 14,
-    "verifiedAt": "2026-10-12"
+    "verifiedAt": "2026-11-28",
+    "others": [
+      {
+        "course_id": "general/materiel/supair-evolite2-notice",
+        "verifiedPage": 6
+      }
+    ]
   },
   "N57V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -2961,11 +2980,19 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 155,
-    "verifiedAt": "2026-11-09"
+    "verifiedAt": "2026-11-28",
+    "others": [
+      {
+        "course_id": "general/materiel/supair-evolite2-notice",
+        "verifiedPage": 45
+      }
+    ]
   },
   "N59B": {
-    "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
-    "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit"
+    "course_id": "general/materiel/supair-evolite2-notice",
+    "title": "Notice d’utilisation d’une sellette : Supair Evo Lite 2",
+    "verifiedPage": 45,
+    "verifiedAt": "2026-11-28"
   },
   "N60V": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -5455,7 +5482,13 @@
     "course_id": "brevet-de-pilote---bleu/livrets-pp-2025/cycle2-2025web/cycle2-2025web",
     "title": "Livret Pédagogique - Cycle 02 - Brevet de Pilote",
     "verifiedPage": 10,
-    "verifiedAt": "2026-10-20"
+    "verifiedAt": "2026-11-28",
+    "others": [
+      {
+        "course_id": "general/materiel/supair-birdy2-notice",
+        "verifiedPage": 5
+      }
+    ]
   },
   "W5B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
@@ -5495,7 +5528,13 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 70,
-    "verifiedAt": "2026-11-04"
+    "verifiedAt": "2026-11-28",
+    "others": [
+      {
+        "course_id": "general/materiel/supair-birdy2-notice",
+        "verifiedPage": 6
+      }
+    ]
   },
   "W11B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
@@ -5803,7 +5842,13 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 26,
-    "verifiedAt": "2026-10-11"
+    "verifiedAt": "2026-11-28",
+    "others": [
+      {
+        "course_id": "general/materiel/supair-birdy2-notice",
+        "verifiedPage": 8
+      }
+    ]
   },
   "W48M": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
@@ -5975,11 +6020,15 @@
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
     "title": "Brevet de Pilote Confirmé - Parapente / Delta - Préparation à l’écrit",
     "verifiedPage": 68,
-    "verifiedAt": "2026-10-20",
+    "verifiedAt": "2026-11-28",
     "others": [
       {
         "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
         "verifiedPage": 12
+      },
+      {
+        "course_id": "general/materiel/supair-birdy2-notice",
+        "verifiedPage": 5
       }
     ]
   },
@@ -6041,7 +6090,13 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
     "title": "Livret Pédagogique - Cycle 01 - Brevet Initial",
     "verifiedPage": 13,
-    "verifiedAt": "2026-11-09"
+    "verifiedAt": "2026-11-28",
+    "others": [
+      {
+        "course_id": "general/materiel/supair-birdy2-notice",
+        "verifiedPage": 5
+      }
+    ]
   },
   "W77V": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
