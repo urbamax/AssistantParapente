@@ -2259,9 +2259,10 @@
     ]
   },
   "L5V": {
-    "course_id": "general/2014-livret-ffvl-9bd",
-    "score": 0.0935,
-    "title": "2014 Livret FFVL 9BD"
+    "course_id": "general/materiel/supair-pilot-casque-notice",
+    "title": "Notice d’utilisation d’un casque de vol libre : Supair Pilot (EN 966)",
+    "verifiedPage": 6,
+    "verifiedAt": "2026-11-28"
   },
   "L6B": {
     "course_id": "brevet-de-pilote-confirme---marron/bpc--pp---delta--v-2025-may-",
@@ -3005,13 +3006,25 @@
     "score": 0.1228,
     "title": "Rafales - Effets instantanés des rafales sur l’incidence et la vitesse de vol",
     "verifiedPage": 1,
-    "verifiedAt": "2026-11-19"
+    "verifiedAt": "2026-11-28",
+    "others": [
+      {
+        "course_id": "general/materiel/supair-pilot-casque-notice",
+        "verifiedPage": 6
+      }
+    ]
   },
   "N62V": {
     "course_id": "general/ffvl-textes/charte-efvl-2026",
     "title": "Charte des Écoles Françaises de Vol Libre (EFVL, 2026)",
     "verifiedPage": 4,
-    "verifiedAt": "2026-11-19"
+    "verifiedAt": "2026-11-28",
+    "others": [
+      {
+        "course_id": "general/materiel/supair-pilot-casque-notice",
+        "verifiedPage": 6
+      }
+    ]
   },
   "N63V": {
     "course_id": "general/ffvl-textes/charte-efvl-2026",
