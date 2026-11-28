@@ -3815,7 +3815,13 @@
     "course_id": "treuil/ffvl-dossiertracte-2023",
     "title": "Dossier Tracté FFVL - Treuillage (version 2023)",
     "verifiedPage": 22,
-    "verifiedAt": "2026-11-04"
+    "verifiedAt": "2026-11-28",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/prise-licence-medical-2023",
+        "verifiedPage": 2
+      }
+    ]
   },
   "S29T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -3921,7 +3927,13 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 22,
-    "verifiedAt": "2026-11-07"
+    "verifiedAt": "2026-11-28",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/vademecum-assurance-2024",
+        "verifiedPage": 1
+      }
+    ]
   },
   "S38T": {
     "course_id": "treuil/ffvl-dossiertracte-2023",
@@ -4015,11 +4027,15 @@
     "course_id": "brevet-de-pilote---bleu/affiches-pedagogiques-a3/12-reglementation2025/12-reglementation2025",
     "title": "Réglementation - La division de l’espace aérien",
     "verifiedPage": 1,
-    "verifiedAt": "2026-11-07",
+    "verifiedAt": "2026-11-28",
     "others": [
       {
         "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
         "verifiedPage": 23
+      },
+      {
+        "course_id": "general/ffvl-textes/note-biplace-pro-2026",
+        "verifiedPage": 1
       }
     ]
   },
@@ -4039,7 +4055,13 @@
     "course_id": "brevet-initial---vert/livrets-pp-2025/initiation-2025-web/initiation-2025-web",
     "title": "Livret Pédagogique - Initiation",
     "verifiedPage": 23,
-    "verifiedAt": "2026-11-04"
+    "verifiedAt": "2026-11-28",
+    "others": [
+      {
+        "course_id": "general/ffvl-textes/note-biplace-pro-2026",
+        "verifiedPage": 1
+      }
+    ]
   },
   "S47B": {
     "course_id": "brevet-initial---vert/livrets-pp-2025/cycle1-2025web/cycle1-2025web",
