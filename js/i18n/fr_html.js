@@ -59,8 +59,9 @@ export const FR_HTML = Object.freeze({
     }),
     welcomeScreen: Object.freeze({
         bienvenue: 'Bienvenue',
-        assistantParapenteVousAide:
-            'Assistant Parapente vous aide à choisir où voler, à tenir votre carnet de vol et à préparer la théorie du brevet.',
+        preparezVotreBrevet: 'Préparez votre brevet, tenez votre carnet.',
+        lesQcmOfficielsLesCours:
+            'Les QCM officiels de la FFVL, les cours et votre carnet de vol, réunis au même endroit.',
         quelEstVotreNiveau: 'Quel est votre niveau ?',
         ilAdapteLesQuestions:
             "Il adapte les questions et les cours. Vous pourrez le changer à tout moment en haut de l'écran.",
@@ -72,6 +73,7 @@ export const FR_HTML = Object.freeze({
         piloteConfirme: 'Pilote Confirmé',
         niveauMarron: 'Niveau marron',
         tousLesNiveaux: 'Tous les niveaux',
+        toutLeProgramme: 'Tout le programme',
         parOuCommencer: 'Par où commencer ?',
         sitesDeVol: 'Sites de vol',
         meteoEtVolabiliteDes: 'Météo et volabilité des sites de vol autour de vous.',

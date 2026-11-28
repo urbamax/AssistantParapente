@@ -344,18 +344,56 @@
         <!-- WELCOME SCREEN (toute première visite uniquement) -->
         <div id="welcome-screen" class="mode-screen">
             <div class="welcome-container">
-                <h2 data-i18n="welcomeScreen.bienvenue" class="page-title">Bienvenue</h2>
-                <p data-i18n="welcomeScreen.assistantParapenteVousAide" class="welcome-lead">
-                    Assistant Parapente vous aide à choisir où voler, à tenir votre carnet de vol et à préparer la
-                    théorie du brevet.
-                </p>
+                <header class="welcome-hero">
+                    <p data-i18n="welcomeScreen.bienvenue" class="welcome-eyebrow">Bienvenue</p>
+                    <h2 data-i18n="welcomeScreen.preparezVotreBrevet" class="welcome-title">
+                        Préparez votre brevet, tenez votre carnet.
+                    </h2>
+                    <p data-i18n="welcomeScreen.lesQcmOfficielsLesCours" class="welcome-lead">
+                        Les QCM officiels de la FFVL, les cours et votre carnet de vol, réunis au même endroit.
+                    </p>
+                    <svg
+                        class="welcome-scene"
+                        viewBox="0 0 800 160"
+                        preserveAspectRatio="xMidYMax meet"
+                        aria-hidden="true"
+                        focusable="false"
+                    >
+                        <path
+                            class="welcome-scene-far"
+                            d="M0 120 L90 78 L150 98 L240 46 L330 92 L400 70 L470 104 L560 40 L650 86 L720 66 L800 96 V160 H0 Z"
+                        />
+                        <path
+                            class="welcome-scene-near"
+                            d="M0 142 L110 112 L190 130 L300 96 L390 126 L500 108 L600 134 L700 104 L800 128 V160 H0 Z"
+                        />
+                        <g class="welcome-scene-glider" transform="translate(590 40) rotate(-6) scale(1.5)">
+                            <path class="welcome-scene-wing" d="M-34 0 Q0 -16 34 0 Q0 -8 -34 0 Z" />
+                            <path class="welcome-scene-lines" d="M-32 1 L0 26 L32 1 M-14 -6 L0 26 L14 -6" />
+                            <circle class="welcome-scene-pilot" cx="0" cy="28" r="3" />
+                        </g>
+                    </svg>
+                </header>
 
                 <section class="welcome-step" aria-labelledby="welcome-level-title">
-                    <h3 data-i18n="welcomeScreen.quelEstVotreNiveau" id="welcome-level-title">Quel est votre niveau ?</h3>
-                    <p data-i18n="welcomeScreen.ilAdapteLesQuestions" class="welcome-hint">
-                        Il adapte les questions et les cours. Vous pourrez le changer à tout moment en haut de l'écran.
-                    </p>
-                    <div data-i18n-aria-label="welcomeScreen.ariaLabelNiveauDePilote" class="welcome-levels" role="group" aria-label="Niveau de pilote">
+                    <div class="welcome-step-head">
+                        <span class="welcome-step-num" aria-hidden="true">1</span>
+                        <div>
+                            <h3 data-i18n="welcomeScreen.quelEstVotreNiveau" id="welcome-level-title">
+                                Quel est votre niveau ?
+                            </h3>
+                            <p data-i18n="welcomeScreen.ilAdapteLesQuestions" class="welcome-hint">
+                                Il adapte les questions et les cours. Vous pourrez le changer à tout moment en haut
+                                de l'écran.
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        data-i18n-aria-label="welcomeScreen.ariaLabelNiveauDePilote"
+                        class="welcome-levels"
+                        role="group"
+                        aria-label="Niveau de pilote"
+                    >
                         <button
                             type="button"
                             class="welcome-level"
@@ -365,7 +403,10 @@
                             data-action="changeLevel"
                             data-args="BI"
                         >
-                            <span data-i18n="welcomeScreen.brevetInitial" class="welcome-level-name">Brevet Initial</span>
+                            <span class="welcome-level-dot" aria-hidden="true"></span>
+                            <span data-i18n="welcomeScreen.brevetInitial" class="welcome-level-name"
+                                >Brevet Initial</span
+                            >
                             <span data-i18n="welcomeScreen.niveauVert" class="welcome-level-sub">Niveau vert</span>
                         </button>
                         <button
@@ -377,7 +418,10 @@
                             data-action="changeLevel"
                             data-args="BP"
                         >
-                            <span data-i18n="welcomeScreen.brevetDePilote" class="welcome-level-name">Brevet de Pilote</span>
+                            <span class="welcome-level-dot" aria-hidden="true"></span>
+                            <span data-i18n="welcomeScreen.brevetDePilote" class="welcome-level-name"
+                                >Brevet de Pilote</span
+                            >
                             <span data-i18n="welcomeScreen.niveauBleu" class="welcome-level-sub">Niveau bleu</span>
                         </button>
                         <button
@@ -389,8 +433,13 @@
                             data-action="changeLevel"
                             data-args="BPC"
                         >
-                            <span data-i18n="welcomeScreen.piloteConfirme" class="welcome-level-name">Pilote Confirmé</span>
-                            <span data-i18n="welcomeScreen.niveauMarron" class="welcome-level-sub">Niveau marron</span>
+                            <span class="welcome-level-dot" aria-hidden="true"></span>
+                            <span data-i18n="welcomeScreen.piloteConfirme" class="welcome-level-name"
+                                >Pilote Confirmé</span
+                            >
+                            <span data-i18n="welcomeScreen.niveauMarron" class="welcome-level-sub"
+                                >Niveau marron</span
+                            >
                         </button>
                         <button
                             type="button"
@@ -401,43 +450,97 @@
                             data-action="changeLevel"
                             data-args="ALL"
                         >
-                            <span data-i18n="welcomeScreen.tousLesNiveaux" class="welcome-level-name">Tous les niveaux</span>
+                            <span class="welcome-level-dot welcome-level-dot--all" aria-hidden="true"></span>
+                            <span data-i18n="welcomeScreen.tousLesNiveaux" class="welcome-level-name"
+                                >Tous les niveaux</span
+                            >
+                            <span data-i18n="welcomeScreen.toutLeProgramme" class="welcome-level-sub"
+                                >Tout le programme</span
+                            >
                         </button>
                     </div>
                 </section>
 
                 <section class="welcome-step" aria-labelledby="welcome-start-title">
-                    <h3 data-i18n="welcomeScreen.parOuCommencer" id="welcome-start-title">Par où commencer ?</h3>
+                    <div class="welcome-step-head">
+                        <span class="welcome-step-num" aria-hidden="true">2</span>
+                        <div>
+                            <h3 data-i18n="welcomeScreen.parOuCommencer" id="welcome-start-title">
+                                Par où commencer ?
+                            </h3>
+                        </div>
+                    </div>
                     <div class="welcome-cards">
-                        <button type="button" class="welcome-card" data-requires-role="owner" hidden data-action="navigate" data-args="SITES">
-                            <i class="ri-map-pin-line" aria-hidden="true"></i>
-                            <span data-i18n="welcomeScreen.sitesDeVol" class="welcome-card-title">Sites de vol</span>
-                            <span data-i18n="welcomeScreen.meteoEtVolabiliteDes" data-requires-role="beta" hidden class="welcome-card-text">Météo et volabilité des sites de vol autour de vous.</span>
-                            <span data-i18n="welcomeScreen.carteEtListeDesSites" data-hidden-with-role="beta" class="welcome-card-text">Carte et liste des sites de vol autour de vous.</span>
+                        <button
+                            type="button"
+                            class="welcome-card"
+                            data-requires-role="owner"
+                            hidden
+                            data-action="navigate"
+                            data-args="SITES"
+                        >
+                            <span class="welcome-card-icon" aria-hidden="true"
+                                ><i class="ri-map-pin-line"></i
+                            ></span>
+                            <span data-i18n="welcomeScreen.sitesDeVol" class="welcome-card-title"
+                                >Sites de vol</span
+                            >
+                            <span
+                                data-i18n="welcomeScreen.meteoEtVolabiliteDes"
+                                data-requires-role="beta"
+                                hidden
+                                class="welcome-card-text"
+                                >Météo et volabilité des sites de vol autour de vous.</span
+                            >
+                            <span
+                                data-i18n="welcomeScreen.carteEtListeDesSites"
+                                data-hidden-with-role="beta"
+                                class="welcome-card-text"
+                                >Carte et liste des sites de vol autour de vous.</span
+                            >
+                            <i class="ri-arrow-right-line welcome-card-arrow" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="welcome-card" data-action="navigate" data-args="QCM">
+                            <span class="welcome-card-icon" aria-hidden="true"
+                                ><i class="ri-graduation-cap-line"></i
+                            ></span>
+                            <span data-i18n="welcomeScreen.theorie" class="welcome-card-title">Théorie</span>
+                            <span data-i18n="welcomeScreen.qcmOfficielsFfvlExamens" class="welcome-card-text"
+                                >QCM officiels FFVL, examens blancs et révisions.</span
+                            >
+                            <i class="ri-arrow-right-line welcome-card-arrow" aria-hidden="true"></i>
                         </button>
                         <button type="button" class="welcome-card" data-action="navigate" data-args="LOGBOOK">
-                            <i class="ri-book-2-line" aria-hidden="true"></i>
-                            <span data-i18n="welcomeScreen.carnetDeVol" class="welcome-card-title">Carnet de vol</span>
+                            <span class="welcome-card-icon" aria-hidden="true"><i class="ri-book-2-line"></i></span>
+                            <span data-i18n="welcomeScreen.carnetDeVol" class="welcome-card-title"
+                                >Carnet de vol</span
+                            >
                             <span data-i18n="welcomeScreen.vosVolsLImportDe" class="welcome-card-text"
                                 >Vos vols, l'import de traces .igc et le suivi du matériel.</span
                             >
-                        </button>
-                        <button type="button" class="welcome-card" data-action="navigate" data-args="QCM">
-                            <i class="ri-graduation-cap-line" aria-hidden="true"></i>
-                            <span data-i18n="welcomeScreen.theorie" class="welcome-card-title">Théorie</span>
-                            <span data-i18n="welcomeScreen.qcmOfficielsFfvlExamens" class="welcome-card-text">QCM officiels FFVL, examens blancs et révisions.</span>
+                            <i class="ri-arrow-right-line welcome-card-arrow" aria-hidden="true"></i>
                         </button>
                         <button type="button" class="welcome-card" data-action="navigate" data-args="LIBRARY">
-                            <i class="ri-archive-line" aria-hidden="true"></i>
-                            <span data-i18n="welcomeScreen.bibliotheque" class="welcome-card-title">Bibliothèque</span>
-                            <span data-i18n="welcomeScreen.lesCoursEtLivrets" class="welcome-card-text">Les cours et livrets PDF officiels.</span>
+                            <span class="welcome-card-icon" aria-hidden="true"
+                                ><i class="ri-archive-line"></i
+                            ></span>
+                            <span data-i18n="welcomeScreen.bibliotheque" class="welcome-card-title"
+                                >Bibliothèque</span
+                            >
+                            <span data-i18n="welcomeScreen.lesCoursEtLivrets" class="welcome-card-text"
+                                >Les cours et livrets PDF officiels.</span
+                            >
+                            <i class="ri-arrow-right-line welcome-card-arrow" aria-hidden="true"></i>
                         </button>
                     </div>
                 </section>
 
-                <p data-i18n="welcomeScreen.aucunCompteRequis" class="welcome-privacy">
-                    Aucun compte requis : vos données restent sur cet appareil, sauf si vous vous connectez pour les
-                    synchroniser.
+                <p class="welcome-privacy">
+                    <i class="ri-lock-line" aria-hidden="true"></i>
+                    <span data-i18n="welcomeScreen.aucunCompteRequis"
+                        >Aucun compte requis : vos données restent sur cet appareil, sauf si vous vous connectez
+                        pour les synchroniser.</span
+                    >
                 </p>
             </div>
             <div class="app-footer-placeholder"></div>
